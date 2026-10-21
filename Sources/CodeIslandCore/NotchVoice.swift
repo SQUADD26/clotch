@@ -42,4 +42,25 @@ public struct VoiceStatus: Equatable, Sendable {
         guard i < levels.count - 1 else { return levels[levels.count - 1] }
         return levels[i] + (levels[i + 1] - levels[i]) * f
     }
+
+    // Issue #29: the light must never beat with the syllables. The level goes through a slow filter, then into a narrow,
+    // high band, so the light is always clearly on and only drifts with the phrases.
+    /// The light never drops below this: 0.8 = always clearly visible.
+    public static let minIntensity: Float = 0.8
+    /// Half-width of the filter: a triangle over ±1 s. A jump in the voice rises or falls over ~1 s (10→90%), and any
+    /// beat of 1 s or faster (syllables, words) cancels out. Centred on now: the envelope is known ahead, so it is not late.
+    public static let smoothing: TimeInterval = 1.0
+
+    /// A level 0…1 mapped into the band `minIntensity`…1.
+    public static func intensity(_ level: Float) -> Float { minIntensity + (1 - minIntensity) * level }
+
+    /// The light's brightness at `now`, `minIntensity`…1: the level filtered by a triangle of ±`smoothing`, one tap per `step`.
+    public func intensity(at now: Date) -> Float {
+        let n = max(1, Int((Self.smoothing / step).rounded()))
+        var sum: Float = 0
+        for i in (1 - n)..<n {
+            sum += Float(n - abs(i)) * level(at: now.addingTimeInterval(Double(i) * step))
+        }
+        return Self.intensity(sum / Float(n * n)) // the weights add up to n²
+    }
 }
