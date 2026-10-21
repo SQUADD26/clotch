@@ -156,6 +156,38 @@ final class NotchZoneViewsTests: XCTestCase {
         shown().forEach { $0.close() }
     }
 
+    /// «Non chiudere quando il puntatore esce» attivo: un clic che porta fuori dal notch lo chiude lo stesso (#126).
+    func testClicksLeavingTheNotchCloseItEvenWhenItStaysOpenOnPointerExit() {
+        _ = NSApplication.shared
+        let settings = SettingsManager.shared
+        let before = settings.collapseOnMouseLeave
+        settings.collapseOnMouseLeave = false
+        defer { settings.collapseOnMouseLeave = before }
+        let appState = AppState()
+        let controller = SettingsWindowController.shared
+        controller.appState = appState
+        controller.present = { $0.alphaValue = 0; $0.orderFrontRegardless() }
+        var launched = 0
+        SessionOpener.launch = { _, _ in launched += 1 }
+        defer {
+            NSApp.windows.filter { $0.toolbar?.identifier == "ClotchSettings" }.forEach { $0.close() }
+            SessionOpener.launch = { _, _ in }
+        }
+
+        appState.surface = .sessionList
+        NotchSettingsButton().open()
+        XCTAssertEqual(appState.surface, .collapsed, "the gear closes the notch")
+
+        appState.surface = .sessionList
+        SessionOpener.open(SessionTarget(localId: "local_1b3f4741-928c-4f60-bf7c-984f7219eaee", profile: ""))
+        XCTAssertEqual(launched, 1)
+        XCTAssertEqual(appState.surface, .collapsed, "a session row closes the notch")
+
+        appState.surface = .questionCard(sessionId: "s")
+        NotchExit.close()
+        XCTAssertEqual(appState.surface, .questionCard(sessionId: "s"), "a question waits for its answer")
+    }
+
     func testStaleAccountDrawsNoBars() throws {
         var d = data
         d.accounts = [quota("claudesquadd1@x.it", five: 50, seven: 90, age: 2 * 86_400)]
