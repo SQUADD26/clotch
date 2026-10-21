@@ -178,6 +178,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     }
 
     private var visibilityTimer: Timer?
+    private var autoScreenPoller: Timer?
     private var fullscreenPoller: Timer?
     private var isSessionObservationArmed = false
     private var goalsObservation: AnyCancellable?
@@ -333,6 +334,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
         // Observe settings changes (display choice, panel height)
         observeSettingsChanges()
+        configureAutoScreenPolling()
 
         // Global click monitor: close panel + repost click when clicking outside
         globalClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
@@ -482,6 +484,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
                 if newChoice != self.lastDisplayChoice {
                     self.lastDisplayChoice = newChoice
                     self.refreshCurrentScreen(forceRebuild: true)
+                    self.configureAutoScreenPolling()
                 } else if newHeightMode != self.lastNotchHeightMode
                     || abs(newCustomHeight - self.lastCustomNotchHeight) > 0.001 {
                     self.lastNotchHeightMode = newHeightMode
@@ -494,6 +497,24 @@ class PanelWindowController: NSObject, NSWindowDelegate {
             }
         }
         settingsObservers.append(observer)
+    }
+
+    private func configureAutoScreenPolling() {
+        autoScreenPoller?.invalidate()
+        autoScreenPoller = nil
+
+        guard SettingsManager.shared.displayChoice == "auto" else { return }
+
+        // Screen-parameter / Space-change / frontmost-app notifications already cover the
+        // common cases. This poller is a fallback for the rare path where a window is
+        // dragged to another display without switching focus — a low cadence is enough
+        // and every tick runs a full CGWindowListCopyWindowInfo, which was measurably
+        // contributing to Energy Impact (#92).
+        autoScreenPoller = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshCurrentScreen()
+            }
+        }
     }
 
     private func updatePosition() {
@@ -706,6 +727,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     }
 
     deinit {
+        autoScreenPoller?.invalidate()
         fullscreenPoller?.invalidate()
         for observer in settingsObservers {
             NotificationCenter.default.removeObserver(observer)

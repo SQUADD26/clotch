@@ -115,7 +115,7 @@ public enum GoalSources {
     // MARK: Helpers
 
     static let sessionKeys: Set<String> = ["scheduledTaskId", "cliSessionId", "spawnedFrom", "sessionId",
-                                           "priorRemoteCliSessionIds", "title", "isRunning", "isArchived", "lastActivityAt"]
+                                           "priorRemoteCliSessionIds", "title", "isRunning", "isArchived", "lastActivityAt", "prs"]
 
     /// A top-level JSON object with only `keys` parsed; every other value is skipped byte by byte, never built.
     /// nil when the object is malformed or truncated (a file caught mid-write).
