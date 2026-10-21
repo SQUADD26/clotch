@@ -75,7 +75,7 @@ struct Pager<Page: View, Footer: View>: View {
     }
 }
 
-/// The page dots with ‹ › on each side; a button is off on the first or last page.
+/// The page dots (at most 4, sliding with the page) with ‹ › on each side; a button is off on the first or last page.
 struct PageControl: View {
     let count: Int
     let index: Int
@@ -85,7 +85,7 @@ struct PageControl: View {
         HStack(spacing: 10) {
             arrow("chevron.left", to: index - 1, help: "Pagina precedente")
             HStack(spacing: 5) {
-                ForEach(0..<count, id: \.self) { i in
+                ForEach(PageDots.window(count: count, index: index), id: \.self) { i in
                     Capsule()
                         .fill(i == index ? GoalInk.primary : GoalInk.track)
                         .frame(width: 14, height: 3.5)

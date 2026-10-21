@@ -1,7 +1,7 @@
 import SwiftUI
 import CodeIslandCore
 
-/// The Requests tab: Roberto's requests, 5 per page, struck through once a session takes them in charge.
+/// The Requests tab: Roberto's requests, waiting ones first, 5 per page, struck through once a session takes them in charge.
 struct RequestsTab: View {
     let requests: [UserRequest]
     /// False until the requests register exists on this Mac.
@@ -10,7 +10,8 @@ struct RequestsTab: View {
     static let perPage = 5
 
     init(requests: [UserRequest], active: Bool, startPage: Int = 0) {
-        self.requests = requests
+        // Waiting ones first: they are what Roberto still has to see move.
+        self.requests = requests.filter { !$0.taken } + requests.filter(\.taken)
         self.active = active
         _page = State(initialValue: startPage)
     }
