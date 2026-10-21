@@ -1,7 +1,7 @@
 import SwiftUI
 import CodeIslandCore
 
-/// The Requests tab: Roberto's requests, waiting ones first, 5 per page, struck through once a session takes them in charge.
+/// The Requests tab: the requests no session has taken in charge yet, 5 per page. A taken one leaves the list.
 struct RequestsTab: View {
     let requests: [UserRequest]
     /// False until the requests register exists on this Mac.
@@ -10,26 +10,24 @@ struct RequestsTab: View {
     static let perPage = 5
 
     init(requests: [UserRequest], active: Bool, startPage: Int = 0) {
-        // Waiting ones first: they are what Roberto still has to see move.
-        self.requests = requests.filter { !$0.taken } + requests.filter(\.taken)
+        self.requests = UserRequest.waiting(requests)
         self.active = active
         _page = State(initialValue: startPage)
     }
 
     var body: some View {
-        let taken = requests.filter(\.taken).count
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 IconLabel(symbol: "tray", text: "Richieste")
                 Spacer()
                 if !requests.isEmpty {
-                    Text("\(requests.count) in tutto · \(taken) \(taken == 1 ? "presa" : "prese") in carico")
+                    Text("\(requests.count) in attesa")
                         .font(NotchType.label)
                         .foregroundStyle(GoalInk.secondary)
                 }
             }
             if requests.isEmpty {
-                EmptyState(text: "Nessuna richiesta", detail: active ? nil : "Arrivano con il prossimo aggiornamento.")
+                EmptyState(text: "Nessuna richiesta in attesa", detail: active ? nil : "Arrivano con il prossimo aggiornamento.")
             } else {
                 let pages = (requests.count + Self.perPage - 1) / Self.perPage
                 let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
@@ -78,21 +76,20 @@ private struct RequestLine: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RequestMark(taken: request.taken)
+            RequestMark(taken: false)
             Text(request.text)
                 .font(NotchType.line)
-                .strikethrough(request.taken, color: GoalInk.quiet)
-                .foregroundStyle(request.taken ? GoalInk.quiet : GoalInk.row)
+                .foregroundStyle(GoalInk.row)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text(request.taken ? "Presa in carico" : "In attesa")
-                .font(request.taken ? NotchType.smallEmphasis : NotchType.small)
-                .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.quiet)
+            Text("In attesa")
+                .font(NotchType.small)
+                .foregroundStyle(GoalInk.quiet)
         }
         .frame(height: 20)
         .help(request.original)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(request.text + (request.taken ? ". Presa in carico" : ". In attesa"))
+        .accessibilityLabel(request.text + ". In attesa")
     }
 }
 

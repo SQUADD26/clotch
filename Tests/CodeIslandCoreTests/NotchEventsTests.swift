@@ -20,6 +20,16 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.goals(old: new, new: new), [])
     }
 
+    func testHoldGrowsWithTextWithinBounds() {
+        XCTAssertEqual(NotchEvents.hold(forText: ""), NotchEvents.minHold)
+        XCTAssertEqual(NotchEvents.hold(forText: "Barra le richieste"), NotchEvents.minHold, "short text: the minimum")
+        let medium = NotchEvents.hold(forText: String(repeating: "a", count: 60))
+        XCTAssertGreaterThan(medium, NotchEvents.minHold)
+        XCTAssertLessThan(medium, NotchEvents.maxHold)
+        XCTAssertGreaterThan(medium, NotchEvents.hold(forText: String(repeating: "a", count: 45)), "longer text: longer")
+        XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 500)), NotchEvents.maxHold, "capped")
+    }
+
     func testProposedGoalAnnouncesNothing() {
         var still = row("p", .still(since: t), done: 1)
         still.proposed = true

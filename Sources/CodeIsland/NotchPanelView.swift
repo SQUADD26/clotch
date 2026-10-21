@@ -342,6 +342,7 @@ struct NotchPanelView: View {
                 // reminders count as "reading this card" — whatever the
                 // hover then does to the surface below.
                 appState.followUps.pointerOverIsland = hovering
+                notifier.pointerOver = hovering
                 // Idle indicator hover — delay un-hover to prevent oscillation when
                 // the animated width change crosses the mouse position (#52).
                 if showIdleIndicator {
