@@ -156,6 +156,10 @@ final class NotchCustomizeWindowController {
     static let shared = NotchCustomizeWindowController()
     private var window: NSWindow?
 
+    func applyAppearance() {
+        window?.appearance = AppearanceChoice.read().nsAppearance
+    }
+
     func show() {
         if let window {
             window.makeKeyAndOrderFront(nil)
@@ -169,7 +173,7 @@ final class NotchCustomizeWindowController {
             defer: false
         )
         window.title = L10n.shared["customize_notch"]
-        window.appearance = NSAppearance(named: .darkAqua)
+        window.appearance = AppearanceChoice.read().nsAppearance
         window.contentView = NSHostingView(rootView: NotchCustomizeView(onDone: { [weak self] in self?.window?.close() }))
         window.isReleasedWhenClosed = false
         window.center()

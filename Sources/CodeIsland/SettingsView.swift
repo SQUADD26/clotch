@@ -329,6 +329,7 @@ private struct SidebarRow: View {
 private struct GeneralPage: View {
     @ObservedObject private var l10n = L10n.shared
     @AppStorage(SettingsKey.displayChoice) private var displayChoice = SettingsDefaults.displayChoice
+    @AppStorage(SettingsKey.windowAppearance) private var windowAppearance = AppearanceChoice.dark.rawValue
     @AppStorage(SettingsKey.allowHorizontalDrag) private var allowHorizontalDrag = SettingsDefaults.allowHorizontalDrag
     @AppStorage(SettingsKey.avoidMenuBarIcons) private var avoidMenuBarIcons = SettingsDefaults.avoidMenuBarIcons
     @State private var launchAtLogin: Bool
@@ -350,6 +351,15 @@ private struct GeneralPage: View {
                     Text("한국어").tag("ko")
                     Text("Türkçe").tag("tr")
                     Text("Italiano").tag("it")
+                }
+                Picker(l10n["window_appearance"], selection: $windowAppearance) {
+                    Text(l10n["appearance_dark"]).tag(AppearanceChoice.dark.rawValue)
+                    Text(l10n["appearance_light"]).tag(AppearanceChoice.light.rawValue)
+                    Text(l10n["appearance_system"]).tag(AppearanceChoice.system.rawValue)
+                }
+                .onChange(of: windowAppearance) { _, _ in
+                    SettingsWindowController.shared.applyAppearance()
+                    NotchCustomizeWindowController.shared.applyAppearance()
                 }
                 Toggle(l10n["launch_at_login"], isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, v in
