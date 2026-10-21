@@ -35,4 +35,12 @@ final class NotchPagingTests: XCTestCase {
         XCTAssertNil(s.feed(dx: -1, phase: .wheel, at: t0.addingTimeInterval(0.1)))
         XCTAssertEqual(s.feed(dx: 1, phase: .wheel, at: t0.addingTimeInterval(0.5)), -1)
     }
+
+    func testDotWindowSlidesAndStaysInRange() {
+        XCTAssertEqual(PageDots.window(count: 3, index: 2), 0..<3)
+        XCTAssertEqual(PageDots.window(count: 13, index: 0), 0..<4)
+        XCTAssertEqual(PageDots.window(count: 13, index: 6), 4..<8)
+        XCTAssertEqual(PageDots.window(count: 13, index: 12), 9..<13)
+        for i in 0..<13 { XCTAssertTrue(PageDots.window(count: 13, index: i).contains(i)) }
+    }
 }

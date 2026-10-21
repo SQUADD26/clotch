@@ -7,6 +7,8 @@ struct AccountsTab: View {
     @ObservedObject var feed: AccountQuotaFeed
     @ObservedObject var inUse: AccountsInUseFeed
     let now: Date
+    @State private var page = 0
+    static let perPage = 6
 
     var body: some View {
         let accounts = feed.accounts
@@ -22,11 +24,18 @@ struct AccountsTab: View {
             if accounts.isEmpty {
                 EmptyState(text: feed.lastFetchFailed ? "Uso non disponibile" : "Caricando...")
             } else {
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                    ForEach(accounts) { account in
-                        AccountCard(account: account, name: repeated.contains(account.label) ? account.email : account.label,
-                                    inUse: inUse.emails.contains(account.email), now: now)
+                // Paged like the other tabs, so many accounts never make the notch taller than 3 rows.
+                let pages = (accounts.count + Self.perPage - 1) / Self.perPage
+                let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
+                Pager(count: pages, index: index) { p in
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                        ForEach(accounts.dropFirst(p * Self.perPage).prefix(Self.perPage)) { account in
+                            AccountCard(account: account, name: repeated.contains(account.label) ? account.email : account.label,
+                                        inUse: inUse.emails.contains(account.email), now: now)
+                        }
                     }
+                } footer: { go in
+                    if pages > 1 { PageControl(count: pages, index: index.wrappedValue, go: go) }
                 }
                 if let age = staleness {
                     Text(age).font(NotchType.label).foregroundStyle(GoalInk.secondary)
