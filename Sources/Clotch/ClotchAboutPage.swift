@@ -12,7 +12,7 @@ struct ClotchAboutPage: View {
             AppLogoView(size: 96)
             Text("clotch").font(.system(size: 20, weight: .semibold)).padding(.top, 12)
             Text(String(format: l10n["version_number"], AppVersion.current)).font(.system(size: 11)).foregroundStyle(.secondary)
-            Group {
+            VStack(spacing: 6) {
                 Text(l10n["about_desc1"])
                 Text(l10n["about_desc2"])
             }

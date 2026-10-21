@@ -117,13 +117,16 @@ struct NotchCustomizeView: View {
 
     // MARK: Palette
 
+    /// The palette's order, as the design: notch elements first, then the accounts and sessions.
+    private static let paletteOrder: [NotchElement] = [.goalRings, .activeGoal, .pendingRequests, .accounts, .accountsWide, .workingSessions]
+
     private var palette: some View {
         Grid(horizontalSpacing: 12, verticalSpacing: 16) {
-            ForEach(Array(stride(from: 0, to: NotchElement.allCases.count, by: 3)), id: \.self) { start in
+            ForEach(Array(stride(from: 0, to: Self.paletteOrder.count, by: 3)), id: \.self) { start in
                 GridRow {
-                    ForEach(NotchElement.allCases[start..<min(start + 3, NotchElement.allCases.count)], id: \.self) { element in
+                    ForEach(Self.paletteOrder[start..<min(start + 3, Self.paletteOrder.count)], id: \.self) { element in
                         VStack(spacing: 6) {
-                            NotchElementSample(element: element)
+                            NotchElementSample(element: element).fixedSize()
                             Text(l10n["notch_el_\(element.rawValue)"]).font(.system(size: 11))
                         }
                         .frame(maxWidth: .infinity)
