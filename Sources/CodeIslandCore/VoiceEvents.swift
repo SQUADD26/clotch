@@ -25,45 +25,75 @@ public struct VoiceEvent: Equatable, Sendable {
 
     public let kind: Kind
     public let at: Date
+    public var id = ""        // "e-xxxxxxxx" in eventi.jsonl; "" for a derived event
     public var session = ""   // cli id; "" = not tied to a session (an account, a custom alert): «Parla per» lets it through
+    public var localId = ""   // `local_…` of the Claude app
+    public var role = ""      // master | figlia | overseer | "" (unknown: «Parla per» uses the session file)
     public var subject = ""   // what it is about, in plain words: the key of «no duplicates»
     public var text = ""
-    public var proof = ""
-    public var level = ""     // `livello`: "alto" / "urgente" goes ahead of its kind
+    public var proof = ""     // for the eye: never said out loud
+    public var level = "normale"  // alto | normale
+    public var judged: Bool? = nil  // `giudizio` already written by claude-config: not judged again
 
-    public init(kind: Kind, at: Date, session: String = "", subject: String = "", text: String = "", proof: String = "", level: String = "") {
-        self.kind = kind; self.at = at; self.session = session; self.subject = subject; self.text = text; self.proof = proof; self.level = level
+    public init(kind: Kind, at: Date, session: String = "", subject: String = "", text: String = "", proof: String = "", level: String? = nil) {
+        self.kind = kind; self.at = at; self.session = session; self.subject = subject; self.text = text; self.proof = proof
+        self.level = level ?? kind.level
     }
 
-    /// What Haiku turns into one spoken line: cleaned for the ear, cut like a turn's report.
+    /// What Haiku turns into one spoken line: cleaned for the ear, cut like a turn's report. The proof stays out (#1854).
     public var report: String {
-        var r = "\(kind.label): \(text.isEmpty ? subject : text)"
-        if !proof.isEmpty { r += "\nProva: \(proof)" }
-        return VoiceTurn.cut(VoiceClean.clean(String(r.prefix(VoiceTurn.maxRaw))), VoiceTurn.maxSpoken)
+        VoiceTurn.cut(VoiceClean.clean(String("\(kind.label): \(text.isEmpty ? subject : text)".prefix(VoiceTurn.maxRaw))), VoiceTurn.maxSpoken)
     }
 
-    var urgent: Bool { ["alto", "urgente", "alta"].contains(level.lowercased()) }
+    var urgent: Bool { level == "alto" }
+}
+
+extension VoiceEvent.Kind {
+    /// The `livello` claude-config gives each type (#1854).
+    var level: String { [.goalBlocked, .question, .risk].contains(self) ? "alto" : "normale" }
 }
 
 public enum VoiceEvents {
-    /// One line of eventi.jsonl: `{t, tipo, sessione: {cli, local_id, titolo}, soggetto, testo, prova, livello}`.
+    /// One line of eventi.jsonl (contract: claude-config `global/skills/overseer/eventi.md`, v 1):
+    /// `{v, id, t, tipo, livello, sessione: {cli, local_id, titolo, ruolo}, soggetto, testo, prova, giudizio?}`.
     /// nil for a broken line or a type the voice does not say.
     public static func parse(line: Substring) -> VoiceEvent? {
         guard let o = (try? JSONSerialization.jsonObject(with: Data(line.utf8))) as? [String: Any],
-              let kind = VoiceEvent.Kind(rawValue: o["tipo"] as? String ?? "") else { return nil }
-        let s = o["sessione"]
-        let cli = (s as? [String: Any])?["cli"] as? String ?? s as? String ?? ""
-        return VoiceEvent(kind: kind, at: GoalSources.date(o["t"]) ?? Date(), session: cli, subject: o["soggetto"] as? String ?? "",
-                          text: o["testo"] as? String ?? "", proof: o["prova"] as? String ?? "", level: o["livello"] as? String ?? "")
+              let kind = VoiceEvent.Kind(rawValue: o["tipo"] as? String ?? ""), let at = GoalSources.date(o["t"]) else { return nil }
+        let s = o["sessione"] as? [String: Any] ?? [:]
+        var e = VoiceEvent(kind: kind, at: at, session: s["cli"] as? String ?? "", subject: o["soggetto"] as? String ?? "",
+                           text: o["testo"] as? String ?? "", proof: o["prova"] as? String ?? "", level: o["livello"] as? String)
+        e.id = o["id"] as? String ?? ""
+        e.localId = s["local_id"] as? String ?? ""
+        e.role = s["ruolo"] as? String ?? ""
+        e.judged = verdict(o["giudizio"])
+        return e
     }
 
-    /// The events of the bytes appended since `offset`; a last line without its newline waits for the next read.
-    /// Returns the new offset. A file shorter than `offset` was rewritten: read from the start.
-    public static func appended(_ data: Data, from offset: Int) -> (events: [VoiceEvent], offset: Int) {
-        let start = offset <= data.count ? offset : 0
-        guard let end = data[start...].lastIndex(of: UInt8(ascii: "\n")) else { return ([], start) }
-        let text = String(decoding: data[start..<end], as: UTF8.self)
-        return (text.split(separator: "\n").compactMap(parse(line:)), end + 1)
+    /// `giudizio` as a yes or no: a bool, «sì»/«no» at the start of a text, or an object with `avvisa` / `si`. nil = none.
+    static func verdict(_ v: Any?) -> Bool? {
+        if let b = v as? Bool { return b }
+        if let o = v as? [String: Any] { return verdict(o["avvisa"] ?? o["si"] ?? o["esito"]) }
+        guard let t = (v as? String)?.lowercased().trimmingCharacters(in: .whitespaces), !t.isEmpty else { return nil }
+        if t.hasPrefix("no") { return false }
+        return ["sì", "si", "yes", "true"].contains { t.hasPrefix($0) } ? true : nil
+    }
+
+    /// Where the reader stopped: the `t` and `id` of the last event seen, never a byte offset (the file is rewritten
+    /// with its last 200 lines past 512 KB).
+    public struct Mark: Equatable, Sendable { public var at: Date; public var id: String }
+
+    /// The events after `mark`, and the new mark. A last line without its newline waits for the next read.
+    /// `mark` nil = the launch: nothing is old news to say, only the mark is taken.
+    public static func newer(_ data: Data, after mark: Mark?) -> (events: [VoiceEvent], mark: Mark?) {
+        var text = String(decoding: data, as: UTF8.self)
+        if !text.hasSuffix("\n") { text = String(text[..<(text.lastIndex(of: "\n").map { text.index(after: $0) } ?? text.startIndex)]) }
+        let all = text.split(separator: "\n").compactMap(parse(line:))
+        let last = all.last.map { Mark(at: $0.at, id: $0.id) } ?? mark
+        guard let mark else { return ([], last) }
+        // The mark's line still there: what follows it. Gone (rewritten): what is newer than it.
+        if !mark.id.isEmpty, let i = all.lastIndex(where: { $0.id == mark.id }) { return (Array(all[(i + 1)...]), last) }
+        return (all.filter { $0.at > mark.at }, last)
     }
 
     // MARK: Derived from what Clotch reads (no eventi.jsonl)
@@ -95,21 +125,17 @@ public enum VoiceEvents {
         }
     }
 
-    public static let riskThresholds: [Double] = [80, 90]
-
-    /// An account window that crossed 80 % or 90 % since the last reading (`before` nil = baseline).
+    /// An account window that reached its threshold since the last reading (#1854: 80 % of the 5 hours, 90 % of the week).
+    /// `before` nil = baseline.
     public static func quotas(before: [AccountQuota]?, after: [AccountQuota], now: Date) -> [VoiceEvent] {
         guard let before else { return [] }
         let was = Dictionary(before.map { ($0.email, $0) }, uniquingKeysWith: { a, _ in a })
         var out: [VoiceEvent] = []
         for a in after where !a.stale(now) {
-            for (name, w, old) in [("5 ore", a.fiveHour, was[a.email]?.fiveHour), ("7 giorni", a.sevenDay, was[a.email]?.sevenDay)] {
-                guard let used = w.usedNow(now) else { continue }
-                let prior = old?.usedNow(now) ?? 0
-                guard let crossed = riskThresholds.last(where: { prior < $0 && used >= $0 }) else { continue }
+            for (name, limit, w, old) in [("5 ore", 80.0, a.fiveHour, was[a.email]?.fiveHour), ("settimana", 90.0, a.sevenDay, was[a.email]?.sevenDay)] {
+                guard let used = w.usedNow(now), used >= limit, (old?.usedNow(now) ?? 0) < limit else { continue }
                 out.append(VoiceEvent(kind: .risk, at: now, subject: "Account \(a.label), \(name)",
-                                      text: "L'account \(a.label) ha usato il \(Int(used)) per cento delle \(name)",
-                                      level: crossed >= 90 ? "alto" : ""))
+                                      text: "L'account \(a.label) ha usato il \(Int(used)) per cento della \(name == "5 ore" ? "finestra di 5 ore" : name)"))
             }
         }
         return out
