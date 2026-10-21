@@ -15,6 +15,8 @@ final class GlobalHotKeyManager {
     private struct Entry {
         let ref: EventHotKeyRef
         let handler: () -> Void
+        /// Only for a hotkey that is held (push to talk): runs when the key goes up.
+        let onRelease: (() -> Void)?
     }
 
     /// FourCharCode signature shared by every hotkey we register. The per-hotkey
@@ -46,6 +48,11 @@ final class GlobalHotKeyManager {
     /// fails (e.g. the combo is already owned by another app).
     @discardableResult
     func register(keyCode: UInt16, modifiers: NSEvent.ModifierFlags, handler: @escaping () -> Void) -> Bool {
+        registerID(keyCode: keyCode, modifiers: modifiers, handler: handler) != nil
+    }
+
+    /// Like `register`, but gives back the id so that one hotkey can be released alone (`unregister(id:)`), e.g. Esc while a dictation is open.
+    func registerID(keyCode: UInt16, modifiers: NSEvent.ModifierFlags, onRelease: (() -> Void)? = nil, handler: @escaping () -> Void) -> UInt32? {
         installHandlerIfNeeded()
 
         let id = nextID
@@ -63,10 +70,15 @@ final class GlobalHotKeyManager {
         )
         guard status == noErr, let ref else {
             Self.log.warning("RegisterEventHotKey failed (status \(status)) for keyCode \(keyCode)")
-            return false
+            return nil
         }
-        entries[id] = Entry(ref: ref, handler: handler)
-        return true
+        entries[id] = Entry(ref: ref, handler: handler, onRelease: onRelease)
+        return id
+    }
+
+    func unregister(id: UInt32) {
+        guard let entry = entries.removeValue(forKey: id) else { return }
+        UnregisterEventHotKey(entry.ref)
     }
 
     /// Unregister every hotkey and remove the shared Carbon event handler.
@@ -82,16 +94,16 @@ final class GlobalHotKeyManager {
     }
 
     /// Dispatch a fired hotkey to its handler. Called from the C trampoline.
-    fileprivate func handle(id: UInt32) {
-        entries[id]?.handler()
+    fileprivate func handle(id: UInt32, released: Bool) {
+        if released { entries[id]?.onRelease?() } else { entries[id]?.handler() }
     }
 
     private func installHandlerIfNeeded() {
         guard eventHandler == nil else { return }
-        var spec = EventTypeSpec(
-            eventClass: OSType(kEventClassKeyboard),
-            eventKind: UInt32(kEventHotKeyPressed)
-        )
+        var specs = [
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
+        ]
         // Pass `self` as the user-data context so the C trampoline can route
         // back to this instance without a global. Unretained: the manager owns
         // the handler and tears it down in unregisterAll/deinit.
@@ -99,8 +111,8 @@ final class GlobalHotKeyManager {
         InstallEventHandler(
             GetApplicationEventTarget(),
             globalHotKeyEventHandler,
-            1,
-            &spec,
+            specs.count,
+            &specs,
             context,
             &eventHandler
         )
@@ -135,10 +147,11 @@ private func globalHotKeyEventHandler(
 
     let manager = Unmanaged<GlobalHotKeyManager>.fromOpaque(userData).takeUnretainedValue()
     let id = hotKeyID.id
+    let released = GetEventKind(event) == UInt32(kEventHotKeyReleased)
     // Carbon delivers on the main run loop already, but hop explicitly so the
     // handler can touch @MainActor UI state safely.
     DispatchQueue.main.async {
-        manager.handle(id: id)
+        manager.handle(id: id, released: released)
     }
     return noErr
 }

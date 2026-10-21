@@ -128,14 +128,20 @@ enum GoalSnapshot {
                                     voice: (VoiceStatus.intensity(level), t / VoiceEdgeLook.period)) { EmptyView() },
                              "17-voce-\(Int(t))s")
                 }
+                // #110: every state of the voice-in pill with its light on the outline, named like the Figma notes.
+                for (name, input) in VoiceInputController.stills {
+                    try save(island(width: NotchSize.note, radius: NotchSpace.noteRadius, light: input.light) {
+                        VoiceInputPill(input: input)
+                    }, "21-pill-\(name)")
+                }
                 // AFK (#106), with the Figma's examples: the moon off and on, the closed sign, the summary long, short and empty.
-                try save(open(.goals, afkOn: false) { GoalsTab(rows: store.rows, now: store.now) }, "21-afk-aperto-spento")
-                try save(open(.goals, afkOn: true, afk: 4) { GoalsTab(rows: store.rows, now: store.now) }, "22-afk-aperto-acceso")
-                try save(island(width: closedWidth, radius: 12, afk: 4) { EmptyView() }, "23-afk-chiuso-acceso")
+                try save(open(.goals, afkOn: false) { GoalsTab(rows: store.rows, now: store.now) }, "22-afk-aperto-spento")
+                try save(open(.goals, afkOn: true, afk: 4) { GoalsTab(rows: store.rows, now: store.now) }, "23-afk-aperto-acceso")
+                try save(island(width: closedWidth, radius: 12, afk: 4) { EmptyView() }, "24-afk-chiuso-acceso")
                 for (name, report) in [("riepilogo", AfkSample.summary), ("lista-lunga", AfkSample.long), ("niente", AfkSample.nothing)] {
                     try save(island(width: openWidth, radius: NotchSpace.radius) {
                         AfkSummaryView(report: report, animated: false, dismiss: {})
-                    }, "24-afk-\(name)")
+                    }, "25-afk-\(name)")
                 }
                 print("snapshot: the no-notch centre comes with #5")
                 try SettingsSnapshot.save(into: dir)
@@ -178,7 +184,7 @@ enum GoalSnapshot {
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
-                                            afk: Int? = nil, expanded: Bool = false, voice: (level: Float, phase: Double)? = nil,
+                                            afk: Int? = nil, expanded: Bool = false, voice: (level: Float, phase: Double)? = nil, light: VoiceInputController.Light = .off,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
@@ -195,6 +201,9 @@ enum GoalSnapshot {
         .frame(width: width)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
         .overlay {
+            if light != .off {
+                VoiceInputLightLive(light: light, shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous))
+            }
             if let voice {
                 VoiceGlow(shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous),
                           level: voice.level, phase: voice.phase)
