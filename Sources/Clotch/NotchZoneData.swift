@@ -25,6 +25,9 @@ struct NotchZoneData {
     var noticeShort: String?
     /// The account bars ask for their card without the pointer: `--snapshot --gallery` draws it this way.
     var accountsCardOpen = false
+    /// AFK on (#106): things done since; nil = off. Open, the sign also says it in words.
+    var afk: Int?
+    var expanded = false
 
     /// The accounts in use here, in the dashboard's «next to use» order.
     var accountsInUse: [AccountQuota] { accounts.filter { inUse.contains($0.email) } }

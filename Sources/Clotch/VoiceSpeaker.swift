@@ -93,6 +93,7 @@ final class VoiceSpeaker {
 
     /// One piece of news the engine let through. The rules of the moment it is said: switch, key, muted session, daily caps.
     func say(_ event: VoiceEvent) async {
+        guard !AfkFiles().isOn else { return }  // AFK (#106): Clotch is silent while Roberto is away
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
         // No canonical prompt from the config (#84): silent, never a copy of it.
@@ -119,6 +120,12 @@ final class VoiceSpeaker {
     private func lastTopic() -> String {
         guard let data = try? Data(contentsOf: files.lastURL) else { return "" }
         return ((try? JSONSerialization.jsonObject(with: data)) as? [String: Any])?["argomento"] as? String ?? ""
+    }
+
+    /// The AFK summary on return (#106): its sentence as written, no Haiku; only with the switch on and a key.
+    func sayAloud(_ text: String) async {
+        guard files.isOn, let key = files.key else { return }
+        _ = await speak(text, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key)
     }
 
     /// «Prova voce»: one fixed sentence, no Haiku, even with the switch off.
