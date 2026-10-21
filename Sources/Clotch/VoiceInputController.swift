@@ -42,6 +42,18 @@ final class VoiceInputController: ObservableObject {
         return (config.engine == .scribe ? "ElevenLabs" : "Parakeet") + " · " + name
     }
 
+    /// `--snapshot --gallery` only: a controller held at one state of the pill, for the Figma comparison.
+    static func still(_ phase: Phase, sure: String = "", maybe: String = "", levels: [Double] = [], elapsed: TimeInterval = 0) -> VoiceInputController {
+        let c = VoiceInputController()
+        c.phase = phase
+        c.sure = sure
+        c.maybe = maybe
+        if !levels.isEmpty { c.levels = levels }
+        c.startedAt = Date().addingTimeInterval(-elapsed)
+        c.sendingSince = Date().addingTimeInterval(-elapsed)
+        return c
+    }
+
     let files = VoiceFiles()
     var config = VoiceInput.Config([:])
     private let local = LocalTranscriber()
