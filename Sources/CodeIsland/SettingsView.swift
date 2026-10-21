@@ -12,6 +12,7 @@ enum SettingsPage: String, Identifiable, Hashable {
     case appearance
     case mascots
     case sound
+    case voice
     case shortcuts
     case remote
     case hooks
@@ -28,6 +29,7 @@ enum SettingsPage: String, Identifiable, Hashable {
         case .appearance: return "paintbrush.fill"
         case .mascots: return "person.2.fill"
         case .sound: return "speaker.wave.2.fill"
+        case .voice: return "waveform"
         case .shortcuts: return "command.circle.fill"
         case .remote: return "network"
         case .hooks: return "link.circle.fill"
@@ -44,6 +46,7 @@ enum SettingsPage: String, Identifiable, Hashable {
         case .appearance: return .blue
         case .mascots: return .pink
         case .sound: return .green
+        case .voice: return .teal
         case .shortcuts: return .indigo
         case .remote: return .mint
         case .hooks: return .purple
@@ -60,7 +63,7 @@ private struct SidebarGroup: Hashable {
 
 // Clotch shows only its own pages (#30); the CodeIsland pages stay compiled, off the sidebar.
 private let sidebarGroups: [SidebarGroup] = [
-    SidebarGroup(title: nil, pages: [.notch, .about]),
+    SidebarGroup(title: nil, pages: [.notch, .voice, .about]),
 ]
 
 // MARK: - Main View
@@ -104,6 +107,7 @@ struct SettingsView: View {
                 case .appearance: AppearancePage()
                 case .mascots: MascotsPage()
                 case .sound: SoundPage()
+                case .voice: VoiceSettingsPage()
                 case .shortcuts: ShortcutsPage()
                 case .remote: RemoteHostsPage()
                 case .hooks: HooksPage(appState: appState)
