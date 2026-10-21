@@ -7,7 +7,7 @@ import CodeIslandCore
 // MARK: - Tone (traffic light)
 
 /// The three colours of the traffic light. Calm system-like hues, legible on black.
-private enum GoalTone {
+enum GoalTone {
     case go, wait, stop
 
     var color: Color {
@@ -19,7 +19,7 @@ private enum GoalTone {
     }
 }
 
-private extension GoalRow {
+extension GoalRow {
     var tone: GoalTone {
         switch status {
         case .moving, .reached: return .go
@@ -72,7 +72,7 @@ private extension GoalRow {
 // MARK: - Bar
 
 /// Fill = declared proofs done / declared proofs. `nil` draws the bare track: never an invented fill.
-private struct GoalBar: View {
+struct GoalBar: View {
     let progress: Double?
     let tone: GoalTone
     let height: CGFloat
@@ -190,6 +190,36 @@ private struct GoalRowView: View {
 
 // MARK: - Expanded list
 
+/// The rows without the scroll view: the expanded list uses it, and so does `--snapshot`
+/// (ImageRenderer does not draw ScrollView content).
+struct GoalRowsList: View {
+    let rows: [GoalRow]
+    let now: Date
+
+    var body: some View {
+        VStack(spacing: 18) {
+            ForEach(rows) { row in
+                GoalRowView(row: row, now: now)
+            }
+        }
+        .padding(.horizontal, 22)
+        .padding(.top, 14)
+        .padding(.bottom, 18)
+    }
+}
+
+struct GoalsEmptyState: View {
+    var body: some View {
+        Text("Nessun obiettivo aperto")
+            .font(.system(size: 12))
+            .foregroundStyle(Color.white.opacity(0.5))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 22)
+            .padding(.vertical, 18)
+    }
+}
+
+
 /// The whole expanded body: replaces the session list. Scrolls inside `maxHeight`.
 struct GoalsNotchView: View {
     let maxHeight: CGFloat
@@ -202,88 +232,15 @@ struct GoalsNotchView: View {
     var body: some View {
         let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
         if store.rows.isEmpty {
-            Text("Nessun obiettivo aperto")
-                .font(.system(size: 12))
-                .foregroundStyle(Color.white.opacity(0.5))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 22)
-                .padding(.vertical, 18)
+            GoalsEmptyState()
         } else {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 18) {
-                    ForEach(store.rows) { row in
-                        GoalRowView(row: row, now: store.now)
-                    }
-                }
-                .padding(.horizontal, 22)
-                .padding(.top, 14)
-                .padding(.bottom, 18)
+                GoalRowsList(rows: store.rows, now: store.now)
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
             }
             .frame(height: listHeight)
             .animation(motion, value: listHeight)
             .animation(motion, value: store.rows.map { $0.id })
         }
-    }
-}
-
-// MARK: - Collapsed and header wings
-
-/// Left wing: collapsed = one tiny bar per goal (up to 4), expanded = the section title.
-struct GoalsLeftWing: View {
-    let expanded: Bool
-    @ObservedObject private var store = GoalStore.shared
-
-    var body: some View {
-        Group {
-            if expanded {
-                Text("Obiettivi")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.6))
-            } else if !store.rows.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(Array(store.rows.prefix(4))) { row in
-                        GoalBar(progress: row.progress, tone: row.tone, height: 3)
-                            .frame(width: 24)
-                    }
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(store.rows.count) obiettivi aperti")
-            }
-        }
-        .padding(.leading, 10)
-    }
-}
-
-/// Right wing: collapsed = sessions running now across all goals (nothing at 0),
-/// expanded = the quit button, the only control kept from the old header.
-struct GoalsRightWing: View {
-    let expanded: Bool
-    @ObservedObject private var store = GoalStore.shared
-
-    private var running: Int { store.rows.reduce(0) { $0 + $1.runningCount } }
-
-    var body: some View {
-        Group {
-            if expanded {
-                GoalsQuitButton()
-            } else if running > 0 {
-                Text("\(running)")
-                    .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                    .foregroundStyle(Color.white.opacity(0.85))
-                    .help("\(running) in corso")
-            }
-        }
-        .padding(.trailing, 10)
-    }
-}
-
-private struct GoalsQuitButton: View {
-    @StateObject private var quit = QuitConfirmation()
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        QuitConfirmButton(confirmation: quit)
-            .animation(reduceMotion ? nil : NotchAnimation.micro, value: quit.isArmed)
     }
 }

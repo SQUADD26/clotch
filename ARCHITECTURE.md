@@ -19,13 +19,14 @@ Real time: FSEvents on these folders; a 30 s tick only re-evaluates time-based s
 - `Sources/CodeIslandCore/GoalBoard.swift`: pure logic, goal → progress, traffic light, reason, session pulses. Tests in `Tests/CodeIslandCoreTests/GoalBoardTests.swift`.
 - `Sources/CodeIslandCore/GoalSources.swift`: parses and reads the files above.
 - `Sources/CodeIsland/GoalStore.swift`: FSEvents watcher, publishes rows to the UI.
-- `Sources/CodeIsland/GoalsNotchView.swift`: the goal rows inside CodeIsland's notch (`NotchPanelView.swift`, `PanelWindowController.swift`).
+- `Sources/CodeIsland/GoalsNotchView.swift` and `GoalsNotchWings.swift`: the goal rows and the collapsed wings inside CodeIsland's notch (`NotchPanelView.swift`, `PanelWindowController.swift`).
 - Everything else under `Sources/` is CodeIsland code kept for the shell; most of it is not reached at launch.
 - `android-watch/`, `ios/`, `windows/`, `hardware/`, `apple-companion/`: CodeIsland companions, not built or used by goal-notch.
 
 ## Build
 - Swift package (`Package.swift`, macOS 14+, Sparkle and Yams via SwiftPM).
 - `./build.sh` on a Mac with Xcode: `swift build -c release --arch arm64`, then assembles `.build/release/CodeIsland.app` (executable name stays `CodeIsland`), ad-hoc signed unless `SIGN_ID` or a Developer ID is found.
+- `CodeIsland.app/Contents/MacOS/CodeIsland --snapshot <dir>` renders the real goal view (collapsed and expanded) from the live register to PNG and quits: the check where screen capture is not allowed (`GoalSnapshot.swift`).
 - Linux sandboxes cannot build the app. They can run the goal logic tests: `bash scripts/test-goals-linux.sh`.
 
 ## Domains, ports, machines

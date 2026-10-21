@@ -3,7 +3,7 @@ import Combine
 import CoreServices
 import CodeIslandCore
 
-private typealias GoalSnapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState])
+private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState])
 
 /// Watches the goal register, the live-state folder and Claude Desktop's session store with one
 /// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`.
@@ -13,13 +13,13 @@ private typealias GoalSnapshot = (goals: [GoalRecord], sessions: [DesktopSession
 private final class GoalWatcher: @unchecked Sendable {
     private let queue = DispatchQueue(label: "goal.store.watcher", qos: .utility)
     private let home: URL
-    private let onLoad: @Sendable (GoalSnapshot) -> Void
+    private let onLoad: @Sendable (GoalDiskData) -> Void
     private let coalesce: TimeInterval = 0.15
     private var stream: FSEventStreamRef?
     private var pending: DispatchWorkItem?
     private var prefixes: [String] = []
 
-    init(home: URL, onLoad: @escaping @Sendable (GoalSnapshot) -> Void) {
+    init(home: URL, onLoad: @escaping @Sendable (GoalDiskData) -> Void) {
         self.home = home
         self.onLoad = onLoad
     }
@@ -102,7 +102,7 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Refreshed on every reload and every 30 s tick; views compute "since …" against this.
     @Published private(set) var now: Date = Date()
 
-    private var snapshot: GoalSnapshot = ([], [], [])
+    private var snapshot: GoalDiskData = ([], [], [])
     private var watcher: GoalWatcher?
     private var timer: Timer?
 
@@ -122,7 +122,12 @@ private final class GoalWatcher: @unchecked Sendable {
         timer = t
     }
 
-    private func apply(_ snap: GoalSnapshot) {
+    /// One synchronous read of the disk, for `--snapshot` (no watcher, no timer).
+    func loadNow() {
+        apply(GoalSources.load(GoalSources.defaultPaths(home: FileManager.default.homeDirectoryForCurrentUser)))
+    }
+
+    private func apply(_ snap: GoalDiskData) {
         snapshot = snap
         refresh()
     }
