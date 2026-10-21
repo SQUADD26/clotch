@@ -1,0 +1,165 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "42:48321",
+  "nome": "riga senza risposta (ritaglio di 42-45145: in Figma non è un frame)",
+  "w": 508,
+  "h": 54
+ },
+ "variabili": {},
+ "nodi": [
+  {
+   "id": "42:48321",
+   "nome": "riga senza risposta",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 508,
+    "h": 54
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffd60a1f",
+    "cornerRadius 12",
+    "topLeftRadius 12",
+    "topRightRadius 12",
+    "bottomLeftRadius 12",
+    "bottomRightRadius 12"
+   ]
+  },
+  {
+   "id": "42:48323",
+   "nome": "punto interrogativo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16.5,
+    "y": 19,
+    "w": 9,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffd60a",
+    "fontSize 15"
+   ],
+   "testo": "?"
+  },
+  {
+   "id": "42:48324",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 10,
+    "w": 310,
+    "h": 17
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffffffeb",
+    "fontSize 14"
+   ],
+   "testo": "Come riavvio il notch se si blocca?"
+  },
+  {
+   "id": "42:48325",
+   "nome": "quante volte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 31,
+    "w": 310,
+    "h": 13
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffffff8c",
+    "fontSize 11"
+   ],
+   "testo": "Chiesta 3 volte · ieri · a Clotch: correzioni notch"
+  },
+  {
+   "id": "42:51782",
+   "nome": "bottone Sollecita",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 412,
+    "y": 16,
+    "w": 84,
+    "h": 22
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffffff1f",
+    "cornerRadius 11",
+    "topLeftRadius 11",
+    "topRightRadius 11",
+    "bottomLeftRadius 11",
+    "bottomRightRadius 11"
+   ]
+  },
+  {
+   "id": "42:51781",
+   "nome": "testo Sollecita",
+   "tipo": "TEXT",
+   "box": {
+    "x": 440,
+    "y": 20,
+    "w": 46,
+    "h": 13
+   },
+   "variabili": {},
+   "senza": [
+    "fills #ffffffeb",
+    "fontSize 11"
+   ],
+   "testo": "Sollecita"
+  },
+  {
+   "id": "42:51783",
+   "nome": "icona Sollecita",
+   "tipo": "FRAME",
+   "box": {
+    "x": 422,
+    "y": 21,
+    "w": 12,
+    "h": 12
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "42:51784",
+   "nome": "Vector",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 423,
+    "y": 22,
+    "w": 10,
+    "h": 10
+   },
+   "variabili": {},
+   "senza": [
+    "strokes #ffffffeb",
+    "strokeWeight 1"
+   ]
+  },
+  {
+   "id": "42:51785",
+   "nome": "Vector",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 427.5,
+    "y": 22,
+    "w": 5.5,
+    "h": 5.5
+   },
+   "variabili": {},
+   "senza": [
+    "strokes #ffffffeb",
+    "strokeWeight 1"
+   ]
+  }
+ ]
+}
