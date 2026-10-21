@@ -91,7 +91,9 @@ enum NotchType {
 
 /// One spring for everything that moves in the notch; Reduce Motion swaps it for a short fade.
 enum NotchMotion {
-    static let spring = Animation.spring(response: 0.38, dampingFraction: 0.86)
+    /// The family's damping: the shell's open spring uses it too (`NotchAnimation.open`).
+    static let damping = 0.86
+    static let spring = Animation.spring(response: 0.38, dampingFraction: damping)
     static let still = Animation.easeOut(duration: 0.15)
 
     static func animation(reduce: Bool) -> Animation { reduce ? still : spring }

@@ -10,6 +10,13 @@ public enum GoalDecision {
     public static func acceptArguments(_ row: GoalRow, home: String) -> [String]? { arguments("conferma", row, home) }
     public static func rejectArguments(_ row: GoalRow, home: String) -> [String]? { arguments("rifiuta", row, home) }
 
+    /// Roberto writes the goal himself (#36): `conferma --sessione ID "testo"` makes the text the fixed goal, signed
+    /// «da roberto», no proposal first. nil when there is nothing new to write.
+    public static func writeArguments(_ row: GoalRow, text: String, home: String) -> [String]? {
+        let t = text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        return t.isEmpty || (t == row.goal && !row.proposed) ? nil : [home + "/.claude/hooks/obiettivo-guard.py", "conferma", "--sessione", row.id, t]
+    }
+
     private static func arguments(_ command: String, _ row: GoalRow, _ home: String) -> [String]? {
         row.proposal.map { _ in [home + "/.claude/hooks/obiettivo-guard.py", command, "--sessione", row.id] }
     }

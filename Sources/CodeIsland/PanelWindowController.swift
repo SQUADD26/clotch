@@ -1,4 +1,5 @@
 import AppKit
+import CodeIslandCore
 import Combine
 import SwiftUI
 import os.log
@@ -124,11 +125,12 @@ enum PanelHeightMetrics {
 @MainActor
 class PanelWindowController: NSObject, NSWindowDelegate {
     private enum ScreenHopMetrics {
-        static let outgoingOffset: CGFloat = 18
-        static let incomingOffset: CGFloat = 30
-        static let fadeOutDuration: TimeInterval = 0.14
-        static let incomingPauseDuration: TimeInterval = 0.06
-        static let fadeInDuration: TimeInterval = 0.34
+        // No vertical offset: with screens stacked, a frame nudged up bleeds onto the screen above (#35).
+        static let outgoingOffset: CGFloat = 0
+        static let incomingOffset: CGFloat = 0
+        static let fadeOutDuration: TimeInterval = 0.08
+        static let incomingPauseDuration: TimeInterval = 0
+        static let fadeInDuration: TimeInterval = 0.18
     }
 
     nonisolated static func screenHopMotion() -> PanelScreenHopMotion {
@@ -465,6 +467,8 @@ class PanelWindowController: NSObject, NSWindowDelegate {
                         Task { @MainActor [weak self] in
                             self?.lastChosenScreenSignature = targetSignature
                             self?.isAnimatingScreenHop = false
+                            // The pointer may have moved on while the hop ran: catch up now (#35).
+                            self?.refreshCurrentScreen()
                         }
                     }
                 }
@@ -513,11 +517,10 @@ class PanelWindowController: NSObject, NSWindowDelegate {
         }
         guard SettingsManager.shared.displayChoice == ScreenDetector.followMouseChoice else { return }
 
-        mouseMoveMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] _ in
+        mouseMoveMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] _ in
             guard let self, !self.mouseHopPending else { return }
             let pointer = NSEvent.mouseLocation
-            guard !self.mouseScreenFrame.contains(pointer),
-                  NSScreen.screens.contains(where: { $0.frame.contains(pointer) }) else { return }
+            guard !NotchScreenPick.isOn(pointer, self.mouseScreenFrame) else { return }
             self.mouseHopPending = true
             Task { @MainActor [weak self] in
                 self?.mouseHopPending = false

@@ -94,6 +94,33 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
     }
 
+    func testTitleIsRealTextNeverATag() {
+        func title(_ testo: String, _ originale: String = "") -> String {
+            let json = try! JSONSerialization.data(withJSONObject: ["id": "Q-1", "testo": testo, "originale": originale])
+            return GoalSources.parseRequest(json)!.text
+        }
+        XCTAssertEqual(title("Correggere   notch"), "Correggere notch", "the short title, spaces collapsed")
+        XCTAssertEqual(title("<system-reminder>Attribution…</system-reminder>\nAprire tunnel Cloudflare"), "Aprire tunnel Cloudflare")
+        XCTAssertEqual(title("<system-reminder>", "Aprire tunnel\nper colleghi"), "Aprire tunnel", "the original gives its first line")
+        XCTAssertEqual(title("<system-reminder>", "<system-reminder>x</system-reminder>\n\nAprire tunnel"), "Aprire tunnel",
+                       "an unclosed tag in the short title: the first real line of the original")
+        XCTAssertEqual(title(#"<pasted_content id="a">log</pasted_content> Guarda questo"#), "Guarda questo")
+        XCTAssertEqual(title("<system-reminder>", "<system-reminder>solo tag"), "una richiesta", "nothing real left")
+    }
+
+    func testLookStrikesOnlyWhenDone() {
+        func look(_ stato: String) -> UserRequest.Look {
+            GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "\#(stato)"}"#))!.look
+        }
+        XCTAssertEqual(look("nuova"), .waiting)
+        XCTAssertEqual(look("presa"), .working)
+        XCTAssertFalse(look("presa").struck, "taken = at work, not struck (#39)")
+        XCTAssertEqual(look("presa").label, "Presa in carico")
+        XCTAssertEqual(look("fatta"), .done)
+        XCTAssertTrue(look("fatta").struck)
+        XCTAssertEqual(look("fatta").label, "Fatta")
+    }
+
     // MARK: folders
 
     func testLoadReadsRequestsAndSkipsTempFiles() throws {
