@@ -1,56 +1,54 @@
 import SwiftUI
 import CodeIslandCore
 
-// The notch shows goals only: one row per open goal, read from GoalStore.
-// Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
+// Shared pieces of the goal notch (Figma A2 «Vetro smerigliato»): what a goal's state reads as,
+// its colour, and the bar and ring that draw its proofs. Copy is plain Italian literals (L10n has no
+// Italian table); app-copy rules.
 
 extension GoalRow {
-    var tone: GoalTone {
+    /// A2's colours: yellow while work is under way, green once reached or every proof is done,
+    /// red when blocked, grey when still or only proposed. Colour is never the only signal: the
+    /// status word (`statusText`) always goes with it.
+    var color: Color {
+        if proposed { return GoalInk.secondary }
         switch status {
-        case .moving, .reached: return .go
-        case .still: return .wait
-        case .blocked: return .stop
+        case .reached: return GoalTone.go.color
+        case .blocked: return GoalTone.stop.color
+        case .still: return GoalInk.secondary
+        case .moving: return proofsTotal > 0 && proofsDone == proofsTotal ? GoalTone.go.color : GoalTone.wait.color
         }
     }
 
-    /// Shape for the state, so colour is never the only signal: play, pause, stop, done.
-    var symbol: String {
+    /// The status label (app-copy: adjective or participle, no verbs).
+    func statusText(now: Date) -> String {
+        if proposed { return "Proposto" }
         switch status {
-        case .moving: return "play.fill"
-        case .still: return "pause.fill"
-        case .blocked: return "stop.fill"
-        case .reached: return "checkmark"
+        case .moving: return "In corso"
+        case .still(let since): return "Fermo da " + Self.elapsed(from: since, to: now)
+        case .blocked: return "Bloccato"
+        case .reached: return "Raggiunto"
         }
+    }
+
+    /// The register's reason for a blocked goal, without its "BLOCCATO:" prefix.
+    var blockedReason: String? {
+        guard case .blocked(let reason) = status else { return nil }
+        var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.uppercased().hasPrefix("BLOCCATO:") { text = String(text.dropFirst(9)).trimmingCharacters(in: .whitespaces) }
+        return text.isEmpty ? nil : text
     }
 
     /// The goal text under the title, unless the title already is it.
     var hasSubtitle: Bool { !goal.isEmpty && goal != title }
-    /// A proposed goal is drawn quiet: grey, never a traffic light.
-    var ink: Color { proposed ? GoalInk.secondary : tone.color }
     var runningCount: Int { pulses.filter { $0.running }.count }
 
     var sessionsText: String {
-        let n = pulses.count
-        return "\(n) \(n == 1 ? "sessione attiva" : "sessioni attive"), \(runningCount) in corso"
+        let n = runningCount
+        return n == 0 ? "Nessuna sessione al lavoro" : "\(n) \(n == 1 ? "sessione" : "sessioni") al lavoro"
     }
 
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
-
-    /// The one line shown only when the goal is not green, or not accepted yet.
-    func reason(now: Date) -> String? {
-        if proposed { return "Proposto" }
-        switch status {
-        case .moving, .reached:
-            return nil
-        case .still(let since):
-            return "Fermo da " + Self.elapsed(from: since, to: now)
-        case .blocked(let reason):
-            var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
-            // The register stores the reason as "BLOCCATO: …".
-            if text.uppercased().hasPrefix("BLOCCATO:") { text = String(text.dropFirst(9)).trimmingCharacters(in: .whitespaces) }
-            return text.isEmpty ? "Bloccato" : text
-        }
-    }
+    var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
     static func elapsed(from start: Date, to end: Date) -> String {
         let minutes = max(1, Int(end.timeIntervalSince(start) / 60))
@@ -59,23 +57,33 @@ extension GoalRow {
         return "\(minutes / (24 * 60)) g"
     }
 
+    /// «Dalle 13:44» today, «Dal 20 ott» before.
+    var sinceText: String? {
+        guard let since else { return nil }
+        return Calendar.current.isDateInToday(since)
+            ? "Dalle " + since.formatted(.dateTime.hour().minute())
+            : "Dal " + since.formatted(.dateTime.day().month(.abbreviated))
+    }
+
     func accessibilityText(now: Date) -> String {
         var parts = [title]
         if hasSubtitle { parts.append(goal) }
-        if proofsTotal > 0 { parts.append("\(proofsDone) prove su \(proofsTotal)") } else { parts.append("Nessuna prova dichiarata") }
-        if case .reached = status { parts.append("Raggiunto") }
-        else if let r = reason(now: now) { parts.append(r) }
-        else { parts.append("In corso") }
-        if !pulses.isEmpty { parts.append(sessionsText) }
+        parts.append(proofsSentence)
+        parts.append(statusText(now: now))
+        if let blockedReason { parts.append(blockedReason) }
+        parts.append(sessionsText)
         return parts.joined(separator: ". ")
     }
 }
 
 extension Array where Element == GoalRow {
-    /// The goal being chased now (`GoalBoard.chased`). The rest keep GoalBoard's
-    /// order (blocked, then still, then moving), so trouble stays on top right under it.
+    /// The goal being chased now (`GoalBoard.chased`).
     var hero: GoalRow? { GoalBoard.chased(self) }
-    var allPulses: [GoalPulse] { flatMap(\.pulses) }
+    /// The chased goal first, then GoalBoard's order: the order of the rings and of the goal pages.
+    var heroFirst: [GoalRow] {
+        guard let hero else { return self }
+        return [hero] + filter { $0.id != hero.id }
+    }
 
     func accessibilitySummary(now: Date) -> String {
         guard let hero else { return "Nessun obiettivo aperto" }
@@ -83,95 +91,90 @@ extension Array where Element == GoalRow {
     }
 }
 
-// MARK: - Bar
+// MARK: - Bar and ring
 
-/// Fill = declared proofs done / declared proofs. `nil` draws the bare track: never an invented fill.
-/// The same bar draws account usage, with its own colour.
+/// Fill = declared proofs done / declared proofs, or an account's usage. `nil` draws the bare track:
+/// never an invented fill.
 struct GoalBar: View {
     let progress: Double?
     let color: Color
-    let height: CGFloat
+    var height: CGFloat = 4
+    var vertical = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(progress: Double?, tone: GoalTone, height: CGFloat) {
-        self.init(progress: progress, color: tone.color, height: height)
+    var body: some View {
+        GeometryReader { geo in
+            let length = vertical ? geo.size.height : geo.size.width
+            // Never shorter than thick, so a first proof reads as a bar, not a dot.
+            let fill = progress.map { $0 > 0 ? max(height, length * CGFloat(Swift.min($0, 1))) : 0 } ?? 0
+            ZStack(alignment: vertical ? .bottom : .leading) {
+                Capsule().fill(GoalInk.track)
+                Capsule().fill(color)
+                    .frame(width: vertical ? nil : fill, height: vertical ? fill : nil)
+            }
+        }
+        .frame(width: vertical ? height : nil, height: vertical ? nil : height)
+        .animation(NotchMotion.spring(reduced: reduceMotion), value: progress)
     }
+}
 
-    init(progress: Double?, color: Color, height: CGFloat) {
-        self.progress = progress
-        self.color = color
-        self.height = height
+/// A goal's proofs as a ring: the arc is the share done; no declared proofs is the bare track.
+struct GoalRing: View {
+    let row: GoalRow
+    var size: CGFloat = 13
+    var line: CGFloat = 2
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var share: Double {
+        if case .reached = row.status { return 1 }
+        return row.progress ?? 0
     }
 
     var body: some View {
-        let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                Capsule().fill(GoalInk.track)
-                if let progress, progress > 0 {
-                    // Never narrower than tall, so a first proof reads as a bar, not a dot.
+        ZStack {
+            Circle().stroke(GoalInk.track, lineWidth: line)
+            Circle()
+                .trim(from: 0, to: share)
+                .stroke(row.color, style: StrokeStyle(lineWidth: line, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+        }
+        .padding(line / 2)
+        .frame(width: size, height: size)
+        .animation(NotchMotion.spring(reduced: reduceMotion), value: share)
+    }
+}
+
+/// A status word on a wash of its own colour («In corso»).
+struct StatusPill: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(NotchType.label)
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(color.opacity(0.18)))
+    }
+}
+
+/// Page dots: the current one long and bright.
+struct PageDots: View {
+    let count: Int
+    let current: Int
+
+    var body: some View {
+        if count > 1 {
+            HStack(spacing: 6) {
+                ForEach(0..<count, id: \.self) { i in
                     Capsule()
-                        .fill(color)
-                        .frame(width: max(height, geo.size.width * CGFloat(min(progress, 1))))
+                        .fill(Color.white.opacity(i == current ? 0.9 : 0.3))
+                        .frame(width: 14, height: 3)
                 }
             }
-        }
-        .frame(height: height)
-        .animation(motion, value: progress)
-        .animation(motion, value: color)
-    }
-}
-
-// MARK: - Sessions
-
-/// How many sessions a goal has, with Apple's own "live" symbol: green and moving while at least one
-/// runs a turn, quiet otherwise. Nothing when the goal has no session.
-struct SessionsLive: View {
-    let row: GoalRow
-    var size: CGFloat = 11.5
-    /// The number alone, for tight columns; the tooltip and VoiceOver keep the full sentence.
-    var compact = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var text: String {
-        let n = row.pulses.count
-        if compact { return "\(n)" }
-        let sessions = "\(n) \(n == 1 ? "sessione" : "sessioni")"
-        return row.runningCount > 0 ? sessions + ", \(row.runningCount) in corso" : sessions
-    }
-
-    var body: some View {
-        if !row.pulses.isEmpty {
-            let live = row.runningCount > 0
-            HStack(spacing: 4) {
-                Image(systemName: "waveform")
-                    .font(.system(size: size - 1, weight: .semibold))
-                    .foregroundStyle(live ? GoalTone.go.color : GoalInk.secondary)
-                    .symbolEffect(.variableColor.iterative, isActive: live && !reduceMotion)
-                Text(text)
-                    .font(.system(size: size, weight: .medium).monospacedDigit())
-                    .foregroundStyle(live ? GoalInk.primary : GoalInk.secondary)
-                    .contentTransition(.numericText())
-            }
-            .fixedSize()
-            .help(row.sessionsText)
-        }
-    }
-}
-
-/// The state shape plus the reason, in the tone colour. Shown only when the goal is not green.
-struct GoalReason: View {
-    let row: GoalRow
-    let now: Date
-    var size: CGFloat = 11.5
-
-    var body: some View {
-        if let reason = row.reason(now: now) {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: row.symbol).font(.system(size: size - 3, weight: .bold))
-                Text(reason).font(.system(size: size, weight: .medium)).lineLimit(1).truncationMode(.tail)
-            }
-            .foregroundStyle(row.tone.color)
+            .accessibilityHidden(true)
         }
     }
 }

@@ -19,11 +19,28 @@ enum GoalTone {
     }
 }
 
-/// Text levels on black. Secondary stays at 0.62 so 11pt text keeps AA contrast.
+/// Text levels on the dark frosted glass. Secondary stays at 0.62 so 11pt text keeps AA contrast.
 enum GoalInk {
     static let primary = Color.white.opacity(0.94)
     static let secondary = Color.white.opacity(0.62)
-    static let track = Color.white.opacity(0.14)
+    static let track = Color.white.opacity(0.18)
+    /// Surfaces inside the glass (tab bar, account cards): lighter washes, never glass on glass.
+    static let well = Color.white.opacity(0.08)
+    static let selected = Color.white.opacity(0.16)
+
+    /// Account usage, as A2 draws it: green with room, yellow from half, red from 90 %.
+    static func usage(_ used: Double?) -> Color {
+        guard let used else { return secondary }
+        return used >= 90 ? GoalTone.stop.color : used >= 50 ? GoalTone.wait.color : GoalTone.go.color
+    }
+}
+
+// MARK: - Motion
+
+/// One spring for every motion of the notch (A2: «una sola molla per tutto»). Reduce Motion: a short fade.
+enum NotchMotion {
+    static var spring: Animation { NotchAnimation.open }
+    static func spring(reduced: Bool) -> Animation { reduced ? .easeOut(duration: 0.18) : spring }
 }
 
 // MARK: - Scale
@@ -40,7 +57,7 @@ enum NotchSpace {
     static let figureColumn: CGFloat = 40  // a right-aligned figure: fits «100%» and «12/12» in NotchType.numbers
 }
 
-/// One type scale (macOS text styles in points): 11 labels, 12 secondary, 13 body, 15 title, 22 figure.
+/// One type scale (macOS text styles in points): 11 labels, 12 secondary, 13 body, 15 title, 19 goal, 22 figure.
 enum NotchType {
     static let label = Font.system(size: 11, weight: .semibold)
     static let caption = Font.system(size: 11, weight: .medium)
@@ -49,6 +66,8 @@ enum NotchType {
     static let body = Font.system(size: 13)
     static let bodyEmphasis = Font.system(size: 13, weight: .medium)
     static let title = Font.system(size: 15, weight: .semibold)
+    static let heroTitle = Font.system(size: 19, weight: .semibold)  // SF Pro Text up to 19 pt (A2)
+    static let tab = Font.system(size: 13, weight: .medium)
     static let figure = Font.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit()
     static let figureUnit = Font.system(size: 13, weight: .medium, design: .rounded).monospacedDigit()
 }

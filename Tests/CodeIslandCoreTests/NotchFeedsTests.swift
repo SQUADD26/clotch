@@ -92,6 +92,8 @@ final class NotchFeedsTests: XCTestCase {
                        "nuova -> presa, born and taken between loads, straight to fatta")
         XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: ["a"]), ["fast", "c"], "a shown id never repeats")
         XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
+        XCTAssertEqual(UserRequest.newlyArrived(before: nil, after: first), [], "launch is the baseline")
+        XCTAssertEqual(UserRequest.newlyArrived(before: first, after: second), ["b"], "new and still waiting only")
     }
 
     // MARK: folders

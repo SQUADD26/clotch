@@ -29,6 +29,13 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
         let was = Dictionary(before.map { ($0.id, $0.taken) }, uniquingKeysWith: { a, _ in a })
         return after.filter { $0.taken && was[$0.id] != true && !shown.contains($0.id) }.map(\.id)
     }
+
+    /// Ids of requests that appeared since the previous load and still wait: «arrivata». Launch is the baseline.
+    public static func newlyArrived(before: [UserRequest]?, after: [UserRequest]) -> [String] {
+        guard let before else { return [] }
+        let known = Set(before.map(\.id))
+        return after.filter { !$0.taken && !known.contains($0.id) }.map(\.id)
+    }
 }
 
 extension GoalSources {

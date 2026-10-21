@@ -120,10 +120,11 @@ private final class GoalWatcher: @unchecked Sendable {
     @Published private(set) var rows: [GoalRow] = []
     /// Newest first; empty until the Overseer writes ~/.claude/richieste.
     @Published private(set) var requests: [UserRequest] = []
-    /// Requests that just went nuova -> presa/fatta, oldest first. The view plays «presa in carico» once
-    /// for each, then calls `takenAnimationShown(id)`; a shown id never comes back while the app runs.
-    @Published private(set) var takenToAnimate: [String] = []
-    private var takenShown: Set<String> = []
+    /// Requests just arrived (nuova) or just taken in charge (nuova -> presa/fatta), oldest first. The notch
+    /// plays each once, then calls `requestNewsShown(_:)`; a shown one never comes back while the app runs.
+    @Published private(set) var requestNews: [NotchEvent] = []
+    /// Requests whose «presa in carico» was played or is queued: never twice.
+    private var takenAnnounced: Set<String> = []
     /// False until ~/.claude/richieste exists (the register ships with a config promotion): the view
     /// then says the section is not active yet instead of «no requests».
     @Published private(set) var requestsFolderExists = false
@@ -159,19 +160,21 @@ private final class GoalWatcher: @unchecked Sendable {
 
     private func apply(_ snap: GoalDiskData) {
         snapshot = snap
-        let fresh = UserRequest.newlyTaken(before: requestsLoaded ? requests : nil, after: snap.requests,
-                                           shown: takenShown.union(takenToAnimate))
+        let before = requestsLoaded ? requests : nil
+        let taken = UserRequest.newlyTaken(before: before, after: snap.requests, shown: takenAnnounced)
+        takenAnnounced.formUnion(taken)
+        let fresh = UserRequest.newlyArrived(before: before, after: snap.requests).map { NotchEvent(kind: .requestArrived, subject: $0, count: 0) }
+            + taken.map { NotchEvent(kind: .requestTaken, subject: $0, count: 0) }
         requestsLoaded = true
         let exists = FileManager.default.fileExists(atPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude/richieste").path)
         if exists != requestsFolderExists { requestsFolderExists = exists }
-        if !fresh.isEmpty { takenToAnimate += fresh }
+        if !fresh.isEmpty { requestNews += fresh }
         if snap.requests != requests { requests = snap.requests }
         refresh()
     }
 
-    func takenAnimationShown(_ id: String) {
-        takenShown.insert(id)
-        takenToAnimate.removeAll { $0 == id }
+    func requestNewsShown(_ event: NotchEvent) {
+        requestNews.removeAll { $0 == event }
     }
 
     private func refresh(tick: Bool = false) {

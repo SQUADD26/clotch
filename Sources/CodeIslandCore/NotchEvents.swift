@@ -1,10 +1,10 @@
 import Foundation
 
-// What the collapsed notch announces about goals: a change between two loads. Requests taken in
-// charge come from GoalStore.takenToAnimate. Pure: the caller keeps the previous load and passes both.
+// What the collapsed notch announces about goals: a change between two loads. Requests arrived or
+// taken in charge come from GoalStore.requestNews. Pure: the caller keeps the previous load and passes both.
 
 public struct NotchEvent: Identifiable, Equatable, Sendable {
-    public enum Kind: Equatable, Sendable { case proofDone, still, blocked, reached, requestTaken }
+    public enum Kind: Equatable, Sendable { case proofDone, still, blocked, reached, requestArrived, requestTaken }
     public let kind: Kind
     /// Goal id (`GoalRow.id`) or request id (`UserRequest.id`): the view reads the live data from it.
     public let subject: String

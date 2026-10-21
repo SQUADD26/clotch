@@ -1,14 +1,13 @@
 import SwiftUI
 
 enum NotchAnimation {
-    /// 展开面板：微弹，有少许回弹感
+    /// The notch's one spring (A2): open, close, notifications, pages, bars.
     static var open: Animation {
-        .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: 0.82)
+        .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: 0.86)
     }
-    /// 收起面板：临界阻尼，无过冲（防止 NotchPanelShape 底边露出刘海）
-    static var close: Animation {
-        .spring(response: NotchAnimationMetrics.closeResponse, dampingFraction: 1.0)
-    }
+    /// Closing uses the same spring as opening: one spring for all motion (A2). NotchPanelShape's
+    /// fixed minimum height keeps the small overshoot from exposing the notch.
+    static var close: Animation { open }
     /// 通知弹出：快速弹跳，用于 completion/approval 自动展开
     static let pop = Animation.spring(response: 0.3, dampingFraction: 0.65)
     /// 微交互：hover 状态变化、按钮高亮等
