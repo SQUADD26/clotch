@@ -116,6 +116,9 @@ struct NotchPanelView: View {
     let notchHeight: CGFloat
     let notchW: CGFloat
     let screenWidth: CGFloat
+    /// The screen's `ScreenDetector.signature`: which saved «Personalizza il notch» layout the closed notch draws.
+    var screenSignature = ""
+    @AppStorage(SettingsKey.notchLayouts) private var notchLayouts = Data()
 
     @AppStorage(SettingsKey.contentFontSize) private var contentFontSize = SettingsDefaults.contentFontSize
     @AppStorage(SettingsKey.showAgentDetails) private var showAgentDetails = SettingsDefaults.showAgentDetails
@@ -233,8 +236,17 @@ struct NotchPanelView: View {
     private var collapsedBarWidth: CGFloat {
         // Immediate hover acknowledgement: a slight widen while the expand delay runs
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
-        // Goal wings: the chosen design's width, never narrower than the shell's own wing.
-        return effectiveNotchW + max(compactWingWidth, GoalsWing.width) * 2 + prehoverExtra
+        // The zones' wings: as wide as their elements need, never narrower than the shell's own wing.
+        let wing = max(compactWingWidth, NotchLayoutMetrics.wing(notchLayout))
+        let centre = hasNotch ? effectiveNotchW
+            : max(effectiveNotchW, NotchLayoutMetrics.width(of: notchLayout.centre, notchLayout))
+        return min(centre + wing * 2 + prehoverExtra, maxPanelWidth)
+    }
+
+    /// This screen's saved layout (re-read when «Personalizza il notch» saves), else the standard one.
+    private var notchLayout: NotchScreenLayout {
+        let store = (try? JSONDecoder().decode(NotchLayoutStore.self, from: notchLayouts)) ?? NotchLayoutStore()
+        return store.layout(for: screenSignature, hasNotch: hasNotch)
     }
 
     /// Status and tool-status reserves, split evenly between the two wings.
@@ -267,19 +279,10 @@ struct NotchPanelView: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 if showBar {
-                    // The goal chased now: state and bar left of the notch, proofs right, open or closed.
-                    // Centred, so the wings stay snug against the notch when the island widens.
-                    HStack(spacing: 0) {
-                        GoalsLeftWing()
-                        if hasNotch {
-                            Color.clear.frame(width: effectiveNotchW)
-                        } else {
-                            CenterZoneSlot(rows: goals.rows)
-                        }
-                        GoalsRightWing()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: notchHeight)
+                    // The elements chosen in «Personalizza il notch» for this screen, left, centre and right.
+                    NotchLiveZones(layout: notchLayout, hasNotch: hasNotch, notchWidth: effectiveNotchW,
+                                   workingSince: goals.rows.hero?.since, barHeight: notchHeight)
+                        .frame(maxWidth: .infinity)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,

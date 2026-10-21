@@ -92,6 +92,9 @@ final class L10n: ObservableObject {
         "notch_width_mid": "Covers up to half of the menu bar",
         "notch_width_high": "Covers most of the menu bar",
         "notch_done": "Done",
+        "notch_show": "Show",
+        "notch_show_text": "Icons and text",
+        "notch_show_icons": "Icons only",
         "notch": "(Notch)",
 
         // Behavior
@@ -673,6 +676,9 @@ final class L10n: ObservableObject {
         "notch_width_mid": "Copre fino a metà della barra dei menu",
         "notch_width_high": "Copre quasi tutta la barra dei menu",
         "notch_done": "Fine",
+        "notch_show": "Mostra",
+        "notch_show_text": "Icone e testo",
+        "notch_show_icons": "Solo icone",
     ]
 
     private static let de: [String: String] = en.merging([

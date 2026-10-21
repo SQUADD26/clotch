@@ -1,8 +1,10 @@
 import SwiftUI
+import CodeIslandCore
 
 /// The three zones of the closed notch, read from the layout stored by «Personalizza il notch».
 /// Beside a hardware notch only the sides draw and the middle is the gap; on a screen without one the
-/// centre zone is used too. The black island and its width are the caller's.
+/// centre zone is used too. The sides split the rest equally and centre their elements (Figma 01). The
+/// black island and its width are the caller's (`NotchLayoutMetrics.wing`).
 struct NotchZonesView: View {
     let layout: NotchScreenLayout
     let hasNotch: Bool
@@ -13,22 +15,28 @@ struct NotchZonesView: View {
     var body: some View {
         let zones = layout.resolved(hasNotch: hasNotch)
         HStack(spacing: 0) {
-            zone(zones.left).frame(maxWidth: .infinity, alignment: .leading)
+            zone(zones.left).frame(maxWidth: .infinity)
             if hasNotch {
                 Color.clear.frame(width: notchWidth)
             } else {
-                zone(zones.centre).fixedSize()
+                zone(zones.centre).frame(minWidth: notchWidth).fixedSize()
             }
-            zone(zones.right).frame(maxWidth: .infinity, alignment: .trailing)
+            Group {
+                if let mark = data.mark {
+                    ResultMark(event: mark, rows: data.rows).transition(.scale(scale: 0.4).combined(with: .opacity))
+                } else {
+                    zone(zones.right)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
         .frame(height: data.barHeight)
     }
 
     private func zone(_ elements: [NotchElement]) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: NotchLayoutMetrics.spacing) {
             ForEach(elements, id: \.self) { NotchElementView(element: $0, data: data) }
         }
-        .padding(.horizontal, 14)
     }
 }
 
@@ -43,6 +51,7 @@ struct NotchLiveZones: View {
     @ObservedObject private var store = GoalStore.shared
     @ObservedObject private var quota = AccountQuotaFeed.shared
     @ObservedObject private var inUse = AccountsInUseFeed.shared
+    @ObservedObject private var notifier = NotchNotifier.shared
 
     var body: some View {
         NotchZonesView(
@@ -51,7 +60,8 @@ struct NotchLiveZones: View {
                 rows: store.rows, accounts: quota.accounts, inUse: inUse.emails,
                 requestsWaiting: store.requests.filter { !$0.taken }.count,
                 workingSessions: store.rows.allPulses.filter(\.running).count,
-                workingSince: workingSince, now: store.now, barHeight: barHeight
+                workingSince: workingSince, now: store.now, barHeight: barHeight,
+                iconsOnly: layout.iconsOnly == true, mark: notifier.phase == .leave ? notifier.current : nil
             )
         )
     }

@@ -16,8 +16,8 @@ struct AccountBarsElement: View {
     var body: some View {
         let accounts = data.accountsInUse
         if !accounts.isEmpty {
-            HStack(spacing: 3) {
-                ForEach(accounts) { account in
+            HStack(spacing: 4) {  // 10 pt pitch
+                ForEach(accounts.prefix(4)) { account in
                     let used = account.stale(data.now) ? nil : account.sevenDay.usedNow(data.now)
                     VerticalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used))
                 }
@@ -41,18 +41,20 @@ struct AccountBarsElement: View {
     }
 }
 
+/// One account as a 6 × 16 bar filled from the bottom (Figma «Barra in alto»).
 private struct VerticalBar: View {
     let progress: Double?
     let color: Color
 
     var body: some View {
+        let bar = RoundedRectangle(cornerRadius: 3, style: .continuous)
         ZStack(alignment: .bottom) {
-            Capsule().fill(GoalInk.track)
+            bar.fill(GoalInk.barTrack)
             if let progress, progress > 0 {
-                Capsule().fill(color).frame(height: max(6, 18 * CGFloat(min(progress, 1))))
+                bar.fill(color).frame(height: max(4, 16 * CGFloat(min(progress, 1))))
             }
         }
-        .frame(width: 6, height: 18)
+        .frame(width: 6, height: 16)
     }
 }
 
@@ -122,10 +124,12 @@ struct AccountsWideElement: View {
             HStack(spacing: 18) {
                 ForEach(accounts) { account in
                     HStack(spacing: 8) {
-                        Text(data.name(of: account))
-                            .font(NotchType.bodyEmphasis)
-                            .foregroundStyle(account.stale(data.now) ? GoalInk.secondary : GoalInk.primary)
-                            .lineLimit(1)
+                        if !data.iconsOnly {
+                            Text(data.name(of: account))
+                                .font(NotchType.label)
+                                .foregroundStyle(account.stale(data.now) ? GoalInk.secondary : Color.white.opacity(0.85))
+                                .lineLimit(1)
+                        }
                         if account.stale(data.now) {
                             Text("Nessun dato").font(NotchType.caption).foregroundStyle(GoalInk.secondary)
                         } else {

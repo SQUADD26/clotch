@@ -15,11 +15,14 @@ struct NotchScreenLayout: Codable, Equatable {
     var right: [NotchElement]
     /// How far the notch covers the menu bar: 0 = only the notch, 1 = the whole bar.
     var width: Double
+    /// «Solo icone»: the elements drop their words. Optional so layouts saved before it still load.
+    var iconsOnly: Bool? = nil
 
-    /// A notch screen has no usable centre, so the active goal sits on the left.
+    /// The approved closed notch (Figma 01, 09): rings left, account bars right, and on a screen
+    /// without a notch the active goal in the centre.
     static func standard(hasNotch: Bool) -> NotchScreenLayout {
         NotchScreenLayout(
-            left: hasNotch ? [.goalRings, .activeGoal] : [.goalRings],
+            left: [.goalRings],
             centre: hasNotch ? [] : [.activeGoal],
             right: [.accounts],
             width: 0.5

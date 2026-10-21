@@ -15,6 +15,10 @@ struct NotchZoneData {
     var now = Date()
     /// Height of the bar the zones sit in (the notch height): the hover card hangs under it.
     var barHeight: CGFloat = 32
+    /// «Solo icone» in the layout: elements drop their words.
+    var iconsOnly = false
+    /// A notification folding back into the notch: its result symbol stands in the right zone a moment.
+    var mark: NotchEvent?
 
     /// The accounts in use here, in the dashboard's «next to use» order.
     var accountsInUse: [AccountQuota] { accounts.filter { inUse.contains($0.email) } }
@@ -41,5 +45,30 @@ enum NotchLayoutMetrics {
     static func islandWidth(fraction: Double, screenWidth: CGFloat, notchWidth: CGFloat) -> CGFloat {
         let widest = max(notchWidth, screenWidth * 0.9)
         return notchWidth + CGFloat(min(max(fraction, 0), 1)) * (widest - notchWidth)
+    }
+
+    static let spacing: CGFloat = 14  // between elements of one zone
+    static let margin: CGFloat = 10.5  // each side of a zone: 4 rings fill the 84 pt Figma wing exactly
+
+    /// Each wing of the closed notch: the wider side's elements, never narrower than the Figma wing.
+    static func wing(_ layout: NotchScreenLayout) -> CGFloat {
+        max(NotchSize.wing, width(of: layout.left, layout), width(of: layout.right, layout))
+    }
+
+    /// The room a zone's elements take, margins included; 0 with none.
+    static func width(of elements: [NotchElement], _ layout: NotchScreenLayout) -> CGFloat {
+        guard !elements.isEmpty else { return 0 }
+        let words = layout.iconsOnly != true
+        // shortcut: fixed estimates per element (titles and names vary), measure them if one gets clipped.
+        let sum = elements.reduce(CGFloat(0)) { total, element in
+            switch element {
+            case .goalRings: return total + 63  // 4 rings of 12, centres 17 apart
+            case .accounts: return total + 36  // up to 4 bars of 6, 10 apart
+            case .activeGoal: return total + (words ? 220 : 80)
+            case .accountsWide: return total + (words ? 330 : 150)
+            case .pendingRequests, .workingSessions: return total + 36
+            }
+        }
+        return sum + CGFloat(elements.count - 1) * spacing + 2 * margin
     }
 }

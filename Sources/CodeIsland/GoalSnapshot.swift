@@ -32,7 +32,7 @@ enum GoalSnapshot {
             func save<V: View>(_ view: V, _ name: String) throws {
                 try write(view, to: dir.appendingPathComponent("goal-notch-\(name).png"))
             }
-            let closedWidth = notchWidth + GoalsWing.width * 2
+            let closedWidth = notchWidth + NotchLayoutMetrics.wing(.standard(hasNotch: true)) * 2
             try save(island(width: closedWidth, radius: 12) { EmptyView() }, "01-riposo")
             try save(open(.goals), "05-obiettivi")
             if CommandLine.arguments.contains("--gallery") {
@@ -105,18 +105,13 @@ enum GoalSnapshot {
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                GoalsLeftWing()
-                Color.clear.frame(width: notchWidth)  // where the hardware notch sits
-                if let mark {
-                    ResultMark(event: mark, rows: GoalStore.shared.rows)
-                        .frame(width: GoalsWing.width)
-                } else {
-                    GoalsRightWing()
-                }
-            }
+            NotchZonesView(
+                layout: .standard(hasNotch: true), hasNotch: true, notchWidth: notchWidth,
+                data: NotchZoneData(rows: GoalStore.shared.rows, accounts: AccountQuotaFeed.shared.accounts,
+                                    inUse: AccountsInUseFeed.shared.emails, now: GoalStore.shared.now,
+                                    barHeight: notchHeight, mark: mark)
+            )
             .frame(maxWidth: .infinity)
-            .frame(height: notchHeight)
             below()
         }
         .frame(width: width)

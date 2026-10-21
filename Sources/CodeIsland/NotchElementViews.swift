@@ -25,15 +25,13 @@ struct NotchElementView: View {
 /// declared proofs is a bare track, never an invented fill.
 private struct GoalRingsElement: View {
     let data: NotchZoneData
-    private let shown = 6
+    /// shortcut: a fifth goal and later ones get no ring (the open notch pages them all); a "+N" mark if Roberto asks.
+    private let shown = 4
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(data.rows.prefix(shown)) { row in
+        HStack(spacing: 5) {  // centres 17 pt apart
+            ForEach(data.rows.pages.prefix(shown)) { row in
                 GoalRing(row: row, size: 12, line: 2.2)
-            }
-            if data.rows.count > shown {
-                Text("+\(data.rows.count - shown)").font(NotchType.numbers).foregroundStyle(GoalInk.secondary)
             }
         }
         .accessibilityElement(children: .ignore)
@@ -49,7 +47,7 @@ private struct ActiveGoalElement: View {
     var body: some View {
         if let hero = data.rows.hero {
             HStack(spacing: 10) {
-                Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail)
+                if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail) }
                 if let since = data.workingSince {
                     HStack(spacing: 5) {
                         Image(systemName: "stopwatch").font(.system(size: 15))

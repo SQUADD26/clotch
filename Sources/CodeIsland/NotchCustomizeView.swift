@@ -130,6 +130,15 @@ struct NotchCustomizeView: View {
                 Button(l10n["notch_done"], action: onDone).keyboardShortcut(.defaultAction)
             }
             HStack(spacing: 16) {
+                Text(l10n["notch_show"]).foregroundStyle(.secondary)
+                Picker("", selection: Binding(
+                    get: { layout.iconsOnly == true },
+                    set: { value in edit { $0.iconsOnly = value; return true } }
+                )) {
+                    Text(l10n["notch_show_text"]).tag(false)
+                    Text(l10n["notch_show_icons"]).tag(true)
+                }
+                .pickerStyle(.segmented).labelsHidden().frame(width: 230)
                 Text(l10n["notch_width"]).foregroundStyle(.secondary)
                 Slider(value: Binding(
                     get: { layout.width },

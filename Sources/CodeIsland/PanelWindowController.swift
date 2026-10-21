@@ -371,7 +371,8 @@ class PanelWindowController: NSObject, NSWindowDelegate {
             hasNotch: hasNotch,
             notchHeight: notchHeight,
             notchW: notchW,
-            screenWidth: screen.frame.width
+            screenWidth: screen.frame.width,
+            screenSignature: ScreenDetector.signature(for: screen)
         )
         let contentView = NotchHostingView(rootView: rootView)
         contentView.sizingOptions = []
