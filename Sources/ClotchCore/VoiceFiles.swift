@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, ownPromptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -19,6 +19,7 @@ public struct VoiceFiles {
         // The config's own files, installed by claude-config `global/bin/installa` with the mod (#84): read, never copied or written.
         let mod = home.appendingPathComponent(".claude/mods/clean-view/hooks")
         promptURL = mod.appendingPathComponent("voce-parlatore.md")
+        ownPromptURL = voce.appendingPathComponent("istruzioni.md")  // Roberto's own, from the page (#95); wins over the config's
         basePronunciationURL = mod.appendingPathComponent("voce-pronuncia.json")
         pronunciationURL = voce.appendingPathComponent("pronuncia.json")
         judgeQuestionURL = home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt")  // the same question as `voce_giudice.py`
@@ -41,6 +42,12 @@ public struct VoiceFiles {
     }
 
     public var hasJevKey: Bool { jevKey != nil }
+
+    /// What the page shows of a saved key: dots and its last 4 characters (#95), nil when none is saved.
+    public func masked(_ url: URL) -> String? {
+        let k = ((try? String(contentsOf: url, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return k.count < 8 ? nil : String(repeating: "•", count: 12) + k.suffix(4)
+    }
 
     public func saveJevKey(_ key: String) throws {
         try write(Data(key.trimmingCharacters(in: .whitespacesAndNewlines).utf8), to: jevKeyURL)
@@ -79,8 +86,24 @@ public struct VoiceFiles {
         try write(JSONSerialization.data(withJSONObject: merged, options: [.prettyPrinted, .sortedKeys]), to: configURL)
     }
 
-    /// The instructions Haiku follows: the config's canonical `voce-parlatore.md` (#84). nil (missing or empty) = the voice is silent.
-    public var prompt: String? { text(promptURL) }
+    /// The instructions Haiku follows: Roberto's own `istruzioni.md` when he wrote one (#95), else the config's canonical
+    /// `voce-parlatore.md` (#84). nil (both missing or empty) = the voice is silent.
+    public var prompt: String? { text(ownPromptURL) ?? text(promptURL) }
+
+    /// True when the page's own instructions are in use: «Ripristina predefinito» has something to undo.
+    public var hasOwnPrompt: Bool { text(ownPromptURL) != nil }
+
+    /// Saves Roberto's instructions; the same text as the config's, or empty, removes his copy so config updates reach him again.
+    public func savePrompt(_ prompt: String) throws {
+        let t = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty, t != text(promptURL) else { return try resetPrompt() }
+        try write(Data((t + "\n").utf8), to: ownPromptURL)
+    }
+
+    /// Back to the config's instructions.
+    public func resetPrompt() throws {
+        if FileManager.default.fileExists(atPath: ownPromptURL.path) { try FileManager.default.removeItem(at: ownPromptURL) }
+    }
 
     /// The judge's question: the config's `voce_giudice_domanda.txt` (#84). nil = the judge is not asked.
     public var judgeQuestion: String? { text(judgeQuestionURL) }

@@ -27,24 +27,16 @@ enum ClotchSettingsTab: String, CaseIterable {
 
     @MainActor @ViewBuilder var page: some View {
         switch self {
-        case .general: ClotchGeneralPage().settingsPage()
-        case .notch: ClotchNotchPage().settingsPage()
-        case .notifications: ClotchNotificationsPage().settingsPage()
-        // Long page with a text editor: the one page that scrolls, at a fixed height.
-        case .voice: VoiceSettingsPage().frame(width: ClotchSettingsWindow.width, height: 600)
-        case .about: AboutPage().padding(.vertical, 24).frame(width: ClotchSettingsWindow.width).fixedSize()
+        case .general: ClotchGeneralPage()
+        case .notch: ClotchNotchPage()
+        case .notifications: ClotchNotificationsPage()
+        // The long page: the one that scrolls, at a fixed height.
+        case .voice:
+            if ClotchSettingsWindow.drawWhole { VoiceSettingsPage() } else {
+                ScrollView { VoiceSettingsPage() }.frame(width: ClotchSettingsWindow.width, height: 640)
+            }
+        case .about: ClotchAboutPage()
         }
-    }
-}
-
-extension View {
-    /// A Finder-style settings page: grouped rows, label left and control right, as tall as its content,
-    /// so the window follows the page's height.
-    func settingsPage() -> some View {
-        formStyle(.grouped)
-            .scrollDisabled(true)
-            .frame(width: ClotchSettingsWindow.width)
-            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -62,7 +54,9 @@ private struct ClotchSettingsRoot: View {
 /// The window: an AppKit toolbar in the preferences style and one SwiftUI page under it. The hosting
 /// view sizes the window to the page, so it changes height with the content.
 @MainActor final class ClotchSettingsWindow: NSObject, NSToolbarDelegate {
-    static let width: CGFloat = 520
+    static let width: CGFloat = 560
+    /// True only for `--snapshot`: the Voce page is drawn whole instead of in its 640 pt scroll view.
+    static var drawWhole = false
     let window: NSWindow
     private let selection: ClotchSettingsSelection
 
