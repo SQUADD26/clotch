@@ -66,6 +66,8 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public let lastActivity: Date?
     public let pulses: [GoalPulse]
     public var proposed = false   // "proposto": not accepted yet, shown quieter, never the goal chased now
+    /// When work on the goal began: its oldest proof, else the register's last write. The register has no start key yet.
+    public var workStart: Date? = nil
 }
 
 public enum GoalBoard {
@@ -129,7 +131,8 @@ public enum GoalBoard {
                 goal: goal,
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
-                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto"))
+                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto",
+                workStart: g.proofs?.compactMap(\.at).min() ?? g.at))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
