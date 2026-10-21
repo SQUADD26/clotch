@@ -1,0 +1,16 @@
+{
+ "regole": [
+  {
+   "condizione": "la PR 12 e' fusa",
+   "creata": 1792000000,
+   "id": "A-29ae",
+   "quando": {
+    "repo": "SQUADD26/clotch",
+    "tipo": "pr-fusa",
+    "valore": "12"
+   },
+   "stato": "attiva"
+  }
+ ],
+ "v": 1
+}
