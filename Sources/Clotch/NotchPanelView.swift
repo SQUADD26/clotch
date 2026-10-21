@@ -1,25 +1,6 @@
 import SwiftUI
 import ClotchCore
 
-/// Shared bounds for the collapsed-width scale setting — keeps the settings
-/// slider and the width math in lockstep. Percent of the (simulated) notch width.
-enum NotchWidthScale {
-    static let min = 50
-    static let max = 150
-    static let step = 1
-}
-
-enum NotchWidthMetrics {
-    /// On notched displays the island can grow beyond the physical notch but never
-    /// shrink under it — narrower would expose the bare hardware cutout (#268).
-    static func effectiveNotchWidth(notchW: CGFloat, collapsedWidthScale: Int, hasNotch: Bool) -> CGFloat {
-        let clampedScale = Swift.max(NotchWidthScale.min, Swift.min(collapsedWidthScale, NotchWidthScale.max))
-        let scaled = notchW * CGFloat(clampedScale) / 100.0
-        if hasNotch { return Swift.max(notchW, scaled) }
-        return scaled
-    }
-}
-
 // MARK: - Hover interaction state machine
 
 /// Where the island is in its hover interaction. `prehover` is the immediate
@@ -125,7 +106,6 @@ struct NotchPanelView: View {
     @AppStorage(SettingsKey.smartSuppress) private var smartSuppress = SettingsDefaults.smartSuppress
     @AppStorage(SettingsKey.hideWhenNoSession) private var hideWhenNoSession = SettingsDefaults.hideWhenNoSession
     @AppStorage(SettingsKey.showToolStatus) private var showToolStatus = SettingsDefaults.showToolStatus
-    @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.showClaudeQuota) private var showClaudeQuota = SettingsDefaults.showClaudeQuota
     @AppStorage(SettingsKey.claudeQuotaChip) private var claudeQuotaChip = SettingsDefaults.claudeQuotaChip
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
@@ -203,21 +183,15 @@ struct NotchPanelView: View {
     /// Minimum wing width needed to display compact bar content
     private var compactWingWidth: CGFloat { mascotSize + 14 }
 
-    /// Effective island width — on notched screens the scale can only widen past the notch.
-    private var effectiveNotchW: CGFloat {
-        NotchWidthMetrics.effectiveNotchWidth(
-            notchW: notchW,
-            collapsedWidthScale: collapsedWidthScale,
-            hasNotch: hasNotch
-        )
-    }
-
     /// Total panel width — adapts based on state and screen geometry
     private var panelWidth: CGFloat {
-        let nw = effectiveNotchW
+        let nw = notchW
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
-        if shouldShowExpanded { return min(max(nw + 200, NotchSize.open), maxPanelWidth) }
+        // Never narrower than the closed notch: opening only grows, width and height on one spring (#99).
+        if shouldShowExpanded {
+            return NotchWidth.open(notchWidth: nw, standard: NotchSize.open, closed: collapsedBarWidth, window: maxPanelWidth)
+        }
         if showsNote { return min(max(collapsedBarWidth, NotchSize.note), maxPanelWidth) }
         return collapsedBarWidth
     }
@@ -252,7 +226,7 @@ struct NotchPanelView: View {
     }
 
     /// The panel window's width (PanelWindowController.panelSize).
-    private var maxPanelWidth: CGFloat { min(620, screenWidth - 40) }
+    private var maxPanelWidth: CGFloat { NotchWidth.window(screenWidth: screenWidth) }
 
     /// The collapsed active bar, before any room for the plan-limit chip.
     private var collapsedBarWidth: CGFloat {
@@ -260,7 +234,7 @@ struct NotchPanelView: View {
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
         // The zones' wings as wide as their elements need (never narrower than the shell's own wing),
         // then the «Larghezza» chosen in «Personalizza il notch».
-        let island = NotchLayoutMetrics.closedWidth(notchLayout, hasNotch: hasNotch, notchWidth: effectiveNotchW,
+        let island = NotchLayoutMetrics.closedWidth(notchLayout, hasNotch: hasNotch, notchWidth: notchW,
                                                     minWing: compactWingWidth, maxWidth: maxPanelWidth)
         return min(island + prehoverExtra, maxPanelWidth)
     }
@@ -348,14 +322,14 @@ struct NotchPanelView: View {
                 Color.clear.frame(width: maxPanelWidth, height: 0)
                 if showBar {
                     // The elements chosen in «Personalizza il notch» for this screen, left, centre and right.
-                    NotchLiveZones(layout: notchLayout, hasNotch: hasNotch, notchWidth: effectiveNotchW,
+                    NotchLiveZones(layout: notchLayout, hasNotch: hasNotch, notchWidth: notchW,
                                    workingSince: goals.rows.hero?.since, barHeight: notchHeight)
                         .frame(width: panelWidth)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,
                         compactWingWidth: compactWingWidth,
-                        notchW: effectiveNotchW,
+                        notchW: notchW,
                         notchHeight: notchHeight,
                         hasNotch: hasNotch,
                         hovered: idleHovered

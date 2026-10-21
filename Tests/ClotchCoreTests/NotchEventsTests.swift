@@ -30,6 +30,16 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 500)), NotchEvents.maxHold + 3, "capped")
     }
 
+    func testThreeLineNoteGetsItsReadingTime() {
+        // #102: the line wraps up to three lines, never more, and a third line still adds reading time.
+        XCTAssertEqual(NotchEvents.noteLines, 3)
+        let twoLines = NotchEvents.hold(forText: String(repeating: "a", count: 74))
+        let threeLines = NotchEvents.hold(forText: String(repeating: "a", count: 110))
+        XCTAssertGreaterThan(twoLines, NotchEvents.hold(forText: String(repeating: "a", count: 37)), "two lines: longer than one")
+        XCTAssertGreaterThan(threeLines, twoLines, "three lines: longer than two")
+        XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 300)), threeLines, "past three lines: the cap")
+    }
+
     func testProposedGoalAnnouncesNothing() {
         var still = row("p", .still(since: t), done: 1)
         still.proposed = true
@@ -53,5 +63,13 @@ final class NotchEventsTests: XCTestCase {
         let long = NotchEvents.notice(.requestTaken, title: String(repeating: "a", count: 80), by: String(repeating: "s", count: 40))!
         XCTAssertEqual(long, "Presa in carico: " + String(repeating: "a", count: 39) + "… · " + String(repeating: "s", count: 23) + "…",
                        "long title and session are clipped with …, the session stays")
+    }
+
+    /// #111: six proofs in a row while the notch is busy read «6 su 6» six times; they must be one notice.
+    func testProofsWaitingInTheQueueBecomeOneNotice() {
+        var queue: [NotchEvent] = []
+        for n in 1...10 { queue = NotchEvents.merge(queue: queue, adding: [NotchEvent(kind: .proofDone, subject: "a", count: n)]) }
+        queue = NotchEvents.merge(queue: queue, adding: [NotchEvent(kind: .blocked, subject: "a", count: 0)])
+        XCTAssertEqual(queue.map(\.id), ["proofDone-a-10", "blocked-a-0"])
     }
 }

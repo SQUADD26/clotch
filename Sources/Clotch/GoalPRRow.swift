@@ -2,7 +2,7 @@ import SwiftUI
 import ClotchCore
 
 // The pull requests under a goal (Figma A3, approved): open ones only, one line each: icon, number, title,
-// state. A PR just merged shows once: one pass of light across its line, then the line leaves (#86, `PRMergeMotion`).
+// state. A PR just merged shows once: one pass of light across its line, then it stays a while, its text fades left to right and the line leaves (#86, #100, `PRMergeMotion`).
 
 /// What a PR state looks like and says. Colours are Apple's dark-appearance system tints, like `GoalTone`.
 struct PRLook: Equatable {
@@ -101,10 +101,12 @@ private struct PRLine: View {
     let info: PRInfo
     let onShown: () -> Void
     @State private var shine: CGFloat = 0
+    @State private var wipe: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         GoalPRRow(info: info, shine: shine)
+            .modifier(RowWipe(progress: wipe))
             .task(id: info.state == .merged ? info.ref : nil) {
                 guard info.state == .merged else { return }
                 // Cancelled when the notch closes: the event waits for the next opening.
@@ -114,7 +116,12 @@ private struct PRLine: View {
                         withAnimation(.timingCurve(0.45, 0, 0.25, 1, duration: PRMergeMotion.shimmer)) { shine = 1 }
                     }
                     try await Task.sleep(for: .seconds(PRMergeMotion.stay(reduceMotion: reduceMotion) - PRMergeMotion.delay))
-                } catch { return }
+                    // The text goes left to right in place, then the row closes and the others rise.
+                    if !reduceMotion {
+                        withAnimation(.easeInOut(duration: PRMergeMotion.wipe)) { wipe = 1 }
+                        try await Task.sleep(for: .seconds(PRMergeMotion.wipe))
+                    }
+                } catch { wipe = 0; return }  // notch closed mid-exit: the row shows whole next time
                 withAnimation(NotchMotion.animation(reduce: reduceMotion)) { onShown() }
             }
     }

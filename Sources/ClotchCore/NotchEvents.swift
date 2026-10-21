@@ -26,7 +26,10 @@ public struct NotchEvent: Identifiable, Equatable, Sendable {
 public enum NotchEvents {
     /// How long a notification stays after its change lands, in seconds: reading time by the length of its text.
     public static let minHold = 3.5
-    public static let maxHold = 8.0
+    /// A full three-line note (~37 characters a line at 14 pt in the 440 pt island) gets its whole reading time (#102).
+    public static let maxHold = 11.0
+    /// The line under the notch wraps up to this many lines, never clipped before (#102).
+    public static let noteLines = 3
     public static let holdPerCharacter = 0.1
     /// Roberto asked for 3 s more to read what was taken in charge (#39).
     public static let extraHold = 3.0
@@ -50,6 +53,12 @@ public enum NotchEvents {
     }
 
     static func clip(_ s: String, _ n: Int) -> String { s.count > n ? String(s.prefix(n - 1)) + "…" : s }
+
+    /// One event, one notice (#111): an event waiting in the queue is replaced by a newer one of the same
+    /// kind and subject, because the line reads the live data, so both would say the same words.
+    public static func merge(queue: [NotchEvent], adding fresh: [NotchEvent]) -> [NotchEvent] {
+        queue.filter { q in !fresh.contains { $0.kind == q.kind && $0.subject == q.subject } } + fresh
+    }
 
     public static func goals(old: [GoalRow], new: [GoalRow]) -> [NotchEvent] {
         let before = Dictionary(old.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })

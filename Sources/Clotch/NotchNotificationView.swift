@@ -13,7 +13,8 @@ struct NotchNotificationView: View {
     var body: some View {
         if let note = Note(event: event, rows: rows, requests: requests) {
             let done = phase >= .settle
-            HStack(spacing: 10) {
+            // The text wraps up to three lines instead of clipping (#102); mark and label stay on its first line.
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Group {
                     if let row = note.row {
                         GoalRing(progress: done ? row.progress : note.before, color: row.ringInk, size: 15, line: 2.2)
@@ -27,22 +28,28 @@ struct NotchNotificationView: View {
                     }
                 }
                 .frame(width: 16)
+                // Centres the mark on the first line: its baseline sits ~5 pt under the line's middle at 14 pt.
+                .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 5 }
                 Text(note.text)
                     .font(NotchType.note)
                     .tracking(-0.14)
                     .strikethrough(done && note.strikes, color: GoalInk.quiet)
                     .foregroundStyle(done && note.strikes ? Color.white.opacity(0.5) : GoalInk.primary)
-                    .lineLimit(1)
+                    .lineLimit(NotchEvents.noteLines)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(done ? note.label : note.startLabel)
                     .font(done ? NotchType.smallEmphasis : NotchType.small)
                     .foregroundStyle(done ? note.color : Color.white.opacity(0.5))
                     .contentTransition(.interpolate)
+                    .fixedSize()
             }
-            // Mark centred 28 pt in, text at 46, label 24 pt from the right edge; 42 pt under the notch.
+            // Mark centred 28 pt in, text at 46, label 24 pt from the right edge; 42 pt under the notch for one line,
+            // taller with each wrapped line (the island's spring carries the height).
             .padding(.leading, 20)
             .padding(.trailing, 24)
-            .frame(height: 42)
+            .padding(.vertical, 12)
+            .frame(minHeight: 42)
             // A request taken in charge opens the session that took it, a goal its master; a PR has no session.
             .opensSession(event.kind == .requestTaken ? requests.first { $0.id == event.subject }?.target : note.row?.master)
             .accessibilityElement(children: .ignore)

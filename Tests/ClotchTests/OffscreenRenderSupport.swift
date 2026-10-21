@@ -241,7 +241,7 @@ struct DefaultsSandbox {
         [
             SettingsKey.appLanguage, SettingsKey.contentFontSize, SettingsKey.showAgentDetails,
             SettingsKey.smartSuppress, SettingsKey.hideWhenNoSession, SettingsKey.showToolStatus,
-            SettingsKey.collapsedWidthScale, SettingsKey.hapticOnHover, SettingsKey.hapticIntensity,
+            SettingsKey.hapticOnHover, SettingsKey.hapticIntensity,
             SettingsKey.sessionGroupingMode, SettingsKey.defaultSource, SettingsKey.soundEnabled,
             SettingsKey.quietHoursEnabled, SettingsKey.quietHoursStart, SettingsKey.quietHoursEnd,
             SettingsKey.autoCollapseAfterSessionJump, SettingsKey.maxVisibleSessions,
@@ -278,8 +278,8 @@ struct StageScreen {
     /// (ScreenDetector.fakeNotchWidth: min(max(w × 0.14, 160), 240)).
     static let external = StageScreen(name: "external", screenWidth: 1920, notchWidth: 240, notchHeight: 25, hasNotch: false)
 
-    /// PanelWindowController.panelSize: min(620, screenWidth - 40).
-    var windowWidth: CGFloat { min(620, screenWidth - 40) }
+    /// PanelWindowController.panelSize.
+    var windowWidth: CGFloat { NotchWidth.window(screenWidth: screenWidth) }
 }
 
 enum StageWallpaper {

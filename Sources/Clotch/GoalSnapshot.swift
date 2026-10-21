@@ -12,6 +12,7 @@ enum GoalSnapshot {
     private static let notchWidth: CGFloat = 185  // 14" MacBook Pro, as in the Figma
     private static let notchHeight: CGFloat = 32
     private static let openWidth = NotchSize.open
+    private static let window = NotchWidth.window(screenWidth: 1512)  // 14" MacBook Pro
     /// Stand-in for the menu bar and desktop around the island, so its black shape reads.
     private static let surround = Color(white: 0.24)
 
@@ -32,7 +33,12 @@ enum GoalSnapshot {
             func save<V: View>(_ view: V, _ name: String) throws {
                 try write(view, to: dir.appendingPathComponent("clotch-\(name).png"))
             }
-            let closedWidth = notchWidth + NotchLayoutMetrics.wing(.standard(hasNotch: true)) * 2
+            func closed(_ fraction: Double) -> CGFloat {  // the panel's own closed width (NotchLayoutMetrics), on a 14" screen
+                var layout = NotchScreenLayout.standard(hasNotch: true)
+                layout.width = fraction
+                return NotchLayoutMetrics.closedWidth(layout, hasNotch: true, notchWidth: notchWidth, minWing: 0, maxWidth: window)
+            }
+            let closedWidth = closed(0)
             try save(island(width: closedWidth, radius: 12) { EmptyView() }, "01-riposo")
             try save(open(.goals), "05-obiettivi")
             if CommandLine.arguments.contains("--gallery") {
@@ -81,7 +87,7 @@ enum GoalSnapshot {
                         }
                     }
                 }, "19-bottoni-riposo-hover-premuto")
-                // #86: a merged PR, the light at a quarter, half and three quarters of its pass, then the line halfway out.
+                // #86: a merged PR, the light at a quarter, half and three quarters of its pass, then the line halfway out (#100: the text gone on the left).
                 let merged = PRInfo(ref: PRRef(repo: "SQUADD26/clotch", number: 86), title: "Notch: luce sulle PR unite",
                                     url: "https://github.com/SQUADD26/clotch/pull/86", state: .merged)
                 try save(open(.goals) {
@@ -99,6 +105,11 @@ enum GoalSnapshot {
                     print("snapshot: \(store.requests.count) requests, no second page")
                 }
                 try save(open(.accounts), "08-account")
+                // «Larghezza» at its widest (#99): the open notch is as wide as the closed one, never narrower.
+                let widest = closed(1)
+                try save(island(width: widest, radius: 12) { EmptyView() }, "02-larghezza-massima-chiuso")
+                try save(open(.goals, width: NotchWidth.open(notchWidth: notchWidth, standard: openWidth, closed: widest, window: window)),
+                         "02-larghezza-massima-aperto")
                 let inUse = AccountQuotaFeed.shared.accounts.filter { AccountsInUseFeed.shared.emails.contains($0.email) }.count
                 if inUse > 0 {
                     // Room under the island for the card, which hangs outside it as in the panel.
@@ -185,9 +196,9 @@ enum GoalSnapshot {
     }
 
     /// The open notch on `tab`, as the panel draws it.
-    private static func open(_ tab: NotchTab) -> some View {
+    private static func open(_ tab: NotchTab, width: CGFloat = openWidth) -> some View {
         let store = GoalStore.shared
-        return island(width: openWidth, radius: NotchSpace.radius) {
+        return island(width: width, radius: NotchSpace.radius) {
             NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared, now: store.now, tab: .constant(tab))
         }
     }

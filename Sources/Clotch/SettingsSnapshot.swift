@@ -17,6 +17,10 @@ enum SettingsSnapshot {
             let sheet = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: false)
             sheet.contentView = NSHostingView(rootView: NotchCustomizeView(onDone: {}))
             try draw(sheet, appearance, to: dir.appendingPathComponent("clotch-10-impostazioni-6-personalizza-\(look).png"))
+            // #101: the sheet halfway through a drag: the lifted element, its ghost open where it lands.
+            let dragging = NSWindow(contentRect: .zero, styleMask: [.titled], backing: .buffered, defer: false)
+            dragging.contentView = NSHostingView(rootView: NotchCustomizeView(onDone: {}, stillDrag: true))
+            try draw(dragging, appearance, to: dir.appendingPathComponent("clotch-10-impostazioni-7-trascinamento-\(look).png"))
         }
     }
 

@@ -1,5 +1,6 @@
 import XCTest
 @testable import Clotch
+import ClotchCore
 
 final class NotchLayoutTests: XCTestCase {
     func testStandardLayoutKeepsCentreEmptyOnNotchScreen() {
@@ -60,6 +61,28 @@ final class NotchLayoutTests: XCTestCase {
         XCTAssertEqual(NotchLayoutStore.load(from: defaults), NotchLayoutStore())
         defaults.set(Data("nope".utf8), forKey: SettingsKey.notchLayouts)
         XCTAssertEqual(NotchLayoutStore.load(from: defaults), NotchLayoutStore())
+    }
+
+    func testOldIslandWidthMovesIntoLarghezzaOnce() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "NotchLayoutTests-\(UUID().uuidString)"))
+        var saved = NotchScreenLayout.standard(hasNotch: true)
+        saved.width = 0.5
+        NotchLayoutStore(screens: ["saved": saved]).save(to: defaults)
+        defaults.set(150, forKey: NotchWidth.oldScaleKey)
+        NotchLayoutStore.migrateWidthScale(defaults, screens: [("saved", true), ("new", false)])
+        let store = NotchLayoutStore.load(from: defaults)
+        XCTAssertEqual(store.screens["saved"]?.width ?? 0, 0.675, accuracy: 0.0001)
+        XCTAssertEqual(store.screens["new"]?.width ?? 0, 0.35, accuracy: 0.0001)
+        XCTAssertEqual(store.screens["new"]?.centre, [.activeGoal])
+        XCTAssertNil(defaults.object(forKey: NotchWidth.oldScaleKey), "runs once")
+    }
+
+    func testOldIslandWidthAtOrUnderTheNotchChangesNothing() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "NotchLayoutTests-\(UUID().uuidString)"))
+        defaults.set(80, forKey: NotchWidth.oldScaleKey)
+        NotchLayoutStore.migrateWidthScale(defaults, screens: [("new", true)])
+        XCTAssertEqual(NotchLayoutStore.load(from: defaults), NotchLayoutStore())
+        XCTAssertNil(defaults.object(forKey: NotchWidth.oldScaleKey))
     }
 
     func testWidthLabelThirds() {
