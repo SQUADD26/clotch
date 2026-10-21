@@ -6,6 +6,7 @@ import CodeIslandCore
 // MARK: - Navigation Model
 
 enum SettingsPage: String, Identifiable, Hashable {
+    case notch = "notch_page"
     case general
     case behavior
     case appearance
@@ -21,6 +22,7 @@ enum SettingsPage: String, Identifiable, Hashable {
 
     var icon: String {
         switch self {
+        case .notch: return "rectangle.topthird.inset.filled"
         case .general: return "gearshape.fill"
         case .behavior: return "slider.horizontal.3"
         case .appearance: return "paintbrush.fill"
@@ -36,6 +38,7 @@ enum SettingsPage: String, Identifiable, Hashable {
 
     var color: Color {
         switch self {
+        case .notch: return .blue
         case .general: return .gray
         case .behavior: return .orange
         case .appearance: return .blue
@@ -55,9 +58,9 @@ private struct SidebarGroup: Hashable {
     let pages: [SettingsPage]
 }
 
+// Clotch shows only its own pages (#30); the CodeIsland pages stay compiled, off the sidebar.
 private let sidebarGroups: [SidebarGroup] = [
-    SidebarGroup(title: nil, pages: [.general, .behavior, .appearance, .mascots, .sound, .shortcuts]),
-    SidebarGroup(title: "CodeIsland", pages: [.remote, .hooks, .buddy, .about]),
+    SidebarGroup(title: nil, pages: [.notch, .about]),
 ]
 
 // MARK: - Main View
@@ -69,7 +72,7 @@ struct SettingsView: View {
 
     /// `initialPage` opens the window on that page (the offscreen UI gallery
     /// renders every page through it).
-    init(appState: AppState? = nil, initialPage: SettingsPage = .general) {
+    init(appState: AppState? = nil, initialPage: SettingsPage = .notch) {
         self.appState = appState
         _selectedPage = State(initialValue: initialPage)
     }
@@ -95,6 +98,7 @@ struct SettingsView: View {
         } detail: {
             Group {
                 switch selectedPage {
+                case .notch: ClotchNotchPage()
                 case .general: GeneralPage()
                 case .behavior: BehaviorPage(appState: appState)
                 case .appearance: AppearancePage()
@@ -2350,7 +2354,7 @@ private struct AboutPage: View {
                 AppLogoView(size: 100)
 
                 VStack(spacing: 6) {
-                    Text("CodeIsland")
+                    Text("Clotch")
                         .font(.system(size: 26, weight: .bold))
                     Text("Version \(AppVersion.current)")
                         .font(.system(size: 13))
@@ -2376,8 +2380,7 @@ private struct AboutPage: View {
                     )
                 }
 
-                // In-app update section
-                updateSection
+                // No update check: Clotch has no feed and must never fetch CodeIsland (issue #30).
 
                 if let reason = updater.readOnlyInstallReason {
                     readOnlyLocationNotice(reason)
@@ -2408,95 +2411,6 @@ private struct AboutPage: View {
             .frame(maxWidth: .infinity)
 
             Spacer()
-        }
-    }
-
-    @ViewBuilder
-    private var updateSection: some View {
-        switch updater.state {
-        case .idle:
-            aboutButton(l10n["check_for_updates"], icon: "arrow.triangle.2.circlepath") {
-                updater.checkForUpdates()
-            }
-
-        case .checking:
-            HStack(spacing: 6) {
-                ProgressView().controlSize(.small)
-                Text(l10n["check_for_updates"])
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-
-        case .upToDate:
-            Button {
-                updater.checkForUpdates()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.system(size: 13))
-                    Text(String(format: l10n["no_update_body"], AppVersion.current))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .buttonStyle(.plain)
-            .onHover { h in
-                if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-            }
-
-        case let .available(version):
-            VStack(spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrow.down.circle.fill")
-                        .foregroundStyle(.blue)
-                        .font(.system(size: 13))
-                    Text(String(format: l10n["update_available_body"], version, AppVersion.current))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-
-                if updater.isHomebrewInstall {
-                    HStack(spacing: 8) {
-                        Text(l10n["update_homebrew_command"])
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .controlBackgroundColor)))
-                        aboutButton(l10n["update_copy_command"], icon: "doc.on.doc") {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(l10n["update_homebrew_command"], forType: .string)
-                        }
-                    }
-                } else {
-                    // Sparkle owns the download + install alert; this button just
-                    // re-surfaces it if the user dismissed it earlier.
-                    aboutButton(l10n["update_now"], icon: "arrow.down.to.line") {
-                        updater.checkForUpdates()
-                    }
-                }
-            }
-
-        // Download progress and install state are owned by Sparkle's standard
-        // UI, not the About page — those enum cases no longer exist.
-
-        case let .failed(message):
-            VStack(spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                        .font(.system(size: 13))
-                    Text(String(format: l10n["update_failed_body"], message))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-                aboutButton(l10n["update_retry"], icon: "arrow.clockwise") {
-                    updater.checkForUpdates()
-                }
-            }
         }
     }
 
