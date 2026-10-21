@@ -158,4 +158,28 @@ final class GoalLoaderTests: GoalTestCase {
         let fresh = Date().timeIntervalSince(r.live.first?.agents.first?.lastActivity ?? .distantPast)
         XCTAssertLessThan(fresh, 60, "subagent transcript mtime counts as activity")
     }
+
+    /// A click on a request taken opens the session that took it (#67): the register's `local_id`, else the
+    /// session whose cli id is `presa_da`; a request not taken opens nothing.
+    func testTakenRequestTargetsTheSessionThatTookIt() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
+        try fm.createDirectory(at: support, withIntermediateDirectories: true)
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
+        try sessionJSON("local_a", cli: "ca").write(to: support.appendingPathComponent("local_a.json"))
+        try sessionJSON("local_b", cli: "cb").write(to: support.appendingPathComponent("local_b.json"))
+        let request = { (id: String, extra: String) in
+            try Data(#"{"id": "\#(id)", "testo": "x", \#(extra)}"#.utf8).write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        try request("Q-1", #""stato": "presa", "presa_da": "cb", "local_id": "local_a""#)
+        try request("Q-2", #""stato": "presa", "presa_da": "cb""#)
+        try request("Q-3", #""stato": "nuova", "local_id": "local_a""#)
+        let byId = Dictionary(uniqueKeysWithValues: GoalSources.load(paths).requests.map { ($0.id, $0) })
+        XCTAssertEqual(byId["Q-1"]?.target?.localId, "local_a", "local_id wins")
+        XCTAssertEqual(byId["Q-2"]?.target?.localId, "local_b", "presa_da as fallback")
+        XCTAssertNil(byId["Q-3"]?.target, "not taken: no session to open")
+    }
 }
