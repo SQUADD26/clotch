@@ -2,12 +2,13 @@ import SwiftUI
 import CodeIslandCore
 
 // Issue #15 (first cut #10): the light on the notch's outline while the Overseer speaks, in the style of Apple Intelligence's
-// edge glow. Apple Intelligence's colours flow along the outline at one steady pace: a sharp line and two soft halos. The voice
-// only brightens and widens the halos, averaged over 0.4 s, so the light swells with the phrases and never pulses with syllables.
-// Zero cost when silent: nothing is in the tree and no timeline runs. Reduce Motion: a still glow at a steady level.
+// edge glow. Apple Intelligence's colours flow along the outline at one steady pace: a sharp line and two soft halos. The motion
+// is the flow of the colours. The voice only drifts the halos within a narrow, high band (`VoiceStatus.intensity(at:)`, #29),
+// so the light never pulses. Long fades in and out. Zero cost when silent: nothing is in the tree and no timeline runs.
+// Reduce Motion: a still glow at a steady level.
 // Place it as an overlay on the notch OUTSIDE its `.clipped()`, with the notch's own shape, so the glow can spill past the edge.
 
-/// Reads the store: the level comes off the clock from the player's envelope, so there is one timeline, not two.
+/// Reads the store: the intensity comes off the clock from the player's envelope, so there is one timeline, not two.
 struct VoiceEdgeLightLive<S: Shape>: View {
     @ObservedObject var voice: VoiceStore
     let shape: S
@@ -15,10 +16,10 @@ struct VoiceEdgeLightLive<S: Shape>: View {
     var body: some View {
         ZStack {
             if let s = voice.status {
-                VoiceGlowDriver(shape: shape, level: s.level(at:)).transition(.opacity)
+                VoiceGlowDriver(shape: shape, intensity: s.intensity(at:)).transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.4), value: voice.status == nil)
+        .animation(.easeInOut(duration: 1.0), value: voice.status == nil) // long fade at the start and end of the voice
         .allowsHitTesting(false)
     }
 }
@@ -27,7 +28,6 @@ struct VoiceEdgeLightLive<S: Shape>: View {
 enum VoiceEdgeLook {
     static let period: TimeInterval = 6 // one lap of the colours round the outline
     static let segments = 48 // one solid colour each; the round caps and the halos' blur hide the steps
-    static let window: TimeInterval = 0.4 // the voice is averaged over this span, centred on now
     /// Apple Intelligence's palette as a loop: #FFBA71 → #FF6778 → #F5B9EA → #C686FF → #8D9FFF, then back to orange.
     private static let palette: [(Double, Double, Double)] = [
         (1.00, 0.73, 0.44), (1.00, 0.40, 0.47), (0.96, 0.73, 0.92), (0.78, 0.53, 1.00), (0.55, 0.62, 1.00),
@@ -46,30 +46,21 @@ enum VoiceEdgeLook {
 private struct VoiceGlowDriver<S: Shape>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let shape: S
-    let level: (Date) -> Float
+    let intensity: (Date) -> Float
 
     var body: some View {
         if reduceMotion {
-            VoiceGlow(shape: shape, level: VoiceStatus.steadyLevel, phase: 0)
+            VoiceGlow(shape: shape, level: VoiceStatus.intensity(VoiceStatus.steadyLevel), phase: 0)
         } else {
             TimelineView(.animation(minimumInterval: 1 / 60)) { ctx in
-                VoiceGlow(shape: shape, level: smoothed(at: ctx.date),
+                VoiceGlow(shape: shape, level: intensity(ctx.date),
                           phase: ctx.date.timeIntervalSinceReferenceDate / VoiceEdgeLook.period)
             }
         }
     }
-
-    /// The envelope is computed before the audio plays, so the average can look ahead: the swell comes on time, not late.
-    private func smoothed(at date: Date) -> Float {
-        let n = 9
-        let sum = (0..<n).reduce(Float(0)) { acc, i in
-            acc + level(date.addingTimeInterval(VoiceEdgeLook.window * (Double(i) / Double(n - 1) - 0.5)))
-        }
-        return sum / Float(n)
-    }
 }
 
-/// One frame of the light: `level` 0…1, `phase` in laps of the colours.
+/// One frame of the light: `level` 0…1 (already filtered and banded), `phase` in laps of the colours.
 struct VoiceGlow<S: Shape>: View {
     let shape: S
     let level: Float
