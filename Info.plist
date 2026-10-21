@@ -29,7 +29,7 @@
 	</dict>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Clotch needs to control terminal apps to jump to the correct window and tab when you click a session.</string>
-	<!-- No updates: no SUFeedURL and no CodeIsland signing key, so Sparkle can never fetch or accept the original CodeIsland app (issue #30). -->
+	<!-- No updates: no SUFeedURL and no signing key, so Sparkle can never fetch or accept another build (issue #30). -->
 	<key>SUAutomaticallyUpdate</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

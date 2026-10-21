@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "CodeIsland",
+    name: "Clotch",
     platforms: [.macOS(.v14)],
     dependencies: [
         // Sparkle — auto-update framework. Pinned to 2.6+ for stable
@@ -12,25 +12,25 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "CodeIslandCore",
-            path: "Sources/CodeIslandCore"
+            name: "ClotchCore",
+            path: "Sources/ClotchCore"
         ),
         .executableTarget(
-            name: "CodeIsland",
+            name: "Clotch",
             dependencies: [
-                "CodeIslandCore",
+                "ClotchCore",
                 .product(name: "Sparkle", package: "Sparkle"),
                 .product(name: "Yams", package: "Yams"),
             ],
-            path: "Sources/CodeIsland",
+            path: "Sources/Clotch",
             resources: [
                 .copy("Resources")
             ]
         ),
         .executableTarget(
-            name: "codeisland-bridge",
-            dependencies: ["CodeIslandCore"],
-            path: "Sources/CodeIslandBridge"
+            name: "clotch-bridge",
+            dependencies: ["ClotchCore"],
+            path: "Sources/ClotchBridge"
         ),
         // Resets the xctest runner's shared defaults domain when a test
         // bundle loads (see Tests/TestDefaultsReset/TestDefaultsReset.c).
@@ -39,18 +39,18 @@ let package = Package(
             path: "Tests/TestDefaultsReset"
         ),
         .testTarget(
-            name: "CodeIslandCoreTests",
-            dependencies: ["CodeIslandCore", "TestDefaultsReset"],
-            path: "Tests/CodeIslandCoreTests"
+            name: "ClotchCoreTests",
+            dependencies: ["ClotchCore", "TestDefaultsReset"],
+            path: "Tests/ClotchCoreTests"
         ),
         .testTarget(
-            name: "CodeIslandTests",
+            name: "ClotchTests",
             dependencies: [
-                "CodeIsland",
+                "Clotch",
                 "TestDefaultsReset",
                 .product(name: "Yams", package: "Yams"),
             ],
-            path: "Tests/CodeIslandTests"
+            path: "Tests/ClotchTests"
         ),
     ]
 )

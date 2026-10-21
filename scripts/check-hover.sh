@@ -2,7 +2,7 @@
 # #47: every clickable thing of the notch and of the settings uses the shared hover (NotchHover.swift).
 # A plain Button style, an onTapGesture without the hover a few lines on, or a hand-made cursor push fails.
 set -euo pipefail
-cd "$(dirname "$0")/../Sources/CodeIsland"
+cd "$(dirname "$0")/../Sources/Clotch"
 files="GoalEditor ClotchNotchPage NotchElementViews NotchNotificationView NotchSections NotchPager NotchProposals NotchRequestsPlate NotchGoalPlate NotchAccountsViews NotchAccountsPlate GoalsNotchView GoalPRRow SessionOpener NotchCustomizeView SettingsView NotchPanelView AgentTaskProgressView MarkdownReplyView PushSettingsView VoiceSettingsPage"
 bad=0; buttons=0
 for f in $files; do

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Every language in L10n.swift has every English key, with the same placeholders. Prints what is off; exit 1 if any."""
 import re, sys, collections
-src = open(sys.argv[1] if len(sys.argv) > 1 else "Sources/CodeIsland/L10n.swift", encoding="utf-8").read()
+src = open(sys.argv[1] if len(sys.argv) > 1 else "Sources/Clotch/L10n.swift", encoding="utf-8").read()
 tables, merged = {}, set()
 for m in re.finditer(r'private static let (\w+): \[String: String\] = (en\.merging\()?\[(.*?)\n    \]', src, re.S):
     tables[m.group(1)] = dict(re.findall(r'^\s*"([^"]+)":\s*"((?:[^"\\]|\\.)*)"', m.group(3), re.M))

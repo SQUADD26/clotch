@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Hot-restart dev loop for CodeIsland:
+# Hot-restart dev loop for Clotch:
 # - Watches source changes
 # - Builds once per change batch
 # - Restarts app only after successful build
@@ -11,11 +11,11 @@ set -euo pipefail
 #   scripts/dev-hot-restart.sh --debounce 1.0 --paths "Sources,Tests,Package.swift"
 #   scripts/dev-hot-restart.sh --build-cmd "swift build"
 #   scripts/dev-hot-restart.sh --with-tests
-#   scripts/dev-hot-restart.sh --socket-path /tmp/codeisland-dev.sock
+#   scripts/dev-hot-restart.sh --socket-path /tmp/clotch-dev.sock
 
 DEBOUNCE="0.8"
 WATCH_PATHS="Sources,Tests,Package.swift"
-APP_PATH=".build/debug/CodeIsland"
+APP_PATH=".build/debug/Clotch"
 BUILD_CMD="swift build"
 WITH_TESTS=0
 SOCKET_PATH=""
@@ -24,22 +24,22 @@ print_usage() {
   cat <<'EOF'
 Usage: scripts/dev-hot-restart.sh [options]
 
-Watch source changes, build once per change batch, and restart CodeIsland app only when build succeeds.
+Watch source changes, build once per change batch, and restart Clotch app only when build succeeds.
 If build fails, current app keeps running.
 
 Examples:
   scripts/dev-hot-restart.sh --debounce 1.0 --paths "Sources,Tests,Package.swift"
   scripts/dev-hot-restart.sh --build-cmd "swift build"
   scripts/dev-hot-restart.sh --with-tests
-  scripts/dev-hot-restart.sh --socket-path /tmp/codeisland-dev.sock
+  scripts/dev-hot-restart.sh --socket-path /tmp/clotch-dev.sock
 
 Options:
   --paths <csv>          Watch paths (default: Sources,Tests,Package.swift)
   --debounce <seconds>   Debounce window (default: 0.8)
-  --app-path <path>      Executable path (default: .build/debug/CodeIsland)
+  --app-path <path>      Executable path (default: .build/debug/Clotch)
   --build-cmd <command>  Build command (default: swift build)
   --with-tests           Run swift test after successful build before restart
-  --socket-path <path>   Set CODEISLAND_SOCKET_PATH when launching app
+  --socket-path <path>   Set CLOTCH_SOCKET_PATH when launching app
   --help                 Show this help message
 EOF
 }
@@ -105,10 +105,10 @@ parse_args() {
 
 quit_app() {
   local existing_pids
-  existing_pids="$(pgrep -x "CodeIsland" || true)"
+  existing_pids="$(pgrep -x "Clotch" || true)"
   [[ -z "$existing_pids" ]] && return 0
 
-  log "Stopping existing CodeIsland process(es): $existing_pids"
+  log "Stopping existing Clotch process(es): $existing_pids"
   local pid
   for pid in $existing_pids; do
     kill -TERM "$pid" >/dev/null 2>&1 || true
@@ -146,7 +146,7 @@ quit_app() {
     sleep 0.1
   done
 
-  fail "Existing CodeIsland process(es) still alive after SIGKILL; aborting restart"
+  fail "Existing Clotch process(es) still alive after SIGKILL; aborting restart"
 }
 
 launch_app() {
@@ -154,8 +154,8 @@ launch_app() {
     log "NOTE: launching a bare executable; Buddy Bluetooth requires a signed .app bundle with Bluetooth entitlements"
   fi
   if [[ -n "$SOCKET_PATH" ]]; then
-    log "Launching app with CODEISLAND_SOCKET_PATH=$SOCKET_PATH"
-    CODEISLAND_SOCKET_PATH="$SOCKET_PATH" "$APP_PATH" &
+    log "Launching app with CLOTCH_SOCKET_PATH=$SOCKET_PATH"
+    CLOTCH_SOCKET_PATH="$SOCKET_PATH" "$APP_PATH" &
   else
     log "Launching app: $APP_PATH"
     "$APP_PATH" &
@@ -237,7 +237,7 @@ main() {
 
   collect_watch_args
 
-  EVENT_FILE="$(mktemp -t codeisland-hot-restart-events)"
+  EVENT_FILE="$(mktemp -t clotch-hot-restart-events)"
   trap cleanup EXIT INT TERM
 
   log "Watching paths: ${WATCH_ARGS[*]}"
