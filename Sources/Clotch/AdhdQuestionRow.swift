@@ -4,6 +4,8 @@
 // Parità col disegno: AdhdParityTests scrive il PNG, parita.mjs (skill figma-ui-design) lo confronta con design/figma/42-48321.png.
 import SwiftUI
 
+private typealias T = FigmaToken.MacOS27GoldenGate
+
 struct AdhdQuestionRow: View {
     let question: String
     /// «Chiesta 3 volte · ieri · a Clotch: correzioni notch».
@@ -13,25 +15,25 @@ struct AdhdQuestionRow: View {
     var body: some View {
         HStack(spacing: 0) {
             Text("?")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(GoalTone.wait.color)
+                .font(.system(size: T.notchTesto15, weight: .semibold))
+                .foregroundStyle(T.notchGiallo)
                 .frame(width: 40)
             VStack(alignment: .leading, spacing: NotchSpace.tight) {
-                Text(question).font(NotchType.line).foregroundStyle(GoalInk.row)
-                Text(detail).font(NotchType.small).foregroundStyle(GoalInk.secondary)
+                Text(question).font(.system(size: T.notchTesto14, weight: .medium)).foregroundStyle(T.notchBiancoA92)
+                Text(detail).font(.system(size: T.notchTesto11, weight: .medium)).foregroundStyle(T.notchBiancoA55)
             }
             .lineLimit(1)
             Spacer(minLength: 12)
             Button(action: nudge) {
-                IconLabel(symbol: "paperplane", text: "Sollecita", font: NotchType.small, color: GoalInk.row)
+                IconLabel(symbol: "paperplane", text: "Sollecita", font: .system(size: T.notchTesto11, weight: .medium), color: T.notchBiancoA92)
                     .padding(.horizontal, 10)
                     .frame(height: 22)
-                    .background(Capsule().fill(GoalInk.button))
+                    .background(RoundedRectangle(cornerRadius: T.notchRaggio11).fill(T.notchBiancoA12))
             }
             .buttonStyle(.plain)
             .padding(.trailing, 12)
         }
         .frame(height: 54)
-        .background(RoundedRectangle(cornerRadius: 12).fill(GoalTone.wait.color.opacity(0.12)))
+        .background(RoundedRectangle(cornerRadius: T.notchRaggio12).fill(T.notchGialloA12))
     }
 }

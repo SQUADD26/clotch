@@ -1,1 +1,179 @@
-{"file":"gayvkX0IaLjZghH2otVbJt","frame":{"id":"42:48321","nome":"riga senza risposta (ritaglio di 42-45145: in Figma non è un frame)","w":508,"h":54},"variabili":{"notch/giallo-a12":"#ffd60a1f","notch/giallo":"#ffd60a","notch/testo/15":15,"notch/bianco-a92":"#ffffffeb","notch/testo/14":14,"notch/bianco-a55":"#ffffff8c","notch/testo/11":11,"notch/bianco-a12":"#ffffff1f","notch/spessore/1":1},"nodi":[{"id":"42:48321","nome":"riga senza risposta","tipo":"RECTANGLE","box":{"x":0,"y":0,"w":508,"h":54},"variabili":{"fills[0]":"notch/giallo-a12"},"senza":["cornerRadius 12"]},{"id":"42:48323","nome":"punto interrogativo","tipo":"TEXT","box":{"x":16.5,"y":19,"w":9,"h":18},"variabili":{"fills[0]":"notch/giallo","fontSize":"notch/testo/15"},"senza":[],"testo":"?","font":"Inter Semi Bold"},{"id":"42:48324","nome":"domanda","tipo":"TEXT","box":{"x":40,"y":10,"w":310,"h":17},"variabili":{"fills[0]":"notch/bianco-a92","fontSize":"notch/testo/14"},"senza":[],"testo":"Come riavvio il notch se si blocca?","font":"Inter Medium"},{"id":"42:48325","nome":"quante volte","tipo":"TEXT","box":{"x":40,"y":31,"w":310,"h":13},"variabili":{"fills[0]":"notch/bianco-a55","fontSize":"notch/testo/11"},"senza":[],"testo":"Chiesta 3 volte · ieri · a Clotch: correzioni notch","font":"Inter Medium"},{"id":"42:51782","nome":"bottone Sollecita","tipo":"RECTANGLE","box":{"x":412,"y":16,"w":84,"h":22},"variabili":{"fills[0]":"notch/bianco-a12"},"senza":["cornerRadius 11"]},{"id":"42:51781","nome":"testo Sollecita","tipo":"TEXT","box":{"x":440,"y":20,"w":46,"h":13},"variabili":{"fills[0]":"notch/bianco-a92","fontSize":"notch/testo/11"},"senza":[],"testo":"Sollecita","font":"Inter Semi Bold"},{"id":"42:51783","nome":"icona Sollecita","tipo":"FRAME","box":{"x":422,"y":21,"w":12,"h":12},"variabili":{},"senza":[]},{"id":"42:51784","nome":"Vector","tipo":"VECTOR","box":{"x":423,"y":22,"w":10,"h":10},"variabili":{"strokes[0]":"notch/bianco-a92","strokeWeight":"notch/spessore/1"},"senza":[]},{"id":"42:51785","nome":"Vector","tipo":"VECTOR","box":{"x":427.5,"y":22,"w":5.5,"h":5.5},"variabili":{"strokes[0]":"notch/bianco-a92","strokeWeight":"notch/spessore/1"},"senza":[]}]}
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "42:48321",
+  "nome": "riga senza risposta",
+  "w": 508,
+  "h": 54
+ },
+ "variabili": {
+  "notch/spessore/1": 1,
+  "notch/testo/15": 15,
+  "notch/giallo": "#ffd60a",
+  "notch/bianco-a55": "#ffffff8c",
+  "notch/testo/11": 11,
+  "notch/bianco-a12": "#ffffff1f",
+  "notch/raggio/11": 11,
+  "notch/bianco-a92": "#ffffffeb",
+  "notch/giallo-a12": "#ffd60a1f",
+  "notch/raggio/12": 12,
+  "notch/testo/14": 14
+ },
+ "nodi": [
+  {
+   "id": "42:48321",
+   "nome": "riga senza risposta",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 508,
+    "h": 54
+   },
+   "variabili": {
+    "fills[0]": "notch/giallo-a12",
+    "topLeftRadius": "notch/raggio/12",
+    "topRightRadius": "notch/raggio/12",
+    "bottomLeftRadius": "notch/raggio/12",
+    "bottomRightRadius": "notch/raggio/12"
+   },
+   "senza": [
+    "cornerRadius 12"
+   ]
+  },
+  {
+   "id": "42:48323",
+   "nome": "punto interrogativo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16.5,
+    "y": 19,
+    "w": 9,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "notch/giallo",
+    "fontSize": "notch/testo/15"
+   },
+   "senza": [],
+   "testo": "?"
+  },
+  {
+   "id": "42:48324",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 10,
+    "w": 310,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Come riavvio il notch se si blocca?"
+  },
+  {
+   "id": "42:48325",
+   "nome": "quante volte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 31,
+    "w": 310,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a55",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Chiesta 3 volte · ieri · a Clotch: correzioni notch"
+  },
+  {
+   "id": "42:51782",
+   "nome": "bottone Sollecita",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 412,
+    "y": 16,
+    "w": 84,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a12",
+    "topLeftRadius": "notch/raggio/11",
+    "topRightRadius": "notch/raggio/11",
+    "bottomLeftRadius": "notch/raggio/11",
+    "bottomRightRadius": "notch/raggio/11"
+   },
+   "senza": [
+    "cornerRadius 11"
+   ]
+  },
+  {
+   "id": "42:51781",
+   "nome": "testo Sollecita",
+   "tipo": "TEXT",
+   "box": {
+    "x": 440,
+    "y": 20,
+    "w": 46,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Sollecita"
+  },
+  {
+   "id": "42:51783",
+   "nome": "icona Sollecita",
+   "tipo": "FRAME",
+   "box": {
+    "x": 422,
+    "y": 21,
+    "w": 12,
+    "h": 12
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "42:51784",
+   "nome": "Vector",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 423,
+    "y": 22,
+    "w": 10,
+    "h": 10
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "42:51785",
+   "nome": "Vector",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 427.5,
+    "y": 22,
+    "w": 5.5,
+    "h": 5.5
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1"
+   },
+   "senza": []
+  }
+ ]
+}
