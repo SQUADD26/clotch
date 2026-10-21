@@ -79,8 +79,6 @@ struct NotchSectionsContent: View {
                 .id(tab)
                 .transition(reduceMotion ? .opacity : .push(from: forward ? .trailing : .leading))
             }
-            .opacity(moving ? 0.45 : 1)  // as the Pager: nothing is read half-way
-            .blur(radius: moving && !reduceMotion ? 2.5 : 0)
             .clipped()
         }
         .padding(.horizontal, NotchSpace.side)
@@ -98,7 +96,7 @@ struct NotchSectionsContent: View {
         withAnimation(NotchMotion.animation(reduce: reduceMotion)) {
             tab = target
         } completion: {
-            withAnimation(NotchMotion.still) { moving = false }
+            moving = false
         }
     }
 
