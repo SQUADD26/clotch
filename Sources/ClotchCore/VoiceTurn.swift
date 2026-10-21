@@ -6,7 +6,9 @@ import FoundationNetworking
 /// One piece of news said out loud (#50, #57): the event's report → yes or no → Haiku → ElevenLabs.
 /// Pure: the app (`VoiceSpeaker`) runs the processes, the network and the audio. Same rules as Clean View's `voce.ts`.
 public enum VoiceTurn {
-    public static let haikuModel = "claude-haiku-5-5"
+    /// The models and effort levels the rewriter may run with (#96); `claude --effort` takes exactly these levels.
+    public static let models = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]
+    public static let efforts = ["low", "medium", "high", "xhigh", "max"]
     /// Haiku gets this long per try, two tries (#73); then the voice is silent (#84).
     public static let haikuSeconds: TimeInterval = 22
     public static let haikuTries = 2
@@ -29,6 +31,8 @@ public enum VoiceTurn {
         /// much of their volume the other apps keep meanwhile (`abbassa_livello`, percent).
         public var duck: Bool
         public var duckLevel: Double
+        /// The model that writes the spoken line and its effort (`riscrittore_modello`, `riscrittore_ragionamento`, #96).
+        public var rewriterModel, rewriterEffort: String
 
         public enum Audience: String { case all = "tutte", main = "principali", one = "una" }
 
@@ -48,6 +52,8 @@ public enum VoiceTurn {
             duck = c["abbassa_audio"] as? Bool ?? false
             let percent = (c["abbassa_livello"] as? NSNumber)?.doubleValue ?? VoiceDuck.defaultLevel * 100
             duckLevel = min(VoiceDuck.levelRange.upperBound, max(VoiceDuck.levelRange.lowerBound, percent / 100))
+            rewriterModel = VoiceTurn.models.first { $0 == c["riscrittore_modello"] as? String } ?? VoiceTurn.models[0]
+            rewriterEffort = VoiceTurn.efforts.first { $0 == c["riscrittore_ragionamento"] as? String } ?? VoiceTurn.efforts[0]
         }
 
         /// Whether this end of turn is said. `sessions` = the Claude app's session files; the turn's `cliId` is found
@@ -105,8 +111,8 @@ public enum VoiceTurn {
 
     /// `claude -p` as Clean View's parlatore runs it: no hooks or mods (safe mode), no tools, a cost ceiling.
     /// The report goes on stdin as data, never in the command line.
-    public static func haikuArguments(prompt: String) -> [String] {
-        ["-p", "--safe-mode", "--model", haikuModel, "--effort", "low", "--tools", "", "--no-session-persistence",
+    public static func haikuArguments(prompt: String, config: Config) -> [String] {
+        ["-p", "--safe-mode", "--model", config.rewriterModel, "--effort", config.rewriterEffort, "--tools", "", "--no-session-persistence",
          "--max-budget-usd", "0.02", "--system-prompt", prompt]
     }
 

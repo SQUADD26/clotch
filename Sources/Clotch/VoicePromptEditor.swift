@@ -1,7 +1,7 @@
 import SwiftUI
 import ClotchCore
 
-/// «Istruzioni di Haiku» (#95): the row shows the start of the instructions in use; «Modifica…» opens a large editor sheet
+/// «Istruzioni» (#95): the row shows the start of the instructions in use; «Modifica…» opens a large editor sheet
 /// (Roberto: «Serve una modalità più decente di modificare il system prompt»). Saved text goes to `istruzioni.md` and wins
 /// over the config's; «Ripristina predefinito» removes it.
 struct VoicePromptRow: View {
@@ -12,7 +12,7 @@ struct VoicePromptRow: View {
     @State private var editing = false
 
     var body: some View {
-        SettingsRow("Istruzioni di Haiku") {
+        SettingsRow("Istruzioni") {
             Text(prompt.isEmpty ? "Istruzioni mancanti. La voce tace." : prompt)
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(prompt.isEmpty ? .secondary : .primary)
@@ -59,8 +59,8 @@ private struct VoicePromptEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Istruzioni di Haiku").font(.system(size: 13, weight: .semibold))
-            SettingsNote("Haiku le segue per scrivere ogni frase della voce.")
+            Text("Istruzioni della frase").font(.system(size: 13, weight: .semibold))
+            SettingsNote("Claude le segue per scrivere ogni frase della voce.")
             TextEditor(text: $text)
                 .font(.system(size: 12, design: .monospaced))
                 .scrollContentBackground(.hidden)

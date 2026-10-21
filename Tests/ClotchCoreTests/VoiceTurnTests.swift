@@ -48,12 +48,22 @@ final class VoiceTurnTests: XCTestCase {
     }
 
     func testHaikuGetsTheReportOnStdinOnly() {
-        let args = VoiceTurn.haikuArguments(prompt: "Istruzioni")
+        let args = VoiceTurn.haikuArguments(prompt: "Istruzioni", config: VoiceTurn.Config([:]))
         XCTAssertEqual(args.suffix(2), ["--system-prompt", "Istruzioni"])
         XCTAssertTrue(args.contains("--safe-mode"), "no hooks in Haiku's own run: it cannot trigger the voice again")
         XCTAssertFalse(args.joined().contains("Rapporto segreto"))
         let input = VoiceTurn.haikuInput(report: "Rapporto segreto", previousTopic: "la voce")
         XCTAssertEqual(input, "<rapporto>\nRapporto segreto\n</rapporto>\n<argomento_precedente>la voce</argomento_precedente>\n")
+    }
+
+    func testRewriterRunsWithTheChosenModelAndEffort() {
+        func pair(_ c: [String: Any]) -> [String] {
+            let a = VoiceTurn.haikuArguments(prompt: "x", config: VoiceTurn.Config(c))
+            return [a[a.firstIndex(of: "--model")! + 1], a[a.firstIndex(of: "--effort")! + 1]]
+        }
+        XCTAssertEqual(pair([:]), ["claude-haiku-5-5", "low"])
+        XCTAssertEqual(pair(["riscrittore_modello": "claude-opus-5-5", "riscrittore_ragionamento": "high"]), ["claude-opus-5-5", "high"])
+        XCTAssertEqual(pair(["riscrittore_modello": "gpt", "riscrittore_ragionamento": "--tools"]), ["claude-haiku-5-5", "low"])
     }
 
     func testHaikuAnswerKeepsTopicApartAndRefusesSecrets() {

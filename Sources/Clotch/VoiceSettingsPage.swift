@@ -3,7 +3,7 @@ import AppKit
 import ClotchCore
 
 /// «Voce» (#38, #50, #57, Figma #95): on/off, «Parla per», other sounds, the two keys, voice, speed, daily limits, a test,
-/// Haiku's instructions and the alerts. Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`;
+/// the sentence's model and its instructions, and the alerts. Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`;
 /// the text is Italian like the rest of Clotch's own pages. Every change is saved at once: the page has no «Salva».
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
@@ -24,6 +24,8 @@ struct VoiceSettingsPage: View {
     @State private var onlySession = ""
     @State private var sessions: [DesktopSession] = []
     @State private var duck = false
+    @State private var rewriterModel = VoiceTurn.models[0]
+    @State private var rewriterEffort = VoiceTurn.efforts[0]
     @State private var duckPercent = VoiceDuck.defaultLevel * 100
     @State private var configBroken = false
     @State private var testing = false
@@ -31,7 +33,7 @@ struct VoiceSettingsPage: View {
 
     var body: some View {
         SettingsForm {
-            SettingsNote("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude Haiku scrive una frase breve, poi ElevenLabs la legge con la voce scelta.")
+            SettingsNote("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude scrive una frase breve, poi ElevenLabs la legge con la voce scelta.")
             SettingsRow("Voce") {
                 SettingsCheckbox(title: "Voce accesa", isOn: Binding(get: { isOn }, set: { on in
                     run("Voce non salvata") { try files.setOn(on) }
@@ -85,6 +87,27 @@ struct VoiceSettingsPage: View {
             Divider()
             reading
             Divider()
+            SettingsRow("Scrive la frase") {
+                Picker("Scrive la frase", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
+                    Text("Haiku 5.5").tag("claude-haiku-5-5")
+                    Text("Sonnet 5.5").tag("claude-sonnet-5-5")
+                    Text("Opus 5.5").tag("claude-opus-5-5")
+                }
+                .labelsHidden().frame(width: 200)
+            }
+            .disabled(configBroken)
+            SettingsRow("Ragionamento") {
+                Picker("Ragionamento", selection: Binding(get: { rewriterEffort }, set: { rewriterEffort = $0; saveRewriter() })) {
+                    Text("Basso").tag("low")
+                    Text("Medio").tag("medium")
+                    Text("Alto").tag("high")
+                    Text("Molto alto").tag("xhigh")
+                    Text("Massimo").tag("max")
+                }
+                .labelsHidden().frame(width: 200)
+                SettingsNote("Più ragionamento: frase più curata, ma più lenta.")
+            }
+            .disabled(configBroken)
             VoicePromptRow(note: $note)
             Divider()
             VoiceAlertsSection(sessions: sessions, note: $note)
@@ -178,11 +201,19 @@ struct VoiceSettingsPage: View {
         onlySession = parsed.onlySession
         duck = parsed.duck
         duckPercent = (parsed.duckLevel * 100).rounded()
+        rewriterModel = parsed.rewriterModel
+        rewriterEffort = parsed.rewriterEffort
     }
 
     private func saveDuck() {
         run("Impostazioni non salvate") {
             try files.updateConfig(["abbassa_audio": duck, "abbassa_livello": Int(duckPercent)])
+        }
+    }
+
+    private func saveRewriter() {
+        run("Impostazioni non salvate") {
+            try files.updateConfig(["riscrittore_modello": rewriterModel, "riscrittore_ragionamento": rewriterEffort])
         }
     }
 
