@@ -54,6 +54,12 @@ public enum NotchEvents {
 
     static func clip(_ s: String, _ n: Int) -> String { s.count > n ? String(s.prefix(n - 1)) + "…" : s }
 
+    /// One event, one notice (#111): an event waiting in the queue is replaced by a newer one of the same
+    /// kind and subject, because the line reads the live data, so both would say the same words.
+    public static func merge(queue: [NotchEvent], adding fresh: [NotchEvent]) -> [NotchEvent] {
+        queue.filter { q in !fresh.contains { $0.kind == q.kind && $0.subject == q.subject } } + fresh
+    }
+
     public static func goals(old: [GoalRow], new: [GoalRow]) -> [NotchEvent] {
         let before = Dictionary(old.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         return new.compactMap { row in

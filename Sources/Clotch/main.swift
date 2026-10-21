@@ -1,3 +1,4 @@
+import AppKit
 import ClotchCore
 import Foundation
 
@@ -8,4 +9,7 @@ LegacyDefaults.renameKeys(in: .standard)
 try? FileManager.default.removeItem(at: FileManager.default.homeDirectoryForCurrentUser
     .appendingPathComponent("Library/Application Support/Goal Notch"))
 NotchTiming.migrate(.standard)  // the old speed multipliers become times in ms (#68)
+NotchLayoutStore.migrateWidthScale(screens: NSScreen.screens.map {
+    (ScreenDetector.signature(for: $0), ScreenDetector.screenHasNotch($0))
+})
 ClotchApp.main()

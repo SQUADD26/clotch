@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import ClotchCore
 
 /// «Personalizza il notch» (Figma #95): a sheet over the Notch page. The elements of one screen's closed notch, dragged in
 /// and out, or the standard set; stored per screen (NotchLayoutStore). Screen and width are on the Notch page.
@@ -8,9 +9,14 @@ struct NotchCustomizeView: View {
     @State private var store = NotchLayoutStore.load()
     var screenSignature = NotchCustomizeView.initialSignature()
     var onDone: () -> Void = {}
+    /// `--gallery`: a still halfway through a drag (#101), drawn by `SettingsSnapshot`.
+    var stillDrag = false
+    @State var drag: NotchDrag?
+    @State var spots: [NotchSpot: CGRect] = [:]
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
-    private var hasNotch: Bool { Self.hasNotch(screenSignature) }
-    private var layout: NotchScreenLayout { store.layout(for: screenSignature, hasNotch: hasNotch) }
+    var hasNotch: Bool { Self.hasNotch(screenSignature) }
+    var layout: NotchScreenLayout { store.layout(for: screenSignature, hasNotch: hasNotch) }
 
     /// The screen the notch is on now: the one the settings open on.
     static func initialSignature() -> String {
@@ -36,9 +42,14 @@ struct NotchCustomizeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            menuBar
-            Text(l10n["customize_notch_hint"]).fontWeight(.medium)
-            palette
+            // The elements move by one drag over the notch and the palette (NotchCustomizeDrag, #101).
+            VStack(alignment: .leading, spacing: 16) {
+                menuBar
+                Text(l10n["customize_notch_hint"]).fontWeight(.medium)
+                palette
+            }
+            .contentShape(Rectangle())
+            .gesture(dragGesture)
             Divider()
             Text(l10n["customize_notch_standard"]).fontWeight(.medium)
             ClosedNotchPreview(layout: .standard(hasNotch: hasNotch))
@@ -62,6 +73,13 @@ struct NotchCustomizeView: View {
         .padding(EdgeInsets(top: 24, leading: 32, bottom: 26, trailing: 32))
         .frame(width: ClotchSettingsWindow.width)
         .fixedSize(horizontal: false, vertical: true)
+        .overlay {
+            if let drag { NotchDragPreview(drag: drag).transition(.scale(scale: 0.6).combined(with: .opacity)) }
+        }
+        .coordinateSpace(name: NotchDrag.space)
+        .onPreferenceChange(NotchSpotKey.self) { value in
+            MainActor.assumeIsolated { spotsChanged(value) }  // SwiftUI delivers preferences on the main thread
+        }
     }
 
     private static let standardDrag = "standard"
@@ -84,6 +102,7 @@ struct NotchCustomizeView: View {
             notch
         }
         .frame(height: 38, alignment: .top)
+        .animation(reduceMotion ? nil : NotchMotion.spring, value: drag?.target)
     }
 
     private var notch: some View {
@@ -103,16 +122,12 @@ struct NotchCustomizeView: View {
 
     private func zone(_ zone: NotchZone) -> some View {
         HStack(spacing: 6) {
-            ForEach(layout.elements(in: zone), id: \.self) { element in
-                NotchElementSample(element: element, chip: false).draggable(element.rawValue)
+            ForEach(cells(in: zone), id: \.self) { cell in
+                if let cell { NotchElementSample(element: cell, chip: false).spot(.item(cell)) } else if let drag { NotchDropGap(element: drag.element) }
             }
         }
         .frame(minWidth: 24, minHeight: 24)
-        .contentShape(Rectangle())
-        .dropDestination(for: String.self) { items, _ in
-            guard let element = items.first.flatMap(NotchElement.init(rawValue:)) else { return false }
-            return edit { $0.place(element, in: zone, hasNotch: hasNotch) }
-        }
+        .spot(.zone(zone))
     }
 
     // MARK: Palette
@@ -126,26 +141,24 @@ struct NotchCustomizeView: View {
                 GridRow {
                     ForEach(Self.paletteOrder[start..<min(start + 3, Self.paletteOrder.count)], id: \.self) { element in
                         VStack(spacing: 6) {
-                            NotchElementSample(element: element).fixedSize()
+                            NotchElementSample(element: element).fixedSize().spot(.sample(element))
                             Text(l10n["notch_el_\(element.rawValue)"]).font(.system(size: 11))
                         }
                         .frame(maxWidth: .infinity)
-                        .opacity(layout.contains(element) ? 0.45 : 1)
-                        .draggable(element.rawValue)
+                        .opacity(layout.contains(element) || drag?.element == element ? 0.45 : 1)
+                        .spot(.tile(element))
                     }
                 }
             }
         }
-        // Dropping an element back on the palette removes it from the notch.
-        .dropDestination(for: String.self) { items, _ in
-            guard let element = items.first.flatMap(NotchElement.init(rawValue:)) else { return false }
-            return edit { $0.remove(element); return true }
-        }
+        // Dropping an element back on the palette removes it from the notch: it lights while that is the drop.
+        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.primary.opacity(drag?.target == .remove ? 0.08 : 0)).padding(-8))
+        .spot(.palette)
     }
 
     /// Applies `change` to this screen's layout and saves; false (a refused drop) saves nothing.
     @discardableResult
-    private func edit(_ change: (inout NotchScreenLayout) -> Bool) -> Bool {
+    func edit(_ change: (inout NotchScreenLayout) -> Bool) -> Bool {
         var updated = layout
         guard change(&updated) else { return false }
         store = NotchLayoutStore.load()  // the Notch page may have changed the width since the sheet opened

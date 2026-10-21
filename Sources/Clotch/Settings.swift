@@ -122,7 +122,6 @@ enum SettingsKey {
     static let showToolStatus = "showToolStatus"              // true = detailed, false = simple
 
     // Island collapsed width scale (percentage: 50–150, default 100)
-    static let collapsedWidthScale = "collapsedWidthScale"
 
     // Default mascot source when no sessions exist (falls back to this instead of always "claude")
     static let defaultSource = "defaultSource"
@@ -232,7 +231,6 @@ struct SettingsDefaults {
 
     static let showToolStatus = true
 
-    static let collapsedWidthScale = 100  // percentage
 
     static let defaultSource = "claude"
 
@@ -331,7 +329,6 @@ class SettingsManager {
             SettingsKey.mascotSpeed: SettingsDefaults.mascotSpeed,
             SettingsKey.sessionGroupingMode: SettingsDefaults.sessionGroupingMode,
             SettingsKey.showToolStatus: SettingsDefaults.showToolStatus,
-            SettingsKey.collapsedWidthScale: SettingsDefaults.collapsedWidthScale,
             SettingsKey.esp32BridgeEnabled: SettingsDefaults.esp32BridgeEnabled,
             SettingsKey.esp32HeartbeatSeconds: SettingsDefaults.esp32HeartbeatSeconds,
             SettingsKey.buddyScreenBrightnessPercent: SettingsDefaults.buddyScreenBrightnessPercent,

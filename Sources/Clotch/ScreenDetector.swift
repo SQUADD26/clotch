@@ -9,7 +9,6 @@ struct ScreenDetector {
     }
 
     /// Simulated notch width for non-notch screens — scales with screen width.
-    /// User scaling is applied in NotchPanelView.effectiveNotchW (reactive via @AppStorage).
     private static func fakeNotchWidth(for screen: NSScreen) -> CGFloat {
         let screenW = screen.frame.width
         return min(max(screenW * 0.14, 160), 240)

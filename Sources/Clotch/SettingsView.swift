@@ -1315,7 +1315,6 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.showProjectName) private var showProjectName = SettingsDefaults.showProjectName
     @AppStorage(SettingsKey.showClaudeQuota) private var showClaudeQuota = SettingsDefaults.showClaudeQuota
     @AppStorage(SettingsKey.claudeQuotaChip) private var claudeQuotaChip = SettingsDefaults.claudeQuotaChip
-    @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.notchHeightMode) private var notchHeightModeRaw = SettingsDefaults.notchHeightMode
     @AppStorage(SettingsKey.customNotchHeight) private var customNotchHeight = SettingsDefaults.customNotchHeight
     @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
@@ -1371,22 +1370,6 @@ private struct AppearancePage: View {
                 } label: {
                     Text(l10n["session_list_density"])
                     Text(l10n["session_list_density_desc"])
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(l10n["collapsed_width_scale"])
-                        Spacer()
-                        Text("\(collapsedWidthScale)%")
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-                    Slider(value: Binding(
-                        get: { Double(collapsedWidthScale) },
-                        set: { collapsedWidthScale = Int($0) }
-                    ), in: Double(NotchWidthScale.min)...Double(NotchWidthScale.max), step: Double(NotchWidthScale.step))
-                    Text(l10n["collapsed_width_scale_desc"])
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     Picker(selection: notchHeightMode) {
