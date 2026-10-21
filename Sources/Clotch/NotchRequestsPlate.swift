@@ -10,6 +10,7 @@ struct RequestsTab: View {
     @State private var page: Int
     /// When the tab was opened last, frozen at first show: the dots stay while Roberto reads, go at the next opening.
     @State private var seenAt: Date
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     static let perPage = 5
 
     init(requests: [UserRequest], active: Bool, now: Date = Date(), seenAt: Date = .distantFuture, startPage: Int = 0) {
@@ -38,10 +39,12 @@ struct RequestsTab: View {
                 let pages = (requests.count + Self.perPage - 1) / Self.perPage
                 let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
                 Pager(count: pages, index: index) { p in
+                    let shown = requests.dropFirst(p * Self.perPage).prefix(Self.perPage)
                     // Every page is as tall as a full one, so the footer never jumps.
                     VStack(alignment: .leading, spacing: 12) {  // rows 32 pt apart
-                        ForEach(requests.dropFirst(p * Self.perPage).prefix(Self.perPage)) { RequestLine(request: $0, isNew: $0.isNewAnswer(since: seenAt)) }
+                        ForEach(shown) { RequestLine(request: $0, isNew: $0.isNewAnswer(since: seenAt)).transition(.notchRow(reduce: reduceMotion)) }
                     }
+                    .animation(NotchMotion.animation(reduce: reduceMotion), value: shown.map(\.id))
                     .frame(minHeight: CGFloat(Self.perPage) * 20 + CGFloat(Self.perPage - 1) * 12, alignment: .top)
                 } footer: { go in
                     if pages > 1 { footer(pages: pages, index: index.wrappedValue, go: go) }

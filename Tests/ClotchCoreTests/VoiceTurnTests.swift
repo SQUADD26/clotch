@@ -74,7 +74,7 @@ final class VoiceTurnTests: XCTestCase {
             XCTAssertFalse(r.contains(bad), "\(bad) in «\(r)»")
         }
         XCTAssertTrue(r.contains("la modifica"))
-        XCTAssertTrue(r.hasSuffix("Io consiglio di sì."), r)
+        XCTAssertFalse(r.contains("consiglio"), "never «io consiglio di sì» (#84): «\(r)»")
         let long = String(repeating: "Una frase del rapporto. ", count: 50)
         XCTAssertLessThanOrEqual(report(long).count, VoiceTurn.maxSpoken)
         XCTAssertFalse(report("la chiave è sk_0123456789abcdefabcd").contains("sk_"), "a key never reaches Haiku")
@@ -86,7 +86,7 @@ final class VoiceTurnTests: XCTestCase {
     func testElevenLabsRequestKeyOnlyInHeader() throws {
         let cfg = VoiceTurn.Config(["voice_id": "voce123456", "speed": 1.8, "model_id": "eleven_v4_turbo"])
         let key = "sk_chiave_di_prova_123"
-        let r = VoiceTurn.speechRequest(text: "Ciao", config: cfg, key: key)
+        let r = VoiceTurn.speechRequest(text: "Ciao", config: cfg, key: key, pronunciation: [:])
         XCTAssertEqual(r.value(forHTTPHeaderField: "xi-api-key"), key)
         XCTAssertFalse(r.url!.absoluteString.contains(key))
         XCTAssertTrue(r.url!.absoluteString.contains("/text-to-speech/voce123456"))
@@ -189,7 +189,7 @@ final class VoiceTurnTests: XCTestCase {
 
     func testSlowHaikuGetsASecondTry() async {
         let calls = Counter()
-        let said = await VoiceTurn.line(report: sample, timeout: 0.2) {
+        let said = await VoiceTurn.line(timeout: 0.2) {
             if await calls.next() == 1 { try? await Task.sleep(nanoseconds: 3_000_000_000); return "Troppo tardi." }
             return "Capo, la voce del notch è pronta.\nARGOMENTO: la voce del notch"
         }
@@ -199,20 +199,46 @@ final class VoiceTurnTests: XCTestCase {
         XCTAssertEqual(n, 2)
     }
 
-    func testTwoFailuresSayTheCleanedReportInThreeSentences() async throws {
+    func testTwoFailuresAreSilence() async {
         let calls = Counter()
-        let line = await VoiceTurn.line(report: sample, timeout: 0.2) { _ = await calls.next(); return nil }
-        let said = try XCTUnwrap(line)
+        let line = await VoiceTurn.line(timeout: 0.2) { _ = await calls.next(); return nil }
         let n = await calls.count
         XCTAssertEqual(n, 2, "two tries")
-        XCTAssertEqual(said.text, "Ho finito la voce del notch, vedi la modifica e un file. La luce ora segue la voce. I test sono verdi.")
-        for bad in ["73", "c254d67a", "http", "Sources", "schermo", "Resta la prova"] { XCTAssertFalse(said.text.contains(bad), bad) }
-        let orderOnly = await VoiceTurn.line(report: "Apri il terminale e incolla il comando.", timeout: 0.2) { nil }
-        XCTAssertNil(orderOnly, "nothing left to say: silence, never a placeholder")
+        XCTAssertNil(line, "the rewriter failed: silence, never the report (#84)")
+    }
+
+    func testAdviceFormulaNeverSaid() {
+        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Mi serve il tuo sì per la luce del notch. Io dico sì.")?.text, "Mi serve il tuo sì per la luce del notch.")
+        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Devi scegliere il colore, capo. Io consiglio di no.")?.text, "Devi scegliere il colore, capo.")
+        XCTAssertNil(VoiceTurn.spoken(fromHaiku: "Io direi di sì."))
+    }
+
+    func testPronunciationAppliedBeforeElevenLabs() throws {
+        let words = ["Clotch": "Clocc", "notch": "nocc", "PR": "pi àr", "CI": "si ai", "pi": "PI"]
+        let r = VoiceTurn.speechRequest(text: "Clotch sul notch, la PR e il NOTCH. Clotchino resta, la CI ci vede, la pr no.",
+                                        config: VoiceTurn.Config([:]), key: "k", pronunciation: words)
+        let o = try JSONSerialization.jsonObject(with: XCTUnwrap(r.httpBody)) as! [String: Any]
+        XCTAssertEqual(o["text"] as? String, "Clocc sul nocc, la pi àr e il nocc. Clotchino resta, la si ai ci vede, la pr no.",
+                       "a sigla matches capitals only; one pass: «pi» of «pi àr» is not read again")
+        XCTAssertEqual(VoiceTurn.pronounced("niente", [:]), "niente")
+        XCTAssertEqual(VoiceTurn.pronounced("costa 5$", ["5$": "cinque dollari $1"]), "costa cinque dollari $1")
+    }
+
+    func testNoCopyOfTheVoicePromptInClotch() throws {
+        // #84: the prompt and the judge question are the config's files; a line of them inside Clotch's sources is a copy.
+        let sources = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../Sources").standardized
+        let all = FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil)!.compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" }
+        XCTAssertFalse(all.isEmpty)
+        for f in all {
+            let src = try String(contentsOf: f, encoding: .utf8)
+            for line in ["Sei la voce di Roberto", "Come rispondi: prima riga la frase da dire", "E' necessario avvisare l'utente adesso"] {
+                XCTAssertNil(src.range(of: line), f.lastPathComponent)
+            }
+        }
     }
 
     func testNoFixedSentenceAnywhere() throws {
-        for f in ["VoiceTurn.swift", "VoiceClean.swift", "VoicePrompt.swift"] {
+        for f in ["VoiceTurn.swift", "VoiceClean.swift"] {
             let src = try String(contentsOf: URL(fileURLWithPath: #filePath).deletingLastPathComponent()
                 .appendingPathComponent("../../Sources/ClotchCore/\(f)").standardized, encoding: .utf8)
             XCTAssertNil(src.range(of: "guarda lo schermo", options: .caseInsensitive), f)

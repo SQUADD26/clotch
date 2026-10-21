@@ -9,14 +9,19 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
         keyURL = home.appendingPathComponent(".config/elevenlabs/api-key")
         configURL = voce.appendingPathComponent("config.json")
         offURL = voce.appendingPathComponent("spento")
-        promptURL = voce.appendingPathComponent("prompt.md")
+        // The config's own files, installed by claude-config `global/bin/installa` with the mod (#84): read, never copied or written.
+        let mod = home.appendingPathComponent(".claude/mods/clean-view/hooks")
+        promptURL = mod.appendingPathComponent("voce-parlatore.md")
+        basePronunciationURL = mod.appendingPathComponent("voce-pronuncia.json")
+        pronunciationURL = voce.appendingPathComponent("pronuncia.json")
+        judgeQuestionURL = home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt")  // the same question as `voce_giudice.py`
         dayURL = voce.appendingPathComponent("giorno.json")
         lastURL = voce.appendingPathComponent("ultima.json")
         statusURL = voce.appendingPathComponent("stato.json")
@@ -74,13 +79,24 @@ public struct VoiceFiles {
         try write(JSONSerialization.data(withJSONObject: merged, options: [.prettyPrinted, .sortedKeys]), to: configURL)
     }
 
-    /// The instructions Haiku follows before the voice speaks: prompt.md when it has text, else the stock ones.
-    public var prompt: String {
-        let own = (try? String(contentsOf: promptURL, encoding: .utf8)) ?? ""
-        return own.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultPrompt : own
+    /// The instructions Haiku follows: the config's canonical `voce-parlatore.md` (#84). nil (missing or empty) = the voice is silent.
+    public var prompt: String? { text(promptURL) }
+
+    /// The judge's question: the config's `voce_giudice_domanda.txt` (#84). nil = the judge is not asked.
+    public var judgeQuestion: String? { text(judgeQuestionURL) }
+
+    private func text(_ url: URL) -> String? {
+        let t = ((try? String(contentsOf: url, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
     }
 
-    public var defaultPrompt: String { VoicePrompt.stock }
+    /// How words are said (`{"parola": "come si dice"}`): the config's base list, then Roberto's `pronuncia.json` on top.
+    /// A missing or broken file counts as empty; an entry that is not text is skipped.
+    public var pronunciation: [String: String] {
+        let read = { (u: URL) in ((try? Data(contentsOf: u)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:])
+            .compactMapValues { $0 as? String } }
+        return read(basePronunciationURL).merging(read(pronunciationURL)) { _, own in own }
+    }
 
     /// The key, for the speaker only: trimmed, nil when missing or not shaped like a key.
     public var key: String? {
@@ -92,16 +108,6 @@ public struct VoiceFiles {
     public func isMuted(session: String) -> Bool {
         let id = session.filter { $0.isLetter || $0.isNumber || $0 == "_" || $0 == "-" }
         return !id.isEmpty && FileManager.default.fileExists(atPath: voiceDir.appendingPathComponent("muto-" + id).path)
-    }
-
-    /// Empty text or the stock text removes prompt.md, so the stock instructions apply (and their updates reach Roberto).
-    public func savePrompt(_ text: String) throws {
-        let blank = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if blank.isEmpty || blank == defaultPrompt.trimmingCharacters(in: .whitespacesAndNewlines) {
-            if FileManager.default.fileExists(atPath: promptURL.path) { try FileManager.default.removeItem(at: promptURL) }
-        } else {
-            try write(Data(text.utf8), to: promptURL)
-        }
     }
 
     /// One write in append, file 600 (a log line): two writers never mix their lines. Best effort.
