@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prints the CodeIslandCore sources and tests that build on Linux, one path per line.
+"""Prints the ClotchCore sources and tests that build on Linux, one path per line.
 
 Rule, no file names: a file is out when it uses an Apple-only API (the pattern below), or when it
 names a type, or calls a method an extension adds, that a file already out declares. Repeated
@@ -38,7 +38,7 @@ def uses(text, names):
 
 
 root = Path(sys.argv[1])
-files = {p: p.read_text() for d in ("Sources/CodeIslandCore", "Tests/CodeIslandCoreTests") for p in sorted((root / d).glob("*.swift"))}
+files = {p: p.read_text() for d in ("Sources/ClotchCore", "Tests/ClotchCoreTests") for p in sorted((root / d).glob("*.swift"))}
 out = {p for p, t in files.items() if APPLE_ONLY.search(t) or (NETWORK.search(t) and "import FoundationNetworking" not in t)}
 while True:
     gone = set().union(*(declared(files[p]) for p in out)) if out else set()

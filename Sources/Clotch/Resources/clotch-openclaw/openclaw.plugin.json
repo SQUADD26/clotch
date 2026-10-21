@@ -1,0 +1,14 @@
+{
+  "id": "clotch",
+  "name": "Clotch",
+  "description": "Bridges OpenClaw agent activity into the Clotch macOS notch panel.",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "activation": {
+    "onStartup": true
+  }
+}
