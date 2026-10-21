@@ -1,3 +1,4 @@
+import ClotchCore
 import Foundation
 
 /// What the user can put in the notch. The notch views read the stored layout; this file only holds it.
@@ -88,5 +89,23 @@ struct NotchLayoutStore: Codable, Equatable {
 
     func save(to defaults: UserDefaults = .standard) {
         defaults.set(try? JSONEncoder().encode(self), forKey: SettingsKey.notchLayouts)
+    }
+
+    /// The old «Larghezza isola» joins «Larghezza» once (#99): on every saved layout and on the screens attached now.
+    static func migrateWidthScale(_ defaults: UserDefaults = .standard, screens: [(signature: String, hasNotch: Bool)]) {
+        guard defaults.object(forKey: NotchWidth.oldScaleKey) != nil else { return }
+        let scale = defaults.integer(forKey: NotchWidth.oldScaleKey)
+        defaults.removeObject(forKey: NotchWidth.oldScaleKey)
+        guard NotchWidth.fraction(fromScale: scale) > 0 else { return }
+        var store = load(from: defaults)
+        for screen in screens where store.screens[screen.signature] == nil {
+            store.screens[screen.signature] = .standard(hasNotch: screen.hasNotch)
+        }
+        store.screens = store.screens.mapValues { layout in
+            var layout = layout
+            layout.width = NotchWidth.merged(width: layout.width, scale: scale)
+            return layout
+        }
+        store.save(to: defaults)
     }
 }

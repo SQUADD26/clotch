@@ -11,7 +11,6 @@ struct ClotchNotchPage: View {
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
     @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
     @AppStorage(SettingsKey.notchCloseMs) private var notchCloseMs = SettingsDefaults.notchCloseMs
-    @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @AppStorage(ClotchPrefs.voiceLight) private var voiceLight = ClotchPrefs.voiceLightDefault
     @AppStorage(ClotchPrefs.voiceLightStrength) private var voiceLightStrength = ClotchPrefs.voiceLightStrengthDefault
@@ -44,12 +43,6 @@ struct ClotchNotchPage: View {
                 } label: {
                     Text(l10n["closed_notch_content"])
                     Text(l10n["closed_notch_desc"])
-                }
-                slider(l10n["collapsed_width_scale"], value: Binding(
-                    get: { Double(collapsedWidthScale) },
-                    set: { collapsedWidthScale = Int($0) }
-                ), in: Double(NotchWidthScale.min)...Double(NotchWidthScale.max), step: Double(NotchWidthScale.step)) {
-                    "\(Int($0))%"
                 }
             }
 
