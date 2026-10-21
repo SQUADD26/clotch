@@ -50,22 +50,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         #endif
 
+        // #117: no boot expand; the notch opens only for Roberto.
         setupGlobalShortcut()
-
-        // Boot animation: brief expand to confirm app is running
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            guard appState.surface == .collapsed else { return }
-            withAnimation(NotchAnimation.pop) {
-                appState.surface = .sessionList
-            }
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            if case .sessionList = appState.surface {
-                withAnimation(NotchAnimation.close) {
-                    appState.surface = .collapsed
-                }
-            }
-        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

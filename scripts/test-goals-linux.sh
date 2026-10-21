@@ -4,6 +4,7 @@
 set -euo pipefail
 bash "$(dirname "$0")/check-hover.sh"
 bash "$(dirname "$0")/check-windows.sh"
+bash "$(dirname "$0")/check-focus.sh"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"
 rm -rf "$pkg"
