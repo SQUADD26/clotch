@@ -23,7 +23,8 @@ extension GoalRow {
         }
     }
 
-    var displayTitle: String { title.isEmpty ? goal : title }
+    /// The goal text under the title, unless the title already is it.
+    var hasSubtitle: Bool { !goal.isEmpty && goal != title }
     var runningCount: Int { pulses.filter { $0.running }.count }
 
     var sessionsText: String {
@@ -56,8 +57,8 @@ extension GoalRow {
     }
 
     func accessibilityText(now: Date) -> String {
-        var parts = [displayTitle]
-        if !title.isEmpty { parts.append(goal) }
+        var parts = [title]
+        if hasSubtitle { parts.append(goal) }
         if proofsTotal > 0 { parts.append("\(proofsDone) prove su \(proofsTotal)") } else { parts.append("Nessuna prova dichiarata") }
         if case .reached = status { parts.append("Raggiunto") }
         else if let r = reason(now: now) { parts.append(r) }
@@ -68,12 +69,9 @@ extension GoalRow {
 }
 
 extension Array where Element == GoalRow {
-    /// The goal being chased now: the open one with the latest activity. The rest keep GoalBoard's
+    /// The goal being chased now (`GoalBoard.chased`). The rest keep GoalBoard's
     /// order (blocked, then still, then moving), so trouble stays on top right under it.
-    var hero: GoalRow? {
-        filter { if case .reached = $0.status { return false } else { return true } }
-            .max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) } ?? first
-    }
+    var hero: GoalRow? { GoalBoard.chased(self) }
     var allPulses: [GoalPulse] { flatMap(\.pulses) }
 
     func accessibilitySummary(now: Date) -> String {

@@ -10,6 +10,8 @@ struct GoalPlate: View {
     var body: some View {
         let hero = rows.hero
         let others = rows.filter { $0.id != hero?.id }
+        // Two goals with one title (two Overseers) are told apart by their goal text.
+        let repeated = Set(Dictionary(grouping: rows, by: \.title).filter { $0.value.count > 1 }.keys)
         Plate(title: "Obiettivo", tint: hero?.tone.color.opacity(0.16)) {
             if let hero { SessionsLive(row: hero, size: 11) }
         } content: {
@@ -19,7 +21,7 @@ struct GoalPlate: View {
                     if !others.isEmpty {
                         Rectangle().fill(Color.white.opacity(0.1)).frame(height: 0.5)
                         VStack(alignment: .leading, spacing: NotchSpace.row) {
-                            ForEach(others) { OtherGoal(row: $0, now: now) }
+                            ForEach(others) { OtherGoal(row: $0, now: now, showGoal: repeated.contains($0.title) && $0.hasSubtitle) }
                         }
                     }
                 }
@@ -38,7 +40,7 @@ private struct HeroGoal: View {
         VStack(alignment: .leading, spacing: NotchSpace.head) {
             VStack(alignment: .leading, spacing: NotchSpace.tight) {
                 HStack(alignment: .firstTextBaseline, spacing: NotchSpace.head) {
-                    Text(row.displayTitle)
+                    Text(row.title)
                         .font(NotchType.title)
                         .foregroundStyle(GoalInk.primary)
                         .lineLimit(2)
@@ -54,7 +56,7 @@ private struct HeroGoal: View {
                         .fixedSize()
                     }
                 }
-                if !row.title.isEmpty {
+                if row.hasSubtitle {
                     Text(row.goal).font(NotchType.secondary).foregroundStyle(GoalInk.secondary).lineLimit(2)
                 }
             }
@@ -76,6 +78,7 @@ private struct HeroGoal: View {
 private struct OtherGoal: View {
     let row: GoalRow
     let now: Date
+    let showGoal: Bool
     /// State column + spacing: the reason line starts under the title.
     private static let indent: CGFloat = 12 + NotchSpace.row
 
@@ -86,7 +89,7 @@ private struct OtherGoal: View {
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(row.tone.color)
                     .frame(width: 12)
-                Text(row.displayTitle)
+                Text(row.title)
                     .font(NotchType.bodyEmphasis)
                     .foregroundStyle(GoalInk.primary)
                     .lineLimit(1)
@@ -96,8 +99,15 @@ private struct OtherGoal: View {
                 Text(row.proofsText ?? "")
                     .font(NotchType.numbers)
                     .foregroundStyle(GoalInk.secondary)
-                    .frame(width: 32, alignment: .trailing)
+                    .frame(width: NotchSpace.figureColumn, alignment: .trailing)
                 SessionsLive(row: row, size: 11, compact: true).frame(width: 40, alignment: .trailing)
+            }
+            if showGoal {
+                Text(row.goal)
+                    .font(NotchType.caption)
+                    .foregroundStyle(GoalInk.secondary)
+                    .lineLimit(1)
+                    .padding(.leading, Self.indent)
             }
             if let reason = row.reason(now: now) {
                 Text(reason)

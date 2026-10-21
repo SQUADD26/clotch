@@ -85,6 +85,14 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "Overseer", "session title too")
     }
 
+    func testTitleIsNeverEmpty() {
+        let t = { (titolo: String, session: String) in self.rows([self.g("m", titolo: titolo)], [self.s("local_m", cli: "m", title: session)])[0].title }
+        XCTAssertEqual(t("★ ⭕", "⭕ Overseer"), "Overseer", "signs-only register title: the session title")
+        XCTAssertEqual(t("", "★ · —"), "Fare il dato vivo", "signs-only session title: the goal's first words")
+        XCTAssertEqual(rows([g("m")])[0].title, "Fare il dato vivo", "no session at all")
+        XCTAssertEqual(GoalBoard.firstWords("uno due tre quattro cinque sei sette"), "uno due tre quattro cinque sei…")
+    }
+
     func testDateFormats() {
         let utc = 1_792_588_432.0  // 2026-10-21T13:13:52Z
         XCTAssertEqual(GoalSources.date("2026-10-21T13:13:52+0300")!.timeIntervalSince1970, utc - 3 * 3600)
@@ -284,6 +292,19 @@ final class GoalBoardTests: XCTestCase {
     }
 
     // MARK: ordering
+
+    /// The goal chased now: proofs still to do and moving beats a goal that is only always active (the Overseer).
+    func testChasedPrefersProofsInProgress() {
+        let half = #"[{"testo": "a", "fatta": true}, {"testo": "b"}]"#
+        let all = #"[{"testo": "a", "fatta": true}]"#
+        let goals = [g("overseer"), g("notch", prove: half), g("notch2", prove: half), g("done", prove: all), g("still", prove: half)]
+        let sessions = [s("l1", cli: "overseer", running: true, ago: 0), s("l2", cli: "notch", ago: 5), s("l3", cli: "notch2", ago: 9),
+                        s("l4", cli: "done", ago: 1), s("l5", cli: "still", ago: 99)]
+        XCTAssertEqual(GoalBoard.chased(rows(goals, sessions))?.id, "notch", "tie between goals with proofs to do: latest activity")
+        XCTAssertEqual(GoalBoard.chased(rows([g("overseer"), g("done", prove: all), g("still", prove: half)], sessions))?.id, "overseer",
+                       "no moving goal with proofs to do: latest activity")
+        XCTAssertNil(GoalBoard.chased([]))
+    }
 
     func testSortBlockedStillMovingReached() {
         let goals = [g("reached", stato: "raggiunto"), g("moving"), g("still"), g("blocked", stato: "bloccato", prova: "x"), g("moving2")]

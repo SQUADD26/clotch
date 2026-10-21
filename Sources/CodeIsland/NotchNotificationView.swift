@@ -121,7 +121,7 @@ private struct Note {
             ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
         // A goal's shape is its state from the first frame; only a request turns from open circle to check.
         let symbol = event.kind == .proofDone ? "checkmark" : row.symbol
-        self.init(title: title, subtitle: row.displayTitle, startSymbol: symbol, symbol: symbol,
+        self.init(title: title, subtitle: row.title, startSymbol: symbol, symbol: symbol,
                   color: row.tone.color, row: row, before: before)
     }
 

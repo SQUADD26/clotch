@@ -95,7 +95,8 @@ private struct QuotaMeter: View {
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
                 .font(NotchType.numbers)
                 .foregroundStyle(GoalInk.primary)
-                .frame(width: 32, alignment: .trailing)
+                .lineLimit(1)
+                .frame(width: NotchSpace.figureColumn, alignment: .trailing)
                 .contentTransition(.numericText())
         }
     }

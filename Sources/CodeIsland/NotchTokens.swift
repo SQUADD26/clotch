@@ -37,6 +37,7 @@ enum NotchSpace {
     static let head: CGFloat = 12      // plate title to its content
     static let row: CGFloat = 8        // between rows
     static let tight: CGFloat = 4      // a line and what belongs to it (bar and its reason)
+    static let figureColumn: CGFloat = 40  // a right-aligned figure: fits «100%» and «12/12» in NotchType.numbers
 }
 
 /// One type scale (macOS text styles in points): 11 labels, 12 secondary, 13 body, 15 title, 22 figure.

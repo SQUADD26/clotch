@@ -116,11 +116,14 @@ public enum GoalBoard {
 
             let total = g.proofs?.count ?? 0
             let done = g.proofs?.filter(\.done).count ?? 0
-            let fromGoal = clean(g.title)
+            let goal = g.goal.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+            // Never an empty row: the register title, else the session title, else the goal's first words.
+            let title = [clean(g.title), clean(master?.title ?? ""), firstWords(clean(goal))]
+                .first { $0.contains { $0.isLetter || $0.isNumber } } ?? "Obiettivo senza titolo"
             out.append(GoalRow(
                 id: g.cli,
-                title: fromGoal.isEmpty ? clean(master?.title ?? "") : fromGoal,
-                goal: g.goal.split(whereSeparator: \.isWhitespace).joined(separator: " "),
+                title: title,
+                goal: goal,
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
                 status: status, lastActivity: last, pulses: pulses))
@@ -168,6 +171,23 @@ public enum GoalBoard {
             }
         }
         return family
+    }
+
+    /// The goal chased now: an open goal with proofs still to do and recent activity (moving) beats one
+    /// that is only always active; ties, and no such goal, go to the latest activity.
+    public static func chased(_ rows: [GoalRow]) -> GoalRow? {
+        let open = rows.filter { if case .reached = $0.status { return false } else { return true } }
+        let working = open.filter { r in
+            guard case .moving = r.status else { return false }
+            return r.proofsTotal > 0 && r.proofsDone < r.proofsTotal
+        }
+        return (working.isEmpty ? open : working)
+            .max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) } ?? rows.first
+    }
+
+    static func firstWords(_ t: String, _ n: Int = 6) -> String {
+        let words = t.split(separator: " ")
+        return words.prefix(n).joined(separator: " ") + (words.count > n ? "…" : "")
     }
 
     private static func rank(_ s: GoalStatus) -> Int {
