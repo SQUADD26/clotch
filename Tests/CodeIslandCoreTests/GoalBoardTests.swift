@@ -160,6 +160,35 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertLessThan(elapsed, 0.5, "load took \(elapsed) s")
     }
 
+    /// The desktop apps rewrite a few session files every minute among thousands: a reload parses only those.
+    func testReloadParsesOnlyChangedFiles() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
+        try fm.createDirectory(at: support, withIntermediateDirectories: true)
+        let old = Date(timeIntervalSinceNow: -3600)
+        for i in 0..<2000 {
+            let url = support.appendingPathComponent("local_\(i).json")
+            try sessionJSON("local_\(i)", cli: "c\(i)").write(to: url)
+            try fm.setAttributes([.modificationDate: old], ofItemAtPath: url.path)
+        }
+        let paths = GoalSources.defaultPaths(home: home)
+        let caches = GoalSources.Caches()
+        XCTAssertEqual(GoalSources.load(paths, caches: caches).sessions.count, 2000)
+        XCTAssertEqual(caches.sessions.parses, 2000)
+
+        try sessionJSON("local_7", cli: "c7", title: "nuovo").write(to: support.appendingPathComponent("local_7.json"))
+        try fm.removeItem(at: support.appendingPathComponent("local_8.json"))
+        let start = Date()
+        let r = GoalSources.load(paths, caches: caches)
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssertEqual(caches.sessions.parses, 2001, "exactly the changed file is parsed again")
+        XCTAssertEqual(r.sessions.count, 1999, "a deleted file is dropped")
+        XCTAssertEqual(r.sessions.first { $0.localId == "local_7" }?.title, "nuovo")
+        XCTAssertLessThan(elapsed, 0.5, "reload took \(elapsed) s")
+    }
+
     func testLoadReadsFoldersAndSkipsGarbage() throws {
         let fm = FileManager.default
         let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")

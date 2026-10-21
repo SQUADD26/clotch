@@ -68,14 +68,15 @@ public enum GoalSources {
 
     /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
     /// per session ever run (thousands), so only the live files of shown goals' families are read.
-    public static func load(_ paths: Paths)
+    /// Goals, sessions and requests go through `caches`: an unchanged file is never parsed twice.
+    /// Live files are read fresh: their activity also depends on subagent transcripts' mtimes.
+    public static func load(_ paths: Paths, caches: Caches = Caches())
         -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest]) {
         let fm = FileManager.default
-        let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
-            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
-        let sessions = paths.sessionRoots.flatMap { root in
+        let goals = caches.goals.values(files(in: paths.goals, fm).filter { $0.pathExtension == "json" }) { d, _ in parseGoal(d) }
+        let sessions = caches.sessions.values(paths.sessionRoots.flatMap { root in
             files(in: root, fm, recursive: true).filter { $0.lastPathComponent.hasPrefix("local_") && $0.pathExtension == "json" }
-        }.compactMap { url in (try? Data(contentsOf: url)).flatMap { parseSession($0, fileName: url.lastPathComponent) } }
+        }) { d, url in parseSession(d, fileName: url.lastPathComponent) }
         let live = GoalBoard.liveIds(goals: goals, sessions: sessions).compactMap { cli -> LiveState? in
             guard !cli.contains("/"), let data = try? Data(contentsOf: paths.live.appendingPathComponent(cli + ".json")) else { return nil }
             let transcript = object(data)?["transcript"] as? String ?? ""
@@ -84,17 +85,18 @@ public enum GoalSources {
                 subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
             }
         }
-        let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }
-            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseRequest) }
+        let requests = caches.requests.values(files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in parseRequest(d) }
             .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
         return (goals, sessions, live, requests)
     }
 
+    /// Lists with mtime and size prefetched, so the cache's stat of each file is free.
     private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
+        let keys: [URLResourceKey] = [.contentModificationDateKey, .fileSizeKey]
         if recursive {
-            return fm.enumerator(at: dir, includingPropertiesForKeys: nil)?.allObjects as? [URL] ?? []
+            return fm.enumerator(at: dir, includingPropertiesForKeys: keys)?.allObjects as? [URL] ?? []
         }
-        return (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
+        return (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys)) ?? []
     }
 
     /// `<transcript without .jsonl>/subagents/agent-<id>.jsonl` by one stat; nested layouts

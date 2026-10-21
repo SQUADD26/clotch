@@ -8,7 +8,9 @@ private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession
 
 /// Watches the goal register, the live-state folder, Claude Desktop's session store and the requests
 /// folder with one
-/// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`.
+/// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`. The desktop
+/// apps rewrite session files every minute and hooks write live files on every tool call: each load
+/// re-parses only changed files (`caches`), and at most one load runs or waits at a time.
 /// Read-only: it never creates a directory; a missing one just means no data, and its nearest
 /// existing ancestor is watched so the data shows up once the directory is created.
 /// All mutable state is confined to `queue`.
@@ -16,7 +18,8 @@ private final class GoalWatcher: @unchecked Sendable {
     private let queue = DispatchQueue(label: "goal.store.watcher", qos: .utility)
     private let home: URL
     private let onLoad: @Sendable (GoalDiskData) -> Void
-    private let coalesce: TimeInterval = 0.15
+    private let coalesce: TimeInterval = 1
+    private let caches = GoalSources.Caches()
     private var stream: FSEventStreamRef?
     private var pending: DispatchWorkItem?
     private var prefixes: [String] = []
@@ -70,11 +73,12 @@ private final class GoalWatcher: @unchecked Sendable {
     }
 
     /// The first event of a burst arms one load `coalesce` later; events arriving meanwhile ride on it.
+    /// FSEvents are delivered on `queue` too, so none arrives while a load runs: never two at once.
     private func schedule() {
         guard pending == nil else { return }
         let item = DispatchWorkItem { [self] in
+            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home), caches: caches))
             pending = nil
-            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home)))
         }
         pending = item
         queue.asyncAfter(deadline: .now() + coalesce, execute: item)
@@ -111,7 +115,8 @@ private final class GoalWatcher: @unchecked Sendable {
     /// then says the section is not active yet instead of «no requests».
     @Published private(set) var requestsFolderExists = false
     private var requestsLoaded = false
-    /// Refreshed on every reload and every 30 s tick; views compute "since …" against this.
+    /// Refreshed when the board changes and every 30 s tick; views compute "since …" against this.
+    /// Never on a reload that changed nothing, so an idle board never redraws.
     @Published private(set) var now: Date = Date()
 
     private var snapshot: GoalDiskData = ([], [], [], [])
@@ -127,7 +132,7 @@ private final class GoalWatcher: @unchecked Sendable {
         w.start()
         // Time alone turns a goal yellow (30 min idle), so re-evaluate even when nothing changes on disk.
         let t = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refresh() }
+            Task { @MainActor in self?.refresh(tick: true) }
         }
         t.tolerance = 5
         RunLoop.main.add(t, forMode: .common)
@@ -156,9 +161,10 @@ private final class GoalWatcher: @unchecked Sendable {
         takenToAnimate.removeAll { $0 == id }
     }
 
-    private func refresh() {
+    private func refresh(tick: Bool = false) {
         let t = Date()
         let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t)
+        guard tick || next != rows else { return }
         now = t
         if next != rows { rows = next }
     }
