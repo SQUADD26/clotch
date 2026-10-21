@@ -148,17 +148,17 @@ struct NotchPanelView: View {
     @State private var quotaChipWidth: CGFloat = 0
     /// Measured width of the collapsed right wing (0 until first laid out).
     @State private var rightWingWidth: CGFloat = 0
+    /// The notch shows goals, not sessions: its content and gating come from here.
+    @ObservedObject private var goals = GoalStore.shared
 
-    private var isActive: Bool { !appState.sessions.isEmpty }
-    /// First launch / no-session state should still render a visible marker so the app
-    /// doesn't disappear completely behind the physical notch.
-    private var showIdleIndicator: Bool {
-        !isActive && !hideWhenNoSession
-    }
-    /// Whether the bar content should be visible (respects hideWhenNoSession)
-    private var showBar: Bool {
-        isActive && !(hideWhenNoSession && appState.activeSessionCount == 0)
-    }
+    /// Gating: the island is live (and expands on hover) whenever it is shown,
+    /// even with no open goal, so the empty state ("Nessun obiettivo aperto") is
+    /// reachable and the bar never vanishes behind the notch. The only way to
+    /// hide it is "hide when no session", which now means no open goal.
+    private var isActive: Bool { !(hideWhenNoSession && goals.rows.isEmpty) }
+    /// The idle bar (and its mascot) is gone: an empty bar is just the empty wings.
+    private var showIdleIndicator: Bool { false }
+    private var showBar: Bool { isActive }
     private var shouldShowExpanded: Bool {
         showBar && appState.surface.isExpanded
     }
@@ -198,7 +198,7 @@ struct NotchPanelView: View {
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
         if shouldShowExpanded { return min(max(nw + 200, 580), maxPanelWidth) }
-        return collapsedBarWidth + quotaReserve.extraWidth + rightWingReserve
+        return collapsedBarWidth
     }
 
     /// Room the collapsed right wing lacks to clear the notch; 0 whenever it fits.
@@ -219,7 +219,7 @@ struct NotchPanelView: View {
     private var collapsedBarWidth: CGFloat {
         // Immediate hover acknowledgement: a slight widen while the expand delay runs
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
-        return effectiveNotchW + compactWingWidth * 2 + collapsedStatusExtra + prehoverExtra
+        return effectiveNotchW + compactWingWidth * 2 + prehoverExtra
     }
 
     /// Status and tool-status reserves, split evenly between the two wings.
@@ -252,43 +252,13 @@ struct NotchPanelView: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 if showBar {
-                    // Active: compact bar — wider version when expanded
+                    // Goals: tiny bars on the left, running sessions on the right
                     HStack(spacing: 0) {
-                        CompactLeftWing(appState: appState, expanded: shouldShowExpanded, mascotSize: mascotSize, hasNotch: hasNotch, showToolStatus: showToolStatus)
-                        if hasNotch && !shouldShowExpanded {
-                            Spacer(minLength: effectiveNotchW)
-                        } else if !shouldShowExpanded && showToolStatus {
-                            CompactToolStatus(appState: appState)
-                            Spacer(minLength: 0)
-                        } else {
-                            Spacer(minLength: 0)
-                        }
-                        CompactRightWing(appState: appState, expanded: shouldShowExpanded, hasNotch: hasNotch)
+                        GoalsLeftWing(expanded: shouldShowExpanded)
+                        Spacer(minLength: hasNotch && !shouldShowExpanded ? effectiveNotchW : 0)
+                        GoalsRightWing(expanded: shouldShowExpanded)
                     }
                     .frame(height: notchHeight)
-                    // Recap on hover while collapsed — shows whenever hover
-                    // doesn't expand the panel (smart suppress with the
-                    // terminal frontmost); expanded cards show it inline.
-                    .help(collapsedRecapTooltip)
-                    // With a question waiting off-screen, a click on the collapsed
-                    // bar opens its card. Otherwise the gesture is off entirely so
-                    // the bar keeps behaving exactly as before.
-                    .contentShape(Rectangle())
-                    .gesture(
-                        TapGesture().onEnded {
-                            hoverTimer?.invalidate()
-                            hoverTimer = nil
-                            appState.openPendingQuestionCard()
-                        },
-                        including: !shouldShowExpanded && appState.hiddenPendingQuestionSessionId != nil
-                            ? .all : .subviews
-                    )
-                    // 0 means the chip isn't drawn right now (a tool name holds
-                    // the slot) — keep the last width so the bar doesn't twitch.
-                    .onPreferenceChange(QuotaChipWidthKey.self) { if $0 > 0 { quotaChipWidth = $0 } }
-                    // 0 while expanded (only the collapsed wing reports) — keep
-                    // the last width for the next collapse.
-                    .onPreferenceChange(CompactRightWingWidthKey.self) { if $0 > 0 { rightWingWidth = $0 } }
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,
@@ -311,86 +281,8 @@ struct NotchPanelView: View {
                         .frame(height: 0.5)
                         .padding(.horizontal, 12)
 
-                    switch appState.surface {
-                    case .approvalCard(let sid):
-                        // Card is addressed by session — render that session's
-                        // request, not whatever is at the head of the queue. (#308)
-                        if let pending = appState.pendingPermission(forSession: sid) {
-                            let session = appState.sessions[sid]
-                            ApprovalBar(
-                                tool: pending.event.toolName ?? "Unknown",
-                                toolInput: pending.event.toolInput,
-                                queuePosition: appState.permissionQueuePosition(forSession: sid),
-                                queueTotal: appState.permissionQueue.count,
-                                session: session,
-                                sessionId: sid,
-                                appState: appState,
-                                alwaysSavesRule: CodexPermissionRules.isCodexEvent(pending.event),
-                                onAllow: { appState.approvePermission(always: false, expectedSessionId: sid) },
-                                onAlwaysAllow: { appState.approvePermission(always: true, expectedSessionId: sid) },
-                                onDeny: { appState.denyPermission(expectedSessionId: sid) },
-                                onDismiss: { appState.dismissPermissionPrompt(expectedSessionId: sid) }
-                            )
-                            .transition(.blurFade.combined(with: .scale(scale: 0.96, anchor: .top)))
-                        }
-                    case .questionCard(let sid):
-                        let session = appState.sessions[sid]
-                        if let q = appState.pendingQuestion(forSession: sid) {
-                            QuestionBar(
-                                question: q.question.question,
-                                options: q.question.options,
-                                descriptions: q.question.descriptions,
-                                allQuestions: q.askUserQuestionState?.items ?? [],
-                                requestId: q.id,
-                                sessionSource: session?.source,
-                                sessionContext: session?.cwd,
-                                session: session,
-                                sessionId: sid,
-                                appState: appState,
-                                queuePosition: appState.questionQueuePosition(forSession: sid),
-                                queueTotal: appState.questionQueue.count,
-                                onAnswer: { appState.answerQuestion($0, expectedSessionId: sid) },
-                                onAnswerMulti: { appState.answerQuestionMulti($0, expectedSessionId: sid) },
-                                onSkip: { appState.skipQuestion(expectedSessionId: sid) },
-                                onDismiss: { appState.dismissQuestion(expectedSessionId: sid) }
-                            )
-                            // One view per request. Answering a card promotes the
-                            // next session's request into this same slot, and
-                            // without a new identity SwiftUI hands it the previous
-                            // card's @State — answers, selection and typed text
-                            // included. (#333)
-                            .id(q.id)
-                            .transition(.blurFade.combined(with: .scale(scale: 0.96, anchor: .top)))
-                        } else if let preview = appState.previewQuestionPayload {
-                            QuestionBar(
-                                question: preview.question,
-                                options: preview.options,
-                                descriptions: preview.descriptions,
-                                allQuestions: [],
-                                requestId: nil,
-                                sessionSource: session?.source,
-                                sessionContext: session?.cwd,
-                                session: session,
-                                sessionId: sid,
-                                appState: appState,
-                                queuePosition: 1,
-                                queueTotal: 1,
-                                onAnswer: { _ in },
-                                onAnswerMulti: { _ in },
-                                onSkip: { },
-                                onDismiss: { }
-                            )
-                            .transition(.blurFade.combined(with: .scale(scale: 0.96, anchor: .top)))
-                        }
-                    case .completionCard:
-                        SessionListView(appState: appState, onlySessionId: appState.justCompletedSessionId)
-                            .transition(.blurFade.combined(with: .move(edge: .top)))
-                    case .sessionList:
-                        SessionListView(appState: appState, onlySessionId: nil)
-                            .transition(.blurFade.combined(with: .move(edge: .top)))
-                    case .collapsed:
-                        EmptyView()
-                    }
+                    GoalsNotchView(maxHeight: cardSpace.windowHeight > 0 ? max(120, cardSpace.windowHeight - notchHeight - 8) : 300)
+                        .transition(.blurFade.combined(with: .move(edge: .top)))
                 }
             }
             .recordsCompletionCardChrome(in: cardSpace)
@@ -548,8 +440,6 @@ struct NotchPanelView: View {
                     hoverPhase = .expanded
                 }
             }
-            // Outside onHover on purpose: the hover region moves with the bar.
-            .offset(x: quotaReserve.shift + rightWingReserve / 2)
 
             Spacer()
                 .allowsHitTesting(false)
