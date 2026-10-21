@@ -96,7 +96,7 @@ private struct AccountCard: View {
     }
 }
 
-/// «5 ore ▬▬── 4%»: no reading, or the window already reset, is no percentage (Macchine's rule).
+/// «5 ore ▬▬── 4% ↻ 2:41:07»: no reading, or the window already reset, is no percentage (Macchine's rule).
 struct QuotaMeter: View {
     let name: String
     let window: QuotaWindow
@@ -112,6 +112,27 @@ struct QuotaMeter: View {
                 .foregroundStyle((used ?? 0) >= 90 ? GoalTone.stop.color : GoalInk.row)
                 .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
+            if let reset = window.reset { ResetCountdownLabel(reset: reset) }
+        }
+    }
+}
+
+/// «↻ 2:41:07»: time left to the window's reset, ticking each second only while it is on screen.
+struct ResetCountdownLabel: View {
+    let reset: Date
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let text = ResetCountdown.text(until: reset, now: context.date)
+            HStack(spacing: 3) {
+                Image(systemName: "arrow.clockwise").font(.system(size: 9, weight: .semibold))
+                Text(text).font(.system(size: 11).monospacedDigit())
+            }
+            .foregroundStyle(GoalInk.secondary)
+            .lineLimit(1)
+            .fixedSize()
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Si azzera tra " + text)
         }
     }
 }
