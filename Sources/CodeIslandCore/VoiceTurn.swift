@@ -21,6 +21,11 @@ public enum VoiceTurn {
         public var voiceId, model: String
         public var speed: Double
         public var maxCalls, maxDayChars: Int
+        /// «Parla per» (`parla_per`): every session, only the main ones (no parent session), or only `sessione` (a local id).
+        public var audience: Audience
+        public var onlySession: String
+
+        public enum Audience: String { case all = "tutte", main = "principali", one = "una" }
 
         /// A premade ElevenLabs voice, so a Mac with only the key set speaks.
         public static let defaultVoice = "JBFqnCBsd6RMkjVDRZzb"
@@ -33,6 +38,20 @@ public enum VoiceTurn {
             speed = min(2.0, max(0.7, (c["speed"] as? NSNumber)?.doubleValue ?? VoiceFiles.defaultSpeed))
             maxCalls = (c["tetto_chiamate"] as? NSNumber)?.intValue ?? VoiceFiles.defaultMaxCalls
             maxDayChars = (c["tetto_caratteri"] as? NSNumber)?.intValue ?? VoiceFiles.defaultMaxChars
+            audience = Audience(rawValue: c["parla_per"] as? String ?? "") ?? .main
+            onlySession = c["sessione"] as? String ?? ""
+        }
+
+        /// Whether this end of turn is said. `sessions` = the Claude app's session files; the turn's `cliId` is found
+        /// by its current or a prior CLI id. shortcut: a turn with no session file (a terminal `claude`) counts as main.
+        public func speaks(cliId: String, sessions: [DesktopSession]) -> Bool {
+            let s = sessions.filter { $0.cliId == cliId || $0.priorCliIds.contains(cliId) }
+                .max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) }
+            switch audience {
+            case .all: return true
+            case .main: return s?.parentLocalId == nil
+            case .one: return s != nil && s?.localId == onlySession
+            }
         }
     }
 

@@ -160,4 +160,24 @@ final class VoiceTurnTests: XCTestCase {
         let payload = try Data(contentsOf: queue.appendingPathComponent(queued()[0]))
         XCTAssertEqual(String(decoding: payload, as: UTF8.self), #"{"session_id":"s"}"#)
     }
+
+    func testAudienceDefaultsToMainSessionsAndFindsPriorCliIds() {
+        let main = DesktopSession(localId: "local_m", cliId: "c-m", parentLocalId: nil, priorCliIds: ["old-m"], title: "M",
+                                  isRunning: true, isArchived: false, lastActivity: nil)
+        let child = DesktopSession(localId: "local_k", cliId: "c-k", parentLocalId: "local_m", title: "K",
+                                   isRunning: true, isArchived: false, lastActivity: nil)
+        let all = [main, child]
+        let byDefault = VoiceTurn.Config([:])
+        XCTAssertEqual(byDefault.audience, .main, "Roberto has not chosen yet: main sessions only")
+        XCTAssertTrue(byDefault.speaks(cliId: "c-m", sessions: all))
+        XCTAssertTrue(byDefault.speaks(cliId: "old-m", sessions: all), "after a /clear the old cli id is the same session")
+        XCTAssertFalse(byDefault.speaks(cliId: "c-k", sessions: all), "a child session stays silent")
+        XCTAssertTrue(byDefault.speaks(cliId: "terminal", sessions: all), "no session file: a terminal claude, counted as main")
+        XCTAssertTrue(VoiceTurn.Config(["parla_per": "tutte"]).speaks(cliId: "c-k", sessions: all))
+        let one = VoiceTurn.Config(["parla_per": "una", "sessione": "local_k"])
+        XCTAssertTrue(one.speaks(cliId: "c-k", sessions: all))
+        XCTAssertFalse(one.speaks(cliId: "c-m", sessions: all))
+        XCTAssertFalse(one.speaks(cliId: "terminal", sessions: all))
+        XCTAssertEqual(VoiceTurn.Config(["parla_per": "boh"]).audience, .main)
+    }
 }

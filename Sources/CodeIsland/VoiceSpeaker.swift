@@ -106,7 +106,8 @@ final class VoiceSpeaker {
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
         let key = files.key
-        guard let key, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: files.isMuted(session: report.session),
+        let heard = config.speaks(cliId: report.session, sessions: await GoalStore.shared.allSessions())
+        guard let key, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: !heard || files.isMuted(session: report.session),
                                          day: day, config: config) == nil else { return }
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1

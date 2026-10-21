@@ -15,6 +15,9 @@ struct VoiceSettingsPage: View {
     @State private var maxCalls = VoiceFiles.defaultMaxCalls
     @State private var maxChars = VoiceFiles.defaultMaxChars
     @State private var prompt = ""
+    @State private var audience = VoiceTurn.Config.Audience.main
+    @State private var onlySession = ""
+    @State private var sessions: [DesktopSession] = []
     @State private var configBroken = false
     @State private var testing = false
     @State private var note: String?
@@ -31,6 +34,28 @@ struct VoiceSettingsPage: View {
                     isOn = files.isOn
                     VoiceSpeaker.shared.refresh()
                 }))
+            }
+
+            Section {
+                Picker("Parla per", selection: Binding(get: { audience }, set: { audience = $0; saveAudience() })) {
+                    Text("Tutte le sessioni").tag(VoiceTurn.Config.Audience.all)
+                    Text("Solo le sessioni principali").tag(VoiceTurn.Config.Audience.main)
+                    Text("Solo una sessione").tag(VoiceTurn.Config.Audience.one)
+                }
+                .disabled(configBroken)
+                if audience == .one {
+                    Picker("Sessione", selection: Binding(get: { onlySession }, set: { onlySession = $0; saveAudience() })) {
+                        if sessions.isEmpty { Text("Nessuna sessione").tag("") }
+                        ForEach(sessions, id: \.localId) { s in
+                            Text(s.title.isEmpty ? "Senza titolo" : s.title).tag(s.localId)
+                        }
+                    }
+                    .disabled(configBroken)
+                }
+            } header: {
+                Text("Sessioni")
+            } footer: {
+                Text("Principali: quelle aperte da te, non da un'altra sessione.")
             }
 
             Section {
@@ -107,6 +132,12 @@ struct VoiceSettingsPage: View {
         }
         .formStyle(.grouped)
         .onAppear(perform: load)
+        .task {
+            // The open ones, newest first; the chosen one stays listed even when archived.
+            sessions = await GoalStore.shared.allSessions()
+                .filter { !$0.isArchived || $0.localId == onlySession }
+                .sorted { ($0.lastActivity ?? .distantPast) > ($1.lastActivity ?? .distantPast) }
+        }
     }
 
     private func load() {
@@ -119,6 +150,15 @@ struct VoiceSettingsPage: View {
         speed = min(max((config["speed"] as? NSNumber)?.doubleValue ?? VoiceFiles.defaultSpeed, 0.7), 2.0)
         maxCalls = (config["tetto_chiamate"] as? NSNumber)?.intValue ?? VoiceFiles.defaultMaxCalls
         maxChars = (config["tetto_caratteri"] as? NSNumber)?.intValue ?? VoiceFiles.defaultMaxChars
+        let parsed = VoiceTurn.Config(config)
+        audience = parsed.audience
+        onlySession = parsed.onlySession
+    }
+
+    private func saveAudience() {
+        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+            try files.updateConfig(["parla_per": audience.rawValue, "sessione": onlySession])
+        }
     }
 
     private func saveConfig() {
