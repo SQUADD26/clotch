@@ -4,7 +4,8 @@ import CodeIslandCore
 
 /// Clotch's own voice (#50): with the switch on and a key set, a Stop hook in every Claude Code folder queues each end of
 /// turn in `~/.config/voce/coda`; here each one goes Haiku → ElevenLabs → light on the notch edge → audio. One at a time,
-/// at most two waiting. `clotch-attiva` (this process's pid) tells the hook and Clean View's mod that Clotch speaks now.
+/// at most two waiting. The file `clotch`, touched every hour, tells the hook and Clean View's mod that Clotch speaks now
+/// (contract in `VoiceHooks`).
 @MainActor
 final class VoiceSpeaker {
     static let shared = VoiceSpeaker()
@@ -15,6 +16,7 @@ final class VoiceSpeaker {
     private var pending: [Data] = []
     private var busy = false
     private var player: AVAudioPlayer?
+    private var heartbeat: Timer?
 
     func start() {
         refresh()
@@ -24,6 +26,7 @@ final class VoiceSpeaker {
 
     /// At quit: the hook and the mod see no live Clotch and stand aside. The hook entries stay, doing nothing.
     func stop() {
+        heartbeat?.invalidate()
         try? FileManager.default.removeItem(at: files.activeURL)
     }
 
@@ -36,8 +39,13 @@ final class VoiceSpeaker {
         if on {
             try? files.write(Data(VoiceHooks.script.utf8), to: script)
             try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: script.path)
-            try? files.write(Data("\(ProcessInfo.processInfo.processIdentifier)".utf8), to: files.activeURL)
+            try? files.write(Data(), to: files.activeURL)
+            heartbeat = heartbeat ?? Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [files] _ in
+                try? files.write(Data(), to: files.activeURL)
+            }
         } else {
+            heartbeat?.invalidate()
+            heartbeat = nil
             try? FileManager.default.removeItem(at: files.activeURL)
             try? FileManager.default.removeItem(at: script)
         }

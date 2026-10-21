@@ -7,10 +7,11 @@ import FoundationNetworking
 /// Pure: the app (`VoiceSpeaker`) runs the processes, the network and the audio. Same rules as Clean View's `voce.ts`.
 public enum VoiceTurn {
     public static let haikuModel = "claude-haiku-5-5"
-    public static let haikuSeconds: TimeInterval = 10
-    /// The ceiling of one spoken line (~25 s of speech) and of the report Haiku reads.
+    public static let haikuSeconds: TimeInterval = 8
+    /// The ceiling of one spoken line (~25 s of speech) and of the cleaned report Haiku reads.
     public static let maxSpoken = 320
-    public static let maxReport = 4000
+    /// The raw text cleaned at most: the answer's opening, where the report leads.
+    static let maxRaw = 4000
     public static let fallback = "C’è una novità, guarda lo schermo."
     public static let testLine = "Ciao, questa è una prova della voce."
     /// ElevenLabs takes speed up to 1.2; the player does the rest.
@@ -53,8 +54,9 @@ public enum VoiceTurn {
         }
     }
 
-    /// The session and the text of the answer that closed the turn: `last_assistant_message`, else the last assistant
-    /// message in the transcript's tail. nil = nothing to say (no text, or Stop fired again by a blocking stop hook).
+    /// The session and the report for Haiku: the answer that closed the turn (`last_assistant_message`, else the last
+    /// assistant message in the transcript's tail), cleaned for the ear and cut to `maxSpoken`.
+    /// nil = nothing to say (no text, or Stop fired again by a blocking stop hook).
     public static func report(payload: Data, transcriptTail: (String) -> Data?) -> (session: String, text: String)? {
         guard let o = (try? JSONSerialization.jsonObject(with: payload)) as? [String: Any],
               o["stop_hook_active"] as? Bool != true else { return nil }
@@ -63,8 +65,8 @@ public enum VoiceTurn {
         if text.isEmpty, let path = o["transcript_path"] as? String, let tail = transcriptTail(path) {
             text = lastAssistantText(tail) ?? ""
         }
-        text = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.isEmpty ? nil : (session, String(text.prefix(maxReport)))
+        text = cut(VoiceClean.clean(String(text.prefix(maxRaw))), maxSpoken)
+        return text.isEmpty ? nil : (session, text)
     }
 
     /// The text blocks of the last `"type":"assistant"` line of a JSONL transcript tail.
@@ -100,7 +102,8 @@ public enum VoiceTurn {
         "<rapporto>\n\(report)\n</rapporto>\n" + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
     }
 
-    /// What Haiku answered, ready to say, and its «ARGOMENTO:» line (kept for next time, never said). nil = say `fallback`.
+    /// What Haiku answered, cleaned again and ready to say, and its «ARGOMENTO:» line (kept for next time, never said).
+    /// nil = say `fallback` (nothing left, or a secret Haiku made up or was tricked into).
     public static func spoken(fromHaiku output: String) -> (text: String, topic: String)? {
         var topic = ""
         let lines = output.split(separator: "\n", omittingEmptySubsequences: false).filter { line in
@@ -109,17 +112,11 @@ public enum VoiceTurn {
             topic = String(t.dropFirst("ARGOMENTO:".count)).trimmingCharacters(in: .whitespaces)
             return false
         }
-        let text = lines.joined(separator: " ").replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespaces)
-        guard !text.isEmpty, !looksSecret(text) else { return nil }
-        return (cut(text, maxSpoken), looksSecret(topic) ? "" : String(topic.prefix(120)))
-    }
-
-    /// Clean View's secret patterns: a key, a token, a password in a link. Such a text is never said.
-    static func looksSecret(_ t: String) -> Bool {
-        [#"\b(?:sk|pk|rk)[-_][\w-]{8,}"#, #"\bgh[pousr]_\w{8,}"#, #"\beyJ[\w-]{10,}\.[\w.-]+"#, #"(?i)\bBearer\s+\S+"#,
-         #"\b[A-Fa-f0-9]{32,}\b"#, #"\b(?=[\w-]*\d)(?=[\w-]*[A-Za-z])[\w-]{32,}\b"#, #"://[^\s/@]+:[^\s/@]+@"#]
-            .contains { t.range(of: $0, options: .regularExpression) != nil }
+        let raw = lines.joined(separator: "\n")
+        guard !VoiceClean.hasSecret(raw) else { return nil }
+        let text = VoiceClean.spoken(raw)
+        guard !text.isEmpty else { return nil }
+        return (cut(text, maxSpoken), String(VoiceClean.clean(topic).trimmingCharacters(in: CharacterSet(charactersIn: ". ")).prefix(120)))
     }
 
     /// Cut at the end of the last sentence that fits; one longer sentence is cut at a word.

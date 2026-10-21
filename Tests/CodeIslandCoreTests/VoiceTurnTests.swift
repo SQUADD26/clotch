@@ -19,7 +19,7 @@ final class VoiceTurnTests: XCTestCase {
         var asked = ""
         let fromFile = VoiceTurn.report(payload: json(["session_id": "s2", "transcript_path": "/t.jsonl"])) { asked = $0; return Data(tail.utf8) }
         XCTAssertEqual(asked, "/t.jsonl")
-        XCTAssertEqual(fromFile?.text, "Ultima risposta")
+        XCTAssertEqual(fromFile?.text, "Ultima risposta.")
 
         XCTAssertNil(VoiceTurn.report(payload: json(["session_id": "s3", "last_assistant_message": "x", "stop_hook_active": true])) { _ in nil },
                      "Stop fired again by a blocking stop hook: said once")
@@ -63,6 +63,22 @@ final class VoiceTurnTests: XCTestCase {
         XCTAssertNil(VoiceTurn.spoken(fromHaiku: "ARGOMENTO: niente\n"))
         let long = String(repeating: "Una frase breve. ", count: 40)
         XCTAssertLessThanOrEqual(VoiceTurn.spoken(fromHaiku: long)!.text.count, VoiceTurn.maxSpoken)
+    }
+
+    func testReportCleanedForTheEarBeforeAndAfterHaiku() throws {
+        let raw = "Fatto: PR #55 su `feat/50-voce` (commit c254d67a), vedi https://github.com/x/y e Sources/CodeIsland/VoiceSpeaker.swift.\n- Prossimo passo (sì)"
+        let r = try XCTUnwrap(VoiceTurn.report(payload: json(["session_id": "s", "last_assistant_message": raw])) { _ in nil })
+        for bad in ["55", "c254d67a", "https", "github", "Sources/", "VoiceSpeaker", "`", "feat/"] {
+            XCTAssertFalse(r.text.contains(bad), "\(bad) in «\(r.text)»")
+        }
+        XCTAssertTrue(r.text.contains("la modifica"))
+        XCTAssertTrue(r.text.hasSuffix("Io consiglio di sì."), r.text)
+        let long = String(repeating: "Una frase del rapporto. ", count: 50)
+        XCTAssertLessThanOrEqual(VoiceTurn.report(payload: json(["last_assistant_message": long])) { _ in nil }!.text.count, VoiceTurn.maxSpoken)
+        XCTAssertFalse(VoiceTurn.report(payload: json(["last_assistant_message": "la chiave è sk_0123456789abcdefabcd"])) { _ in nil }!.text.contains("sk_"),
+                       "a key never reaches Haiku")
+        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Apri il terminale e incolla il comando.\nARGOMENTO: la voce")?.text, VoiceClean.screenNotice)
+        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "La modifica #12 è pronta, capo.")?.text, "La modifica è pronta, capo.")
     }
 
     func testElevenLabsRequestKeyOnlyInHeader() throws {
@@ -129,12 +145,14 @@ final class VoiceTurnTests: XCTestCase {
         }
         let queue = home.appendingPathComponent(".config/voce/coda")
         let queued = { ((try? FileManager.default.contentsOfDirectory(atPath: queue.path)) ?? []).filter { $0.hasSuffix(".json") } }
+        let sign = home.appendingPathComponent(".config/voce/clotch")
         try run()
-        XCTAssertEqual(queued(), [], "no clotch-attiva: nothing")
-        try "999999999".write(to: home.appendingPathComponent(".config/voce/clotch-attiva"), atomically: true, encoding: .utf8)
+        XCTAssertEqual(queued(), [], "no live sign: nothing")
+        try Data().write(to: sign)
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(-3 * 3600)], ofItemAtPath: sign.path)
         try run()
-        XCTAssertEqual(queued(), [], "a dead Clotch: nothing")
-        try "\(ProcessInfo.processInfo.processIdentifier)".write(to: home.appendingPathComponent(".config/voce/clotch-attiva"), atomically: true, encoding: .utf8)
+        XCTAssertEqual(queued(), [], "a sign not touched for hours (Clotch died): nothing")
+        try Data().write(to: sign)
         try run(["CLOTCH_VOCE_INTERNA": "1"])
         XCTAssertEqual(queued(), [], "Clotch's own Haiku: nothing")
         try run()

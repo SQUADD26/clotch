@@ -20,7 +20,7 @@ public struct VoiceFiles {
         dayURL = voce.appendingPathComponent("giorno.json")
         lastURL = voce.appendingPathComponent("ultima.json")
         statusURL = voce.appendingPathComponent("stato.json")
-        activeURL = voce.appendingPathComponent("clotch-attiva")
+        activeURL = voce.appendingPathComponent("clotch")  // contract with Clean View: see VoiceHooks
         queueURL = voce.appendingPathComponent("coda")
         voiceDir = voce
     }

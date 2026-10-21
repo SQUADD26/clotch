@@ -8,14 +8,19 @@ public enum VoiceHooks {
     public static let command = "~/.clotch/voce-stop.sh"
     public static let scriptPath = ".clotch/voce-stop.sh"
 
-    /// Never blocks or fails the turn. Writes the payload into `~/.config/voce/coda` only if the Clotch that wrote
-    /// `clotch-attiva` (its pid) is alive, and never for Clotch's own Haiku call (CLOTCH_VOCE_INTERNA).
+    /// Contract with Clean View's mod (claude-config#1837): Clotch writes the empty file `~/.config/voce/clotch` while its
+    /// voice is on, touches it every hour while it runs, removes it when the voice goes off or Clotch quits. The mod is
+    /// silent while the file is younger than 24 h; this hook queues only while it is younger than `freshMinutes`.
+    public static let freshMinutes = 90
+
+    /// Never blocks or fails the turn. Writes the payload into `~/.config/voce/coda` only while Clotch is live (above),
+    /// and never for Clotch's own Haiku call (CLOTCH_VOCE_INTERNA).
     public static let script = """
         #!/bin/bash
         # Clotch voice (goal-notch#50): hands the Stop payload to Clotch. Nothing when Clotch is not running with its voice on.
         [ -n "$CLOTCH_VOCE_INTERNA" ] && exit 0
         d="$HOME/.config/voce"
-        p=$(cat "$d/clotch-attiva" 2>/dev/null) && kill -0 "$p" 2>/dev/null || exit 0
+        [ -n "$(find "$d/clotch" -mmin -\(freshMinutes) 2>/dev/null)" ] || exit 0
         mkdir -p "$d/coda" && t="$d/coda/.$$.tmp" && cat > "$t" && mv -f "$t" "$d/coda/$(date +%s)-$$.json"
         exit 0
 
