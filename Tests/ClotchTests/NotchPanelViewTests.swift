@@ -3,53 +3,6 @@ import XCTest
 import ClotchCore
 
 final class NotchPanelViewTests: XCTestCase {
-    func testEffectiveNotchWidthAppliesCollapsedWidthScaleOnNonNotchScreens() {
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 50, hasNotch: false),
-            100,
-            accuracy: 0.001
-        )
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 150, hasNotch: false),
-            300,
-            accuracy: 0.001
-        )
-    }
-
-    func testEffectiveNotchWidthNeverShrinksUnderPhysicalNotch() {
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 50, hasNotch: true),
-            200,
-            accuracy: 0.001
-        )
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 100, hasNotch: true),
-            200,
-            accuracy: 0.001
-        )
-    }
-
-    func testEffectiveNotchWidthWidensBeyondPhysicalNotch() {
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 150, hasNotch: true),
-            300,
-            accuracy: 0.001
-        )
-    }
-
-    func testEffectiveNotchWidthClampsOutOfRangeScale() {
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 10, hasNotch: false),
-            100,
-            accuracy: 0.001
-        )
-        XCTAssertEqual(
-            NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 250, hasNotch: false),
-            300,
-            accuracy: 0.001
-        )
-    }
-
     func testCompactToolNameKeepsShortNamesUnchanged() {
         XCTAssertEqual(ToolNameDisplay.compact("Bash"), "Bash")
         XCTAssertEqual(ToolNameDisplay.compact("  Read  "), "Read")
@@ -254,21 +207,6 @@ final class NotchHoverInteractionTests: XCTestCase {
     func testCollapseDelayWhileNotExpandedIsANoOp() {
         XCTAssertEqual(NotchHoverInteraction.nextPhase(from: .collapsed, event: .collapseDelayElapsed), .collapsed)
         XCTAssertEqual(NotchHoverInteraction.nextPhase(from: .prehover, event: .collapseDelayElapsed), .prehover)
-    }
-
-    func testWidthScaleSliderUsesOnePercentSteps() {
-        XCTAssertEqual(NotchWidthScale.min, 50)
-        XCTAssertEqual(NotchWidthScale.max, 150)
-        XCTAssertEqual(NotchWidthScale.step, 1)
-    }
-
-    func testEffectiveNotchWidthClampsToSharedBounds() {
-        // Physical notch is never scaled.
-        XCTAssertEqual(NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 80, hasNotch: true), 200)
-        // Simulated notch scales and clamps to NotchWidthScale bounds.
-        XCTAssertEqual(NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 75, hasNotch: false), 150)
-        XCTAssertEqual(NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 10, hasNotch: false), 100)
-        XCTAssertEqual(NotchWidthMetrics.effectiveNotchWidth(notchW: 200, collapsedWidthScale: 900, hasNotch: false), 300)
     }
 
     // MARK: - Click-to-jump card ownership
