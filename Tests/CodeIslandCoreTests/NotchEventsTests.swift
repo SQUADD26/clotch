@@ -46,6 +46,7 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch tra schermi", by: "Clotch"),
                        "Presa in carico: Correggere notch tra schermi · Clotch")
         XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch"), "Presa in carico: Correggere notch")
+        XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch", done: true), "Fatta: Correggere notch")
         XCTAssertEqual(NotchEvents.notice(.confirmed, title: "Notch"), "Obiettivo confermato: Notch")
         XCTAssertEqual(NotchEvents.notice(.reached, title: "Notch"), "Obiettivo raggiunto: Notch")
         XCTAssertNil(NotchEvents.notice(.proofDone, title: "Notch"), "other events keep only their line")

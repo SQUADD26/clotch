@@ -37,10 +37,10 @@ public enum NotchEvents {
 
     /// What the closed notch says where the goal chased now stands, while the event is up (#39):
     /// «Presa in carico: <request> · <session>». nil = the event has only its line under the notch.
-    public static func notice(_ kind: NotchEvent.Kind, title: String, by session: String = "") -> String? {
+    public static func notice(_ kind: NotchEvent.Kind, title: String, by session: String = "", done: Bool = false) -> String? {
         let head: String
         switch kind {
-        case .requestTaken: head = "Presa in carico"
+        case .requestTaken: head = done ? "Fatta" : "Presa in carico"
         case .confirmed: head = "Obiettivo confermato"
         case .reached: head = "Obiettivo raggiunto"
         default: return nil

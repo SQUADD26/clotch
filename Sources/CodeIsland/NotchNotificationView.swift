@@ -18,7 +18,7 @@ struct NotchNotificationView: View {
                     if let row = note.row {
                         GoalRing(progress: done ? row.progress : note.before, color: row.ringInk, size: 15, line: 2.2)
                     } else if event.kind == .requestTaken {
-                        RequestMark(taken: done)
+                        RequestMark(look: done ? requests.first { $0.id == event.subject }?.look ?? .working : .waiting)
                     } else {
                         Image(systemName: done ? note.symbol : note.startSymbol)
                             .font(.system(size: 15))
@@ -59,7 +59,10 @@ struct ResultMark: View {
     var body: some View {
         let color = event.kind == .prMerged ? NoteColor.merged
             : rows.first { $0.id == event.subject }.map(\.ringInk) ?? GoalTone.go.color
-        if event.kind == .prMerged {
+        if event.kind == .requestTaken {
+            // A request still at work leaves its working dot, not a check (#39).
+            RequestMark(look: GoalStore.shared.requests.first { $0.id == event.subject }?.look ?? .working)
+        } else if event.kind == .prMerged {
             Image(systemName: "arrow.triangle.merge").font(.system(size: 14, weight: .semibold)).foregroundStyle(color)
         } else {
             Image(systemName: "checkmark.circle.fill")
@@ -91,8 +94,10 @@ struct Note {
         switch event.kind {
         case .requestTaken:
             guard let request = requests.first(where: { $0.id == event.subject }) else { return nil }
-            self.init(text: request.text, startLabel: "In attesa", label: "Presa in carico", startSymbol: "circle",
-                      symbol: "checkmark.circle.fill", color: GoalTone.go.color, strikes: true, row: nil, before: nil)
+            let look = request.look
+            self.init(text: request.text, startLabel: UserRequest.Look.waiting.label, label: look.label, startSymbol: "circle",
+                      symbol: "checkmark.circle.fill", color: look.struck ? GoalTone.go.color : GoalInk.secondary,
+                      strikes: look.struck, row: nil, before: nil)
         case .prMerged:
             let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
             self.init(text: title, startLabel: "In corso", label: "Unita", startSymbol: "arrow.triangle.pull",
@@ -129,7 +134,9 @@ extension NotchEvent {
     /// (`presa_da` = `sessione` today); read the taker's own title if requests ever change hands.
     func notice(rows: [GoalRow], requests: [UserRequest]) -> String? {
         if kind == .requestTaken {
-            return requests.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.text, by: $0.sessionTitle) }
+            return requests.first { $0.id == subject }.flatMap {
+                NotchEvents.notice(kind, title: $0.text, by: $0.sessionTitle, done: $0.look == .done)
+            }
         }
         return rows.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.title) }
     }

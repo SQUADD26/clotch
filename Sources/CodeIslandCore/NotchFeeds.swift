@@ -25,6 +25,15 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }
 
+    /// How a request looks, the one place that decides it (#39): taken = at work, never struck; struck and ticked only once done.
+    public enum Look: Equatable, Sendable {
+        case waiting, working, done
+        public var label: String { switch self { case .waiting: "In attesa"; case .working: "Presa in carico"; case .done: "Fatta" } }
+        public var struck: Bool { self == .done }
+    }
+
+    public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : .waiting }
+
     /// The requests Roberto still waits on: the Requests tab shows only these (taken ones are announced once, then hidden).
     public static func waiting(_ all: [UserRequest]) -> [UserRequest] { all.filter { !$0.taken } }
 

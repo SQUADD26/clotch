@@ -94,6 +94,19 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
     }
 
+    func testLookStrikesOnlyWhenDone() {
+        func look(_ stato: String) -> UserRequest.Look {
+            GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "\#(stato)"}"#))!.look
+        }
+        XCTAssertEqual(look("nuova"), .waiting)
+        XCTAssertEqual(look("presa"), .working)
+        XCTAssertFalse(look("presa").struck, "taken = at work, not struck (#39)")
+        XCTAssertEqual(look("presa").label, "Presa in carico")
+        XCTAssertEqual(look("fatta"), .done)
+        XCTAssertTrue(look("fatta").struck)
+        XCTAssertEqual(look("fatta").label, "Fatta")
+    }
+
     // MARK: folders
 
     func testLoadReadsRequestsAndSkipsTempFiles() throws {
