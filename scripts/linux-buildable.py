@@ -17,6 +17,7 @@ APPLE_ONLY = re.compile(
     re.M)
 TYPE = re.compile(r"^(?:(?:public|internal|private|fileprivate|final|indirect)\s+)*(?:struct|class|enum|protocol|actor|typealias)\s+(\w+)", re.M)
 EXTENSION = re.compile(r"^(?:public\s+)?extension\s+(\w+)")
+OWN_FUNC = re.compile(r"\bfunc\s+(\w+)")
 FUNC = re.compile(r"^\s+(?:(?:public|internal|mutating|@\w+)\s+)*func\s+(\w+)")  # static ones are called through their type
 
 
@@ -32,13 +33,17 @@ def declared(text):
     return names
 
 
+def uses(text, names):
+    return bool(names) and re.search(r"\b(" + "|".join(map(re.escape, sorted(names))) + r")\b", text) is not None
+
+
 root = Path(sys.argv[1])
 files = {p: p.read_text() for d in ("Sources/CodeIslandCore", "Tests/CodeIslandCoreTests") for p in sorted((root / d).glob("*.swift"))}
 out = {p for p, t in files.items() if APPLE_ONLY.search(t)}
 while True:
     gone = set().union(*(declared(files[p]) for p in out)) if out else set()
-    pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(gone))) + r")\b") if gone else None
-    more = {p for p, t in files.items() if p not in out and pattern and pattern.search(t)}
+    # A name the file declares itself, type or any func, is its own (NotchFeeds' `headline` is not SessionHeadline's).
+    more = {p for p, t in files.items() if p not in out and uses(t, gone - declared(t) - set(OWN_FUNC.findall(t)))}
     if not more:
         break
     out |= more

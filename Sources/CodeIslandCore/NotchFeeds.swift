@@ -47,9 +47,12 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
 }
 
 extension GoalSources {
+    /// Only tasks (#61): a chat question or a note (`tipo` "domanda" / "nota", claude-config#1825) is never a request
+    /// taken in charge, so the notch drops it here, the one place that reads the file. No `tipo` = a task.
     public static func parseRequest(_ data: Data) -> UserRequest? {
         guard let d = object(data), let id = d["id"] as? String, !id.isEmpty,
-              let text = d["testo"] as? String else { return nil }
+              let text = d["testo"] as? String,
+              !["domanda", "nota"].contains(d["tipo"] as? String ?? "compito") else { return nil }
         return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
                            text: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",

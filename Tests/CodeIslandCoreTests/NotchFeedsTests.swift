@@ -171,4 +171,36 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.waiting(all).map(\.id), ["Q-0", "Q-3"])
         XCTAssertEqual(UserRequest.waiting([]), [])
     }
+
+    /// #61: a question in chat or a note is never «presa in carico»: no row, no count, no notice. No `tipo` = a task.
+    func testOnlyTasksAreRequests() {
+        func parse(_ tipo: String) -> UserRequest? {
+            GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "presa"\#(tipo)}"#))
+        }
+        XCTAssertNil(parse(#", "tipo": "domanda""#))
+        XCTAssertNil(parse(#", "tipo": "nota""#))
+        XCTAssertEqual(parse(#", "tipo": "compito""#)?.look, .working)
+        XCTAssertEqual(parse("")?.look, .working, "an old file without tipo is a task")
+    }
+
+    func testQuestionTakenOnDiskNeverAnnounced() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("feeds-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
+        for (id, tipo) in [("Q-d", "domanda"), ("Q-n", "nota"), ("Q-c", "compito")] {
+            try data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "nuova", "tipo": "\#(tipo)"}"#)
+                .write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        let before = GoalSources.load(paths).requests
+        XCTAssertEqual(before.map(\.id), ["Q-c"])
+        for (id, tipo) in [("Q-d", "domanda"), ("Q-n", "nota"), ("Q-c", "compito")] {
+            try data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "presa", "tipo": "\#(tipo)"}"#)
+                .write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        let after = GoalSources.load(paths).requests
+        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-c"], "only the task is announced")
+        XCTAssertEqual(UserRequest.waiting(after), [])
+    }
 }

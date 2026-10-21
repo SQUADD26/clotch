@@ -3,7 +3,7 @@
 # A plain Button style, an onTapGesture without the hover a few lines on, or a hand-made cursor push fails.
 set -euo pipefail
 cd "$(dirname "$0")/../Sources/CodeIsland"
-files="NotchSections NotchPager NotchProposals NotchRequestsPlate NotchGoalPlate NotchAccountsViews NotchAccountsPlate GoalsNotchView GoalPRRow SessionOpener NotchCustomizeView SettingsView"
+files="GoalEditor ClotchNotchPage NotchElementViews NotchNotificationView NotchSections NotchPager NotchProposals NotchRequestsPlate NotchGoalPlate NotchAccountsViews NotchAccountsPlate GoalsNotchView GoalPRRow SessionOpener NotchCustomizeView SettingsView"
 bad=0; buttons=0
 for f in $files; do
   p="$f.swift"
