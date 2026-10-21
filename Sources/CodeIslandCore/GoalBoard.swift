@@ -227,6 +227,14 @@ public enum GoalBoard {
         return (live.filter { !$0.proposed }, toConfirm, rows.count - live.count)
     }
 
+    /// The open Goals tab keeps its order (#36): ids already shown keep their place, new ones go at the end,
+    /// gone ones leave. So arrivals never move the page Roberto is reading.
+    public static func keepOrder(_ shown: [String], _ fresh: [String]) -> [String] {
+        let live = Set(fresh)
+        let kept = shown.filter(live.contains)
+        return kept + fresh.filter { !kept.contains($0) }
+    }
+
     static func firstWords(_ t: String, _ n: Int = 6) -> String {
         let words = t.split(separator: " ")
         return words.prefix(n).joined(separator: " ") + (words.count > n ? "…" : "")
