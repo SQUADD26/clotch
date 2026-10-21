@@ -296,7 +296,6 @@ final class AppState {
                 glanceCompletionActive = false
             }
             if surface.isExpanded {
-                refreshClaudeUsageIfStale()
                 claudeQuota.noteExpanded()
             } else {
                 claudeQuota.noteCollapsed()
@@ -337,21 +336,11 @@ final class AppState {
         return sid
     }
 
-    /// Local-transcript token usage shown in the session-list footer.
-    /// Refreshed lazily on panel expansion (no resident timer, no API calls).
+    /// Local-transcript token usage of CodeIsland's footer. goal-notch never scans for it (usage comes
+    /// from the dashboard): it stays nil outside the debug harness.
     var claudeUsage: ClaudeUsageScanner.Snapshot?
     /// Subscription rate limits (5h / weekly) from Anthropic — opt-in, network.
     let claudeQuota = ClaudeQuotaMonitor()
-    /// Process-wide, not per-instance: the scan reads one shared history
-    /// (`~/.claude`), so two concurrent runs are always duplicate work. Production
-    /// has a single AppState and never noticed, but anything constructing several —
-    /// the test bundle does — otherwise starts N cold scans at once on the shared
-    /// `.utility` cooperative pool and starves every other detached probe on it
-    /// (git-branch resolution among them).
-    private static var usageScanInFlight = false
-    /// Incremental parse state — round-trips through each detached scan so
-    /// growing transcripts are only read past their last consumed offset.
-    private var usageFileCache = ClaudeUsageScanner.FileCache()
 
     /// Glance completion mode: an agent finished while the pill was collapsed —
     /// light the dot instead of expanding. Cleared when the user expands the
@@ -1321,28 +1310,6 @@ final class AppState {
         } else {
             // Show immediately
             showCompletion(sessionId)
-        }
-    }
-
-    /// Prewarm at launch so the footer doesn't pop in (and shift panel height)
-    /// on the first expansion.
-    func refreshClaudeUsageIfStale() {
-        guard UserDefaults.standard.bool(forKey: SettingsKey.showUsageStats) else { return }
-        guard !Self.usageScanInFlight else { return }
-        if let scannedAt = claudeUsage?.scannedAt, Date().timeIntervalSince(scannedAt) < 120 { return }
-        Self.usageScanInFlight = true
-        let cacheCopy = usageFileCache
-        Task.detached(priority: .utility) {
-            var cache = cacheCopy
-            let snapshot = ClaudeUsageScanner.scan(claudeHomes: ClaudeConfigPaths.allConfigDirs(), cache: &cache)
-            // Bound to a `let` before the hop: capturing the `var` in the
-            // concurrently-executing closure is an error under Swift 6.
-            let scannedCache = cache
-            await MainActor.run { [weak self] in
-                self?.claudeUsage = snapshot
-                self?.usageFileCache = scannedCache
-                AppState.usageScanInFlight = false
-            }
         }
     }
 

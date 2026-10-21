@@ -42,6 +42,21 @@ final class L10nTests: XCTestCase {
         XCTAssertTrue(missingKeys.isEmpty, "German is missing keys: \(missingKeys)")
     }
 
+    /// The class guard: every language has every English key, with the same placeholders (scripts/check-l10n.py does the same without Swift).
+    func testEveryLanguageHasEveryEnglishKeyWithItsPlaceholders() throws {
+        let en = try XCTUnwrap(L10n.strings["en"])
+        let placeholder = try NSRegularExpression(pattern: #"%(?:\d+\$)?[-+ 0#]*\d*(?:\.\d+)?(?:ll|l|h)?[@dfsuxXeg%]"#)
+        func marks(_ s: String) -> [String] {
+            placeholder.matches(in: s, range: NSRange(s.startIndex..., in: s)).map { String(s[Range($0.range, in: s)!]) }.sorted()
+        }
+        for (lang, table) in L10n.strings where lang != "en" {
+            XCTAssertEqual(Set(en.keys).subtracting(table.keys), [], "\(lang) is missing keys")
+            for (key, value) in en {
+                if let local = table[key] { XCTAssertEqual(marks(local), marks(value), "\(lang) \(key)") }
+            }
+        }
+    }
+
     func testTurkishTranslationReturnsCorrectValue() {
         L10n.shared.language = "tr"
 

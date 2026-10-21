@@ -20,8 +20,9 @@ public enum GoalSources {
     }
 
     /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).
+    /// Reads only the keys below: ~98 % of a session file is MCP config the board never uses, skipped unbuilt.
     public static func parseSession(_ data: Data, fileName: String) -> DesktopSession? {
-        guard let d = object(data), (d["scheduledTaskId"] as? String ?? "").isEmpty,
+        guard let d = topLevel(data, keys: sessionKeys), (d["scheduledTaskId"] as? String ?? "").isEmpty,
               let cli = d["cliSessionId"] as? String, !cli.isEmpty else { return nil }
         let parent = (d["spawnedFrom"] as? [String: Any])?["sessionId"] as? String ?? d["spawnedFrom"] as? String
         let fileId = fileName.hasSuffix(".json") ? String(fileName.dropLast(5)) : fileName
@@ -29,7 +30,8 @@ public enum GoalSources {
                               parentLocalId: parent?.isEmpty == false ? parent : nil,
                               priorCliIds: (d["priorRemoteCliSessionIds"] as? [Any] ?? []).compactMap { $0 as? String },
                               title: d["title"] as? String ?? "", isRunning: d["isRunning"] as? Bool ?? false,
-                              isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]))
+                              isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]),
+                              prs: PullRequests.parse(d["prs"]))
     }
 
     public static func parseLive(_ data: Data, cliId: String) -> LiveState? {
@@ -52,8 +54,7 @@ public enum GoalSources {
     // MARK: Folders
 
     public struct Paths: Sendable {
-        public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var usage: URL; public var requests: URL
-        public var home: URL   // accounts.json and its "~/…" config dirs resolve against it
+        public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var requests: URL
     }
 
     public static func defaultPaths(home: URL) -> Paths {
@@ -64,44 +65,31 @@ public enum GoalSources {
         }
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
-                     usage: home.appendingPathComponent(".cache/claude-accounts"),
-                     requests: home.appendingPathComponent(".claude/richieste"), home: home)
+                     requests: home.appendingPathComponent(".claude/richieste"))
     }
 
-    /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
-    /// per session ever run (thousands), so only the live files of shown goals' families are read.
-    public static func load(_ paths: Paths)
-        -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], usage: [AccountUsage], requests: [UserRequest]) {
-        let fm = FileManager.default
-        let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
-            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
-        let sessions = paths.sessionRoots.flatMap { root in
-            files(in: root, fm, recursive: true).filter { $0.lastPathComponent.hasPrefix("local_") && $0.pathExtension == "json" }
-        }.compactMap { url in (try? Data(contentsOf: url)).flatMap { parseSession($0, fileName: url.lastPathComponent) } }
-        let live = GoalBoard.liveIds(goals: goals, sessions: sessions).compactMap { cli -> LiveState? in
-            guard !cli.contains("/"), let data = try? Data(contentsOf: paths.live.appendingPathComponent(cli + ".json")) else { return nil }
-            let transcript = object(data)?["transcript"] as? String ?? ""
-            var index: [String: Date]?  // built at most once per transcript, only if a direct stat misses
-            return parseLive(data, cliId: cli) { aid in
-                subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
-            }
+    /// One full read (launch of `--snapshot`, tests). The app's watcher keeps one `GoalLoader` instead.
+    public static func load(_ paths: Paths) -> GoalLoader.Snapshot {
+        GoalLoader(paths: paths).load(changed: nil)!
+    }
+
+    /// One live file, with alive subagents' transcript mtimes as activity.
+    static func readLive(cli: String, dir: URL, _ fm: FileManager) -> LiveState? {
+        guard !cli.contains("/"), let data = try? Data(contentsOf: dir.appendingPathComponent(cli + ".json")) else { return nil }
+        let transcript = object(data)?["transcript"] as? String ?? ""
+        var index: [String: Date]?  // built at most once per transcript, only if a direct stat misses
+        return parseLive(data, cliId: cli) { aid in
+            subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
         }
-        let usage = files(in: paths.usage, fm).filter { $0.lastPathComponent.hasPrefix("uso-acct-") && $0.pathExtension == "json" }
-            .compactMap { url in (try? Data(contentsOf: url)).flatMap { parseUsage($0, fileName: url.lastPathComponent) } }
-        let names = usage.isEmpty ? [:] : accountNames(home: paths.home)
-        let named = usage.map { u in var u = u; u.name = names[u.id]; return u }
-            .sorted { ($0.label, $0.id) < ($1.label, $1.id) }
-        let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }
-            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseRequest) }
-            .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
-        return (goals, sessions, live, named, requests)
     }
 
-    private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
+    /// Lists with mtime and size prefetched, so the cache's stat of each file is free.
+    static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
+        let keys: [URLResourceKey] = [.contentModificationDateKey, .fileSizeKey]
         if recursive {
-            return fm.enumerator(at: dir, includingPropertiesForKeys: nil)?.allObjects as? [URL] ?? []
+            return fm.enumerator(at: dir, includingPropertiesForKeys: keys)?.allObjects as? [URL] ?? []
         }
-        return (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
+        return (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys)) ?? []
     }
 
     /// `<transcript without .jsonl>/subagents/agent-<id>.jsonl` by one stat; nested layouts
@@ -126,6 +114,74 @@ public enum GoalSources {
     }
 
     // MARK: Helpers
+
+    static let sessionKeys: Set<String> = ["scheduledTaskId", "cliSessionId", "spawnedFrom", "sessionId",
+                                           "priorRemoteCliSessionIds", "title", "isRunning", "isArchived", "lastActivityAt", "prs"]
+
+    /// A top-level JSON object with only `keys` parsed; every other value is skipped byte by byte, never built.
+    /// nil when the object is malformed or truncated (a file caught mid-write).
+    static func topLevel(_ data: Data, keys: Set<String>) -> [String: Any]? {
+        data.withUnsafeBytes { (raw: UnsafeRawBufferPointer) -> [String: Any]? in
+            let b = raw.bindMemory(to: UInt8.self)
+            let n = b.count
+            var i = 0
+            func space() { while i < n, b[i] == 0x20 || b[i] == 0x0A || b[i] == 0x0D || b[i] == 0x09 { i += 1 } }
+            func string() -> Bool {  // b[i] == '"'; leaves i after the closing quote
+                i += 1
+                while i < n {
+                    let c = b[i]
+                    if c == 0x5C { i += 2; continue }
+                    i += 1
+                    if c == 0x22 { return true }
+                }
+                return false
+            }
+            func value() -> Bool {
+                guard i < n else { return false }
+                switch b[i] {
+                case 0x22: return string()
+                case 0x7B, 0x5B:
+                    var depth = 0
+                    while i < n {
+                        let c = b[i]
+                        if c == 0x22 { if !string() { return false }; continue }
+                        if c == 0x7B || c == 0x5B { depth += 1 }
+                        else if c == 0x7D || c == 0x5D { depth -= 1; if depth == 0 { i += 1; return true } }
+                        i += 1
+                    }
+                    return false
+                default:  // number, true, false, null
+                    let start = i
+                    while i < n, ![0x2C, 0x7D, 0x5D, 0x20, 0x0A, 0x0D, 0x09].contains(b[i]) { i += 1 }
+                    return i > start
+                }
+            }
+            space()
+            guard i < n, b[i] == 0x7B else { return nil }
+            i += 1
+            var out: [String: Any] = [:]
+            while true {
+                space()
+                guard i < n else { return nil }
+                if b[i] == 0x7D { return out }
+                if b[i] == 0x2C { i += 1; continue }
+                guard b[i] == 0x22 else { return nil }
+                let k0 = i + 1
+                guard string() else { return nil }
+                let key = String(decoding: UnsafeBufferPointer(rebasing: b[k0..<(i - 1)]), as: UTF8.self)
+                space()
+                guard i < n, b[i] == 0x3A else { return nil }
+                i += 1
+                space()
+                let v0 = i
+                guard value() else { return nil }
+                if keys.contains(key) {
+                    let slice = Data(UnsafeRawBufferPointer(rebasing: raw[v0..<i]))
+                    out[key] = try? JSONSerialization.jsonObject(with: slice, options: .fragmentsAllowed)
+                }
+            }
+        }
+    }
 
     static func object(_ data: Data) -> [String: Any]? {
         (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]

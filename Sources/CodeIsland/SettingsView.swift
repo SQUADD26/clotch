@@ -329,6 +329,7 @@ private struct SidebarRow: View {
 private struct GeneralPage: View {
     @ObservedObject private var l10n = L10n.shared
     @AppStorage(SettingsKey.displayChoice) private var displayChoice = SettingsDefaults.displayChoice
+    @AppStorage(SettingsKey.windowAppearance) private var windowAppearance = AppearanceChoice.dark.rawValue
     @AppStorage(SettingsKey.allowHorizontalDrag) private var allowHorizontalDrag = SettingsDefaults.allowHorizontalDrag
     @AppStorage(SettingsKey.avoidMenuBarIcons) private var avoidMenuBarIcons = SettingsDefaults.avoidMenuBarIcons
     @State private var launchAtLogin: Bool
@@ -349,6 +350,16 @@ private struct GeneralPage: View {
                     Text("日本語").tag("ja")
                     Text("한국어").tag("ko")
                     Text("Türkçe").tag("tr")
+                    Text("Italiano").tag("it")
+                }
+                Picker(l10n["window_appearance"], selection: $windowAppearance) {
+                    Text(l10n["appearance_dark"]).tag(AppearanceChoice.dark.rawValue)
+                    Text(l10n["appearance_light"]).tag(AppearanceChoice.light.rawValue)
+                    Text(l10n["appearance_system"]).tag(AppearanceChoice.system.rawValue)
+                }
+                .onChange(of: windowAppearance) { _, _ in
+                    SettingsWindowController.shared.applyAppearance()
+                    NotchCustomizeWindowController.shared.applyAppearance()
                 }
                 Toggle(l10n["launch_at_login"], isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, v in
@@ -369,13 +380,15 @@ private struct GeneralPage: View {
                     .foregroundStyle(.secondary)
                 Picker(l10n["display"], selection: $displayChoice) {
                     Text(l10n["auto"]).tag("auto")
-                    ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { index, screen in
+                    Text(l10n["follow_mouse"]).tag(ScreenDetector.followMouseChoice)
+                    ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { _, screen in
                         let name = screen.localizedName
                         let isBuiltin = name.contains("Built-in") || name.contains("内置")
                         let label = isBuiltin ? l10n["builtin_display"] : name
-                        Text(label).tag("screen_\(index)")
+                        Text(label).tag(ScreenDetector.fixedPrefix + ScreenDetector.signature(for: screen))
                     }
                 }
+                Button(l10n["customize_notch"]) { NotchCustomizeWindowController.shared.show() }
             }
         }
         .formStyle(.grouped)
@@ -1292,7 +1305,6 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.showSessionRecap) private var showSessionRecap = SettingsDefaults.showSessionRecap
     @AppStorage(SettingsKey.showModelLabel) private var showModelLabel = SettingsDefaults.showModelLabel
     @AppStorage(SettingsKey.showProjectName) private var showProjectName = SettingsDefaults.showProjectName
-    @AppStorage(SettingsKey.showUsageStats) private var showUsageStats = SettingsDefaults.showUsageStats
     @AppStorage(SettingsKey.showClaudeQuota) private var showClaudeQuota = SettingsDefaults.showClaudeQuota
     @AppStorage(SettingsKey.claudeQuotaChip) private var claudeQuotaChip = SettingsDefaults.claudeQuotaChip
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
@@ -1457,12 +1469,6 @@ private struct AppearancePage: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Toggle(l10n["show_model_label"], isOn: $showModelLabel)
                     Text(l10n["show_model_label_desc"])
-                        .font(.system(size: 11))
-                        .foregroundStyle(.tertiary)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Toggle(l10n["show_usage_stats"], isOn: $showUsageStats)
-                    Text(l10n["show_usage_stats_desc"])
                         .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
                 }

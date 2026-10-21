@@ -3,12 +3,13 @@ import Combine
 import CoreServices
 import CodeIslandCore
 
-private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState],
-                                  usage: [AccountUsage], requests: [UserRequest])
+private typealias GoalDiskData = GoalLoader.Snapshot
 
-/// Watches the goal register, the live-state folder, Claude Desktop's session store, the account usage
-/// cache and the requests folder with one
-/// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`.
+/// Watches the goal register, the live-state folder, Claude Desktop's session store and the requests
+/// folder with one
+/// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`. The desktop
+/// apps rewrite session files every minute and hooks write live files on every tool call: each load
+/// touches only the paths the events named (`GoalLoader`), and at most one load runs or waits at a time.
 /// Read-only: it never creates a directory; a missing one just means no data, and its nearest
 /// existing ancestor is watched so the data shows up once the directory is created.
 /// All mutable state is confined to `queue`.
@@ -16,24 +17,30 @@ private final class GoalWatcher: @unchecked Sendable {
     private let queue = DispatchQueue(label: "goal.store.watcher", qos: .utility)
     private let home: URL
     private let onLoad: @Sendable (GoalDiskData) -> Void
-    private let coalesce: TimeInterval = 0.15
+    private let coalesce: TimeInterval = 1
+    private let loader: GoalLoader
+    private var support = ""
     private var stream: FSEventStreamRef?
     private var pending: DispatchWorkItem?
+    /// Paths named by file events since the last load; nil = the next load rescans everything.
+    private var changed: Set<String>? = nil
     private var prefixes: [String] = []
 
     init(home: URL, onLoad: @escaping @Sendable (GoalDiskData) -> Void) {
         self.home = home
+        loader = GoalLoader(home: home)
         self.onLoad = onLoad
     }
 
     func start() {
         queue.async { [self] in
             guard stream == nil else { return }
-            let paths = GoalSources.defaultPaths(home: home)
+            let paths = loader.paths
             let support = home.appendingPathComponent("Library/Application Support")
+            self.support = support.resolvingSymlinksInPath().path
             // FSEvents reports resolved paths (/private/var…), so match both spellings.
-            prefixes = [paths.goals, paths.live, paths.usage, paths.requests].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
-            let roots = Array(Set([paths.goals, paths.live, paths.usage, paths.requests, support].map { Self.existingAncestor($0).path }))
+            prefixes = [paths.goals, paths.live, paths.requests].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
+            let roots = Array(Set([paths.goals, paths.live, paths.requests, support].map { Self.existingAncestor($0).path }))
 
             var context = FSEventStreamContext(version: 0, info: Unmanaged.passUnretained(self).toOpaque(),
                                                retain: nil, release: nil, copyDescription: nil)
@@ -49,9 +56,10 @@ private final class GoalWatcher: @unchecked Sendable {
             }
             guard let created = FSEventStreamCreate(
                 nil, callback, &context, roots as CFArray,
-                FSEventStreamEventId(kFSEventStreamEventIdSinceNow), 0.05,
-                FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes
-                    | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer)
+                // No NoDefer: FSEvents itself batches a burst into one callback `coalesce` after its first event,
+                // so foreign writes under Application Support wake this queue at most once a second.
+                FSEventStreamEventId(kFSEventStreamEventIdSinceNow), coalesce,
+                FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagFileEvents)
             ) else { return }
             FSEventStreamSetDispatchQueue(created, queue)
             FSEventStreamStart(created)
@@ -61,23 +69,35 @@ private final class GoalWatcher: @unchecked Sendable {
     }
 
     private func handle(_ paths: [String], rescan: Bool) {
-        let hit = paths.contains { path in
+        let hits = paths.filter { path in
             path.contains("claude-code-sessions") || prefixes.contains { path.hasPrefix($0) }
         }
-        if rescan || hit {
+        // A new Claude app folder (another account) brings a session store the loader does not know yet.
+        // String checks only: foreign apps write under Application Support all the time.
+        let newRoot = paths.contains { p in
+            guard p.hasPrefix(support + "/") else { return false }
+            var name = p.dropFirst(support.count + 1)
+            if name.hasSuffix("/") { name = name.dropLast() }
+            return !name.contains("/") && name.lowercased().hasPrefix("claude")
+        }
+        if rescan || newRoot { changed = nil } else { changed?.formUnion(hits) }
+        if rescan || newRoot || !hits.isEmpty {
             schedule()
         }
     }
 
-    /// The first event of a burst arms one load `coalesce` later; events arriving meanwhile ride on it.
+    /// One load per batch of events (the stream already waits `coalesce`); batches arriving meanwhile ride on it.
+    /// FSEvents are delivered on `queue` too, so none arrives while a load runs: never two at once.
     private func schedule() {
         guard pending == nil else { return }
         let item = DispatchWorkItem { [self] in
+            let paths = changed
+            changed = []
+            if let snap = loader.load(changed: paths) { onLoad(snap) }
             pending = nil
-            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home)))
         }
         pending = item
-        queue.asyncAfter(deadline: .now() + coalesce, execute: item)
+        queue.async(execute: item)
     }
 
     private static func existingAncestor(_ url: URL) -> URL {
@@ -101,21 +121,25 @@ private final class GoalWatcher: @unchecked Sendable {
     static let shared = GoalStore()
 
     @Published private(set) var rows: [GoalRow] = []
-    /// One per account, sorted by id; empty until claude_accounts_uso.py has written the cache.
-    @Published private(set) var usage: [AccountUsage] = []
     /// Newest first; empty until the Overseer writes ~/.claude/richieste.
     @Published private(set) var requests: [UserRequest] = []
     /// Requests that just went nuova -> presa/fatta, oldest first. The view plays «presa in carico» once
     /// for each, then calls `takenAnimationShown(id)`; a shown id never comes back while the app runs.
     @Published private(set) var takenToAnimate: [String] = []
     private var takenShown: Set<String> = []
+    /// False until ~/.claude/richieste exists (the register ships with a config promotion): the view
+    /// then says the section is not active yet instead of «no requests».
+    @Published private(set) var requestsFolderExists = false
     private var requestsLoaded = false
-    /// Refreshed on every reload and every 30 s tick; views compute "since …" against this.
+    /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
+    /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
 
-    private var snapshot: GoalDiskData = ([], [], [], [], [])
+    private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
+    private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
-    private var timer: Timer?
+    /// One-shot, at `GoalBoard.nextChange`: the only time the board is rebuilt without a change on disk.
+    private var deadline: Timer?
 
     func start() {
         guard watcher == nil else { return }
@@ -124,28 +148,24 @@ private final class GoalWatcher: @unchecked Sendable {
         }
         watcher = w
         w.start()
-        // Time alone turns a goal yellow (30 min idle), so re-evaluate even when nothing changes on disk.
-        let t = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refresh() }
-        }
-        t.tolerance = 5
-        RunLoop.main.add(t, forMode: .common)
-        timer = t
     }
 
-    /// One synchronous read of the disk, for `--snapshot` (no watcher, no timer).
+    /// One synchronous read of the disk, for `--snapshot` (no watcher, no deadline).
     func loadNow() {
         apply(GoalSources.load(GoalSources.defaultPaths(home: FileManager.default.homeDirectoryForCurrentUser)))
     }
 
     private func apply(_ snap: GoalDiskData) {
         snapshot = snap
-        if snap.usage != usage { usage = snap.usage }
         let fresh = UserRequest.newlyTaken(before: requestsLoaded ? requests : nil, after: snap.requests,
                                            shown: takenShown.union(takenToAnimate))
         requestsLoaded = true
+        let exists = FileManager.default.fileExists(atPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude/richieste").path)
+        if exists != requestsFolderExists { requestsFolderExists = exists }
         if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
+        let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
+        if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()
     }
 
@@ -157,7 +177,18 @@ private final class GoalWatcher: @unchecked Sendable {
     private func refresh() {
         let t = Date()
         let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t)
+        deadline?.invalidate()
+        deadline = nil
+        if watcher != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {
+            let d = Timer(fire: at.addingTimeInterval(1), interval: 0, repeats: false) { [weak self] _ in
+                Task { @MainActor in self?.refresh() }
+            }
+            d.tolerance = 5
+            RunLoop.main.add(d, forMode: .common)
+            deadline = d
+        }
+        guard next != rows else { return }
         now = t
-        if next != rows { rows = next }
+        rows = next
     }
 }

@@ -1,0 +1,118 @@
+import SwiftUI
+import CodeIslandCore
+
+enum NotchTab: String, CaseIterable, Identifiable {
+    case goals, requests, accounts
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .goals: return "Obiettivi"
+        case .requests: return "Richieste"
+        case .accounts: return "Account"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .goals: return "target"
+        case .requests: return "tray"
+        case .accounts: return "person.2"
+        }
+    }
+}
+
+/// The open notch: the tab bar, then the tab. The tab chosen last is kept for the next opening.
+struct NotchSections: View {
+    let maxHeight: CGFloat
+    @ObservedObject private var store = GoalStore.shared
+    @ObservedObject private var quota = AccountQuotaFeed.shared
+    @AppStorage("notchTab") private var tab: NotchTab = .goals
+
+    var body: some View {
+        // Ticks only while the notch is open: "since …" and "updated … ago" are what time moves.
+        TimelineView(.periodic(from: .now, by: 30)) { ctx in
+            NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
+        }
+        .frame(maxHeight: maxHeight, alignment: .top)
+        .onAppear {  // opening the notch is when fresh numbers matter
+            quota.refresh()
+            PullRequestFeed.shared.refresh()
+        }
+    }
+}
+
+/// The tab bar and the tab, without the clock: `--snapshot` draws this.
+struct NotchSectionsContent: View {
+    @ObservedObject var store: GoalStore
+    @ObservedObject var quota: AccountQuotaFeed
+    let now: Date
+    @Binding var tab: NotchTab
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        VStack(spacing: NotchSpace.section) {
+            TabBar(tab: $tab)
+            Group {
+                switch tab {
+                case .goals: GoalsTab(rows: store.rows, now: now)
+                case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
+                case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .transition(.opacity)
+        }
+        .padding(.horizontal, NotchSpace.side)
+        .padding(.top, 10)
+        .padding(.bottom, NotchSpace.bottom)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: tab)
+    }
+}
+
+/// Three 142 × 30 segments in a 38 pt well; the chosen one lifts. One spring moves the highlight.
+struct TabBar: View {
+    @Binding var tab: NotchTab
+    @Namespace private var highlight
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(NotchTab.allCases) { item in
+                Button { tab = item } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: item.symbol)
+                        Text(item.title)
+                    }
+                    .font(item == tab ? NotchType.tab : NotchType.tabOff)
+                    .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.off)
+                    .frame(maxWidth: .infinity, minHeight: 30)
+                    .background {
+                        if item == tab {
+                            Capsule().fill(GoalInk.selected).matchedGeometryEffect(id: "tab", in: highlight)
+                        }
+                    }
+                    .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(item == tab ? .isSelected : [])
+            }
+        }
+        .padding(4)
+        .background(Capsule().fill(GoalInk.well))
+        .frame(maxWidth: 434)
+    }
+}
+
+/// An empty state: what is (or is not) there, and at most one line on why.
+struct EmptyState: View {
+    let text: String
+    var detail: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: NotchSpace.tight) {
+            Text(text).font(NotchType.bodyEmphasis).foregroundStyle(GoalInk.secondary)
+            if let detail { Text(detail).font(NotchType.body).foregroundStyle(GoalInk.secondary) }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
