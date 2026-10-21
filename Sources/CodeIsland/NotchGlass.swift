@@ -22,7 +22,9 @@ private struct GlassPlate: ViewModifier {
 
     func body(content: Content) -> some View {
         #if compiler(>=6.2)
-        if #available(macOS 26, *), !snapshot {
+        if snapshot {
+            standIn(content)
+        } else if #available(macOS 26, *) {
             content.glassEffect(tint.map { Glass.regular.tint($0) } ?? Glass.regular, in: .rect(cornerRadius: radius))
         } else {
             standIn(content)
@@ -54,7 +56,9 @@ struct GlassGroup<Content: View>: View {
 
     var body: some View {
         #if compiler(>=6.2)
-        if #available(macOS 26, *), !snapshot {
+        if snapshot {
+            content
+        } else if #available(macOS 26, *) {
             GlassEffectContainer(spacing: spacing) { content }
         } else {
             content

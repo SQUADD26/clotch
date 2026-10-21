@@ -139,7 +139,7 @@ private struct UsageMeter: View {
     var body: some View {
         HStack(spacing: 8) {
             GoalBar(progress: used.map { $0 / 100 }, color: color, height: 4)
-            Text(used.map { "\(Int($0.rounded()))%" } ?? "–")
+            Text(used.map { "\(Int($0.rounded()))%" } ?? "")
                 .font(.system(size: 11.5, weight: .semibold).monospacedDigit())
                 .foregroundStyle(used == nil ? GoalInk.secondary : GoalInk.primary)
                 .frame(width: 36, alignment: .trailing)

@@ -11,6 +11,12 @@ public struct NotchEvent: Identifiable, Equatable, Sendable {
     /// Proofs done when the event fired, so two proofs in a row are two events.
     public let count: Int
 
+    public init(kind: Kind, subject: String, count: Int) {
+        self.kind = kind
+        self.subject = subject
+        self.count = count
+    }
+
     public var id: String { "\(kind)-\(subject)-\(count)" }
 }
 
