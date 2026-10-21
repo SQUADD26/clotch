@@ -30,6 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
         VoiceSpeaker.shared.start()
+        AfkStore.shared.start()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present

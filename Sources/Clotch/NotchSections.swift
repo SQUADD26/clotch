@@ -36,17 +36,26 @@ struct NotchSections: View {
     @ObservedObject private var store = GoalStore.shared
     @ObservedObject private var quota = AccountQuotaFeed.shared
     @AppStorage("notchTab") private var tab: NotchTab = .goals
+    @ObservedObject private var afk = AfkStore.shared
 
     var body: some View {
-        // Ticks only while the notch is open: "since …" and "updated … ago" are what time moves.
-        TimelineView(.periodic(from: .now, by: 30)) { ctx in
-            NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
+        Group {
+            // Back from AFK (#106): the summary stands in for the tabs until it is closed.
+            if let report = afk.report {
+                AfkSummaryView(report: report, maxHeight: maxHeight)
+            } else {
+                // Ticks only while the notch is open: "since …" and "updated … ago" are what time moves.
+                TimelineView(.periodic(from: .now, by: 30)) { ctx in
+                    NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
+                }
+            }
         }
         .hugging(maxHeight: maxHeight)
         .onAppear {  // opening the notch is when fresh numbers matter
             quota.refresh()
             PullRequestFeed.shared.refresh()
         }
+        .onDisappear { afk.dismiss(closing: false) }  // closed by the pointer: the next opening shows the tabs
     }
 }
 
@@ -144,6 +153,8 @@ struct TabBar: View {
     var tabs = NotchTab.allCases
     /// The tab with a small yellow dot (a new answer, #90); never the open one.
     var dotted: NotchTab? = nil
+    /// The AFK moon's state for `--snapshot`; nil = live.
+    var afkOn: Bool? = nil
     @Namespace private var highlight
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -178,9 +189,15 @@ struct TabBar: View {
         .frame(maxWidth: 434)
         .onHover { TabBarPointer.inside = $0 }
         .onDisappear { TabBarPointer.inside = false }  // closing the notch sends no hover-out
-        // The gear sits in the 37 pt beside the centred bar, so it is there on every tab.
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .trailing) { NotchSettingsButton() }
+        // The gear and the AFK moon (#106) on the right of the bar, so they are there on every tab.
+        .padding(.trailing, 86)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .trailing) {
+            HStack(spacing: 12) {
+                NotchSettingsButton()
+                AfkButton(on: afkOn)
+            }
+        }
     }
 }
 

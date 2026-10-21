@@ -128,6 +128,15 @@ enum GoalSnapshot {
                                     voice: (VoiceStatus.intensity(level), t / VoiceEdgeLook.period)) { EmptyView() },
                              "17-voce-\(Int(t))s")
                 }
+                // AFK (#106), with the Figma's examples: the moon off and on, the closed sign, the summary long, short and empty.
+                try save(open(.goals, afkOn: false) { GoalsTab(rows: store.rows, now: store.now) }, "21-afk-aperto-spento")
+                try save(open(.goals, afkOn: true, afk: 4) { GoalsTab(rows: store.rows, now: store.now) }, "22-afk-aperto-acceso")
+                try save(island(width: closedWidth, radius: 12, afk: 4) { EmptyView() }, "23-afk-chiuso-acceso")
+                for (name, report) in [("riepilogo", AfkSample.summary), ("lista-lunga", AfkSample.long), ("niente", AfkSample.nothing)] {
+                    try save(island(width: openWidth, radius: NotchSpace.radius) {
+                        AfkSummaryView(report: report, animated: false, dismiss: {})
+                    }, "24-afk-\(name)")
+                }
                 print("snapshot: the no-notch centre comes with #5")
                 try SettingsSnapshot.save(into: dir)
             }
@@ -169,7 +178,7 @@ enum GoalSnapshot {
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
-                                            voice: (level: Float, phase: Double)? = nil,
+                                            afk: Int? = nil, expanded: Bool = false, voice: (level: Float, phase: Double)? = nil,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
@@ -177,7 +186,8 @@ enum GoalSnapshot {
                 layout: .standard(hasNotch: notice == nil), hasNotch: notice == nil, notchWidth: notchWidth,
                 data: NotchZoneData(rows: GoalStore.shared.rows, accounts: AccountQuotaFeed.shared.accounts,
                                     inUse: AccountsInUseFeed.shared.emails, now: GoalStore.shared.now,
-                                    barHeight: notchHeight, mark: mark, notice: notice, noticeShort: noticeShort, accountsCardOpen: cardOpen)
+                                    barHeight: notchHeight, mark: mark, notice: notice, noticeShort: noticeShort, accountsCardOpen: cardOpen,
+                                    afk: afk, expanded: expanded)
             )
             .frame(maxWidth: .infinity)
             below()
@@ -204,10 +214,10 @@ enum GoalSnapshot {
     }
 
     /// The open notch's tab bar with `body` as the tab's content (a second page, a still of a slide).
-    private static func open<Body: View>(_ tab: NotchTab, @ViewBuilder body: () -> Body) -> some View {
-        island(width: openWidth, radius: NotchSpace.radius) {
+    private static func open<Body: View>(_ tab: NotchTab, afkOn: Bool? = nil, afk: Int? = nil, @ViewBuilder body: () -> Body) -> some View {
+        island(width: openWidth, radius: NotchSpace.radius, afk: afk, expanded: true) {
             VStack(spacing: NotchSpace.section) {
-                TabBar(tab: .constant(tab))
+                TabBar(tab: .constant(tab), afkOn: afkOn)
                 body().frame(maxWidth: .infinity, alignment: .topLeading)
             }
             .padding(.horizontal, NotchSpace.side)
