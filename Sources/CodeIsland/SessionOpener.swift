@@ -36,15 +36,10 @@ enum SessionOpener {
 }
 
 extension View {
-    /// A row that opens `target` on click: hand cursor and tap. No target (or an id the app would refuse): the row stays as it is.
+    /// A row that opens `target` on click: the shared hover (hand cursor) and tap. No target (or an id the app would refuse): the row stays as it is.
     @ViewBuilder func opensSession(_ target: SessionTarget?) -> some View {
         if let target, target.url != nil {
-            if #available(macOS 15, *) {
-                contentShape(Rectangle()).onTapGesture { SessionOpener.open(target) }.pointerStyle(.link)
-            } else {
-                // shortcut: no hand cursor before macOS 15 (push/pop would stick when the row goes away); the click works.
-                contentShape(Rectangle()).onTapGesture { SessionOpener.open(target) }
-            }
+            contentShape(Rectangle()).onTapGesture { SessionOpener.open(target) }.notchHover()
         } else {
             self
         }

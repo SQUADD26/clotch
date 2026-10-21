@@ -153,7 +153,7 @@ struct TabBar: View {
                     }
                     .contentShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.notch)
                 .accessibilityAddTraits(item == tab ? .isSelected : [])
             }
         }

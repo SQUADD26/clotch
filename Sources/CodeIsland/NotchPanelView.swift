@@ -781,8 +781,6 @@ struct NotchIconButton: View {
     var tint: Color = .white
     var tooltip: String? = nil
     let action: () -> Void
-    @State private var hovering = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The drawn circle, and the hit target around it.
     static let circleSize: CGFloat = 22
@@ -792,18 +790,13 @@ struct NotchIconButton: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(tint.opacity(hovering ? 1.0 : 0.85))
+                .foregroundStyle(tint.opacity(0.85))
                 .frame(width: Self.circleSize, height: Self.circleSize)
-                .background(
-                    Circle()
-                        .fill(tint.opacity(hovering ? 0.2 : 0.08))
-                )
-                .scaleEffect(hovering && !reduceMotion ? 1.1 : 1.0)
+                .background(Circle().fill(tint.opacity(0.08)))
                 .frame(width: Self.hitSize, height: Self.hitSize)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h } }
+        .buttonStyle(.notchSmall)
         .help(tooltip ?? "")
         // Icon-only: VoiceOver would otherwise read the symbol name
         // ("gearshape"), in English, instead of what the button does.

@@ -41,7 +41,7 @@ struct EditableGoalText: View {
                             .foregroundStyle(GoalInk.secondary)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.notchSmall)
                     .help("Scrivi obiettivo")
                     if store.writing.contains(row.id) {
                         Text("Salvando...").font(NotchType.small).foregroundStyle(GoalInk.quiet)
