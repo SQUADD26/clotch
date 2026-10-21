@@ -41,7 +41,7 @@ struct RowPhase: View {
     @ObservedObject private var seen = SessionSeen.shared
 
     var body: some View {
-        PhaseIndicator(phase: row.phase, pulsing: seen.needsEye(row), size: size, compact: compact)
+        PhaseIndicator(phase: row.phase, pulsing: seen.needsEye(row), size: size, compact: compact, tint: row.phaseRGB)
     }
 }
 
@@ -52,9 +52,11 @@ struct PhaseIndicator: View {
     /// A small dot only, for the closed notch's rings.
     var compact = false
     var style = WorkingStyle.current
+    /// The colour to draw, when it is not the phase's own (a still session that waits for Roberto).
+    var tint: RGB?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var color: Color { Color(phase.rgb) }
+    private var color: Color { Color(tint ?? phase.rgb) }
 
     var body: some View {
         Group {

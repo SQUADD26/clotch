@@ -65,10 +65,15 @@ public struct SessionMotor: Equatable, Sendable {
     public let what: String
     /// «visto»: the session's last sign of life; the newest file wins when a /clear left two for one session.
     public let seen: Date?
+    /// «muove»: for `ferma`, who has to move it (`roberto` | `overseer`).
+    public let mover: String
 
-    public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil) {
-        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen) = (cli, localId, phase, why, since, what, seen)
+    public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil, mover: String = "") {
+        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover) = (cli, localId, phase, why, since, what, seen, mover)
     }
+
+    /// The phase colour, except a still session that only Roberto can move: yellow, like the old «still» light.
+    public var rgb: RGB { phase == .ferma && mover == "roberto" ? RGB(255, 214, 10) : phase.rgb }
 }
 
 extension GoalSources {
@@ -78,6 +83,6 @@ extension GoalSources {
         func line(_ key: String) -> String { (d[key] as? String ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ") }
         let file = (d["cli"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? cli
         return SessionMotor(cli: file, localId: line("local_id"), phase: phase, why: line("perche"), since: date(d["da"]),
-                            what: line("cosa"), seen: date(d["visto"]))
+                            what: line("cosa"), seen: date(d["visto"]), mover: line("muove"))
     }
 }

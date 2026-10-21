@@ -99,6 +99,9 @@ extension GoalRow {
         }
     }
 
+    /// The colour of the mark: the engine's, else the phase's.
+    public var phaseRGB: RGB { motor.flatMap { $0.phase == phase ? $0.rgb : nil } ?? phase.rgb }
+
     /// The timer counts the time in the state; without an engine file it falls back to the goal's own start.
     public var clockStart: Date? { motor?.since ?? since }
 }

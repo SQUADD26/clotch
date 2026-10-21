@@ -10,7 +10,7 @@ extension GoalRow {
     var ink: Color {
         if proposed { return GoalInk.secondary }
         if case .reached = status { return GoalTone.go.color }
-        return Color(phase.rgb)
+        return Color(phaseRGB)
     }
 
     /// The phase mark shows on goals still being worked, never on proposed or reached ones.

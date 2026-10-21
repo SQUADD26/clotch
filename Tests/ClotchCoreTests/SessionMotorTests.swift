@@ -66,6 +66,16 @@ final class SessionMotorTests: GoalTestCase {
         XCTAssertEqual(Set(SessionPhase.allCases.map { "\($0.rgb)" }).count, 5, "no two phases share a colour")
     }
 
+    func testStillSessionOnlyRobertoCanMoveIsYellow() {
+        let robertoMoves = GoalSources.parseMotor(Data(#"{"stato": "ferma", "muove": "roberto"}"#.utf8), cli: "m")!
+        let overseerMoves = GoalSources.parseMotor(Data(#"{"stato": "ferma", "muove": "overseer"}"#.utf8), cli: "m")!
+        XCTAssertEqual(robertoMoves.rgb, RGB(255, 214, 10), "yellow: it waits for him")
+        XCTAssertEqual(overseerMoves.rgb, SessionPhase.ferma.rgb, "grey")
+        XCTAssertEqual(motor("problema").rgb, SessionPhase.problema.rgb, "muove counts for ferma only")
+        let r = GoalBoard.rows(goals: [g("m")], sessions: [s("local_m", cli: "m")], live: [], motor: [robertoMoves], now: now)[0]
+        XCTAssertEqual(r.phaseRGB, RGB(255, 214, 10))
+    }
+
     func testOnlyWaitingForRobertoPulsesOnlyWorkingAnimates() {
         XCTAssertEqual(SessionPhase.allCases.filter(\.pulses), [.aspettaRoberto])
         XCTAssertEqual(SessionPhase.allCases.filter(\.animates), [.lavora])
