@@ -135,6 +135,7 @@ private final class GoalWatcher: @unchecked Sendable {
     /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
 
+    private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
     private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
     /// One-shot, at `GoalBoard.nextChange`: the only time the board is rebuilt without a change on disk.
@@ -163,6 +164,8 @@ private final class GoalWatcher: @unchecked Sendable {
         if exists != requestsFolderExists { requestsFolderExists = exists }
         if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
+        let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
+        if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()
     }
 

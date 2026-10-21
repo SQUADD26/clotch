@@ -35,7 +35,10 @@ struct NotchSections: View {
             NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
         }
         .frame(maxHeight: maxHeight, alignment: .top)
-        .onAppear { quota.refresh() }  // opening the notch is when fresh numbers matter
+        .onAppear {  // opening the notch is when fresh numbers matter
+            quota.refresh()
+            PullRequestFeed.shared.refresh()
+        }
     }
 }
 

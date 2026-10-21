@@ -9,7 +9,7 @@ public final class GoalLoader: @unchecked Sendable {
     public typealias Snapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest])
     /// Session stats and values kept across launches, so a restart parses only the files changed since.
     /// Bump the name when `DesktopSession` or `GoalSources.sessionKeys` change: the old file is then ignored.
-    public static let indexName = "sessions-v1.json"
+    public static let indexName = "sessions-v2.json"
 
     public private(set) var paths: GoalSources.Paths
     private let makePaths: () -> GoalSources.Paths
