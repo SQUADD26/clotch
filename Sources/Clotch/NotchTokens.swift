@@ -17,6 +17,15 @@ enum GoalTone {
         case .stop: return Color(red: 1, green: 69 / 255, blue: 58 / 255)
         }
     }
+
+    /// Dark text on a pill filled with the tone (above 4.5:1 on each).
+    var ink: Color {
+        switch self {
+        case .go: return GoalInk.check
+        case .wait: return Color(red: 38 / 255, green: 30 / 255, blue: 0)
+        case .stop: return Color(red: 38 / 255, green: 8 / 255, blue: 6 / 255)
+        }
+    }
 }
 
 /// Text levels and fills on black: the Figma specs' opacities of white (specs.md, «Colori»).
@@ -91,7 +100,7 @@ enum NotchType {
 
 /// One spring for everything that moves in the notch; Reduce Motion swaps it for a short fade.
 enum NotchMotion {
-    /// The family's damping: the shell's open spring uses it too (`NotchAnimation.open`).
+    /// The family's damping for the elements; the shell opens with no bounce (`NotchAnimation.open`, #68).
     static let damping = 0.86
     static let spring = Animation.spring(response: 0.38, dampingFraction: damping)
     static let still = Animation.easeOut(duration: 0.15)

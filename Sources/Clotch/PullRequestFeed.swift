@@ -53,6 +53,7 @@ import ClotchCore
             let out = tracker.settle(byGoal, answers: answers)
             if out.open != openByGoal { openByGoal = out.open }
             mergedToAnimate += out.merged
+            if !out.merged.isEmpty { VoiceAlertCenter.shared.merged(out.merged) }
             if tracker.seen.count != seenBefore {
                 UserDefaults.standard.set(tracker.seen.sorted().map { "\($0.repo)#\($0.number)" }, forKey: Self.seenKey)
             }

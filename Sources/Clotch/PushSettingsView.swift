@@ -152,7 +152,7 @@ private struct MaskedPushField: View {
                 Image(systemName: revealed ? "eye.slash" : "eye")
                     .frame(width: 16)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.window)
             .help(l10n[revealed ? "push_hide_value" : "push_show_value"])
             .accessibilityLabel(l10n[revealed ? "push_hide_value" : "push_show_value"])
         }

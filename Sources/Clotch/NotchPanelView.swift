@@ -242,9 +242,13 @@ struct NotchPanelView: View {
         )
     }
 
-    /// The open content and the notes come down from under the notch; Reduce Motion only fades them.
+    /// The open content and the notes fade in, a few points down, once the shell has made room;
+    /// they leave first, before the shell closes over them. Reduce Motion only fades them.
     private var contentTransition: AnyTransition {
-        reduceMotion ? .opacity : .blurFade.combined(with: .move(edge: .top))
+        let enter: AnyTransition = reduceMotion ? .opacity : .blurFade.combined(with: .offset(y: -6))
+        let leave: AnyTransition = reduceMotion ? .opacity : .blurFade
+        return .asymmetric(insertion: enter.animation(NotchAnimation.contentIn),
+                           removal: leave.animation(NotchAnimation.contentOut))
     }
 
     /// The panel window's width (PanelWindowController.panelSize).
@@ -869,7 +873,7 @@ struct QuitConfirmButton: View {
             .frame(minWidth: NotchIconButton.hitSize, minHeight: NotchIconButton.hitSize, alignment: .trailing)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notchSmall)
         .onHover { h in
             withAnimation(NotchAnimation.micro) { hovering = h }
             if !h { confirmation.cancel() }
@@ -919,7 +923,7 @@ private struct SessionGroupingTabs: View {
                     .frame(height: layout.hitHeight)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.notch)
                 .onHover { hoveredTag = $0 ? tab.tag : (hoveredTag == tab.tag ? nil : hoveredTag) }
                 // The pixel glyphs are drawn, not text: without a label
                 // VoiceOver reads nothing.
@@ -1466,7 +1470,7 @@ private struct NotchCardButton: View {
             .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(stroke, lineWidth: 1))
             .contentShape(RoundedRectangle(cornerRadius: 6))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notch)
         .disabled(!isEnabled)
         .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h && isEnabled } }
         .help(help ?? "")
@@ -1509,7 +1513,7 @@ private struct NotchCardTextLink: View {
             .frame(minHeight: 26)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notch)
         .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h } }
         .help(help ?? "")
         .accessibilityLabel(label)
@@ -1632,7 +1636,7 @@ private struct NotchCardContextRow: View {
         // The hover wash reaches past the column; the text lines up with it.
         .padding(.horizontal, -6)
         .contentShape(Rectangle())
-        .onTapGesture { onJump() }
+        .onTapGesture { onJump() }.notchHover(active: canJump)
         .onHover { h in
             guard canJump else { return }
             withAnimation(NotchAnimation.micro) { hovering = h }
@@ -1716,7 +1720,7 @@ private struct ApprovalBar: View {
                 Spacer(minLength: 0)
             }
             .contentShape(Rectangle())
-            .onTapGesture { handleCardClick() }
+            .onTapGesture { handleCardClick() }.notchHover()
 
             // Tool-specific detail view. A long command scrolls inside the
             // window rather than pushing the buttons off its bottom edge.
@@ -1729,7 +1733,7 @@ private struct ApprovalBar: View {
                 }
                 .background(RoundedRectangle(cornerRadius: 6).fill(Color.white.opacity(0.06)))
                 .contentShape(Rectangle())
-                .onTapGesture { handleCardClick() }
+                .onTapGesture { handleCardClick() }.notchHover()
             }
 
             actionRow(type)
@@ -2392,7 +2396,7 @@ private struct MultiSelectRow: View {
             )
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notch)
         .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h } }
         .accessibilityAddTraits(isChecked ? .isSelected : [])
     }
@@ -2452,7 +2456,7 @@ private struct OptionRow: View {
             )
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notch)
         .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h } }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
@@ -2990,11 +2994,8 @@ private struct ProjectNameLink: View {
             .foregroundStyle(color)
             .lineLimit(1)
             .truncationMode(.tail)
-            .onTapGesture {
-                if isInteractive, let cwd = cwd {
-                    NSWorkspace.shared.open(URL(fileURLWithPath: cwd))
-                }
-            }
+            .onTapGesture { if isInteractive, let cwd { NSWorkspace.shared.open(URL(fileURLWithPath: cwd)) } }
+            .notchHover(active: isInteractive && cwd != nil)
             .help(isInteractive && cwd != nil ? "\(L10n.shared["open_path"]) \(cwd ?? "")" : "")
     }
 }
@@ -3239,7 +3240,7 @@ private struct SessionCard: View {
         }
         .offset(x: failureShakeOffset)
         .contentShape(Rectangle())
-        .onTapGesture { handleSessionClick() }
+        .onTapGesture { handleSessionClick() }.notchHover()
         .onHover { h in withAnimation(NotchAnimation.micro) { hovering = h } }
         .onDisappear {
             jumpValidationTask?.cancel()
@@ -3943,7 +3944,7 @@ private struct SessionInlineButton: View {
 
     var body: some View {
         Button(action: action) { label }
-            .buttonStyle(.plain)
+            .buttonStyle(.notch)
             .disabled(!enabled)
             .help(help ?? "")
             .onHover { hovering = $0 }

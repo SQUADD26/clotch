@@ -7,4 +7,5 @@ LegacyDefaults.renameKeys(in: .standard)
 // The parse cache moved to «Clotch» (#69): the old folder holds only a stale copy of it.
 try? FileManager.default.removeItem(at: FileManager.default.homeDirectoryForCurrentUser
     .appendingPathComponent("Library/Application Support/Goal Notch"))
+NotchTiming.migrate(.standard)  // the old speed multipliers become times in ms (#68)
 ClotchApp.main()

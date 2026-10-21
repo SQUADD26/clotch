@@ -613,7 +613,7 @@ private struct MarkdownCodeBlockView: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(IslandMarkdownStyle.badgeSurface))
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.notchSmall)
             .help(L10n.shared["copy_code"])
             .padding(4)
         } else if let language = block.language {

@@ -940,9 +940,9 @@ private struct HooksPage: View {
                                 refreshCLIStatuses()
                                 refreshKey += 1
                             } label: {
-                                Image(systemName: "trash")
+                                Image(systemName: "trash").foregroundStyle(.red)
                             }
-                            .buttonStyle(.borderless)
+                            .buttonStyle(.window)
                         }
                     }
                 }
@@ -1091,9 +1091,9 @@ private struct ExtraConfigDirRow: View {
                 // The primary under another spelling: nothing to switch here.
                 .disabled(!status.sourceEnabled || status.sameAsPrimary)
             Button(role: .destructive, action: onRemove) {
-                Image(systemName: "trash")
+                Image(systemName: "trash").foregroundStyle(.red)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.window)
             .help(l10n["extra_config_dirs_remove_help"])
         }
     }
@@ -1318,8 +1318,8 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.notchHeightMode) private var notchHeightModeRaw = SettingsDefaults.notchHeightMode
     @AppStorage(SettingsKey.customNotchHeight) private var customNotchHeight = SettingsDefaults.customNotchHeight
-    @AppStorage(SettingsKey.notchOpenSpeed) private var notchOpenSpeed = SettingsDefaults.notchOpenSpeed
-    @AppStorage(SettingsKey.notchCloseSpeed) private var notchCloseSpeed = SettingsDefaults.notchCloseSpeed
+    @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
+    @AppStorage(SettingsKey.notchCloseMs) private var notchCloseMs = SettingsDefaults.notchCloseMs
 
     private var notchHeightMode: Binding<NotchHeightMode> {
         Binding(
@@ -1335,29 +1335,6 @@ private struct AppearancePage: View {
         )
     }
 
-    private func speedBinding(_ speed: Binding<Double>) -> Binding<Double> {
-        Binding(
-            get: { NotchAnimationSpeed.clamped(speed.wrappedValue) },
-            set: { speed.wrappedValue = NotchAnimationSpeed.clamped($0) }
-        )
-    }
-
-    private func speedSlider(_ title: String, _ speed: Binding<Double>) -> some View {
-        let value = speedBinding(speed)
-        return VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(title)
-                Spacer()
-                Text("\(value.wrappedValue, specifier: "%.1f")×")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-            Slider(value: value, in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step)
-                .accessibilityLabel(Text(title))
-                .accessibilityValue(Text("\(value.wrappedValue, specifier: "%.1f")×"))
-        }
-    }
-
     var body: some View {
         Form {
             Section(l10n["preview"]) {
@@ -1370,9 +1347,9 @@ private struct AppearancePage: View {
             }
 
             Section(l10n["panel"]) {
-                speedSlider(l10n["notch_open_speed"], $notchOpenSpeed)
-                speedSlider(l10n["notch_close_speed"], $notchCloseSpeed)
-                Text(l10n["notch_animation_speed_desc"])
+                NotchTimeField(title: l10n["notch_open_ms"], ms: $notchOpenMs)
+                NotchTimeField(title: l10n["notch_close_ms"], ms: $notchCloseMs)
+                Text(l10n["notch_animation_ms_desc"])
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Picker(selection: $maxVisibleSessions) {

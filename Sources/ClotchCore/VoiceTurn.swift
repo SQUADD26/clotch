@@ -3,16 +3,19 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// One end of turn, said out loud (#50): the Stop payload → the answer's text → yes or no → Haiku → ElevenLabs.
+/// One piece of news said out loud (#50, #57): the event's report → yes or no → Haiku → ElevenLabs.
 /// Pure: the app (`VoiceSpeaker`) runs the processes, the network and the audio. Same rules as Clean View's `voce.ts`.
 public enum VoiceTurn {
     public static let haikuModel = "claude-haiku-5-5"
-    public static let haikuSeconds: TimeInterval = 8
+    /// Haiku gets this long per try, two tries (#73); then the cleaned report is said.
+    public static let haikuSeconds: TimeInterval = 22
+    public static let haikuTries = 2
+    /// The cleaned report, when Haiku failed twice, is at most this many sentences.
+    static let plainSentences = 3
     /// The ceiling of one spoken line (~25 s of speech) and of the cleaned report Haiku reads.
     public static let maxSpoken = 320
     /// The raw text cleaned at most: the answer's opening, where the report leads.
     static let maxRaw = 4000
-    public static let fallback = "C’è una novità, guarda lo schermo."
     public static let testLine = "Ciao, questa è una prova della voce."
     /// ElevenLabs takes speed up to 1.2; the player does the rest.
     public static let apiMaxSpeed = 1.2
@@ -73,21 +76,6 @@ public enum VoiceTurn {
         }
     }
 
-    /// The session and the report for Haiku: the answer that closed the turn (`last_assistant_message`, else the last
-    /// assistant message in the transcript's tail), cleaned for the ear and cut to `maxSpoken`.
-    /// nil = nothing to say (no text, or Stop fired again by a blocking stop hook).
-    public static func report(payload: Data, transcriptTail: (String) -> Data?) -> (session: String, text: String)? {
-        guard let o = (try? JSONSerialization.jsonObject(with: payload)) as? [String: Any],
-              o["stop_hook_active"] as? Bool != true else { return nil }
-        let session = o["session_id"] as? String ?? ""
-        var text = o["last_assistant_message"] as? String ?? ""
-        if text.isEmpty, let path = o["transcript_path"] as? String, let tail = transcriptTail(path) {
-            text = lastAssistantText(tail) ?? ""
-        }
-        text = cut(VoiceClean.clean(String(text.prefix(maxRaw))), maxSpoken)
-        return text.isEmpty ? nil : (session, text)
-    }
-
     /// The text blocks of the last `"type":"assistant"` line of a JSONL transcript tail.
     static func lastAssistantText(_ tail: Data) -> String? {
         for line in String(decoding: tail, as: UTF8.self).split(separator: "\n").reversed() {
@@ -121,8 +109,33 @@ public enum VoiceTurn {
         "<rapporto>\n\(report)\n</rapporto>\n" + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
     }
 
+    /// The line to say (#73): Haiku up to `haikuTries` times, each cut at `timeout`; when both fail, the report itself,
+    /// cleaned and cut to `plainSentences`. Never a fixed sentence: nil = nothing to say at all (silence).
+    public static func line(report: String, timeout: TimeInterval = haikuSeconds,
+                            haiku: @escaping @Sendable () async -> String?) async -> (text: String, topic: String)? {
+        for _ in 0..<haikuTries {
+            let out: String? = await withTaskGroup(of: String?.self) { g in
+                g.addTask { await haiku() }
+                g.addTask { try? await Task.sleep(nanoseconds: UInt64(timeout * 1e9)); return nil }
+                let first = await g.next() ?? nil
+                g.cancelAll()
+                return first
+            }
+            if let out, let said = spoken(fromHaiku: out) { return said }
+        }
+        let plain = plain(report)
+        return plain.isEmpty ? nil : (plain, "")
+    }
+
+    /// The report made fit for the ear without Haiku: no paths, links, hashes, PR numbers, orders; the first sentences.
+    static func plain(_ report: String) -> String {
+        let sentences = VoiceClean.spoken(report).replacingOccurrences(of: #"([.!?])\s+"#, with: "$1\n", options: .regularExpression)
+            .split(separator: "\n").prefix(plainSentences)
+        return cut(sentences.joined(separator: " "), maxSpoken)
+    }
+
     /// What Haiku answered, cleaned again and ready to say, and its «ARGOMENTO:» line (kept for next time, never said).
-    /// nil = say `fallback` (nothing left, or a secret Haiku made up or was tricked into).
+    /// nil = a failed try (nothing left, or a secret Haiku made up or was tricked into).
     public static func spoken(fromHaiku output: String) -> (text: String, topic: String)? {
         var topic = ""
         let lines = output.split(separator: "\n", omittingEmptySubsequences: false).filter { line in
