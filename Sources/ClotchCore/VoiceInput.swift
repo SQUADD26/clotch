@@ -61,7 +61,7 @@ public enum VoiceInput {
         case started
         case partial(String)
         case committed(String)
-        case failure(String)
+        case failure(Failure)
         case ignored
     }
 
@@ -92,18 +92,70 @@ public enum VoiceInput {
         case "warning", "scribe_warning": return .ignored
         default:
             // Every other type with an `error` is a failure: auth_error, quota_exceeded, rate_limited, input_error, …
-            guard let message = o["error"] as? String else { return .ignored }
-            return .failure(failureText(type: type, message: message))
+            guard o["error"] is String else { return .ignored }
+            return .failure(failure(type: type))
         }
     }
 
-    /// Plain Italian for the pill; the raw message stays out of it.
-    static func failureText(type: String, message: String) -> String {
+    /// Why a dictation stopped, as the pill says it (Figma #110, note 5 and 6): what happened, why, and what Roberto can do.
+    /// Never a code or a raw message.
+    public enum Failure: Equatable, Sendable {
+        case mic, key, credits, network, local, silence
+
+        public var title: String {
+            switch self {
+            case .mic: return "Clotch non può usare il microfono"
+            case .key: return "La chiave di ElevenLabs non funziona"
+            case .credits: return "Crediti ElevenLabs finiti"
+            case .network: return "Non riesco a trascrivere"
+            case .local: return "Il modello locale non parte"
+            case .silence: return "Non ho sentito niente"
+            }
+        }
+
+        public var detail: String {
+            switch self {
+            case .mic: return "Attiva Clotch in Privacy › Microfono: appena lo fai, torno ad ascoltare."
+            case .key: return "Forse è sbagliata o scaduta. Controllala nelle impostazioni."
+            case .credits: return "Non posso più trascrivere in rete."
+            case .network: return "Niente connessione, oppure il servizio è lento."
+            case .local: return "Riprova. Se non basta, passa a ElevenLabs nelle impostazioni."
+            case .silence: return "Riprova parlando più vicino al microfono."
+            }
+        }
+
+        /// The buttons under the text, the first is the main one.
+        public var actions: [Action] {
+            switch self {
+            case .mic: return [.openPrivacy]
+            case .key: return [.checkKey, .useLocal]
+            case .credits: return [.useLocal]
+            case .network: return [.retry, .useLocal]
+            case .local, .silence: return [.retry]
+            }
+        }
+    }
+
+    public enum Action: Equatable, Sendable {
+        case openPrivacy, checkKey, useLocal, retry
+
+        public var label: String {
+            switch self {
+            case .openPrivacy: return "Apri Privacy › Microfono"
+            case .checkKey: return "Controlla la chiave"
+            case .useLocal: return "Usa il modello locale"
+            case .retry: return "Riprova"
+            }
+        }
+    }
+
+    /// Scribe's error types (docs: elevenlabs.io/docs/api-reference/speech-to-text/v-1-speech-to-text-realtime) to what the pill says.
+    static func failure(type: String) -> Failure {
         switch type {
-        case "auth_error", "unaccepted_terms": return "Chiave ElevenLabs non valida. Controllala in Voce."
-        case "quota_exceeded", "rate_limited", "resource_exhausted": return "ElevenLabs è al limite. Riprova tra poco."
-        case "insufficient_audio_activity": return "Non ho sentito niente."
-        default: return "Il trascrittore ha dato errore. Riprova."
+        case "auth_error", "unaccepted_terms": return .key
+        case "quota_exceeded": return .credits
+        case "insufficient_audio_activity": return .silence
+        default: return .network  // rate_limited, resource_exhausted, transcriber_error, …
         }
     }
 
@@ -127,6 +179,10 @@ public enum VoiceInput {
 
         /// Local engines hand over the whole text so far each time: it replaces the current segment.
         public mutating func replace(with text: String) { partial = text }
+
+        /// The words Scribe has closed, apart from the segment still changing: the pill shows them brighter.
+        public var sure: String { done.joined(separator: " ") }
+        public var maybe: String { partial.trimmingCharacters(in: .whitespacesAndNewlines) }
 
         public var text: String {
             (done + [partial.trimmingCharacters(in: .whitespacesAndNewlines)]).filter { !$0.isEmpty }.joined(separator: " ")

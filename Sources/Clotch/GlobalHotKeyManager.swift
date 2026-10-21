@@ -46,6 +46,11 @@ final class GlobalHotKeyManager {
     /// fails (e.g. the combo is already owned by another app).
     @discardableResult
     func register(keyCode: UInt16, modifiers: NSEvent.ModifierFlags, handler: @escaping () -> Void) -> Bool {
+        registerID(keyCode: keyCode, modifiers: modifiers, handler: handler) != nil
+    }
+
+    /// Like `register`, but gives back the id so that one hotkey can be released alone (`unregister(id:)`), e.g. Esc while a dictation is open.
+    func registerID(keyCode: UInt16, modifiers: NSEvent.ModifierFlags, handler: @escaping () -> Void) -> UInt32? {
         installHandlerIfNeeded()
 
         let id = nextID
@@ -63,10 +68,15 @@ final class GlobalHotKeyManager {
         )
         guard status == noErr, let ref else {
             Self.log.warning("RegisterEventHotKey failed (status \(status)) for keyCode \(keyCode)")
-            return false
+            return nil
         }
         entries[id] = Entry(ref: ref, handler: handler)
-        return true
+        return id
+    }
+
+    func unregister(id: UInt32) {
+        guard let entry = entries.removeValue(forKey: id) else { return }
+        UnregisterEventHotKey(entry.ref)
     }
 
     /// Unregister every hotkey and remove the shared Carbon event handler.

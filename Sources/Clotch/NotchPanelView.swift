@@ -369,6 +369,7 @@ struct NotchPanelView: View {
             .background(panelShape.fill(.black))
             // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
+            .overlay { VoiceInputLightLive(light: voiceInput.light, shape: panelShape) }
             .simultaneousGesture(TapGesture().onEnded { openOnClick() })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)

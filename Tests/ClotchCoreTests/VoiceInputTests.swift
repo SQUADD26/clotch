@@ -59,12 +59,28 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"partial_transcript","text":"ciao"}"#), .partial("ciao"))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"committed_transcript","text":"ciao a tutti"}"#), .committed("ciao a tutti"))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"committed_transcript_with_timestamps","text":"x","words":[]}"#), .committed("x"))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"auth_error","error":"bad key"}"#), .failure("Chiave ElevenLabs non valida. Controllala in Voce."))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"quota_exceeded","error":"x"}"#), .failure("ElevenLabs è al limite. Riprova tra poco."))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure("Il trascrittore ha dato errore. Riprova."))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"auth_error","error":"bad key"}"#), .failure(.key))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"quota_exceeded","error":"x"}"#), .failure(.credits))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure(.network))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"warning","warning":"w"}"#), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent("not json"), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"something_new"}"#), .ignored)
+    }
+
+    /// Figma #110 note 5 and 6: a title, a cause and the move that fixes it; never a code.
+    func testFailuresSpeakPlainlyAndOfferTheFix() {
+        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local, .silence]
+        for f in all {
+            XCTAssertNil((f.title + f.detail).range(of: #"\d{3}|HTTP|error|errore"#, options: .regularExpression), "\(f)")
+            XCTAssertFalse(f.actions.isEmpty)
+        }
+        XCTAssertEqual(VoiceInput.Failure.key.title, "La chiave di ElevenLabs non funziona")
+        XCTAssertEqual(VoiceInput.Failure.key.actions.map(\.label), ["Controlla la chiave", "Usa il modello locale"])
+        XCTAssertEqual(VoiceInput.Failure.credits.actions, [.useLocal])
+        XCTAssertEqual(VoiceInput.Failure.network.actions, [.retry, .useLocal])
+        XCTAssertEqual(VoiceInput.Failure.mic.actions.map(\.label), ["Apri Privacy › Microfono"])
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.network))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .failure(.silence))
     }
 
     func testDictationKeepsCommittedAndShowsThePartial() {

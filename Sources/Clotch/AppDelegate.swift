@@ -8,7 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "AppDelegate")
 
     var panelController: PanelWindowController?
-    private let hotKeyManager = GlobalHotKeyManager()
+    let hotKeyManager = GlobalHotKeyManager()
     private var localShortcutMonitor: Any?
     let appState = AppState()
 
