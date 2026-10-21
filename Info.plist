@@ -29,6 +29,8 @@
 	</dict>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Clotch needs to control terminal apps to jump to the correct window and tab when you click a session.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Clotch ascolta il microfono solo mentre premi la scorciatoia per parlargli.</string>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>Clotch abbassa l'audio degli altri programmi mentre la voce parla.</string>
 	<!-- No updates: no SUFeedURL and no signing key, so Sparkle can never fetch or accept another build (issue #30). -->

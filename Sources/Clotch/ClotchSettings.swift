@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The pages of «Impostazioni di Clotch» (#56), in the toolbar's order: icon and name on top, like the Finder.
 enum ClotchSettingsTab: String, CaseIterable {
-    case general, notch, notifications, voice, about
+    case general, notch, notifications, voice, dictation, about
 
     var title: String {
         switch self {
@@ -11,6 +11,7 @@ enum ClotchSettingsTab: String, CaseIterable {
         case .notch: return L10n.shared["notch_page"]
         case .notifications: return L10n.shared["notifications_page"]
         case .voice: return L10n.shared["voice"]
+        case .dictation: return L10n.shared["dictation_page"]
         case .about: return L10n.shared["about"]
         }
     }
@@ -21,6 +22,7 @@ enum ClotchSettingsTab: String, CaseIterable {
         case .notch: return "rectangle.topthird.inset.filled"
         case .notifications: return "bell.badge"
         case .voice: return "waveform"
+        case .dictation: return "mic.fill"
         case .about: return "info.circle"
         }
     }
@@ -35,6 +37,7 @@ enum ClotchSettingsTab: String, CaseIterable {
             if ClotchSettingsWindow.drawWhole { VoiceSettingsPage() } else {
                 ScrollView { VoiceSettingsPage() }.frame(width: ClotchSettingsWindow.width, height: 640)
             }
+        case .dictation: DictationPage()
         case .about: ClotchAboutPage()
         }
     }

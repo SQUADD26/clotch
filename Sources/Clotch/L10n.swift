@@ -49,6 +49,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "General",
         "notch_page": "Notch",
+        "dictation_page": "Dictation",
         "notifications_page": "Notifications",
         "opening": "Opening",
         "open_on_hover": "Open on hover",
@@ -707,6 +708,7 @@ final class L10n: ObservableObject {
     private static let it: [String: String] = [
         "general": "Generale",
         "notch_page": "Notch",
+        "dictation_page": "Dettatura",
         "notifications_page": "Avvisi",
         "opening": "Apertura",
         "open_on_hover": "Apri al passaggio del mouse",
@@ -1328,6 +1330,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "Allgemein",
         "notch_page": "Notch",
+        "dictation_page": "Diktat",
         "notifications_page": "Mitteilungen",
         "opening": "Öffnen",
         "open_on_hover": "Beim Darüberfahren öffnen",
@@ -1960,6 +1963,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "通用",
         "notch_page": "Notch",
+        "dictation_page": "听写",
         "notifications_page": "通知",
         "opening": "打开",
         "open_on_hover": "悬停时打开",
@@ -2618,6 +2622,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "一般",
         "notch_page": "Notch",
+        "dictation_page": "聽寫",
         "notifications_page": "通知",
         "opening": "打開",
         "open_on_hover": "懸停時打開",
@@ -3276,6 +3281,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "一般",
         "notch_page": "Notch",
+        "dictation_page": "音声入力",
         "notifications_page": "通知",
         "opening": "開く",
         "open_on_hover": "ポインタを置くと開く",
@@ -3934,6 +3940,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "일반",
         "notch_page": "Notch",
+        "dictation_page": "받아쓰기",
         "notifications_page": "알림",
         "opening": "열기",
         "open_on_hover": "마우스를 올리면 열기",
@@ -4592,6 +4599,7 @@ final class L10n: ObservableObject {
         // Settings pages
         "general": "Genel",
         "notch_page": "Notch",
+        "dictation_page": "Dikte",
         "notifications_page": "Bildirimler",
         "opening": "Açılış",
         "open_on_hover": "Üzerine gelince aç",
