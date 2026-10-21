@@ -131,13 +131,12 @@ private final class GoalWatcher: @unchecked Sendable {
     /// then says the section is not active yet instead of «no requests».
     @Published private(set) var requestsFolderExists = false
     private var requestsLoaded = false
-    /// Refreshed when the board changes and every 30 s tick; views compute "since …" against this.
-    /// Never on a reload that changed nothing, so an idle board never redraws.
+    /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
+    /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
 
     private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
-    private var timer: Timer?
     /// One-shot, at `GoalBoard.nextChange`: the only time the board is rebuilt without a change on disk.
     private var deadline: Timer?
 
@@ -148,16 +147,9 @@ private final class GoalWatcher: @unchecked Sendable {
         }
         watcher = w
         w.start()
-        // The tick moves only the "since …" text; status changes due to time alone come from `deadline`.
-        let t = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.now = Date() }
-        }
-        t.tolerance = 5
-        RunLoop.main.add(t, forMode: .common)
-        timer = t
     }
 
-    /// One synchronous read of the disk, for `--snapshot` (no watcher, no timer).
+    /// One synchronous read of the disk, for `--snapshot` (no watcher, no deadline).
     func loadNow() {
         apply(GoalSources.load(GoalSources.defaultPaths(home: FileManager.default.homeDirectoryForCurrentUser)))
     }
@@ -184,7 +176,7 @@ private final class GoalWatcher: @unchecked Sendable {
         let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t)
         deadline?.invalidate()
         deadline = nil
-        if timer != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {
+        if watcher != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {
             let d = Timer(fire: at.addingTimeInterval(1), interval: 0, repeats: false) { [weak self] _ in
                 Task { @MainActor in self?.refresh() }
             }

@@ -131,6 +131,8 @@ struct SessionsLive: View {
     var size: CGFloat = 11.5
     /// The number alone, for tight columns; the tooltip and VoiceOver keep the full sentence.
     var compact = false
+    /// False in the closed notch: it is always on screen, so an endless symbol effect there costs CPU at idle.
+    var moves = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var text: String {
@@ -147,7 +149,7 @@ struct SessionsLive: View {
                 Image(systemName: "waveform")
                     .font(.system(size: size - 1, weight: .semibold))
                     .foregroundStyle(live ? GoalTone.go.color : GoalInk.secondary)
-                    .symbolEffect(.variableColor.iterative, isActive: live && !reduceMotion)
+                    .symbolEffect(.variableColor.iterative, isActive: live && moves && !reduceMotion)
                 Text(text)
                     .font(.system(size: size, weight: .medium).monospacedDigit())
                     .foregroundStyle(live ? GoalInk.primary : GoalInk.secondary)
