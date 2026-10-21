@@ -1,7 +1,8 @@
 import SwiftUI
 import CodeIslandCore
 
-/// «Voce» (#38, #50): Clotch's voice: ElevenLabs key, on/off, voice, speed, daily limits, Haiku's instructions, a test.
+/// «Voce» (#38, #50, #57): Clotch's voice: on/off, «Parla per», «Avvisami quando…», ElevenLabs key, voice, speed,
+/// daily limits, Haiku's instructions, a test.
 /// Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`; the text is Italian like the rest of Clotch's own pages.
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
@@ -25,7 +26,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         Form {
             Section {
-                Text("A fine turno Claude ti dice a voce cosa ha fatto. Prima un aiutante Claude Haiku riscrive la risposta in una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
+                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima un aiutante Claude Haiku scrive una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -57,6 +58,8 @@ struct VoiceSettingsPage: View {
             } footer: {
                 Text("Principali: quelle aperte da te, non da un'altra sessione.")
             }
+
+            VoiceAlertsSection(sessions: sessions, note: $note)
 
             Section {
                 LabeledContent("Stato") {

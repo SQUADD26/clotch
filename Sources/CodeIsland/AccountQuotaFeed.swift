@@ -44,6 +44,7 @@ import CodeIslandCore
         let now = Date()
         if let data, let list = AccountQuotas.parse(data, now: now) {
             if list != accounts { accounts = list }
+            VoiceAlertCenter.shared.quotasRead(list)
             fetchedAt = now
             lastFetchFailed = false
         } else {

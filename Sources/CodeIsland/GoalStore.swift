@@ -181,6 +181,7 @@ private final class GoalWatcher: @unchecked Sendable {
         if exists != requestsFolderExists { requestsFolderExists = exists }
         if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
+        VoiceAlertCenter.shared.registersLoaded(goals: snap.goals, requests: snap.requests)
         let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
         if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()

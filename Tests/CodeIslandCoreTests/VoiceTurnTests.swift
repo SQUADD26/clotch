@@ -5,10 +5,12 @@ import XCTest
 final class VoiceTurnTests: XCTestCase {
     private func json(_ o: [String: Any]) -> Data { try! JSONSerialization.data(withJSONObject: o) }
 
-    func testReportFromPayloadOrTranscript() {
-        let direct = VoiceTurn.report(payload: json(["session_id": "s1", "last_assistant_message": " Fatto. "])) { _ in nil }
+    func testStopGivesTheAnswerFromPayloadOrTranscript() {
+        let now = Date()
+        let direct = VoiceEvents.stop(payload: json(["session_id": "s1", "last_assistant_message": "Fatto."]), transcriptTail: { _ in nil }, now: now)
         XCTAssertEqual(direct?.session, "s1")
-        XCTAssertEqual(direct?.text, "Fatto.")
+        XCTAssertEqual(direct?.answer, "Fatto.")
+        XCTAssertNil(direct?.question, "no question: the end of turn says nothing")
 
         let tail = """
             {"type":"assistant","message":{"content":[{"type":"text","text":"Prima"}]}}
@@ -17,13 +19,12 @@ final class VoiceTurnTests: XCTestCase {
             {"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read"}]}}
             """
         var asked = ""
-        let fromFile = VoiceTurn.report(payload: json(["session_id": "s2", "transcript_path": "/t.jsonl"])) { asked = $0; return Data(tail.utf8) }
+        let fromFile = VoiceEvents.stop(payload: json(["session_id": "s2", "transcript_path": "/t.jsonl"]), transcriptTail: { asked = $0; return Data(tail.utf8) }, now: now)
         XCTAssertEqual(asked, "/t.jsonl")
-        XCTAssertEqual(fromFile?.text, "Ultima risposta.")
+        XCTAssertEqual(fromFile?.answer, "Ultima risposta")
 
-        XCTAssertNil(VoiceTurn.report(payload: json(["session_id": "s3", "last_assistant_message": "x", "stop_hook_active": true])) { _ in nil },
+        XCTAssertNil(VoiceEvents.stop(payload: json(["session_id": "s3", "last_assistant_message": "x", "stop_hook_active": true]), transcriptTail: { _ in nil }, now: now),
                      "Stop fired again by a blocking stop hook: said once")
-        XCTAssertNil(VoiceTurn.report(payload: json(["session_id": "s4"])) { _ in nil })
     }
 
     func testRefusalsMuteAndCapsMeanNoCalls() {
@@ -67,16 +68,16 @@ final class VoiceTurnTests: XCTestCase {
 
     func testReportCleanedForTheEarBeforeAndAfterHaiku() throws {
         let raw = "Fatto: PR #55 su `feat/50-voce` (commit c254d67a), vedi https://github.com/x/y e Sources/CodeIsland/VoiceSpeaker.swift.\n- Prossimo passo (sì)"
-        let r = try XCTUnwrap(VoiceTurn.report(payload: json(["session_id": "s", "last_assistant_message": raw])) { _ in nil })
+        let report = { (text: String) in VoiceEvent(kind: .question, at: Date(), text: text).report }
+        let r = report(raw)
         for bad in ["55", "c254d67a", "https", "github", "Sources/", "VoiceSpeaker", "`", "feat/"] {
-            XCTAssertFalse(r.text.contains(bad), "\(bad) in «\(r.text)»")
+            XCTAssertFalse(r.contains(bad), "\(bad) in «\(r)»")
         }
-        XCTAssertTrue(r.text.contains("la modifica"))
-        XCTAssertTrue(r.text.hasSuffix("Io consiglio di sì."), r.text)
+        XCTAssertTrue(r.contains("la modifica"))
+        XCTAssertTrue(r.hasSuffix("Io consiglio di sì."), r)
         let long = String(repeating: "Una frase del rapporto. ", count: 50)
-        XCTAssertLessThanOrEqual(VoiceTurn.report(payload: json(["last_assistant_message": long])) { _ in nil }!.text.count, VoiceTurn.maxSpoken)
-        XCTAssertFalse(VoiceTurn.report(payload: json(["last_assistant_message": "la chiave è sk_0123456789abcdefabcd"])) { _ in nil }!.text.contains("sk_"),
-                       "a key never reaches Haiku")
+        XCTAssertLessThanOrEqual(report(long).count, VoiceTurn.maxSpoken)
+        XCTAssertFalse(report("la chiave è sk_0123456789abcdefabcd").contains("sk_"), "a key never reaches Haiku")
         XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Apri il terminale e incolla il comando.\nARGOMENTO: la voce")?.text, VoiceClean.screenNotice)
         XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "La modifica #12 è pronta, capo.")?.text, "La modifica è pronta, capo.")
     }

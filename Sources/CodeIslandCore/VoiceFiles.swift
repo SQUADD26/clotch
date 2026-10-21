@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -22,6 +22,8 @@ public struct VoiceFiles {
         statusURL = voce.appendingPathComponent("stato.json")
         activeURL = voce.appendingPathComponent("clotch")  // contract with Clean View: see VoiceHooks
         queueURL = voce.appendingPathComponent("coda")
+        eventsURL = voce.appendingPathComponent("eventi.jsonl")  // claude-config#1854 writes it; Clotch only reads
+        alertsURL = voce.appendingPathComponent("avvisi.json")   // «Avvisami quando…»: the page and `avvisami` write it
         voiceDir = voce
     }
 
