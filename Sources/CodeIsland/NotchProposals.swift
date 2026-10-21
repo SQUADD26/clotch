@@ -6,6 +6,8 @@ import CodeIslandCore
 struct ProposalsPage: View {
     let rows: [GoalRow]
     let total: Int
+    /// The first proposal's text open, as after a click (the gallery's still).
+    var openFirst = false
     static let perPage = 2
 
     var body: some View {
@@ -15,7 +17,7 @@ struct ProposalsPage: View {
                 Spacer()
                 Text("\(total) \(total == 1 ? "proposto" : "proposti")").font(NotchType.label).foregroundStyle(GoalInk.secondary)
             }
-            ForEach(rows) { ProposalLine(row: $0) }
+            ForEach(rows) { ProposalLine(row: $0, open: openFirst && $0.id == rows.first?.id) }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
@@ -23,6 +25,7 @@ struct ProposalsPage: View {
 
 private struct ProposalLine: View {
     let row: GoalRow
+    let open: Bool
     @ObservedObject private var store = GoalStore.shared
 
     var body: some View {
@@ -31,13 +34,12 @@ private struct ProposalLine: View {
         HStack(alignment: .center, spacing: NotchSpace.section) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1)
-                Text(text).font(NotchType.body).foregroundStyle(GoalInk.description).lineLimit(2)
+                GoalText(text: text, expanded: open)
                 if store.acceptFailed.contains(row.id) {
                     Text("Non accettato. Riprova.").font(NotchType.caption).foregroundStyle(GoalTone.stop.color)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .help(text)
             HStack(spacing: 8) {
                 pill("Rifiuta", GoalInk.secondary) { store.reject(row) }
                 pill("Accetta", GoalTone.go.color) { store.accept(row) }.disabled(busy).opacity(busy ? 0.5 : 1)

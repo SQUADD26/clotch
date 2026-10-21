@@ -205,6 +205,27 @@ struct WorkTimer: View {
     }
 }
 
+/// A goal's text, cut to `lines` with «…»; a click shows it whole, another click cuts it again (#20).
+/// Only the text expands: the goal's title stays the link to its session.
+struct GoalText: View {
+    let text: String
+    var lines = 2
+    @State var expanded = false
+
+    var body: some View {
+        Text(text)
+            .font(NotchType.body)
+            .foregroundStyle(GoalInk.description)
+            .lineLimit(expanded ? nil : lines)
+            .fixedSize(horizontal: false, vertical: expanded)
+            .contentShape(Rectangle())
+            .onTapGesture { expanded.toggle() }
+            .help(expanded ? "Riduci testo" : "Mostra testo intero")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { expanded.toggle() }
+    }
+}
+
 /// A small icon + text pair: «⌘ 2 sessioni al lavoro», «◎ Obiettivo 1 di 4».
 struct IconLabel: View {
     let symbol: String

@@ -63,8 +63,7 @@ struct GoalPage: View {
                 VStack(alignment: .leading, spacing: 6) {
                     GoalTitle(row: row)
                     if row.hasSubtitle {
-                        Text(row.goal).font(NotchType.body).foregroundStyle(GoalInk.description).lineLimit(2)
-                            .frame(maxWidth: 412, alignment: .leading)
+                        GoalText(text: row.goal).frame(maxWidth: 412, alignment: .leading)
                     }
                     if let reason = row.reason(now: now) {
                         Text(reason).font(NotchType.caption).foregroundStyle(row.ink).lineLimit(1)

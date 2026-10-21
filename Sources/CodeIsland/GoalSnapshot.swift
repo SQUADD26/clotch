@@ -61,6 +61,9 @@ enum GoalSnapshot {
                     try save(open(.goals) {
                         ProposalsPage(rows: Array(toConfirm.prefix(ProposalsPage.perPage)), total: toConfirm.count)
                     }, "16-da-confermare")
+                    try save(open(.goals) {
+                        ProposalsPage(rows: Array(toConfirm.prefix(ProposalsPage.perPage)), total: toConfirm.count, openFirst: true)
+                    }, "17-da-confermare-testo-intero")
                 }
                 try save(open(.requests), "07-richieste")
                 if store.requests.count > RequestsTab.perPage {
