@@ -31,6 +31,12 @@ import CodeIslandCore
         refresh()
     }
 
+    /// The merges waiting to be shown that belong to this goal (a promotion PR belongs to many goals).
+    func merged(for goal: String) -> [PRInfo] {
+        let refs = Set((byGoal[goal] ?? []).map(\.ref))
+        return mergedToAnimate.filter { refs.contains($0.ref) }
+    }
+
     func mergedAnimationShown(_ ref: PRRef) { mergedToAnimate.removeAll { $0.ref == ref } }
 
     func refresh() {
