@@ -21,6 +21,28 @@ final class HoverAndDisplaySettingsTests: XCTestCase {
         XCTAssertEqual(NotchHoverInteraction.expandDelay(forSetting: 12), 1.0)
     }
 
+    // MARK: - Exit delay (#125)
+
+    func testExitDelayDefaultIsUnchanged() {
+        XCTAssertEqual(SettingsDefaults.hoverCollapseDelay, 0.5)
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: SettingsDefaults.hoverCollapseDelay), 0.5)
+    }
+
+    func testSavedExitDelayIsTheDelayUsedAtClose() {
+        // The key the page writes is the one the panel reads; the panel passes it to collapseDelay(forSetting:).
+        let suite = UserDefaults(suiteName: "clotch-125-\(UUID().uuidString)")!
+        suite.set(0.8, forKey: SettingsKey.hoverCollapseDelay)
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: suite.double(forKey: SettingsKey.hoverCollapseDelay)), 0.8)
+        suite.set(0.2, forKey: SettingsKey.hoverCollapseDelay)
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: suite.double(forKey: SettingsKey.hoverCollapseDelay)), 0.2)
+    }
+
+    func testExitDelayIsClampedAndNeverZero() {
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: 0), 0.1)
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: 12), 1.0)
+        XCTAssertEqual(NotchHoverInteraction.collapseDelay(forSetting: .nan), NotchHoverInteraction.collapseDelay)
+    }
+
     func testNonFiniteHoverDelayFallsBackToTheDefault() {
         XCTAssertEqual(NotchHoverInteraction.expandDelay(forSetting: .nan), NotchHoverInteraction.expandDelay)
         XCTAssertEqual(NotchHoverInteraction.expandDelay(forSetting: .infinity), NotchHoverInteraction.expandDelay)

@@ -3,16 +3,17 @@ import Foundation
 /// Turns horizontal scroll events into page steps: one step per gesture, however strong the swipe.
 /// A trackpad gesture steps once its travel passes `threshold`; the rest of it and its momentum
 /// are swallowed. A mouse wheel (no phases) steps on the first click of a spin; the spin ends after
-/// a `wheelGap` pause, however long or fast it was. Pure: the caller passes time.
+/// a `wheelGap` pause (or when the wheel turns back), however long or fast it was. Pure: the caller passes time.
 public struct PageSwipe: Equatable, Sendable {
     public enum Phase: Sendable { case began, changed, ended, momentum, wheel }
 
     public static let threshold: Double = 24
-    public static let wheelGap: TimeInterval = 0.35
+    public static let wheelGap: TimeInterval = 0.2
 
     private var travel: Double = 0
     private var stepped = false
     private var lastWheel: Date?
+    private var lastWheelDx: Double = 0
 
     public init() {}
 
@@ -28,8 +29,9 @@ public struct PageSwipe: Equatable, Sendable {
             return nil
         case .wheel:
             guard dx != 0 else { return nil }
-            defer { lastWheel = now }  // every click extends the spin, so a fast one still steps once
-            guard lastWheel.map({ now.timeIntervalSince($0) >= Self.wheelGap }) ?? true else { return nil }
+            defer { lastWheel = now; lastWheelDx = dx }  // every click extends the spin, so a fast one still steps once
+            let turnedBack = lastWheelDx * dx < 0  // a reversal is a new gesture: no waiting for the pause
+            guard turnedBack || lastWheel.map({ now.timeIntervalSince($0) >= Self.wheelGap }) ?? true else { return nil }
             return dx < 0 ? 1 : -1
         }
         guard !stepped, abs(travel) >= Self.threshold else { return nil }
@@ -60,7 +62,7 @@ public struct PageDrag: Equatable, Sendable {
     public private(set) var velocity: Double = 0
     private var last: Date?
 
-    public init() {}
+    public init(travel: Double = 0) { self.travel = travel }
 
     public mutating func move(dx: Double, at now: Date) {
         travel += dx
@@ -101,6 +103,38 @@ public struct PageDrag: Equatable, Sendable {
     public static func springVelocity(_ velocity: Double, travel: Double) -> Double {
         guard travel != 0 else { return 0 }
         return min(max(velocity / travel, 0), 12)
+    }
+}
+
+/// The spring that settles the pages, run by hand rather than by SwiftUI so that a new gesture can take it
+/// where it is (#119): `offset` and `velocity` are always the pages' real place and speed. A drag starts
+/// from `offset` (`PageDrag(travel:)`), a page turn in flight starts the next spring with `velocity`.
+/// Offsets are in points, as in `PageDrag`; the rest place is 0.
+public struct PageSpring: Equatable, Sendable {
+    /// The notch's page spring (#52): 0.38 s, bounce 0.14.
+    private static let omega = 2 * Double.pi / 0.38
+    private static let damping = 1 - 0.14
+
+    public private(set) var offset: Double
+    public private(set) var velocity: Double
+
+    public init(offset: Double = 0, velocity: Double = 0) {
+        self.offset = offset
+        self.velocity = velocity
+    }
+
+    public var isAtRest: Bool { offset == 0 && velocity == 0 }
+
+    /// Runs the spring for `dt` seconds (small steps, so a slow frame stays stable); at rest it snaps to 0.
+    public mutating func advance(by dt: TimeInterval) {
+        var left = min(max(dt, 0), 0.1)
+        while left > 0, !isAtRest {
+            let h = min(left, 1.0 / 240)
+            left -= h
+            velocity += (-Self.omega * Self.omega * offset - 2 * Self.damping * Self.omega * velocity) * h
+            offset += velocity * h
+            if abs(offset) < 0.5, abs(velocity) < 5 { offset = 0; velocity = 0 }
+        }
     }
 }
 

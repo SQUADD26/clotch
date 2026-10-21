@@ -8,6 +8,7 @@ struct ClotchNotchPage: View {
     @ObservedObject private var l10n = L10n.shared
     @AppStorage(ClotchPrefs.openOnHover) private var openOnHover = ClotchPrefs.openOnHoverDefault
     @AppStorage(SettingsKey.hoverExpandDelay) private var hoverExpandDelay = SettingsDefaults.hoverExpandDelay
+    @AppStorage(SettingsKey.hoverCollapseDelay) private var hoverCollapseDelay = SettingsDefaults.hoverCollapseDelay
     @AppStorage(SettingsKey.collapseOnMouseLeave) private var collapseOnMouseLeave = SettingsDefaults.collapseOnMouseLeave
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
     @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
@@ -41,6 +42,15 @@ struct ClotchNotchPage: View {
                    ticks: [seconds(NotchHoverInteraction.expandDelayRange.lowerBound), seconds(NotchHoverInteraction.expandDelayRange.upperBound)],
                    shown: seconds(NotchHoverInteraction.expandDelay(forSetting: hoverExpandDelay)), label: l10n["hover_delay"])
                 .disabled(!openOnHover)
+            }
+            SettingsRow(l10n["hover_exit_delay"]) {
+                SettingsSlider(value: Binding(
+                    get: { NotchHoverInteraction.collapseDelay(forSetting: hoverCollapseDelay) },
+                    set: { hoverCollapseDelay = NotchHoverInteraction.collapseDelay(forSetting: $0) }
+                ), range: NotchHoverInteraction.expandDelayRange, step: NotchHoverInteraction.expandDelayStep,
+                   ticks: [seconds(NotchHoverInteraction.expandDelayRange.lowerBound), seconds(NotchHoverInteraction.expandDelayRange.upperBound)],
+                   shown: seconds(NotchHoverInteraction.collapseDelay(forSetting: hoverCollapseDelay)), label: l10n["hover_exit_delay"])
+                .disabled(!collapseOnMouseLeave)
             }
             msRow(l10n["notch_open_ms"], $notchOpenMs)
             msRow(l10n["notch_close_ms"], $notchCloseMs)
