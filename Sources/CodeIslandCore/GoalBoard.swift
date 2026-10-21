@@ -149,7 +149,7 @@ public enum GoalBoard {
         for g in goals where shown.contains(g.state) {
             live.insert(g.cli)
             let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
-            for s in family(of: master, children: children, archived: true) {
+            for s in family(of: master, children: children, includeArchived: true) {
                 reached.insert(s.localId)
                 if s.localId == master?.localId || !s.isArchived { live.insert(s.cliId) }
             }
@@ -180,15 +180,15 @@ public enum GoalBoard {
         return out
     }
 
-    /// Master + every non-archived descendant (visited set = cycle-safe); `archived`: every visited one.
-    static func family(of master: DesktopSession?, children: [String: [DesktopSession]], archived: Bool = false) -> [DesktopSession] {
+    /// Master + every non-archived descendant (visited set = cycle-safe); `includeArchived` keeps the archived ones too.
+    static func family(of master: DesktopSession?, children: [String: [DesktopSession]], includeArchived: Bool = false) -> [DesktopSession] {
         var family: [DesktopSession] = master.map { [$0] } ?? []
         var seen = Set(family.map(\.localId))
         var queue = family
         while let s = queue.popLast() {
             for c in children[s.localId] ?? [] where seen.insert(c.localId).inserted {
                 queue.append(c)
-                if archived || !c.isArchived { family.append(c) }
+                if includeArchived || !c.isArchived { family.append(c) }
             }
         }
         return family

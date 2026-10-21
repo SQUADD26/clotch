@@ -734,6 +734,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     }
 
     deinit {
+        autoScreenPoller?.invalidate()
         fullscreenPoller?.invalidate()
         for observer in settingsObservers {
             NotificationCenter.default.removeObserver(observer)

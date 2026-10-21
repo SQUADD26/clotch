@@ -10,7 +10,7 @@ No backend. The app runs on Roberto's Mac only and reads local files, read-only.
 | What | Path | Written by |
 |---|---|---|
 | Goals register, one file per master session | `~/.claude/obiettivi/<cli>.json` (`cli`, `obiettivo`, `stato` aperto/raggiunto/bloccato/passato, `prova`, `t`, `titolo`, `prove` = `[{testo, fatta, t}]` when present) | claude-config `global/hooks/obiettivo_registro.py` |
-| Desktop app sessions | `~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json` (only these top-level keys are parsed, the rest is skipped: `sessionId`, `cliSessionId`, `spawnedFrom`, `priorRemoteCliSessionIds`, `scheduledTaskId`, `title`, `isRunning`, `isArchived`, `lastActivityAt`) | Claude desktop app |
+| Desktop app sessions | `~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json` (only these top-level keys are parsed, the rest is skipped: `sessionId`, `cliSessionId`, `spawnedFrom`, `priorRemoteCliSessionIds`, `scheduledTaskId`, `title`, `isRunning`, `isArchived`, `lastActivityAt`, `prs`) | Claude desktop app |
 | Live subagents per session | `~/.claude/handoff/live/<cli>.json` (`agenti`, `aggiornato`) | claude-config `global/hooks/live_state.py` |
 | Accounts in use on this Mac | running apps (`NSWorkspace.runningApplications`): bundle `Claude <email>.app` (full-width ＠ in the name), matched to the dashboard row by exact email; updated on app launch/quit notifications only | each account's Claude desktop app |
 | Roberto's requests | `~/.claude/richieste/<id>.json` (`id`, `t`, `testo`, `stato` nuova/presa/fatta, `t_presa`, …); the folder arrives with a claude-config promotion, until then the plate says so | claude-config (Overseer) |
