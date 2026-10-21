@@ -71,5 +71,6 @@ final class ResetCountdownTests: XCTestCase {
         XCTAssertEqual(text(0.4), "0:00:01", "a partial second still counts")
         XCTAssertEqual(text(0), "adesso")
         XCTAssertEqual(text(-90), "adesso", "past")
+        XCTAssertEqual(text(863_999), ResetCountdown.longest, "the widest a weekly window can show")
     }
 }

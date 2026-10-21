@@ -98,6 +98,9 @@ public enum AccountsInUse {
 }
 
 public enum ResetCountdown {
+    /// The widest text `text` gives for a window up to 10 days, for a column that never cuts it.
+    public static let longest = "9 g 23:59:59"
+
     /// Time left to a reset: «2:41:07», «0:04:11», «2 g 3:04:11» past a day; «adesso» once it is due.
     public static func text(until reset: Date, now: Date) -> String {
         let s = Int(reset.timeIntervalSince(now).rounded(.up))
