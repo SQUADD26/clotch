@@ -2,7 +2,8 @@
 """Prints the CodeIslandCore sources and tests that build on Linux, one path per line.
 
 Rule, no file names: a file is out when it uses an Apple-only API (the pattern below), or when it
-names a type, or calls a method an extension adds, that a file already out declares. Repeated
+names a type, or calls a method an extension adds, that a file already out declares and the file
+itself does not. Repeated
 until nothing changes, so a new Core file joins by itself unless it depends on Apple-only code.
 """
 import re, sys
@@ -38,7 +39,9 @@ out = {p for p, t in files.items() if APPLE_ONLY.search(t)}
 while True:
     gone = set().union(*(declared(files[p]) for p in out)) if out else set()
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(gone))) + r")\b") if gone else None
-    more = {p for p, t in files.items() if p not in out and pattern and pattern.search(t)}
+    # A name the file declares itself (a type or any func) is its own, not the Apple-only one.
+    own = lambda t: declared(t) | set(re.findall(r"\bfunc\s+(\w+)", t))
+    more = {p for p, t in files.items() if p not in out and pattern and any(m.group(1) not in own(t) for m in pattern.finditer(t))}
     if not more:
         break
     out |= more
