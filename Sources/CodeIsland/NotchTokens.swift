@@ -95,6 +95,12 @@ enum NotchMotion {
     static let still = Animation.easeOut(duration: 0.15)
     /// Hover: the same spring, shorter.
     static let hover = Animation.spring(response: 0.2, dampingFraction: 0.9)
+    /// A page turn (#52): the same spring, starting at the gesture's speed (fraction of the travel per second).
+    static func page(velocity: Double) -> Animation {
+        .interpolatingSpring(duration: 0.38, bounce: 0.14, initialVelocity: velocity)
+    }
+    /// Pages under the fingers: a very short spring, so they track 1:1 and pick up a page in flight smoothly.
+    static let follow = Animation.interactiveSpring(response: 0.1, dampingFraction: 0.9)
 
     static func animation(reduce: Bool) -> Animation { reduce ? still : spring }
 }

@@ -45,6 +45,65 @@ public struct PageSwipe: Equatable, Sendable {
     }
 }
 
+/// A trackpad drag of the pages, as on Apple's pagers: the content follows the fingers 1:1, resists past
+/// the first and last page, and on release settles on the page that distance and speed point to, one page
+/// at most. Offsets are in points, in the user's scrolling direction (negative = content moves left = next).
+/// Pure: the caller passes time.
+public struct PageDrag: Equatable, Sendable {
+    /// How far a flick coasts, in seconds of its speed: UIScrollView's normal deceleration (0.998 per ms).
+    public static let coast: Double = 0.998 / (1 - 0.998) / 1000
+    /// A pause this long before lifting the fingers means the flick is over: no speed is carried.
+    public static let hold: TimeInterval = 0.08
+
+    public private(set) var travel: Double = 0
+    /// Points per second, smoothed over the last events.
+    public private(set) var velocity: Double = 0
+    private var last: Date?
+
+    public init() {}
+
+    public mutating func move(dx: Double, at now: Date) {
+        travel += dx
+        if let last, now > last {
+            let v = dx / now.timeIntervalSince(last)
+            velocity = velocity == 0 ? v : 0.6 * v + 0.4 * velocity
+        }
+        last = now
+    }
+
+    /// The speed the release carries: none when the fingers rested before lifting.
+    public func releaseVelocity(at now: Date) -> Double {
+        guard let last, now.timeIntervalSince(last) < Self.hold else { return 0 }
+        return velocity
+    }
+
+    /// The offset shown for `travel`: 1:1 within one page, a rubber band past the first or last page.
+    public static func offset(travel: Double, index: Int, count: Int, width: Double) -> Double {
+        guard width > 0 else { return 0 }
+        let pastEdge = (travel > 0 && index <= 0) || (travel < 0 && index >= count - 1)
+        guard pastEdge else { return max(-width, min(width, travel)) }
+        // Apple's rubber band: (1 − 1 / (x·c / d + 1)) · d, c = 0.55; never more than a fraction of the width.
+        let x = abs(travel)
+        return (1 - 1 / (x * 0.55 / width + 1)) * width * (travel < 0 ? -1 : 1)
+    }
+
+    /// The page to settle on: where the content would coast to (offset + speed · `coast`) past half a page
+    /// moves one page that way; the edges hold.
+    public static func settle(index: Int, offset: Double, velocity: Double, width: Double, count: Int) -> Int {
+        guard width > 0, count > 0 else { return index }
+        let projected = offset + velocity * coast
+        let step = abs(projected) > width / 2 ? (projected < 0 ? 1 : -1) : 0
+        return min(max(index + step, 0), count - 1)
+    }
+
+    /// The release speed as a spring's initial velocity (fraction of `travel` per second). Only speed toward
+    /// the page counts, capped, so a hard flick near the rest point never overshoots far.
+    public static func springVelocity(_ velocity: Double, travel: Double) -> Double {
+        guard travel != 0 else { return 0 }
+        return min(max(velocity / travel, 0), 12)
+    }
+}
+
 /// Which page dots to draw: at most `limit`, sliding with the page so the current one stays in view.
 public enum PageDots {
     public static func window(count: Int, index: Int, limit: Int = 4) -> Range<Int> {

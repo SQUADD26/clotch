@@ -26,7 +26,7 @@ struct GoalsTab: View {
                 get: { ids.firstIndex { $0 == shownId } ?? 0 },
                 set: { shownId = ids.indices.contains($0) ? ids[$0] : nil }
             )
-            Pager(count: ids.count, index: index) { i in
+            Pager(count: ids.count, index: index, pageID: { ids[$0] }) { i in
                 if i < asks.count {
                     ProposalsPage(rows: asks[i], total: tab.toConfirm.count)
                 } else {
