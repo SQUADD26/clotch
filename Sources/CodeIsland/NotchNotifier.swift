@@ -6,9 +6,9 @@ import CodeIslandCore
 /// The steps of one notification in the closed notch. Each step is a still frame,
 /// so `--snapshot` can draw the animation frame by frame.
 enum NotePhase: Int, CaseIterable, Comparable {
-    case arrive   // the island opens and the glass drop falls out of the notch
-    case reveal   // the drop splits into the symbol and the text plate
-    case settle   // the change lands: strike drawn, bar filled, symbol replaced
+    case arrive   // the line opens under the notch in its old state
+    case settle   // the change lands: struck through, ring filled, label and colour turned
+    case leave    // the line folds back; only the result symbol stays in the notch
 
     static func < (a: NotePhase, b: NotePhase) -> Bool { a.rawValue < b.rawValue }
 }
@@ -60,19 +60,21 @@ enum NotePhase: Int, CaseIterable, Comparable {
         defer { draining = false }
         while !queue.isEmpty {
             let event = queue.removeFirst()
+            // One spring for every step; Reduce Motion: the result at once, fades only.
             let still = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            let motion = NotchMotion.animation(reduce: still)
             phase = still ? .settle : .arrive
-            withAnimation(still ? .easeOut(duration: 0.2) : NotchAnimation.open) { current = event }
+            withAnimation(motion) { current = event }
             if !still {
-                await pause(0.38)
-                withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { phase = .reveal }
-                await pause(0.42)
-                withAnimation(.easeOut(duration: 0.55)) { phase = .settle }
+                await pause(0.9)
+                withAnimation(motion) { phase = .settle }
             }
-            await pause(3.4)
+            await pause(2.6)
             if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }
-            withAnimation(still ? .easeOut(duration: 0.2) : NotchAnimation.close) { current = nil }
-            await pause(0.45)
+            withAnimation(motion) { phase = .leave }
+            await pause(1.0)
+            withAnimation(motion) { current = nil }
+            await pause(0.4)
         }
     }
 

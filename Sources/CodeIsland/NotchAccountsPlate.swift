@@ -1,38 +1,44 @@
 import SwiftUI
 import CodeIslandCore
 
-/// Account usage, as Macchine shows it: the account to use next first, accounts without a reading
-/// for a day last and muted, never drawn as bars.
-struct AccountsPlate: View {
+/// The Accounts tab: one card per account in Macchine's "next to use" order, with its 5-hour and weekly
+/// usage. The accounts whose Claude app runs on this Mac carry the Mac mark.
+struct AccountsTab: View {
     @ObservedObject var feed: AccountQuotaFeed
+    @ObservedObject var inUse: AccountsInUseFeed
     let now: Date
-    static let column: CGFloat = 128
+    @State private var page = 0
+    static let perPage = 6
 
     var body: some View {
         let accounts = feed.accounts
         // Two logins can share the part before the @: those show the whole email.
         let repeated = Set(Dictionary(grouping: accounts, by: \.label).filter { $0.value.count > 1 }.keys)
-        Plate(title: "Account") {
-            if accounts.contains(where: { !$0.stale(now) }) {
-                HStack(spacing: NotchSpace.plate) {
-                    Text("5 ore").frame(width: Self.column, alignment: .leading)
-                    Text("Settimana").frame(width: Self.column, alignment: .leading)
-                }
-                .font(NotchType.label)
-                .foregroundStyle(GoalInk.secondary)
+        let used = accounts.filter { inUse.emails.contains($0.email) }.count
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                IconLabel(symbol: "person.2", text: "Account")
+                Spacer()
+                if used > 0 { IconLabel(symbol: "laptopcomputer", text: "\(used) in uso su questo Mac", font: NotchType.label) }
             }
-        } content: {
             if accounts.isEmpty {
                 EmptyState(text: feed.lastFetchFailed ? "Uso non disponibile" : "Caricando...")
             } else {
-                VStack(alignment: .leading, spacing: NotchSpace.row) {
-                    ForEach(accounts) { account in
-                        AccountLine(account: account, name: repeated.contains(account.label) ? account.email : account.label,
-                                    now: now)
+                // Paged like the other tabs, so many accounts never make the notch taller than 3 rows.
+                let pages = (accounts.count + Self.perPage - 1) / Self.perPage
+                let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
+                Pager(count: pages, index: index) { p in
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                        ForEach(accounts.dropFirst(p * Self.perPage).prefix(Self.perPage)) { account in
+                            AccountCard(account: account, name: repeated.contains(account.label) ? account.email : account.label,
+                                        inUse: inUse.emails.contains(account.email), now: now)
+                        }
                     }
-                    if let age = staleness {
-                        Text(age).font(NotchType.caption).foregroundStyle(GoalInk.secondary)
-                    }
+                } footer: { go in
+                    if pages > 1 { PageControl(count: pages, index: index.wrappedValue, go: go) }
+                }
+                if let age = staleness {
+                    Text(age).font(NotchType.label).foregroundStyle(GoalInk.secondary)
                 }
             }
         }
@@ -45,31 +51,36 @@ struct AccountsPlate: View {
     }
 }
 
-private struct AccountLine: View {
+private struct AccountCard: View {
     let account: AccountQuota
     let name: String
+    let inUse: Bool
     let now: Date
 
     var body: some View {
         let stale = account.stale(now)
-        HStack(spacing: NotchSpace.plate) {
-            Text(name)
-                .font(NotchType.bodyEmphasis)
-                .foregroundStyle(stale ? GoalInk.secondary : GoalInk.primary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .help(account.email)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(name)
+                    .font(NotchType.bodyEmphasis.weight(.semibold))
+                    .foregroundStyle(stale ? GoalInk.secondary : GoalInk.primary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                Spacer(minLength: 4)
+                if inUse { Image(systemName: "laptopcomputer").font(NotchType.label).foregroundStyle(GoalInk.secondary) }
+            }
             if stale {
                 Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato")
-                    .font(NotchType.secondary)
+                    .font(NotchType.label)
                     .foregroundStyle(GoalInk.secondary)
-                    .frame(width: AccountsPlate.column * 2 + NotchSpace.plate, alignment: .leading)
             } else {
-                QuotaMeter(window: account.fiveHour, now: now).frame(width: AccountsPlate.column)
-                QuotaMeter(window: account.sevenDay, now: now).frame(width: AccountsPlate.column)
+                QuotaMeter(name: "5 ore", window: account.fiveHour, now: now)
+                QuotaMeter(name: "Settimana", window: account.sevenDay, now: now)
             }
         }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(GoalInk.well))
+        .help(account.email)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText(stale: stale))
     }
@@ -79,31 +90,35 @@ private struct AccountLine: View {
         func part(_ w: QuotaWindow, _ name: String) -> String {
             w.usedNow(now).map { "\(name) \(Int($0.rounded())) per cento" } ?? "\(name) libero"
         }
-        return [account.email, part(account.fiveHour, "5 ore"), part(account.sevenDay, "settimana")].joined(separator: ". ")
+        return ([account.email] + (inUse ? ["In uso su questo Mac"] : [])
+                + [part(account.fiveHour, "5 ore"), part(account.sevenDay, "settimana")]).joined(separator: ". ")
     }
 }
 
-private struct QuotaMeter: View {
+/// «5 ore ▬▬── 4%»: no reading, or the window already reset, is no percentage (Macchine's rule).
+struct QuotaMeter: View {
+    let name: String
     let window: QuotaWindow
     let now: Date
 
     var body: some View {
-        // Macchine's rule: no reading, or the window already reset, is no percentage (the bar stays empty).
         let used = window.usedNow(now)
-        HStack(spacing: NotchSpace.row) {
-            GoalBar(progress: used.map { $0 / 100 }, color: color(used), height: 4)
+        HStack(spacing: 8) {
+            Text(name).font(NotchType.label).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
+            GoalBar(progress: used.map { $0 / 100 }, color: QuotaTone.color(used), height: 4)
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
                 .font(NotchType.numbers)
                 .foregroundStyle(GoalInk.primary)
-                .lineLimit(1)
-                .frame(width: NotchSpace.figureColumn, alignment: .trailing)
+                .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
         }
     }
+}
 
-    /// Plenty left is plain white; the colour only warns.
-    private func color(_ used: Double?) -> Color {
+/// Usage colour: green with room, yellow past half, red near the limit.
+enum QuotaTone {
+    static func color(_ used: Double?) -> Color {
         guard let used else { return GoalInk.secondary }
-        return used >= 90 ? GoalTone.stop.color : used >= 70 ? GoalTone.wait.color : Color.white.opacity(0.85)
+        return used >= 85 ? GoalTone.stop.color : used >= 50 ? GoalTone.wait.color : GoalTone.go.color
     }
 }

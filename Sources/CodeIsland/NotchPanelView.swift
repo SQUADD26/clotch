@@ -152,7 +152,8 @@ struct NotchPanelView: View {
     @ObservedObject private var goals = GoalStore.shared
     /// A goal change or a request taken in charge, shown under the closed notch.
     @ObservedObject private var notifier = NotchNotifier.shared
-    private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil }
+    /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
+    private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil && notifier.phase != .leave }
 
     /// Gating: the island is live (and expands on hover) whenever it is shown,
     /// even with no open goal, so the empty state ("Nessun obiettivo aperto") is
@@ -200,7 +201,7 @@ struct NotchPanelView: View {
         let nw = effectiveNotchW
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
-        if shouldShowExpanded { return min(max(nw + 200, 580), maxPanelWidth) }
+        if shouldShowExpanded { return min(max(nw + 200, 600), maxPanelWidth) }
         if showsNote { return min(max(collapsedBarWidth, 420), maxPanelWidth) }
         return collapsedBarWidth
     }
@@ -261,7 +262,11 @@ struct NotchPanelView: View {
                     // Centred, so the wings stay snug against the notch when the island widens.
                     HStack(spacing: 0) {
                         GoalsLeftWing()
-                        Color.clear.frame(width: hasNotch ? effectiveNotchW : 0)
+                        if hasNotch {
+                            Color.clear.frame(width: effectiveNotchW)
+                        } else {
+                            CenterZoneSlot(rows: goals.rows)
+                        }
                         GoalsRightWing()
                     }
                     .frame(maxWidth: .infinity)
@@ -297,7 +302,7 @@ struct NotchPanelView: View {
             .background(
                 NotchPanelShape(
                     topExtension: shouldShowExpanded || showsNote ? 14 : 3,
-                    bottomRadius: shouldShowExpanded || showsNote ? 24 : 12,
+                    bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote ? NotchSpace.noteRadius : 12,
                     minHeight: notchHeight
                 )
                 .fill(.black)
