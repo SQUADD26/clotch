@@ -72,6 +72,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         VoiceSpeaker.shared.stop()
     }
 
+    // Closing the settings window (X, Cmd+W) leaves Clotch running; only Quit ends it (#70).
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+
     // The notch panel is always a visible window, so the Dock click ignores the flag.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         SettingsWindowController.shared.show()

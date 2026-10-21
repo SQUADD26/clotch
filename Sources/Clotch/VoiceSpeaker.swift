@@ -3,8 +3,8 @@ import Foundation
 import ClotchCore
 
 /// Clotch's own voice (#50): with the switch on and a key set, a Stop hook in every Claude Code folder queues each end of
-/// turn in `~/.config/voce/coda`; here each one goes Haiku → ElevenLabs → light on the notch edge → audio. One at a time,
-/// at most two waiting. The file `clotch`, touched every hour, tells the hook and Clean View's mod that Clotch speaks now
+/// turn in `~/.config/voce/coda`; each one goes to the alerts engine (`VoiceAlertCenter`, #57), and only the news it lets
+/// through is said here: Haiku → ElevenLabs → light on the notch edge → audio. The file `clotch`, touched every hour, tells the hook and Clean View's mod that Clotch speaks now
 /// (contract in `VoiceHooks`).
 @MainActor
 final class VoiceSpeaker {
@@ -13,13 +13,12 @@ final class VoiceSpeaker {
     private let files = VoiceFiles()
     private let home = FileManager.default.homeDirectoryForCurrentUser
     private var source: DispatchSourceFileSystemObject?
-    private var pending: [Data] = []
-    private var busy = false
     private var player: AVAudioPlayer?
     private var heartbeat: Timer?
 
     func start() {
         refresh()
+        VoiceAlertCenter.shared.start()
         watch()
         drain()
     }
@@ -76,7 +75,7 @@ final class VoiceSpeaker {
         source = s
     }
 
-    /// Takes every queued turn. Older than two minutes (Clotch was busy or closed) or a third in line: dropped.
+    /// Takes every queued turn to the alerts engine. Older than two minutes (Clotch was busy or closed): dropped.
     private func drain() {
         let fm = FileManager.default
         let names = ((try? fm.contentsOfDirectory(atPath: files.queueURL.path)) ?? []).filter { $0.hasSuffix(".json") }.sorted()
@@ -85,39 +84,26 @@ final class VoiceSpeaker {
             let data = try? Data(contentsOf: url)
             try? fm.removeItem(at: url)
             let age = Date().timeIntervalSince1970 - (Double(name.prefix { $0.isNumber }) ?? 0)
-            if let data, age < 120, pending.count < 2 { pending.append(data) }
-        }
-        next()
-    }
-
-    private func next() {
-        guard !busy, !pending.isEmpty else { return }
-        busy = true
-        let payload = pending.removeFirst()
-        Task {
-            await turn(payload)
-            busy = false
-            next()
+            if let data, age < 120 { VoiceAlertCenter.shared.stopped(data) }
         }
     }
 
-    private func turn(_ payload: Data) async {
-        guard let report = VoiceTurn.report(payload: payload, transcriptTail: Self.tail) else { return }
+    /// One piece of news the engine let through. The rules of the moment it is said: switch, key, muted session, daily caps.
+    func say(_ event: VoiceEvent) async {
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
-        let key = files.key
-        let heard = config.speaks(cliId: report.session, sessions: await GoalStore.shared.allSessions())
-        guard let key, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: !heard || files.isMuted(session: report.session),
-                                         day: day, config: config) == nil else { return }
+        guard let key = files.key, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: files.isMuted(session: event.session),
+                                                     day: day, config: config) == nil else { return }
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
-        let input = VoiceTurn.haikuInput(report: report.text, previousTopic: lastTopic())
-        let spoken = await Self.haiku(prompt: files.prompt, input: input).flatMap(VoiceTurn.spoken(fromHaiku:))
-        let text = spoken?.text ?? VoiceTurn.fallback
+        let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
+        let prompt = files.prompt
+        guard let spoken = await VoiceTurn.line(report: event.report, haiku: { await Self.haiku(prompt: prompt, input: input) }) else { return }
+        let text = spoken.text
         day.caratteri += text.count
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
-        if await speak(text, config: config, key: key) == nil, let spoken {
+        if await speak(text, config: config, key: key) == nil, !spoken.topic.isEmpty {
             let last: [String: Any] = ["argomento": spoken.topic, "frase": text, "t": Int(Date().timeIntervalSince1970 * 1000)]
             try? files.write(JSONSerialization.data(withJSONObject: last), to: files.lastURL)
         }
@@ -188,7 +174,7 @@ final class VoiceSpeaker {
         }
     }
 
-    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (then the fallback line).
+    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then says the cleaned report).
     nonisolated private static func haiku(prompt: String, input: String) async -> String? {
         await Task.detached { () -> String? in
             guard let bin = Self.claudeBinary() else { return nil }
@@ -228,7 +214,7 @@ final class VoiceSpeaker {
     }
 
     /// The last 256 KB of a transcript: enough for the last answer, never the whole file.
-    nonisolated private static func tail(_ path: String) -> Data? {
+    nonisolated static func tail(_ path: String) -> Data? {
         guard let h = FileHandle(forReadingAtPath: path) else { return nil }
         defer { try? h.close() }
         let end = h.seekToEndOfFile()

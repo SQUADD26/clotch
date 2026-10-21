@@ -1,17 +1,32 @@
 import AppKit
+import CodeIslandCore
 import SwiftUI
 
-/// The shell's motion, one family with `NotchMotion`: the same damping, Reduce Motion a short fade.
+/// The shell's motion (#68): the shape first, the content after it; closing is the reverse, faster.
+/// Reduce Motion: a short fade.
 enum NotchAnimation {
     private static var reduce: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
+    private static var openMs: Int { NotchTiming.openMs(.standard) }
+    private static var closeMs: Int { NotchTiming.closeMs(.standard) }
 
-    /// 展开面板：微弹，有少许回弹感
-    static var open: Animation {
-        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: NotchMotion.damping)
+    /// The shell grows out of the notch in the time chosen in Settings, no overshoot (#68).
+    static var open: Animation { shell(openMs) }
+    /// The shell goes back into the notch, faster by default.
+    static var close: Animation { shell(closeMs) }
+    /// The content comes in once the shell has made room, and ends with it.
+    static var contentIn: Animation {
+        if reduce { return NotchMotion.still }
+        let c = NotchTiming.contentIn(openMs: openMs)
+        return .easeOut(duration: c.duration).delay(c.delay)
     }
-    /// 收起面板：临界阻尼，无过冲（防止 NotchPanelShape 底边露出刘海）
-    static var close: Animation {
-        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.closeResponse, dampingFraction: 1.0)
+    /// The content leaves first, before the shell closes over it.
+    static var contentOut: Animation {
+        reduce ? NotchMotion.still : .easeIn(duration: NotchTiming.contentOut(closeMs: closeMs))
+    }
+
+    private static func shell(_ ms: Int) -> Animation {
+        let s = NotchTiming.spring(ms: ms)
+        return reduce ? NotchMotion.still : .spring(duration: s.duration, bounce: s.bounce)
     }
     /// 通知弹出：auto-expand opens like a hover does; a bouncier spring overshot the notch.
     static var pop: Animation { open }

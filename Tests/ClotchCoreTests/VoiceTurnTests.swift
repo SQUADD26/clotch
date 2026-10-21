@@ -5,10 +5,12 @@ import XCTest
 final class VoiceTurnTests: XCTestCase {
     private func json(_ o: [String: Any]) -> Data { try! JSONSerialization.data(withJSONObject: o) }
 
-    func testReportFromPayloadOrTranscript() {
-        let direct = VoiceTurn.report(payload: json(["session_id": "s1", "last_assistant_message": " Fatto. "])) { _ in nil }
+    func testStopGivesTheAnswerFromPayloadOrTranscript() {
+        let now = Date()
+        let direct = VoiceEvents.stop(payload: json(["session_id": "s1", "last_assistant_message": "Fatto."]), transcriptTail: { _ in nil }, now: now)
         XCTAssertEqual(direct?.session, "s1")
-        XCTAssertEqual(direct?.text, "Fatto.")
+        XCTAssertEqual(direct?.answer, "Fatto.")
+        XCTAssertNil(direct?.question, "no question: the end of turn says nothing")
 
         let tail = """
             {"type":"assistant","message":{"content":[{"type":"text","text":"Prima"}]}}
@@ -17,13 +19,12 @@ final class VoiceTurnTests: XCTestCase {
             {"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read"}]}}
             """
         var asked = ""
-        let fromFile = VoiceTurn.report(payload: json(["session_id": "s2", "transcript_path": "/t.jsonl"])) { asked = $0; return Data(tail.utf8) }
+        let fromFile = VoiceEvents.stop(payload: json(["session_id": "s2", "transcript_path": "/t.jsonl"]), transcriptTail: { asked = $0; return Data(tail.utf8) }, now: now)
         XCTAssertEqual(asked, "/t.jsonl")
-        XCTAssertEqual(fromFile?.text, "Ultima risposta.")
+        XCTAssertEqual(fromFile?.answer, "Ultima risposta")
 
-        XCTAssertNil(VoiceTurn.report(payload: json(["session_id": "s3", "last_assistant_message": "x", "stop_hook_active": true])) { _ in nil },
+        XCTAssertNil(VoiceEvents.stop(payload: json(["session_id": "s3", "last_assistant_message": "x", "stop_hook_active": true]), transcriptTail: { _ in nil }, now: now),
                      "Stop fired again by a blocking stop hook: said once")
-        XCTAssertNil(VoiceTurn.report(payload: json(["session_id": "s4"])) { _ in nil })
     }
 
     func testRefusalsMuteAndCapsMeanNoCalls() {
@@ -66,18 +67,24 @@ final class VoiceTurnTests: XCTestCase {
     }
 
     func testReportCleanedForTheEarBeforeAndAfterHaiku() throws {
+<<<<<<< HEAD:Tests/ClotchCoreTests/VoiceTurnTests.swift
         let raw = "Fatto: PR #55 su `feat/50-voce` (commit c254d67a), vedi https://github.com/x/y e Sources/Clotch/VoiceSpeaker.swift.\n- Prossimo passo (sì)"
         let r = try XCTUnwrap(VoiceTurn.report(payload: json(["session_id": "s", "last_assistant_message": raw])) { _ in nil })
+=======
+        let raw = "Fatto: PR #55 su `feat/50-voce` (commit c254d67a), vedi https://github.com/x/y e Sources/CodeIsland/VoiceSpeaker.swift.\n- Prossimo passo (sì)"
+        let report = { (text: String) in VoiceEvent(kind: .question, at: Date(), text: text).report }
+        let r = report(raw)
+>>>>>>> origin/dev:Tests/CodeIslandCoreTests/VoiceTurnTests.swift
         for bad in ["55", "c254d67a", "https", "github", "Sources/", "VoiceSpeaker", "`", "feat/"] {
-            XCTAssertFalse(r.text.contains(bad), "\(bad) in «\(r.text)»")
+            XCTAssertFalse(r.contains(bad), "\(bad) in «\(r)»")
         }
-        XCTAssertTrue(r.text.contains("la modifica"))
-        XCTAssertTrue(r.text.hasSuffix("Io consiglio di sì."), r.text)
+        XCTAssertTrue(r.contains("la modifica"))
+        XCTAssertTrue(r.hasSuffix("Io consiglio di sì."), r)
         let long = String(repeating: "Una frase del rapporto. ", count: 50)
-        XCTAssertLessThanOrEqual(VoiceTurn.report(payload: json(["last_assistant_message": long])) { _ in nil }!.text.count, VoiceTurn.maxSpoken)
-        XCTAssertFalse(VoiceTurn.report(payload: json(["last_assistant_message": "la chiave è sk_0123456789abcdefabcd"])) { _ in nil }!.text.contains("sk_"),
-                       "a key never reaches Haiku")
-        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Apri il terminale e incolla il comando.\nARGOMENTO: la voce")?.text, VoiceClean.screenNotice)
+        XCTAssertLessThanOrEqual(report(long).count, VoiceTurn.maxSpoken)
+        XCTAssertFalse(report("la chiave è sk_0123456789abcdefabcd").contains("sk_"), "a key never reaches Haiku")
+        XCTAssertNil(VoiceTurn.spoken(fromHaiku: "Apri il terminale e incolla il comando.\nARGOMENTO: la voce"), "only an order: a failed try, no fixed line")
+        XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "Mi serve il tuo sì. Apri il terminale e incolla il comando.")?.text, "Mi serve il tuo sì.")
         XCTAssertEqual(VoiceTurn.spoken(fromHaiku: "La modifica #12 è pronta, capo.")?.text, "La modifica è pronta, capo.")
     }
 
@@ -180,4 +187,46 @@ final class VoiceTurnTests: XCTestCase {
         XCTAssertFalse(one.speaks(cliId: "terminal", sessions: all))
         XCTAssertEqual(VoiceTurn.Config(["parla_per": "boh"]).audience, .main)
     }
+
+    // MARK: #73: never «guarda lo schermo», never a fixed line
+
+    let sample = "Ho finito la voce del notch, vedi PR #73 e Sources/CodeIsland/VoiceSpeaker.swift (c254d67a). La luce ora segue la voce. I test sono verdi. Resta la prova sul Mac. https://github.com/x"
+
+    func testSlowHaikuGetsASecondTry() async {
+        let calls = Counter()
+        let said = await VoiceTurn.line(report: sample, timeout: 0.2) {
+            if await calls.next() == 1 { try? await Task.sleep(nanoseconds: 3_000_000_000); return "Troppo tardi." }
+            return "Capo, la voce del notch è pronta.\nARGOMENTO: la voce del notch"
+        }
+        XCTAssertEqual(said?.text, "Capo, la voce del notch è pronta.")
+        XCTAssertEqual(said?.topic, "la voce del notch")
+        let n = await calls.count
+        XCTAssertEqual(n, 2)
+    }
+
+    func testTwoFailuresSayTheCleanedReportInThreeSentences() async throws {
+        let calls = Counter()
+        let line = await VoiceTurn.line(report: sample, timeout: 0.2) { _ = await calls.next(); return nil }
+        let said = try XCTUnwrap(line)
+        let n = await calls.count
+        XCTAssertEqual(n, 2, "two tries")
+        XCTAssertEqual(said.text, "Ho finito la voce del notch, vedi la modifica e un file. La luce ora segue la voce. I test sono verdi.")
+        for bad in ["73", "c254d67a", "http", "Sources", "schermo", "Resta la prova"] { XCTAssertFalse(said.text.contains(bad), bad) }
+        let orderOnly = await VoiceTurn.line(report: "Apri il terminale e incolla il comando.", timeout: 0.2) { nil }
+        XCTAssertNil(orderOnly, "nothing left to say: silence, never a placeholder")
+    }
+
+    func testNoFixedSentenceAnywhere() throws {
+        for f in ["VoiceTurn.swift", "VoiceClean.swift", "VoicePrompt.swift"] {
+            let src = try String(contentsOf: URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+                .appendingPathComponent("../../Sources/CodeIslandCore/\(f)").standardized, encoding: .utf8)
+            XCTAssertNil(src.range(of: "guarda lo schermo", options: .caseInsensitive), f)
+            XCTAssertNil(src.range(of: "c’è una novità", options: .caseInsensitive), f)
+        }
+    }
+}
+
+actor Counter {
+    var count = 0
+    func next() -> Int { count += 1; return count }
 }

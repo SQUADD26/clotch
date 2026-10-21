@@ -101,22 +101,23 @@ final class L10nTests: XCTestCase {
         XCTAssertEqual(L10n.shared["quit"], "Beenden")
     }
 
-    func testNotchAnimationSpeedLabelsAreLocalized() {
+    func testNotchAnimationTimeLabelsAreLocalized() {
         let expected: [String: (open: String, close: String, description: String)] = [
-            "en": ("Opening speed", "Closing speed", "How fast the island expands and collapses"),
-            "de": ("Öffnungsgeschwindigkeit", "Schließgeschwindigkeit", "Wie schnell die Insel auf- und zuklappt"),
-            "zh": ("展开速度", "收起速度", "灵动岛展开和收起动画的快慢"),
-            "zh-Hant": ("展開速度", "收合速度", "靈動島展開和收合動畫的快慢"),
-            "ja": ("開くスピード", "閉じるスピード", "アイランドが展開・収縮する速さ"),
-            "ko": ("열기 속도", "닫기 속도", "아일랜드가 펼쳐지고 접히는 속도"),
-            "tr": ("Açılma Hızı", "Kapanma Hızı", "Adanın ne kadar hızlı açılıp kapandığı"),
+            "en": ("Opening time", "Closing time", "How long the island takes to expand and collapse"),
+            "it": ("Durata apertura", "Durata chiusura", "Quanto dura l'apertura e la chiusura dell'isola"),
+            "de": ("Öffnungsdauer", "Schließdauer", "Wie lange die Insel zum Auf- und Zuklappen braucht"),
+            "zh": ("展开时长", "收起时长", "灵动岛展开和收起动画的时长"),
+            "zh-Hant": ("展開時長", "收合時長", "靈動島展開和收合動畫的時長"),
+            "ja": ("開く時間", "閉じる時間", "アイランドが展開・収縮するのにかかる時間"),
+            "ko": ("열기 시간", "닫기 시간", "아일랜드가 펼쳐지고 접히는 데 걸리는 시간"),
+            "tr": ("Açılma Süresi", "Kapanma Süresi", "Adanın açılıp kapanma süresi"),
         ]
 
         for (language, translation) in expected {
             L10n.shared.language = language
-            XCTAssertEqual(L10n.shared["notch_open_speed"], translation.open)
-            XCTAssertEqual(L10n.shared["notch_close_speed"], translation.close)
-            XCTAssertEqual(L10n.shared["notch_animation_speed_desc"], translation.description)
+            XCTAssertEqual(L10n.shared["notch_open_ms"], translation.open)
+            XCTAssertEqual(L10n.shared["notch_close_ms"], translation.close)
+            XCTAssertEqual(L10n.shared["notch_animation_ms_desc"], translation.description)
         }
     }
 

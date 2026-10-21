@@ -70,6 +70,17 @@ enum GoalSnapshot {
                         ProposalsPage(rows: Array(toConfirm.prefix(ProposalsPage.perPage)), total: toConfirm.count, openFirst: true)
                     }, "17-da-confermare-testo-intero")
                 }
+                // #65: Rifiuta and Accetta at rest, under the pointer, pressed (top to bottom).
+                try save(open(.goals) {
+                    VStack(alignment: .leading, spacing: NotchSpace.row) {
+                        ForEach(0..<3) { i in
+                            HStack(spacing: 8) {
+                                TonePill(label: Text("Rifiuta"), tone: .stop, lit: i == 1, pressed: i == 2)
+                                TonePill(label: Text("Accetta"), tone: .go, lit: i == 1, pressed: i == 2)
+                            }
+                        }
+                    }
+                }, "19-bottoni-riposo-hover-premuto")
                 try save(open(.requests), "07-richieste")
                 if store.requests.count > RequestsTab.perPage {
                     try save(open(.requests) {

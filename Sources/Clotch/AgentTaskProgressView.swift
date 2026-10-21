@@ -71,7 +71,7 @@ struct AgentTaskProgressView: View, Equatable {
                 } label: {
                     compactRow
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.notch)
                 .help(tooltip)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(
