@@ -9,9 +9,9 @@ import CodeIslandCore
 @MainActor
 enum GoalSnapshot {
     /// A 14/16" MacBook notch, in points.
-    private static let notchWidth: CGFloat = 200
+    private static let notchWidth: CGFloat = 185  // 14" MacBook Pro, as in the Figma
     private static let notchHeight: CGFloat = 32
-    private static let openWidth: CGFloat = 600
+    private static let openWidth = NotchSize.open
     /// Stand-in for the menu bar and desktop around the island, so its black shape reads.
     private static let surround = Color(white: 0.24)
 
@@ -37,10 +37,10 @@ enum GoalSnapshot {
             try save(open(.goals), "05-obiettivi")
             if CommandLine.arguments.contains("--gallery") {
                 for (name, event) in notifications() {
-                    try save(island(width: 420, radius: NotchSpace.noteRadius) {
+                    try save(island(width: NotchSize.note, radius: NotchSpace.noteRadius) {
                         NotchNotificationView(event: event, phase: .arrive, rows: store.rows, requests: store.requests)
                     }, "02-notifica-\(name)-arriva")
-                    try save(island(width: 420, radius: NotchSpace.noteRadius) {
+                    try save(island(width: NotchSize.note, radius: NotchSpace.noteRadius) {
                         NotchNotificationView(event: event, phase: .settle, rows: store.rows, requests: store.requests)
                     }, "03-notifica-\(name)-cambia")
                     try save(island(width: closedWidth, radius: 12, mark: event) { EmptyView() }, "04-notifica-\(name)-sparisce")
@@ -110,8 +110,7 @@ enum GoalSnapshot {
                 Color.clear.frame(width: notchWidth)  // where the hardware notch sits
                 if let mark {
                     ResultMark(event: mark, rows: GoalStore.shared.rows)
-                        .padding(.leading, 8)
-                        .frame(width: GoalsWing.width, alignment: .leading)
+                        .frame(width: GoalsWing.width)
                 } else {
                     GoalsRightWing()
                 }
@@ -143,8 +142,8 @@ enum GoalSnapshot {
                 body().frame(maxWidth: .infinity, alignment: .topLeading)
             }
             .padding(.horizontal, NotchSpace.side)
-            .padding(.top, 6)
-            .padding(.bottom, 20)
+            .padding(.top, 10)
+            .padding(.bottom, NotchSpace.bottom)
         }
     }
 

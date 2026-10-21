@@ -15,7 +15,7 @@ enum NotchTab: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .goals: return "scope"
+        case .goals: return "target"
         case .requests: return "tray"
         case .accounts: return "person.2"
         }
@@ -61,13 +61,13 @@ struct NotchSectionsContent: View {
             .transition(.opacity)
         }
         .padding(.horizontal, NotchSpace.side)
-        .padding(.top, 6)
-        .padding(.bottom, 20)
+        .padding(.top, 10)
+        .padding(.bottom, NotchSpace.bottom)
         .animation(NotchMotion.animation(reduce: reduceMotion), value: tab)
     }
 }
 
-/// Three segments in a dark well; the chosen one lifts. One spring moves the highlight.
+/// Three 142 × 30 segments in a 38 pt well; the chosen one lifts. One spring moves the highlight.
 struct TabBar: View {
     @Binding var tab: NotchTab
     @Namespace private var highlight
@@ -80,9 +80,9 @@ struct TabBar: View {
                         Image(systemName: item.symbol)
                         Text(item.title)
                     }
-                    .font(NotchType.tab)
-                    .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .font(item == tab ? NotchType.tab : NotchType.tabOff)
+                    .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.off)
+                    .frame(maxWidth: .infinity, minHeight: 30)
                     .background {
                         if item == tab {
                             Capsule().fill(GoalInk.selected).matchedGeometryEffect(id: "tab", in: highlight)
@@ -96,7 +96,7 @@ struct TabBar: View {
         }
         .padding(4)
         .background(Capsule().fill(GoalInk.well))
-        .frame(maxWidth: 464)
+        .frame(maxWidth: 434)
     }
 }
 

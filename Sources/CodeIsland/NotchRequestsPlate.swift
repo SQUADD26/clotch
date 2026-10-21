@@ -35,10 +35,10 @@ struct RequestsTab: View {
                 let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
                 Pager(count: pages, index: index) { p in
                     // Every page is as tall as a full one, so the footer never jumps.
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 12) {  // rows 32 pt apart
                         ForEach(requests.dropFirst(p * Self.perPage).prefix(Self.perPage)) { RequestLine(request: $0) }
                     }
-                    .frame(minHeight: CGFloat(Self.perPage) * 20 + CGFloat(Self.perPage - 1) * 14, alignment: .top)
+                    .frame(minHeight: CGFloat(Self.perPage) * 20 + CGFloat(Self.perPage - 1) * 12, alignment: .top)
                 } footer: { go in
                     if pages > 1 { footer(pages: pages, index: index.wrappedValue, go: go) }
                 }
@@ -63,11 +63,11 @@ struct RequestsTab: View {
                         }
                     }
                     Spacer()
-                    Text("\(index + 1) di \(pages)").font(NotchType.label).foregroundStyle(GoalInk.secondary)
+                    Text("\(index + 1) di \(pages)").font(NotchType.label).foregroundStyle(Color.white.opacity(0.5))
                 }
                 .buttonStyle(.plain)
                 .font(NotchType.caption)
-                .foregroundStyle(GoalInk.primary)
+                .foregroundStyle(Color.white.opacity(0.75))
             }
         }
     }
@@ -77,23 +77,40 @@ private struct RequestLine: View {
     let request: UserRequest
 
     var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: request.taken ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 15))
-                .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.secondary)
+        HStack(spacing: 12) {
+            RequestMark(taken: request.taken)
             Text(request.text)
-                .font(NotchType.body)
-                .strikethrough(request.taken, color: GoalInk.secondary)
-                .foregroundStyle(request.taken ? GoalInk.secondary : GoalInk.primary)
+                .font(NotchType.line)
+                .strikethrough(request.taken, color: GoalInk.quiet)
+                .foregroundStyle(request.taken ? GoalInk.quiet : GoalInk.row)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(request.taken ? "Presa in carico" : "In attesa")
-                .font(request.taken ? NotchType.caption : NotchType.label)
-                .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.secondary)
+                .font(request.taken ? NotchType.smallEmphasis : NotchType.small)
+                .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.quiet)
         }
         .frame(height: 20)
         .help(request.original)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(request.text + (request.taken ? ". Presa in carico" : ". In attesa"))
+    }
+}
+
+/// A request's mark: a green circle with a dark check once taken, a thin white circle while it waits.
+struct RequestMark: View {
+    let taken: Bool
+
+    var body: some View {
+        Group {
+            if taken {
+                Image(systemName: "checkmark.circle.fill")
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(GoalInk.check, GoalTone.go.color)
+                    .font(.system(size: 16))
+            } else {
+                Circle().stroke(Color.white.opacity(0.42), lineWidth: 1.5).frame(width: 15, height: 15)
+            }
+        }
+        .frame(width: 16, height: 16)
     }
 }

@@ -16,7 +16,9 @@ struct NotchNotificationView: View {
             HStack(spacing: 10) {
                 Group {
                     if let row = note.row {
-                        GoalRing(progress: done ? row.progress : note.before, color: row.ink, size: 15, line: 2.5)
+                        GoalRing(progress: done ? row.progress : note.before, color: row.ringInk, size: 15, line: 2.2)
+                    } else if event.kind == .requestTaken {
+                        RequestMark(taken: done)
                     } else {
                         Image(systemName: done ? note.symbol : note.startSymbol)
                             .font(.system(size: 15))
@@ -26,19 +28,21 @@ struct NotchNotificationView: View {
                 }
                 .frame(width: 16)
                 Text(note.text)
-                    .font(NotchType.bodyEmphasis)
-                    .strikethrough(done && note.strikes, color: GoalInk.secondary)
-                    .foregroundStyle(done && note.strikes ? GoalInk.secondary : GoalInk.primary)
+                    .font(NotchType.note)
+                    .tracking(-0.14)
+                    .strikethrough(done && note.strikes, color: GoalInk.quiet)
+                    .foregroundStyle(done && note.strikes ? Color.white.opacity(0.5) : GoalInk.primary)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(done ? note.label : note.startLabel)
-                    .font(NotchType.caption)
-                    .foregroundStyle(done ? note.color : GoalInk.secondary)
+                    .font(done ? NotchType.smallEmphasis : NotchType.small)
+                    .foregroundStyle(done ? note.color : Color.white.opacity(0.5))
                     .contentTransition(.interpolate)
             }
-            .padding(.horizontal, 18)
-            .frame(height: 36)
-            .padding(.bottom, 4)
+            // Mark centred 28 pt in, text at 46, label 24 pt from the right edge; 42 pt under the notch.
+            .padding(.leading, 20)
+            .padding(.trailing, 24)
+            .frame(height: 42)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(note.text + ". " + note.label)
         }
@@ -52,10 +56,15 @@ struct ResultMark: View {
 
     var body: some View {
         let color = event.kind == .prMerged ? NoteColor.merged
-            : rows.first { $0.id == event.subject }.map(\.ink) ?? GoalTone.go.color
-        Image(systemName: event.kind == .prMerged ? "arrow.triangle.merge" : "checkmark.circle.fill")
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(color)
+            : rows.first { $0.id == event.subject }.map(\.ringInk) ?? GoalTone.go.color
+        if event.kind == .prMerged {
+            Image(systemName: "arrow.triangle.merge").font(.system(size: 14, weight: .semibold)).foregroundStyle(color)
+        } else {
+            Image(systemName: "checkmark.circle.fill")
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(GoalInk.check, color)
+                .font(.system(size: 16))
+        }
     }
 }
 

@@ -36,9 +36,9 @@ struct GoalPage: View {
     let now: Date
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NotchSpace.section) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                IconLabel(symbol: "scope", text: "Obiettivo \(position) di \(of)")
+                IconLabel(symbol: "target", text: "Obiettivo \(position) di \(of)")
                 Spacer()
                 StatusPill(text: row.statusLabel, color: row.ink)
             }
@@ -46,7 +46,8 @@ struct GoalPage: View {
                 VStack(alignment: .leading, spacing: 6) {
                     GoalTitle(row: row)
                     if row.hasSubtitle {
-                        Text(row.goal).font(NotchType.body).foregroundStyle(GoalInk.secondary).lineLimit(2)
+                        Text(row.goal).font(NotchType.body).foregroundStyle(GoalInk.description).lineLimit(2)
+                            .frame(maxWidth: 412, alignment: .leading)
                     }
                     if let reason = row.reason(now: now) {
                         Text(reason).font(NotchType.caption).foregroundStyle(row.ink).lineLimit(1)
@@ -54,18 +55,18 @@ struct GoalPage: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 ZStack {
-                    GoalRing(row: row, size: 68, line: 6)
+                    GoalRing(row: row, size: 64, line: 5)
                     VStack(spacing: 0) {
                         Text(row.proofsText ?? "–").font(NotchType.ringFigure).foregroundStyle(GoalInk.primary)
-                        Text("prove").font(.system(size: 10)).foregroundStyle(GoalInk.secondary)
+                        Text("prove").font(.system(size: 10, weight: .medium)).foregroundStyle(GoalInk.secondary)
                     }
                 }
             }
             HStack(spacing: NotchSpace.section) {
-                IconLabel(symbol: "apple.terminal", text: row.sessionsText)
+                IconLabel(symbol: "apple.terminal", text: row.sessionsText, color: GoalInk.strong)
                 if let since = row.since, !row.proposed {
                     HStack(spacing: 6) {
-                        Image(systemName: "stopwatch").font(NotchType.body).foregroundStyle(GoalInk.secondary)
+                        Image(systemName: "stopwatch").font(.system(size: 15)).foregroundStyle(GoalInk.strong)
                         WorkTimer(since: since)
                     }
                     .accessibilityElement(children: .combine)
@@ -73,7 +74,7 @@ struct GoalPage: View {
                 Spacer()
                 Text(row.proofsSentence)
                     .font(NotchType.caption)
-                    .foregroundStyle(row.proofsTotal > 0 ? row.ink : GoalInk.secondary)
+                    .foregroundStyle(row.proofsTotal > 0 ? row.ringInk : GoalInk.secondary)
             }
             GoalPRSlot(row: row)
         }
@@ -90,11 +91,11 @@ private struct GoalTitle: View {
     var body: some View {
         let link = row.masterLink
         HStack(alignment: .firstTextBaseline, spacing: 6) {
-            Text(row.title).font(NotchType.title).foregroundStyle(GoalInk.primary).lineLimit(1)
+            Text(row.title).font(NotchType.title).tracking(-0.24).foregroundStyle(GoalInk.primary).lineLimit(1)
             if link != nil {
                 Image(systemName: "arrow.up.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(hovered ? GoalInk.primary : GoalInk.secondary)
+                    .font(.system(size: 14))
+                    .foregroundStyle(hovered ? GoalInk.primary : Color.white.opacity(0.5))
             }
         }
         .contentShape(Rectangle())

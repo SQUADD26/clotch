@@ -23,8 +23,8 @@ struct Pager<Page: View, Footer: View>: View {
                     .id(index)
                     .transition(reduceMotion ? .opacity : .push(from: forward ? .trailing : .leading))
             }
-            .opacity(moving ? 0.35 : 1)
-            .blur(radius: moving && !reduceMotion ? 2 : 0)
+            .opacity(moving ? 0.45 : 1)  // Figma: 35% leaving, 55% arriving
+            .blur(radius: moving && !reduceMotion ? 2.5 : 0)
             .frame(maxWidth: .infinity, alignment: .top)
             .clipped()
             footer(go)
@@ -82,13 +82,13 @@ struct PageControl: View {
     let go: (Int) -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 11) {  // button centre 22 pt past the dots
             arrow("chevron.left", to: index - 1, help: "Pagina precedente")
-            HStack(spacing: 5) {
+            HStack(spacing: 6) {
                 ForEach(PageDots.window(count: count, index: index), id: \.self) { i in
                     Capsule()
-                        .fill(i == index ? GoalInk.primary : GoalInk.track)
-                        .frame(width: 14, height: 3.5)
+                        .fill(Color.white.opacity(i == index ? 0.9 : 0.25))
+                        .frame(width: 14, height: 4)
                         .contentShape(Rectangle().inset(by: -4))
                         .onTapGesture { go(i) }
                 }
@@ -103,10 +103,10 @@ struct PageControl: View {
         let enabled = (0..<count).contains(target)
         return Button { go(target) } label: {
             Image(systemName: symbol)
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(enabled ? GoalInk.primary : GoalInk.track)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(enabled ? 0.9 : 0.35))
                 .frame(width: 22, height: 22)
-                .background(Circle().fill(GoalInk.well))
+                .background(Circle().fill(enabled ? GoalInk.button : GoalInk.buttonOff))
         }
         .buttonStyle(.plain)
         .disabled(!enabled)

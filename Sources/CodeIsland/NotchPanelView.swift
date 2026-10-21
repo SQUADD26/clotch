@@ -201,8 +201,8 @@ struct NotchPanelView: View {
         let nw = effectiveNotchW
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
-        if shouldShowExpanded { return min(max(nw + 200, 600), maxPanelWidth) }
-        if showsNote { return min(max(collapsedBarWidth, 420), maxPanelWidth) }
+        if shouldShowExpanded { return min(max(nw + 200, NotchSize.open), maxPanelWidth) }
+        if showsNote { return min(max(collapsedBarWidth, NotchSize.note), maxPanelWidth) }
         return collapsedBarWidth
     }
 

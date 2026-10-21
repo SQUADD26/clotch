@@ -19,41 +19,72 @@ enum GoalTone {
     }
 }
 
-/// Text levels and fills on black. Secondary stays at 0.62 so 11pt text keeps AA contrast.
+/// Text levels and fills on black: the Figma specs' opacities of white (specs.md, «Colori»).
 enum GoalInk {
-    static let primary = Color.white.opacity(0.94)
-    static let secondary = Color.white.opacity(0.62)
+    static let primary = Color.white
+    static let row = Color.white.opacity(0.92)
+    static let strong = Color.white.opacity(0.8)
+    static let description = Color.white.opacity(0.66)
+    static let off = Color.white.opacity(0.6)
+    static let secondary = Color.white.opacity(0.55)
+    /// Waiting and struck-through text.
+    static let quiet = Color.white.opacity(0.45)
     static let track = Color.white.opacity(0.16)
-    static let divider = Color.white.opacity(0.1)
-    /// The tab bar's well and its selected segment; the page buttons.
-    static let well = Color.white.opacity(0.08)
-    static let selected = Color.white.opacity(0.18)
+    static let ringTrack = Color.white.opacity(0.22)
+    static let barTrack = Color.white.opacity(0.18)
+    /// A ring with no declared proofs: only its outline.
+    static let bare = Color.white.opacity(0.35)
+    static let divider = Color.white.opacity(0.08)
+    /// The tab bar's well and its selected segment.
+    static let well = Color.white.opacity(0.07)
+    static let selected = Color.white.opacity(0.16)
+    static let button = Color.white.opacity(0.12)
+    static let buttonOff = Color.white.opacity(0.06)
+    static let card = Color.white.opacity(0.05)
+    static let cardInUse = Color.white.opacity(0.09)
+    /// The dark check inside a green circle.
+    static let check = Color(red: 6 / 255, green: 33 / 255, blue: 15 / 255)
 }
 
 // MARK: - Scale
 
 /// One spacing scale on a 4/8 pt grid.
 enum NotchSpace {
-    static let side: CGFloat = 28      // open notch edge to content
+    static let side: CGFloat = 26      // open notch edge to content
+    static let bottom: CGFloat = 22    // last content to the open notch's bottom edge
     static let section: CGFloat = 16   // between blocks of one page
     static let row: CGFloat = 8        // between rows
     static let tight: CGFloat = 4      // a line and what belongs to it
-    static let radius: CGFloat = 28    // the open notch's bottom corners
-    static let noteRadius: CGFloat = 18
+    static let radius: CGFloat = 30    // the open notch's bottom corners
+    static let noteRadius: CGFloat = 26
     static let figureColumn: CGFloat = 40  // a right-aligned figure: fits «100%» and «12/12» in NotchType.numbers
 }
 
-/// One type scale (macOS text styles in points).
+/// The island's widths (Figma specs.md, «Forma dell'app»).
+enum NotchSize {
+    static let open: CGFloat = 560
+    static let note: CGFloat = 440
+    /// Each wing of the closed notch: 185 + 2 × 84 = 353 on a 14" MacBook Pro.
+    static let wing: CGFloat = 84
+}
+
+/// One type scale (macOS text styles in points). SF Pro, Text up to 19 pt and Display from 20.
 enum NotchType {
     static let label = Font.system(size: 12, weight: .medium)
     static let caption = Font.system(size: 12, weight: .semibold)
     static let numbers = Font.system(size: 12, weight: .semibold).monospacedDigit()
+    static let small = Font.system(size: 11, weight: .medium)
+    static let smallEmphasis = Font.system(size: 11, weight: .semibold)
     static let body = Font.system(size: 13)
     static let bodyEmphasis = Font.system(size: 13, weight: .medium)
+    static let name = Font.system(size: 13, weight: .semibold)
+    static let line = Font.system(size: 14, weight: .medium)
+    static let note = Font.system(size: 14, weight: .semibold)
     static let tab = Font.system(size: 13, weight: .semibold)
-    static let title = Font.system(size: 18, weight: .semibold)
-    static let timer = Font.system(size: 13, weight: .semibold).monospacedDigit()
-    static let ringFigure = Font.system(size: 17, weight: .semibold).monospacedDigit()
+    static let tabOff = Font.system(size: 13, weight: .medium)
+    static let title = Font.system(size: 20, weight: .semibold)
+    static let timer = Font.system(size: 12, weight: .semibold).monospacedDigit()
+    static let ringFigure = Font.system(size: 16, weight: .semibold).monospacedDigit()
 }
 
 // MARK: - Motion

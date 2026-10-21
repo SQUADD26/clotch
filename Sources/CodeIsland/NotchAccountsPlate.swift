@@ -8,7 +8,7 @@ struct AccountsTab: View {
     @ObservedObject var inUse: AccountsInUseFeed
     let now: Date
     @State private var page = 0
-    static let perPage = 6
+    static let perPage = 4
 
     var body: some View {
         let accounts = feed.accounts
@@ -24,7 +24,7 @@ struct AccountsTab: View {
             if accounts.isEmpty {
                 EmptyState(text: feed.lastFetchFailed ? "Uso non disponibile" : "Caricando...")
             } else {
-                // Paged like the other tabs, so many accounts never make the notch taller than 3 rows.
+                // Paged like the other tabs: 2 rows of 2, as in the Figma, however many accounts there are.
                 let pages = (accounts.count + Self.perPage - 1) / Self.perPage
                 let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
                 Pager(count: pages, index: index) { p in
@@ -59,15 +59,15 @@ private struct AccountCard: View {
 
     var body: some View {
         let stale = account.stale(now)
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(name)
-                    .font(NotchType.bodyEmphasis.weight(.semibold))
+                    .font(NotchType.name)
                     .foregroundStyle(stale ? GoalInk.secondary : GoalInk.primary)
                     .lineLimit(1)
                     .truncationMode(.middle)
                 Spacer(minLength: 4)
-                if inUse { Image(systemName: "laptopcomputer").font(NotchType.label).foregroundStyle(GoalInk.secondary) }
+                if inUse { Image(systemName: "laptopcomputer").font(.system(size: 14)).foregroundStyle(GoalInk.off) }
             }
             if stale {
                 Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato")
@@ -78,8 +78,9 @@ private struct AccountCard: View {
                 QuotaMeter(name: "Settimana", window: account.sevenDay, now: now)
             }
         }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(GoalInk.well))
+        .padding(.horizontal, 14)
+        .frame(height: 70)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(inUse ? GoalInk.cardInUse : GoalInk.card))
         .help(account.email)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText(stale: stale))
@@ -104,21 +105,21 @@ struct QuotaMeter: View {
     var body: some View {
         let used = window.usedNow(now)
         HStack(spacing: 8) {
-            Text(name).font(NotchType.label).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
+            Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
             GoalBar(progress: used.map { $0 / 100 }, color: QuotaTone.color(used), height: 4)
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
-                .font(NotchType.numbers)
-                .foregroundStyle(GoalInk.primary)
+                .font(.system(size: 11, weight: (used ?? 0) >= 90 ? .semibold : .regular).monospacedDigit())
+                .foregroundStyle((used ?? 0) >= 90 ? GoalTone.stop.color : GoalInk.row)
                 .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
         }
     }
 }
 
-/// Usage colour: green with room, yellow past half, red near the limit.
+/// Usage colour: green with room, yellow from half, red from 90%.
 enum QuotaTone {
     static func color(_ used: Double?) -> Color {
         guard let used else { return GoalInk.secondary }
-        return used >= 85 ? GoalTone.stop.color : used >= 50 ? GoalTone.wait.color : GoalTone.go.color
+        return used >= 90 ? GoalTone.stop.color : used >= 50 ? GoalTone.wait.color : GoalTone.go.color
     }
 }

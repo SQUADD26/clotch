@@ -16,6 +16,11 @@ extension GoalRow {
 
     /// A proposed goal is drawn quiet: grey, never a traffic light.
     var ink: Color { proposed ? GoalInk.secondary : tone.color }
+    /// The ring and the proofs count: coloured by the share of proofs done (Figma thresholds), never by state.
+    var ringInk: Color {
+        guard !proposed, let p = progress else { return GoalInk.secondary }
+        return p >= 0.75 ? GoalTone.go.color : p >= 0.4 ? GoalTone.wait.color : GoalTone.stop.color
+    }
     var runningCount: Int { pulses.filter { $0.running }.count }
 
     /// The state as a label (app-copy: adjective or participle).
@@ -131,7 +136,7 @@ struct GoalBar: View {
 // MARK: - Ring
 
 /// A goal as a ring: the track, and the arc of declared proofs done in the goal's colour.
-/// No declared proofs: the bare track. Used large on the goal page and small in the closed notch.
+/// No declared proofs: only a thin outline. Used large on the goal page and small in the closed notch.
 struct GoalRing: View {
     let progress: Double?
     let color: Color
@@ -141,7 +146,11 @@ struct GoalRing: View {
 
     var body: some View {
         ZStack {
-            Circle().stroke(GoalInk.track, lineWidth: line)
+            if progress == nil {
+                Circle().stroke(GoalInk.bare, lineWidth: 1.4)
+            } else {
+                Circle().stroke(GoalInk.ringTrack, lineWidth: line)
+            }
             Circle()
                 .trim(from: 0, to: CGFloat(min(progress ?? 0, 1)))
                 .stroke(color, style: StrokeStyle(lineWidth: line, lineCap: .round))
@@ -155,7 +164,7 @@ struct GoalRing: View {
 
 extension GoalRing {
     init(row: GoalRow, size: CGFloat, line: CGFloat) {
-        self.init(progress: row.progress, color: row.ink, size: size, line: line)
+        self.init(progress: row.progress, color: row.ringInk, size: size, line: line)
     }
 }
 
@@ -170,7 +179,8 @@ struct WorkTimer: View {
         TimelineView(.periodic(from: .now, by: 1)) { ctx in
             Text(GoalRow.clock(from: since, to: ctx.date))
                 .font(NotchType.timer)
-                .foregroundStyle(GoalInk.primary)
+                .tracking(0.24)
+                .foregroundStyle(GoalInk.row)
         }
     }
 }
@@ -179,7 +189,7 @@ struct WorkTimer: View {
 struct IconLabel: View {
     let symbol: String
     let text: String
-    var font: Font = NotchType.body
+    var font: Font = NotchType.label
     var color: Color = GoalInk.secondary
 
     var body: some View {
@@ -198,10 +208,10 @@ struct StatusPill: View {
 
     var body: some View {
         Text(text)
-            .font(NotchType.caption)
+            .font(NotchType.smallEmphasis)
             .foregroundStyle(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(Capsule().fill(color.opacity(0.18)))
+            .padding(.horizontal, 9)
+            .frame(height: 20)
+            .background(Capsule().fill(color.opacity(0.16)))
     }
 }
