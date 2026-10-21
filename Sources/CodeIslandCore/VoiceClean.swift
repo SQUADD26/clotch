@@ -3,8 +3,6 @@ import Foundation
 /// Text made for the screen, made fit for the ear: Clean View's `riscrivi` and `parlata` (claude-config `voce.ts`), applied
 /// to the report before Haiku and to Haiku's answer before ElevenLabs (#50). No keys, paths, links, hashes, PR or issue numbers, code.
 public enum VoiceClean {
-    public static let screenNotice = "Ho una domanda per te, guarda lo schermo."
-
     /// A key, a token, a password in a link: never sent to Haiku, never said.
     static let secrets = [#"\b(?:sk|pk|rk)[-_][\w-]{8,}"#, #"\bgh[pousr]_\w{8,}"#, #"\beyJ[\w-]{10,}\.[\w.-]+"#, #"(?i)\bBearer\s+\S+"#,
                           #"(?i)\bxi-api-key\b"#, #"\b[A-Fa-f0-9]{32,}\b"#, #"\b(?=[\w-]*\d)(?=[\w-]*[A-Za-z])[\w-]{32,}\b"#,
@@ -16,9 +14,11 @@ public enum VoiceClean {
 
     public static func hasSecret(_ t: String) -> Bool { secrets.contains { t.range(of: $0, options: .regularExpression) != nil } }
 
-    /// Haiku's answer: an order about hands or screen becomes the fixed notice; the rest is cleaned.
+    /// Text to say: a sentence with an order about hands or keyboard is dropped (#73: never a fixed line in its place);
+    /// the rest is cleaned. "" = nothing left to say.
     public static func spoken(_ raw: String) -> String {
-        raw.range(of: operative, options: .regularExpression) != nil ? screenNotice : clean(raw)
+        let sentences = raw.replacingOccurrences(of: #"([.!?])\s+"#, with: "$1\n", options: .regularExpression).split(separator: "\n")
+        return clean(sentences.filter { $0.range(of: operative, options: .regularExpression) == nil }.joined(separator: " "))
     }
 
     public static func clean(_ raw: String) -> String {

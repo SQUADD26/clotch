@@ -113,11 +113,12 @@ final class VoiceSpeaker {
         day.chiamate += 1
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
         let input = VoiceTurn.haikuInput(report: report.text, previousTopic: lastTopic())
-        let spoken = await Self.haiku(prompt: files.prompt, input: input).flatMap(VoiceTurn.spoken(fromHaiku:))
-        let text = spoken?.text ?? VoiceTurn.fallback
+        let prompt = files.prompt
+        guard let spoken = await VoiceTurn.line(report: report.text, haiku: { await Self.haiku(prompt: prompt, input: input) }) else { return }
+        let text = spoken.text
         day.caratteri += text.count
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
-        if await speak(text, config: config, key: key) == nil, let spoken {
+        if await speak(text, config: config, key: key) == nil, !spoken.topic.isEmpty {
             let last: [String: Any] = ["argomento": spoken.topic, "frase": text, "t": Int(Date().timeIntervalSince1970 * 1000)]
             try? files.write(JSONSerialization.data(withJSONObject: last), to: files.lastURL)
         }
@@ -188,7 +189,7 @@ final class VoiceSpeaker {
         }
     }
 
-    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (then the fallback line).
+    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then says the cleaned report).
     nonisolated private static func haiku(prompt: String, input: String) async -> String? {
         await Task.detached { () -> String? in
             guard let bin = Self.claudeBinary() else { return nil }
