@@ -71,7 +71,8 @@ enum NotePhase: Int, CaseIterable, Comparable {
                 await pause(0.9)
                 withAnimation(motion) { phase = .settle }
             }
-            let text = Note(event: event, rows: GoalStore.shared.rows, requests: GoalStore.shared.requests)?.text ?? ""
+            let (rows, requests) = (GoalStore.shared.rows, GoalStore.shared.requests)
+            let text = event.notice(rows: rows, requests: requests) ?? Note(event: event, rows: rows, requests: requests)?.text ?? ""
             await pause(NotchEvents.hold(forText: text))
             while pointerOver { await pause(0.25) }
             if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }

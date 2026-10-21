@@ -6,7 +6,8 @@ if [ -d /Applications/Xcode.app/Contents/Developer ]; then
     export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 fi
 
-APP_NAME="CodeIsland"
+APP_NAME="Clotch"
+PRODUCT="CodeIsland"  # SwiftPM executable name; only the bundle is renamed
 BUILD_DIR=".build/release"
 APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
 ICON_CATALOG="Assets.xcassets"
@@ -82,7 +83,7 @@ build_mac() {
     mkdir -p "$APP_BUNDLE/Contents/Resources"
     mkdir -p "$APP_BUNDLE/Contents/Frameworks"
 
-    cp "$ARM_DIR/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+    cp "$ARM_DIR/$PRODUCT" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
     cp "$ARM_DIR/codeisland-bridge" "$APP_BUNDLE/Contents/Helpers/codeisland-bridge"
     cp Info.plist "$APP_BUNDLE/Contents/Info.plist"
 
@@ -101,6 +102,8 @@ build_mac() {
     install_name_tool -add_rpath "@executable_path/../../Frameworks" \
         "$APP_BUNDLE/Contents/Helpers/codeisland-bridge" 2>/dev/null || true
 
+    # App icon: the Clotch logo (#31) replaces AppIcon.icon (Icon Composer) and
+    # Sources/CodeIsland/Resources/AppIcon.icns; nothing else changes here.
     echo "Compiling app icon assets..."
     xcrun actool \
         --output-format human-readable-text \

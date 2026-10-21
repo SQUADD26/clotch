@@ -48,6 +48,7 @@ final class L10n: ObservableObject {
     private static let en: [String: String] = [
         // Settings pages
         "general": "General",
+        "notch_page": "Notch",
         "behavior": "Behavior",
         "appearance": "Appearance",
         "mascots": "Mascots",
@@ -549,7 +550,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Supports %d CLI/IDE tools via Unix socket IPC",
 
         // Window
-        "settings_title": "CodeIsland Settings",
+        "settings_title": "Clotch Settings",
 
         // Menu
         "settings_ellipsis": "Settings...",
@@ -652,6 +653,7 @@ final class L10n: ObservableObject {
     // Every English key, in English order (scripts/check-l10n.py checks keys and placeholders).
     private static let it: [String: String] = [
         "general": "Generale",
+        "notch_page": "Notch",
         "behavior": "Comportamento",
         "appearance": "Aspetto",
         "mascots": "Mascotte",
@@ -1126,7 +1128,7 @@ final class L10n: ObservableObject {
         "apple_companion_desc": "Rispecchia lo stato di CodeIsland sull'app per iPhone via rete locale quando è in primo piano, e in background invia riepiloghi Bluetooth leggeri per Live Activity e aggiornamenti di Apple Watch.",
         "about_desc1": "Pannello in tempo reale dello stato degli agenti di coding AI per macOS",
         "about_desc2": "Supporta %d strumenti CLI/IDE tramite IPC su socket Unix",
-        "settings_title": "Impostazioni di CodeIsland",
+        "settings_title": "Impostazioni di Clotch",
         "settings_ellipsis": "Impostazioni...",
         "check_for_updates": "Cerca aggiornamenti...",
         "export_diagnostics": "Esporta diagnostica...",
@@ -1219,6 +1221,7 @@ final class L10n: ObservableObject {
     private static let de: [String: String] = en.merging([
         // Settings pages
         "general": "Allgemein",
+        "notch_page": "Notch",
         "behavior": "Verhalten",
         "appearance": "Darstellung",
         "mascots": "Maskottchen",
@@ -1694,7 +1697,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unterstützt %d CLI/IDE-Tools über Unix-Socket-IPC",
 
         // Window
-        "settings_title": "CodeIsland-Einstellungen",
+        "settings_title": "Clotch-Einstellungen",
 
         // Menu
         "settings_ellipsis": "Einstellungen...",
@@ -1797,6 +1800,7 @@ final class L10n: ObservableObject {
     private static let zh: [String: String] = [
         // Settings pages
         "general": "通用",
+        "notch_page": "Notch",
         "behavior": "行为",
         "appearance": "外观",
         "mascots": "角色",
@@ -2298,7 +2302,7 @@ final class L10n: ObservableObject {
         "about_desc2": "通过 Unix socket IPC 支持 %d 种 CLI/IDE 工具",
 
         // Window
-        "settings_title": "CodeIsland 设置",
+        "settings_title": "Clotch 设置",
 
         // Menu
         "settings_ellipsis": "设置...",
@@ -2401,6 +2405,7 @@ final class L10n: ObservableObject {
     private static let zhHant: [String: String] = [
         // Settings pages
         "general": "一般",
+        "notch_page": "Notch",
         "behavior": "行為",
         "appearance": "外觀",
         "mascots": "角色",
@@ -2902,7 +2907,7 @@ final class L10n: ObservableObject {
         "about_desc2": "透過 Unix socket IPC 支援 %d 種 CLI/IDE 工具",
 
         // Window
-        "settings_title": "CodeIsland 設定",
+        "settings_title": "Clotch 設定",
 
         // Menu
         "settings_ellipsis": "設定...",
@@ -3005,6 +3010,7 @@ final class L10n: ObservableObject {
     private static let ja: [String: String] = [
         // Settings pages
         "general": "一般",
+        "notch_page": "Notch",
         "behavior": "動作",
         "appearance": "外観",
         "mascots": "マスコット",
@@ -3506,7 +3512,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC を通じて %d 種類の CLI/IDE ツールをサポート",
 
         // Window
-        "settings_title": "CodeIsland 設定",
+        "settings_title": "Clotch 設定",
 
         // Menu
         "settings_ellipsis": "設定...",
@@ -3609,6 +3615,7 @@ final class L10n: ObservableObject {
     private static let ko: [String: String] = [
         // Settings pages
         "general": "일반",
+        "notch_page": "Notch",
         "behavior": "동작",
         "appearance": "외관",
         "mascots": "마스코트",
@@ -4110,7 +4117,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC를 통해 %d개의 CLI/IDE 도구를 지원합니다",
 
         // Window
-        "settings_title": "CodeIsland 설정",
+        "settings_title": "Clotch 설정",
 
         // Menu
         "settings_ellipsis": "설정...",
@@ -4213,6 +4220,7 @@ final class L10n: ObservableObject {
     private static let tr: [String: String] = [
         // Settings pages
         "general": "Genel",
+        "notch_page": "Notch",
         "behavior": "Davranış",
         "appearance": "Görünüm",
         "mascots": "Maskotlar",
@@ -4714,7 +4722,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC üzerinden %d CLI/IDE aracını destekler",
 
         // Window
-        "settings_title": "CodeIsland Ayarları",
+        "settings_title": "Clotch Ayarları",
 
         // Menu
         "settings_ellipsis": "Ayarlar...",

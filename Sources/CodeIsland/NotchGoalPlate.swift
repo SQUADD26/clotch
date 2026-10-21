@@ -10,12 +10,17 @@ struct GoalsTab: View {
     @ObservedObject private var store = GoalStore.shared
     /// The page shown, by id, so a reload that reorders the goals keeps it.
     @State private var shownId: String?
+    /// The order on screen while the tab is open (`GoalBoard.keepOrder`): arrivals go at the end (#36).
+    @State private var askOrder: [String] = []
+    @State private var pageOrder: [String] = []
 
     var body: some View {
         let tab = GoalBoard.tab(rows, rejected: store.rejected)
-        let pages = rows.pages
-        let asks = stride(from: 0, to: tab.toConfirm.count, by: ProposalsPage.perPage).map {
-            Array(tab.toConfirm[$0..<min($0 + ProposalsPage.perPage, tab.toConfirm.count)])
+        let freshAsks = tab.toConfirm.map(\.id), freshPages = rows.pages.map(\.id)
+        let toConfirm = GoalBoard.keepOrder(askOrder, freshAsks).compactMap { id in tab.toConfirm.first { $0.id == id } }
+        let pages = GoalBoard.keepOrder(pageOrder, freshPages).compactMap { id in tab.goals.first { $0.id == id } }
+        let asks = stride(from: 0, to: toConfirm.count, by: ProposalsPage.perPage).map {
+            Array(toConfirm[$0..<min($0 + ProposalsPage.perPage, toConfirm.count)])
         }
         let ids = asks.indices.map { "da-confermare-\($0)" } + pages.map(\.id)
         let closed = tab.closed == 0 ? nil : (tab.closed == 1 ? "1 obiettivo chiuso" : "\(tab.closed) obiettivi chiusi")
@@ -28,7 +33,7 @@ struct GoalsTab: View {
             )
             Pager(count: ids.count, index: index, pageID: { ids[$0] }) { i in
                 if i < asks.count {
-                    ProposalsPage(rows: asks[i], total: tab.toConfirm.count)
+                    ProposalsPage(rows: asks[i], total: toConfirm.count)
                 } else {
                     GoalPage(row: pages[i - asks.count], position: i - asks.count + 1, of: pages.count, now: now)
                 }
@@ -40,7 +45,16 @@ struct GoalsTab: View {
                     }
                 }
             }
+            .onAppear { remember(freshAsks, freshPages, first: ids.first) }
+            .onChange(of: freshAsks + [""] + freshPages) { remember(freshAsks, freshPages, first: ids.first) }
         }
+    }
+
+    /// Pins what is on screen: the order, and the page shown (the first one until Roberto moves).
+    private func remember(_ asks: [String], _ goals: [String], first: String?) {
+        askOrder = GoalBoard.keepOrder(askOrder, asks)
+        pageOrder = GoalBoard.keepOrder(pageOrder, goals)
+        if shownId == nil { shownId = first }
     }
 }
 
@@ -62,9 +76,7 @@ struct GoalPage: View {
             HStack(alignment: .center, spacing: NotchSpace.section) {
                 VStack(alignment: .leading, spacing: 6) {
                     GoalTitle(row: row)
-                    if row.hasSubtitle {
-                        GoalText(text: row.goal).frame(maxWidth: 412, alignment: .leading)
-                    }
+                    EditableGoalText(row: row, text: row.hasSubtitle ? row.goal : nil).frame(maxWidth: 412, alignment: .leading)
                     if let reason = row.reason(now: now) {
                         Text(reason).font(NotchType.caption).foregroundStyle(row.ink).lineLimit(1)
                     }
@@ -84,6 +96,7 @@ struct GoalPage: View {
                     HStack(spacing: 6) {
                         Image(systemName: "stopwatch").font(.system(size: 15)).foregroundStyle(GoalInk.strong)
                         WorkTimer(since: since, until: row.workEnd)
+                            .font(NotchType.timer).tracking(0.24).foregroundStyle(GoalInk.row)
                     }
                     .accessibilityElement(children: .combine)
                 }
