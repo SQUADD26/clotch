@@ -19,11 +19,13 @@ enum NotchHeightMode: String, CaseIterable {
 
 enum SettingsKey {
     // Language
+    static let windowAppearance = "windowAppearance"       // "dark" (default), "light", "system" — AppearanceChoice
     static let appLanguage = "appLanguage"                 // "system", "en", "zh", "zh-Hant", "de", "ja", "ko", "tr"
 
     // General - System
     static let launchAtLogin = "launchAtLogin"
-    static let displayChoice = "displayChoice"             // "auto", "builtin", "main"
+    static let displayChoice = "displayChoice"             // "auto", "mouse", "sig:<signature>" (ScreenDetector.selectedIndex)
+    static let notchLayouts = "notchLayouts"               // JSON NotchLayoutStore, one layout per screen signature
     static let allowHorizontalDrag = "allowHorizontalDrag"
     static let avoidMenuBarIcons = "avoidMenuBarIcons"
     static let panelHorizontalOffset = "panelHorizontalOffset"

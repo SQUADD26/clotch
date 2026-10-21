@@ -68,4 +68,34 @@ final class ScreenDetectorTests: XCTestCase {
 
         XCTAssertEqual(index, 1)
     }
+
+    private let builtIn = CGRect(x: 0, y: 0, width: 1512, height: 982)
+    private let external = CGRect(x: 1512, y: 0, width: 1920, height: 1080)
+
+    func testFixedChoiceIgnoresMouse() {
+        let choice = ScreenDetector.fixedPrefix + ScreenDetector.signature(of: builtIn)
+        let index = ScreenDetector.selectedIndex(choice: choice, frames: [builtIn, external], mouse: CGPoint(x: 2000, y: 500))
+        XCTAssertEqual(index, 0)
+    }
+
+    func testFollowMouseChoosesScreenUnderPointer() {
+        let frames = [builtIn, external]
+        XCTAssertEqual(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: frames, mouse: CGPoint(x: 100, y: 100)), 0)
+        XCTAssertEqual(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: frames, mouse: CGPoint(x: 2000, y: 500)), 1)
+    }
+
+    func testFixedScreenRemovedFallsBack() {
+        let choice = ScreenDetector.fixedPrefix + ScreenDetector.signature(of: external)
+        XCTAssertNil(ScreenDetector.selectedIndex(choice: choice, frames: [builtIn], mouse: .zero))
+    }
+
+    func testFollowMouseOutsideEveryScreenFallsBack() {
+        XCTAssertNil(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: [builtIn], mouse: CGPoint(x: 5000, y: 5000)))
+    }
+
+    func testAutoAndLegacyIndexChoice() {
+        XCTAssertNil(ScreenDetector.selectedIndex(choice: "auto", frames: [builtIn, external], mouse: .zero))
+        XCTAssertEqual(ScreenDetector.selectedIndex(choice: "screen_1", frames: [builtIn, external], mouse: .zero), 1)
+        XCTAssertNil(ScreenDetector.selectedIndex(choice: "screen_2", frames: [builtIn, external], mouse: .zero))
+    }
 }
