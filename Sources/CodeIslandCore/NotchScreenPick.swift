@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(CoreGraphics)
+import CoreGraphics // macOS: CGRect.minX/maxX live in the CoreGraphics overlay, Foundation alone does not bring them
+#endif
 
 /// Which screen the notch belongs to, in Cocoa screen coordinates (origin bottom-left, y up). Pure: tested on Linux (#35).
 public enum NotchScreenPick {
