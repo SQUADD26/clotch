@@ -28,4 +28,4 @@ bash scripts/test-goals-linux.sh
 
 ## Credits
 
-Clotch started as a fork of [Clotch](https://github.com/SQUADD26/clotch) by wxtsky (MIT): the notch shell, window and motion come from it. License: [LICENSE](LICENSE).
+Clotch started as a fork of [CodeIsland](https://github.com/wxtsky/CodeIsland) by wxtsky (MIT): the notch shell, window and motion come from it. License: [LICENSE](LICENSE).
