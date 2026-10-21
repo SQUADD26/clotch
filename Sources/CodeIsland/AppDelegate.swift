@@ -68,7 +68,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Collect all enabled shortcut bindings, skip duplicates (first wins)
         var bindings: [(keyCode: UInt16, mods: NSEvent.ModifierFlags, action: ShortcutAction)] = []
         var seen: Set<String> = []
-        for action in ShortcutAction.allCases {
+        // Goal notch: only the panel toggle; the card shortcuts would grab keys system-wide for cards that never show.
+        for action in [ShortcutAction.togglePanel] {
             guard action.isEnabled else { continue }
             let b = action.binding
             let key = "\(b.keyCode)-\(b.modifiers.rawValue)"
