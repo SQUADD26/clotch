@@ -141,6 +141,21 @@ public struct VoiceFiles {
         FileHandle(fileDescriptor: fd, closeOnDealloc: true).write(data)
     }
 
+    /// Read, change and write one shared file under the flock the engine takes on `lock` (claude-config `avvisi.lock`):
+    /// neither side loses the other's update. `change` returns nil to leave the file as it is. Blocks while the engine holds it (a few ms).
+    @discardableResult
+    public func modify(_ url: URL, lock: String, _ change: (Data?) -> Data?) throws -> Data? {
+        try FileManager.default.createDirectory(at: voiceDir, withIntermediateDirectories: true)
+        let fd = open(voiceDir.appendingPathComponent(lock).path, O_WRONLY | O_CREAT, 0o600)
+        guard fd >= 0 else { throw CocoaError(.fileWriteUnknown) }
+        defer { close(fd) }
+        flock(fd, LOCK_EX)
+        defer { flock(fd, LOCK_UN) }
+        guard let next = change(try? Data(contentsOf: url)) else { return nil }
+        try write(next, to: url)
+        return next
+    }
+
     /// Atomic write, file 600 and folder 700 (the key and its neighbours are never readable by others).
     public func write(_ data: Data, to url: URL) throws {
         let fm = FileManager.default

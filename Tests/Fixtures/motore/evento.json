@@ -1,0 +1,16 @@
+{
+ "id": "e-81788521",
+ "livello": "alto",
+ "prova": "PR #12",
+ "sessione": {
+  "cli": "cli-9",
+  "local_id": "",
+  "ruolo": "",
+  "titolo": ""
+ },
+ "soggetto": "fondere la PR",
+ "t": 1792610025.501,
+ "testo": "Posso fondere la PR?",
+ "tipo": "domanda",
+ "v": 1
+}

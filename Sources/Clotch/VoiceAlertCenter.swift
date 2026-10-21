@@ -89,7 +89,7 @@ final class VoiceAlertCenter {
             }
             guard !events.isEmpty else { return }
             // Re-read before writing: the page or `avvisami` may have changed the file meanwhile; only `stato` is set.
-            if let next = VoiceAlertRule.firing(fired, in: try? Data(contentsOf: files.alertsURL)) { try? files.write(next, to: files.alertsURL) }
+            try? files.modify(files.alertsURL, lock: "avvisi.lock") { VoiceAlertRule.firing(fired, in: $0) }
             offer(events)
         }
     }
