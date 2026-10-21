@@ -3,9 +3,11 @@ import Combine
 import CoreServices
 import CodeIslandCore
 
-private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState])
+private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState],
+                                  usage: [AccountUsage], requests: [UserRequest])
 
-/// Watches the goal register, the live-state folder and Claude Desktop's session store with one
+/// Watches the goal register, the live-state folder, Claude Desktop's session store, the account usage
+/// cache and the requests folder with one
 /// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`.
 /// Read-only: it never creates a directory; a missing one just means no data, and its nearest
 /// existing ancestor is watched so the data shows up once the directory is created.
@@ -30,8 +32,8 @@ private final class GoalWatcher: @unchecked Sendable {
             let paths = GoalSources.defaultPaths(home: home)
             let support = home.appendingPathComponent("Library/Application Support")
             // FSEvents reports resolved paths (/private/var…), so match both spellings.
-            prefixes = [paths.goals, paths.live].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
-            let roots = Array(Set([paths.goals, paths.live, support].map { Self.existingAncestor($0).path }))
+            prefixes = [paths.goals, paths.live, paths.usage, paths.requests].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
+            let roots = Array(Set([paths.goals, paths.live, paths.usage, paths.requests, support].map { Self.existingAncestor($0).path }))
 
             var context = FSEventStreamContext(version: 0, info: Unmanaged.passUnretained(self).toOpaque(),
                                                retain: nil, release: nil, copyDescription: nil)
@@ -99,10 +101,14 @@ private final class GoalWatcher: @unchecked Sendable {
     static let shared = GoalStore()
 
     @Published private(set) var rows: [GoalRow] = []
+    /// One per account, sorted by id; empty until claude_accounts_uso.py has written the cache.
+    @Published private(set) var usage: [AccountUsage] = []
+    /// Newest first; empty until the Overseer writes ~/.claude/richieste.
+    @Published private(set) var requests: [UserRequest] = []
     /// Refreshed on every reload and every 30 s tick; views compute "since …" against this.
     @Published private(set) var now: Date = Date()
 
-    private var snapshot: GoalDiskData = ([], [], [])
+    private var snapshot: GoalDiskData = ([], [], [], [], [])
     private var watcher: GoalWatcher?
     private var timer: Timer?
 
@@ -129,6 +135,8 @@ private final class GoalWatcher: @unchecked Sendable {
 
     private func apply(_ snap: GoalDiskData) {
         snapshot = snap
+        if snap.usage != usage { usage = snap.usage }
+        if snap.requests != requests { requests = snap.requests }
         refresh()
     }
 

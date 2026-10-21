@@ -16,7 +16,7 @@ public enum GoalSources {
         }
         return GoalRecord(cli: cli, goal: goal, state: d["stato"] as? String ?? "aperto",
                           proof: d["prova"] as? String ?? "", at: date(d["t"]),
-                          title: d["titolo"] as? String ?? "", proofs: proofs)
+                          title: d["titolo"] as? String ?? "", proofs: proofs, successor: d["a"] as? String)
     }
 
     /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).
@@ -27,6 +27,7 @@ public enum GoalSources {
         let fileId = fileName.hasSuffix(".json") ? String(fileName.dropLast(5)) : fileName
         return DesktopSession(localId: d["sessionId"] as? String ?? fileId, cliId: cli,
                               parentLocalId: parent?.isEmpty == false ? parent : nil,
+                              priorCliIds: (d["priorRemoteCliSessionIds"] as? [Any] ?? []).compactMap { $0 as? String },
                               title: d["title"] as? String ?? "", isRunning: d["isRunning"] as? Bool ?? false,
                               isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]))
     }
@@ -50,7 +51,9 @@ public enum GoalSources {
 
     // MARK: Folders
 
-    public struct Paths: Sendable { public var goals: URL; public var live: URL; public var sessionRoots: [URL] }
+    public struct Paths: Sendable {
+        public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var usage: URL; public var requests: URL
+    }
 
     public static func defaultPaths(home: URL) -> Paths {
         let support = home.appendingPathComponent("Library/Application Support")
@@ -59,12 +62,15 @@ public enum GoalSources {
             support.appendingPathComponent($0).appendingPathComponent("claude-code-sessions")
         }
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
-                     live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots)
+                     live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
+                     usage: home.appendingPathComponent(".cache/claude-accounts"),
+                     requests: home.appendingPathComponent(".claude/richieste"))
     }
 
     /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
     /// per session ever run (thousands), so only the live files of shown goals' families are read.
-    public static func load(_ paths: Paths) -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState]) {
+    public static func load(_ paths: Paths)
+        -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], usage: [AccountUsage], requests: [UserRequest]) {
         let fm = FileManager.default
         let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
             .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
@@ -79,7 +85,13 @@ public enum GoalSources {
                 subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
             }
         }
-        return (goals, sessions, live)
+        let usage = files(in: paths.usage, fm).filter { $0.lastPathComponent.hasPrefix("uso-acct-") && $0.pathExtension == "json" }
+            .compactMap { url in (try? Data(contentsOf: url)).flatMap { parseUsage($0, fileName: url.lastPathComponent) } }
+            .sorted { $0.id < $1.id }
+        let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }
+            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseRequest) }
+            .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
+        return (goals, sessions, live, usage, requests)
     }
 
     private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
@@ -112,7 +124,7 @@ public enum GoalSources {
 
     // MARK: Helpers
 
-    private static func object(_ data: Data) -> [String: Any]? {
+    static func object(_ data: Data) -> [String: Any]? {
         (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
     }
 

@@ -13,6 +13,7 @@ public struct GoalRecord: Equatable, Sendable {
     public let at: Date?
     public let title: String      // may start with "★ ", may be ""
     public let proofs: [GoalProof]?   // nil when the "prove" key is absent
+    public var successor: String? = nil  // "a": the cli that took this goal's place
 }
 
 /// One local_*.json of the Claude desktop app.
@@ -20,8 +21,9 @@ public struct DesktopSession: Equatable, Sendable {
     public let localId: String
     public let cliId: String
     public let parentLocalId: String?
+    public var priorCliIds: [String] = []  // the cli ids this session had before a /clear or resume
     public let title: String
-    public let isRunning: Bool
+    public let isRunning: Bool    // false when the app did not write it: status then comes from activity time
     public let isArchived: Bool
     public let lastActivity: Date?
 }
@@ -69,13 +71,13 @@ public enum GoalBoard {
     public static let stillAfter: TimeInterval = 30 * 60
 
     public static func rows(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> [GoalRow] {
-        let masters = Dictionary(sessions.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
         for g in goals where g.state != "passato" {
-            let master = masters[g.cli]
+            let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
             if g.state == "raggiunto", master == nil || master!.isArchived { continue }
 
             let family = family(of: master, children: children)
@@ -134,14 +136,24 @@ public enum GoalBoard {
     /// The CLI ids whose live state can matter: every member of a shown goal's family.
     /// `GoalSources.load` reads only these live files, never the whole folder.
     public static func liveIds(goals: [GoalRecord], sessions: [DesktopSession]) -> Set<String> {
-        let masters = Dictionary(sessions.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
         var ids = Set<String>()
         for g in goals where g.state != "passato" {
             ids.insert(g.cli)
-            for s in family(of: masters[g.cli], children: children) { ids.insert(s.cliId) }
+            for s in family(of: masters[g.cli] ?? g.successor.flatMap { masters[$0] }, children: children) { ids.insert(s.cliId) }
         }
         return ids
+    }
+
+    /// cli id -> session. A goal keeps the cli it was set under, so a session that changed id (/clear, resume)
+    /// is found by its prior ids too; a current id always wins, and a live session wins over an archived one.
+    static func index(_ sessions: [DesktopSession]) -> [String: DesktopSession] {
+        var out = Dictionary(sessions.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        for s in sessions.filter({ !$0.isArchived }) + sessions.filter(\.isArchived) {
+            for p in s.priorCliIds where out[p] == nil { out[p] = s }
+        }
+        return out
     }
 
     /// Master + every non-archived descendant (visited set = cycle-safe).
@@ -163,7 +175,7 @@ public enum GoalBoard {
     }
 
     /// Title without signs and emoji (★, ⭕, 🛠️, flags…), spaces collapsed. Digits, # and * stay: they are emoji only with a keycap.
-    private static func clean(_ t: String) -> String {
+    static func clean(_ t: String) -> String {
         t.filter { c in
             !c.unicodeScalars.contains { $0.properties.generalCategory == .otherSymbol || $0.properties.isEmojiPresentation }
         }.split(whereSeparator: \.isWhitespace).joined(separator: " ")
