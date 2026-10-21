@@ -20,8 +20,9 @@ public enum GoalSources {
     }
 
     /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).
+    /// Reads only the keys below: ~98 % of a session file is MCP config the board never uses, skipped unbuilt.
     public static func parseSession(_ data: Data, fileName: String) -> DesktopSession? {
-        guard let d = object(data), (d["scheduledTaskId"] as? String ?? "").isEmpty,
+        guard let d = topLevel(data, keys: sessionKeys), (d["scheduledTaskId"] as? String ?? "").isEmpty,
               let cli = d["cliSessionId"] as? String, !cli.isEmpty else { return nil }
         let parent = (d["spawnedFrom"] as? [String: Any])?["sessionId"] as? String ?? d["spawnedFrom"] as? String
         let fileId = fileName.hasSuffix(".json") ? String(fileName.dropLast(5)) : fileName
@@ -112,6 +113,74 @@ public enum GoalSources {
     }
 
     // MARK: Helpers
+
+    static let sessionKeys: Set<String> = ["scheduledTaskId", "cliSessionId", "spawnedFrom", "sessionId",
+                                           "priorRemoteCliSessionIds", "title", "isRunning", "isArchived", "lastActivityAt"]
+
+    /// A top-level JSON object with only `keys` parsed; every other value is skipped byte by byte, never built.
+    /// nil when the object is malformed or truncated (a file caught mid-write).
+    static func topLevel(_ data: Data, keys: Set<String>) -> [String: Any]? {
+        data.withUnsafeBytes { (raw: UnsafeRawBufferPointer) -> [String: Any]? in
+            let b = raw.bindMemory(to: UInt8.self)
+            let n = b.count
+            var i = 0
+            func space() { while i < n, b[i] == 0x20 || b[i] == 0x0A || b[i] == 0x0D || b[i] == 0x09 { i += 1 } }
+            func string() -> Bool {  // b[i] == '"'; leaves i after the closing quote
+                i += 1
+                while i < n {
+                    let c = b[i]
+                    if c == 0x5C { i += 2; continue }
+                    i += 1
+                    if c == 0x22 { return true }
+                }
+                return false
+            }
+            func value() -> Bool {
+                guard i < n else { return false }
+                switch b[i] {
+                case 0x22: return string()
+                case 0x7B, 0x5B:
+                    var depth = 0
+                    while i < n {
+                        let c = b[i]
+                        if c == 0x22 { if !string() { return false }; continue }
+                        if c == 0x7B || c == 0x5B { depth += 1 }
+                        else if c == 0x7D || c == 0x5D { depth -= 1; if depth == 0 { i += 1; return true } }
+                        i += 1
+                    }
+                    return false
+                default:  // number, true, false, null
+                    let start = i
+                    while i < n, ![0x2C, 0x7D, 0x5D, 0x20, 0x0A, 0x0D, 0x09].contains(b[i]) { i += 1 }
+                    return i > start
+                }
+            }
+            space()
+            guard i < n, b[i] == 0x7B else { return nil }
+            i += 1
+            var out: [String: Any] = [:]
+            while true {
+                space()
+                guard i < n else { return nil }
+                if b[i] == 0x7D { return out }
+                if b[i] == 0x2C { i += 1; continue }
+                guard b[i] == 0x22 else { return nil }
+                let k0 = i + 1
+                guard string() else { return nil }
+                let key = String(decoding: UnsafeBufferPointer(rebasing: b[k0..<(i - 1)]), as: UTF8.self)
+                space()
+                guard i < n, b[i] == 0x3A else { return nil }
+                i += 1
+                space()
+                let v0 = i
+                guard value() else { return nil }
+                if keys.contains(key) {
+                    let slice = Data(UnsafeRawBufferPointer(rebasing: raw[v0..<i]))
+                    out[key] = try? JSONSerialization.jsonObject(with: slice, options: .fragmentsAllowed)
+                }
+            }
+        }
+    }
 
     static func object(_ data: Data) -> [String: Any]? {
         (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]

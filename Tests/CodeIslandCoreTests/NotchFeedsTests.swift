@@ -28,7 +28,7 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(r.title, "Overseer")
         XCTAssertEqual(r.pulses.map(\.id), ["local_new"], "the live session wins over the archived one")
         XCTAssertEqual(r.status, .moving, "activity time drives the status when isRunning is unknown")
-        XCTAssertEqual(GoalBoard.liveIds(goals: [goal("old")], sessions: [archived, live]), ["old", "new"])
+        XCTAssertEqual(GoalBoard.reach(goals: [goal("old")], sessions: [archived, live]).live, ["old", "new"])
     }
 
     func testCurrentCliIdWinsOverAnotherSessionsPriorId() {

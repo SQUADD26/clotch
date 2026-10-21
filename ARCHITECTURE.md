@@ -4,13 +4,13 @@
 A macOS notch app that shows only the goals of Roberto's master Claude sessions and whether each goal is getting closer (issue #1). It is a fork of CodeIsland (MIT, Swift): the notch shell, window and open/close motion come from CodeIsland; the content is replaced by the goal list. Display name `Goal Notch`, bundle id `com.squadd.goalnotch`.
 
 ## Backend and where it runs
-No backend. The app runs on Roberto's Mac only and reads local files, read-only. It writes nothing into `~/.claude`, `~/.codex` or other agent configs (CodeIsland's hook installer, hook socket server, agent watchers and companion bridges are not started at launch).
+No backend. The app runs on Roberto's Mac only and reads local files, read-only. Its only write is its own cache, `~/Library/Application Support/Goal Notch/sessions-v<N>.json` (stat and parsed fields of each session file, so a restart re-parses only changed files; safe to delete). It writes nothing into `~/.claude`, `~/.codex` or other agent configs (CodeIsland's hook installer, hook socket server, agent watchers and companion bridges are not started at launch).
 
 ## Data the app reads (all on the Mac, read-only)
 | What | Path | Written by |
 |---|---|---|
 | Goals register, one file per master session | `~/.claude/obiettivi/<cli>.json` (`cli`, `obiettivo`, `stato` aperto/raggiunto/bloccato/passato, `prova`, `t`, `titolo`, `prove` = `[{testo, fatta, t}]` when present) | claude-config `global/hooks/obiettivo_registro.py` |
-| Desktop app sessions | `~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json` (`sessionId`, `cliSessionId`, `spawnedFrom`, `title`, `isRunning`, `isArchived`, `lastActivityAt`) | Claude desktop app |
+| Desktop app sessions | `~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json` (only these top-level keys are parsed, the rest is skipped: `sessionId`, `cliSessionId`, `spawnedFrom`, `priorRemoteCliSessionIds`, `scheduledTaskId`, `title`, `isRunning`, `isArchived`, `lastActivityAt`) | Claude desktop app |
 | Live subagents per session | `~/.claude/handoff/live/<cli>.json` (`agenti`, `aggiornato`) | claude-config `global/hooks/live_state.py` |
 | Roberto's requests | `~/.claude/richieste/<id>.json` (`id`, `t`, `testo`, `stato` nuova/presa/fatta, `t_presa`, …); the folder arrives with a claude-config promotion, until then the plate says so | claude-config (Overseer) |
 
@@ -18,7 +18,7 @@ Real time: one FSEvents stream with file-level events, batched by FSEvents to on
 
 ## Code layout
 - `Sources/CodeIslandCore/GoalBoard.swift`: pure logic, goal → progress, traffic light, reason, session pulses. Tests in `Tests/CodeIslandCoreTests/GoalBoardTests.swift`.
-- `Sources/CodeIslandCore/GoalSources.swift`: parses the files above. `GoalLoader.swift` + `GoalFileCache.swift`: the incremental reader the watcher keeps (cache by mtime and size, work per changed path).
+- `Sources/CodeIslandCore/GoalSources.swift`: parses the files above. `GoalLoader.swift` + `GoalFileCache.swift`: the incremental reader the watcher keeps (cache by mtime and size, work per changed path, only goal-family sessions reach the board, the on-disk index above).
 - `Sources/CodeIsland/GoalStore.swift`: FSEvents watcher, publishes rows to the UI.
 - The notch view (issue #3), one Liquid Glass design inside CodeIsland's black notch (`NotchPanelView.swift`, `PanelWindowController.swift`): `NotchSections.swift` (scale and plate) + `NotchAccountsPlate.swift`, `NotchGoalPlate.swift`, `NotchRequestsPlate.swift` (open: account usage, the goal chased now with the other goals, Roberto's requests), `GoalsNotchWings.swift` (closed: state, bar and proofs of the goal chased now), `NotchNotificationView.swift` + `NotchNotifier.swift` (notifications under the closed notch: goal changes from `CodeIslandCore/NotchEvents.swift`, requests from `GoalStore.takenToAnimate`), `NotchGlass.swift` (real `glassEffect` on macOS 26+, a stand-in before and in snapshots), `NotchTokens.swift` (colour, spacing and type tokens: the one file the approved Figma target changes), `GoalsNotchView.swift` (shared pieces).
 - Everything else under `Sources/` is CodeIsland code kept for the shell; most of it is not reached at launch.
