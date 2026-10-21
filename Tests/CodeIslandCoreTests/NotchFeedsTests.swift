@@ -63,6 +63,37 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(bad.reason, "login scaduto")
     }
 
+    func testUsageGetsAccountNamesWithoutReadingSecrets() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("names-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let paths = GoalSources.defaultPaths(home: home)
+        for d in [paths.usage, home.appendingPathComponent(".config/claude-accounts"), home.appendingPathComponent(".claude-r"),
+                  home.appendingPathComponent(".claude-n")] {
+            try fm.createDirectory(at: d, withIntermediateDirectories: true)
+        }
+        try data("""
+        {"accounts": {"r-bondici": {"config": "~/.claude-r", "email": "old@x", "securestorage": "~/nope"},
+                      "plain": {"config": "~/.claude"}, "declared": {"config": "~/.claude-missing", "email": "d@x"},
+                      "nulled": {"config": "~/.claude-n"}}}
+        """).write(to: home.appendingPathComponent(".config/claude-accounts/accounts.json"))
+        // project history before the login, with braces and a decoy key inside strings
+        try data("""
+        {"projects": {"/a": {"history": [{"display": "{ oauthAccount }"}]}}, "oauthAccount": {"accountUuid": "u-1", "emailAddress": "r@x",
+         "organizationName": "S"}, "other": {"accountUuid": "decoy"}}
+        """).write(to: home.appendingPathComponent(".claude-r/.claude.json"))
+        try data(#"{"oauthAccount": {"accountUuid": "u-2"}}"#).write(to: home.appendingPathComponent(".claude.json"))
+        try data(#"{"oauthAccount": null, "x": {"accountUuid": "u-wrong"}}"#).write(to: home.appendingPathComponent(".claude-n/.claude.json"))
+        let usage = #"{"at": 1, "scaduto": false}"#
+        for id in ["u-1", "u-2", "d@x", "1234567890abcdef", "u-wrong"] {
+            try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-\(id).json"))
+        }
+        let r = GoalSources.load(paths).usage
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: r.map { ($0.id, $0.label) }),
+                       ["u-1": "r-bondici", "u-2": "plain", "d@x": "declared", "1234567890abcdef": "12345678", "u-wrong": "u-wrong"])
+        XCTAssertEqual(r.map(\.label), ["12345678", "declared", "plain", "r-bondici", "u-wrong"], "sorted by what the view shows")
+    }
+
     // MARK: requests
 
     func testParseRequestAsRichiestePyWritesIt() {

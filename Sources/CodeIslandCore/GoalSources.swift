@@ -53,6 +53,7 @@ public enum GoalSources {
 
     public struct Paths: Sendable {
         public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var usage: URL; public var requests: URL
+        public var home: URL   // accounts.json and its "~/…" config dirs resolve against it
     }
 
     public static func defaultPaths(home: URL) -> Paths {
@@ -64,7 +65,7 @@ public enum GoalSources {
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
                      usage: home.appendingPathComponent(".cache/claude-accounts"),
-                     requests: home.appendingPathComponent(".claude/richieste"))
+                     requests: home.appendingPathComponent(".claude/richieste"), home: home)
     }
 
     /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
@@ -87,11 +88,13 @@ public enum GoalSources {
         }
         let usage = files(in: paths.usage, fm).filter { $0.lastPathComponent.hasPrefix("uso-acct-") && $0.pathExtension == "json" }
             .compactMap { url in (try? Data(contentsOf: url)).flatMap { parseUsage($0, fileName: url.lastPathComponent) } }
-            .sorted { $0.id < $1.id }
+        let names = usage.isEmpty ? [:] : accountNames(home: paths.home)
+        let named = usage.map { u in var u = u; u.name = names[u.id]; return u }
+            .sorted { ($0.label, $0.id) < ($1.label, $1.id) }
         let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }
             .compactMap { (try? Data(contentsOf: $0)).flatMap(parseRequest) }
             .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
-        return (goals, sessions, live, usage, requests)
+        return (goals, sessions, live, named, requests)
     }
 
     private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
