@@ -2346,7 +2346,7 @@ private struct BuddyPage: View {
 
 // MARK: - About Page
 
-private struct AboutPage: View {
+struct AboutPage: View {
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var updater = UpdateChecker.shared
 

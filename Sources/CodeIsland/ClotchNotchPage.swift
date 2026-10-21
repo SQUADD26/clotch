@@ -1,64 +1,84 @@
 import SwiftUI
 import AppKit
+import CodeIslandCore
 
-/// Clotch's one settings page: only what drives the notch (#30). The CodeIsland
-/// pages stay in SettingsView.swift, off the sidebar.
+/// «Notch» (#30, #56): how the notch opens, what it shows, its tabs, the voice light, where it sits.
 struct ClotchNotchPage: View {
     @ObservedObject private var l10n = L10n.shared
-    @AppStorage(SettingsKey.displayChoice) private var displayChoice = SettingsDefaults.displayChoice
-    @AppStorage(SettingsKey.windowAppearance) private var windowAppearance = AppearanceChoice.dark.rawValue
-    @AppStorage(SettingsKey.allowHorizontalDrag) private var allowHorizontalDrag = SettingsDefaults.allowHorizontalDrag
-    @AppStorage(SettingsKey.avoidMenuBarIcons) private var avoidMenuBarIcons = SettingsDefaults.avoidMenuBarIcons
-    @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
+    @AppStorage(ClotchPrefs.openOnHover) private var openOnHover = ClotchPrefs.openOnHoverDefault
+    @AppStorage(SettingsKey.hoverExpandDelay) private var hoverExpandDelay = SettingsDefaults.hoverExpandDelay
+    @AppStorage(SettingsKey.collapseOnMouseLeave) private var collapseOnMouseLeave = SettingsDefaults.collapseOnMouseLeave
+    @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
     @AppStorage(SettingsKey.notchOpenSpeed) private var notchOpenSpeed = SettingsDefaults.notchOpenSpeed
     @AppStorage(SettingsKey.notchCloseSpeed) private var notchCloseSpeed = SettingsDefaults.notchCloseSpeed
-    @State private var launchAtLogin: Bool
-
-    init() {
-        _launchAtLogin = State(initialValue: SettingsManager.shared.launchAtLogin)
-    }
+    @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
+    @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
+    @AppStorage(ClotchPrefs.voiceLight) private var voiceLight = ClotchPrefs.voiceLightDefault
+    @AppStorage(ClotchPrefs.voiceLightStrength) private var voiceLightStrength = ClotchPrefs.voiceLightStrengthDefault
+    @AppStorage(SettingsKey.allowHorizontalDrag) private var allowHorizontalDrag = SettingsDefaults.allowHorizontalDrag
+    @AppStorage(SettingsKey.avoidMenuBarIcons) private var avoidMenuBarIcons = SettingsDefaults.avoidMenuBarIcons
 
     var body: some View {
         Form {
-            Section {
-                Button(l10n["customize_notch"]) { NotchCustomizeWindowController.shared.show() }
-                Picker(l10n["display"], selection: $displayChoice) {
-                    Text(l10n["auto"]).tag("auto")
-                    Text(l10n["follow_mouse"]).tag(ScreenDetector.followMouseChoice)
-                    ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { _, screen in
-                        let name = screen.localizedName
-                        let isBuiltin = name.contains("Built-in") || name.contains("内置")
-                        Text(isBuiltin ? l10n["builtin_display"] : name)
-                            .tag(ScreenDetector.fixedPrefix + ScreenDetector.signature(for: screen))
-                    }
+            Section(l10n["opening"]) {
+                Toggle(isOn: $openOnHover) {
+                    Text(l10n["open_on_hover"])
+                    Text(l10n["open_on_hover_desc"])
                 }
-                Picker(l10n["window_appearance"], selection: $windowAppearance) {
-                    Text(l10n["appearance_dark"]).tag(AppearanceChoice.dark.rawValue)
-                    Text(l10n["appearance_light"]).tag(AppearanceChoice.light.rawValue)
-                    Text(l10n["appearance_system"]).tag(AppearanceChoice.system.rawValue)
+                slider(l10n["hover_expand_delay"], value: Binding(
+                    get: { NotchHoverInteraction.expandDelay(forSetting: hoverExpandDelay) },
+                    set: { hoverExpandDelay = NotchHoverInteraction.expandDelay(forSetting: $0) }
+                ), in: NotchHoverInteraction.expandDelayRange, step: NotchHoverInteraction.expandDelayStep) {
+                    String(format: l10n["hover_expand_delay_value"], $0)
                 }
-                .onChange(of: windowAppearance) { _, _ in
-                    SettingsWindowController.shared.applyAppearance()
-                    NotchCustomizeWindowController.shared.applyAppearance()
-                }
-                Toggle(l10n["launch_at_login"], isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, v in SettingsManager.shared.launchAtLogin = v }
+                .disabled(!openOnHover)
+                Toggle(l10n["collapse_on_mouse_leave"], isOn: $collapseOnMouseLeave)
+                Toggle(l10n["haptic_on_hover"], isOn: $hapticOnHover)
+                speed(l10n["notch_open_speed"], $notchOpenSpeed)
+                speed(l10n["notch_close_speed"], $notchCloseSpeed)
             }
 
-            Section(l10n["panel"]) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(l10n["collapsed_width_scale"])
-                        Spacer()
-                        Text("\(collapsedWidthScale)%").foregroundStyle(.secondary).monospacedDigit()
-                    }
-                    Slider(value: Binding(
-                        get: { Double(collapsedWidthScale) },
-                        set: { collapsedWidthScale = Int($0) }
-                    ), in: Double(NotchWidthScale.min)...Double(NotchWidthScale.max), step: Double(NotchWidthScale.step))
+            Section(l10n["closed_notch"]) {
+                LabeledContent {
+                    Button(l10n["customize_notch"]) { NotchCustomizeWindowController.shared.show() }
+                } label: {
+                    Text(l10n["closed_notch_content"])
+                    Text(l10n["closed_notch_desc"])
                 }
-                speedSlider(l10n["notch_open_speed"], $notchOpenSpeed)
-                speedSlider(l10n["notch_close_speed"], $notchCloseSpeed)
+                slider(l10n["collapsed_width_scale"], value: Binding(
+                    get: { Double(collapsedWidthScale) },
+                    set: { collapsedWidthScale = Int($0) }
+                ), in: Double(NotchWidthScale.min)...Double(NotchWidthScale.max), step: Double(NotchWidthScale.step)) {
+                    "\(Int($0))%"
+                }
+            }
+
+            Section {
+                ForEach(NotchTab.allCases) { tab in
+                    Toggle(l10n["tab_" + tab.rawValue], isOn: Binding(
+                        get: { ClotchPrefs.visibleTabs(NotchTab.allCases.map(\.rawValue), hidden: hiddenTabs).contains(tab.rawValue) },
+                        set: { hiddenTabs = ClotchPrefs.setTab(tab.rawValue, on: $0, hidden: hiddenTabs, all: NotchTab.allCases.map(\.rawValue)) }
+                    ))
+                }
+            } header: {
+                Text(l10n["tabs"])
+            } footer: {
+                Text(l10n["tabs_desc"])
+            }
+
+            Section(l10n["voice_light"]) {
+                Toggle(isOn: $voiceLight) {
+                    Text(l10n["voice_light"])
+                    Text(l10n["voice_light_desc"])
+                }
+                slider(l10n["voice_light_strength"], value: Binding(
+                    get: { ClotchPrefs.strength(voiceLightStrength) },
+                    set: { voiceLightStrength = ClotchPrefs.strength($0) }
+                ), in: ClotchPrefs.voiceLightStrengthRange, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
+                .disabled(!voiceLight)
+            }
+
+            Section(l10n["position"]) {
                 Toggle(l10n["allow_horizontal_drag"], isOn: $allowHorizontalDrag)
                     .onChange(of: allowHorizontalDrag) { _, enabled in
                         if !enabled { SettingsManager.shared.panelHorizontalOffset = 0 }
@@ -66,22 +86,25 @@ struct ClotchNotchPage: View {
                 Toggle(l10n["avoid_menu_bar_icons"], isOn: $avoidMenuBarIcons)
             }
         }
-        .formStyle(.grouped)
     }
 
-    private func speedSlider(_ title: String, _ speed: Binding<Double>) -> some View {
-        let value = Binding(
-            get: { NotchAnimationSpeed.clamped(speed.wrappedValue) },
-            set: { speed.wrappedValue = NotchAnimationSpeed.clamped($0) }
-        )
-        return VStack(alignment: .leading, spacing: 4) {
+    private func speed(_ title: String, _ value: Binding<Double>) -> some View {
+        slider(title, value: Binding(
+            get: { NotchAnimationSpeed.clamped(value.wrappedValue) },
+            set: { value.wrappedValue = NotchAnimationSpeed.clamped($0) }
+        ), in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step) {
+            String(format: "%.1f×", $0)
+        }
+    }
+
+    /// Label left; slider and its value right, as the Finder's rows.
+    private func slider(_ title: String, value: Binding<Double>, in range: ClosedRange<Double>, step: Double,
+                        format: @escaping (Double) -> String) -> some View {
+        LabeledContent(title) {
             HStack {
-                Text(title)
-                Spacer()
-                Text("\(value.wrappedValue, specifier: "%.1f")×").foregroundStyle(.secondary).monospacedDigit()
+                Slider(value: value, in: range, step: step).frame(width: 160).accessibilityLabel(Text(title))
+                Text(format(value.wrappedValue)).foregroundStyle(.secondary).monospacedDigit().frame(width: 52, alignment: .trailing)
             }
-            Slider(value: value, in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step)
-                .accessibilityLabel(Text(title))
         }
     }
 }

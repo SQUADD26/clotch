@@ -52,7 +52,12 @@ enum NotePhase: Int, CaseIterable, Comparable {
 
     private func enqueue(_ events: [NotchEvent]) {
         // The same change never notifies twice, even if a file flickers back and forth.
-        queue += events.filter { seen.insert($0.id).inserted }
+        var fresh = events.filter { seen.insert($0.id).inserted }
+        if !(UserDefaults.standard.object(forKey: ClotchPrefs.notes) as? Bool ?? ClotchPrefs.notesDefault) {  // «Mostra avvisi» off (#56)
+            fresh.filter { $0.kind == .requestTaken }.forEach { GoalStore.shared.takenAnimationShown($0.subject) }
+            fresh = []
+        }
+        queue += fresh
         guard !draining, !queue.isEmpty else { return }
         draining = true
         Task { await drain() }
@@ -72,7 +77,7 @@ enum NotePhase: Int, CaseIterable, Comparable {
                 withAnimation(motion) { phase = .settle }
             }
             let text = Note(event: event, rows: GoalStore.shared.rows, requests: GoalStore.shared.requests)?.text ?? ""
-            await pause(NotchEvents.hold(forText: text))
+            await pause(NotchEvents.hold(forText: text) * ClotchPrefs.noteScale(UserDefaults.standard.string(forKey: ClotchPrefs.noteLength) ?? ""))
             while pointerOver { await pause(0.25) }
             if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }
             withAnimation(motion) { phase = .leave }
