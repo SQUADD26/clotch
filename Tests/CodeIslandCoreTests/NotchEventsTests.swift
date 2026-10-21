@@ -21,13 +21,13 @@ final class NotchEventsTests: XCTestCase {
     }
 
     func testHoldGrowsWithTextWithinBounds() {
-        XCTAssertEqual(NotchEvents.hold(forText: ""), NotchEvents.minHold)
-        XCTAssertEqual(NotchEvents.hold(forText: "Barra le richieste"), NotchEvents.minHold, "short text: the minimum")
+        XCTAssertEqual(NotchEvents.hold(forText: ""), NotchEvents.minHold + 3, "#39: 3 s more than before")
+        XCTAssertEqual(NotchEvents.hold(forText: "Barra le richieste"), NotchEvents.minHold + 3, "short text: the minimum")
         let medium = NotchEvents.hold(forText: String(repeating: "a", count: 60))
-        XCTAssertGreaterThan(medium, NotchEvents.minHold)
-        XCTAssertLessThan(medium, NotchEvents.maxHold)
+        XCTAssertGreaterThan(medium, NotchEvents.minHold + 3)
+        XCTAssertLessThan(medium, NotchEvents.maxHold + 3)
         XCTAssertGreaterThan(medium, NotchEvents.hold(forText: String(repeating: "a", count: 45)), "longer text: longer")
-        XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 500)), NotchEvents.maxHold, "capped")
+        XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 500)), NotchEvents.maxHold + 3, "capped")
     }
 
     func testProposedGoalAnnouncesNothing() {
@@ -36,4 +36,22 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.goals(old: [row("p", .moving)], new: [still]), [])
     }
 
+    func testConfirmedGoalIsNews() {
+        var proposed = row("p", .moving)
+        proposed.proposed = true
+        XCTAssertEqual(NotchEvents.goals(old: [proposed], new: [row("p", .moving)]).map(\.id), ["confirmed-p-0"])
+    }
+
+    func testNoticeSaysWhatAndWho() {
+        XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch tra schermi", by: "Clotch"),
+                       "Presa in carico: Correggere notch tra schermi · Clotch")
+        XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch"), "Presa in carico: Correggere notch")
+        XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch", done: true), "Fatta: Correggere notch")
+        XCTAssertEqual(NotchEvents.notice(.confirmed, title: "Notch"), "Obiettivo confermato: Notch")
+        XCTAssertEqual(NotchEvents.notice(.reached, title: "Notch"), "Obiettivo raggiunto: Notch")
+        XCTAssertNil(NotchEvents.notice(.proofDone, title: "Notch"), "other events keep only their line")
+        let long = NotchEvents.notice(.requestTaken, title: String(repeating: "a", count: 80), by: String(repeating: "s", count: 40))!
+        XCTAssertEqual(long, "Presa in carico: " + String(repeating: "a", count: 39) + "… · " + String(repeating: "s", count: 23) + "…",
+                       "long title and session are clipped with …, the session stays")
+    }
 }

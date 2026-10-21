@@ -19,7 +19,7 @@ struct NotchZonesView: View {
             if hasNotch {
                 Color.clear.frame(width: notchWidth)
             } else {
-                zone(zones.centre).frame(minWidth: notchWidth).fixedSize()
+                zone(zones.centre).frame(width: max(notchWidth, NotchLayoutMetrics.width(of: zones.centre, zones)))
             }
             Group {
                 if let mark = data.mark {
@@ -61,7 +61,9 @@ struct NotchLiveZones: View {
                 requestsWaiting: UserRequest.waiting(store.requests).count,
                 workingSessions: store.rows.allPulses.filter(\.running).count,
                 workingSince: workingSince, now: store.now, barHeight: barHeight,
-                iconsOnly: layout.iconsOnly == true, mark: notifier.phase == .leave ? notifier.current : nil
+                iconsOnly: layout.iconsOnly == true, mark: notifier.phase == .leave ? notifier.current : nil,
+                notice: notifier.current?.notice(rows: store.rows, requests: store.requests),
+                noticeShort: notifier.current?.notice(rows: store.rows, requests: store.requests, withSession: false)
             )
         )
     }

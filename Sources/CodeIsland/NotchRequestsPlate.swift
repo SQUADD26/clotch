@@ -76,30 +76,38 @@ private struct RequestLine: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RequestMark(taken: false)
+            RequestMark(look: request.look)
             Text(request.text)
                 .font(NotchType.line)
+                .strikethrough(request.look.struck, color: GoalInk.quiet)
                 .foregroundStyle(GoalInk.row)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text("In attesa")
+            Text(request.look.label)
                 .font(NotchType.small)
                 .foregroundStyle(GoalInk.quiet)
         }
         .frame(height: 20)
         .help(request.original)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(request.text + ". In attesa")
+        .accessibilityLabel(request.text + ". " + request.look.label)
     }
 }
 
-/// A request's mark: a green circle with a dark check once taken, a thin white circle while it waits.
+/// A request's mark (#39): a thin white circle while it waits, a slowly pulsing dot while a session works on it,
+/// a green circle with a dark check only once done.
 struct RequestMark: View {
-    let taken: Bool
+    let look: UserRequest.Look
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Group {
-            if taken {
+            if look == .working {
+                Image(systemName: "circle.circle")
+                    .font(.system(size: 15))
+                    .foregroundStyle(GoalInk.secondary)
+                    .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
+            } else if look == .done {
                 Image(systemName: "checkmark.circle.fill")
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(GoalInk.check, GoalTone.go.color)

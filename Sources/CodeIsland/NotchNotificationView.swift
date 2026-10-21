@@ -18,7 +18,7 @@ struct NotchNotificationView: View {
                     if let row = note.row {
                         GoalRing(progress: done ? row.progress : note.before, color: row.ringInk, size: 15, line: 2.2)
                     } else if event.kind == .requestTaken {
-                        RequestMark(taken: done)
+                        RequestMark(look: done ? requests.first { $0.id == event.subject }?.look ?? .working : .waiting)
                     } else {
                         Image(systemName: done ? note.symbol : note.startSymbol)
                             .font(.system(size: 15))
@@ -59,7 +59,10 @@ struct ResultMark: View {
     var body: some View {
         let color = event.kind == .prMerged ? NoteColor.merged
             : rows.first { $0.id == event.subject }.map(\.ringInk) ?? GoalTone.go.color
-        if event.kind == .prMerged {
+        if event.kind == .requestTaken {
+            // A request still at work leaves its working dot, not a check (#39).
+            RequestMark(look: GoalStore.shared.requests.first { $0.id == event.subject }?.look ?? .working)
+        } else if event.kind == .prMerged {
             Image(systemName: "arrow.triangle.merge").font(.system(size: 14, weight: .semibold)).foregroundStyle(color)
         } else {
             Image(systemName: "checkmark.circle.fill")
@@ -91,18 +94,21 @@ struct Note {
         switch event.kind {
         case .requestTaken:
             guard let request = requests.first(where: { $0.id == event.subject }) else { return nil }
-            self.init(text: request.text, startLabel: "In attesa", label: "Presa in carico", startSymbol: "circle",
-                      symbol: "checkmark.circle.fill", color: GoalTone.go.color, strikes: true, row: nil, before: nil)
+            let look = request.look
+            self.init(text: request.text, startLabel: UserRequest.Look.waiting.label, label: look.label, startSymbol: "circle",
+                      symbol: "checkmark.circle.fill", color: look.struck ? GoalTone.go.color : GoalInk.secondary,
+                      strikes: look.struck, row: nil, before: nil)
         case .prMerged:
             let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
             self.init(text: title, startLabel: "In corso", label: "Unita", startSymbol: "arrow.triangle.pull",
                       symbol: "arrow.triangle.merge", color: NoteColor.merged, strikes: false, row: nil, before: nil)
-        case .proofDone, .still, .blocked, .reached:
+        case .proofDone, .still, .blocked, .reached, .confirmed:
             guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
             // The ring starts from the count before this proof, so the fill is the news.
             let before = event.kind == .proofDone && row.proofsTotal > 0
                 ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
-            let label = event.kind == .proofDone ? "Prova fatta, \(row.proofsDone) su \(row.proofsTotal)" : row.statusLabel
+            let label = event.kind == .proofDone ? "Prova fatta, \(row.proofsDone) su \(row.proofsTotal)"
+                : event.kind == .confirmed ? "Confermato" : row.statusLabel
             self.init(text: row.title, startLabel: row.proofsSentence, label: label, startSymbol: "", symbol: "",
                       color: row.ink, strikes: false, row: row, before: before)
         }
@@ -119,5 +125,19 @@ struct Note {
         self.strikes = strikes
         self.row = row
         self.before = before
+    }
+}
+
+extension NotchEvent {
+    /// The centre text of the closed notch while this event is up (#39); nil = only the line under the notch.
+    /// shortcut: «who» is the title of the session the request was written in, which is the one that takes it
+    /// (`presa_da` = `sessione` today); read the taker's own title if requests ever change hands.
+    func notice(rows: [GoalRow], requests: [UserRequest], withSession: Bool = true) -> String? {
+        if kind == .requestTaken {
+            return requests.first { $0.id == subject }.flatMap {
+                NotchEvents.notice(kind, title: $0.text, by: withSession ? $0.sessionTitle : "", done: $0.look == .done)
+            }
+        }
+        return rows.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.title) }
     }
 }
