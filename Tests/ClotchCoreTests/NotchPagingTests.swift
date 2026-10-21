@@ -68,6 +68,15 @@ final class NotchPagingTests: XCTestCase {
         XCTAssertNil(PageSwipe.target(from: 0, step: -1, count: 3))
     }
 
+    /// The symptom of #119 on the Goals tab: a pager that keeps the page count it had when it appeared
+    /// (here 2) stops at the second page, however many goals have arrived since (here 5).
+    func testOldCountStopsTheNextPageNewCountDoesNot() {
+        XCTAssertNil(PageSwipe.target(from: 1, step: 1, count: 2))
+        XCTAssertEqual(PageSwipe.target(from: 1, step: 1, count: 5), 2)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: -300, velocity: -800, width: 440, count: 2), 1)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: -300, velocity: -800, width: 440, count: 5), 2)
+    }
+
     func testDotWindowSlidesAndStaysInRange() {
         XCTAssertEqual(PageDots.window(count: 3, index: 2), 0..<3)
         XCTAssertEqual(PageDots.window(count: 13, index: 0), 0..<4)
