@@ -19,14 +19,14 @@ Real time: FSEvents on these folders; a 30 s tick only re-evaluates time-based s
 - `Sources/CodeIslandCore/GoalBoard.swift`: pure logic, goal → progress, traffic light, reason, session pulses. Tests in `Tests/CodeIslandCoreTests/GoalBoardTests.swift`.
 - `Sources/CodeIslandCore/GoalSources.swift`: parses and reads the files above.
 - `Sources/CodeIsland/GoalStore.swift`: FSEvents watcher, publishes rows to the UI.
-- `Sources/CodeIsland/GoalsNotchView.swift` (shared pieces: tone, bar, session ticks, reason) and `GoalsNotchWings.swift`: the goal rows and the collapsed wings inside CodeIsland's notch (`NotchPanelView.swift`, `PanelWindowController.swift`). Until Roberto picks one (issue #3), three design directions live side by side in `GoalDesign.swift` and `GoalDesignA/B/C.swift`, chosen with `defaults write com.squadd.goalnotch goalDesign A|B|C`.
+- The notch view (issue #3), one Liquid Glass design inside CodeIsland's black notch (`NotchPanelView.swift`, `PanelWindowController.swift`): `NotchSections.swift` + `NotchRequestsPlate.swift` (open: account usage, the goal chased now with the other goals, Roberto's requests), `GoalsNotchWings.swift` (closed: state, bar and proofs of the goal chased now), `NotchNotificationView.swift` + `NotchNotifier.swift` (notifications under the closed notch: goal changes from `CodeIslandCore/NotchEvents.swift`, requests from `GoalStore.takenToAnimate`), `NotchGlass.swift` (real `glassEffect` on macOS 26+, a stand-in before and in snapshots), `GoalsNotchView.swift` (shared pieces).
 - Everything else under `Sources/` is CodeIsland code kept for the shell; most of it is not reached at launch.
 - `android-watch/`, `ios/`, `windows/`, `hardware/`, `apple-companion/`: CodeIsland companions, not built or used by goal-notch.
 
 ## Build
 - Swift package (`Package.swift`, macOS 14+, Sparkle and Yams via SwiftPM).
 - `./build.sh` on a Mac with Xcode: `swift build -c release --arch arm64`, then assembles `.build/release/CodeIsland.app` (executable name stays `CodeIsland`), ad-hoc signed unless `SIGN_ID` or a Developer ID is found.
-- `CodeIsland.app/Contents/MacOS/CodeIsland --snapshot <dir>` renders the real goal view (collapsed and expanded) from the live register to PNG and quits: the check where screen capture is not allowed (`GoalSnapshot.swift`). `--gallery` renders every design direction (collapsed, expanded, expanded with the first row hovered).
+- `CodeIsland.app/Contents/MacOS/CodeIsland --snapshot <dir> [--gallery]` renders the real notch from the live data to PNG and quits: closed, open, and with `--gallery` three frames of each notification today's data can produce (`GoalSnapshot.swift`). ImageRenderer cannot sample a backdrop, so the glass shows as its stand-in there; the real glass shows only in the running app.
 - Linux sandboxes cannot build the app. They can run the goal logic tests: `bash scripts/test-goals-linux.sh`.
 
 ## Domains, ports, machines

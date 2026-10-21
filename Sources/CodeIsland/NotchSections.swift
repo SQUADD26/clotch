@@ -40,7 +40,7 @@ struct NotchSectionsContent: View {
     }
 }
 
-private struct PlateTitle: View {
+struct PlateTitle: View {
     let text: String
     init(_ text: String) { self.text = text }
 
@@ -49,7 +49,7 @@ private struct PlateTitle: View {
     }
 }
 
-private struct EmptyLine: View {
+struct EmptyLine: View {
     let text: String
     init(_ text: String) { self.text = text }
 
@@ -161,7 +161,7 @@ private struct GoalPlate: View {
             HStack {
                 PlateTitle("Obiettivo")
                 Spacer(minLength: 8)
-                if let hero { SessionCount(pulses: hero.pulses, size: 11.5).help(hero.sessionsText) }
+                if let hero { SessionsLive(row: hero) }
             }
             if let hero { HeroGoal(row: hero, now: now) } else { EmptyLine("Nessun obiettivo aperto") }
             if !others.isEmpty {
@@ -208,8 +208,12 @@ private struct HeroGoal: View {
             if !row.title.isEmpty {
                 Text(row.goal).font(.system(size: 12)).foregroundStyle(GoalInk.secondary).lineLimit(2)
             }
-            GoalBar(progress: row.progress, tone: row.tone, height: 8).padding(.top, 2)
-            GoalReason(row: row, now: now, size: 12)
+            // The reason belongs to the bar: tight under it, never a separate block.
+            VStack(alignment: .leading, spacing: 5) {
+                GoalBar(progress: row.progress, tone: row.tone, height: 8)
+                GoalReason(row: row, now: now, size: 12)
+            }
+            .padding(.top, 2)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(row.accessibilityText(now: now))
@@ -233,11 +237,12 @@ private struct OtherGoal: View {
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 GoalBar(progress: row.progress, tone: row.tone, height: 4).frame(width: 96)
-                Text(row.proofsText ?? "–")
+                // No declared proofs: the bare track says it; the hero says it in words once.
+                Text(row.proofsText ?? "")
                     .font(.system(size: 11.5, weight: .medium).monospacedDigit())
                     .foregroundStyle(GoalInk.secondary)
                     .frame(width: 30, alignment: .trailing)
-                SessionCount(pulses: row.pulses, cap: 3, size: 11).frame(width: 34, alignment: .trailing)
+                SessionsLive(row: row, size: 11, compact: true).frame(width: 34, alignment: .trailing)
             }
             if let reason = row.reason(now: now) {
                 Text(reason)
@@ -249,70 +254,5 @@ private struct OtherGoal: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(row.accessibilityText(now: now))
-    }
-}
-
-// MARK: - Requests
-
-private struct RequestsPlate: View {
-    let requests: [UserRequest]
-    private static let shown = 6
-
-    var body: some View {
-        // Waiting first, then the ones taken in charge; newest first in each (GoalStore's order).
-        let ordered = requests.filter { !$0.taken } + requests.filter(\.taken)
-        let pending = requests.count - requests.filter(\.taken).count
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                PlateTitle("Richieste")
-                Spacer(minLength: 8)
-                if pending > 0 {
-                    Text("\(pending) in attesa").font(.system(size: 11, weight: .medium)).foregroundStyle(GoalInk.secondary)
-                }
-            }
-            if requests.isEmpty { EmptyLine("Nessuna richiesta") }
-            ForEach(ordered.prefix(Self.shown)) { RequestLine(request: $0) }
-            if ordered.count > Self.shown {
-                Text("Altre \(ordered.count - Self.shown)")
-                    .font(.system(size: 11))
-                    .foregroundStyle(GoalInk.secondary)
-                    .padding(.leading, 19)
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .glassPlate(radius: 16)
-    }
-}
-
-private struct RequestLine: View {
-    let request: UserRequest
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Image(systemName: request.taken ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.secondary)
-                .frame(width: 11)
-            Text(request.text)
-                .font(.system(size: 12, weight: request.taken ? .regular : .medium))
-                .strikethrough(request.taken, color: GoalInk.secondary)
-                .foregroundStyle(request.taken ? GoalInk.secondary : GoalInk.primary)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if let at = request.takenAt ?? request.at {
-                Text(Self.time(at))
-                    .font(.system(size: 11).monospacedDigit())
-                    .foregroundStyle(GoalInk.secondary)
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(request.text + (request.taken ? ". Presa in carico" : ". In attesa"))
-    }
-
-    static func time(_ date: Date) -> String {
-        Calendar.current.isDateInToday(date)
-            ? date.formatted(.dateTime.hour().minute())
-            : date.formatted(.dateTime.day().month(.abbreviated))
     }
 }

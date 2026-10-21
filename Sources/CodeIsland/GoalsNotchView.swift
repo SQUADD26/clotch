@@ -146,53 +146,29 @@ struct GoalBar: View {
 
 // MARK: - Sessions
 
-/// One thin tick per active session (capped), the number beside it is the true count.
-/// Running ticks move, idle ones stay dim: `bounce` moves them in height, otherwise they breathe in opacity.
-/// The resting frame is the full bright tick, so a still render (snapshot, reduce motion) is honest.
-struct SessionTicks: View {
-    let pulses: [GoalPulse]
-    var cap = 5
-    var height: CGFloat = 11
-    var bounce = false
-    @State private var moving = false
+/// How many sessions of a goal run now, with Apple's own "live" symbol moving while they do.
+/// Shown only when at least one runs: idle sessions are not news (the reason line says "Fermo").
+struct SessionsLive: View {
+    let row: GoalRow
+    var size: CGFloat = 11.5
+    /// The number alone, for tight columns; the tooltip and VoiceOver keep the full sentence.
+    var compact = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: 2) {
-            ForEach(Array(pulses.prefix(cap).enumerated()), id: \.element.id) { i, pulse in
-                let live = pulse.running && !reduceMotion
-                Capsule()
-                    .fill(Color.white)
-                    .frame(width: 2, height: height)
-                    .opacity(pulse.running ? (live && moving && !bounce ? 0.45 : 0.95) : 0.3)
-                    .scaleEffect(x: 1, y: live && moving && bounce ? 0.4 : 1, anchor: .bottom)
-                    // Staggered periods so several running sessions never move in lockstep; under 2 s (HIG).
-                    .animation(live ? Animation.easeInOut(duration: (bounce ? 0.5 : 1.6) + Double(i) * 0.12)
-                        .repeatForever(autoreverses: true) : nil, value: moving)
-            }
-        }
-        .onAppear { moving = true }
-        .accessibilityHidden(true)
-    }
-}
-
-/// Ticks plus the count, the "how many sessions" cluster every direction uses.
-struct SessionCount: View {
-    let pulses: [GoalPulse]
-    var cap = 5
-    var bounce = false
-    var size: CGFloat = 12
-
-    var body: some View {
-        if !pulses.isEmpty {
-            HStack(spacing: 5) {
-                SessionTicks(pulses: pulses, cap: cap, height: size - 1, bounce: bounce)
-                Text("\(pulses.count)")
-                    .font(.system(size: size, weight: .semibold).monospacedDigit())
+        if row.runningCount > 0 {
+            HStack(spacing: 4) {
+                Image(systemName: "waveform")
+                    .font(.system(size: size - 1, weight: .semibold))
+                    .foregroundStyle(GoalTone.go.color)
+                    .symbolEffect(.variableColor.iterative, isActive: !reduceMotion)
+                Text(compact ? "\(row.runningCount)" : "\(row.runningCount) in corso")
+                    .font(.system(size: size, weight: .medium).monospacedDigit())
                     .foregroundStyle(GoalInk.primary)
                     .contentTransition(.numericText())
             }
             .fixedSize()
+            .help(row.sessionsText)
         }
     }
 }

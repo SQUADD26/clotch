@@ -150,6 +150,9 @@ struct NotchPanelView: View {
     @State private var rightWingWidth: CGFloat = 0
     /// The notch shows goals, not sessions: its content and gating come from here.
     @ObservedObject private var goals = GoalStore.shared
+    /// A goal change or a request taken in charge, shown under the closed notch.
+    @ObservedObject private var notifier = NotchNotifier.shared
+    private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil }
 
     /// Gating: the island is live (and expands on hover) whenever it is shown,
     /// even with no open goal, so the empty state ("Nessun obiettivo aperto") is
@@ -198,6 +201,7 @@ struct NotchPanelView: View {
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
         if shouldShowExpanded { return min(max(nw + 200, 580), maxPanelWidth) }
+        if showsNote { return min(max(collapsedBarWidth, 420), maxPanelWidth) }
         return collapsedBarWidth
     }
 
@@ -220,7 +224,7 @@ struct NotchPanelView: View {
         // Immediate hover acknowledgement: a slight widen while the expand delay runs
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
         // Goal wings: the chosen design's width, never narrower than the shell's own wing.
-        return effectiveNotchW + max(compactWingWidth, GoalDesign.current.wing) * 2 + prehoverExtra
+        return effectiveNotchW + max(compactWingWidth, GoalsWing.width) * 2 + prehoverExtra
     }
 
     /// Status and tool-status reserves, split evenly between the two wings.
@@ -253,12 +257,14 @@ struct NotchPanelView: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 if showBar {
-                    // Goals: tiny bars on the left, running sessions on the right
+                    // The goal chased now: state and bar left of the notch, proofs right. Centred, so the
+                    // wings stay snug against the notch when a notification widens the island.
                     HStack(spacing: 0) {
                         GoalsLeftWing(expanded: shouldShowExpanded)
-                        Spacer(minLength: hasNotch && !shouldShowExpanded ? effectiveNotchW : 0)
+                        Color.clear.frame(width: hasNotch && !shouldShowExpanded ? effectiveNotchW : 0)
                         GoalsRightWing(expanded: shouldShowExpanded)
                     }
+                    .frame(maxWidth: .infinity)
                     .frame(height: notchHeight)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
@@ -277,7 +283,11 @@ struct NotchPanelView: View {
 
                 // Below-notch expanded content
                 if shouldShowExpanded {
-                    GoalsNotchView(maxHeight: cardSpace.windowHeight > 0 ? max(120, cardSpace.windowHeight - notchHeight - 8) : 300)
+                    NotchSections(maxHeight: cardSpace.windowHeight > 0 ? max(120, cardSpace.windowHeight - notchHeight - 8) : 300)
+                        .transition(.blurFade.combined(with: .move(edge: .top)))
+                } else if showsNote, let event = notifier.current {
+                    NotchNotificationView(event: event, phase: notifier.phase, rows: goals.rows, requests: goals.requests)
+                        .id(event.id)
                         .transition(.blurFade.combined(with: .move(edge: .top)))
                 }
             }
@@ -286,8 +296,8 @@ struct NotchPanelView: View {
             .clipped()
             .background(
                 NotchPanelShape(
-                    topExtension: shouldShowExpanded ? 14 : 3,
-                    bottomRadius: shouldShowExpanded ? 24 : 12,
+                    topExtension: shouldShowExpanded || showsNote ? 14 : 3,
+                    bottomRadius: shouldShowExpanded || showsNote ? 24 : 12,
                     minHeight: notchHeight
                 )
                 .fill(.black)

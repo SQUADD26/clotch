@@ -1,10 +1,13 @@
 import AppKit
 import SwiftUI
+import CodeIslandCore
 
-/// `CodeIsland --snapshot <dir> [--gallery]`: renders the real goal views from the live register
-/// to PNG (2x) and quits. It is how the notch is checked where screen capture is not allowed.
-/// Real data only. `--gallery` renders every design direction, plus the open list with its first
-/// row hovered; without it, only the current direction.
+/// `CodeIsland --snapshot <dir> [--gallery]`: renders the real notch from the live data to PNG (2x)
+/// and quits: closed at rest, the open panel, and with `--gallery` the three frames of each
+/// notification the live data can produce now (a request taken in charge, a proof of the goal chased
+/// now). It is how the notch is checked where screen capture is not allowed. Real data only.
+/// ImageRenderer cannot sample a backdrop, so plates draw their stand-in: the real Liquid Glass
+/// shows only in the running app.
 @MainActor
 enum GoalSnapshot {
     /// A 14/16" MacBook notch, in points.
@@ -22,19 +25,24 @@ enum GoalSnapshot {
     static func run(into dir: URL) {
         let store = GoalStore.shared
         store.loadNow()
-        let gallery = CommandLine.arguments.contains("--gallery")
         var failed = false
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            for design in gallery ? GoalDesign.allCases : [GoalDesign.current] {
-                let name = gallery ? "goal-notch-\(design.rawValue)-" : "goal-notch-"
-                try write(collapsed(design), to: dir.appendingPathComponent(name + "collapsed.png"))
-                try write(expanded(design, hovered: nil), to: dir.appendingPathComponent(name + "expanded.png"))
-                if gallery, let first = store.rows.first {
-                    try write(expanded(design, hovered: first.id), to: dir.appendingPathComponent(name + "expanded-hover.png"))
+            func save<V: View>(_ view: V, _ name: String) throws {
+                try write(view, to: dir.appendingPathComponent("goal-notch-\(name).png"))
+            }
+            try save(island(width: notchWidth + GoalsWing.width * 2, radius: 12) { EmptyView() }, "collapsed")
+            try save(expanded(), "expanded")
+            if CommandLine.arguments.contains("--gallery") {
+                for (name, event) in notifications() {
+                    for phase in NotePhase.allCases {
+                        try save(island(width: 420, radius: 24) {
+                            NotchNotificationView(event: event, phase: phase, rows: store.rows, requests: store.requests)
+                        }, "notifica-\(name)-\(phase.rawValue + 1)")
+                    }
                 }
             }
-            print("snapshot: \(store.rows.count) goals -> \(dir.path)")
+            print("snapshot: \(store.rows.count) goals, \(store.usage.count) accounts, \(store.requests.count) requests -> \(dir.path)")
         } catch {
             print("snapshot failed: \(error)")
             failed = true
@@ -42,34 +50,46 @@ enum GoalSnapshot {
         exit(failed ? 1 : 0)
     }
 
-    private static func collapsed(_ design: GoalDesign) -> some View {
-        HStack(spacing: 0) {
-            GoalsLeftWing(expanded: false, design: design)
-            Color.clear.frame(width: notchWidth)  // where the hardware notch sits
-            GoalsRightWing(expanded: false, design: design)
+    /// The notifications today's data can really produce; one that cannot is skipped and said.
+    private static func notifications() -> [(String, NotchEvent)] {
+        let store = GoalStore.shared
+        var out: [(String, NotchEvent)] = []
+        if let taken = store.requests.first(where: \.taken) {
+            out.append(("richiesta", NotchEvent(kind: .requestTaken, subject: taken.id, count: 0)))
+        } else {
+            print("snapshot: no request taken in charge yet, no «presa in carico» frames")
         }
-        .frame(height: notchHeight)
-        .background(UnevenRoundedRectangle(bottomLeadingRadius: 12, bottomTrailingRadius: 12, style: .continuous).fill(.black))
+        if let hero = store.rows.hero {
+            out.append(("obiettivo", NotchEvent(kind: hero.proofsDone > 0 ? .proofDone : .opened,
+                                                subject: hero.id, count: hero.proofsDone)))
+        }
+        return out
+    }
+
+    /// The closed island (wings beside the notch) with `below` hanging under it.
+    private static func island<Below: View>(width: CGFloat, radius: CGFloat, @ViewBuilder below: () -> Below) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                GoalsLeftWing(expanded: false)
+                Color.clear.frame(width: notchWidth)  // where the hardware notch sits
+                GoalsRightWing(expanded: false)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: notchHeight)
+            below()
+        }
+        .frame(width: width)
+        .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
         .padding(.horizontal, 48)
-        .padding(.bottom, 12)
+        .padding(.bottom, 24)
         .background(surround)
     }
 
-    private static func expanded(_ design: GoalDesign, hovered: String?) -> some View {
+    private static func expanded() -> some View {
         let store = GoalStore.shared
         return VStack(spacing: 0) {
-            HStack {
-                GoalsLeftWing(expanded: true, design: design)
-                Spacer()
-                GoalsRightWing(expanded: true, design: design)
-            }
-            .frame(height: notchHeight)
-            if store.rows.isEmpty {
-                GoalsEmptyState()
-            } else {
-                // The rows without the scroll view: ImageRenderer does not draw ScrollView content.
-                design.rows(store.rows, now: store.now, hovered: .constant(hovered))
-            }
+            Color.clear.frame(height: notchHeight)
+            NotchSectionsContent(rows: store.rows, usage: store.usage, requests: store.requests, now: store.now)
         }
         .frame(width: 580)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: 24, bottomTrailingRadius: 24, style: .continuous).fill(.black))
@@ -79,7 +99,7 @@ enum GoalSnapshot {
     }
 
     private static func write<V: View>(_ view: V, to url: URL) throws {
-        let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark))
+        let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark).environment(\.notchSnapshot, true))
         renderer.scale = 2
         guard let image = renderer.cgImage else { throw CocoaError(.fileWriteUnknown) }
         guard let data = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
