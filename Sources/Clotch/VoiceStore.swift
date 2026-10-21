@@ -33,6 +33,8 @@ final class VoiceStore: ObservableObject {
             let paths = list.prefix(count)
             // The same stream tells the alerts engine about new events (#57).
             if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged() } }
+            // And AFK's files (#106).
+            if paths.contains(where: { $0.hasSuffix("/voce/afk.json") || $0.contains("/clotch/afk-") }) { MainActor.assumeIsolated { AfkStore.shared.reload() } }
             guard paths.contains(where: { $0.hasSuffix("/voce/stato.json") }) else { return }
             let store = Unmanaged<VoiceStore>.fromOpaque(info).takeUnretainedValue()
             MainActor.assumeIsolated { store.reload() } // the stream runs on the main queue

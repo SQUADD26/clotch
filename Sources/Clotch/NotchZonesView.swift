@@ -26,7 +26,10 @@ struct NotchZonesView: View {
                 if let mark = data.mark {
                     ResultMark(event: mark, rows: data.rows).transition(reduceMotion ? .opacity : .scale(scale: 0.4).combined(with: .opacity))
                 } else {
-                    zone(zones.right)
+                    HStack(spacing: NotchLayoutMetrics.spacing) {
+                        if let afk = data.afk { AfkSign(count: afk, expanded: data.expanded) }
+                        zone(zones.right)
+                    }
                 }
             }
             .frame(maxWidth: .infinity)
@@ -48,8 +51,10 @@ struct NotchLiveZones: View {
     let notchWidth: CGFloat
     var workingSince: Date? = nil
     var barHeight: CGFloat = 32
+    var expanded = false
 
     @ObservedObject private var store = GoalStore.shared
+    @ObservedObject private var afk = AfkStore.shared
     @ObservedObject private var quota = AccountQuotaFeed.shared
     @ObservedObject private var inUse = AccountsInUseFeed.shared
     @ObservedObject private var notifier = NotchNotifier.shared
@@ -64,7 +69,8 @@ struct NotchLiveZones: View {
                 workingSince: workingSince, now: store.now, barHeight: barHeight,
                 iconsOnly: layout.iconsOnly == true, mark: notifier.phase == .leave ? notifier.current : nil,
                 notice: notifier.current?.notice(rows: store.rows, requests: store.requests),
-                noticeShort: notifier.current?.notice(rows: store.rows, requests: store.requests, withSession: false)
+                noticeShort: notifier.current?.notice(rows: store.rows, requests: store.requests, withSession: false),
+                afk: afk.isOn ? afk.count : nil, expanded: expanded
             )
         )
     }

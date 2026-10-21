@@ -139,7 +139,8 @@ final class NotchZoneViewsTests: XCTestCase {
 
     func testOpenNotchHasTheSettingsGearBesideTheTabs() throws {
         let image = try render(TabBar(tab: .constant(.goals)).frame(width: 508), named: "pulsante-impostazioni")
-        XCTAssertGreaterThan(image.count(white, columns: 0.94..<1), 0, "the gear right of the centred tab bar")
+        // #106: the gear right of the tab bar, the AFK moon (38 pt) at the far right.
+        XCTAssertGreaterThan(image.count(white, columns: 0.84..<0.92), 0, "the gear right of the tab bar, left of the moon")
     }
 
     func testSettingsButtonOpensOneSettingsWindow() {
