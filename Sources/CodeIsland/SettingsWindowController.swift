@@ -5,6 +5,7 @@ import SwiftUI
 class SettingsWindowController {
     static let shared = SettingsWindowController()
     private var window: NSWindow?
+    private var settings: ClotchSettingsWindow?
     weak var appState: AppState?
 
     private var closeObserver: NSObjectProtocol?
@@ -28,28 +29,10 @@ class SettingsWindowController {
             return
         }
 
-        let settingsView = SettingsView(appState: appState)
-        let hostingView = NSHostingView(rootView: settingsView)
-
-        let screen = NSScreen.main ?? NSScreen.screens.first
-        let screenW = screen?.frame.width ?? 1440
-        let screenH = screen?.frame.height ?? 900
-        let winW = min(660, screenW * 0.5)
-        let winH = min(540, screenH * 0.6)
-
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: winW, height: winH),
-            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
-            backing: .buffered,
-            defer: false
-        )
-        window.titleVisibility = .visible
-        window.title = L10n.shared["settings_title"]
-        window.appearance = AppearanceChoice.read().nsAppearance
-        window.backgroundColor = .windowBackgroundColor
-        window.contentView = hostingView
-        window.contentMinSize = NSSize(width: min(560, screenW * 0.4), height: min(420, screenH * 0.4))
-        window.toolbar = nil
+        // Finder-style window (#56): toolbar with one item per page, height follows the page.
+        let settings = ClotchSettingsWindow()
+        self.settings = settings  // the toolbar's delegate: NSToolbar holds it weakly
+        let window = settings.window
         window.center()
         window.isReleasedWhenClosed = false
         window.makeKeyAndOrderFront(nil)
@@ -61,6 +44,7 @@ class SettingsWindowController {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.window = nil
+                self?.settings = nil
                 self?.clearCloseObserver()
             }
         }
