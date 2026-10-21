@@ -192,6 +192,7 @@ struct GoalText: View {
     let text: String
     var lines = 2
     @State var expanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Text(text)
@@ -200,11 +201,14 @@ struct GoalText: View {
             .lineLimit(expanded ? nil : lines)
             .fixedSize(horizontal: false, vertical: expanded)
             .contentShape(Rectangle())
-            .onTapGesture { expanded.toggle() }
+            .onTapGesture { toggle() }
             .help(expanded ? "Riduci testo" : "Mostra testo intero")
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction { expanded.toggle() }
+            .accessibilityAction { toggle() }
     }
+
+    /// withAnimation, so the notch's height follows the text with the same spring (#33).
+    private func toggle() { withAnimation(NotchMotion.animation(reduce: reduceMotion)) { expanded.toggle() } }
 }
 
 /// A small icon + text pair: «⌘ 2 sessioni al lavoro», «◎ Obiettivo 1 di 4».
