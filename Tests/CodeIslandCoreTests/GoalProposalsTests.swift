@@ -26,20 +26,35 @@ final class GoalProposalsTests: GoalTestCase {
         XCTAssertEqual(GoalBoard.tab(r, rejected: [GoalDecision.key(cli: "p", text: "un altro testo")]).toConfirm.map(\.id), ["p"])
     }
 
-    func testAcceptRunsConfermaWithTheRowCliAndText() {
+    func testAcceptAndRejectRunTheGuardWithTheRowCli() {
         let row = rows([g("cli-123", stato: "proposto")], [s("local_x", cli: "cli-123")])[0]
-        let args = GoalDecision.acceptArguments(row)!
-        XCTAssertEqual(args[0], "-c")
-        XCTAssertTrue(args[1].contains("obiettivo_registro") && args[1].contains("r.conferma(sys.argv[1], sys.argv[2])"))
-        XCTAssertEqual(Array(args.dropFirst(2)), ["cli-123", "Fare il dato vivo"], "the cli id, not the app's local id")
-        XCTAssertNil(GoalDecision.acceptArguments(rows([g("a")], [s("l", cli: "a")])[0]), "nothing to accept on a confirmed goal")
-    }
-
-    func testRejectRunsRifiutaWithTheRowCli() {
-        let row = rows([g("cli-123", stato: "proposto")], [s("local_x", cli: "cli-123")])[0]
+        XCTAssertEqual(GoalDecision.acceptArguments(row, home: "/Users/r"),
+                       ["/Users/r/.claude/hooks/obiettivo-guard.py", "conferma", "--sessione", "cli-123"], "the cli id, not the app's local id")
         XCTAssertEqual(GoalDecision.rejectArguments(row, home: "/Users/r"),
                        ["/Users/r/.claude/hooks/obiettivo-guard.py", "rifiuta", "--sessione", "cli-123"])
-        XCTAssertNil(GoalDecision.rejectArguments(rows([g("a")], [s("l", cli: "a")])[0], home: "/Users/r"))
+        let confirmed = rows([g("a")], [s("l", cli: "a")])[0]
+        XCTAssertNil(GoalDecision.acceptArguments(confirmed, home: "/Users/r"), "nothing to accept on a confirmed goal")
+        XCTAssertNil(GoalDecision.rejectArguments(confirmed, home: "/Users/r"))
+    }
+
+    func testRejectedAndPastNeverShown() {
+        let states = ["rifiutato", "passato", "proposto"]
+        XCTAssertEqual(rows(states.map { g($0, stato: $0) }, states.map { s("l\($0)", cli: $0) }).map(\.id), ["proposto"])
+    }
+
+    /// «Overseer fermo da 2 h»: its session data is old, but the hook wrote `ultima_attivita` a minute ago.
+    func testStillComesFromUltimaAttivita() {
+        func record(_ extra: String) -> GoalRecord {
+            let json = String(decoding: goalJSON("o"), as: UTF8.self)
+                .replacingOccurrences(of: #""visto": "ab12cd34ef""#, with: #""visto": "ab12cd34ef""# + extra)
+            return GoalSources.parseGoal(Data(json.utf8))!
+        }
+        let old = [s("l", cli: "o", ago: 120)]
+        guard case .moving = rows([record(#", "ultima_attivita": "\#(local(1))""#)], old)[0].status else { return XCTFail("expected moving") }
+        guard case .still(let since) = rows([record("")], old)[0].status else { return XCTFail("expected still") }
+        XCTAssertEqual(since, minutesAgo(120), "without ultima_attivita the old signs still count")
+        XCTAssertEqual(GoalBoard.nextChange(goals: [record(#", "ultima_attivita": "\#(local(1))""#)], sessions: old, live: [], now: now),
+                       minutesAgo(1).addingTimeInterval(GoalBoard.stillAfter), "the board turns it still 30 min after the last sign")
     }
 
     func testClosedSessionsLastAndOutOfTheList() {

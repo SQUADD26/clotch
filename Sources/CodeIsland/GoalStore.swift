@@ -184,10 +184,11 @@ private final class GoalWatcher: @unchecked Sendable {
         }
     }
 
-    /// Roberto's «sì» from the notch: the register's `conferma`, off the main thread. On success the watcher
+    /// Roberto's «sì» from the notch: `obiettivo-guard.py conferma`, off the main thread. On success the watcher
     /// sees the register change and the goal moves among the confirmed ones.
     func accept(_ row: GoalRow) {
-        guard let args = GoalDecision.acceptArguments(row), accepting.insert(row.id).inserted else { return }
+        guard let args = GoalDecision.acceptArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path),
+              accepting.insert(row.id).inserted else { return }
         acceptFailed.remove(row.id)
         Task.detached {
             let ok = Self.python(args)
@@ -204,6 +205,9 @@ private final class GoalWatcher: @unchecked Sendable {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: py)
         process.arguments = args
+        var env = ProcessInfo.processInfo.environment
+        env["CLAUDE_CODE_SESSION_ID"] = nil  // Roberto, not a master: with it the command refuses (exit 3)
+        process.environment = env
         process.standardInput = FileHandle.nullDevice  // a mode obiettivo-guard.py does not know yet reads stdin as a hook
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice

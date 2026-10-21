@@ -15,6 +15,7 @@ public struct GoalRecord: Equatable, Sendable {
     public let proofs: [GoalProof]?   // nil when the "prove" key is absent
     public var successor: String? = nil  // "a": the cli that took this goal's place
     public var proposal: String? = nil   // "proposta.testo": a new goal proposed beside the open one, not confirmed yet
+    public var lastSeen: Date? = nil     // "ultima_attivita": the hook's sign of life at each prompt and Stop of the live session
 }
 
 /// One local_*.json of the Claude desktop app.
@@ -109,6 +110,7 @@ public enum GoalBoard {
                     busy = true
                 }
             }
+            if let t = g.lastSeen { times.append(t) }  // follows the session that works on it, whatever its id
             let last = times.max() ?? g.at
 
             let status: GoalStatus
@@ -167,7 +169,7 @@ public enum GoalBoard {
     /// a silent subagent stops counting): the store recomputes then, never on a periodic tick.
     public static func nextChange(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> Date? {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
-        var times = goals.compactMap(\.at)
+        var times = goals.compactMap(\.at) + goals.compactMap(\.lastSeen)
         for s in sessions {
             if let t = s.lastActivity { times.append(t) }
             guard let l = liveByCli[s.cliId] else { continue }
