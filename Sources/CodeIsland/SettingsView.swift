@@ -1119,7 +1119,7 @@ private struct ExtraConfigDirRow: View {
                         .font(.system(size: 11))
                         .foregroundStyle(.blue)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.window)
             }
         }
     }
@@ -1265,7 +1265,7 @@ private struct CLIStatusRow: View {
                                     .font(.system(size: 11))
                                     .foregroundStyle(.blue)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.window)
                         }
                     }
                 }
@@ -1941,7 +1941,7 @@ private struct SoundEventRow: View {
                     .font(.system(size: 22))
                     .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.window)
             Toggle("", isOn: $isOn)
                 .labelsHidden()
         }
@@ -2147,7 +2147,7 @@ private struct BuddyPage: View {
                         }
                         .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.window)
                 }
 
                 if bridge.discovered.isEmpty {
@@ -2400,10 +2400,7 @@ private struct AboutPage: View {
                             .fill(Color(nsColor: .controlBackgroundColor))
                     )
                 }
-                .buttonStyle(.plain)
-                .onHover { h in
-                    if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                }
+                .buttonStyle(.window)
             }
             .frame(maxWidth: .infinity)
 
@@ -2440,10 +2437,7 @@ private struct AboutPage: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .buttonStyle(.plain)
-            .onHover { h in
-                if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-            }
+            .buttonStyle(.window)
 
         case let .available(version):
             VStack(spacing: 8) {
@@ -2547,10 +2541,7 @@ private struct AboutPage: View {
                     .fill(Color(nsColor: .controlBackgroundColor))
             )
         }
-        .buttonStyle(.plain)
-        .onHover { h in
-            if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-        }
+        .buttonStyle(.window)
     }
 
     private func aboutLink(_ title: String, icon: String, url: String) -> some View {
@@ -3089,13 +3080,14 @@ private struct ShortcutRow: View {
                         .padding(.vertical, 5)
                         .background(RoundedRectangle(cornerRadius: 6).fill(.quaternary))
                         .onTapGesture { onStartRecording() }
+                    .notchHover(small: true, onDark: nil)
 
                     Button(action: onClear) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
                             .font(.system(size: 14))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.window)
                 }
             } else {
                 Text(l10n["shortcut_none"])
@@ -3105,6 +3097,7 @@ private struct ShortcutRow: View {
                     .padding(.vertical, 5)
                     .background(RoundedRectangle(cornerRadius: 6).strokeBorder(.quaternary))
                     .onTapGesture { onStartRecording() }
+                    .notchHover(small: true, onDark: nil)
             }
         }
         .contentShape(Rectangle())

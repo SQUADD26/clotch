@@ -100,6 +100,7 @@ struct PageControl: View {
                         .frame(width: 14, height: 4)
                         .contentShape(Rectangle().inset(by: -4))
                         .onTapGesture { go(i) }
+                        .notchHover(small: true)
                 }
             }
             arrow("chevron.right", to: index + 1, help: "Pagina successiva")
@@ -117,7 +118,7 @@ struct PageControl: View {
                 .frame(width: 22, height: 22)
                 .background(Circle().fill(enabled ? GoalInk.button : GoalInk.buttonOff))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notchSmall)
         .disabled(!enabled)
         .help(help)
         .accessibilityLabel(help)

@@ -93,6 +93,8 @@ enum NotchType {
 enum NotchMotion {
     static let spring = Animation.spring(response: 0.38, dampingFraction: 0.86)
     static let still = Animation.easeOut(duration: 0.15)
+    /// Hover: the same spring, shorter.
+    static let hover = Animation.spring(response: 0.2, dampingFraction: 0.9)
 
     static func animation(reduce: Bool) -> Animation { reduce ? still : spring }
 }

@@ -2,6 +2,7 @@
 # Runs the goal-notch logic tests without macOS: a throwaway SwiftPM package under
 # .build/goals-linux that symlinks the two Core goal files and the test file.
 set -euo pipefail
+bash "$(dirname "$0")/check-hover.sh"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"
 rm -rf "$pkg"

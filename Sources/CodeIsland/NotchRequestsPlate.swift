@@ -63,7 +63,7 @@ struct RequestsTab: View {
                     Spacer()
                     Text("\(index + 1) di \(pages)").font(NotchType.label).foregroundStyle(Color.white.opacity(0.5))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.notch)
                 .font(NotchType.caption)
                 .foregroundStyle(Color.white.opacity(0.75))
             }

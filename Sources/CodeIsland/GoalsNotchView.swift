@@ -216,6 +216,7 @@ struct GoalText: View {
             .fixedSize(horizontal: false, vertical: expanded)
             .contentShape(Rectangle())
             .onTapGesture { toggle() }
+            .notchHover()
             .help(expanded ? "Riduci testo" : "Mostra testo intero")
             .accessibilityAddTraits(.isButton)
             .accessibilityAction { toggle() }
