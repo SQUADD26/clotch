@@ -11,6 +11,7 @@ struct NotchZonesView: View {
     /// The hardware notch, left empty; unused without one.
     let notchWidth: CGFloat
     let data: NotchZoneData
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let zones = layout.resolved(hasNotch: hasNotch)
@@ -23,7 +24,7 @@ struct NotchZonesView: View {
             }
             Group {
                 if let mark = data.mark {
-                    ResultMark(event: mark, rows: data.rows).transition(.scale(scale: 0.4).combined(with: .opacity))
+                    ResultMark(event: mark, rows: data.rows).transition(reduceMotion ? .opacity : .scale(scale: 0.4).combined(with: .opacity))
                 } else {
                     zone(zones.right)
                 }

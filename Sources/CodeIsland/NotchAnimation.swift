@@ -1,18 +1,22 @@
+import AppKit
 import SwiftUI
 
+/// The shell's motion, one family with `NotchMotion`: the same damping, Reduce Motion a short fade.
 enum NotchAnimation {
+    private static var reduce: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
+
     /// 展开面板：微弹，有少许回弹感
     static var open: Animation {
-        .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: 0.82)
+        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: 0.86)
     }
     /// 收起面板：临界阻尼，无过冲（防止 NotchPanelShape 底边露出刘海）
     static var close: Animation {
-        .spring(response: NotchAnimationMetrics.closeResponse, dampingFraction: 1.0)
+        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.closeResponse, dampingFraction: 1.0)
     }
-    /// 通知弹出：快速弹跳，用于 completion/approval 自动展开
-    static let pop = Animation.spring(response: 0.3, dampingFraction: 0.65)
+    /// 通知弹出：auto-expand opens like a hover does; a bouncier spring overshot the notch.
+    static var pop: Animation { open }
     /// 微交互：hover 状态变化、按钮高亮等
-    static let micro = Animation.easeOut(duration: 0.12)
+    static let micro = NotchMotion.still
     /// Hover 预备段：全量展开的延迟计时期间，先给一个轻量的"我看到你了"反馈
     static let hoverPrehover = Animation.easeOut(duration: NotchHoverInteraction.prehoverAnimationDuration)
 }

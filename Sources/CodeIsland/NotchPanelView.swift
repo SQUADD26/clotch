@@ -158,6 +158,7 @@ struct NotchPanelView: View {
     /// A goal change or a request taken in charge, shown under the closed notch.
     @ObservedObject private var notifier = NotchNotifier.shared
     @ObservedObject private var voice = VoiceStore.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
     private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil && notifier.phase != .leave }
 
@@ -225,10 +226,16 @@ struct NotchPanelView: View {
 
     private var panelShape: NotchPanelShape {
         NotchPanelShape(
+            width: panelWidth,
             topExtension: shouldShowExpanded || showsNote ? 14 : 3,
             bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote ? NotchSpace.noteRadius : 12,
             minHeight: notchHeight
         )
+    }
+
+    /// The open content and the notes come down from under the notch; Reduce Motion only fades them.
+    private var contentTransition: AnyTransition {
+        reduceMotion ? .opacity : .blurFade.combined(with: .move(edge: .top))
     }
 
     /// The panel window's width (PanelWindowController.panelSize).
@@ -317,11 +324,14 @@ struct NotchPanelView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
+                // Holds this stack at the window's width: a stack as wide as its widest child moved with the island's width,
+                // and a child that appears on opening was placed in it and slid sideways while it came down (#33).
+                Color.clear.frame(width: maxPanelWidth, height: 0)
                 if showBar {
                     // The elements chosen in «Personalizza il notch» for this screen, left, centre and right.
                     NotchLiveZones(layout: notchLayout, hasNotch: hasNotch, notchWidth: effectiveNotchW,
                                    workingSince: goals.rows.hero?.since, barHeight: notchHeight)
-                        .frame(maxWidth: .infinity)
+                        .frame(width: panelWidth)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,
@@ -331,6 +341,7 @@ struct NotchPanelView: View {
                         hasNotch: hasNotch,
                         hovered: idleHovered
                     )
+                    .frame(width: panelWidth)
                 } else {
                     // Idle: just the notch shell
                     Spacer()
@@ -340,16 +351,19 @@ struct NotchPanelView: View {
                 // Below-notch expanded content
                 if shouldShowExpanded {
                     NotchSections(maxHeight: cardSpace.windowHeight > 0 ? max(120, cardSpace.windowHeight - notchHeight - 8) : 300)
-                        .transition(.blurFade.combined(with: .move(edge: .top)))
+                        .frame(width: panelWidth)
+                        .transition(contentTransition)
                 } else if showsNote, let event = notifier.current {
                     NotchNotificationView(event: event, phase: notifier.phase, rows: goals.rows, requests: goals.requests)
+                        .frame(width: panelWidth)
                         .id(event.id)
-                        .transition(.blurFade.combined(with: .move(edge: .top)))
+                        .transition(contentTransition)
                 }
             }
             .recordsCompletionCardChrome(in: cardSpace)
-            .frame(width: panelWidth)
-            .clipped()
+            // A column as wide as the window that never moves; only the island inside it grows, from the centre.
+            .frame(width: maxPanelWidth)
+            .clipShape(IslandColumn(width: panelWidth))
             .background(panelShape.fill(.black))
             // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
@@ -375,7 +389,7 @@ struct NotchPanelView: View {
             }
             .onAppear { displayedToolStatus = showToolStatus }
             .scaleEffect(shouldShowPrehover ? NotchHoverInteraction.prehoverScale : 1, anchor: .top)
-            .contentShape(Rectangle())
+            .contentShape(IslandColumn(width: panelWidth))
             .onHover { hovering in
                 // The pointer is on the island itself — what follow-up
                 // reminders count as "reading this card" — whatever the
@@ -492,6 +506,9 @@ struct NotchPanelView: View {
         .environment(\.sessionGroupingTabsRoom, SessionGroupingTabsLayout.room(
             panelWidth: panelWidth, notchWidth: notchW, hasNotch: hasNotch
         ))
+        // New goals or requests change the open notch's height: it eases to it instead of jumping.
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: goals.rows)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: goals.requests)
         // Closing is its own spring: this modifier would otherwise win over `withAnimation(.close)`.
         .animation(appState.surface.isExpanded ? NotchAnimation.open : NotchAnimation.close, value: appState.surface)
     }
@@ -4087,21 +4104,36 @@ private struct ClaudeLogoShape: Shape {
 
 // MARK: - Notch Panel Shape (inverse radius at top, regular radius at bottom)
 
+/// The island's own column inside the window-wide frame: clip and hover area (#33).
+private struct IslandColumn: Shape {
+    var width: CGFloat
+    var animatableData: CGFloat {
+        get { width }
+        set { width = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path { Path(NotchIslandGeometry.column(in: rect, width: width)) }
+}
+
 private struct NotchPanelShape: Shape {
+    /// The island's width, drawn centred in the window-wide frame (#33).
+    var width: CGFloat
     var topExtension: CGFloat
     var bottomRadius: CGFloat
     /// Fixed minimum height — NOT animated, prevents spring overshoot from exposing the notch
     var minHeight: CGFloat = 0
 
-    var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(topExtension, bottomRadius) }
+    var animatableData: AnimatablePair<CGFloat, AnimatablePair<CGFloat, CGFloat>> {
+        get { AnimatablePair(width, AnimatablePair(topExtension, bottomRadius)) }
         set {
-            topExtension = newValue.first
-            bottomRadius = newValue.second
+            width = newValue.first
+            topExtension = newValue.second.first
+            bottomRadius = newValue.second.second
         }
     }
 
-    func path(in rect: CGRect) -> Path {
+    func path(in frame: CGRect) -> Path {
+        let rect = NotchIslandGeometry.column(in: frame, width: width)
         let ext = topExtension
         let maxY = max(rect.maxY, rect.minY + minHeight)
         let br = min(bottomRadius, rect.width / 4, (maxY - rect.minY) / 2)
