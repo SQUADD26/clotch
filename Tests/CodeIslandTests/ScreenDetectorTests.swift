@@ -89,8 +89,13 @@ final class ScreenDetectorTests: XCTestCase {
         XCTAssertNil(ScreenDetector.selectedIndex(choice: choice, frames: [builtIn], mouse: .zero))
     }
 
-    func testFollowMouseOutsideEveryScreenFallsBack() {
-        XCTAssertNil(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: [builtIn], mouse: CGPoint(x: 5000, y: 5000)))
+    func testFollowMouseOutsideEveryScreenTakesNearest() {
+        XCTAssertEqual(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: [builtIn, external], mouse: CGPoint(x: 5000, y: 5000)), 1)
+    }
+
+    /// The top row reports mouseLocation.y == maxY: still the screen under the pointer, not the auto fallback (#35).
+    func testFollowMouseOnTopRowKeepsThatScreen() {
+        XCTAssertEqual(ScreenDetector.selectedIndex(choice: ScreenDetector.followMouseChoice, frames: [builtIn, external], mouse: CGPoint(x: 2000, y: 1080)), 1)
     }
 
     func testAutoAndLegacyIndexChoice() {

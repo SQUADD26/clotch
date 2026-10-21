@@ -46,13 +46,6 @@ extension GoalRow {
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
     var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
-    /// When work stopped: a still goal's counter stops at the moment it went still, and with no
-    /// session at work at the last sign of work; it does not keep counting.
-    var workEnd: Date? {
-        if case .still(let at) = status { return at }
-        return runningCount == 0 ? lastActivity ?? since : nil
-    }
-
     /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
         switch status {
@@ -177,26 +170,19 @@ extension GoalRing {
 
 // MARK: - Work time
 
-/// «2:04:17» since the goal took its present text. Ticks once a second, and only while it is on
-/// screen (TimelineView): the closed notch never shows it, so it costs nothing at rest. With `until`
-/// (work stopped) it is a fixed figure and no clock runs.
+/// «2:04:17» since the goal took its present text: the one clock of the goal timer, open and closed
+/// notch. Ticks once a second, and only while it is on screen (TimelineView). With `until` (work
+/// stopped, `GoalRow.workEnd`) it is a fixed figure and no clock runs. The caller sets font and colour.
 struct WorkTimer: View {
     let since: Date
     var until: Date? = nil
 
     var body: some View {
         if let until {
-            figure(until)
+            Text(GoalRow.clock(from: since, to: until))
         } else {
-            TimelineView(.periodic(from: .now, by: 1)) { ctx in figure(ctx.date) }
+            TimelineView(.periodic(from: .now, by: 1)) { ctx in Text(GoalRow.clock(from: since, to: ctx.date)) }
         }
-    }
-
-    private func figure(_ end: Date) -> some View {
-        Text(GoalRow.clock(from: since, to: end))
-            .font(NotchType.timer)
-            .tracking(0.24)
-            .foregroundStyle(GoalInk.row)
     }
 }
 
@@ -206,6 +192,7 @@ struct GoalText: View {
     let text: String
     var lines = 2
     @State var expanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Text(text)
@@ -214,11 +201,14 @@ struct GoalText: View {
             .lineLimit(expanded ? nil : lines)
             .fixedSize(horizontal: false, vertical: expanded)
             .contentShape(Rectangle())
-            .onTapGesture { expanded.toggle() }
+            .onTapGesture { toggle() }
             .help(expanded ? "Riduci testo" : "Mostra testo intero")
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction { expanded.toggle() }
+            .accessibilityAction { toggle() }
     }
+
+    /// withAnimation, so the notch's height follows the text with the same spring (#33).
+    private func toggle() { withAnimation(NotchMotion.animation(reduce: reduceMotion)) { expanded.toggle() } }
 }
 
 /// A small icon + text pair: «⌘ 2 sessioni al lavoro», «◎ Obiettivo 1 di 4».

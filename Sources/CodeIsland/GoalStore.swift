@@ -144,6 +144,9 @@ private final class GoalWatcher: @unchecked Sendable {
     @Published private(set) var rejected = Set(UserDefaults.standard.stringArray(forKey: GoalStore.rejectedKey) ?? [])
     @Published private(set) var accepting: Set<String> = []
     @Published private(set) var acceptFailed: Set<String> = []
+    /// Goals Roberto is writing from the notch (#36), and the ones the register refused.
+    @Published private(set) var writing: Set<String> = []
+    @Published private(set) var writeFailed: Set<String> = []
     private nonisolated static let rejectedKey = "goalnotch.rejectedProposals"
 
     private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
@@ -198,14 +201,25 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Roberto's «sì» from the notch: `obiettivo-guard.py conferma`, off the main thread. On success the watcher
     /// sees the register change and the goal moves among the confirmed ones.
     func accept(_ row: GoalRow) {
-        guard let args = GoalDecision.acceptArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path),
-              accepting.insert(row.id).inserted else { return }
-        acceptFailed.remove(row.id)
+        guard let args = GoalDecision.acceptArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path) else { return }
+        launch(args, row.id, busy: \.accepting, failed: \.acceptFailed)
+    }
+
+    /// Roberto's own text from the notch (#36): `conferma` with the text, fixed at once. The watcher brings the new goal.
+    func write(_ row: GoalRow, text: String) {
+        guard let args = GoalDecision.writeArguments(row, text: text, home: FileManager.default.homeDirectoryForCurrentUser.path) else { return }
+        launch(args, row.id, busy: \.writing, failed: \.writeFailed)
+    }
+
+    private func launch(_ args: [String], _ id: String, busy: ReferenceWritableKeyPath<GoalStore, Set<String>>,
+                        failed: ReferenceWritableKeyPath<GoalStore, Set<String>>) {
+        guard self[keyPath: busy].insert(id).inserted else { return }
+        self[keyPath: failed].remove(id)
         Task.detached {
             let ok = Self.python(args)
             await MainActor.run {
-                self.accepting.remove(row.id)
-                if !ok { self.acceptFailed.insert(row.id) }
+                self[keyPath: busy].remove(id)
+                if !ok { self[keyPath: failed].insert(id) }
             }
         }
     }

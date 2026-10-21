@@ -94,7 +94,7 @@ private struct VerticalBar: View {
 }
 
 /// «Account in uso su questo Mac»: per account its name, then 5 hours and week, each with bar, figure and
-/// when it resets; a hairline between accounts. Black like the island, white 12% border (Figma 11, widened
+/// the countdown to its reset; a hairline between accounts. Black like the island, white 12% border (Figma 11, widened
 /// for the reset column). The rows are the Account tab's `QuotaMeter`.
 struct AccountsDetailCard: View {
     let data: NotchZoneData
@@ -130,14 +130,7 @@ struct AccountsDetailCard: View {
     }
 
     private func row(_ name: String, _ window: QuotaWindow) -> some View {
-        HStack(spacing: 10) {
-            QuotaMeter(name: name, window: window, now: data.now)
-            Text(AccountText.reset(window, now: data.now))
-                .font(NotchType.small)
-                .foregroundStyle(GoalInk.secondary)
-                .lineLimit(1)
-                .frame(width: 116, alignment: .trailing)
-        }
+        QuotaMeter(name: name, window: window, now: data.now)
     }
 }
 
@@ -201,14 +194,5 @@ enum AccountText {
             w.usedNow(now).map { "\(name) \(Int($0.rounded())) per cento" } ?? "\(name) libero"
         }
         return [account.email, part(account.fiveHour, "5 ore"), part(account.sevenDay, "settimana")].joined(separator: ". ")
-    }
-
-    /// «si azzera alle 14:30» today, «si azzera lun 09:00» on another day; nothing once reset or unknown.
-    static func reset(_ window: QuotaWindow, now: Date) -> String {
-        guard let reset = window.reset, reset > now else { return "" }
-        let time = reset.formatted(date: .omitted, time: .shortened)
-        return Calendar.current.isDate(reset, inSameDayAs: now)
-            ? "si azzera alle " + time
-            : "si azzera " + reset.formatted(.dateTime.weekday(.abbreviated)) + " " + time
     }
 }

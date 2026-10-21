@@ -7,6 +7,8 @@ import CodeIslandCore
 struct Pager<Page: View, Footer: View>: View {
     let count: Int
     @Binding var index: Int
+    /// Who a page is: a page keeps its identity (and what is open on it) when others arrive before it (#36).
+    var pageID: (Int) -> String = { String($0) }
     @ViewBuilder let page: (Int) -> Page
     /// Gets `go`, so the page buttons step like a swipe.
     @ViewBuilder let footer: (_ go: @escaping (Int) -> Void) -> Footer
@@ -20,7 +22,7 @@ struct Pager<Page: View, Footer: View>: View {
         VStack(spacing: NotchSpace.section) {
             ZStack(alignment: .top) {
                 page(index)
-                    .id(index)
+                    .id(pageID(index))
                     .transition(reduceMotion ? .opacity : .push(from: forward ? .trailing : .leading))
             }
             .opacity(moving ? 0.45 : 1)  // Figma: 35% leaving, 55% arriving

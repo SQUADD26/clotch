@@ -19,6 +19,10 @@ struct NotchZoneData {
     var iconsOnly = false
     /// A notification folding back into the notch: its result symbol stands in the right zone a moment.
     var mark: NotchEvent?
+    /// A request taken in charge or a goal confirmed or reached: the goal element says it instead (#39).
+    var notice: String?
+    /// The notice without its session: drawn when the whole one does not fit.
+    var noticeShort: String?
     /// The account bars ask for their card without the pointer: `--snapshot --gallery` draws it this way.
     var accountsCardOpen = false
 
