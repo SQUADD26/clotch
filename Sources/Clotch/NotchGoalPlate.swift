@@ -71,7 +71,12 @@ struct GoalPage: View {
             HStack {
                 IconLabel(symbol: "target", text: "Obiettivo \(position) di \(of)")
                 Spacer()
-                StatusPill(text: row.statusLabel, color: row.ink)
+                HStack(spacing: 6) {
+                    if row.showsPhase { RowPhase(row: row, size: 14) }
+                    StatusPill(text: row.statusLabel, color: row.ink)
+                }
+                .opensSession(row.master)
+                .help(row.reason(now: now) ?? row.statusLabel)
             }
             HStack(alignment: .center, spacing: NotchSpace.section) {
                 VStack(alignment: .leading, spacing: 6) {
@@ -92,7 +97,7 @@ struct GoalPage: View {
             }
             HStack(spacing: NotchSpace.section) {
                 IconLabel(symbol: "apple.terminal", text: row.sessionsText, color: GoalInk.strong)
-                if let since = row.since, !row.proposed {
+                if let since = row.clockStart, !row.proposed {
                     HStack(spacing: 6) {
                         Image(systemName: "stopwatch").font(.system(size: 15)).foregroundStyle(GoalInk.strong)
                         WorkTimer(since: since, until: row.workEnd)

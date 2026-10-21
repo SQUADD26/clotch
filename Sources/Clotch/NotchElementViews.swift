@@ -32,6 +32,7 @@ private struct GoalRingsElement: View {
         HStack(spacing: 5) {  // centres 17 pt apart
             ForEach(data.rows.pages.prefix(shown)) { row in
                 GoalRing(row: row, size: 12, line: 2.2)
+                    .overlay { if row.showsPhase { RowPhase(row: row, size: 12, compact: true) } }
             }
         }
         .accessibilityElement(children: .ignore)
@@ -64,6 +65,7 @@ private struct ActiveGoalElement: View {
     @ViewBuilder private var goal: some View {
         if let hero = data.rows.hero {
             HStack(spacing: 10) {
+                if hero.showsPhase { RowPhase(row: hero, size: 12, compact: true) }
                 if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail) }
                 if let since = data.workingSince {
                     HStack(spacing: 5) {

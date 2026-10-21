@@ -6,16 +6,20 @@ import ClotchCore
 // Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
 
 extension GoalRow {
-    var tone: GoalTone {
-        switch status {
-        case .moving, .reached: return .go
-        case .still: return .wait
-        case .blocked: return .stop
-        }
+    /// A proposed goal is drawn quiet: grey. A reached one is green; any other takes its session's phase colour (#114).
+    var ink: Color {
+        if proposed { return GoalInk.secondary }
+        if case .reached = status { return GoalTone.go.color }
+        return Color(phase.rgb)
     }
 
-    /// A proposed goal is drawn quiet: grey, never a traffic light.
-    var ink: Color { proposed ? GoalInk.secondary : tone.color }
+    /// The phase mark shows on goals still being worked, never on proposed or reached ones.
+    var showsPhase: Bool {
+        if proposed { return false }
+        if case .reached = status { return false }
+        return true
+    }
+
     /// The ring and the proofs count: coloured by the share of proofs done (Figma thresholds), never by state.
     var ringInk: Color {
         guard !proposed, let p = progress else { return GoalInk.secondary }
@@ -26,12 +30,8 @@ extension GoalRow {
     /// The state as a label (app-copy: adjective or participle).
     var statusLabel: String {
         if proposed { return "Proposto" }
-        switch status {
-        case .moving: return "In corso"
-        case .still: return "Fermo"
-        case .blocked: return "Bloccato"
-        case .reached: return "Raggiunto"
-        }
+        if case .reached = status { return "Raggiunto" }
+        return phase.label
     }
 
     /// The goal text under the title, unless the title already is it.
@@ -49,10 +49,13 @@ extension GoalRow {
     /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
         switch status {
-        case .moving, .reached:
+        case .reached:
             return nil
-        case .still(let since):
-            return "Fermo da " + Self.elapsed(from: since, to: now)
+        case .moving, .still:
+            // The engine's reason (what it waits for, what went wrong) beats a guess from silence.
+            if let why = motor?.why, !why.isEmpty, phase != .lavora { return why }
+            if motor == nil, case .still(let since) = status { return "Fermo da " + Self.elapsed(from: since, to: now) }
+            return nil
         case .blocked(let reason):
             var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
             // The register stores the reason as "BLOCCATO: …".

@@ -74,6 +74,7 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public var proposal: String? = nil  // text waiting for Roberto's yes: the proposed goal, or a proposal beside the open one
     public var closed = false  // its master session is archived or gone: kept out of the list, only counted
     public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
+    public var motor: SessionMotor? = nil  // the engine's true state of the master session (clotch#114); nil = not written yet
 }
 
 extension GoalRow {
@@ -83,10 +84,23 @@ extension GoalRow {
     public var workEnd: Date? {
         switch status {
         case .moving: return nil
-        case .still(let at): return at
+        case .still(let at): return motor == nil ? at : nil  // the engine's state counts its own time, whatever it is
         case .blocked, .reached: return lastActivity ?? since
         }
     }
+
+    /// What the session does now. The register's «bloccato» is a problem and beats the engine; otherwise the
+    /// engine's word wins, and with no engine file activity decides: moving works, anything else is still.
+    public var phase: SessionPhase {
+        switch status {
+        case .blocked: return .problema
+        case .reached: return .ferma
+        case .moving, .still: return motor?.phase ?? (status == .moving ? .lavora : .ferma)
+        }
+    }
+
+    /// The timer counts the time in the state; without an engine file it falls back to the goal's own start.
+    public var clockStart: Date? { motor?.since ?? since }
 }
 
 public enum GoalBoard {
@@ -94,10 +108,11 @@ public enum GoalBoard {
     /// Register states the notch shows; a new or unknown state stays hidden until it is added here.
     static let shown: Set<String> = ["aperto", "bloccato", "raggiunto", "proposto"]
 
-    public static func rows(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> [GoalRow] {
+    public static func rows(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], motor: [SessionMotor] = [], now: Date) -> [GoalRow] {
         let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        let motorByCli = Dictionary(motor.map { ($0.cli, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
         for g in goals where shown.contains(g.state) {
@@ -153,7 +168,8 @@ public enum GoalBoard {
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
                 proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
-                master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) }))
+                master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) },
+                motor: motorByCli[g.cli] ?? master.flatMap { motorByCli[$0.cliId] }))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
@@ -253,11 +269,12 @@ public enum GoalBoard {
         return words.prefix(n).joined(separator: " ") + (words.count > n ? "…" : "")
     }
 
-    /// Blocked, still, moving, then proposed (quiet), then reached, then goals of closed sessions.
+    /// Problem, waiting for Roberto, still, working or waiting for something else, then proposed (quiet), then reached, then goals of closed sessions.
     private static func rank(_ r: GoalRow) -> Int {
-        if r.closed { return 5 }
-        if r.proposed { return 3 }
-        switch r.status { case .blocked: return 0; case .still: return 1; case .moving: return 2; case .reached: return 4 }
+        if r.closed { return 6 }
+        if r.proposed { return 4 }
+        if case .reached = r.status { return 5 }
+        switch r.phase { case .problema: return 0; case .aspettaRoberto: return 1; case .ferma: return 2; case .lavora, .aspettaAltro: return 3 }
     }
 
     /// The title as written, icons included (★, ◰︎, 🎨, #79), spaces collapsed.
