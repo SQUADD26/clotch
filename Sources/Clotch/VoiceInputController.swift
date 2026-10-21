@@ -51,18 +51,40 @@ final class VoiceInputController: ObservableObject {
     private var feeding: Task<Void, Never>?
     private var dictation = VoiceInput.Dictation()
     private var scribeCommitted = false
+    /// Hold mode: the key is still down. `begin` looks at it once the microphone runs, in case it went up while macOS asked.
+    private var holds = false
+    private var pressedAt = Date.distantPast
+    private var releasedAt: Date?
+    static let tap: TimeInterval = 0.35
+    /// Hold mode and the key went up after a real hold (not a tap).
+    private var heldLong: Bool { releasedAt.map { $0.timeIntervalSince(pressedAt) >= Self.tap } ?? false }
     var timers: [Task<Void, Never>] = []
     var escapeID: UInt32?
     /// Every utterance has its number: a late event of a finished one changes nothing.
     var run = 0
 
-    /// The shortcut: starts, or ends the utterance. Pressed while it thinks or waits to send: nothing (Esc and «Annulla» take it back).
-    func toggle() {
+    /// The key went down. Idle: starts. Open: ends it (press mode, or a quick tap in hold mode). Thinking or waiting to send: nothing
+    /// (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
+    func press() {
+        let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        guard current.enabled else { return }
         switch phase {
-        case .idle, .result, .failure: Task { await begin() }
+        case .idle, .result, .failure:
+            holds = current.mode == .hold
+            pressedAt = Date()
+            releasedAt = nil
+            Task { await begin() }
         case .ready, .listening: finish()
         case .finishing, .thinking, .sending: break
         }
+    }
+
+    /// The key went up: in hold mode that ends the utterance. A tap shorter than `tap` keeps it open instead, to end with the next press.
+    func release() {
+        guard holds else { return }
+        holds = false
+        releasedAt = Date()
+        if heldLong, phase == .ready || phase == .listening { finish() }
     }
 
     /// Esc, «annulla»: whatever is happening stops and nothing is sent.
@@ -84,7 +106,7 @@ final class VoiceInputController: ObservableObject {
         armEscape()
         guard await VoiceCapture.authorized() else { return show(failure: .mic) }
         guard me == run, phase == .ready else { return }  // pressed again while macOS asked: finished or aborted already
-        let capture = VoiceCapture()
+        let capture = VoiceCapture(microphone: config.microphone)
         let meter: @Sendable (Double) -> Void = { l in Task { @MainActor [weak self] in self?.push(l) } }
         switch config.engine {
         case .scribe:
@@ -111,6 +133,7 @@ final class VoiceInputController: ObservableObject {
         self.capture = capture
         startedAt = Date()
         phase = .listening
+        if heldLong { finish() }  // the key went up during the start
         timers.append(Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(VoiceInput.maxSeconds * 1e9))
             if !Task.isCancelled { self?.finish() }

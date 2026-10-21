@@ -103,7 +103,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // and — unlike an NSEvent global keyboard monitor — needs no
         // Accessibility permission. This is the primary handler. See #217.
         for b in bindings {
-            hotKeyManager.register(keyCode: b.keyCode, modifiers: b.mods) { [weak self] in
+            // The voice is push to talk too: Carbon also tells when the key goes up.
+            let up: (() -> Void)? = b.action == .voiceInput ? { Task { @MainActor in VoiceInputController.shared.release() } } : nil
+            _ = hotKeyManager.registerID(keyCode: b.keyCode, modifiers: b.mods, onRelease: up) { [weak self] in
                 Task { @MainActor in self?.executeShortcut(b.action) }
             }
         }
@@ -145,7 +147,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         case .voiceInput:
             if appState.surface.isExpanded { withAnimation(NotchAnimation.close) { appState.surface = .collapsed } }
-            VoiceInputController.shared.toggle()
+            VoiceInputController.shared.press()
         // Card shortcuts act only on the card on screen (#308); with the
         // request hidden they open its card instead of acting unseen.
         case .approve, .approveAlways, .deny, .skipQuestion:

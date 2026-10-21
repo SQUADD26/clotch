@@ -20,6 +20,18 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertFalse(c.spoken)
     }
 
+    func testConfigDictationPage() {
+        let d = VoiceInput.Config([:])
+        XCTAssertEqual(d.mode, .hold, "hold the key is the default of the design")
+        XCTAssertTrue(d.enabled)
+        XCTAssertEqual(d.microphone, "")
+        let c = VoiceInput.Config(["ingresso_modo": "premi", "ingresso_acceso": false, "ingresso_microfono": "BuiltInMicrophoneDevice"])
+        XCTAssertEqual(c.mode, .toggle)
+        XCTAssertFalse(c.enabled)
+        XCTAssertEqual(c.microphone, "BuiltInMicrophoneDevice")
+        XCTAssertEqual(VoiceInput.Config(["ingresso_modo": "boh"]).mode, .hold)
+    }
+
     // MARK: audio
 
     func testPcmRoundTripAndLevel() {

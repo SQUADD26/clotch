@@ -589,7 +589,7 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
         case .approveAlways:  return nil
         case .skipQuestion:   return nil
         case .jumpToTerminal: return nil
-        case .voiceInput:     return ShortcutBinding(keyCode: 49, modifiers: [.control, .option]) // ⌃⌥Spazio
+        case .voiceInput:     return ShortcutBinding(keyCode: 49, modifiers: [.option]) // ⌥Spazio
         }
     }
 

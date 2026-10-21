@@ -9,6 +9,12 @@ public enum VoiceInput {
         case local = "locale"
     }
 
+    /// «Modo» of the «Dettatura» page: hold the key while he speaks (default, as drawn in Figma), or press to start and press to end.
+    public enum Mode: String, CaseIterable, Sendable {
+        case hold = "tieni"
+        case toggle = "premi"
+    }
+
     public static let sampleRate = 16_000
     /// «auto»: Scribe detects the language; Parakeet detects it too. Anything else is an ISO 639-1 code.
     public static let languages: [(code: String, name: String)] = [("it", "Italiano"), ("en", "English"), ("auto", "Automatica")]
@@ -19,14 +25,22 @@ public enum VoiceInput {
         public var engine: Engine
         public var language: String
         public var spoken: Bool
+        public var mode: Mode
+        /// The switch «Dettatura accesa»: off, the shortcut does nothing.
+        public var enabled: Bool
+        /// Unique id of the input device; "" = the system's.
+        public var microphone: String
 
-        /// config.json keys `ingresso_motore`, `ingresso_lingua`, `ingresso_a_voce`; a missing or odd value is the default
-        /// (cloud engine, Italian, answers spoken).
+        /// config.json keys `ingresso_motore`, `ingresso_lingua`, `ingresso_a_voce`, `ingresso_modo`, `ingresso_acceso`, `ingresso_microfono`;
+        /// a missing or odd value is the default (cloud engine, Italian, answers spoken, hold the key, on, the system's microphone).
         public init(_ config: [String: Any]) {
             engine = (config["ingresso_motore"] as? String).flatMap(Engine.init(rawValue:)) ?? .scribe
             let lang = (config["ingresso_lingua"] as? String) ?? "it"
             language = languages.contains { $0.code == lang } ? lang : "it"
             spoken = config["ingresso_a_voce"] as? Bool ?? true
+            mode = (config["ingresso_modo"] as? String).flatMap(Mode.init(rawValue:)) ?? .hold
+            enabled = config["ingresso_acceso"] as? Bool ?? true
+            microphone = config["ingresso_microfono"] as? String ?? ""
         }
     }
 
