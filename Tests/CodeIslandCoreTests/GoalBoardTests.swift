@@ -76,6 +76,15 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertEqual(r.at, GoalSources.date("2026-10-21T13:13:52+0000"))
     }
 
+    func testTitleDropsSignsAndEmoji() {
+        let t = { (titolo: String) in self.rows([self.g("m", titolo: titolo)], [])[0].title }
+        XCTAssertEqual(t("⭕ Overseer ⭕"), "Overseer")
+        XCTAssertEqual(t("★ Notch: goal sul notch"), "Notch: goal sul notch")
+        XCTAssertEqual(t("🛠️ Fix #12 · 3 step ✅"), "Fix #12 · 3 step")
+        XCTAssertEqual(t("👨‍💻  dentalspace  🇮🇹"), "dentalspace")
+        XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "Overseer", "session title too")
+    }
+
     func testDateFormats() {
         let utc = 1_792_588_432.0  // 2026-10-21T13:13:52Z
         XCTAssertEqual(GoalSources.date("2026-10-21T13:13:52+0300")!.timeIntervalSince1970, utc - 3 * 3600)
