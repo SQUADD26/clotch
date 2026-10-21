@@ -15,7 +15,9 @@ grep -q 'panel.becomesKeyOnlyIfNeeded = true' PanelWindowController.swift || fai
 if grep -rnE 'NSApp\.activate|makeKeyAndOrderFront' . | grep -vE '^\./(SettingsWindowController|NotchCustomizeView)\.swift:'; then
   fail "a window outside the settings activates Clotch"; fi
 # a hover-enter counts only when the pointer moved (a still pointer under a growing island is not Roberto)
-grep -q 'NotchFocus.isUserHover(secondsSincePointerMoved:' NotchPanelView.swift || fail "NotchPanelView.swift: hover opens with a still pointer"
+grep -q 'hoverGate.enter(at: NSEvent.mouseLocation, secondsSincePointerMoved:' NotchPanelView.swift || fail "NotchPanelView.swift: hover opens with a still pointer"
+# …and a real move of a pointer resting on the island opens it, without leaving and coming back
+grep -q 'hoverGate.move(to: NSEvent.mouseLocation) { handleHover(true) }' NotchPanelView.swift || fail "NotchPanelView.swift: a move inside the island does not open it"
 # automatic events (feeds, alerts, voice, screens, notifications) never open the notch or activate
 events="NotchNotifier GoalStore PullRequestFeed AccountQuotaFeed AccountsInUseFeed VoiceStore VoiceSpeaker VoiceAlertCenter ScreenDetector PanelWindowController StatusItemController"
 for f in $events; do

@@ -118,6 +118,8 @@ struct NotchPanelView: View {
     /// Delayed hover: prevents accidental expansion when mouse passes through
     @State private var hoverTimer: Timer?
     @State private var isHovered = false
+    /// #117: an enter with a still pointer waits for a real move inside the island.
+    @State private var hoverGate = NotchHoverGate()
     @State private var idleHovered = false
     /// Three-stage hover: collapsed → prehover (immediate ack) → expanded (after delay)
     @State private var hoverPhase: NotchHoverPhase = .collapsed
@@ -271,6 +273,92 @@ struct NotchPanelView: View {
         )
     }
 
+    private func handleHover(_ hovering: Bool) {
+        // The pointer is on the island itself — what follow-up
+        // reminders count as "reading this card" — whatever the
+        // hover then does to the surface below.
+        appState.followUps.pointerOverIsland = hovering
+        notifier.pointerOver = hovering
+        // Idle indicator hover — delay un-hover to prevent oscillation when
+        // the animated width change crosses the mouse position (#52).
+        if showIdleIndicator {
+            if hovering {
+                hoverTimer?.invalidate()
+                hoverTimer = nil
+                withAnimation(NotchAnimation.micro) { idleHovered = true }
+            } else {
+                hoverTimer?.invalidate()
+                hoverTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+                    Task { @MainActor in
+                        withAnimation(NotchAnimation.micro) { idleHovered = false }
+                    }
+                }
+            }
+            return
+        }
+        switch appState.surface {
+        case .approvalCard, .questionCard: return
+        case .completionCard:
+            // Completion card: mark entered on hover-in, block collapse until entered
+            if hovering {
+                appState.completionHasBeenEntered = true
+            } else if appState.completionHasBeenEntered || appState.deferCollapseOnMouseLeave {
+                // Mouse entered then left — allow collapse (immediate or deferred)
+                hoverTimer?.invalidate()
+                hoverTimer = nil
+                appState.deferCollapseOnMouseLeave = false
+                appState.cancelCompletionQueue()
+                withAnimation(NotchAnimation.close) {
+                    appState.surface = .collapsed
+                }
+            }
+            return
+        default: break
+        }
+        // Respect collapseOnMouseLeave setting
+        if !hovering && !SettingsManager.shared.collapseOnMouseLeave { return }
+        // Smart suppress: don't auto-expand when active session's terminal is foreground
+        if hovering && smartSuppress {
+            if let delegate = NSApp.delegate as? AppDelegate,
+               let pc = delegate.panelController,
+               pc.isActiveTerminalForeground() {
+                return
+            }
+        }
+
+        // #117: a still pointer under a growing island (a notification) or a moved window is not Roberto;
+        // its first real move inside the island is (onContinuousHover).
+        if !hovering { hoverGate.exit() }
+        if hovering && !hoverGate.enter(at: NSEvent.mouseLocation, secondsSincePointerMoved:
+            CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)) { return }
+        isHovered = hovering
+        if hovering {
+            // Immediate lightweight acknowledgement; a quick pass-through
+            // only ever plays this first stage and reverses.
+            withAnimation(NotchAnimation.hoverPrehover) {
+                hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseEntered)
+            }
+            if openOnHover { scheduleHoverExpand() }  // off: a click opens it (#56)
+        } else {
+            // Reverse the prehover acknowledgement right away…
+            withAnimation(NotchAnimation.hoverPrehover) {
+                hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseExited)
+            }
+            // …and collapse an expanded panel after a grace delay so an
+            // accidental mouse-out doesn't flicker it shut.
+            hoverTimer?.invalidate()
+            hoverTimer = Timer.scheduledTimer(withTimeInterval: NotchHoverInteraction.collapseDelay, repeats: false) { _ in
+                Task { @MainActor in
+                    guard !isHovered else { return }
+                    hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .collapseDelayElapsed)
+                    withAnimation(NotchAnimation.close) {
+                        appState.surface = .collapsed
+                    }
+                }
+            }
+        }
+    }
+
     /// With «Apri al passaggio del mouse» off, a click on the closed notch opens it (#56).
     private func openOnClick() {
         guard !openOnHover, !appState.surface.isExpanded else { return }
@@ -384,88 +472,9 @@ struct NotchPanelView: View {
             .onAppear { displayedToolStatus = showToolStatus }
             .scaleEffect(shouldShowPrehover ? NotchHoverInteraction.prehoverScale : 1, anchor: .top)
             .contentShape(IslandColumn(width: panelWidth))
-            .onHover { hovering in
-                // The pointer is on the island itself — what follow-up
-                // reminders count as "reading this card" — whatever the
-                // hover then does to the surface below.
-                appState.followUps.pointerOverIsland = hovering
-                notifier.pointerOver = hovering
-                // Idle indicator hover — delay un-hover to prevent oscillation when
-                // the animated width change crosses the mouse position (#52).
-                if showIdleIndicator {
-                    if hovering {
-                        hoverTimer?.invalidate()
-                        hoverTimer = nil
-                        withAnimation(NotchAnimation.micro) { idleHovered = true }
-                    } else {
-                        hoverTimer?.invalidate()
-                        hoverTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-                            Task { @MainActor in
-                                withAnimation(NotchAnimation.micro) { idleHovered = false }
-                            }
-                        }
-                    }
-                    return
-                }
-                switch appState.surface {
-                case .approvalCard, .questionCard: return
-                case .completionCard:
-                    // Completion card: mark entered on hover-in, block collapse until entered
-                    if hovering {
-                        appState.completionHasBeenEntered = true
-                    } else if appState.completionHasBeenEntered || appState.deferCollapseOnMouseLeave {
-                        // Mouse entered then left — allow collapse (immediate or deferred)
-                        hoverTimer?.invalidate()
-                        hoverTimer = nil
-                        appState.deferCollapseOnMouseLeave = false
-                        appState.cancelCompletionQueue()
-                        withAnimation(NotchAnimation.close) {
-                            appState.surface = .collapsed
-                        }
-                    }
-                    return
-                default: break
-                }
-                // Respect collapseOnMouseLeave setting
-                if !hovering && !SettingsManager.shared.collapseOnMouseLeave { return }
-                // Smart suppress: don't auto-expand when active session's terminal is foreground
-                if hovering && smartSuppress {
-                    if let delegate = NSApp.delegate as? AppDelegate,
-                       let pc = delegate.panelController,
-                       pc.isActiveTerminalForeground() {
-                        return
-                    }
-                }
-
-                // #117: a still pointer under a growing island (a notification) or a moved window is not Roberto.
-                if hovering && !NotchFocus.isUserHover(secondsSincePointerMoved:
-                    CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)) { return }
-                isHovered = hovering
-                if hovering {
-                    // Immediate lightweight acknowledgement; a quick pass-through
-                    // only ever plays this first stage and reverses.
-                    withAnimation(NotchAnimation.hoverPrehover) {
-                        hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseEntered)
-                    }
-                    if openOnHover { scheduleHoverExpand() }  // off: a click opens it (#56)
-                } else {
-                    // Reverse the prehover acknowledgement right away…
-                    withAnimation(NotchAnimation.hoverPrehover) {
-                        hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseExited)
-                    }
-                    // …and collapse an expanded panel after a grace delay so an
-                    // accidental mouse-out doesn't flicker it shut.
-                    hoverTimer?.invalidate()
-                    hoverTimer = Timer.scheduledTimer(withTimeInterval: NotchHoverInteraction.collapseDelay, repeats: false) { _ in
-                        Task { @MainActor in
-                            guard !isHovered else { return }
-                            hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .collapseDelayElapsed)
-                            withAnimation(NotchAnimation.close) {
-                                appState.surface = .collapsed
-                            }
-                        }
-                    }
-                }
+            .onHover { handleHover($0) }
+            .onContinuousHover { phase in
+                if case .active = phase, hoverGate.move(to: NSEvent.mouseLocation) { handleHover(true) }
             }
             .onChange(of: appState.surface) { _, newSurface in
                 // The surface can change from outside the hover flow (auto-expand
