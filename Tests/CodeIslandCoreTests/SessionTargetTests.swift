@@ -41,8 +41,8 @@ final class SessionTargetTests: GoalTestCase {
         let home = fm.temporaryDirectory.appendingPathComponent("target-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: home) }
         let sessions = home.appendingPathComponent("Library/Application Support/Claude-b/claude-code-sessions/acct/org")
-        let paths = GoalSources.defaultPaths(home: home)
         try fm.createDirectory(at: sessions, withIntermediateDirectories: true)
+        let paths = GoalSources.defaultPaths(home: home)  // after the folder exists: it lists the Claude* app folders
         try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
         try sessionJSON("local_t", cli: "taker").write(to: sessions.appendingPathComponent("local_t.json"))
         func request(_ id: String, _ state: String, by: String, localId: String? = nil) throws {
