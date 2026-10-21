@@ -66,6 +66,7 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public let lastActivity: Date?
     public let pulses: [GoalPulse]
     public var proposed = false   // "proposto": not accepted yet, shown quieter, never the goal chased now
+    public var since: Date? = nil  // when the goal took its present text and state: the work-time counter starts here
 }
 
 public enum GoalBoard {
@@ -129,7 +130,7 @@ public enum GoalBoard {
                 goal: goal,
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
-                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto"))
+                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))

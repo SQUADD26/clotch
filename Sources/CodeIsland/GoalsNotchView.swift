@@ -1,7 +1,8 @@
+import AppKit
 import SwiftUI
 import CodeIslandCore
 
-// The notch shows goals only: one row per open goal, read from GoalStore.
+// The notch shows goals: one page per open goal, read from GoalStore.
 // Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
 
 extension GoalRow {
@@ -13,32 +14,40 @@ extension GoalRow {
         }
     }
 
-    /// Shape for the state, so colour is never the only signal: play, pause, stop, done.
-    var symbol: String {
+    /// A proposed goal is drawn quiet: grey, never a traffic light.
+    var ink: Color { proposed ? GoalInk.secondary : tone.color }
+    var runningCount: Int { pulses.filter { $0.running }.count }
+
+    /// The state as a label (app-copy: adjective or participle).
+    var statusLabel: String {
+        if proposed { return "Proposto" }
         switch status {
-        case .moving: return "play.fill"
-        case .still: return "pause.fill"
-        case .blocked: return "stop.fill"
-        case .reached: return "checkmark"
+        case .moving: return "In corso"
+        case .still: return "Fermo"
+        case .blocked: return "Bloccato"
+        case .reached: return "Raggiunto"
         }
     }
 
     /// The goal text under the title, unless the title already is it.
     var hasSubtitle: Bool { !goal.isEmpty && goal != title }
-    /// A proposed goal is drawn quiet: grey, never a traffic light.
-    var ink: Color { proposed ? GoalInk.secondary : tone.color }
-    var runningCount: Int { pulses.filter { $0.running }.count }
 
     var sessionsText: String {
-        let n = pulses.count
-        return "\(n) \(n == 1 ? "sessione attiva" : "sessioni attive"), \(runningCount) in corso"
+        let n = runningCount
+        if n == 0 { return "Nessuna sessione al lavoro" }
+        return "\(n) \(n == 1 ? "sessione" : "sessioni") al lavoro"
     }
 
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
+    var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
-    /// The one line shown only when the goal is not green, or not accepted yet.
+    /// The master session chasing the goal, opened in the Claude app; nil when it has none.
+    var masterLink: URL? {
+        pulses.first { $0.kind == .master }.flatMap { ClaudeDesktopCodeSession.deepLinkURL(hostSessionId: $0.id) }
+    }
+
+    /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
-        if proposed { return "Proposto" }
         switch status {
         case .moving, .reached:
             return nil
@@ -48,7 +57,7 @@ extension GoalRow {
             var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
             // The register stores the reason as "BLOCCATO: …".
             if text.uppercased().hasPrefix("BLOCCATO:") { text = String(text.dropFirst(9)).trimmingCharacters(in: .whitespaces) }
-            return text.isEmpty ? "Bloccato" : text
+            return text.isEmpty ? nil : text
         }
     }
 
@@ -59,14 +68,19 @@ extension GoalRow {
         return "\(minutes / (24 * 60)) g"
     }
 
+    /// Work time as a clock, «2:04:17»; hours keep counting past a day.
+    static func clock(from start: Date, to end: Date) -> String {
+        let s = max(0, Int(end.timeIntervalSince(start)))
+        return String(format: "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
+    }
+
     func accessibilityText(now: Date) -> String {
         var parts = [title]
         if hasSubtitle { parts.append(goal) }
-        if proofsTotal > 0 { parts.append("\(proofsDone) prove su \(proofsTotal)") } else { parts.append("Nessuna prova dichiarata") }
-        if case .reached = status { parts.append("Raggiunto") }
-        else if let r = reason(now: now) { parts.append(r) }
-        else { parts.append("In corso") }
-        if !pulses.isEmpty { parts.append(sessionsText) }
+        parts.append(statusLabel)
+        parts.append(proofsSentence)
+        if let r = reason(now: now) { parts.append(r) }
+        parts.append(sessionsText)
         return parts.joined(separator: ". ")
     }
 }
@@ -75,7 +89,12 @@ extension Array where Element == GoalRow {
     /// The goal being chased now (`GoalBoard.chased`). The rest keep GoalBoard's
     /// order (blocked, then still, then moving), so trouble stays on top right under it.
     var hero: GoalRow? { GoalBoard.chased(self) }
-    var allPulses: [GoalPulse] { flatMap(\.pulses) }
+
+    /// The pages of the open notch and the rings of the closed one: the goal chased now first.
+    var pages: [GoalRow] {
+        guard let hero else { return self }
+        return [hero] + filter { $0.id != hero.id }
+    }
 
     func accessibilitySummary(now: Date) -> String {
         guard let hero else { return "Nessun obiettivo aperto" }
@@ -85,95 +104,104 @@ extension Array where Element == GoalRow {
 
 // MARK: - Bar
 
-/// Fill = declared proofs done / declared proofs. `nil` draws the bare track: never an invented fill.
-/// The same bar draws account usage, with its own colour.
+/// Fill = progress. `nil` draws the bare track: never an invented fill. Account usage uses it too.
 struct GoalBar: View {
     let progress: Double?
     let color: Color
     let height: CGFloat
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(progress: Double?, tone: GoalTone, height: CGFloat) {
-        self.init(progress: progress, color: tone.color, height: height)
-    }
-
-    init(progress: Double?, color: Color, height: CGFloat) {
-        self.progress = progress
-        self.color = color
-        self.height = height
-    }
-
     var body: some View {
-        let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule().fill(GoalInk.track)
                 if let progress, progress > 0 {
-                    // Never narrower than tall, so a first proof reads as a bar, not a dot.
+                    // Never narrower than tall, so a first step reads as a bar, not a dot.
                     Capsule()
                         .fill(color)
-                        .frame(width: max(height, geo.size.width * CGFloat(min(progress, 1))))
+                        .frame(width: max(height, geo.size.width * CGFloat(Swift.min(progress, 1))))
                 }
             }
         }
         .frame(height: height)
-        .animation(motion, value: progress)
-        .animation(motion, value: color)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: progress)
     }
 }
 
-// MARK: - Sessions
+// MARK: - Ring
 
-/// How many sessions a goal has, with Apple's own "live" symbol: green and moving while at least one
-/// runs a turn, quiet otherwise. Nothing when the goal has no session.
-struct SessionsLive: View {
-    let row: GoalRow
-    var size: CGFloat = 11.5
-    /// The number alone, for tight columns; the tooltip and VoiceOver keep the full sentence.
-    var compact = false
-    /// False in the closed notch: it is always on screen, so an endless symbol effect there costs CPU at idle.
-    var moves = true
+/// A goal as a ring: the track, and the arc of declared proofs done in the goal's colour.
+/// No declared proofs: the bare track. Used large on the goal page and small in the closed notch.
+struct GoalRing: View {
+    let progress: Double?
+    let color: Color
+    let size: CGFloat
+    let line: CGFloat
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var text: String {
-        let n = row.pulses.count
-        if compact { return "\(n)" }
-        let sessions = "\(n) \(n == 1 ? "sessione" : "sessioni")"
-        return row.runningCount > 0 ? sessions + ", \(row.runningCount) in corso" : sessions
+    var body: some View {
+        ZStack {
+            Circle().stroke(GoalInk.track, lineWidth: line)
+            Circle()
+                .trim(from: 0, to: CGFloat(min(progress ?? 0, 1)))
+                .stroke(color, style: StrokeStyle(lineWidth: line, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+        }
+        .padding(line / 2)
+        .frame(width: size, height: size)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: progress)
     }
+}
+
+extension GoalRing {
+    init(row: GoalRow, size: CGFloat, line: CGFloat) {
+        self.init(progress: row.progress, color: row.ink, size: size, line: line)
+    }
+}
+
+// MARK: - Work time
+
+/// «2:04:17» since the goal took its present text. Ticks once a second, and only while it is on
+/// screen (TimelineView): the closed notch never shows it, so it costs nothing at rest.
+struct WorkTimer: View {
+    let since: Date
 
     var body: some View {
-        if !row.pulses.isEmpty {
-            let live = row.runningCount > 0
-            HStack(spacing: 4) {
-                Image(systemName: "waveform")
-                    .font(.system(size: size - 1, weight: .semibold))
-                    .foregroundStyle(live ? GoalTone.go.color : GoalInk.secondary)
-                    .symbolEffect(.variableColor.iterative, isActive: live && moves && !reduceMotion)
-                Text(text)
-                    .font(.system(size: size, weight: .medium).monospacedDigit())
-                    .foregroundStyle(live ? GoalInk.primary : GoalInk.secondary)
-                    .contentTransition(.numericText())
-            }
-            .fixedSize()
-            .help(row.sessionsText)
+        TimelineView(.periodic(from: .now, by: 1)) { ctx in
+            Text(GoalRow.clock(from: since, to: ctx.date))
+                .font(NotchType.timer)
+                .foregroundStyle(GoalInk.primary)
         }
     }
 }
 
-/// The state shape plus the reason, in the tone colour. Shown only when the goal is not green.
-struct GoalReason: View {
-    let row: GoalRow
-    let now: Date
-    var size: CGFloat = 11.5
+/// A small icon + text pair: «⌘ 2 sessioni al lavoro», «◎ Obiettivo 1 di 4».
+struct IconLabel: View {
+    let symbol: String
+    let text: String
+    var font: Font = NotchType.body
+    var color: Color = GoalInk.secondary
 
     var body: some View {
-        if let reason = row.reason(now: now) {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: row.symbol).font(.system(size: size - 3, weight: .bold))
-                Text(reason).font(.system(size: size, weight: .medium)).lineLimit(1).truncationMode(.tail)
-            }
-            .foregroundStyle(row.tone.color)
+        HStack(spacing: 6) {
+            Image(systemName: symbol).font(font)
+            Text(text).font(font).lineLimit(1)
         }
+        .foregroundStyle(color)
+    }
+}
+
+/// The state in its colour, as a pill: «In corso».
+struct StatusPill: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(NotchType.caption)
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(color.opacity(0.18)))
     }
 }

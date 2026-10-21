@@ -3,16 +3,15 @@ import SwiftUI
 import CodeIslandCore
 
 /// `CodeIsland --snapshot <dir> [--gallery]`: renders the real notch from the live data to PNG (2x)
-/// and quits: closed at rest, the open panel, and with `--gallery` the three frames of each
-/// notification the live data can produce now (a request taken in charge, a proof of the goal chased
-/// now). It is how the notch is checked where screen capture is not allowed. Real data only.
-/// ImageRenderer cannot sample a backdrop, so plates draw their stand-in: the real Liquid Glass
-/// shows only in the running app.
+/// and quits. Without `--gallery`: closed and open (Goals). With it: every Figma state the live data
+/// can produce now, named like the Figma frames (01-riposo …); a state the data cannot produce is
+/// skipped and said. It is how the notch is checked where screen capture is not allowed. Real data only.
 @MainActor
 enum GoalSnapshot {
     /// A 14/16" MacBook notch, in points.
     private static let notchWidth: CGFloat = 200
     private static let notchHeight: CGFloat = 32
+    private static let openWidth: CGFloat = 600
     /// Stand-in for the menu bar and desktop around the island, so its black shape reads.
     private static let surround = Color(white: 0.24)
 
@@ -26,22 +25,45 @@ enum GoalSnapshot {
         let store = GoalStore.shared
         store.loadNow()
         AccountQuotaFeed.shared.loadNow()
+        AccountsInUseFeed.shared.start()
         var failed = false
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             func save<V: View>(_ view: V, _ name: String) throws {
                 try write(view, to: dir.appendingPathComponent("goal-notch-\(name).png"))
             }
-            try save(island(width: notchWidth + GoalsWing.width * 2, radius: 12) { EmptyView() }, "collapsed")
-            try save(expanded(), "expanded")
+            let closedWidth = notchWidth + GoalsWing.width * 2
+            try save(island(width: closedWidth, radius: 12) { EmptyView() }, "01-riposo")
+            try save(open(.goals), "05-obiettivi")
             if CommandLine.arguments.contains("--gallery") {
                 for (name, event) in notifications() {
-                    for phase in NotePhase.allCases {
-                        try save(island(width: 420, radius: 24) {
-                            NotchNotificationView(event: event, phase: phase, rows: store.rows, requests: store.requests)
-                        }, "notifica-\(name)-\(phase.rawValue + 1)")
-                    }
+                    try save(island(width: 420, radius: NotchSpace.noteRadius) {
+                        NotchNotificationView(event: event, phase: .arrive, rows: store.rows, requests: store.requests)
+                    }, "02-notifica-\(name)-arriva")
+                    try save(island(width: 420, radius: NotchSpace.noteRadius) {
+                        NotchNotificationView(event: event, phase: .settle, rows: store.rows, requests: store.requests)
+                    }, "03-notifica-\(name)-cambia")
+                    try save(island(width: closedWidth, radius: 12, mark: event) { EmptyView() }, "04-notifica-\(name)-sparisce")
                 }
+                let pages = store.rows.pages
+                if pages.count > 1 {
+                    // A still of the slide: the next page, dimmed as both pages are while it moves.
+                    try save(open(.goals) {
+                        GoalPage(row: pages[1], position: 2, of: pages.count, now: store.now).opacity(0.35).blur(radius: 2)
+                    }, "06-scorrimento")
+                } else {
+                    print("snapshot: one goal only, no «scorrimento» frame")
+                }
+                try save(open(.requests), "07-richieste")
+                if store.requests.count > RequestsTab.perPage {
+                    try save(open(.requests) {
+                        RequestsTab(requests: store.requests, active: store.requestsFolderExists, startPage: 1)
+                    }, "15-richieste-pagina2")
+                } else {
+                    print("snapshot: \(store.requests.count) requests, no second page")
+                }
+                try save(open(.accounts), "08-account")
+                print("snapshot: «PR unita», no-notch centre and account hover come with #6 and #5")
             }
             print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")
         } catch {
@@ -78,13 +100,21 @@ enum GoalSnapshot {
         return out
     }
 
-    /// The closed island (wings beside the notch) with `below` hanging under it.
-    private static func island<Below: View>(width: CGFloat, radius: CGFloat, @ViewBuilder below: () -> Below) -> some View {
+    /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
+    /// the notifier's `.leave` step, which the right wing reads from the live notifier.
+    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil,
+                                            @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 GoalsLeftWing()
                 Color.clear.frame(width: notchWidth)  // where the hardware notch sits
-                GoalsRightWing()
+                if let mark {
+                    ResultMark(event: mark, rows: GoalStore.shared.rows)
+                        .padding(.leading, 8)
+                        .frame(width: GoalsWing.width, alignment: .leading)
+                } else {
+                    GoalsRightWing()
+                }
             }
             .frame(maxWidth: .infinity)
             .frame(height: notchHeight)
@@ -97,26 +127,29 @@ enum GoalSnapshot {
         .background(surround)
     }
 
-    private static func expanded() -> some View {
+    /// The open notch on `tab`, as the panel draws it.
+    private static func open(_ tab: NotchTab) -> some View {
         let store = GoalStore.shared
-        return VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                GoalsLeftWing()
-                Color.clear.frame(width: notchWidth)
-                GoalsRightWing()
-            }
-            .frame(height: notchHeight)
-            NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared, now: store.now)
+        return island(width: openWidth, radius: NotchSpace.radius) {
+            NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared, now: store.now, tab: .constant(tab))
         }
-        .frame(width: 580)
-        .background(UnevenRoundedRectangle(bottomLeadingRadius: 24, bottomTrailingRadius: 24, style: .continuous).fill(.black))
-        .padding(.horizontal, 24)
-        .padding(.bottom, 24)
-        .background(surround)
+    }
+
+    /// The open notch's tab bar with `body` as the tab's content (a second page, a still of a slide).
+    private static func open<Body: View>(_ tab: NotchTab, @ViewBuilder body: () -> Body) -> some View {
+        island(width: openWidth, radius: NotchSpace.radius) {
+            VStack(spacing: NotchSpace.section) {
+                TabBar(tab: .constant(tab))
+                body().frame(maxWidth: .infinity, alignment: .topLeading)
+            }
+            .padding(.horizontal, NotchSpace.side)
+            .padding(.top, 6)
+            .padding(.bottom, 20)
+        }
     }
 
     private static func write<V: View>(_ view: V, to url: URL) throws {
-        let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark).environment(\.notchSnapshot, true))
+        let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark))
         renderer.scale = 2
         guard let image = renderer.cgImage else { throw CocoaError(.fileWriteUnknown) }
         guard let data = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
