@@ -90,7 +90,7 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertLessThan(NotchLayoutMetrics.wing(icons), NotchLayoutMetrics.wing(wide))
     }
 
-    func testCounterStopsWhenTheGoalIsStillOrNoSessionWorks() {
+    func testCounterStopsOnlyWhenTheGoalIsStill() {
         let started = now.addingTimeInterval(-3600)
         func goal(_ status: GoalStatus, running: Bool) -> GoalRow {
             var r = GoalRow(id: "a", title: "t", goal: "g", proofsDone: 0, proofsTotal: 0, progress: nil, status: status,
@@ -99,7 +99,7 @@ final class NotchZoneViewsTests: XCTestCase {
             return r
         }
         XCTAssertNil(goal(.moving, running: true).workEnd, "at work: the clock runs")
-        XCTAssertEqual(goal(.moving, running: false).workEnd, now.addingTimeInterval(-600), "«Nessuna sessione al lavoro»")
+        XCTAssertNil(goal(.moving, running: false).workEnd, "isRunning left out but recent activity: still counts (#49)")
         XCTAssertEqual(goal(.still(since: now.addingTimeInterval(-300)), running: false).workEnd, now.addingTimeInterval(-300), "«Fermo»")
         XCTAssertEqual([goal(.moving, running: true), goal(.moving, running: false)].allPulses.filter(\.running).count, 1)
     }
@@ -118,16 +118,6 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertGreaterThan(image.count(green), 0)
         XCTAssertGreaterThan(image.count(yellow), 0)
         XCTAssertGreaterThan(image.count(white), 100, "title, names and figures")
-    }
-
-    func testResetIsSaidWithTheTimeTodayAndTheDayOtherwise() {
-        // `now` is mid-afternoon in Europe and mid-day in UTC: a minute later is the same day.
-        let today = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(60)), now: now)
-        XCTAssertTrue(today.hasPrefix("si azzera alle "), today)
-        let later = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(3 * 86_400)), now: now)
-        XCTAssertTrue(later.hasPrefix("si azzera ") && !later.contains("alle"), later)
-        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(-1)), now: now), "", "already reset")
-        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: nil), now: now), "")
     }
 
     func testHoverCardHangsUnderTheBarsOnlyWhenAllowed() throws {

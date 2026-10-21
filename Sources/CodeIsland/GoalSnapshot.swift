@@ -44,6 +44,11 @@ enum GoalSnapshot {
                         NotchNotificationView(event: event, phase: .settle, rows: store.rows, requests: store.requests)
                     }, "03-notifica-\(name)-cambia")
                     try save(island(width: closedWidth, radius: 12, mark: event) { EmptyView() }, "04-notifica-\(name)-sparisce")
+                    if let notice = event.notice(rows: store.rows, requests: store.requests) {
+                        let short = event.notice(rows: store.rows, requests: store.requests, withSession: false)
+                        try save(island(width: closedWidth, radius: 12, notice: notice, noticeShort: short) { EmptyView() },
+                                 "18-avviso-\(name)")
+                    }
                 }
                 let pages = store.rows.pages
                 if pages.count > 1 {
@@ -131,15 +136,16 @@ enum GoalSnapshot {
 
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
-    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, cardOpen: Bool = false,
+    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
                                             voice: (level: Float, phase: Double)? = nil,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
-                layout: .standard(hasNotch: true), hasNotch: true, notchWidth: notchWidth,
+                // The notice stands where the goal chased now does: the centre of a screen without a notch (#39).
+                layout: .standard(hasNotch: notice == nil), hasNotch: notice == nil, notchWidth: notchWidth,
                 data: NotchZoneData(rows: GoalStore.shared.rows, accounts: AccountQuotaFeed.shared.accounts,
                                     inUse: AccountsInUseFeed.shared.emails, now: GoalStore.shared.now,
-                                    barHeight: notchHeight, mark: mark, accountsCardOpen: cardOpen)
+                                    barHeight: notchHeight, mark: mark, notice: notice, noticeShort: noticeShort, accountsCardOpen: cardOpen)
             )
             .frame(maxWidth: .infinity)
             below()

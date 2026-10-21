@@ -96,7 +96,9 @@ private struct AccountCard: View {
     }
 }
 
-/// «5 ore ▬▬── 4%»: no reading, or the window already reset, is no percentage (Macchine's rule).
+/// «5 ore ▬▬── 4% ↻ 2:41:07»: no reading, or the window already reset, is no percentage (Macchine's rule).
+/// Name, figure and countdown each sit in a column as wide as their longest text, measured, never cut:
+/// the bars of every row line up and take the room left.
 struct QuotaMeter: View {
     let name: String
     let window: QuotaWindow
@@ -104,14 +106,58 @@ struct QuotaMeter: View {
 
     var body: some View {
         let used = window.usedNow(now)
-        HStack(spacing: 8) {
-            Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
+        HStack(spacing: 6) {
+            Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary)
+                .sized(like: Text("Settimana").font(NotchType.small), alignment: .leading)
             GoalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used), height: 4)
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
-                .font(.system(size: 11, weight: (used ?? 0) >= 90 ? .semibold : .regular).monospacedDigit())
+                .font(Self.figureFont(used))
                 .foregroundStyle((used ?? 0) >= 90 ? GoalTone.stop.color : GoalInk.row)
-                .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
+                .sized(like: Text("100%").font(Self.figureFont(100)), alignment: .trailing)
+            Group {
+                if let reset = window.reset { ResetCountdownLabel(reset: reset) } else { Color.clear }
+            }
+            .sized(like: ResetCountdownLabel.Face(text: ResetCountdown.longest), alignment: .trailing)
         }
+    }
+
+    private static func figureFont(_ used: Double?) -> Font {
+        .system(size: 11, weight: (used ?? 0) >= 90 ? .semibold : .regular).monospacedDigit()
+    }
+}
+
+/// «↻ 2:41:07»: time left to the window's reset, ticking each second only while it is on screen.
+struct ResetCountdownLabel: View {
+    let reset: Date
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let text = ResetCountdown.text(until: reset, now: context.date)
+            Face(text: text)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Si azzera tra " + text)
+        }
+    }
+
+    struct Face: View {
+        let text: String
+
+        var body: some View {
+            HStack(spacing: 3) {
+                Image(systemName: "arrow.clockwise").font(.system(size: 9, weight: .semibold))
+                Text(text).font(.system(size: 11).monospacedDigit())
+            }
+            .foregroundStyle(GoalInk.secondary)
+            .lineLimit(1)
+            .fixedSize()
+        }
+    }
+}
+
+private extension View {
+    /// As wide as `template` drawn whole (it stays invisible): a column that fits its longest text.
+    func sized<T: View>(like template: T, alignment: Alignment) -> some View {
+        template.fixedSize().hidden().overlay(alignment: alignment) { self.fixedSize() }
     }
 }

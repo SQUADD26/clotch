@@ -7,7 +7,7 @@ enum NotchAnimation {
 
     /// 展开面板：微弹，有少许回弹感
     static var open: Animation {
-        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: 0.86)
+        reduce ? NotchMotion.still : .spring(response: NotchAnimationMetrics.openResponse, dampingFraction: NotchMotion.damping)
     }
     /// 收起面板：临界阻尼，无过冲（防止 NotchPanelShape 底边露出刘海）
     static var close: Animation {

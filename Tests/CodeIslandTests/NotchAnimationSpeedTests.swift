@@ -80,6 +80,6 @@ final class NotchAnimationSpeedTests: XCTestCase {
 
         UserDefaults.standard.set(2.0, forKey: SettingsKey.notchCloseSpeed)
         XCTAssertNotEqual(NotchAnimation.close, slowClose)
-        XCTAssertEqual(NotchAnimation.open, Animation.spring(response: 0.42, dampingFraction: 0.82))
+        XCTAssertEqual(NotchAnimation.open, Animation.spring(response: 0.42, dampingFraction: NotchMotion.damping))
     }
 }

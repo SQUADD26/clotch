@@ -1,7 +1,7 @@
 # Architecture — goal-notch
 
 ## What the project is
-A macOS notch app that shows only the goals of Roberto's master Claude sessions and whether each goal is getting closer (issue #1). It is a fork of CodeIsland (MIT, Swift): the notch shell, window and open/close motion come from CodeIsland; the content is replaced by the goal list. Display name `Goal Notch`, bundle id `com.squadd.goalnotch`.
+A macOS notch app that shows only the goals of Roberto's master Claude sessions and whether each goal is getting closer (issue #1). It is a fork of CodeIsland (MIT, Swift): the notch shell, window and open/close motion come from CodeIsland; the content is replaced by the goal list. App name `Clotch`, bundle id `com.squadd.clotch` (issue #30; until then `Goal Notch`, `com.squadd.goalnotch`). A normal app: Dock icon while it runs, app menu with Impostazioni… (Cmd+,) and Esci (Cmd+Q), a Dock click opens the settings. At the first launch `Sources/CodeIsland/main.swift` copies the old `com.squadd.goalnotch` UserDefaults once, without overwriting (`CodeIslandCore/LegacyDefaults.swift`).
 
 ## Backend and where it runs
 No backend. The app runs on Roberto's Mac only and reads local files, read-only. Its only write is its own cache, `~/Library/Application Support/Goal Notch/sessions-v<N>.json` (stat and parsed fields of each session file, so a restart re-parses only changed files; safe to delete). One exception, on Roberto's click (issue #20): «Accetta» / «Rifiuta» on a proposed goal run `python3 ~/.claude/hooks/obiettivo-guard.py conferma|rifiuta --sessione <cli>` (claude-config#1807) without `CLAUDE_CODE_SESSION_ID`, which write `~/.claude/obiettivi/` (`CodeIslandCore/GoalDecision.swift`); a rejected proposal is also hidden at once through UserDefaults `goalnotch.rejectedProposals`. Otherwise it writes nothing into `~/.claude`, `~/.codex` or other agent configs (CodeIsland's hook installer, hook socket server, agent watchers and companion bridges are not started at launch).
@@ -31,15 +31,15 @@ Real time: one FSEvents stream with file-level events, batched by FSEvents to on
 
 ## Build
 - Swift package (`Package.swift`, macOS 14+, Sparkle and Yams via SwiftPM).
-- `./build.sh` on a Mac with Xcode: `swift build -c release --arch arm64`, then assembles `.build/release/CodeIsland.app` (executable name stays `CodeIsland`), ad-hoc signed unless `SIGN_ID` or a Developer ID is found.
-- `CodeIsland.app/Contents/MacOS/CodeIsland --snapshot <dir> [--gallery]` renders the real notch from the live data to PNG and quits: closed, open, and with `--gallery` three frames of each notification today's data can produce (`GoalSnapshot.swift`). ImageRenderer cannot sample a backdrop, so the glass shows as its stand-in there; the real glass shows only in the running app.
+- `./build.sh` on a Mac with Xcode: `swift build -c release --arch arm64`, then assembles `.build/release/Clotch.app` (executable `Clotch`; the SwiftPM product and the sources keep the name `CodeIsland`). App icon: `AppIcon.icon` and `Sources/CodeIsland/Resources/AppIcon.icns` (the Clotch logo of #31 replaces both), ad-hoc signed unless `SIGN_ID` or a Developer ID is found.
+- `Clotch.app/Contents/MacOS/Clotch --snapshot <dir> [--gallery]` renders the real notch from the live data to PNG and quits: closed, open, and with `--gallery` three frames of each notification today's data can produce (`GoalSnapshot.swift`). ImageRenderer cannot sample a backdrop, so the glass shows as its stand-in there; the real glass shows only in the running app.
 - Linux sandboxes cannot build the app. They can run the goal logic tests: `bash scripts/test-goals-linux.sh`.
 
 ## Domains, ports, machines
 None. No network service, no ports. Runs only on Roberto's Mac; developed in the `squaddv2` sandbox.
 
 ## Branches and path to production
-Work branches → PR into `dev` → promotion PR `dev` → `main`. "Production" is the app built from `main` and run on the Mac. No migrations, functions or deploys. Auto-update (Sparkle) is off: there is no feed URL.
+Work branches → PR into `dev` → promotion PR `dev` → `main`. "Production" is the app built from `main` and run on the Mac. No migrations, functions or deploys. Auto-update (Sparkle) is off: no `SUFeedURL`, no CodeIsland signing key in `Info.plist`, no update button in About, so Clotch can never download the original CodeIsland app.
 
 ## Secrets
 None.
