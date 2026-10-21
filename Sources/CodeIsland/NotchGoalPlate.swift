@@ -96,6 +96,7 @@ struct GoalPage: View {
                     HStack(spacing: 6) {
                         Image(systemName: "stopwatch").font(.system(size: 15)).foregroundStyle(GoalInk.strong)
                         WorkTimer(since: since, until: row.workEnd)
+                            .font(NotchType.timer).tracking(0.24).foregroundStyle(GoalInk.row)
                     }
                     .accessibilityElement(children: .combine)
                 }
