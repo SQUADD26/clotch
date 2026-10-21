@@ -56,6 +56,26 @@ final class VoiceFilesTests: XCTestCase {
         XCTAssertTrue(files.isOn)
     }
 
+    func testMaskedShowsOnlyTheTail() throws {
+        XCTAssertNil(files.masked(files.keyURL))
+        try files.saveKey("sk_abcdefgh3f9a")
+        XCTAssertEqual(files.masked(files.keyURL), "••••••••••••3f9a")
+    }
+
+    func testOwnPromptWinsAndResets() throws {
+        try put("Sei la voce.\n", files.promptURL)
+        try files.savePrompt("  Parla piano.  ")
+        XCTAssertEqual(files.prompt, "Parla piano.")
+        XCTAssertTrue(files.hasOwnPrompt)
+        XCTAssertEqual(try mode(files.ownPromptURL), 0o600)
+        try files.savePrompt("Sei la voce.")  // the config's own text: no copy kept
+        XCTAssertFalse(files.hasOwnPrompt)
+        try files.savePrompt("Altro.")
+        try files.resetPrompt()
+        XCTAssertEqual(files.prompt, "Sei la voce.")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.ownPromptURL.path))
+    }
+
     func testPromptIsTheConfigFile() throws {
         XCTAssertNil(files.prompt, "no config file: silence, no stock copy")
         XCTAssertEqual(files.promptURL.path, home.appendingPathComponent(".claude/mods/clean-view/hooks/voce-parlatore.md").path)
