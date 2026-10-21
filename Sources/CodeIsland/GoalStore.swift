@@ -73,9 +73,12 @@ private final class GoalWatcher: @unchecked Sendable {
             path.contains("claude-code-sessions") || prefixes.contains { path.hasPrefix($0) }
         }
         // A new Claude app folder (another account) brings a session store the loader does not know yet.
+        // String checks only: foreign apps write under Application Support all the time.
         let newRoot = paths.contains { p in
-            let u = URL(fileURLWithPath: p)
-            return u.deletingLastPathComponent().path == support && u.lastPathComponent.lowercased().hasPrefix("claude")
+            guard p.hasPrefix(support + "/") else { return false }
+            var name = p.dropFirst(support.count + 1)
+            if name.hasSuffix("/") { name = name.dropLast() }
+            return !name.contains("/") && name.lowercased().hasPrefix("claude")
         }
         if rescan || newRoot { changed = nil } else { changed?.formUnion(hits) }
         if rescan || newRoot || !hits.isEmpty {
@@ -135,6 +138,8 @@ private final class GoalWatcher: @unchecked Sendable {
     private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
     private var timer: Timer?
+    /// One-shot, at `GoalBoard.nextChange`: the only time the board is rebuilt without a change on disk.
+    private var deadline: Timer?
 
     func start() {
         guard watcher == nil else { return }
@@ -143,9 +148,9 @@ private final class GoalWatcher: @unchecked Sendable {
         }
         watcher = w
         w.start()
-        // Time alone turns a goal yellow (30 min idle), so re-evaluate even when nothing changes on disk.
+        // The tick moves only the "since …" text; status changes due to time alone come from `deadline`.
         let t = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refresh(tick: true) }
+            Task { @MainActor in self?.now = Date() }
         }
         t.tolerance = 5
         RunLoop.main.add(t, forMode: .common)
@@ -174,11 +179,21 @@ private final class GoalWatcher: @unchecked Sendable {
         takenToAnimate.removeAll { $0 == id }
     }
 
-    private func refresh(tick: Bool = false) {
+    private func refresh() {
         let t = Date()
         let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t)
-        guard tick || next != rows else { return }
+        deadline?.invalidate()
+        deadline = nil
+        if timer != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {
+            let d = Timer(fire: at.addingTimeInterval(1), interval: 0, repeats: false) { [weak self] _ in
+                Task { @MainActor in self?.refresh() }
+            }
+            d.tolerance = 5
+            RunLoop.main.add(d, forMode: .common)
+            deadline = d
+        }
+        guard next != rows else { return }
         now = t
-        if next != rows { rows = next }
+        rows = next
     }
 }

@@ -86,3 +86,13 @@ public enum AccountQuotas {
         }
     }
 }
+
+public enum AccountsInUse {
+    /// Each account's desktop app is its own bundle «Claude <email>.app» (file names carry the full-width ＠);
+    /// plain «Claude.app» names no account. The email matches a dashboard row exactly, never by label.
+    public static func email(bundleName: String) -> String? {
+        guard bundleName.hasPrefix("Claude "), bundleName.hasSuffix(".app") else { return nil }
+        let email = bundleName.dropFirst(7).dropLast(4).replacingOccurrences(of: "＠", with: "@")
+        return email.contains("@") && !email.contains(" ") ? email : nil
+    }
+}

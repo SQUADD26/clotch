@@ -17,7 +17,7 @@ public struct GoalRecord: Equatable, Sendable {
 }
 
 /// One local_*.json of the Claude desktop app.
-public struct DesktopSession: Equatable, Sendable {
+public struct DesktopSession: Equatable, Sendable, Codable {
     public let localId: String
     public let cliId: String
     public let parentLocalId: String?
@@ -139,17 +139,35 @@ public enum GoalBoard {
         }
     }
 
-    /// The CLI ids whose live state can matter: every member of a shown goal's family.
-    /// `GoalSources.load` reads only these live files, never the whole folder.
-    public static func liveIds(goals: [GoalRecord], sessions: [DesktopSession]) -> Set<String> {
+    /// What a shown goal can read. `sessions`: the local ids of every master and descendant, archived links
+    /// included, so `rows` over just these sessions (in their original order) equals `rows` over all of them.
+    /// `live`: the CLI ids whose live state can matter; `GoalSources.load` reads only these live files.
+    public static func reach(goals: [GoalRecord], sessions: [DesktopSession]) -> (sessions: Set<String>, live: Set<String>) {
         let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
-        var ids = Set<String>()
+        var reached = Set<String>(), live = Set<String>()
         for g in goals where shown.contains(g.state) {
-            ids.insert(g.cli)
-            for s in family(of: masters[g.cli] ?? g.successor.flatMap { masters[$0] }, children: children) { ids.insert(s.cliId) }
+            live.insert(g.cli)
+            let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
+            for s in family(of: master, children: children, archived: true) {
+                reached.insert(s.localId)
+                if s.localId == master?.localId || !s.isArchived { live.insert(s.cliId) }
+            }
         }
-        return ids
+        return (reached, live)
+    }
+
+    /// The first instant after `now` when time alone can change a row (30 min of silence turns it still,
+    /// a silent subagent stops counting): the store recomputes then, never on a periodic tick.
+    public static func nextChange(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> Date? {
+        let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        var times = goals.compactMap(\.at)
+        for s in sessions {
+            if let t = s.lastActivity { times.append(t) }
+            guard let l = liveByCli[s.cliId] else { continue }
+            times += [l.updated].compactMap { $0 } + l.agents.compactMap(\.lastActivity)
+        }
+        return times.map { $0.addingTimeInterval(stillAfter) }.filter { $0 > now }.min()
     }
 
     /// cli id -> session. A goal keeps the cli it was set under, so a session that changed id (/clear, resume)
@@ -162,15 +180,15 @@ public enum GoalBoard {
         return out
     }
 
-    /// Master + every non-archived descendant (visited set = cycle-safe).
-    static func family(of master: DesktopSession?, children: [String: [DesktopSession]]) -> [DesktopSession] {
+    /// Master + every non-archived descendant (visited set = cycle-safe); `archived`: every visited one.
+    static func family(of master: DesktopSession?, children: [String: [DesktopSession]], archived: Bool = false) -> [DesktopSession] {
         var family: [DesktopSession] = master.map { [$0] } ?? []
         var seen = Set(family.map(\.localId))
         var queue = family
         while let s = queue.popLast() {
             for c in children[s.localId] ?? [] where seen.insert(c.localId).inserted {
                 queue.append(c)
-                if !c.isArchived { family.append(c) }
+                if archived || !c.isArchived { family.append(c) }
             }
         }
         return family

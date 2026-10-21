@@ -46,4 +46,14 @@ final class AccountQuotaTests: XCTestCase {
                                fiveHour: QuotaWindow(used: 50, reset: nil), sevenDay: QuotaWindow(used: 1, reset: nil))
         XCTAssertEqual(AccountQuotas.merge(real: [real], rows: [row], now: now).first?.fiveHour.used, 50)
     }
+
+    /// Bundle names as they run on Roberto's Mac (ps, 2026-10-21).
+    func testAccountInUseFromAppBundleName() {
+        XCTAssertEqual(AccountsInUse.email(bundleName: "Claude amministrazione＠squaddcrm.com.app"), "amministrazione@squaddcrm.com")
+        XCTAssertEqual(AccountsInUse.email(bundleName: "Claude claudesquadd1＠gmail.com.app"), "claudesquadd1@gmail.com")
+        XCTAssertEqual(AccountsInUse.email(bundleName: "Claude supporto@squaddcrm.com.app"), "supporto@squaddcrm.com")
+        XCTAssertNil(AccountsInUse.email(bundleName: "Claude.app"), "the plain app names no account")
+        XCTAssertNil(AccountsInUse.email(bundleName: "Claude Helper.app"))
+        XCTAssertNil(AccountsInUse.email(bundleName: "Claude a＠b.com"), "not an app bundle")
+    }
 }
