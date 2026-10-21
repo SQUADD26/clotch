@@ -132,6 +132,7 @@ struct NotchPanelView: View {
     @AppStorage(SettingsKey.hapticIntensity) private var hapticIntensity = SettingsDefaults.hapticIntensity
     @AppStorage(SettingsKey.showSessionRecap) private var showSessionRecap = SettingsDefaults.showSessionRecap
     @AppStorage(SettingsKey.hoverExpandDelay) private var hoverExpandDelay = SettingsDefaults.hoverExpandDelay
+    @AppStorage(ClotchPrefs.openOnHover) private var openOnHover = ClotchPrefs.openOnHoverDefault
     @AppStorage(SettingsKey.showProjectName) private var showProjectName = SettingsDefaults.showProjectName
 
     /// Delayed hover: prevents accidental expansion when mouse passes through
@@ -296,6 +297,12 @@ struct NotchPanelView: View {
         )
     }
 
+    /// With «Apri al passaggio del mouse» off, a click on the closed notch opens it (#56).
+    private func openOnClick() {
+        guard !openOnHover, !appState.surface.isExpanded else { return }
+        withAnimation(NotchAnimation.open) { appState.surface = .sessionList }
+    }
+
     /// Delay full expansion to avoid accidental triggers.
     private func scheduleHoverExpand() {
         hoverTimer?.invalidate()
@@ -379,6 +386,7 @@ struct NotchPanelView: View {
             .background(panelShape.fill(.black))
             // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
+            .simultaneousGesture(TapGesture().onEnded { openOnClick() })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
             .onChange(of: showToolStatus) { _, newValue in
@@ -462,7 +470,7 @@ struct NotchPanelView: View {
                     withAnimation(NotchAnimation.hoverPrehover) {
                         hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseEntered)
                     }
-                    scheduleHoverExpand()
+                    if openOnHover { scheduleHoverExpand() }  // off: a click opens it (#56)
                 } else {
                     // Reverse the prehover acknowledgement right away…
                     withAnimation(NotchAnimation.hoverPrehover) {
