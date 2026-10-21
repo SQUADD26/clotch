@@ -51,6 +51,12 @@ extension GoalRow {
         pulses.first { $0.kind == .master }.flatMap { ClaudeDesktopCodeSession.deepLinkURL(hostSessionId: $0.id) }
     }
 
+    /// When work stopped: a still goal's counter stops at the moment it went still, it does not keep counting.
+    var workEnd: Date? {
+        if case .still(let at) = status { return at }
+        return nil
+    }
+
     /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
         switch status {
@@ -171,17 +177,25 @@ extension GoalRing {
 // MARK: - Work time
 
 /// «2:04:17» since the goal took its present text. Ticks once a second, and only while it is on
-/// screen (TimelineView): the closed notch never shows it, so it costs nothing at rest.
+/// screen (TimelineView): the closed notch never shows it, so it costs nothing at rest. With `until`
+/// (work stopped) it is a fixed figure and no clock runs.
 struct WorkTimer: View {
     let since: Date
+    var until: Date? = nil
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { ctx in
-            Text(GoalRow.clock(from: since, to: ctx.date))
-                .font(NotchType.timer)
-                .tracking(0.24)
-                .foregroundStyle(GoalInk.row)
+        if let until {
+            figure(until)
+        } else {
+            TimelineView(.periodic(from: .now, by: 1)) { ctx in figure(ctx.date) }
         }
+    }
+
+    private func figure(_ end: Date) -> some View {
+        Text(GoalRow.clock(from: since, to: end))
+            .font(NotchType.timer)
+            .tracking(0.24)
+            .foregroundStyle(GoalInk.row)
     }
 }
 

@@ -67,7 +67,7 @@ struct GoalPage: View {
                 if let since = row.since, !row.proposed {
                     HStack(spacing: 6) {
                         Image(systemName: "stopwatch").font(.system(size: 15)).foregroundStyle(GoalInk.strong)
-                        WorkTimer(since: since)
+                        WorkTimer(since: since, until: row.workEnd)
                     }
                     .accessibilityElement(children: .combine)
                 }
