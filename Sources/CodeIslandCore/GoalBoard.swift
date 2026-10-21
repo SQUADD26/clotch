@@ -76,6 +76,19 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
 }
 
+extension GoalRow {
+    /// When the work-time counter stops; nil = it runs. It follows the status only: a moving goal counts
+    /// even with no session marked running (the app often leaves `isRunning` out, #49); a still goal stops
+    /// when it went still; a closed one at its last sign of work.
+    public var workEnd: Date? {
+        switch status {
+        case .moving: return nil
+        case .still(let at): return at
+        case .blocked, .reached: return lastActivity ?? since
+        }
+    }
+}
+
 public enum GoalBoard {
     public static let stillAfter: TimeInterval = 30 * 60
     /// Register states the notch shows; a new or unknown state stays hidden until it is added here.
@@ -225,6 +238,14 @@ public enum GoalBoard {
         let live = rows.filter { !$0.closed }
         let toConfirm = live.filter { r in r.proposal.map { !rejected.contains(GoalDecision.key(cli: r.id, text: $0)) } ?? false }
         return (live.filter { !$0.proposed }, toConfirm, rows.count - live.count)
+    }
+
+    /// The open Goals tab keeps its order (#36): ids already shown keep their place, new ones go at the end,
+    /// gone ones leave. So arrivals never move the page Roberto is reading.
+    public static func keepOrder(_ shown: [String], _ fresh: [String]) -> [String] {
+        let live = Set(fresh)
+        let kept = shown.filter(live.contains)
+        return kept + fresh.filter { !kept.contains($0) }
     }
 
     static func firstWords(_ t: String, _ n: Int = 6) -> String {

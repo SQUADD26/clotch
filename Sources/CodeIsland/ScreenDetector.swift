@@ -1,4 +1,5 @@
 import AppKit
+import CodeIslandCore
 
 struct ScreenDetector {
     struct Candidate {
@@ -161,7 +162,7 @@ struct ScreenDetector {
     /// Index of the screen the choice names. nil = "auto", or the named screen is gone: the caller falls back to `preferredScreen`.
     static func selectedIndex(choice: String, frames: [CGRect], mouse: CGPoint) -> Int? {
         if choice == followMouseChoice {
-            return frames.firstIndex { $0.contains(mouse) }
+            return NotchScreenPick.index(of: mouse, in: frames)
         }
         if choice.hasPrefix(fixedPrefix) {
             let target = String(choice.dropFirst(fixedPrefix.count))
@@ -201,7 +202,7 @@ struct ScreenDetector {
                   rect.height > 0 else { continue }
             guard pid != ownPID else { continue }
             if let preferredPID, pid != preferredPID { continue }
-            return rect
+            return cocoa(rect)
         }
 
         guard preferredPID != nil else { return nil }
@@ -215,9 +216,14 @@ struct ScreenDetector {
                   let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary),
                   rect.width > 0,
                   rect.height > 0 else { continue }
-            return rect
+            return cocoa(rect)
         }
 
         return nil
+    }
+
+    /// CGWindowList bounds are y-down from the primary screen's top; NSScreen frames are y-up (#35).
+    private static func cocoa(_ quartz: CGRect) -> CGRect {
+        NotchScreenPick.cocoaRect(fromQuartz: quartz, primaryHeight: NSScreen.screens.first?.frame.height ?? 0)
     }
 }

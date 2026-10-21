@@ -25,6 +25,15 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }
 
+    /// How a request looks, the one place that decides it (#39): taken = at work, never struck; struck and ticked only once done.
+    public enum Look: Equatable, Sendable {
+        case waiting, working, done
+        public var label: String { switch self { case .waiting: "In attesa"; case .working: "Presa in carico"; case .done: "Fatta" } }
+        public var struck: Bool { self == .done }
+    }
+
+    public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : .waiting }
+
     /// The requests Roberto still waits on: the Requests tab shows only these (taken ones are announced once, then hidden).
     public static func waiting(_ all: [UserRequest]) -> [UserRequest] { all.filter { !$0.taken } }
 
@@ -38,16 +47,30 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
 }
 
 extension GoalSources {
+    /// Only tasks (#61): a chat question or a note (`tipo` "domanda" / "nota", claude-config#1825) is never a request
+    /// taken in charge, so the notch drops it here, the one place that reads the file. No `tipo` = a task.
     public static func parseRequest(_ data: Data) -> UserRequest? {
         guard let d = object(data), let id = d["id"] as? String, !id.isEmpty,
-              let text = d["testo"] as? String else { return nil }
+              let text = d["testo"] as? String,
+              !["domanda", "nota"].contains(d["tipo"] as? String ?? "compito") else { return nil }
         return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
-                           text: text.split(whereSeparator: \.isWhitespace).joined(separator: " "),
+                           text: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
                            original: d["originale"] as? String ?? text,
                            state: d["stato"] as? String ?? "nuova", takenAt: date(d["t_presa"]),
                            takenBy: d["presa_da"] as? String ?? "", doneAt: date(d["t_fatta"]),
                            proof: d["prova"] as? String ?? "", notOurs: d["non_nostra"] as? Bool ?? false,
                            folder: d["cartella"] as? String ?? "", localId: d["local_id"] as? String ?? "")
+    }
+
+    /// Real text only (#39): blocks like <system-reminder>…</system-reminder> or <pasted_content …>…, an unclosed one up to
+    /// the end, and stray tags removed; the first piece left (its first line with `firstLine`), spaces collapsed.
+    /// nil when nothing is left, never a raw tag.
+    static func headline(_ s: String, firstLine: Bool = false) -> String? {
+        let bare = s.replacingOccurrences(of: #"(?s)<([A-Za-z_][\w-]*)\b[^>]*>(.*?</\1\s*>|.*$)"#, with: "\u{0}", options: .regularExpression)
+            .replacingOccurrences(of: #"</?[A-Za-z_][^>]*>"#, with: "\u{0}", options: .regularExpression)
+        return bare.split(whereSeparator: { $0 == "\u{0}" || (firstLine && $0.isNewline) }).lazy
+            .map { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }
+            .first { !$0.isEmpty }
     }
 }

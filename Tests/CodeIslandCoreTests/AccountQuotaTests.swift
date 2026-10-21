@@ -57,3 +57,20 @@ final class AccountQuotaTests: XCTestCase {
         XCTAssertNil(AccountsInUse.email(bundleName: "Claude a＠b.com"), "not an app bundle")
     }
 }
+
+final class ResetCountdownTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_792_590_000)
+    private func text(_ seconds: Double) -> String { ResetCountdown.text(until: now.addingTimeInterval(seconds), now: now) }
+
+    func testFormat() {
+        XCTAssertEqual(text(7), "0:00:07", "seconds")
+        XCTAssertEqual(text(251), "0:04:11", "minutes")
+        XCTAssertEqual(text(9667), "2:41:07", "hours")
+        XCTAssertEqual(text(183_851), "2 g 3:04:11", "days")
+        XCTAssertEqual(text(86_400), "1 g 0:00:00")
+        XCTAssertEqual(text(0.4), "0:00:01", "a partial second still counts")
+        XCTAssertEqual(text(0), "adesso")
+        XCTAssertEqual(text(-90), "adesso", "past")
+        XCTAssertEqual(text(863_999), ResetCountdown.longest, "the widest a weekly window can show")
+    }
+}

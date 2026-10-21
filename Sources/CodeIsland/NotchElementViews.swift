@@ -39,20 +39,36 @@ private struct GoalRingsElement: View {
     }
 }
 
-/// The goal chased now and, when a source gives it, how long work on it has run. `Text(_, style: .timer)`
-/// is drawn by the system: no timer of ours.
+/// The goal chased now and, when a source gives it, how long work on it has run (`WorkTimer`).
 private struct ActiveGoalElement: View {
     let data: NotchZoneData
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        Group {
+            if let notice = data.notice {
+                // The session follows the title only when both fit; else the title alone, cut with «…».
+                ViewThatFits(in: .horizontal) {
+                    Text(notice).fixedSize()
+                    Text(data.noticeShort ?? notice).lineLimit(1).truncationMode(.tail)
+                }
+                .font(NotchType.name).foregroundStyle(GoalInk.primary)
+                .transition(.blurFade)
+            } else {
+                goal.transition(.blurFade)
+            }
+        }
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: data.notice)
+    }
+
+    @ViewBuilder private var goal: some View {
         if let hero = data.rows.hero {
             HStack(spacing: 10) {
                 if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail) }
                 if let since = data.workingSince {
                     HStack(spacing: 5) {
                         Image(systemName: "stopwatch").font(.system(size: 15))
-                        // Work stopped (still, or no session at work): a fixed figure, no clock.
-                        (hero.workEnd.map { Text(GoalRow.clock(from: since, to: $0)) } ?? Text(since, style: .timer))
+                        WorkTimer(since: since, until: hero.workEnd)
                             .font(NotchType.name.monospacedDigit()).tracking(0.26)
                     }
                     .foregroundStyle(Color.white.opacity(0.75))

@@ -94,6 +94,33 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
     }
 
+    func testTitleIsRealTextNeverATag() {
+        func title(_ testo: String, _ originale: String = "") -> String {
+            let json = try! JSONSerialization.data(withJSONObject: ["id": "Q-1", "testo": testo, "originale": originale])
+            return GoalSources.parseRequest(json)!.text
+        }
+        XCTAssertEqual(title("Correggere   notch"), "Correggere notch", "the short title, spaces collapsed")
+        XCTAssertEqual(title("<system-reminder>Attribution…</system-reminder>\nAprire tunnel Cloudflare"), "Aprire tunnel Cloudflare")
+        XCTAssertEqual(title("<system-reminder>", "Aprire tunnel\nper colleghi"), "Aprire tunnel", "the original gives its first line")
+        XCTAssertEqual(title("<system-reminder>", "<system-reminder>x</system-reminder>\n\nAprire tunnel"), "Aprire tunnel",
+                       "an unclosed tag in the short title: the first real line of the original")
+        XCTAssertEqual(title(#"<pasted_content id="a">log</pasted_content> Guarda questo"#), "Guarda questo")
+        XCTAssertEqual(title("<system-reminder>", "<system-reminder>solo tag"), "una richiesta", "nothing real left")
+    }
+
+    func testLookStrikesOnlyWhenDone() {
+        func look(_ stato: String) -> UserRequest.Look {
+            GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "\#(stato)"}"#))!.look
+        }
+        XCTAssertEqual(look("nuova"), .waiting)
+        XCTAssertEqual(look("presa"), .working)
+        XCTAssertFalse(look("presa").struck, "taken = at work, not struck (#39)")
+        XCTAssertEqual(look("presa").label, "Presa in carico")
+        XCTAssertEqual(look("fatta"), .done)
+        XCTAssertTrue(look("fatta").struck)
+        XCTAssertEqual(look("fatta").label, "Fatta")
+    }
+
     // MARK: folders
 
     func testLoadReadsRequestsAndSkipsTempFiles() throws {
@@ -143,5 +170,37 @@ final class NotchFeedsTests: XCTestCase {
         }
         XCTAssertEqual(UserRequest.waiting(all).map(\.id), ["Q-0", "Q-3"])
         XCTAssertEqual(UserRequest.waiting([]), [])
+    }
+
+    /// #61: a question in chat or a note is never «presa in carico»: no row, no count, no notice. No `tipo` = a task.
+    func testOnlyTasksAreRequests() {
+        func parse(_ tipo: String) -> UserRequest? {
+            GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "presa"\#(tipo)}"#))
+        }
+        XCTAssertNil(parse(#", "tipo": "domanda""#))
+        XCTAssertNil(parse(#", "tipo": "nota""#))
+        XCTAssertEqual(parse(#", "tipo": "compito""#)?.look, .working)
+        XCTAssertEqual(parse("")?.look, .working, "an old file without tipo is a task")
+    }
+
+    func testQuestionTakenOnDiskNeverAnnounced() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("feeds-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
+        for (id, tipo) in [("Q-d", "domanda"), ("Q-n", "nota"), ("Q-c", "compito")] {
+            try data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "nuova", "tipo": "\#(tipo)"}"#)
+                .write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        let before = GoalSources.load(paths).requests
+        XCTAssertEqual(before.map(\.id), ["Q-c"])
+        for (id, tipo) in [("Q-d", "domanda"), ("Q-n", "nota"), ("Q-c", "compito")] {
+            try data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "presa", "tipo": "\#(tipo)"}"#)
+                .write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        let after = GoalSources.load(paths).requests
+        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-c"], "only the task is announced")
+        XCTAssertEqual(UserRequest.waiting(after), [])
     }
 }

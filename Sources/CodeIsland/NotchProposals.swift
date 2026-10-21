@@ -34,7 +34,7 @@ private struct ProposalLine: View {
         HStack(alignment: .center, spacing: NotchSpace.section) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1)
-                GoalText(text: text, expanded: open)
+                EditableGoalText(row: row, text: text, expanded: open)
                 if store.acceptFailed.contains(row.id) {
                     Text("Non accettato. Riprova.").font(NotchType.caption).foregroundStyle(GoalTone.stop.color)
                 }
