@@ -1,18 +1,19 @@
 import XCTest
+import SwiftUI
 @testable import CodeIsland
 
 final class NotchAnimationSpeedTests: XCTestCase {
-    private var previousStoredSpeed: Any?
+    private let keys = [SettingsKey.notchOpenSpeed, SettingsKey.notchCloseSpeed]
+    private var previous: [String: Any] = [:]
 
     override func setUp() {
-        previousStoredSpeed = UserDefaults.standard.object(forKey: SettingsKey.notchAnimationSpeed)
+        previous = keys.reduce(into: [:]) { $0[$1] = UserDefaults.standard.object(forKey: $1) }
     }
 
     override func tearDown() {
-        if let previousStoredSpeed {
-            UserDefaults.standard.set(previousStoredSpeed, forKey: SettingsKey.notchAnimationSpeed)
-        } else {
-            UserDefaults.standard.removeObject(forKey: SettingsKey.notchAnimationSpeed)
+        for key in keys {
+            if let value = previous[key] { UserDefaults.standard.set(value, forKey: key) }
+            else { UserDefaults.standard.removeObject(forKey: key) }
         }
     }
 
@@ -48,17 +49,37 @@ final class NotchAnimationSpeedTests: XCTestCase {
         XCTAssertEqual(NotchAnimationMetrics.baseCloseResponse, 0.38, accuracy: 0.0001)
     }
 
-    func testStoredSpeedScalesBothAnimationResponses() {
-        UserDefaults.standard.set(2.0, forKey: SettingsKey.notchAnimationSpeed)
+    func testOpenAndCloseSpeedsAreStoredApart() {
+        UserDefaults.standard.set(2.0, forKey: SettingsKey.notchOpenSpeed)
+        UserDefaults.standard.set(0.5, forKey: SettingsKey.notchCloseSpeed)
 
         XCTAssertEqual(NotchAnimationMetrics.openResponse, 0.21, accuracy: 0.0001)
+        XCTAssertEqual(NotchAnimationMetrics.closeResponse, 0.76, accuracy: 0.0001)
+    }
+
+    func testChangingOneSpeedLeavesTheOtherAlone() {
+        UserDefaults.standard.removeObject(forKey: SettingsKey.notchOpenSpeed)
+        UserDefaults.standard.set(2.0, forKey: SettingsKey.notchCloseSpeed)
+
+        XCTAssertEqual(NotchAnimationMetrics.openResponse, 0.42, accuracy: 0.0001)
         XCTAssertEqual(NotchAnimationMetrics.closeResponse, 0.19, accuracy: 0.0001)
     }
 
-    func testMissingStoredSpeedUsesNormalResponses() {
-        UserDefaults.standard.removeObject(forKey: SettingsKey.notchAnimationSpeed)
+    func testMissingStoredSpeedsUseNormalResponses() {
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
 
         XCTAssertEqual(NotchAnimationMetrics.openResponse, 0.42, accuracy: 0.0001)
         XCTAssertEqual(NotchAnimationMetrics.closeResponse, 0.38, accuracy: 0.0001)
+    }
+
+    func testStoredSpeedsChangeTheAnimationsThePanelUses() {
+        UserDefaults.standard.set(1.0, forKey: SettingsKey.notchOpenSpeed)
+        UserDefaults.standard.set(1.0, forKey: SettingsKey.notchCloseSpeed)
+        let slowClose = Animation.spring(response: NotchAnimationMetrics.closeResponse, dampingFraction: 1.0)
+        XCTAssertEqual(NotchAnimation.close, slowClose)
+
+        UserDefaults.standard.set(2.0, forKey: SettingsKey.notchCloseSpeed)
+        XCTAssertNotEqual(NotchAnimation.close, slowClose)
+        XCTAssertEqual(NotchAnimation.open, Animation.spring(response: 0.42, dampingFraction: 0.82))
     }
 }
