@@ -2,7 +2,7 @@ import SwiftUI
 import ClotchCore
 
 // The pull requests under a goal (Figma A3, approved): open ones only, one line each: icon, number, title,
-// state. A PR just merged shows once in purple («Unita») with one spring, then leaves.
+// state. A PR just merged shows once: one pass of light across its line, then the line leaves (#86, `PRMergeMotion`).
 
 /// What a PR state looks like and says. Colours are Apple's dark-appearance system tints, like `GoalTone`.
 struct PRLook: Equatable {
@@ -30,9 +30,10 @@ struct PRLook: Equatable {
     }
 }
 
-/// One PR line. A merged one carries the purple band the design shows.
+/// One PR line. A merged one is quieter (done) and lights up as `shine` runs from 0 to 1.
 struct GoalPRRow: View {
     let info: PRInfo
+    var shine: CGFloat = 0
 
     var body: some View {
         let look = PRLook(info.state)
@@ -50,7 +51,7 @@ struct GoalPRRow: View {
                 .frame(minWidth: 30, alignment: .leading)
             Text(info.title)
                 .font(NotchType.body)
-                .foregroundStyle(GoalInk.primary)
+                .foregroundStyle(info.state == .merged ? GoalInk.secondary : GoalInk.primary)
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -61,9 +62,61 @@ struct GoalPRRow: View {
         }
         .padding(.horizontal, NotchSpace.row)
         .padding(.vertical, 5)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(info.state == .merged ? PRLook.purple.opacity(0.14) : .clear))
+        .modifier(Shine(progress: shine, tint: look.color))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Pull request \(info.ref.number), \(info.title), \(look.label)")
+    }
+}
+
+/// A pass of light across a line, drawn only through its own text and symbols, like the Lock screen's
+/// «slide to unlock»: white at the centre, the state's tint at the edges, nothing at 0 and 1.
+private struct Shine: ViewModifier, Animatable {
+    var progress: CGFloat
+    let tint: Color
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        // Always there, so no insertion fades it in mid-pass; at 0 and 1 the band lies outside the mask.
+        content.overlay {
+            GeometryReader { g in
+                let band = max(g.size.width * 0.4, 1)
+                LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: tint.opacity(0.6), location: 0.3),
+                                       .init(color: .white, location: 0.5), .init(color: tint.opacity(0.6), location: 0.7),
+                                       .init(color: .clear, location: 1)],
+                               startPoint: .leading, endPoint: .trailing)
+                    .frame(width: band)
+                    .offset(x: -band + (g.size.width + band) * progress)
+            }
+            .mask(content)
+            .allowsHitTesting(false)
+        }
+    }
+}
+
+/// A line of the list. A merged one plays its moment (`PRMergeMotion`), then asks to leave.
+private struct PRLine: View {
+    let info: PRInfo
+    let onShown: () -> Void
+    @State private var shine: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        GoalPRRow(info: info, shine: shine)
+            .task(id: info.state == .merged ? info.ref : nil) {
+                guard info.state == .merged else { return }
+                // Cancelled when the notch closes: the event waits for the next opening.
+                do {
+                    try await Task.sleep(for: .seconds(PRMergeMotion.delay))
+                    if !reduceMotion {
+                        withAnimation(.timingCurve(0.45, 0, 0.25, 1, duration: PRMergeMotion.shimmer)) { shine = 1 }
+                    }
+                    try await Task.sleep(for: .seconds(PRMergeMotion.stay(reduceMotion: reduceMotion) - PRMergeMotion.delay))
+                } catch { return }
+                withAnimation(NotchMotion.animation(reduce: reduceMotion)) { onShown() }
+            }
     }
 }
 
@@ -75,9 +128,6 @@ struct GoalPRList: View {
     let merged: [PRInfo]
     var onMergedShown: (PRRef) -> Void = { _ in }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    /// How long a merged PR stays in purple before it leaves.
-    private static let mergedStay: Duration = .seconds(2.5)
 
     var body: some View {
         let motion = NotchMotion.animation(reduce: reduceMotion)  // one spring; Reduce Motion: a short fade
@@ -91,19 +141,12 @@ struct GoalPRList: View {
                     .foregroundStyle(GoalInk.secondary)
                     .padding(.horizontal, NotchSpace.row).padding(.bottom, NotchSpace.tight)
                 ForEach(rows, id: \.ref) { info in
-                    GoalPRRow(info: info)
-                        .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96, anchor: .leading)))
-                        .task(id: info.state == .merged ? info.ref : nil) {
-                            guard info.state == .merged else { return }
-                            // Cancelled when the notch closes: the event waits for the next opening.
-                            try? await Task.sleep(for: Self.mergedStay)
-                            guard !Task.isCancelled else { return }
-                            withAnimation(motion) { onMergedShown(info.ref) }
-                        }
+                    PRLine(info: info) { onMergedShown(info.ref) }
+                        .transition(.notchRow(reduce: reduceMotion))
                 }
             }
         }
-        .padding(.horizontal, -NotchSpace.row)  // the rows' own inset lets a band reach past the text column
+        .padding(.horizontal, -NotchSpace.row)  // undoes the rows' own inset: the text sits on the column
         .animation(motion, value: rows.map(\.ref))
     }
 }
