@@ -80,14 +80,14 @@ struct GoalPRList: View {
     private static let mergedStay: Duration = .seconds(2.5)
 
     var body: some View {
-        let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
+        let motion = NotchMotion.animation(reduce: reduceMotion)  // one spring; Reduce Motion: a short fade
         let rows = open.sorted { $0.ref.number > $1.ref.number } + merged
         VStack(alignment: .leading, spacing: 0) {
             if !rows.isEmpty {
-                Rectangle().fill(Color.white.opacity(0.1)).frame(height: 0.5)  // the rule under the goal's summary (Figma A3)
+                Rectangle().fill(GoalInk.divider).frame(height: 0.5)  // the rule under the goal's summary (Figma A3)
                     .padding(.horizontal, NotchSpace.row).padding(.bottom, NotchSpace.row)
                 Label("Pull request", systemImage: "arrow.triangle.branch")
-                    .font(NotchType.secondary)
+                    .font(NotchType.label)
                     .foregroundStyle(GoalInk.secondary)
                     .padding(.horizontal, NotchSpace.row).padding(.bottom, NotchSpace.tight)
                 ForEach(rows, id: \.ref) { info in

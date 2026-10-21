@@ -17,10 +17,8 @@ final class GoalPRRowTests: XCTestCase {
 
     func testListDrawsFixturesAndStaysEmptyWithoutPRs() throws {
         func render<V: View>(_ view: V) -> NSBitmapImageRep? {
-            let r = ImageRenderer(content: view.padding(24).frame(width: 520).background(Color.black)
-                .environment(\.colorScheme, .dark).environment(\.notchSnapshot, true))
-            r.scale = 2
-            return r.cgImage.map { NSBitmapImageRep(cgImage: $0) }
+            OffscreenRender.rasterize(view.padding(24).frame(width: 520).background(Color.black).environment(\.colorScheme, .dark))
+                .map { NSBitmapImageRep(cgImage: $0) }
         }
         let full = try XCTUnwrap(render(GoalPRList(open: GoalPRFixtures.open, merged: GoalPRFixtures.merged)))
         XCTAssertEqual(full.pixelsWide, 1040)
