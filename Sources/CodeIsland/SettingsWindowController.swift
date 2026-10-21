@@ -45,6 +45,7 @@ class SettingsWindowController {
         )
         window.titleVisibility = .visible
         window.title = L10n.shared["settings_title"]
+        window.appearance = NSAppearance(named: .darkAqua) // dark by default (Roberto)
         window.backgroundColor = .windowBackgroundColor
         window.contentView = hostingView
         window.contentMinSize = NSSize(width: min(560, screenW * 0.4), height: min(420, screenH * 0.4))

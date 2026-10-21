@@ -35,7 +35,6 @@ struct NotchCustomizeView: View {
             controls.padding(.horizontal, 24).padding(.vertical, 14)
         }
         .frame(width: 780, height: 560)
-        .preferredColorScheme(.dark)
     }
 
     // MARK: Preview
@@ -170,6 +169,7 @@ final class NotchCustomizeWindowController {
             defer: false
         )
         window.title = L10n.shared["customize_notch"]
+        window.appearance = NSAppearance(named: .darkAqua)
         window.contentView = NSHostingView(rootView: NotchCustomizeView(onDone: { [weak self] in self?.window?.close() }))
         window.isReleasedWhenClosed = false
         window.center()
