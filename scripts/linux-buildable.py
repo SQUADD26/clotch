@@ -10,11 +10,11 @@ from pathlib import Path
 
 APPLE_ONLY = re.compile(
     r"^import (SQLite3|CryptoKit|Darwin|AppKit|Security|os)$"   # modules Linux lacks
-    r"|\bURL(Session|Request)\b|HTTPURLResponse"                 # FoundationNetworking, not imported by Core
     r"|\bDarwin\.|SO_NOSIGPIPE"                                  # BSD sockets
     r"|\bCF[A-Z]\w+\("                                           # CoreFoundation functions
     r"|inlineOnlyPreservingWhitespace|PresentationIntent",       # AttributedString markdown, Apple Foundation only
     re.M)
+NETWORK = re.compile(r"\bURL(Session|Request)\b|HTTPURLResponse")  # FoundationNetworking: fine where the file imports it
 TYPE = re.compile(r"^(?:(?:public|internal|private|fileprivate|final|indirect)\s+)*(?:struct|class|enum|protocol|actor|typealias)\s+(\w+)", re.M)
 EXTENSION = re.compile(r"^(?:public\s+)?extension\s+(\w+)")
 FUNC = re.compile(r"^\s+(?:(?:public|internal|mutating|@\w+)\s+)*func\s+(\w+)")  # static ones are called through their type
@@ -34,7 +34,7 @@ def declared(text):
 
 root = Path(sys.argv[1])
 files = {p: p.read_text() for d in ("Sources/CodeIslandCore", "Tests/CodeIslandCoreTests") for p in sorted((root / d).glob("*.swift"))}
-out = {p for p, t in files.items() if APPLE_ONLY.search(t)}
+out = {p for p, t in files.items() if APPLE_ONLY.search(t) or (NETWORK.search(t) and "import FoundationNetworking" not in t)}
 while True:
     gone = set().union(*(declared(files[p]) for p in out)) if out else set()
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(gone))) + r")\b") if gone else None
