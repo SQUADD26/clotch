@@ -60,7 +60,7 @@ struct EditableGoalText: View {
     private func save() { if let draft = edit.save() { store.write(row, text: draft) } }
 }
 
-/// A notch pill button: «Accetta», «Rifiuta», «Modifica».
+/// A notch pill button: «Salva», «Annulla», «Modifica».
 struct PillButton: View {
     let title: String
     let color: Color

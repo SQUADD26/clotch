@@ -41,8 +41,8 @@ private struct ProposalLine: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 8) {
-                PillButton(title: "Rifiuta", color: GoalInk.secondary) { store.reject(row) }
-                PillButton(title: "Accetta", color: GoalTone.go.color) { store.accept(row) }.disabled(busy).opacity(busy ? 0.5 : 1)
+                Button("Rifiuta") { store.reject(row) }.buttonStyle(.tone(.stop))
+                Button("Accetta") { store.accept(row) }.buttonStyle(.tone(.go)).disabled(busy).opacity(busy ? 0.5 : 1)
             }
         }
         .accessibilityElement(children: .contain)

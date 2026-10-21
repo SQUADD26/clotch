@@ -17,6 +17,15 @@ enum GoalTone {
         case .stop: return Color(red: 1, green: 69 / 255, blue: 58 / 255)
         }
     }
+
+    /// Dark text on a pill filled with the tone (above 4.5:1 on each).
+    var ink: Color {
+        switch self {
+        case .go: return GoalInk.check
+        case .wait: return Color(red: 38 / 255, green: 30 / 255, blue: 0)
+        case .stop: return Color(red: 38 / 255, green: 8 / 255, blue: 6 / 255)
+        }
+    }
 }
 
 /// Text levels and fills on black: the Figma specs' opacities of white (specs.md, «Colori»).
