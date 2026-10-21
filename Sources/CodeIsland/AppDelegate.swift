@@ -67,6 +67,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    // The notch panel is always a visible window, so the Dock click ignores the flag.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        SettingsWindowController.shared.show()
+        return false
+    }
+
     // MARK: - Global Shortcuts
 
     func setupGlobalShortcut() {
