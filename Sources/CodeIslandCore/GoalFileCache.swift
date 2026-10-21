@@ -8,26 +8,36 @@ public final class GoalFileCache<T>: @unchecked Sendable {
     private var entries: [String: Entry] = [:]
     /// Files actually read and parsed since the cache was made (tests read it).
     public private(set) var parses = 0
+    /// False until one full listing filled the cache: `update` needs it as a base.
+    public private(set) var scanned = false
 
     public init() {}
 
-    /// The parsed values of `urls`, in order. Paths no longer listed are dropped from the cache.
+    /// Full rescan: the parsed values of `urls`; paths no longer listed are dropped from the cache.
     func values(_ urls: [URL], parse: (Data, URL) -> T?) -> [T] {
         var next: [String: Entry] = [:]
-        let out = urls.compactMap { url -> T? in
-            let v = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
-            let (mtime, size) = (v?.contentModificationDate, v?.fileSize)
-            if let e = entries[url.path], mtime != nil, e.mtime == mtime, e.size == size {
-                next[url.path] = e
-                return e.value
-            }
-            parses += 1
-            let value = (try? Data(contentsOf: url)).flatMap { parse($0, url) }
-            next[url.path] = Entry(mtime: mtime, size: size, value: value)
-            return value
-        }
+        for url in urls { next[url.path] = entry(url, parse: parse) }
         entries = next
-        return out
+        scanned = true
+        return all
+    }
+
+    /// No listing: only `changed` (paths named by file events) are stat'ed; a vanished one is dropped.
+    func update(_ changed: [URL], parse: (Data, URL) -> T?) -> [T] {
+        for url in changed {
+            entries[url.path] = FileManager.default.fileExists(atPath: url.path) ? entry(url, parse: parse) : nil
+        }
+        return all
+    }
+
+    private var all: [T] { entries.keys.sorted().compactMap { entries[$0]?.value } }
+
+    private func entry(_ url: URL, parse: (Data, URL) -> T?) -> Entry {
+        let v = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
+        let (mtime, size) = (v?.contentModificationDate, v?.fileSize)
+        if let e = entries[url.path], mtime != nil, e.mtime == mtime, e.size == size { return e }
+        parses += 1
+        return Entry(mtime: mtime, size: size, value: (try? Data(contentsOf: url)).flatMap { parse($0, url) })
     }
 }
 

@@ -22,6 +22,8 @@ private final class GoalWatcher: @unchecked Sendable {
     private let caches = GoalSources.Caches()
     private var stream: FSEventStreamRef?
     private var pending: DispatchWorkItem?
+    /// Paths named by file events since the last load; nil = the next load rescans everything.
+    private var changed: Set<String>? = nil
     private var prefixes: [String] = []
 
     init(home: URL, onLoad: @escaping @Sendable (GoalDiskData) -> Void) {
@@ -67,6 +69,7 @@ private final class GoalWatcher: @unchecked Sendable {
         let hit = paths.contains { path in
             path.contains("claude-code-sessions") || prefixes.contains { path.hasPrefix($0) }
         }
+        if rescan { changed = nil } else if hit { changed?.formUnion(paths) }
         if rescan || hit {
             schedule()
         }
@@ -77,7 +80,9 @@ private final class GoalWatcher: @unchecked Sendable {
     private func schedule() {
         guard pending == nil else { return }
         let item = DispatchWorkItem { [self] in
-            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home), caches: caches))
+            let paths = changed
+            changed = []
+            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home), caches: caches, changed: paths))
             pending = nil
         }
         pending = item

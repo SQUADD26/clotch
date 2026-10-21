@@ -70,13 +70,23 @@ public enum GoalSources {
     /// per session ever run (thousands), so only the live files of shown goals' families are read.
     /// Goals, sessions and requests go through `caches`: an unchanged file is never parsed twice.
     /// Live files are read fresh: their activity also depends on subagent transcripts' mtimes.
-    public static func load(_ paths: Paths, caches: Caches = Caches())
+    /// `changed` = the paths file events named since the last load: the session store (1600+ files)
+    /// is then never listed, only those paths are stat'ed. nil = full rescan (launch, dropped events).
+    public static func load(_ paths: Paths, caches: Caches = Caches(), changed: Set<String>? = nil)
         -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest]) {
         let fm = FileManager.default
         let goals = caches.goals.values(files(in: paths.goals, fm).filter { $0.pathExtension == "json" }) { d, _ in parseGoal(d) }
-        let sessions = caches.sessions.values(paths.sessionRoots.flatMap { root in
-            files(in: root, fm, recursive: true).filter { $0.lastPathComponent.hasPrefix("local_") && $0.pathExtension == "json" }
-        }) { d, url in parseSession(d, fileName: url.lastPathComponent) }
+        let isSession = { (u: URL) in u.lastPathComponent.hasPrefix("local_") && u.pathExtension == "json" }
+        let parseS = { (d: Data, url: URL) in parseSession(d, fileName: url.lastPathComponent) }
+        let sessions: [DesktopSession]
+        if let changed, caches.sessions.scanned {
+            let roots = paths.sessionRoots.map { $0.path + "/" }
+            sessions = caches.sessions.update(changed.map { URL(fileURLWithPath: $0) }
+                .filter { u in isSession(u) && roots.contains { u.path.hasPrefix($0) } }, parse: parseS)
+        } else {
+            sessions = caches.sessions.values(paths.sessionRoots.flatMap { files(in: $0, fm, recursive: true).filter(isSession) },
+                                              parse: parseS)
+        }
         let live = GoalBoard.liveIds(goals: goals, sessions: sessions).compactMap { cli -> LiveState? in
             guard !cli.contains("/"), let data = try? Data(contentsOf: paths.live.appendingPathComponent(cli + ".json")) else { return nil }
             let transcript = object(data)?["transcript"] as? String ?? ""

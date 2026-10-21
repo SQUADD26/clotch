@@ -187,6 +187,19 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertEqual(r.sessions.count, 1999, "a deleted file is dropped")
         XCTAssertEqual(r.sessions.first { $0.localId == "local_7" }?.title, "nuovo")
         XCTAssertLessThan(elapsed, 0.5, "reload took \(elapsed) s")
+
+        // File events name the changed paths: no listing of the 2000, only those are stat'ed.
+        let nine = support.appendingPathComponent("local_9.json"), ten = support.appendingPathComponent("local_10.json")
+        try sessionJSON("local_9", cli: "c9", title: "nove").write(to: nine)
+        try fm.removeItem(at: ten)
+        let outside = home.appendingPathComponent("elsewhere/local_x.json").path
+        let start2 = Date()
+        let r2 = GoalSources.load(paths, caches: caches, changed: [nine.path, ten.path, outside])
+        let elapsed2 = Date().timeIntervalSince(start2)
+        XCTAssertEqual(caches.sessions.parses, 2002, "only the named changed file is parsed")
+        XCTAssertEqual(r2.sessions.count, 1998, "a named deleted file is dropped")
+        XCTAssertEqual(r2.sessions.first { $0.localId == "local_9" }?.title, "nove")
+        XCTAssertLessThan(elapsed2, 0.05, "event reload took \(elapsed2) s")
     }
 
     func testLoadReadsFoldersAndSkipsGarbage() throws {
