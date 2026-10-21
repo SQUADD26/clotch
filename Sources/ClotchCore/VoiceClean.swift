@@ -12,13 +12,16 @@ public enum VoiceClean {
     private static let file = #"\b[\w-]+\.(?:tsx?|jsx?|py|md|json|sh|ya?ml|log|txt|plist|toml|html|css|mp3|swift)\b"#
     private static let operative = #"(?i)\b(?:terminale|terminal|shell|bash|zsh|sudo|comando|comandi|prompt|console|incolla\w*|copia\w*|apri\w*|lancia\w*|esegui\w*|digita\w*|premi\w*|clicca\w*|scrivi|inserisci\w*|installa\w*|avvia\w*)\b|(?:^|[.!?]\s*)prova\s*:"#
 
+    /// The advice said as a formula («io dico sì», «io consiglio di no»): never said (claude-config#1837), the sentence goes.
+    private static let advice = #"(?i)^\W*(?:capo,?\s*)?(?:e\s+)?io\s+(?:dico|direi|consiglio|consiglierei)\s+(?:di\s+)?(?:sì|si|no)\b|^\W*per me è uguale\W*$"#
+
     public static func hasSecret(_ t: String) -> Bool { secrets.contains { t.range(of: $0, options: .regularExpression) != nil } }
 
-    /// Text to say: a sentence with an order about hands or keyboard is dropped (#73: never a fixed line in its place);
+    /// Text to say: a sentence with an order about hands or keyboard, or an advice formula, is dropped (#73: never a fixed line in its place);
     /// the rest is cleaned. "" = nothing left to say.
     public static func spoken(_ raw: String) -> String {
         let sentences = raw.replacingOccurrences(of: #"([.!?])\s+"#, with: "$1\n", options: .regularExpression).split(separator: "\n")
-        return clean(sentences.filter { $0.range(of: operative, options: .regularExpression) == nil }.joined(separator: " "))
+        return clean(sentences.filter { s in [operative, advice].allSatisfy { s.range(of: $0, options: .regularExpression) == nil } }.joined(separator: " "))
     }
 
     public static func clean(_ raw: String) -> String {
@@ -38,9 +41,6 @@ public enum VoiceClean {
         t = re(t, #"(?i)\b(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b"#, " ")
         t = re(t, #"\b\d{4,}\b"#, " ")
         t = re(t, #"\s*(?:→|->|=>)\s*"#, ", ")
-        t = re(t, #"(?i)\s*\((?:sì|si)\)\s*$"#, " Io consiglio di sì.")
-        t = re(t, #"(?i)\s*\(no\)\s*$"#, " Io consiglio di no.")
-        t = re(t, #"(?i)\s*\(scegli tu\)\s*$"#, " Per me è uguale.")
         t = t.components(separatedBy: .newlines)
             .map { re($0, #"^[\s>*•-]+"#, "").trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
