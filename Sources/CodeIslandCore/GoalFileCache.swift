@@ -1,52 +1,50 @@
 import Foundation
 
-/// Parsed files by path, re-read only when their mtime or size changed: a watched folder with
-/// thousands of files (1600+ desktop sessions) costs one listing per load, not one parse per file.
+/// Parsed files by key, re-read only when their mtime or size changed. `version` moves only when a
+/// parsed value really changed, so a rewrite that changes nothing the board reads costs one parse.
 /// Not thread-safe: one cache belongs to one serial loader.
-public final class GoalFileCache<T>: @unchecked Sendable {
+public final class GoalFileCache<T: Equatable>: @unchecked Sendable {
     private struct Entry { let mtime: Date?; let size: Int?; let value: T? }
     private var entries: [String: Entry] = [:]
+    private let key: (URL) -> String
+    private var memo: [T]?
     /// Files actually read and parsed since the cache was made (tests read it).
     public private(set) var parses = 0
-    /// False until one full listing filled the cache: `update` needs it as a base.
-    public private(set) var scanned = false
+    public private(set) var version = 0
 
-    public init() {}
+    /// `key` names a file across path spellings (/var vs /private/var): the session store uses the file name.
+    public init(key: @escaping (URL) -> String = { $0.path }) { self.key = key }
 
-    /// Full rescan: the parsed values of `urls`; paths no longer listed are dropped from the cache.
-    func values(_ urls: [URL], parse: (Data, URL) -> T?) -> [T] {
-        var next: [String: Entry] = [:]
-        for url in urls { next[url.path] = entry(url, parse: parse) }
-        entries = next
-        scanned = true
-        return all
+    /// Every parsed value, in key order; rebuilt only after a change.
+    public var all: [T] {
+        if let memo { return memo }
+        let out = entries.keys.sorted().compactMap { entries[$0]?.value }
+        memo = out
+        return out
     }
 
-    /// No listing: only `changed` (paths named by file events) are stat'ed; a vanished one is dropped.
-    func update(_ changed: [URL], parse: (Data, URL) -> T?) -> [T] {
-        for url in changed {
-            entries[url.path] = FileManager.default.fileExists(atPath: url.path) ? entry(url, parse: parse) : nil
+    /// Full rescan: `urls` are the whole folder; keys no longer listed are dropped.
+    func replace(with urls: [URL], parse: (Data, URL) -> T?) {
+        let listed = Set(urls.map(key))
+        for k in entries.keys where !listed.contains(k) { set(k, nil) }
+        update(urls, parse: parse)
+    }
+
+    /// Only `urls` are stat'ed (and parsed when changed); a vanished one is dropped.
+    func update(_ urls: [URL], parse: (Data, URL) -> T?) {
+        for url in urls {
+            let v = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
+            guard let mtime = v?.contentModificationDate else { set(key(url), nil); continue }
+            let size = v?.fileSize
+            if let e = entries[key(url)], e.mtime == mtime, e.size == size { continue }
+            parses += 1
+            set(key(url), Entry(mtime: mtime, size: size, value: (try? Data(contentsOf: url)).flatMap { parse($0, url) }))
         }
-        return all
     }
 
-    private var all: [T] { entries.keys.sorted().compactMap { entries[$0]?.value } }
-
-    private func entry(_ url: URL, parse: (Data, URL) -> T?) -> Entry {
-        let v = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
-        let (mtime, size) = (v?.contentModificationDate, v?.fileSize)
-        if let e = entries[url.path], mtime != nil, e.mtime == mtime, e.size == size { return e }
-        parses += 1
-        return Entry(mtime: mtime, size: size, value: (try? Data(contentsOf: url)).flatMap { parse($0, url) })
-    }
-}
-
-extension GoalSources {
-    /// One cache per watched folder, kept by the watcher across loads.
-    public final class Caches: @unchecked Sendable {
-        public let goals = GoalFileCache<GoalRecord>()
-        public let sessions = GoalFileCache<DesktopSession>()
-        public let requests = GoalFileCache<UserRequest>()
-        public init() {}
+    private func set(_ k: String, _ e: Entry?) {
+        let old = entries[k]
+        entries[k] = e
+        if old?.value != e?.value { version += 1; memo = nil }
     }
 }

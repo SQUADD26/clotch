@@ -66,42 +66,23 @@ public enum GoalSources {
                      requests: home.appendingPathComponent(".claude/richieste"))
     }
 
-    /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
-    /// per session ever run (thousands), so only the live files of shown goals' families are read.
-    /// Goals, sessions and requests go through `caches`: an unchanged file is never parsed twice.
-    /// Live files are read fresh: their activity also depends on subagent transcripts' mtimes.
-    /// `changed` = the paths file events named since the last load: the session store (1600+ files)
-    /// is then never listed, only those paths are stat'ed. nil = full rescan (launch, dropped events).
-    public static func load(_ paths: Paths, caches: Caches = Caches(), changed: Set<String>? = nil)
-        -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest]) {
-        let fm = FileManager.default
-        let goals = caches.goals.values(files(in: paths.goals, fm).filter { $0.pathExtension == "json" }) { d, _ in parseGoal(d) }
-        let isSession = { (u: URL) in u.lastPathComponent.hasPrefix("local_") && u.pathExtension == "json" }
-        let parseS = { (d: Data, url: URL) in parseSession(d, fileName: url.lastPathComponent) }
-        let sessions: [DesktopSession]
-        if let changed, caches.sessions.scanned {
-            let roots = paths.sessionRoots.map { $0.path + "/" }
-            sessions = caches.sessions.update(changed.map { URL(fileURLWithPath: $0) }
-                .filter { u in isSession(u) && roots.contains { u.path.hasPrefix($0) } }, parse: parseS)
-        } else {
-            sessions = caches.sessions.values(paths.sessionRoots.flatMap { files(in: $0, fm, recursive: true).filter(isSession) },
-                                              parse: parseS)
+    /// One full read (launch of `--snapshot`, tests). The app's watcher keeps one `GoalLoader` instead.
+    public static func load(_ paths: Paths) -> GoalLoader.Snapshot {
+        GoalLoader(paths: paths).load(changed: nil)!
+    }
+
+    /// One live file, with alive subagents' transcript mtimes as activity.
+    static func readLive(cli: String, dir: URL, _ fm: FileManager) -> LiveState? {
+        guard !cli.contains("/"), let data = try? Data(contentsOf: dir.appendingPathComponent(cli + ".json")) else { return nil }
+        let transcript = object(data)?["transcript"] as? String ?? ""
+        var index: [String: Date]?  // built at most once per transcript, only if a direct stat misses
+        return parseLive(data, cliId: cli) { aid in
+            subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
         }
-        let live = GoalBoard.liveIds(goals: goals, sessions: sessions).compactMap { cli -> LiveState? in
-            guard !cli.contains("/"), let data = try? Data(contentsOf: paths.live.appendingPathComponent(cli + ".json")) else { return nil }
-            let transcript = object(data)?["transcript"] as? String ?? ""
-            var index: [String: Date]?  // built at most once per transcript, only if a direct stat misses
-            return parseLive(data, cliId: cli) { aid in
-                subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
-            }
-        }
-        let requests = caches.requests.values(files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in parseRequest(d) }
-            .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
-        return (goals, sessions, live, requests)
     }
 
     /// Lists with mtime and size prefetched, so the cache's stat of each file is free.
-    private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
+    static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
         let keys: [URLResourceKey] = [.contentModificationDateKey, .fileSizeKey]
         if recursive {
             return fm.enumerator(at: dir, includingPropertiesForKeys: keys)?.allObjects as? [URL] ?? []

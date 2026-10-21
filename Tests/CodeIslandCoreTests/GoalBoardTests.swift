@@ -160,46 +160,48 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertLessThan(elapsed, 0.5, "load took \(elapsed) s")
     }
 
-    /// The desktop apps rewrite a few session files every minute among thousands: a reload parses only those.
+    /// The desktop apps rewrite a few session files every minute among thousands: a reload touches only
+    /// the paths file events named, whatever their spelling (/var vs /private/var on macOS).
     func testReloadParsesOnlyChangedFiles() throws {
         let fm = FileManager.default
         let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: home) }
         let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
         try fm.createDirectory(at: support, withIntermediateDirectories: true)
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.goals, withIntermediateDirectories: true)
+        try goalJSON("c1").write(to: paths.goals.appendingPathComponent("c1.json"))
         let old = Date(timeIntervalSinceNow: -3600)
         for i in 0..<2000 {
             let url = support.appendingPathComponent("local_\(i).json")
             try sessionJSON("local_\(i)", cli: "c\(i)").write(to: url)
             try fm.setAttributes([.modificationDate: old], ofItemAtPath: url.path)
         }
-        let paths = GoalSources.defaultPaths(home: home)
-        let caches = GoalSources.Caches()
-        XCTAssertEqual(GoalSources.load(paths, caches: caches).sessions.count, 2000)
-        XCTAssertEqual(caches.sessions.parses, 2000)
+        let loader = GoalLoader(paths: paths)
+        XCTAssertEqual(loader.load(changed: nil)?.sessions.count, 2000)
+        XCTAssertEqual(loader.sessions.parses, 2000)
 
-        try sessionJSON("local_7", cli: "c7", title: "nuovo").write(to: support.appendingPathComponent("local_7.json"))
-        try fm.removeItem(at: support.appendingPathComponent("local_8.json"))
-        let start = Date()
-        let r = GoalSources.load(paths, caches: caches)
-        let elapsed = Date().timeIntervalSince(start)
-        XCTAssertEqual(caches.sessions.parses, 2001, "exactly the changed file is parsed again")
-        XCTAssertEqual(r.sessions.count, 1999, "a deleted file is dropped")
-        XCTAssertEqual(r.sessions.first { $0.localId == "local_7" }?.title, "nuovo")
-        XCTAssertLessThan(elapsed, 0.5, "reload took \(elapsed) s")
-
-        // File events name the changed paths: no listing of the 2000, only those are stat'ed.
         let nine = support.appendingPathComponent("local_9.json"), ten = support.appendingPathComponent("local_10.json")
         try sessionJSON("local_9", cli: "c9", title: "nove").write(to: nine)
         try fm.removeItem(at: ten)
         let outside = home.appendingPathComponent("elsewhere/local_x.json").path
-        let start2 = Date()
-        let r2 = GoalSources.load(paths, caches: caches, changed: [nine.path, ten.path, outside])
-        let elapsed2 = Date().timeIntervalSince(start2)
-        XCTAssertEqual(caches.sessions.parses, 2002, "only the named changed file is parsed")
-        XCTAssertEqual(r2.sessions.count, 1998, "a named deleted file is dropped")
-        XCTAssertEqual(r2.sessions.first { $0.localId == "local_9" }?.title, "nove")
-        XCTAssertLessThan(elapsed2, 0.05, "event reload took \(elapsed2) s")
+        let start = Date()
+        // FSEvents names resolved paths: on macOS /private/var/… for a /var/… temp dir.
+        let r = loader.load(changed: [nine.resolvingSymlinksInPath().path, support.resolvingSymlinksInPath().path + "/local_10.json", outside])
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssertEqual(loader.sessions.parses, 2001, "only the named changed file is parsed")
+        XCTAssertEqual(r?.sessions.count, 1999, "a named deleted file is dropped")
+        XCTAssertEqual(r?.sessions.first { $0.localId == "local_9" }?.title, "nove")
+        XCTAssertLessThan(elapsed, 0.05, "event reload took \(elapsed) s")
+
+        // Same content rewritten (only the mtime moves): parsed once, no new board.
+        try sessionJSON("local_9", cli: "c9", title: "nove").write(to: nine)
+        try fm.setAttributes([.modificationDate: Date(timeIntervalSinceNow: 5)], ofItemAtPath: nine.path)
+        XCTAssertNil(loader.load(changed: [nine.path]), "nothing the board reads changed")
+        XCTAssertEqual(loader.sessions.parses, 2002)
+        XCTAssertNil(loader.load(changed: [home.appendingPathComponent("Library/Application Support/Chrome/x").path]),
+                     "a foreign path costs nothing")
+        XCTAssertEqual(loader.sessions.parses, 2002)
     }
 
     func testLoadReadsFoldersAndSkipsGarbage() throws {

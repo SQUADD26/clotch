@@ -3,14 +3,13 @@ import Combine
 import CoreServices
 import CodeIslandCore
 
-private typealias GoalDiskData = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState],
-                                  requests: [UserRequest])
+private typealias GoalDiskData = GoalLoader.Snapshot
 
 /// Watches the goal register, the live-state folder, Claude Desktop's session store and the requests
 /// folder with one
 /// FSEventStream and reloads them off the main thread, coalesced to one load per `coalesce`. The desktop
 /// apps rewrite session files every minute and hooks write live files on every tool call: each load
-/// re-parses only changed files (`caches`), and at most one load runs or waits at a time.
+/// touches only the paths the events named (`GoalLoader`), and at most one load runs or waits at a time.
 /// Read-only: it never creates a directory; a missing one just means no data, and its nearest
 /// existing ancestor is watched so the data shows up once the directory is created.
 /// All mutable state is confined to `queue`.
@@ -19,7 +18,8 @@ private final class GoalWatcher: @unchecked Sendable {
     private let home: URL
     private let onLoad: @Sendable (GoalDiskData) -> Void
     private let coalesce: TimeInterval = 1
-    private let caches = GoalSources.Caches()
+    private let loader: GoalLoader
+    private var support = ""
     private var stream: FSEventStreamRef?
     private var pending: DispatchWorkItem?
     /// Paths named by file events since the last load; nil = the next load rescans everything.
@@ -28,14 +28,16 @@ private final class GoalWatcher: @unchecked Sendable {
 
     init(home: URL, onLoad: @escaping @Sendable (GoalDiskData) -> Void) {
         self.home = home
+        loader = GoalLoader(home: home)
         self.onLoad = onLoad
     }
 
     func start() {
         queue.async { [self] in
             guard stream == nil else { return }
-            let paths = GoalSources.defaultPaths(home: home)
+            let paths = loader.paths
             let support = home.appendingPathComponent("Library/Application Support")
+            self.support = support.resolvingSymlinksInPath().path
             // FSEvents reports resolved paths (/private/var…), so match both spellings.
             prefixes = [paths.goals, paths.live, paths.requests].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
             let roots = Array(Set([paths.goals, paths.live, paths.requests, support].map { Self.existingAncestor($0).path }))
@@ -54,9 +56,10 @@ private final class GoalWatcher: @unchecked Sendable {
             }
             guard let created = FSEventStreamCreate(
                 nil, callback, &context, roots as CFArray,
-                FSEventStreamEventId(kFSEventStreamEventIdSinceNow), 0.05,
-                FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes
-                    | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer)
+                // No NoDefer: FSEvents itself batches a burst into one callback `coalesce` after its first event,
+                // so foreign writes under Application Support wake this queue at most once a second.
+                FSEventStreamEventId(kFSEventStreamEventIdSinceNow), coalesce,
+                FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagFileEvents)
             ) else { return }
             FSEventStreamSetDispatchQueue(created, queue)
             FSEventStreamStart(created)
@@ -66,27 +69,32 @@ private final class GoalWatcher: @unchecked Sendable {
     }
 
     private func handle(_ paths: [String], rescan: Bool) {
-        let hit = paths.contains { path in
+        let hits = paths.filter { path in
             path.contains("claude-code-sessions") || prefixes.contains { path.hasPrefix($0) }
         }
-        if rescan { changed = nil } else if hit { changed?.formUnion(paths) }
-        if rescan || hit {
+        // A new Claude app folder (another account) brings a session store the loader does not know yet.
+        let newRoot = paths.contains { p in
+            let u = URL(fileURLWithPath: p)
+            return u.deletingLastPathComponent().path == support && u.lastPathComponent.lowercased().hasPrefix("claude")
+        }
+        if rescan || newRoot { changed = nil } else { changed?.formUnion(hits) }
+        if rescan || newRoot || !hits.isEmpty {
             schedule()
         }
     }
 
-    /// The first event of a burst arms one load `coalesce` later; events arriving meanwhile ride on it.
+    /// One load per batch of events (the stream already waits `coalesce`); batches arriving meanwhile ride on it.
     /// FSEvents are delivered on `queue` too, so none arrives while a load runs: never two at once.
     private func schedule() {
         guard pending == nil else { return }
         let item = DispatchWorkItem { [self] in
             let paths = changed
             changed = []
-            onLoad(GoalSources.load(GoalSources.defaultPaths(home: home), caches: caches, changed: paths))
+            if let snap = loader.load(changed: paths) { onLoad(snap) }
             pending = nil
         }
         pending = item
-        queue.asyncAfter(deadline: .now() + coalesce, execute: item)
+        queue.async(execute: item)
     }
 
     private static func existingAncestor(_ url: URL) -> URL {

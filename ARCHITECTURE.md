@@ -14,11 +14,11 @@ No backend. The app runs on Roberto's Mac only and reads local files, read-only.
 | Live subagents per session | `~/.claude/handoff/live/<cli>.json` (`agenti`, `aggiornato`) | claude-config `global/hooks/live_state.py` |
 | Roberto's requests | `~/.claude/richieste/<id>.json` (`id`, `t`, `testo`, `stato` nuova/presa/fatta, `t_presa`, …); the folder arrives with a claude-config promotion, until then the plate says so | claude-config (Overseer) |
 
-Real time: FSEvents on these folders; a 30 s tick only re-evaluates time-based state (yellow after 30 min still).
+Real time: one FSEvents stream with file-level events, batched by FSEvents to one callback a second. Each reload touches only the paths the events named (`GoalLoader`): the 1600+ session files are listed and parsed once at launch, then a rewrite costs one stat and one parse, and an unchanged value publishes nothing. A full rescan happens only at launch, when FSEvents drops events, or when a new Claude app folder appears. A 30 s tick only re-evaluates time-based state (yellow after 30 min still).
 
 ## Code layout
 - `Sources/CodeIslandCore/GoalBoard.swift`: pure logic, goal → progress, traffic light, reason, session pulses. Tests in `Tests/CodeIslandCoreTests/GoalBoardTests.swift`.
-- `Sources/CodeIslandCore/GoalSources.swift`: parses and reads the files above.
+- `Sources/CodeIslandCore/GoalSources.swift`: parses the files above. `GoalLoader.swift` + `GoalFileCache.swift`: the incremental reader the watcher keeps (cache by mtime and size, work per changed path).
 - `Sources/CodeIsland/GoalStore.swift`: FSEvents watcher, publishes rows to the UI.
 - The notch view (issue #3), one Liquid Glass design inside CodeIsland's black notch (`NotchPanelView.swift`, `PanelWindowController.swift`): `NotchSections.swift` (scale and plate) + `NotchAccountsPlate.swift`, `NotchGoalPlate.swift`, `NotchRequestsPlate.swift` (open: account usage, the goal chased now with the other goals, Roberto's requests), `GoalsNotchWings.swift` (closed: state, bar and proofs of the goal chased now), `NotchNotificationView.swift` + `NotchNotifier.swift` (notifications under the closed notch: goal changes from `CodeIslandCore/NotchEvents.swift`, requests from `GoalStore.takenToAnimate`), `NotchGlass.swift` (real `glassEffect` on macOS 26+, a stand-in before and in snapshots), `NotchTokens.swift` (colour, spacing and type tokens: the one file the approved Figma target changes), `GoalsNotchView.swift` (shared pieces).
 - Everything else under `Sources/` is CodeIsland code kept for the shell; most of it is not reached at launch.

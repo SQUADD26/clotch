@@ -1,0 +1,82 @@
+import Foundation
+
+/// The goal sources as the watcher reads them: work per reload follows the paths file events named,
+/// never the 1600+ session files on disk. Full rescan only at launch or when events were dropped.
+/// Not thread-safe: the watcher calls it from one serial queue.
+public final class GoalLoader: @unchecked Sendable {
+    public typealias Snapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest])
+
+    public private(set) var paths: GoalSources.Paths
+    private let makePaths: () -> GoalSources.Paths
+    let goals = GoalFileCache<GoalRecord>()
+    let sessions = GoalFileCache<DesktopSession>(key: { $0.lastPathComponent })
+    let requests = GoalFileCache<UserRequest>()
+    private var live: [String: LiveState] = [:]
+    private var liveIds: Set<String> = []
+    private var seen: (goals: Int, sessions: Int)?
+    private var shipped: (goals: Int, sessions: Int, requests: Int)?
+
+    public init(home: URL) {
+        makePaths = { GoalSources.defaultPaths(home: home) }
+        paths = makePaths()
+    }
+
+    init(paths: GoalSources.Paths) {
+        makePaths = { paths }
+        self.paths = paths
+    }
+
+    /// `changed` = paths named by file events since the last call; nil = rescan everything.
+    /// nil result: nothing the board reads changed.
+    public func load(changed: Set<String>?) -> Snapshot? {
+        let fm = FileManager.default
+        let rescan = changed == nil || shipped == nil
+        if rescan { paths = makePaths() }
+        let named = changed ?? []
+        func touched(_ dir: URL) -> Bool {
+            let spellings = [dir.path + "/", dir.resolvingSymlinksInPath().path + "/"]
+            return rescan || named.contains { p in spellings.contains { p.hasPrefix($0) } }
+        }
+
+        // Small folders (a few goals, a few requests): re-listed whole, only when one of their files moved.
+        if touched(paths.goals) {
+            goals.replace(with: GoalSources.files(in: paths.goals, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseGoal(d) }
+        }
+        if touched(paths.requests) {
+            requests.replace(with: GoalSources.files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseRequest(d) }
+        }
+        let isSession = { (u: URL) in u.lastPathComponent.hasPrefix("local_") && u.pathExtension == "json" }
+        let parseSession = { (d: Data, u: URL) in GoalSources.parseSession(d, fileName: u.lastPathComponent) }
+        if rescan {
+            sessions.replace(with: paths.sessionRoots.flatMap { GoalSources.files(in: $0, fm, recursive: true).filter(isSession) },
+                             parse: parseSession)
+        } else {
+            let roots = paths.sessionRoots.flatMap { [$0.path + "/", $0.resolvingSymlinksInPath().path + "/"] }
+            sessions.update(named.filter { p in roots.contains { p.hasPrefix($0) } }.map { URL(fileURLWithPath: $0) }.filter(isSession),
+                            parse: parseSession)
+        }
+
+        // Which live files matter follows goals and sessions: recomputed only when either changed.
+        let now = (goals.version, sessions.version)
+        if rescan || seen.map({ $0 != now }) ?? true {
+            liveIds = GoalBoard.liveIds(goals: goals.all, sessions: sessions.all)
+            seen = now
+        }
+        var liveMoved = live.keys.contains { !liveIds.contains($0) }
+        live = live.filter { liveIds.contains($0.key) }
+        let liveDirs = [paths.live.path + "/", paths.live.resolvingSymlinksInPath().path + "/"]
+        let namedLive = Set(named.filter { p in liveDirs.contains { p.hasPrefix($0) } }.map { URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent })
+        for cli in liveIds where rescan || live[cli] == nil || namedLive.contains(cli) {
+            let fresh = GoalSources.readLive(cli: cli, dir: paths.live, fm)
+            if fresh != live[cli] { liveMoved = true }
+            live[cli] = fresh
+        }
+
+        // Unchanged values (a rewrite with the same content, a live file of another session): no new board.
+        let versions = (goals.version, sessions.version, requests.version)
+        if !rescan, !liveMoved, let shipped, shipped == versions { return nil }
+        shipped = versions
+        return (goals.all, sessions.all, live.keys.sorted().compactMap { live[$0] },
+                requests.all.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) })
+    }
+}
