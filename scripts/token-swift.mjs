@@ -11,7 +11,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const IN = join(root, 'design/tokens.json'), OUT = join(root, 'Sources/Clotch/FigmaTokens.swift');
 
 // «macOS 27 · Golden Gate» -> MacOS27GoldenGate; «finestra/fondo» -> finestraFondo
-const parole = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^A-Za-z0-9]+/).filter(Boolean);
+// «_» resta: «raggio/1_5» diventa notchRaggio1_5, mai notchRaggio15 come «raggio/15»
+// «_» resta nel nome: «raggio/1_5» diventa notchRaggio1_5 e non si scontra con «raggio/15» (notchRaggio15)
+const parole = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^A-Za-z0-9_]+/).filter(Boolean);
 const tipoSwift = p => p.map(w => w[0].toUpperCase() + w.slice(1)).join('').replace(/^\d/, '_$&');
 const nomeSwift = p => { const n = tipoSwift(p); return n[0].toLowerCase() + n.slice(1); };
 
@@ -34,6 +36,7 @@ export function genera(tokens) {
   for (const [col, modi] of Object.entries(tokens)) {
     if (col.startsWith('$')) continue;
     const nomiModi = Object.keys(modi).filter(m => !m.startsWith('$'));
+    const usati = new Map(); // identificatore Swift -> nome Figma
     const voci = new Map(); // nome variabile -> {tipo, per modo: $value}
     const giu = (nodo, via, modo) => {
       for (const [k, f] of Object.entries(nodo)) {
@@ -47,6 +50,8 @@ export function genera(tokens) {
     for (const [n, { tipo, modi: per }] of voci) {
       const valori = nomiModi.map(m => per[m]);
       const id = nomeSwift(parole(n));
+      if (usati.has(id)) throw new Error(`«${n}» e «${usati.get(id)}» diventano entrambe ${id} in Swift: rinomina una delle due in Figma`);
+      usati.set(id, n);
       if (new Set(valori).size === 1) { const [t, v] = valore(tipo, valori[0]); righe.push(`        static let ${id}: ${t} = ${t === 'Color' ? `Color(nsColor: ${v})` : v}  // ${n}`); }
       else if (tipo === 'color' && nomiModi.length === 2 && nomiModi.includes('Chiaro') && nomiModi.includes('Scuro'))
         righe.push(`        static let ${id} = coppia(chiaro: ${colore(per.Chiaro)}, scuro: ${colore(per.Scuro)})  // ${n}`);
