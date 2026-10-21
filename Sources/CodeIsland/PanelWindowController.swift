@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 import os.log
 
@@ -180,6 +181,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     private var autoScreenPoller: Timer?
     private var fullscreenPoller: Timer?
     private var isSessionObservationArmed = false
+    private var goalsObservation: AnyCancellable?
     private var fullscreenLatch = false
     private var settingsObservers: [NSObjectProtocol] = []
     private var globalClickMonitor: Any?
@@ -324,6 +326,11 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
         // Observe session changes via @Observable tracking
         armSessionObservation()
+        // "Hide when no session" now means no open goal; @Published fires before the
+        // write lands, so re-evaluate on the next main-actor turn.
+        goalsObservation = GoalStore.shared.$rows.dropFirst().sink { [weak self] _ in
+            Task { @MainActor in self?.updateVisibility() }
+        }
 
         // Observe settings changes (display choice, panel height)
         observeSettingsChanges()
@@ -642,7 +649,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
             return
         }
 
-        if settings.hideWhenNoSession && appState.activeSessionCount == 0 {
+        if settings.hideWhenNoSession && GoalStore.shared.rows.isEmpty {
             panel.orderOut(nil)
             MascotAnimationGate.shared.setPanelVisible(false)
             return
