@@ -119,19 +119,12 @@ struct AfkSummaryView: View {
                 Rectangle().fill(GoalInk.divider).frame(height: 1).padding(.top, 14)
             }
             .padding(.bottom, 14)
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 22) {
-                    ForEach(Array(report.groups.enumerated()), id: \.element.id) { i, group in
-                        AfkGroupView(group: group)
-                            .opacity(shown || !animated ? 1 : 0)
-                            .offset(y: shown || !animated ? 0 : 6)
-                            .animation(animated ? NotchMotion.spring.delay(Double(min(i, 8)) * 0.04) : nil, value: shown)
-                    }
-                }
-                .padding(.bottom, 12)
-                .onGeometryChange(for: CGRect.self) { $0.frame(in: .named("afkList")) } action: {
-                    content = $0.height
-                    offset = -$0.minY
+            Group {
+                // `ImageRenderer` draws no ScrollView content: the still (`--snapshot`) is the list as it opens, clipped.
+                if animated {
+                    ScrollView(.vertical, showsIndicators: false) { list }
+                } else {
+                    TopClip { list }.clipped()
                 }
             }
             .coordinateSpace(name: "afkList")
@@ -146,6 +139,22 @@ struct AfkSummaryView: View {
                 Rectangle().fill(GoalInk.divider).frame(height: 1).padding(.top, 2)
                 HStack { Spacer(); close }.padding(.top, 12)
             }
+        }
+    }
+
+    private var list: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            ForEach(Array(report.groups.enumerated()), id: \.element.id) { i, group in
+                AfkGroupView(group: group)
+                    .opacity(shown || !animated ? 1 : 0)
+                    .offset(y: shown || !animated ? 0 : 6)
+                    .animation(animated ? NotchMotion.spring.delay(Double(min(i, 8)) * 0.04) : nil, value: shown)
+            }
+        }
+        .padding(.bottom, 12)
+        .onGeometryChange(for: CGRect.self) { $0.frame(in: .named("afkList")) } action: {
+            content = $0.height
+            offset = -$0.minY
         }
     }
 
@@ -182,6 +191,18 @@ private struct AfkColumn: Layout {
         let natural = views.map { $0.sizeThatFits(ProposedViewSize(width: width, height: nil)).height }
         guard natural.count == 3 else { return natural }
         return [natural[0], min(natural[1], max(80, tallest - natural[0] - natural[2])), natural[2]]
+    }
+}
+
+/// Its content's height, or less when the room is smaller: the content stays at the top, the rest is cut by `.clipped()`.
+private struct TopClip: Layout {
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let natural = subviews[0].sizeThatFits(ProposedViewSize(width: proposal.width, height: nil))
+        return CGSize(width: proposal.width ?? natural.width, height: min(natural.height, proposal.height ?? natural.height))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: nil))
     }
 }
 
