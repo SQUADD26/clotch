@@ -136,6 +136,19 @@ private final class GoalWatcher: @unchecked Sendable {
     /// then says the section is not active yet instead of «no requests».
     @Published private(set) var requestsFolderExists = false
     private var requestsLoaded = false
+    /// When Roberto last opened the Requests tab (#90): an answer written after this is new. The first run starts now,
+    /// so old answers do not all light up.
+    @Published private(set) var answersSeenAt: Date = {
+        let t = UserDefaults.standard.double(forKey: GoalStore.answersSeenKey)
+        return t > 0 ? Date(timeIntervalSince1970: t) : Date()
+    }()
+    private nonisolated static let answersSeenKey = "clotch.answersSeenAt"
+    var hasNewAnswer: Bool { requests.contains { $0.isNewAnswer(since: answersSeenAt) } }
+
+    func markAnswersSeen() {
+        answersSeenAt = Date()
+        UserDefaults.standard.set(answersSeenAt.timeIntervalSince1970, forKey: Self.answersSeenKey)
+    }
     /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
     /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()

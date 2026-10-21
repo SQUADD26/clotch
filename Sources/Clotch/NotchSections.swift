@@ -78,12 +78,12 @@ struct NotchSectionsContent: View {
 
     var body: some View {
         VStack(spacing: NotchSpace.section) {
-            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs)
+            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, dotted: store.hasNewAnswer ? .requests : nil)
             ZStack(alignment: .top) {
                 Group {
                     switch shown {
                     case .goals: GoalsTab(rows: store.rows, now: now)
-                    case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
+                    case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists, now: now, seenAt: store.answersSeenAt)
                     case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
                     }
                 }
@@ -142,6 +142,8 @@ enum TabBarPointer {
 struct TabBar: View {
     @Binding var tab: NotchTab
     var tabs = NotchTab.allCases
+    /// The tab with a small yellow dot (a new answer, #90); never the open one.
+    var dotted: NotchTab? = nil
     @Namespace private var highlight
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -153,6 +155,9 @@ struct TabBar: View {
                     HStack(spacing: 6) {
                         Image(systemName: item.symbol)
                         Text(item.title)
+                        if item == dotted && item != tab {
+                            Circle().fill(GoalTone.wait.color).frame(width: 6, height: 6).accessibilityLabel("Nuova risposta")
+                        }
                     }
                     .font(item == tab ? NotchType.tab : NotchType.tabOff)
                     .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.off)

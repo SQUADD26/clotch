@@ -112,7 +112,7 @@ public enum VoiceEvents {
     public static func requests(before: [UserRequest]?, after: [UserRequest], now: Date) -> [VoiceEvent] {
         guard let before else { return [] }
         let was = Dictionary(before.map { ($0.id, $0.state) }, uniquingKeysWith: { a, _ in a })
-        return after.filter { $0.state == "fatta" && was[$0.id] != "fatta" && !$0.notOurs }.map {
+        return after.filter { !$0.isQuestion && $0.state == "fatta" && was[$0.id] != "fatta" && !$0.notOurs }.map {
             VoiceEvent(kind: .requestDone, at: $0.doneAt ?? now, session: $0.session, subject: $0.text, text: $0.text, proof: $0.proof)
         }
     }
