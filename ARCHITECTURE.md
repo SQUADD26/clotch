@@ -39,4 +39,4 @@ Work branches → PR into `dev` → promotion PR `dev` → `main`. "Production" 
 None.
 
 ## External services
-None at runtime. CI: GitHub Actions (`architettura.yml` from claude-config; CodeIsland's own release/DMG workflows are manual and unused).
+None at runtime. CI: GitHub Actions (`architettura.yml`, an inline copy of the claude-config check on `ubuntu-latest`: this repo is public and cannot call a private reusable workflow or use the self-hosted runners; CodeIsland's own release/DMG workflows are manual and unused).
