@@ -6,26 +6,20 @@ if [ -d /Applications/Xcode.app/Contents/Developer ]; then
     export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 fi
 
-APP_NAME="CodeIsland"
+APP_NAME="Clotch"
+PRODUCT="Clotch"  # SwiftPM executable name
 BUILD_DIR=".build/release"
 APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
 ICON_CATALOG="Assets.xcassets"
 ICON_SOURCE="AppIcon.icon"
 ICON_INFO_PLIST=".build/AppIcon.partial.plist"
-WATCH_DIR="android-watch"
-WATCH_GRADLEW="$WATCH_DIR/gradlew"
-WATCH_APK_DEBUG="$WATCH_DIR/app/build/outputs/apk/debug/app-debug.apk"
 
-BUILD_MAC=true
-BUILD_WATCH=false
 NOTARIZE=false
 
 usage() {
     cat <<'EOF'
-Usage: ./build.sh [--watch] [--with-watch] [--notarize]
+Usage: ./build.sh [--notarize]
 
-  --watch       Build Android watch app only
-  --with-watch  Build macOS app and Android watch app
   --notarize    Notarize macOS app bundle / DMG after signing
   --help        Show this help
 EOF
@@ -33,13 +27,6 @@ EOF
 
 for arg in "$@"; do
     case "$arg" in
-        --watch)
-            BUILD_MAC=false
-            BUILD_WATCH=true
-            ;;
-        --with-watch)
-            BUILD_WATCH=true
-            ;;
         --notarize)
             NOTARIZE=true
             ;;
@@ -55,24 +42,20 @@ for arg in "$@"; do
     esac
 done
 
-build_watch() {
-    echo "Building Android watch app..."
-    if [ ! -x "$WATCH_GRADLEW" ]; then
-        echo "Missing executable Gradle wrapper: $WATCH_GRADLEW" >&2
-        exit 1
-    fi
-
-    "$WATCH_GRADLEW" -p "$WATCH_DIR" testDebugUnitTest
-    "$WATCH_GRADLEW" -p "$WATCH_DIR" assembleDebug
-
-    echo "Watch APK ready: $WATCH_APK_DEBUG"
+# grep reads the saved output: a pipe into grep -q breaks tee (SIGPIPE) under pipefail and reads Accepted as failed.
+notarize() {
+    local out
+    out=$(xcrun notarytool submit "$1" --keychain-profile "clotch" --wait 2>&1) || true
+    echo "$out" >&2
+    grep -q "status: Accepted" <<<"$out"
 }
 
 build_mac() {
     echo "Building $APP_NAME (arm64 only)..."
     swift build -c release --arch arm64
 
-    ARM_DIR=".build/arm64-apple-macosx/release"
+    # Newer SwiftPM puts products in .build/out/Products/Release: ask it instead of guessing.
+    ARM_DIR="$(swift build -c release --arch arm64 --show-bin-path)"
 
     echo "Creating app bundle..."
     rm -rf "$APP_BUNDLE"
@@ -81,8 +64,8 @@ build_mac() {
     mkdir -p "$APP_BUNDLE/Contents/Resources"
     mkdir -p "$APP_BUNDLE/Contents/Frameworks"
 
-    cp "$ARM_DIR/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
-    cp "$ARM_DIR/codeisland-bridge" "$APP_BUNDLE/Contents/Helpers/codeisland-bridge"
+    cp "$ARM_DIR/$PRODUCT" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+    cp "$ARM_DIR/clotch-bridge" "$APP_BUNDLE/Contents/Helpers/clotch-bridge"
     cp Info.plist "$APP_BUNDLE/Contents/Info.plist"
 
     echo "Embedding frameworks..."
@@ -98,8 +81,10 @@ build_mac() {
     install_name_tool -add_rpath "@executable_path/../Frameworks" \
         "$APP_BUNDLE/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     install_name_tool -add_rpath "@executable_path/../../Frameworks" \
-        "$APP_BUNDLE/Contents/Helpers/codeisland-bridge" 2>/dev/null || true
+        "$APP_BUNDLE/Contents/Helpers/clotch-bridge" 2>/dev/null || true
 
+    # App icon: the Clotch logo (#31) replaces AppIcon.icon (Icon Composer) and
+    # Sources/Clotch/Resources/AppIcon.icns; nothing else changes here.
     echo "Compiling app icon assets..."
     xcrun actool \
         --output-format human-readable-text \
@@ -114,32 +99,35 @@ build_mac() {
         --compile "$APP_BUNDLE/Contents/Resources" \
         "$ICON_CATALOG" \
         "$ICON_SOURCE"
-    cp "Sources/CodeIsland/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+    cp "Sources/Clotch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
     # Copy SPM resource bundles into Contents/Resources/ (required for code signing)
-    for bundle in .build/*/release/*.bundle; do
+    for bundle in "$ARM_DIR"/*.bundle; do
         if [ -e "$bundle" ]; then
             cp -R "$bundle" "$APP_BUNDLE/Contents/Resources/"
             break
         fi
     done
 
-    ENTITLEMENTS="CodeIsland.entitlements"
+    ENTITLEMENTS="Clotch.entitlements"
 
     # Use SIGN_ID env var, or auto-detect: prefer "Developer ID Application" for distribution,
-    # fall back to any valid identity, then ad-hoc
+    # fall back to any valid identity, then ad-hoc. Sign by SHA-1: two certificates with the
+    # same name make the name ambiguous to codesign.
     if [ -z "${SIGN_ID:-}" ]; then
-        SIGN_ID=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)".*/\1/' 2>/dev/null || true)
-    fi
-    if [ -z "$SIGN_ID" ]; then
-        SIGN_ID=$(security find-identity -v -p codesigning | grep -v "REVOKED" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/' 2>/dev/null || true)
+        IDS=$(security find-identity -v -p codesigning 2>/dev/null | grep -v "REVOKED" | grep '"' || true)
+        LINE=$(echo "$IDS" | grep "Developer ID Application" | head -1 || true)
+        [ -n "$LINE" ] || LINE=$(echo "$IDS" | head -1)
+        SIGN_ID=$(echo "$LINE" | awk '{print $2}')
+        SIGN_NAME=$(echo "$LINE" | sed 's/.*"\(.*\)".*/\1/')
     fi
     if [ -z "$SIGN_ID" ]; then
         echo "No developer certificate found, using ad-hoc signing..."
         SIGN_ID="-"
     fi
+    SIGN_NAME="${SIGN_NAME:-$SIGN_ID}"
 
-    echo "Code signing ($SIGN_ID)..."
+    echo "Code signing ($SIGN_NAME)..."
     # Sign embedded frameworks first (inside-out).
     SPARKLE_FW="$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
     # Sign nested helpers inside Sparkle before the framework itself.
@@ -155,20 +143,20 @@ build_mac() {
     fi
     codesign --force --options runtime --sign "$SIGN_ID" "$SPARKLE_FW"
 
-    codesign --force --options runtime --sign "$SIGN_ID" "$APP_BUNDLE/Contents/Helpers/codeisland-bridge"
+    codesign --force --options runtime --sign "$SIGN_ID" "$APP_BUNDLE/Contents/Helpers/clotch-bridge"
     codesign --force --options runtime --sign "$SIGN_ID" --entitlements "$ENTITLEMENTS" "$APP_BUNDLE"
 
-    if [ "$NOTARIZE" = true ] && [[ "$SIGN_ID" == *"Developer ID"* ]]; then
+    if [ "$NOTARIZE" = true ] && [[ "$SIGN_NAME" == *"Developer ID"* ]]; then
         echo "Creating ZIP for notarization..."
         ZIP_PATH="$BUILD_DIR/$APP_NAME.zip"
         ditto -c -k --keepParent "$APP_BUNDLE" "$ZIP_PATH"
 
         echo "Submitting for notarization..."
-        if xcrun notarytool submit "$ZIP_PATH" --keychain-profile "CodeIsland" --wait 2>&1 | tee /dev/stderr | grep -q "status: Accepted"; then
+        if notarize "$ZIP_PATH"; then
             echo "Stapling notarization ticket..."
             xcrun stapler staple "$APP_BUNDLE"
         else
-            echo "ERROR: Notarization failed. Run 'xcrun notarytool log <submission-id> --keychain-profile CodeIsland' for details."
+            echo "ERROR: Notarization failed. Run 'xcrun notarytool log <submission-id> --keychain-profile clotch' for details."
             rm -f "$ZIP_PATH"
             exit 1
         fi
@@ -204,7 +192,7 @@ build_mac() {
 
         codesign --force --sign "$SIGN_ID" "$DMG_PATH"
         echo "Notarizing DMG..."
-        if xcrun notarytool submit "$DMG_PATH" --keychain-profile "CodeIsland" --wait 2>&1 | tee /dev/stderr | grep -q "status: Accepted"; then
+        if notarize "$DMG_PATH"; then
             xcrun stapler staple "$DMG_PATH"
             echo "DMG ready: $DMG_PATH"
         else
@@ -216,10 +204,4 @@ build_mac() {
     echo "Run: open $APP_BUNDLE"
 }
 
-if [ "$BUILD_MAC" = true ]; then
-    build_mac
-fi
-
-if [ "$BUILD_WATCH" = true ]; then
-    build_watch
-fi
+build_mac

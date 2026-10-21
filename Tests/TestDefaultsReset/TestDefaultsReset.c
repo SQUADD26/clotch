@@ -11,7 +11,7 @@
 // Only the xctest runner's domain is ever touched: under any other bundle
 // identifier this does nothing.
 __attribute__((constructor))
-static void codeisland_reset_test_defaults(void) {
+static void clotch_reset_test_defaults(void) {
     CFBundleRef bundle = CFBundleGetMainBundle();
     CFStringRef identifier = bundle ? CFBundleGetIdentifier(bundle) : NULL;
     if (!identifier || CFStringCompare(identifier, CFSTR("com.apple.dt.xctest.tool"), 0) != kCFCompareEqualTo) {

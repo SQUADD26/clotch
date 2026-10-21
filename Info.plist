@@ -3,47 +3,38 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>CodeIsland</string>
+	<string>Clotch</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.codeisland.app</string>
+	<string>com.squadd.clotch</string>
 	<key>CFBundleName</key>
-	<string>CodeIsland</string>
+	<string>Clotch</string>
+	<key>CFBundleDisplayName</key>
+	<string>Clotch</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.38</string>
 	<key>CFBundleVersion</key>
 	<string>1.0.38</string>
-	<key>LSUIElement</key>
-	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>CodeIsland needs to control terminal apps to jump to the correct window and tab when you click a session.</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>CodeIsland uses Bluetooth to mirror the island onto Buddy.</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_codeisland._tcp</string>
-	</array>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>CodeIsland advertises itself on the local network so iPhone can mirror the island state.</string>
+	<string>Clotch needs to control terminal apps to jump to the correct window and tab when you click a session.</string>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>Clotch abbassa l'audio degli altri programmi mentre la voce parla.</string>
+	<!-- No updates: no SUFeedURL and no signing key, so Sparkle can never fetch or accept another build (issue #30). -->
 	<key>SUAutomaticallyUpdate</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
-	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/wxtsky/CodeIsland/main/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>oqLtx5s2hc8Xgsp4rEuTwnQ8UGRT4ma4tjlf+1i3YHA=</string>
-	<key>SUScheduledCheckInterval</key>
-	<integer>14400</integer>
+	<false/>
 </dict>
 </plist>
