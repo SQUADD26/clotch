@@ -42,6 +42,14 @@ for arg in "$@"; do
     esac
 done
 
+# grep reads the saved output: a pipe into grep -q breaks tee (SIGPIPE) under pipefail and reads Accepted as failed.
+notarize() {
+    local out
+    out=$(xcrun notarytool submit "$1" --keychain-profile "clotch" --wait 2>&1) || true
+    echo "$out" >&2
+    grep -q "status: Accepted" <<<"$out"
+}
+
 build_mac() {
     echo "Building $APP_NAME (arm64 only)..."
     swift build -c release --arch arm64
@@ -144,7 +152,7 @@ build_mac() {
         ditto -c -k --keepParent "$APP_BUNDLE" "$ZIP_PATH"
 
         echo "Submitting for notarization..."
-        if xcrun notarytool submit "$ZIP_PATH" --keychain-profile "clotch" --wait 2>&1 | tee /dev/stderr | grep -q "status: Accepted"; then
+        if notarize "$ZIP_PATH"; then
             echo "Stapling notarization ticket..."
             xcrun stapler staple "$APP_BUNDLE"
         else
@@ -184,7 +192,7 @@ build_mac() {
 
         codesign --force --sign "$SIGN_ID" "$DMG_PATH"
         echo "Notarizing DMG..."
-        if xcrun notarytool submit "$DMG_PATH" --keychain-profile "clotch" --wait 2>&1 | tee /dev/stderr | grep -q "status: Accepted"; then
+        if notarize "$DMG_PATH"; then
             xcrun stapler staple "$DMG_PATH"
             echo "DMG ready: $DMG_PATH"
         else
