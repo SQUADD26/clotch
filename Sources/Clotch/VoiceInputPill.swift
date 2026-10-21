@@ -102,7 +102,7 @@ struct VoiceInputPill: View {
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {
                 ForEach(Array(why.actions.enumerated()), id: \.offset) { i, action in
-                    Button(action.label) { input.perform(action) }.buttonStyle(PillButton(primary: i == 0))
+                    Button(action.label) { input.perform(action) }.buttonStyle(VoicePillButtonStyle(primary: i == 0))
                 }
             }
         }
@@ -171,7 +171,7 @@ private struct CancelButton: View {
                     Text("Annulla · \(Int(left.rounded(.up)))")
                 }
             }
-            .buttonStyle(PillButton(primary: false))
+            .buttonStyle(VoicePillButtonStyle(primary: false))
         }
     }
 }
@@ -187,7 +187,7 @@ private struct FadeTop: View {
 }
 
 /// Pill buttons: 12 % white, or the main one 94 % white with dark text.
-private struct PillButton: ButtonStyle {
+private struct VoicePillButtonStyle: ButtonStyle {
     let primary: Bool
 
     func makeBody(configuration: Configuration) -> some View {
