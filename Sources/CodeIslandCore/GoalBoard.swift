@@ -76,6 +76,19 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
 }
 
+extension GoalRow {
+    /// When the work-time counter stops; nil = it runs. It follows the status only: a moving goal counts
+    /// even with no session marked running (the app often leaves `isRunning` out, #49); a still goal stops
+    /// when it went still; a closed one at its last sign of work.
+    public var workEnd: Date? {
+        switch status {
+        case .moving: return nil
+        case .still(let at): return at
+        case .blocked, .reached: return lastActivity ?? since
+        }
+    }
+}
+
 public enum GoalBoard {
     public static let stillAfter: TimeInterval = 30 * 60
     /// Register states the notch shows; a new or unknown state stays hidden until it is added here.

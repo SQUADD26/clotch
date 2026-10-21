@@ -90,7 +90,7 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertLessThan(NotchLayoutMetrics.wing(icons), NotchLayoutMetrics.wing(wide))
     }
 
-    func testCounterStopsWhenTheGoalIsStillOrNoSessionWorks() {
+    func testCounterStopsOnlyWhenTheGoalIsStill() {
         let started = now.addingTimeInterval(-3600)
         func goal(_ status: GoalStatus, running: Bool) -> GoalRow {
             var r = GoalRow(id: "a", title: "t", goal: "g", proofsDone: 0, proofsTotal: 0, progress: nil, status: status,
@@ -99,7 +99,7 @@ final class NotchZoneViewsTests: XCTestCase {
             return r
         }
         XCTAssertNil(goal(.moving, running: true).workEnd, "at work: the clock runs")
-        XCTAssertEqual(goal(.moving, running: false).workEnd, now.addingTimeInterval(-600), "«Nessuna sessione al lavoro»")
+        XCTAssertNil(goal(.moving, running: false).workEnd, "isRunning left out but recent activity: still counts (#49)")
         XCTAssertEqual(goal(.still(since: now.addingTimeInterval(-300)), running: false).workEnd, now.addingTimeInterval(-300), "«Fermo»")
         XCTAssertEqual([goal(.moving, running: true), goal(.moving, running: false)].allPulses.filter(\.running).count, 1)
     }

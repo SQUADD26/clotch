@@ -39,8 +39,7 @@ private struct GoalRingsElement: View {
     }
 }
 
-/// The goal chased now and, when a source gives it, how long work on it has run. `Text(_, style: .timer)`
-/// is drawn by the system: no timer of ours.
+/// The goal chased now and, when a source gives it, how long work on it has run (`WorkTimer`).
 private struct ActiveGoalElement: View {
     let data: NotchZoneData
 
@@ -51,8 +50,7 @@ private struct ActiveGoalElement: View {
                 if let since = data.workingSince {
                     HStack(spacing: 5) {
                         Image(systemName: "stopwatch").font(.system(size: 15))
-                        // Work stopped (still, or no session at work): a fixed figure, no clock.
-                        (hero.workEnd.map { Text(GoalRow.clock(from: since, to: $0)) } ?? Text(since, style: .timer))
+                        WorkTimer(since: since, until: hero.workEnd)
                             .font(NotchType.name.monospacedDigit()).tracking(0.26)
                     }
                     .foregroundStyle(Color.white.opacity(0.75))
