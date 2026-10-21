@@ -132,6 +132,8 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Never on a reload that changed nothing, so an idle board never redraws.
     @Published private(set) var now: Date = Date()
 
+    /// Goal cli -> its pull requests (family sessions' `prs` and PR numbers in its proofs); their state is `PullRequestFeed.shared.infos`.
+    @Published private(set) var goalPRs: [String: [PRRef]] = [:]
     private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
     private var timer: Timer?
@@ -166,6 +168,8 @@ private final class GoalWatcher: @unchecked Sendable {
         if exists != requestsFolderExists { requestsFolderExists = exists }
         if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
+        let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
+        if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()
     }
 

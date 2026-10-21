@@ -26,6 +26,7 @@ public struct DesktopSession: Equatable, Sendable {
     public let isRunning: Bool    // false when the app did not write it: status then comes from activity time
     public let isArchived: Bool
     public let lastActivity: Date?
+    public var prs: [PRRef] = []  // the session's own pull requests (`prs` of the session file)
 }
 
 /// One ~/.claude/handoff/live/<cli>.json
@@ -162,15 +163,15 @@ public enum GoalBoard {
         return out
     }
 
-    /// Master + every non-archived descendant (visited set = cycle-safe).
-    static func family(of master: DesktopSession?, children: [String: [DesktopSession]]) -> [DesktopSession] {
+    /// Master + every non-archived descendant (visited set = cycle-safe); `includeArchived` keeps the archived ones too.
+    static func family(of master: DesktopSession?, children: [String: [DesktopSession]], includeArchived: Bool = false) -> [DesktopSession] {
         var family: [DesktopSession] = master.map { [$0] } ?? []
         var seen = Set(family.map(\.localId))
         var queue = family
         while let s = queue.popLast() {
             for c in children[s.localId] ?? [] where seen.insert(c.localId).inserted {
                 queue.append(c)
-                if !c.isArchived { family.append(c) }
+                if includeArchived || !c.isArchived { family.append(c) }
             }
         }
         return family

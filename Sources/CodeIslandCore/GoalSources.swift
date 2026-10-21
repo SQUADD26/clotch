@@ -29,7 +29,8 @@ public enum GoalSources {
                               parentLocalId: parent?.isEmpty == false ? parent : nil,
                               priorCliIds: (d["priorRemoteCliSessionIds"] as? [Any] ?? []).compactMap { $0 as? String },
                               title: d["title"] as? String ?? "", isRunning: d["isRunning"] as? Bool ?? false,
-                              isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]))
+                              isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]),
+                              prs: PullRequests.parse(d["prs"]))
     }
 
     public static func parseLive(_ data: Data, cliId: String) -> LiveState? {
