@@ -89,19 +89,17 @@ private struct GoalTitle: View {
     @State private var hovered = false
 
     var body: some View {
-        let link = row.masterLink
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text(row.title).font(NotchType.title).tracking(-0.24).foregroundStyle(GoalInk.primary).lineLimit(1)
-            if link != nil {
+            if row.master?.url != nil {
                 Image(systemName: "arrow.up.right")
                     .font(.system(size: 14))
                     .foregroundStyle(hovered ? GoalInk.primary : Color.white.opacity(0.5))
             }
         }
-        .contentShape(Rectangle())
-        .onHover { hovered = link != nil && $0 }
-        .onTapGesture { if let link { NSWorkspace.shared.open(link) } }
-        .help(link != nil ? "Apri sessione master" : "")
-        .accessibilityAddTraits(link != nil ? .isLink : [])
+        .opensSession(row.master)
+        .onHover { hovered = row.master?.url != nil && $0 }
+        .help(row.master?.url != nil ? "Apri sessione master" : "")
+        .accessibilityAddTraits(row.master?.url != nil ? .isLink : [])
     }
 }

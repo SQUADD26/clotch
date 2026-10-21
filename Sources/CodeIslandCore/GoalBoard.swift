@@ -27,6 +27,7 @@ public struct DesktopSession: Equatable, Sendable, Codable {
     public let isArchived: Bool
     public let lastActivity: Date?
     public var prs: [SessionPR] = []  // the session's own pull requests (`prs` of the session file)
+    public var profile = ""  // data folder of the app copy that owns the file (`SessionTarget.profile`)
 }
 
 /// One ~/.claude/handoff/live/<cli>.json
@@ -68,6 +69,7 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public let pulses: [GoalPulse]
     public var proposed = false   // "proposto": not accepted yet, shown quieter, never the goal chased now
     public var since: Date? = nil  // when the goal took its present text and state: the work-time counter starts here
+    public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
 }
 
 public enum GoalBoard {
@@ -131,7 +133,8 @@ public enum GoalBoard {
                 goal: goal,
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
-                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at))
+                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
+                master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) }))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))

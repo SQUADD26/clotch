@@ -18,6 +18,9 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public let proof: String          // #PR / sha, or the reason it was closed
     public let notOurs: Bool
     public let folder: String
+    public let localId: String        // app id (`local_…`) of the session that took it; "" while the register does not know it
+    /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its cli id); nil when not taken or unknown.
+    public var target: SessionTarget? = nil
 
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }
@@ -45,6 +48,6 @@ extension GoalSources {
                            state: d["stato"] as? String ?? "nuova", takenAt: date(d["t_presa"]),
                            takenBy: d["presa_da"] as? String ?? "", doneAt: date(d["t_fatta"]),
                            proof: d["prova"] as? String ?? "", notOurs: d["non_nostra"] as? Bool ?? false,
-                           folder: d["cartella"] as? String ?? "")
+                           folder: d["cartella"] as? String ?? "", localId: d["local_id"] as? String ?? "")
     }
 }

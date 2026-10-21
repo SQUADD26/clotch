@@ -43,6 +43,8 @@ struct NotchNotificationView: View {
             .padding(.leading, 20)
             .padding(.trailing, 24)
             .frame(height: 42)
+            // A request taken in charge opens the session that took it, a goal its master; a PR has no session.
+            .opensSession(event.kind == .requestTaken ? requests.first { $0.id == event.subject }?.target : note.row?.master)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(note.text + ". " + note.label)
         }

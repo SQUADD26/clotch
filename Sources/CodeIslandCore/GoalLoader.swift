@@ -9,7 +9,7 @@ public final class GoalLoader: @unchecked Sendable {
     public typealias Snapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest])
     /// Session stats and values kept across launches, so a restart parses only the files changed since.
     /// Bump the name when `DesktopSession` or `GoalSources.sessionKeys` change: the old file is then ignored.
-    public static let indexName = "sessions-v2.json"
+    public static let indexName = "sessions-v3.json"
 
     public private(set) var paths: GoalSources.Paths
     private let makePaths: () -> GoalSources.Paths
@@ -57,7 +57,11 @@ public final class GoalLoader: @unchecked Sendable {
             requests.replace(with: GoalSources.files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseRequest(d) }
         }
         let isSession = { (u: URL) in u.lastPathComponent.hasPrefix("local_") && u.pathExtension == "json" }
-        let parseSession = { (d: Data, u: URL) in GoalSources.parseSession(d, fileName: u.lastPathComponent) }
+        let parseSession = { (d: Data, u: URL) -> DesktopSession? in
+            var s = GoalSources.parseSession(d, fileName: u.lastPathComponent)
+            s?.profile = SessionTarget.profile(ofSessionFile: u.path)
+            return s
+        }
         if shipped == nil, let index, let data = try? Data(contentsOf: index) { sessions.restore(data) }
         if rescan {
             sessions.replace(with: paths.sessionRoots.flatMap { GoalSources.files(in: $0, fm, recursive: true).filter(isSession) },
@@ -72,6 +76,9 @@ public final class GoalLoader: @unchecked Sendable {
         // only when a goal or a link changed; activity of a session outside every family changes nothing.
         let moved = sessions.takeChanged()
         var touchedReached = moved.keys.contains(where: Set(reached).contains)
+        // A request's link follows its taker's session file, which may sit outside every goal family.
+        let takers = Set(requests.all.filter(\.taken).flatMap { [$0.takenBy, $0.localId] })
+        let touchedTaker = moved.keys.contains { k in sessions[k].map { takers.contains($0.cliId) || takers.contains($0.localId) || $0.priorCliIds.contains(where: takers.contains) } ?? false }
         let relinked = moved.contains { k, old in old.map(Self.link) != sessions[k].map(Self.link) }
         if rescan || relinked || seenGoals != goals.version {
             let reach = GoalBoard.reach(goals: goals.all, sessions: sessions.all)
@@ -95,10 +102,21 @@ public final class GoalLoader: @unchecked Sendable {
 
         // Unchanged values (a rewrite with the same content, a live file of another session): no new board.
         let versions = (goals.version, requests.version)
-        if !rescan, !liveMoved, !touchedReached, let shipped, shipped == versions { return nil }
+        if !rescan, !liveMoved, !touchedReached, !touchedTaker, let shipped, shipped == versions { return nil }
         shipped = versions
+        let byCli = takers.isEmpty ? [:] : GoalBoard.index(sessions.all)
+        let byLocal = takers.isEmpty ? [:] : Dictionary(sessions.all.map { ($0.localId, $0) }, uniquingKeysWith: { a, _ in a })
+        // The register's own `local_id` first; the cli id of `presa_da` only as a fallback (older requests).
+        let linked = requests.all.map { r -> UserRequest in
+            guard r.taken else { return r }
+            let s = r.localId.isEmpty ? byCli[r.takenBy] : byLocal[r.localId]  // never another session folder for a given id
+            guard let id = r.localId.isEmpty ? s?.localId : r.localId else { return r }
+            var r = r
+            r.target = SessionTarget(localId: id, profile: s?.profile ?? "")
+            return r
+        }
         return (goals.all, reached.compactMap { sessions[$0] }, live.keys.sorted().compactMap { live[$0] },
-                requests.all.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) })
+                linked.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) })
     }
 
     /// What ties a session into a goal family; anything else (title, activity) matters only inside one.
