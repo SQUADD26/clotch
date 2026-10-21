@@ -96,3 +96,17 @@ public enum AccountsInUse {
         return email.contains("@") && !email.contains(" ") ? email : nil
     }
 }
+
+public enum ResetCountdown {
+    /// The widest text `text` gives for a window up to 10 days, for a column that never cuts it.
+    public static let longest = "9 g 23:59:59"
+
+    /// Time left to a reset: «2:41:07», «0:04:11», «2 g 3:04:11» past a day; «adesso» once it is due.
+    public static func text(until reset: Date, now: Date) -> String {
+        let s = Int(reset.timeIntervalSince(now).rounded(.up))
+        guard s > 0 else { return "adesso" }
+        let (d, h, m, sec) = (s / 86_400, s % 86_400 / 3600, s % 3600 / 60, s % 60)
+        let clock = String(format: "%d:%02d:%02d", h, m, sec)
+        return d > 0 ? "\(d) g " + clock : clock
+    }
+}
