@@ -1,0 +1,37 @@
+{
+ "cli": "cli-9",
+ "da": "roberto",
+ "firma": "08c2c56c3b8086c0a1ff51087009af76",
+ "local_id": null,
+ "obiettivo": "Il notch mostra le prove: la pagina Y mostra Z e la PR e' in main",
+ "origine": null,
+ "proposta": {
+  "t": "2026-10-21T19:13:45+0000",
+  "testo": "Il notch mostra anche le richieste: la pagina R mostra S e il test passa"
+ },
+ "prova": "",
+ "prove": [
+  {
+   "atteso": "7",
+   "cmd": "python3 -c 'print(7)'",
+   "cwd": "/repo",
+   "fatta": true,
+   "t": "2026-10-21T19:13:45+0000",
+   "testo": "Il test passa"
+  },
+  {
+   "atteso": "8",
+   "cmd": "python3 -c 'print(8)'",
+   "cwd": "/repo",
+   "fatta": false,
+   "t": "2026-10-21T19:13:45+0000",
+   "testo": "La PR e' in main"
+  }
+ ],
+ "stato": "aperto",
+ "storia": [],
+ "t": "2026-10-21T19:13:45+0000",
+ "titolo": "★ Clotch: prove",
+ "ultima_attivita": "2026-10-21T19:13:45+0000",
+ "visto": null
+}

@@ -100,16 +100,20 @@ final class VoiceSpeaker {
                                                      day: day, config: config) == nil else { return }
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1
-        try? files.write(JSONEncoder().encode(day), to: files.dayURL)
+        saveDay(day)
         let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
         guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else { return }
         let text = spoken.text
         day.caratteri += text.count
-        try? files.write(JSONEncoder().encode(day), to: files.dayURL)
+        saveDay(day)
         if await speak(text, config: config, key: key) == nil, !spoken.topic.isEmpty {
             let last: [String: Any] = ["argomento": spoken.topic, "frase": text, "t": Int(Date().timeIntervalSince1970 * 1000)]
             try? files.write(JSONSerialization.data(withJSONObject: last), to: files.lastURL)
         }
+    }
+
+    private func saveDay(_ day: VoiceTurn.Day) {
+        if let data = day.merged(into: try? Data(contentsOf: files.dayURL)) { try? files.write(data, to: files.dayURL) }
     }
 
     private func lastTopic() -> String {

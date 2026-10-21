@@ -165,11 +165,11 @@ public struct VoiceAlertRule: Equatable, Sendable, Identifiable {
 
     public static func removing(_ id: String, from data: Data?) -> Data? { edit(data) { $0.filter { $0["id"] as? String != id } } }
 
-    /// The file with these rules `scattata`; only `stato` changes.
-    public static func firing(_ ids: Set<String>, in data: Data?) -> Data? {
+    /// The file with these rules `scattata` (+ `scattata` = when, epoch seconds: the engine drops a fired rule 7 days after it); nothing else changes.
+    public static func firing(_ ids: Set<String>, in data: Data?, now: Date = Date()) -> Data? {
         edit(data) { $0.map { r in
             var r = r
-            if ids.contains(r["id"] as? String ?? "") { r["stato"] = "scattata" }
+            if ids.contains(r["id"] as? String ?? "") { r["stato"] = "scattata"; r["scattata"] = Int(now.timeIntervalSince1970) }
             return r
         } }
     }

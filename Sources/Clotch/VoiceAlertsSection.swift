@@ -66,8 +66,7 @@ struct VoiceAlertsSection: View {
     /// nil = the file is broken: never overwritten.
     private func remove(_ r: VoiceAlertRule) {
         do {
-            guard let next = VoiceAlertRule.removing(r.id, from: file()) else { throw CocoaError(.fileReadCorruptFile) }
-            try files.write(next, to: files.alertsURL)
+            guard let next = try files.modify(files.alertsURL, lock: "avvisi.lock", { VoiceAlertRule.removing(r.id, from: $0) }) else { throw CocoaError(.fileReadCorruptFile) }
             rules = VoiceAlertRule.parse(next)
             note = l10n["voice_alert_removed"]
         } catch {
