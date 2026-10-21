@@ -23,7 +23,6 @@ enum NotePhase: Int, CaseIterable, Comparable {
     private var queue: [NotchEvent] = []
     private var seen = Set<String>()
     private var lastRows: [GoalRow] = []
-    private var lastRequests: [UserRequest] = []
     private var primedUntil = Date.distantFuture
     private var bag: Set<AnyCancellable> = []
     private var draining = false
@@ -34,7 +33,8 @@ enum NotePhase: Int, CaseIterable, Comparable {
         // than that would be announced once. Upgrade if GoalStore ever exposes "first load done".
         primedUntil = Date().addingTimeInterval(3)
         store.$rows.sink { [weak self] rows in Task { @MainActor in self?.take(rows: rows) } }.store(in: &bag)
-        store.$requests.sink { [weak self] list in Task { @MainActor in self?.take(requests: list) } }.store(in: &bag)
+        // GoalStore already keeps the baseline for requests and hands over only the fresh ones.
+        store.$takenToAnimate.sink { [weak self] ids in Task { @MainActor in self?.take(taken: ids) } }.store(in: &bag)
     }
 
     private var priming: Bool { Date() < primedUntil }
@@ -44,9 +44,8 @@ enum NotePhase: Int, CaseIterable, Comparable {
         if !priming { enqueue(NotchEvents.goals(old: lastRows, new: rows)) }
     }
 
-    private func take(requests: [UserRequest]) {
-        defer { lastRequests = requests }
-        if !priming { enqueue(NotchEvents.requests(old: lastRequests, new: requests)) }
+    private func take(taken ids: [String]) {
+        enqueue(ids.map { NotchEvent(kind: .requestTaken, subject: $0, count: 0) })
     }
 
     private func enqueue(_ events: [NotchEvent]) {
@@ -71,6 +70,7 @@ enum NotePhase: Int, CaseIterable, Comparable {
                 withAnimation(.easeOut(duration: 0.55)) { phase = .settle }
             }
             await pause(3.4)
+            if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }
             withAnimation(still ? .easeOut(duration: 0.2) : NotchAnimation.close) { current = nil }
             await pause(0.45)
         }

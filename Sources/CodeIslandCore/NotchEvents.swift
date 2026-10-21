@@ -1,7 +1,7 @@
 import Foundation
 
-// What the collapsed notch announces: a change between two loads of the goals or of the requests.
-// Pure: the caller keeps the previous load and passes both.
+// What the collapsed notch announces about goals: a change between two loads. Requests taken in
+// charge come from GoalStore.takenToAnimate. Pure: the caller keeps the previous load and passes both.
 
 public struct NotchEvent: Identifiable, Equatable, Sendable {
     public enum Kind: Equatable, Sendable { case opened, proofDone, still, blocked, reached, requestTaken }
@@ -32,11 +32,5 @@ public enum NotchEvents {
             }
             return row.proofsDone > prev.proofsDone ? event(.proofDone) : nil
         }
-    }
-
-    public static func requests(old: [UserRequest], new: [UserRequest]) -> [NotchEvent] {
-        let takenBefore = Set(old.filter(\.taken).map(\.id))
-        return new.filter { $0.taken && !takenBefore.contains($0.id) }
-            .map { NotchEvent(kind: .requestTaken, subject: $0.id, count: 0) }
     }
 }

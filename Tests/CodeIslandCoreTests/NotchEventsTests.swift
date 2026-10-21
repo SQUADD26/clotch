@@ -9,10 +9,6 @@ final class NotchEventsTests: XCTestCase {
                 status: status, lastActivity: t, pulses: [])
     }
 
-    private func request(_ id: String, _ state: String) -> UserRequest {
-        UserRequest(id: id, at: t, session: "s", sessionTitle: "", text: "x", state: state,
-                    takenAt: nil, takenBy: "", doneAt: nil)
-    }
 
     func testGoalChanges() {
         let old = [row("a", .moving, done: 1), row("b", .moving), row("c", .moving), row("d", .still(since: t))]
@@ -24,9 +20,4 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.goals(old: new, new: new), [])
     }
 
-    func testRequestTakenOnce() {
-        let old = [request("1", "nuova"), request("2", "presa")]
-        let new = [request("1", "presa"), request("2", "fatta"), request("3", "nuova")]
-        XCTAssertEqual(NotchEvents.requests(old: old, new: new).map(\.id), ["requestTaken-1-0"])
-    }
 }
