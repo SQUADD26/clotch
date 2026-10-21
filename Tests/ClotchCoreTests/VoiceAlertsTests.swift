@@ -97,7 +97,7 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertEqual(VoiceEvents.goals(before: nil, after: [goal("raggiunto")], now: now), [], "launch baseline")
         let e = VoiceEvents.goals(before: [goal("aperto"), goal("aperto", cli: "z")], after: [goal("raggiunto"), goal("bloccato", cli: "z")], now: now)
         XCTAssertEqual(e.map(\.kind), [.goalReached, .goalBlocked])
-        XCTAssertEqual(e[0].subject, "Clotch")
+        XCTAssertEqual(e[0].subject, "★ Clotch")
         XCTAssertEqual(e[0].text, "Timer che scorre")
         XCTAssertEqual(e[0].proof, "PR #51")
         XCTAssertEqual(VoiceEvents.goals(before: [goal("raggiunto")], after: [goal("raggiunto")], now: now), [], "no change, no news")
