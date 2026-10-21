@@ -6,6 +6,7 @@ import CodeIslandCore
 // MARK: - Navigation Model
 
 enum SettingsPage: String, Identifiable, Hashable {
+    case notch = "notch_page"
     case general
     case behavior
     case appearance
@@ -22,6 +23,7 @@ enum SettingsPage: String, Identifiable, Hashable {
 
     var icon: String {
         switch self {
+        case .notch: return "rectangle.topthird.inset.filled"
         case .general: return "gearshape.fill"
         case .behavior: return "slider.horizontal.3"
         case .appearance: return "paintbrush.fill"
@@ -38,6 +40,7 @@ enum SettingsPage: String, Identifiable, Hashable {
 
     var color: Color {
         switch self {
+        case .notch: return .blue
         case .general: return .gray
         case .behavior: return .orange
         case .appearance: return .blue
@@ -58,9 +61,9 @@ private struct SidebarGroup: Hashable {
     let pages: [SettingsPage]
 }
 
+// Clotch shows only its own pages (#30); the CodeIsland pages stay compiled, off the sidebar.
 private let sidebarGroups: [SidebarGroup] = [
-    SidebarGroup(title: nil, pages: [.general, .behavior, .appearance, .mascots, .sound, .voice, .shortcuts]),
-    SidebarGroup(title: "CodeIsland", pages: [.remote, .hooks, .buddy, .about]),
+    SidebarGroup(title: nil, pages: [.notch, .voice, .about]),
 ]
 
 // MARK: - Main View
@@ -72,7 +75,7 @@ struct SettingsView: View {
 
     /// `initialPage` opens the window on that page (the offscreen UI gallery
     /// renders every page through it).
-    init(appState: AppState? = nil, initialPage: SettingsPage = .general) {
+    init(appState: AppState? = nil, initialPage: SettingsPage = .notch) {
         self.appState = appState
         _selectedPage = State(initialValue: initialPage)
     }
@@ -98,6 +101,7 @@ struct SettingsView: View {
         } detail: {
             Group {
                 switch selectedPage {
+                case .notch: ClotchNotchPage()
                 case .general: GeneralPage()
                 case .behavior: BehaviorPage(appState: appState)
                 case .appearance: AppearancePage()
