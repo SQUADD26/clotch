@@ -16,6 +16,7 @@ public struct AccountUsage: Identifiable, Equatable, Sendable {
     public let sevenDay: UsageWindow?
     public let expired: Bool       // "scaduto": the login must be renewed
     public let reason: String?     // "motivo": why the numbers are missing or stale
+    public let email: String?      // the verified owner of the login: how an account is shown
 }
 
 /// One ~/.claude/richieste/<id>.json
@@ -44,7 +45,8 @@ extension GoalSources {
         }
         return AccountUsage(id: String(fileName.dropFirst(9).dropLast(5)), at: date(d["at"]),
                             fiveHour: window("five_hour"), sevenDay: window("seven_day"),
-                            expired: d["scaduto"] as? Bool ?? false, reason: d["motivo"] as? String)
+                            expired: d["scaduto"] as? Bool ?? false, reason: d["motivo"] as? String,
+                            email: d["email"] as? String)
     }
 
     public static func parseRequest(_ data: Data) -> UserRequest? {

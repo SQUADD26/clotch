@@ -49,8 +49,10 @@ final class NotchFeedsTests: XCTestCase {
     func testParseUsageAsClaudeAccountsUsoWritesIt() {
         let u = GoalSources.parseUsage(data("""
         {"at": 1792588432.5, "five_hour": {"usato": 42.0, "reset": 1792600000.0}, "seven_day": {"usato": 7, "reset": null},
-         "extra": null, "src": "k", "exp": 1, "fails": 0, "riprova": null, "motivo": null, "scaduto": false}
+         "extra": null, "src": "k", "exp": 1, "fails": 0, "riprova": null, "motivo": null, "scaduto": false,
+         "email": "info@squadd.it"}
         """), fileName: "uso-acct-abc-123.json")!
+        XCTAssertEqual(u.email, "info@squadd.it")
         XCTAssertEqual(u.id, "abc-123")
         XCTAssertEqual(u.at, Date(timeIntervalSince1970: 1_792_588_432.5))
         XCTAssertEqual(u.fiveHour, UsageWindow(used: 42, reset: Date(timeIntervalSince1970: 1_792_600_000)))

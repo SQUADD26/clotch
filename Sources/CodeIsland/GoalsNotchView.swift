@@ -91,25 +91,39 @@ extension GoalRow {
 }
 
 extension Array where Element == GoalRow {
-    /// Rows come sorted worst first (GoalBoard), so the first row carries the overall state.
-    var worst: GoalRow? { first }
+    /// The goal being chased now: the open one with the latest activity. The rest keep GoalBoard's
+    /// order (blocked, then still, then moving), so trouble stays on top right under it.
+    var hero: GoalRow? {
+        filter { if case .reached = $0.status { return false } else { return true } }
+            .max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) } ?? first
+    }
     var allPulses: [GoalPulse] { flatMap(\.pulses) }
 
     func accessibilitySummary(now: Date) -> String {
-        guard let worst else { return "Nessun obiettivo aperto" }
-        let head = "\(count) \(count == 1 ? "obiettivo aperto" : "obiettivi aperti")"
-        return [head, worst.reason(now: now) ?? "Tutti in corso"].joined(separator: ". ")
+        guard let hero else { return "Nessun obiettivo aperto" }
+        return hero.accessibilityText(now: now)
     }
 }
 
 // MARK: - Bar
 
 /// Fill = declared proofs done / declared proofs. `nil` draws the bare track: never an invented fill.
+/// The same bar draws account usage, with its own colour.
 struct GoalBar: View {
     let progress: Double?
-    let tone: GoalTone
+    let color: Color
     let height: CGFloat
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    init(progress: Double?, tone: GoalTone, height: CGFloat) {
+        self.init(progress: progress, color: tone.color, height: height)
+    }
+
+    init(progress: Double?, color: Color, height: CGFloat) {
+        self.progress = progress
+        self.color = color
+        self.height = height
+    }
 
     var body: some View {
         let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
@@ -119,14 +133,14 @@ struct GoalBar: View {
                 if let progress, progress > 0 {
                     // Never narrower than tall, so a first proof reads as a bar, not a dot.
                     Capsule()
-                        .fill(tone.color)
+                        .fill(color)
                         .frame(width: max(height, geo.size.width * CGFloat(min(progress, 1))))
                 }
             }
         }
         .frame(height: height)
         .animation(motion, value: progress)
-        .animation(motion, value: tone)
+        .animation(motion, value: color)
     }
 }
 
@@ -197,55 +211,5 @@ struct GoalReason: View {
             }
             .foregroundStyle(row.tone.color)
         }
-    }
-}
-
-// MARK: - Expanded list
-
-struct GoalsEmptyState: View {
-    var body: some View {
-        Text("Nessun obiettivo aperto")
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(GoalInk.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 22)
-            .padding(.vertical, 18)
-    }
-}
-
-/// The whole expanded body: replaces the session list. Scrolls inside `maxHeight`.
-struct GoalsNotchView: View {
-    let maxHeight: CGFloat
-    @ObservedObject private var store = GoalStore.shared
-    @State private var contentHeight: CGFloat = 0
-    @State private var hovered: String?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var listHeight: CGFloat { min(contentHeight, maxHeight) }
-
-    var body: some View {
-        let motion: Animation? = reduceMotion ? nil : NotchAnimation.close
-        if store.rows.isEmpty {
-            GoalsEmptyState()
-        } else {
-            ScrollView(.vertical, showsIndicators: false) {
-                GoalDesign.current.rows(store.rows, now: store.now, hovered: $hovered)
-                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
-            }
-            .frame(height: listHeight)
-            .animation(motion, value: listHeight)
-            .animation(motion, value: store.rows.map { $0.id })
-            .animation(reduceMotion ? nil : NotchAnimation.micro, value: hovered)
-        }
-    }
-}
-
-extension View {
-    /// Hover for one row: sets the shared id on enter, clears it on leave only if still ours.
-    func goalHover(_ id: String, _ hovered: Binding<String?>) -> some View {
-        contentShape(Rectangle())
-            .onHover { inside in
-                if inside { hovered.wrappedValue = id } else if hovered.wrappedValue == id { hovered.wrappedValue = nil }
-            }
     }
 }
