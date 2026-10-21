@@ -36,6 +36,38 @@ final class NotchPagingTests: XCTestCase {
         XCTAssertEqual(s.feed(dx: 1, phase: .wheel, at: t0.addingTimeInterval(0.5)), -1)
     }
 
+    func testWheelBurstOf10In100msStepsOnce() {
+        var s = PageSwipe()
+        var steps: [Int] = []
+        for i in 0..<10 { if let x = s.feed(dx: -3, phase: .wheel, at: t0.addingTimeInterval(Double(i) * 0.01)) { steps.append(x) } }
+        XCTAssertEqual(steps, [1])
+    }
+
+    func testLongFastSpinStepsOnceThenPauseStepsAgain() {
+        var s = PageSwipe()
+        var steps: [Int] = []
+        for i in 0..<40 { if let x = s.feed(dx: 2, phase: .wheel, at: t0.addingTimeInterval(Double(i) * 0.05)) { steps.append(x) } }
+        XCTAssertEqual(steps, [-1])  // 2 s of spin, one gesture
+        XCTAssertEqual(s.feed(dx: 2, phase: .wheel, at: t0.addingTimeInterval(1.95 + PageSwipe.wheelGap + 0.05)), -1)
+    }
+
+    func testTrackpadBurstStepsOnceEachWay() {
+        var s = PageSwipe()
+        var steps: [Int] = []
+        _ = s.feed(dx: -1, phase: .began, at: t0)
+        for _ in 0..<10 { if let x = s.feed(dx: -200, phase: .changed, at: t0) { steps.append(x) } }
+        _ = s.feed(dx: 3, phase: .began, at: t0)
+        for _ in 0..<10 { if let x = s.feed(dx: 200, phase: .changed, at: t0) { steps.append(x) } }
+        XCTAssertEqual(steps, [1, -1])  // fingers left = next, right = previous
+    }
+
+    func testTargetStopsAtTheEdges() {
+        XCTAssertEqual(PageSwipe.target(from: 0, step: 1, count: 3), 1)
+        XCTAssertEqual(PageSwipe.target(from: 2, step: -1, count: 3), 1)
+        XCTAssertNil(PageSwipe.target(from: 2, step: 1, count: 3))
+        XCTAssertNil(PageSwipe.target(from: 0, step: -1, count: 3))
+    }
+
     func testDotWindowSlidesAndStaysInRange() {
         XCTAssertEqual(PageDots.window(count: 3, index: 2), 0..<3)
         XCTAssertEqual(PageDots.window(count: 13, index: 0), 0..<4)
