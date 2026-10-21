@@ -77,8 +77,8 @@ public final class GoalLoader: @unchecked Sendable {
         let moved = sessions.takeChanged()
         var touchedReached = moved.keys.contains(where: Set(reached).contains)
         // A request's link follows its taker's session file, which may sit outside every goal family.
-        let takers = Set(requests.all.filter(\.taken).map(\.takenBy))
-        let touchedTaker = moved.keys.contains { k in sessions[k].map { takers.contains($0.cliId) || $0.priorCliIds.contains(where: takers.contains) } ?? false }
+        let takers = Set(requests.all.filter(\.taken).flatMap { [$0.takenBy, $0.localId] })
+        let touchedTaker = moved.keys.contains { k in sessions[k].map { takers.contains($0.cliId) || takers.contains($0.localId) || $0.priorCliIds.contains(where: takers.contains) } ?? false }
         let relinked = moved.contains { k, old in old.map(Self.link) != sessions[k].map(Self.link) }
         if rescan || relinked || seenGoals != goals.version {
             let reach = GoalBoard.reach(goals: goals.all, sessions: sessions.all)
@@ -105,10 +105,14 @@ public final class GoalLoader: @unchecked Sendable {
         if !rescan, !liveMoved, !touchedReached, !touchedTaker, let shipped, shipped == versions { return nil }
         shipped = versions
         let byCli = takers.isEmpty ? [:] : GoalBoard.index(sessions.all)
+        let byLocal = takers.isEmpty ? [:] : Dictionary(sessions.all.map { ($0.localId, $0) }, uniquingKeysWith: { a, _ in a })
+        // The register's own `local_id` first; the cli id of `presa_da` only as a fallback (older requests).
         let linked = requests.all.map { r -> UserRequest in
-            guard r.taken, let s = byCli[r.takenBy] else { return r }
+            guard r.taken else { return r }
+            let s = r.localId.isEmpty ? byCli[r.takenBy] : byLocal[r.localId]  // never another session folder for a given id
+            guard let id = r.localId.isEmpty ? s?.localId : r.localId else { return r }
             var r = r
-            r.target = SessionTarget(localId: s.localId, profile: s.profile)
+            r.target = SessionTarget(localId: id, profile: s?.profile ?? "")
             return r
         }
         return (goals.all, reached.compactMap { sessions[$0] }, live.keys.sorted().compactMap { live[$0] },

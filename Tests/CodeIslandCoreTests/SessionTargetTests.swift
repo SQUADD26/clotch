@@ -45,18 +45,26 @@ final class SessionTargetTests: GoalTestCase {
         try fm.createDirectory(at: sessions, withIntermediateDirectories: true)
         try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
         try sessionJSON("local_t", cli: "taker").write(to: sessions.appendingPathComponent("local_t.json"))
-        func request(_ id: String, _ state: String, by: String) throws {
-            try Data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "\#(state)", "presa_da": "\#(by)"}"#.utf8)
+        func request(_ id: String, _ state: String, by: String, localId: String? = nil) throws {
+            let local = localId.map { #", "local_id": "\#($0)""# } ?? ""
+            try Data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "\#(state)", "presa_da": "\#(by)"\#(local)}"#.utf8)
                 .write(to: paths.requests.appendingPathComponent("\(id).json"))
         }
         try request("Q-a", "presa", by: "taker")
         try request("Q-b", "presa", by: "nobody")
         try request("Q-c", "nuova", by: "taker")
+        try request("Q-d", "presa", by: "nobody", localId: "local_t")  // the register's local_id wins, no cli lookup needed
+        try request("Q-e", "presa", by: "taker", localId: "local_other")  // its own id, even if the cli points elsewhere
+        try request("Q-f", "presa", by: "taker", localId: "")  // empty: the fallback
         let byId = Dictionary(uniqueKeysWithValues: GoalSources.load(paths).requests.map { ($0.id, $0.target) })
         let found = try XCTUnwrap(byId["Q-a"] ?? nil)
         XCTAssertEqual(found.localId, "local_t")
         XCTAssertTrue(found.profile.hasSuffix("/Library/Application Support/Claude-b"), found.profile)  // /var vs /private/var
         XCTAssertNil(byId["Q-b"] ?? nil, "taker not found: no click")
         XCTAssertNil(byId["Q-c"] ?? nil, "not taken yet: no click")
+        XCTAssertEqual((byId["Q-d"] ?? nil)?.localId, "local_t")
+        XCTAssertEqual((byId["Q-d"] ?? nil)?.profile, found.profile, "profile found by the local id")
+        XCTAssertEqual(byId["Q-e"] ?? nil, SessionTarget(localId: "local_other", profile: ""), "id unknown here: default app, not the cli session folder")
+        XCTAssertEqual((byId["Q-f"] ?? nil)?.localId, "local_t")
     }
 }
