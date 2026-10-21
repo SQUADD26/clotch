@@ -40,11 +40,19 @@ enum NotchQuotaTone {
 }
 
 enum NotchLayoutMetrics {
-    /// How wide the island is for `NotchScreenLayout.width`: 0 = the hardware (or simulated) notch alone,
-    /// 1 = 90% of the screen.
-    static func islandWidth(fraction: Double, screenWidth: CGFloat, notchWidth: CGFloat) -> CGFloat {
-        let widest = max(notchWidth, screenWidth * 0.9)
-        return notchWidth + CGFloat(min(max(fraction, 0), 1)) * (widest - notchWidth)
+    /// How wide the island is for `NotchScreenLayout.width`: 0 = just its elements, 1 = the widest it can be.
+    static func islandWidth(fraction: Double, from narrowest: CGFloat, to widest: CGFloat) -> CGFloat {
+        narrowest + CGFloat(min(max(fraction, 0), 1)) * max(0, widest - narrowest)
+    }
+
+    /// The closed notch's width for a screen's layout: its zones' elements, widened by the «Larghezza» slider.
+    /// shortcut: the widest is the panel window (620 pt at most), not 90% of the screen; widen the window if Roberto wants more.
+    static func closedWidth(_ layout: NotchScreenLayout, hasNotch: Bool, notchWidth: CGFloat,
+                            minWing: CGFloat, maxWidth: CGFloat) -> CGFloat {
+        let zones = layout.resolved(hasNotch: hasNotch)
+        let side = max(minWing, wing(zones))
+        let centre = hasNotch ? notchWidth : max(notchWidth, width(of: zones.centre, zones))
+        return min(islandWidth(fraction: layout.width, from: centre + side * 2, to: maxWidth), maxWidth)
     }
 
     static let spacing: CGFloat = 14  // between elements of one zone

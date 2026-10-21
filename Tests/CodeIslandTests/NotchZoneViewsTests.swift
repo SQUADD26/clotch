@@ -54,11 +54,29 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertEqual(d.name(of: d.accounts[0]), "claudesquadd1")
     }
 
-    func testIslandWidthGrowsFromTheNotchToMostOfTheScreen() {
-        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0, screenWidth: 1512, notchWidth: 200), 200)
-        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 1, screenWidth: 1512, notchWidth: 200), 1512 * 0.9, accuracy: 0.01)
-        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 9, screenWidth: 1512, notchWidth: 200), 1512 * 0.9, accuracy: 0.01)
-        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0.5, screenWidth: 100, notchWidth: 200), 200)
+    func testIslandWidthGrowsFromItsElementsToTheWidest() {
+        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0, from: 368, to: 620), 368)
+        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 1, from: 368, to: 620), 620)
+        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 9, from: 368, to: 620), 620)
+        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0.5, from: 368, to: 620), 494)
+        XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0.5, from: 700, to: 620), 700, "never narrower than its elements")
+    }
+
+    func testSavedWidthChangesTheClosedNotchWidth() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "NotchZoneViewsTests-\(UUID().uuidString)"))
+        var wide = NotchScreenLayout.standard(hasNotch: true)
+        wide.width = 1
+        var half = wide
+        half.width = 0.5
+        NotchLayoutStore(screens: ["wide": wide, "half": half]).save(to: defaults)
+        let saved = NotchLayoutStore.load(from: defaults)
+        func width(_ signature: String) -> CGFloat {
+            NotchLayoutMetrics.closedWidth(saved.layout(for: signature, hasNotch: true), hasNotch: true,
+                                           notchWidth: 200, minWing: 41, maxWidth: 620)
+        }
+        XCTAssertEqual(width("other screen"), 200 + 84 * 2, "standard: the Figma wings beside the notch")
+        XCTAssertEqual(width("half"), 494)
+        XCTAssertEqual(width("wide"), 620)
     }
 
     func testWingFitsTheLayoutsElements() {

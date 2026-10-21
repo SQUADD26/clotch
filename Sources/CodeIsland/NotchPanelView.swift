@@ -236,11 +236,11 @@ struct NotchPanelView: View {
     private var collapsedBarWidth: CGFloat {
         // Immediate hover acknowledgement: a slight widen while the expand delay runs
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
-        // The zones' wings: as wide as their elements need, never narrower than the shell's own wing.
-        let wing = max(compactWingWidth, NotchLayoutMetrics.wing(notchLayout))
-        let centre = hasNotch ? effectiveNotchW
-            : max(effectiveNotchW, NotchLayoutMetrics.width(of: notchLayout.centre, notchLayout))
-        return min(centre + wing * 2 + prehoverExtra, maxPanelWidth)
+        // The zones' wings as wide as their elements need (never narrower than the shell's own wing),
+        // then the «Larghezza» chosen in «Personalizza il notch».
+        let island = NotchLayoutMetrics.closedWidth(notchLayout, hasNotch: hasNotch, notchWidth: effectiveNotchW,
+                                                    minWing: compactWingWidth, maxWidth: maxPanelWidth)
+        return min(island + prehoverExtra, maxPanelWidth)
     }
 
     /// This screen's saved layout (re-read when «Personalizza il notch» saves), else the standard one.
