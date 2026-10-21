@@ -4,7 +4,7 @@ import Foundation
 // charge come from GoalStore.takenToAnimate. Pure: the caller keeps the previous load and passes both.
 
 public struct NotchEvent: Identifiable, Equatable, Sendable {
-    public enum Kind: Equatable, Sendable { case opened, proofDone, still, blocked, reached, requestTaken }
+    public enum Kind: Equatable, Sendable { case proofDone, still, blocked, reached, requestTaken }
     public let kind: Kind
     /// Goal id (`GoalRow.id`) or request id (`UserRequest.id`): the view reads the live data from it.
     public let subject: String
@@ -25,10 +25,8 @@ public enum NotchEvents {
         let before = Dictionary(old.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         return new.compactMap { row in
             let event = { (kind: NotchEvent.Kind) in NotchEvent(kind: kind, subject: row.id, count: row.proofsDone) }
-            guard let prev = before[row.id] else {
-                if case .reached = row.status { return nil }
-                return event(.opened)
-            }
+            // A goal that appears is not news: only a change of a known goal is.
+            guard let prev = before[row.id] else { return nil }
             switch (prev.status, row.status) {
             case (.reached, .reached), (.blocked, .blocked), (.still, .still): break
             case (_, .reached): return event(.reached)

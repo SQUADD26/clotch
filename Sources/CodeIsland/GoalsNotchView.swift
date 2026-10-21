@@ -146,8 +146,8 @@ struct GoalBar: View {
 
 // MARK: - Sessions
 
-/// How many sessions of a goal run now, with Apple's own "live" symbol moving while they do.
-/// Shown only when at least one runs: idle sessions are not news (the reason line says "Fermo").
+/// How many sessions a goal has, with Apple's own "live" symbol: green and moving while at least one
+/// runs a turn, quiet otherwise. Nothing when the goal has no session.
 struct SessionsLive: View {
     let row: GoalRow
     var size: CGFloat = 11.5
@@ -155,16 +155,24 @@ struct SessionsLive: View {
     var compact = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var text: String {
+        let n = row.pulses.count
+        if compact { return "\(n)" }
+        let sessions = "\(n) \(n == 1 ? "sessione" : "sessioni")"
+        return row.runningCount > 0 ? sessions + ", \(row.runningCount) in corso" : sessions
+    }
+
     var body: some View {
-        if row.runningCount > 0 {
+        if !row.pulses.isEmpty {
+            let live = row.runningCount > 0
             HStack(spacing: 4) {
                 Image(systemName: "waveform")
                     .font(.system(size: size - 1, weight: .semibold))
-                    .foregroundStyle(GoalTone.go.color)
-                    .symbolEffect(.variableColor.iterative, isActive: !reduceMotion)
-                Text(compact ? "\(row.runningCount)" : "\(row.runningCount) in corso")
+                    .foregroundStyle(live ? GoalTone.go.color : GoalInk.secondary)
+                    .symbolEffect(.variableColor.iterative, isActive: live && !reduceMotion)
+                Text(text)
                     .font(.system(size: size, weight: .medium).monospacedDigit())
-                    .foregroundStyle(GoalInk.primary)
+                    .foregroundStyle(live ? GoalInk.primary : GoalInk.secondary)
                     .contentTransition(.numericText())
             }
             .fixedSize()

@@ -15,7 +15,7 @@ final class NotchEventsTests: XCTestCase {
         let new = [row("a", .moving, done: 2), row("b", .blocked(reason: "r")), row("c", .reached),
                    row("d", .still(since: t.addingTimeInterval(60))), row("e", .moving)]
         XCTAssertEqual(NotchEvents.goals(old: old, new: new).map(\.id),
-                       ["proofDone-a-2", "blocked-b-0", "reached-c-0", "opened-e-0"])
+                       ["proofDone-a-2", "blocked-b-0", "reached-c-0"], "a new goal (e) is not news")
         // Still while still is no news; unchanged rows give nothing.
         XCTAssertEqual(NotchEvents.goals(old: new, new: new), [])
     }

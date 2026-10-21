@@ -59,9 +59,20 @@ enum GoalSnapshot {
         } else {
             print("snapshot: no request taken in charge yet, no «presa in carico» frames")
         }
+        // The goal chased now, as the change its present state would have announced.
         if let hero = store.rows.hero {
-            out.append(("obiettivo", NotchEvent(kind: hero.proofsDone > 0 ? .proofDone : .opened,
-                                                subject: hero.id, count: hero.proofsDone)))
+            let kind: NotchEvent.Kind?
+            switch hero.status {
+            case .blocked: kind = .blocked
+            case .still: kind = .still
+            case .reached: kind = .reached
+            case .moving: kind = hero.proofsDone > 0 ? .proofDone : nil
+            }
+            if let kind {
+                out.append(("obiettivo", NotchEvent(kind: kind, subject: hero.id, count: hero.proofsDone)))
+            } else {
+                print("snapshot: the goal chased now is moving with no proof done, no goal frames")
+            }
         }
         return out
     }
@@ -70,9 +81,9 @@ enum GoalSnapshot {
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                GoalsLeftWing(expanded: false)
+                GoalsLeftWing()
                 Color.clear.frame(width: notchWidth)  // where the hardware notch sits
-                GoalsRightWing(expanded: false)
+                GoalsRightWing()
             }
             .frame(maxWidth: .infinity)
             .frame(height: notchHeight)
@@ -88,7 +99,12 @@ enum GoalSnapshot {
     private static func expanded() -> some View {
         let store = GoalStore.shared
         return VStack(spacing: 0) {
-            Color.clear.frame(height: notchHeight)
+            HStack(spacing: 0) {
+                GoalsLeftWing()
+                Color.clear.frame(width: notchWidth)
+                GoalsRightWing()
+            }
+            .frame(height: notchHeight)
             NotchSectionsContent(rows: store.rows, usage: store.usage, requests: store.requests, now: store.now)
         }
         .frame(width: 580)

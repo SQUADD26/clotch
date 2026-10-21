@@ -257,12 +257,12 @@ struct NotchPanelView: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 if showBar {
-                    // The goal chased now: state and bar left of the notch, proofs right. Centred, so the
-                    // wings stay snug against the notch when a notification widens the island.
+                    // The goal chased now: state and bar left of the notch, proofs right, open or closed.
+                    // Centred, so the wings stay snug against the notch when the island widens.
                     HStack(spacing: 0) {
-                        GoalsLeftWing(expanded: shouldShowExpanded)
-                        Color.clear.frame(width: hasNotch && !shouldShowExpanded ? effectiveNotchW : 0)
-                        GoalsRightWing(expanded: shouldShowExpanded)
+                        GoalsLeftWing()
+                        Color.clear.frame(width: hasNotch ? effectiveNotchW : 0)
+                        GoalsRightWing()
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: notchHeight)

@@ -75,11 +75,24 @@ private struct UsagePlate: View {
                 }
             }
             if usage.isEmpty { EmptyLine("Nessun dato sull'uso") }
-            ForEach(usage) { AccountLine(account: $0, now: now) }
+            // Fresh numbers first; accounts without fresh numbers keep their place below, muted.
+            ForEach(usage.filter { $0.fresh(now: now) } + usage.filter { !$0.fresh(now: now) }) {
+                AccountLine(account: $0, now: now)
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassPlate(radius: 16)
+    }
+}
+
+extension AccountUsage {
+    /// Numbers read in the last hour, with no "motivo" (claude-accounts sets it when they are missing
+    /// or could not be refreshed). Expired logins count as fresh: "Login scaduto" is the news.
+    func fresh(now: Date) -> Bool {
+        if expired { return true }
+        guard reason?.isEmpty ?? true, let at else { return false }
+        return now.timeIntervalSince(at) < 60 * 60
     }
 }
 
@@ -92,13 +105,18 @@ private struct AccountLine: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(account.label)
                     .font(.system(size: 12.5, weight: .medium))
-                    .foregroundStyle(GoalInk.primary)
+                    .foregroundStyle(account.fresh(now: now) ? GoalInk.primary : GoalInk.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                if let note { Text(note).font(.system(size: 11)).foregroundStyle(GoalInk.secondary).lineLimit(1) }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            if account.expired {
+            if !account.fresh(now: now) {
+                // Old or missing numbers are never drawn as bars: they would read as real usage.
+                Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato")
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(GoalInk.secondary)
+                    .frame(width: UsagePlate.meter * 2 + 12, alignment: .leading)
+            } else if account.expired {
                 Label("Login scaduto", systemImage: "pause.fill")
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(GoalTone.wait.color)
@@ -109,13 +127,6 @@ private struct AccountLine: View {
             }
         }
         .accessibilityElement(children: .combine)
-    }
-
-    /// Why the numbers are missing, or how old they are: real data says its age.
-    private var note: String? {
-        if account.fiveHour == nil, account.sevenDay == nil, let reason = account.reason, !reason.isEmpty { return reason }
-        guard let at = account.at, now.timeIntervalSince(at) > 15 * 60 else { return nil }
-        return "Aggiornato " + GoalRow.elapsed(from: at, to: now) + " fa"
     }
 }
 

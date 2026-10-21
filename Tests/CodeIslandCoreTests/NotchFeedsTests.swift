@@ -171,4 +171,24 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(r.usage.map(\.id), ["a", "b"])
         XCTAssertEqual(r.requests.map(\.id), ["new", "old"], "newest first")
     }
+
+    func testAccountNameFromDesktopAppFolder() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("feeds-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let id = "f5c31b0f-80df-4c45-a343-71768151f6f4"
+        let support = home.appendingPathComponent("Library/Application Support")
+        try fm.createDirectory(at: support.appendingPathComponent("Claude-r-bondici/claude-code-sessions/\(id)/org"),
+                               withIntermediateDirectories: true)
+        try fm.createDirectory(at: support.appendingPathComponent("Claude/claude-code-sessions/1599c9b4-0000-4000-8000-000000000000"),
+                               withIntermediateDirectories: true)
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.usage, withIntermediateDirectories: true)
+        let usage = #"{"at": 1, "five_hour": {"usato": 1, "reset": null}, "scaduto": false}"#
+        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-\(id).json"))
+        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-1599c9b4-0000-4000-8000-000000000000.json"))
+
+        let labels = GoalSources.load(paths).usage.map(\.label)
+        XCTAssertEqual(labels, ["1599c9b4", "r-bondici"], "plain Claude folder: no name, short id")
+    }
 }

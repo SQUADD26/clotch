@@ -111,7 +111,6 @@ private struct Note {
         guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
         let title: String
         switch event.kind {
-        case .opened: title = "Obiettivo aperto"
         case .proofDone: title = "Prova fatta"
         case .still: title = "Obiettivo fermo"
         case .blocked: title = "Obiettivo bloccato"
@@ -121,9 +120,10 @@ private struct Note {
         // The bar starts from the count before this proof, so the fill is the news.
         let before = event.kind == .proofDone && row.proofsTotal > 0
             ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
-        self.init(title: title, subtitle: row.displayTitle, startSymbol: "circle",
-                  symbol: event.kind == .proofDone ? "checkmark" : row.symbol, color: row.tone.color,
-                  row: row, before: before)
+        // A goal's shape is its state from the first frame; only a request turns from open circle to check.
+        let symbol = event.kind == .proofDone ? "checkmark" : row.symbol
+        self.init(title: title, subtitle: row.displayTitle, startSymbol: symbol, symbol: symbol,
+                  color: row.tone.color, row: row, before: before)
     }
 
     private init(title: String, subtitle: String, startSymbol: String, symbol: String, color: Color,

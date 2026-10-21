@@ -88,7 +88,9 @@ public enum GoalSources {
         }
         let usage = files(in: paths.usage, fm).filter { $0.lastPathComponent.hasPrefix("uso-acct-") && $0.pathExtension == "json" }
             .compactMap { url in (try? Data(contentsOf: url)).flatMap { parseUsage($0, fileName: url.lastPathComponent) } }
+        // accounts.json and the logins win; the desktop app's per-account folders fill the gaps.
         let names = usage.isEmpty ? [:] : accountNames(home: paths.home)
+            .merging(desktopAccountNames(sessionRoots: paths.sessionRoots)) { declared, _ in declared }
         let named = usage.map { u in var u = u; u.name = names[u.id]; return u }
             .sorted { ($0.label, $0.id) < ($1.label, $1.id) }
         let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }

@@ -84,6 +84,21 @@ extension GoalSources {
         return out
     }
 
+    /// Second source of account names: the desktop app keeps one folder per account,
+    /// `Application Support/Claude-<name>/claude-code-sessions/<account uuid>/`. Plain `Claude` has no name.
+    static func desktopAccountNames(sessionRoots: [URL]) -> [String: String] {
+        var out: [String: String] = [:]
+        for root in sessionRoots {
+            let app = root.deletingLastPathComponent().lastPathComponent
+            guard app.lowercased().hasPrefix("claude-"), app.count > 7 else { continue }
+            let name = String(app.dropFirst(7))
+            for id in (try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [] where UUID(uuidString: id) != nil {
+                out[id] = out[id] ?? name
+            }
+        }
+        return out
+    }
+
     /// The flat "oauthAccount" object of a .claude.json, cut out and parsed alone: the file holds megabytes
     /// of project history and is re-read on every load.
     static func oauthAccount(_ url: URL) -> [String: Any] {
