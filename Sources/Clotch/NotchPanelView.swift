@@ -437,6 +437,9 @@ struct NotchPanelView: View {
                     }
                 }
 
+                // #117: a still pointer under a growing island (a notification) or a moved window is not Roberto.
+                if hovering && !NotchFocus.isUserHover(secondsSincePointerMoved:
+                    CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)) { return }
                 isHovered = hovering
                 if hovering {
                     // Immediate lightweight acknowledgement; a quick pass-through
