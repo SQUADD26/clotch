@@ -1,17 +1,19 @@
 import SwiftUI
+import AppKit
 import ClotchCore
 
-/// «Voce» (#38, #50, #57): Clotch's voice: on/off, «Parla per», «Avvisami quando…», ElevenLabs key, voice, speed,
-/// daily limits, a test. Haiku's instructions are the config's own file (#84), never edited here.
-/// Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`; the text is Italian like the rest of Clotch's own pages.
+/// «Voce» (#38, #50, #57, Figma #95): on/off, «Parla per», other sounds, the two keys, voice, speed, daily limits, a test,
+/// the sentence's model and its instructions, and the alerts. Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`;
+/// the text is Italian like the rest of Clotch's own pages. Every change is saved at once: the page has no «Salva».
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
+    /// ElevenLabs models offered in the menu; a model written by hand in config.json is listed too.
+    private static let models = [("eleven_v4_turbo", "Turbo v4"), ("eleven_flash_v2_5", "Flash v2.5"),
+                                 ("eleven_multilingual_v2", "Multilingual v2"), ("eleven_v3", "v3")]
 
     @State private var isOn = true
-    @State private var hasKey = false
-    @State private var newKey = ""
-    @State private var hasJevKey = false
-    @State private var newJevKey = ""
+    @State private var key: String?
+    @State private var jevKey: String?
     @State private var voiceId = ""
     @State private var model = VoiceFiles.defaultModel
     @State private var speed = VoiceFiles.defaultSpeed
@@ -30,76 +32,71 @@ struct VoiceSettingsPage: View {
     @State private var note: String?
 
     var body: some View {
-        Form {
-            Section {
-                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude scrive una frase breve, con le stesse istruzioni della voce di Clean View. Poi ElevenLabs la legge con la voce scelta.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Toggle("Voce accesa", isOn: Binding(get: { isOn }, set: { on in
+        SettingsForm {
+            SettingsNote("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude scrive una frase breve, poi ElevenLabs la legge con la voce scelta.")
+            SettingsRow("Voce") {
+                SettingsCheckbox(title: "Voce accesa", isOn: Binding(get: { isOn }, set: { on in
                     run("Voce non salvata") { try files.setOn(on) }
                     isOn = files.isOn
                     VoiceSpeaker.shared.refresh()
                 }))
-                if !hasPrompt {
-                    Text("Istruzioni della voce mancanti. La voce tace.")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
             }
-
-            Section {
+            SettingsRow("Stato") {
+                HStack(spacing: 6) {
+                    Circle().fill(key == nil ? Color.orange : Color.green).frame(width: 8, height: 8)
+                    Text(key == nil ? "Manca la chiave" : "Chiave salvata")
+                }
+                if !hasPrompt { SettingsNote("Istruzioni della voce mancanti. La voce tace.") }
+            }
+            SettingsRow("Parla per") {
                 Picker("Parla per", selection: Binding(get: { audience }, set: { audience = $0; saveAudience() })) {
                     Text("Tutte le sessioni").tag(VoiceTurn.Config.Audience.all)
                     Text("Solo le sessioni principali").tag(VoiceTurn.Config.Audience.main)
                     Text("Solo una sessione").tag(VoiceTurn.Config.Audience.one)
                 }
-                .disabled(configBroken)
+                .labelsHidden().frame(width: 240)
                 if audience == .one {
                     Picker("Sessione", selection: Binding(get: { onlySession }, set: { onlySession = $0; saveAudience() })) {
                         if sessions.isEmpty { Text("Nessuna sessione").tag("") }
-                        ForEach(sessions, id: \.localId) { s in
-                            Text(s.title.isEmpty ? "Senza titolo" : s.title).tag(s.localId)
-                        }
+                        ForEach(sessions, id: \.localId) { s in Text(s.title.isEmpty ? "Senza titolo" : s.title).tag(s.localId) }
                     }
-                    .disabled(configBroken)
+                    .labelsHidden().frame(width: 240)
                 }
-            } header: {
-                Text("Sessioni")
-            } footer: {
-                Text("Principali: quelle aperte da te, non da un'altra sessione.")
+                SettingsNote("Principali: quelle aperte da te, non da un’altra sessione.")
             }
-
-            Section {
-                Toggle("Abbassa l'audio mentre parlo", isOn: Binding(get: { duck }, set: { duck = $0; saveDuck() }))
-                    .disabled(configBroken)
+            .disabled(configBroken)
+            SettingsRow("Altri suoni") {
+                SettingsCheckbox(title: "Abbassa l’audio mentre parla",
+                                 note: "Musica e video scendono mezzo secondo prima della voce. Al primo uso macOS chiede il permesso.",
+                                 isOn: Binding(get: { duck }, set: { duck = $0; saveDuck() }))
                 if duck {
-                    LabeledContent("Livello") {
-                        HStack {
-                            Slider(value: $duckPercent, in: (VoiceDuck.levelRange.lowerBound * 100)...(VoiceDuck.levelRange.upperBound * 100), step: 5) { editing in
-                                if !editing { saveDuck() }
-                            }
-                            Text("\(Int(duckPercent)) %")
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                                .frame(width: 44, alignment: .trailing)
-                        }
-                    }
-                    .disabled(configBroken)
+                    SettingsSlider(value: $duckPercent,
+                                   range: (VoiceDuck.levelRange.lowerBound * 100)...(VoiceDuck.levelRange.upperBound * 100), step: 5,
+                                   ticks: ["\(Int(VoiceDuck.levelRange.lowerBound * 100))%", "\(Int(VoiceDuck.levelRange.upperBound * 100))%"],
+                                   shown: "\(Int(duckPercent))%", label: "Volume degli altri suoni", onEnd: saveDuck)
                 }
-            } header: {
-                Text("Altri suoni")
-            } footer: {
-                Text("Musica e video scendono mezzo secondo prima della voce e risalgono mezzo secondo dopo. Al primo uso macOS chiede il permesso per l'audio di sistema.")
             }
-
-            Section {
-                Picker("Modello", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
+            .disabled(configBroken)
+            Divider()
+            keyRow("Chiave ElevenLabs", masked: key, note: "Creala su elevenlabs.io, in Developers › API Keys. Resta solo su questo Mac.") {
+                try files.saveKey($0)
+            }
+            keyRow("Chiave Jev", masked: jevKey, note: "Prima di parlare, la voce chiede a Jev se la novità ti serve. Resta solo su questo Mac.") {
+                try files.saveJevKey($0)
+            }
+            Divider()
+            reading
+            Divider()
+            SettingsRow("Scrive la frase") {
+                Picker("Scrive la frase", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
                     Text("Haiku 5.5").tag("claude-haiku-5-5")
                     Text("Sonnet 5.5").tag("claude-sonnet-5-5")
                     Text("Opus 5.5").tag("claude-opus-5-5")
                 }
-                .disabled(configBroken)
+                .labelsHidden().frame(width: 200)
+            }
+            .disabled(configBroken)
+            SettingsRow("Ragionamento") {
                 Picker("Ragionamento", selection: Binding(get: { rewriterEffort }, set: { rewriterEffort = $0; saveRewriter() })) {
                     Text("Basso").tag("low")
                     Text("Medio").tag("medium")
@@ -107,89 +104,17 @@ struct VoiceSettingsPage: View {
                     Text("Molto alto").tag("xhigh")
                     Text("Massimo").tag("max")
                 }
-                .disabled(configBroken)
-            } header: {
-                Text("Frase")
-            } footer: {
-                Text("Il modello che scrive la frase da leggere. Più ragionamento: frase più curata, ma più lenta.")
+                .labelsHidden().frame(width: 200)
+                SettingsNote("Più ragionamento: frase più curata, ma più lenta.")
             }
-
+            .disabled(configBroken)
+            VoicePromptRow(note: $note)
+            Divider()
             VoiceAlertsSection(sessions: sessions, note: $note)
-
-            Section {
-                LabeledContent("Stato") {
-                    Text(hasKey ? "Chiave salvata" : "Manca la chiave")
-                        .foregroundStyle(hasKey ? Color.secondary : Color.orange)
-                }
-                HStack {
-                    SecureField("Incolla chiave", text: $newKey)
-                    Button("Salva") {
-                        run("Chiave non salvata", done: "Chiave salvata") { try files.saveKey(newKey) }
-                        newKey = ""
-                        hasKey = files.hasKey
-                        VoiceSpeaker.shared.refresh()
-                    }
-                    .disabled(newKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            } header: {
-                Text("Chiave ElevenLabs")
-            } footer: {
-                Text("Creala su elevenlabs.io, in Developers › API Keys. Resta solo su questo Mac.")
-            }
-
-            Section {
-                LabeledContent("Stato") {
-                    Text(hasJevKey ? "Chiave salvata" : "Manca la chiave")
-                        .foregroundStyle(.secondary)
-                }
-                HStack {
-                    SecureField("Incolla chiave", text: $newJevKey)
-                    Button("Salva") {
-                        run("Chiave non salvata", done: "Chiave salvata") { try files.saveJevKey(newJevKey) }
-                        newJevKey = ""
-                        hasJevKey = files.hasJevKey
-                    }
-                    .disabled(newJevKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            } header: {
-                Text("Chiave Jev")
-            } footer: {
-                Text("Prima di parlare, la voce chiede a Jev se la novità ti serve. Resta solo su questo Mac.")
-            }
-
-            Section {
-                TextField("ID voce", text: $voiceId, prompt: Text("Lascia vuoto per la voce di serie"))
-                TextField("Modello", text: $model)
-                LabeledContent("Velocità") {
-                    HStack {
-                        Slider(value: $speed, in: VoiceFiles.speedRange, step: 0.05)
-                        Text(String(format: "%.2f×", speed))
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 44, alignment: .trailing)
-                    }
-                }
-                TextField("Frasi al giorno", value: $maxCalls, format: .number)
-                TextField("Caratteri al giorno", value: $maxChars, format: .number)
-                HStack {
-                    Button(testing ? "Prova in corso..." : "Prova voce", action: test).disabled(testing)
-                    Spacer()
-                    Button("Salva", action: saveConfig).disabled(configBroken)
-                }
-            } header: {
-                Text("Lettura")
-            } footer: {
-                Text(configBroken
-                     ? "Impostazioni illeggibili. Correggi a mano il file config.json della voce."
-                     : "Oltre i limiti del giorno la voce tace fino a domani.")
-            }
-
-            if let note {
-                Text(note).font(.system(size: 12)).foregroundStyle(.secondary)
-            }
+            if let note { SettingsNote(note).frame(maxWidth: .infinity, alignment: .trailing) }
         }
-        .formStyle(.grouped)
         .onAppear(perform: load)
+        .onDisappear { if !configBroken { saveConfig() } }
         .task {
             // The open ones, newest first; the chosen one stays listed even when archived.
             sessions = await GoalStore.shared.allSessions()
@@ -198,10 +123,72 @@ struct VoiceSettingsPage: View {
         }
     }
 
+    /// Voice, model, speed, limits and the test.
+    @ViewBuilder private var reading: some View {
+        SettingsRow("ID voce") {
+            TextField("ID voce", text: $voiceId, prompt: Text("Lascia vuoto per la voce di serie"))
+                .labelsHidden().frame(width: 260).onSubmit(saveConfig)
+        }
+        SettingsRow("Modello") {
+            Picker("Modello", selection: Binding(get: { model }, set: { model = $0; saveConfig() })) {
+                ForEach(Self.models, id: \.0) { Text($0.1).tag($0.0) }
+                if !Self.models.contains(where: { $0.0 == model }) { Text(model).tag(model) }
+            }
+            .labelsHidden().frame(width: 200)
+        }
+        SettingsRow("Velocità") {
+            SettingsSlider(value: $speed, range: VoiceFiles.speedRange, step: 0.05,
+                           ticks: [times(VoiceFiles.speedRange.lowerBound), times(VoiceFiles.speedRange.upperBound)],
+                           shown: times(speed), label: "Velocità", onEnd: saveConfig)
+        }
+        SettingsRow("Limiti al giorno") {
+            HStack(spacing: 8) {
+                TextField("Frasi al giorno", value: $maxCalls, format: .number).labelsHidden().frame(width: 64).onSubmit(saveConfig)
+                Text("frasi")
+                TextField("Caratteri al giorno", value: $maxChars, format: .number).labelsHidden().frame(width: 80).onSubmit(saveConfig)
+                Text("caratteri")
+            }
+            SettingsNote(configBroken
+                         ? "Impostazioni illeggibili. Correggi a mano il file config.json della voce."
+                         : "Oltre i limiti la voce tace fino a domani.")
+        }
+        SettingsRow("") {
+            Button(testing ? "Prova in corso…" : "Prova voce", action: test).disabled(testing)
+        }
+        .disabled(configBroken)
+    }
+
+    /// A saved key shows as dots and its last 4 characters; «Incolla chiave» saves what is on the clipboard.
+    private func keyRow(_ label: String, masked: String?, note: String, save: @escaping (String) throws -> Void) -> some View {
+        SettingsRow(label) {
+            HStack(spacing: 8) {
+                Text(masked ?? "Chiave non salvata")
+                    .font(masked == nil ? .system(size: 13) : .system(size: 13, design: .monospaced))
+                    .foregroundStyle(masked == nil ? .secondary : .primary)
+                    .lineLimit(1)
+                    .padding(.horizontal, 7)
+                    .frame(width: 200, height: 22, alignment: .leading)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .textBackgroundColor)))
+                    .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color(nsColor: .separatorColor)))
+                    .accessibilityLabel(Text(label))
+                Button("Incolla chiave") {
+                    let pasted = NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    guard pasted.count >= 8 else { self.note = "Negli appunti non c’è una chiave."; return }
+                    run("Chiave non salvata", done: "Chiave salvata") { try save(pasted) }
+                    load()
+                    VoiceSpeaker.shared.refresh()
+                }
+            }
+            SettingsNote(note)
+        }
+    }
+
+    private func times(_ v: Double) -> String { settingsDecimal(v) + "×" }
+
     private func load() {
         isOn = files.isOn
-        hasKey = files.hasKey
-        hasJevKey = files.hasJevKey
+        key = files.masked(files.keyURL)
+        jevKey = files.masked(files.jevKeyURL)
         hasPrompt = files.prompt != nil
         guard let config = try? files.readConfig() else { configBroken = true; return }
         voiceId = config["voice_id"] as? String ?? ""
@@ -219,25 +206,26 @@ struct VoiceSettingsPage: View {
     }
 
     private func saveDuck() {
-        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+        run("Impostazioni non salvate") {
             try files.updateConfig(["abbassa_audio": duck, "abbassa_livello": Int(duckPercent)])
         }
     }
 
     private func saveRewriter() {
-        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+        run("Impostazioni non salvate") {
             try files.updateConfig(["riscrittore_modello": rewriterModel, "riscrittore_ragionamento": rewriterEffort])
         }
     }
 
     private func saveAudience() {
-        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+        run("Impostazioni non salvate") {
             try files.updateConfig(["parla_per": audience.rawValue, "sessione": onlySession])
         }
     }
 
     private func saveConfig() {
-        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+        guard !configBroken else { return }
+        run("Impostazioni non salvate") {
             try files.updateConfig([
                 "voice_id": voiceId.trimmingCharacters(in: .whitespacesAndNewlines),
                 "model_id": model.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -249,12 +237,12 @@ struct VoiceSettingsPage: View {
     }
 
     private func run(_ failure: String, done: String? = nil, _ write: () throws -> Void) {
-        do { try write(); note = done } catch { note = "\(failure). Riprova." }
+        do { try write(); if let done { note = done } } catch { note = "\(failure). Riprova." }
     }
 
     /// Saves the values on screen, then says one fixed sentence with them (even with the voice off).
     private func test() {
-        if !configBroken { saveConfig() }
+        saveConfig()
         testing = true
         Task {
             note = await VoiceSpeaker.shared.test()
