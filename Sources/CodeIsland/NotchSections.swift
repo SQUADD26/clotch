@@ -100,6 +100,19 @@ struct TabBar: View {
         .padding(4)
         .background(Capsule().fill(GoalInk.well))
         .frame(maxWidth: 434)
+        // The gear sits in the 37 pt beside the centred bar, so it is there on every tab.
+        .frame(maxWidth: .infinity)
+        .overlay(alignment: .trailing) { NotchSettingsButton() }
+    }
+}
+
+/// The gear of the open notch: the app's settings window, the same as the menu bar's «Impostazioni…»
+/// (where «Personalizza il notch» lives too).
+struct NotchSettingsButton: View {
+    var open: @MainActor () -> Void = { SettingsWindowController.shared.show() }
+
+    var body: some View {
+        NotchIconButton(icon: "gearshape", tooltip: "Apri impostazioni") { open() }
     }
 }
 
