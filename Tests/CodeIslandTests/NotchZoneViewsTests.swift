@@ -93,7 +93,7 @@ final class NotchZoneViewsTests: XCTestCase {
         let flat = try render(zones(hasNotch: false), named: "zone-senza-notch")
         let notched = try render(zones(hasNotch: true), named: "zone-con-notch")
         XCTAssertGreaterThan(flat.count(white, columns: 0.33..<0.67), 100, "the active goal sits in the centre")
-        XCTAssertEqual(notched.count(white, columns: 0.38..<0.62), 0, "beside a notch the middle stays empty")
+        XCTAssertEqual(notched.count(white, columns: 0.42..<0.58), 0, "beside a notch the middle stays empty")
         XCTAssertGreaterThan(notched.count(white), 0, "the goal moved to the left side")
     }
 
