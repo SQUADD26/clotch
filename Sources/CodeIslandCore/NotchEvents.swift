@@ -26,7 +26,8 @@ public enum NotchEvents {
         return new.compactMap { row in
             let event = { (kind: NotchEvent.Kind) in NotchEvent(kind: kind, subject: row.id, count: row.proofsDone) }
             // A goal that appears is not news: only a change of a known goal is.
-            guard let prev = before[row.id] else { return nil }
+            // A proposed goal is not chased yet: it announces nothing.
+            guard let prev = before[row.id], !row.proposed else { return nil }
             switch (prev.status, row.status) {
             case (.reached, .reached), (.blocked, .blocked), (.still, .still): break
             case (_, .reached): return event(.reached)

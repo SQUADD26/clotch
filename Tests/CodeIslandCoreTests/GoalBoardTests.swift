@@ -293,16 +293,30 @@ final class GoalBoardTests: XCTestCase {
 
     // MARK: ordering
 
-    /// The goal chased now: proofs still to do and moving beats a goal that is only always active (the Overseer).
-    func testChasedPrefersProofsInProgress() {
-        let half = #"[{"testo": "a", "fatta": true}, {"testo": "b"}]"#
-        let all = #"[{"testo": "a", "fatta": true}]"#
-        let goals = [g("overseer"), g("notch", prove: half), g("notch2", prove: half), g("done", prove: all), g("still", prove: half)]
-        let sessions = [s("l1", cli: "overseer", running: true, ago: 0), s("l2", cli: "notch", ago: 5), s("l3", cli: "notch2", ago: 9),
-                        s("l4", cli: "done", ago: 1), s("l5", cli: "still", ago: 99)]
-        XCTAssertEqual(GoalBoard.chased(rows(goals, sessions))?.id, "notch", "tie between goals with proofs to do: latest activity")
-        XCTAssertEqual(GoalBoard.chased(rows([g("overseer"), g("done", prove: all), g("still", prove: half)], sessions))?.id, "overseer",
-                       "no moving goal with proofs to do: latest activity")
+    private func prove(_ done: Int, of total: Int) -> String {
+        "[" + (0..<total).map { #"{"testo": "p\#($0)", "fatta": \#($0 < done)}"# }.joined(separator: ", ") + "]"
+    }
+
+    func testOnlyKnownStatesShow() {
+        let states = ["aperto", "bloccato", "raggiunto", "proposto", "nessuno", "passato", "nuovo-stato"]
+        let shown = rows(states.map { g($0, stato: $0) }, states.map { s("local_\($0)", cli: $0) })
+        XCTAssertEqual(Set(shown.map(\.id)), ["aperto", "bloccato", "raggiunto", "proposto"])
+        XCTAssertEqual(shown.filter(\.proposed).map(\.id), ["proposto"])
+        XCTAssertEqual(shown.map(\.id).suffix(2), ["proposto", "raggiunto"], "proposed sorts after open goals, before reached")
+    }
+
+    /// Today's real register: Overseer always active, no proofs; «Sessioni» proposed 0/5 and live;
+    /// «Notch» 3/6 with live sessions; «Lead» 0/4.
+    func testChasedRule() {
+        let goals = [g("overseer"), g("sessioni", stato: "proposto", prove: prove(0, of: 5)), g("notch", prove: prove(3, of: 6)),
+                     g("lead", prove: prove(0, of: 4)), g("done", prove: prove(2, of: 2))]
+        let sessions = [s("l1", cli: "overseer", running: true, ago: 0), s("l2", cli: "sessioni", running: true, ago: 0),
+                        s("l3", cli: "notch", running: true, ago: 2), s("l4", cli: "lead", ago: 1), s("l5", cli: "done", ago: 0)]
+        let chased = { (ids: [String]) in GoalBoard.chased(self.rows(goals.filter { ids.contains($0.cli) }, sessions))?.id }
+        XCTAssertEqual(chased(["overseer", "sessioni", "notch", "lead", "done"]), "notch", "(a) 0 < done < total wins")
+        XCTAssertEqual(chased(["overseer", "sessioni", "lead", "done"]), "done", "(b) else any declared proofs, latest activity")
+        XCTAssertEqual(chased(["overseer", "sessioni"]), "overseer", "(c) else any open goal; proposed never")
+        XCTAssertNil(chased(["sessioni"]), "only a proposed goal: nothing is chased")
         XCTAssertNil(GoalBoard.chased([]))
     }
 

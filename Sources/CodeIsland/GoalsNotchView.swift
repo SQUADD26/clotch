@@ -25,6 +25,8 @@ extension GoalRow {
 
     /// The goal text under the title, unless the title already is it.
     var hasSubtitle: Bool { !goal.isEmpty && goal != title }
+    /// A proposed goal is drawn quiet: grey, never a traffic light.
+    var ink: Color { proposed ? GoalInk.secondary : tone.color }
     var runningCount: Int { pulses.filter { $0.running }.count }
 
     var sessionsText: String {
@@ -34,8 +36,9 @@ extension GoalRow {
 
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
 
-    /// The one line shown only when the goal is not green.
+    /// The one line shown only when the goal is not green, or not accepted yet.
     func reason(now: Date) -> String? {
+        if proposed { return "Proposto" }
         switch status {
         case .moving, .reached:
             return nil

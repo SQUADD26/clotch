@@ -26,7 +26,11 @@ struct GoalPlate: View {
                     }
                 }
             } else {
-                EmptyState(text: "Nessun obiettivo aperto")
+                // Only proposed goals: none is chased yet, but they still show.
+                VStack(alignment: .leading, spacing: NotchSpace.row) {
+                    EmptyState(text: "Nessun obiettivo aperto")
+                    ForEach(rows) { OtherGoal(row: $0, now: now, showGoal: repeated.contains($0.title) && $0.hasSubtitle) }
+                }
             }
         }
     }
@@ -87,15 +91,15 @@ private struct OtherGoal: View {
             HStack(spacing: NotchSpace.row) {
                 Image(systemName: row.symbol)
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(row.tone.color)
+                    .foregroundStyle(row.ink)
                     .frame(width: 12)
                 Text(row.title)
                     .font(NotchType.bodyEmphasis)
-                    .foregroundStyle(GoalInk.primary)
+                    .foregroundStyle(row.proposed ? GoalInk.secondary : GoalInk.primary)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 // No declared proofs: the bare track says it.
-                GoalBar(progress: row.progress, tone: row.tone, height: 4).frame(width: 96)
+                GoalBar(progress: row.progress, color: row.ink, height: 4).frame(width: 96)
                 Text(row.proofsText ?? "")
                     .font(NotchType.numbers)
                     .foregroundStyle(GoalInk.secondary)
@@ -112,7 +116,7 @@ private struct OtherGoal: View {
             if let reason = row.reason(now: now) {
                 Text(reason)
                     .font(NotchType.caption)
-                    .foregroundStyle(row.tone.color)
+                    .foregroundStyle(row.ink)
                     .lineLimit(1)
                     .padding(.leading, Self.indent)
             }

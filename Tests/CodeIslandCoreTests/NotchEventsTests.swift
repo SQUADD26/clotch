@@ -20,4 +20,10 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.goals(old: new, new: new), [])
     }
 
+    func testProposedGoalAnnouncesNothing() {
+        var still = row("p", .still(since: t), done: 1)
+        still.proposed = true
+        XCTAssertEqual(NotchEvents.goals(old: [row("p", .moving)], new: [still]), [])
+    }
+
 }

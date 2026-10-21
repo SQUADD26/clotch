@@ -8,7 +8,7 @@ public struct GoalProof: Equatable, Sendable { public let text: String; public l
 public struct GoalRecord: Equatable, Sendable {
     public let cli: String
     public let goal: String
-    public let state: String      // aperto|raggiunto|bloccato|passato
+    public let state: String      // aperto|bloccato|raggiunto|proposto shown; nessuno|passato|anything else hidden
     public let proof: String      // BLOCCATO / RAGGIUNTO text, "" if none
     public let at: Date?
     public let title: String      // may start with "★ ", may be ""
@@ -65,10 +65,13 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public let status: GoalStatus
     public let lastActivity: Date?
     public let pulses: [GoalPulse]
+    public var proposed = false   // "proposto": not accepted yet, shown quieter, never the goal chased now
 }
 
 public enum GoalBoard {
     public static let stillAfter: TimeInterval = 30 * 60
+    /// Register states the notch shows; a new or unknown state stays hidden until it is added here.
+    static let shown: Set<String> = ["aperto", "bloccato", "raggiunto", "proposto"]
 
     public static func rows(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> [GoalRow] {
         let masters = index(sessions)
@@ -76,7 +79,7 @@ public enum GoalBoard {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
-        for g in goals where g.state != "passato" {
+        for g in goals where shown.contains(g.state) {
             let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
             if g.state == "raggiunto", master == nil || master!.isArchived { continue }
 
@@ -126,10 +129,10 @@ public enum GoalBoard {
                 goal: goal,
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
-                status: status, lastActivity: last, pulses: pulses))
+                status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto"))
         }
         return out.sorted {
-            let (a, b) = (rank($0.status), rank($1.status))
+            let (a, b) = (rank($0), rank($1))
             if a != b { return a < b }
             if $0.lastActivity != $1.lastActivity { return ($0.lastActivity ?? .distantPast) > ($1.lastActivity ?? .distantPast) }
             return $0.id < $1.id
@@ -142,7 +145,7 @@ public enum GoalBoard {
         let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
         var ids = Set<String>()
-        for g in goals where g.state != "passato" {
+        for g in goals where shown.contains(g.state) {
             ids.insert(g.cli)
             for s in family(of: masters[g.cli] ?? g.successor.flatMap { masters[$0] }, children: children) { ids.insert(s.cliId) }
         }
@@ -173,16 +176,18 @@ public enum GoalBoard {
         return family
     }
 
-    /// The goal chased now: an open goal with proofs still to do and recent activity (moving) beats one
-    /// that is only always active; ties, and no such goal, go to the latest activity.
+    /// The goal chased now, among open goals (not reached, not proposed), latest activity first:
+    /// (a) proofs in progress (0 < done < total), else (b) any declared proofs, else (c) any open goal.
+    /// An always-active goal without proofs (the Overseer) never beats one whose proofs are moving.
     public static func chased(_ rows: [GoalRow]) -> GoalRow? {
-        let open = rows.filter { if case .reached = $0.status { return false } else { return true } }
-        let working = open.filter { r in
-            guard case .moving = r.status else { return false }
-            return r.proofsTotal > 0 && r.proofsDone < r.proofsTotal
+        let open = rows.filter { r in
+            if case .reached = r.status { return false }
+            return !r.proposed
         }
-        return (working.isEmpty ? open : working)
-            .max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) } ?? rows.first
+        let pool = [open.filter { 0 < $0.proofsDone && $0.proofsDone < $0.proofsTotal },
+                    open.filter { $0.proofsTotal > 0 }, open].first { !$0.isEmpty } ?? []
+        return pool.max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) }
+            ?? rows.first { !$0.proposed }
     }
 
     static func firstWords(_ t: String, _ n: Int = 6) -> String {
@@ -190,8 +195,10 @@ public enum GoalBoard {
         return words.prefix(n).joined(separator: " ") + (words.count > n ? "…" : "")
     }
 
-    private static func rank(_ s: GoalStatus) -> Int {
-        switch s { case .blocked: return 0; case .still: return 1; case .moving: return 2; case .reached: return 3 }
+    /// Blocked, still, moving, then proposed (quiet), then reached.
+    private static func rank(_ r: GoalRow) -> Int {
+        if r.proposed { return 3 }
+        switch r.status { case .blocked: return 0; case .still: return 1; case .moving: return 2; case .reached: return 4 }
     }
 
     /// Title without signs and emoji (★, ⭕, 🛠️, flags…), spaces collapsed. Digits, # and * stay: they are emoji only with a keycap.
