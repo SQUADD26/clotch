@@ -151,6 +151,8 @@ struct NotchPanelView: View {
     @State private var quotaChipWidth: CGFloat = 0
     /// Measured width of the collapsed right wing (0 until first laid out).
     @State private var rightWingWidth: CGFloat = 0
+    /// The pointer rests on the account bars: their card shows and the notch stays closed.
+    @State private var accountsHover = false
     /// The notch shows goals, not sessions: its content and gating come from here.
     @ObservedObject private var goals = GoalStore.shared
     /// A goal change or a request taken in charge, shown under the closed notch.
@@ -275,6 +277,43 @@ struct NotchPanelView: View {
         )
     }
 
+    /// Delay full expansion to avoid accidental triggers.
+    private func scheduleHoverExpand() {
+        hoverTimer?.invalidate()
+        hoverTimer = Timer.scheduledTimer(
+            withTimeInterval: NotchHoverInteraction.expandDelay(forSetting: hoverExpandDelay),
+            repeats: false
+        ) { _ in
+            Task { @MainActor in
+                // Guard: mouse may have left during the delay, or rests on the account bars (their card shows)
+                guard isHovered, !accountsHover else { return }
+                guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface) else { return }
+                if hapticOnHover {
+                    let performer = NSHapticFeedbackManager.defaultPerformer
+                    switch hapticIntensity {
+                    case 3: // strong: two taps
+                        performer.perform(.levelChange, performanceTime: .now)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            performer.perform(.levelChange, performanceTime: .now)
+                        }
+                    case 2: // medium
+                        performer.perform(.levelChange, performanceTime: .default)
+                    default: // light
+                        performer.perform(.alignment, performanceTime: .default)
+                    }
+                }
+                hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .expandDelayElapsed)
+                withAnimation(NotchAnimation.open) {
+                    appState.surface = .sessionList
+                    appState.cancelCompletionQueue()
+                    if appState.activeSessionId == nil {
+                        appState.activeSessionId = appState.sessions.keys.sorted().first
+                    }
+                }
+            }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
@@ -397,40 +436,7 @@ struct NotchPanelView: View {
                     withAnimation(NotchAnimation.hoverPrehover) {
                         hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .mouseEntered)
                     }
-                    // Delay full expansion to avoid accidental triggers
-                    hoverTimer?.invalidate()
-                    hoverTimer = Timer.scheduledTimer(
-                        withTimeInterval: NotchHoverInteraction.expandDelay(forSetting: hoverExpandDelay),
-                        repeats: false
-                    ) { _ in
-                        Task { @MainActor in
-                            // Guard: mouse may have left during the delay
-                            guard isHovered else { return }
-                            guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface) else { return }
-                            if hapticOnHover {
-                                let performer = NSHapticFeedbackManager.defaultPerformer
-                                switch hapticIntensity {
-                                case 3: // strong: two taps
-                                    performer.perform(.levelChange, performanceTime: .now)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                        performer.perform(.levelChange, performanceTime: .now)
-                                    }
-                                case 2: // medium
-                                    performer.perform(.levelChange, performanceTime: .default)
-                                default: // light
-                                    performer.perform(.alignment, performanceTime: .default)
-                                }
-                            }
-                            hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .expandDelayElapsed)
-                            withAnimation(NotchAnimation.open) {
-                                appState.surface = .sessionList
-                                appState.cancelCompletionQueue()
-                                if appState.activeSessionId == nil {
-                                    appState.activeSessionId = appState.sessions.keys.sorted().first
-                                }
-                            }
-                        }
-                    }
+                    scheduleHoverExpand()
                 } else {
                     // Reverse the prehover acknowledgement right away…
                     withAnimation(NotchAnimation.hoverPrehover) {
@@ -468,6 +474,15 @@ struct NotchPanelView: View {
         // measurement below is the window, and any overflow runs off the
         // bottom instead of pushing the notch bar off the top.
         .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+        // The account bars' card hangs under the closed island, over the whole window so the island's clip
+        // does not cut it; leaving the bars with the pointer still on the island opens the notch as usual.
+        .accountsCard(allowed: showBar && !shouldShowExpanded && !showsNote)
+        .onPreferenceChange(AccountsHoverKey.self) { on in
+            MainActor.assumeIsolated {  // SwiftUI delivers preferences on the main thread
+                accountsHover = on
+                if !on && isHovered && !shouldShowExpanded { scheduleHoverExpand() }
+            }
+        }
         // The hosting view fills the panel window, whose height is already
         // clamped to the screen.
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { cardSpace.recordWindowHeight($0) }

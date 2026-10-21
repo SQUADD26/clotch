@@ -6,12 +6,12 @@ import CodeIslandCore
 
 // MARK: - Bars and hover
 
-/// One vertical bar per account in use, filled with its week. The pointer over them opens the card
-/// with account, 5 hours and week; the card hangs 8 pt under the bar the zones sit in.
+/// One vertical bar per account in use, filled with its week. The pointer over them asks for the card
+/// (`AccountsCardKey`); the panel draws it under the island, outside the island's clip, and holds the
+/// notch closed meanwhile (`AccountsHoverKey`).
 struct AccountBarsElement: View {
     let data: NotchZoneData
     @State private var hovering = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let accounts = data.accountsInUse
@@ -25,18 +25,53 @@ struct AccountBarsElement: View {
             .frame(height: data.barHeight)
             .contentShape(Rectangle())
             .onHover { hovering = $0 }
-            .overlay(alignment: .bottom) {
-                if hovering {
-                    AccountsDetailCard(data: data)
-                        .fixedSize()
-                        .allowsHitTesting(false)
-                        .alignmentGuide(.bottom) { $0[.top] - 8 }
-                        .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
-                }
+            .anchorPreference(key: AccountsCardKey.self, value: .bounds) {
+                hovering || data.accountsCardOpen ? AccountsCardRequest(bars: $0, data: data) : nil
             }
-            .animation(reduceMotion ? nil : NotchAnimation.close, value: hovering)
+            .preference(key: AccountsHoverKey.self, value: hovering)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accounts.map { AccountText.speech($0, now: data.now) }.joined(separator: ". "))
+        }
+    }
+}
+
+/// The account bars under the pointer: where they are and what the card shows.
+struct AccountsCardRequest {
+    let bars: Anchor<CGRect>
+    let data: NotchZoneData
+}
+
+struct AccountsCardKey: PreferenceKey {
+    static let defaultValue: AccountsCardRequest? = nil
+    static func reduce(value: inout AccountsCardRequest?, nextValue: () -> AccountsCardRequest?) {
+        value = value ?? nextValue()
+    }
+}
+
+/// True while the pointer is on the account bars: the closed notch does not open meanwhile.
+struct AccountsHoverKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) { value = value || nextValue() }
+}
+
+extension View {
+    /// Hangs the accounts card 10 pt under the bars that asked for it (Figma 11: 42 from the top), inside
+    /// this view's width. Put it on a view that is not clipped to the island; `allowed` is false while the
+    /// notch is open or a notification hangs under it, so the card never covers either.
+    func accountsCard(allowed: Bool) -> some View {
+        overlayPreferenceValue(AccountsCardKey.self) { request in
+            GeometryReader { proxy in
+                if allowed, let request {
+                    let bars = proxy[request.bars]
+                    let w = AccountsDetailCard.width
+                    AccountsDetailCard(data: request.data)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .offset(x: min(max(bars.midX - w / 2, 8), proxy.size.width - w - 8), y: bars.maxY + 10)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+            }
+            .animation(NotchMotion.still, value: allowed && request != nil)
         }
     }
 }
@@ -58,55 +93,50 @@ private struct VerticalBar: View {
     }
 }
 
-/// «Account in uso su questo Mac»: per account its name, then 5 hours and week with a bar and a figure each.
+/// «Account in uso su questo Mac»: per account its name, then 5 hours and week, each with bar, figure and
+/// when it resets; a hairline between accounts. Black like the island, white 12% border (Figma 11, widened
+/// for the reset column). The rows are the Account tab's `QuotaMeter`.
 struct AccountsDetailCard: View {
     let data: NotchZoneData
-    private static let barWidth: CGFloat = 52
+    static let width: CGFloat = 360
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {  // account rows 40 pt apart
+        VStack(alignment: .leading, spacing: 12) {
             Text("Account in uso su questo Mac").font(NotchType.small).foregroundStyle(GoalInk.secondary)
-            ForEach(data.accountsInUse) { account in
-                VStack(alignment: .leading, spacing: NotchSpace.tight) {
+            ForEach(Array(data.accountsInUse.enumerated()), id: \.element.id) { index, account in
+                if index > 0 { Rectangle().fill(GoalInk.divider).frame(height: 1) }
+                VStack(alignment: .leading, spacing: 6) {
                     Text(data.name(of: account))
                         .font(NotchType.name)
                         .foregroundStyle(account.stale(data.now) ? GoalInk.secondary : GoalInk.primary)
                         .lineLimit(1)
+                        .truncationMode(.middle)
                     if account.stale(data.now) {
                         Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: data.now) } ?? "Nessun dato")
                             .font(NotchType.small).foregroundStyle(GoalInk.secondary)
                     } else {
-                        HStack(spacing: 24) {
-                            Meter(title: "5 ore", window: account.fiveHour, now: data.now, toned: false)
-                            Meter(title: "Sett.", window: account.sevenDay, now: data.now, toned: true)
-                        }
+                        row("5 ore", account.fiveHour)
+                        row("Settimana", account.sevenDay)
                     }
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(AccountText.speech(account, now: data.now))
             }
         }
         .padding(16)
+        .frame(width: Self.width, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.black))
         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
     }
 
-    private struct Meter: View {
-        let title: String
-        let window: QuotaWindow
-        let now: Date
-        /// The week's bar and figure take the warning colour; the 5 hours stay plain.
-        let toned: Bool
-
-        var body: some View {
-            let used = window.usedNow(now)
-            HStack(spacing: 8) {
-                Text(title).font(.system(size: 10, weight: .medium)).foregroundStyle(GoalInk.secondary)
-                GoalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used), height: 4)
-                    .frame(width: AccountsDetailCard.barWidth)
-                Text(used.map { "\(Int($0.rounded()))%" } ?? "")
-                    .font(.system(size: 11, weight: .medium).monospacedDigit())
-                    .foregroundStyle(toned ? NotchQuotaTone.color(used: used) : GoalInk.primary)
-                    .frame(width: NotchSpace.figureColumn, alignment: .trailing)
-            }
+    private func row(_ name: String, _ window: QuotaWindow) -> some View {
+        HStack(spacing: 10) {
+            QuotaMeter(name: name, window: window, now: data.now)
+            Text(AccountText.reset(window, now: data.now))
+                .font(NotchType.small)
+                .foregroundStyle(GoalInk.secondary)
+                .lineLimit(1)
+                .frame(width: 116, alignment: .trailing)
         }
     }
 }
@@ -171,5 +201,14 @@ enum AccountText {
             w.usedNow(now).map { "\(name) \(Int($0.rounded())) per cento" } ?? "\(name) libero"
         }
         return [account.email, part(account.fiveHour, "5 ore"), part(account.sevenDay, "settimana")].joined(separator: ". ")
+    }
+
+    /// «si azzera alle 14:30» today, «si azzera lun 09:00» on another day; nothing once reset or unknown.
+    static func reset(_ window: QuotaWindow, now: Date) -> String {
+        guard let reset = window.reset, reset > now else { return "" }
+        let time = reset.formatted(date: .omitted, time: .shortened)
+        return Calendar.current.isDate(reset, inSameDayAs: now)
+            ? "si azzera alle " + time
+            : "si azzera " + reset.formatted(.dateTime.weekday(.abbreviated)) + " " + time
     }
 }
