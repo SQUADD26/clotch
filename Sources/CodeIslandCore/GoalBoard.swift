@@ -78,16 +78,7 @@ public enum GoalBoard {
             let master = masters[g.cli]
             if g.state == "raggiunto", master == nil || master!.isArchived { continue }
 
-            // Family: master + every non-archived descendant (visited set = cycle-safe).
-            var family: [DesktopSession] = master.map { [$0] } ?? []
-            var seen = Set(family.map(\.localId))
-            var queue = family
-            while let s = queue.popLast() {
-                for c in children[s.localId] ?? [] where seen.insert(c.localId).inserted {
-                    queue.append(c)
-                    if !c.isArchived { family.append(c) }
-                }
-            }
+            let family = family(of: master, children: children)
 
             var times: [Date] = []
             var pulses: [GoalPulse] = []
@@ -138,6 +129,33 @@ public enum GoalBoard {
             if $0.lastActivity != $1.lastActivity { return ($0.lastActivity ?? .distantPast) > ($1.lastActivity ?? .distantPast) }
             return $0.id < $1.id
         }
+    }
+
+    /// The CLI ids whose live state can matter: every member of a shown goal's family.
+    /// `GoalSources.load` reads only these live files, never the whole folder.
+    public static func liveIds(goals: [GoalRecord], sessions: [DesktopSession]) -> Set<String> {
+        let masters = Dictionary(sessions.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
+        let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
+        var ids = Set<String>()
+        for g in goals where g.state != "passato" {
+            ids.insert(g.cli)
+            for s in family(of: masters[g.cli], children: children) { ids.insert(s.cliId) }
+        }
+        return ids
+    }
+
+    /// Master + every non-archived descendant (visited set = cycle-safe).
+    static func family(of master: DesktopSession?, children: [String: [DesktopSession]]) -> [DesktopSession] {
+        var family: [DesktopSession] = master.map { [$0] } ?? []
+        var seen = Set(family.map(\.localId))
+        var queue = family
+        while let s = queue.popLast() {
+            for c in children[s.localId] ?? [] where seen.insert(c.localId).inserted {
+                queue.append(c)
+                if !c.isArchived { family.append(c) }
+            }
+        }
+        return family
     }
 
     private static func rank(_ s: GoalStatus) -> Int {

@@ -40,8 +40,10 @@ public enum GoalSources {
         guard let d = object(data) else { return nil }
         let agents = (d["agenti"] as? [String: Any] ?? [:]).compactMap { id, v -> LiveAgent? in
             guard let a = v as? [String: Any] else { return nil }
-            let times = [date(a["partito"]), date((a["ultimo_tool"] as? [String: Any])?["quando"]), transcriptMTime(id)]
-            return LiveAgent(id: id, alive: a["stato"] as? String == "vivo", lastActivity: times.compactMap { $0 }.max())
+            let alive = a["stato"] as? String == "vivo"
+            // Disk is touched only for alive agents: a finished one never pulses again.
+            let times = [date(a["partito"]), date((a["ultimo_tool"] as? [String: Any])?["quando"]), alive ? transcriptMTime(id) : nil]
+            return LiveAgent(id: id, alive: alive, lastActivity: times.compactMap { $0 }.max())
         }.sorted { $0.id < $1.id }
         return LiveState(cliId: cliId, updated: date(d["aggiornato"]), agents: agents)
     }
@@ -60,36 +62,52 @@ public enum GoalSources {
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots)
     }
 
+    /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
+    /// per session ever run (thousands), so only the live files of shown goals' families are read.
     public static func load(_ paths: Paths) -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState]) {
         let fm = FileManager.default
         let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
             .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
-        let live = files(in: paths.live, fm).filter { $0.pathExtension == "json" }.compactMap { url -> LiveState? in
-            guard let data = try? Data(contentsOf: url) else { return nil }
-            let transcript = object(data)?["transcript"] as? String ?? ""
-            return parseLive(data, cliId: url.deletingPathExtension().lastPathComponent) { aid in
-                subagentMTime(transcript: transcript, agentId: aid, fm)
-            }
-        }
         let sessions = paths.sessionRoots.flatMap { root in
             files(in: root, fm, recursive: true).filter { $0.lastPathComponent.hasPrefix("local_") && $0.pathExtension == "json" }
         }.compactMap { url in (try? Data(contentsOf: url)).flatMap { parseSession($0, fileName: url.lastPathComponent) } }
+        let live = GoalBoard.liveIds(goals: goals, sessions: sessions).compactMap { cli -> LiveState? in
+            guard !cli.contains("/"), let data = try? Data(contentsOf: paths.live.appendingPathComponent(cli + ".json")) else { return nil }
+            let transcript = object(data)?["transcript"] as? String ?? ""
+            var index: [String: Date]?  // built at most once per transcript, only if a direct stat misses
+            return parseLive(data, cliId: cli) { aid in
+                subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
+            }
+        }
         return (goals, sessions, live)
     }
 
     private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
         if recursive {
-            return (fm.enumerator(at: dir, includingPropertiesForKeys: nil)?.allObjects as? [URL] ?? []).sorted { $0.path < $1.path }
+            return fm.enumerator(at: dir, includingPropertiesForKeys: nil)?.allObjects as? [URL] ?? []
         }
-        return ((try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []).sorted { $0.path < $1.path }
+        return (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
     }
 
-    /// `<transcript without .jsonl>/subagents/**/agent-<id>.jsonl` (live_state.scaduti).
-    private static func subagentMTime(transcript: String, agentId: String, _ fm: FileManager) -> Date? {
+    /// `<transcript without .jsonl>/subagents/agent-<id>.jsonl` by one stat; nested layouts
+    /// (`subagents/**/agent-<id>.jsonl`, live_state.scaduti) through one listing of that transcript's tree.
+    private static func subagentMTime(transcript: String, agentId: String, index: inout [String: Date]?, _ fm: FileManager) -> Date? {
         guard transcript.hasSuffix(".jsonl") else { return nil }
         let dir = URL(fileURLWithPath: String(transcript.dropLast(6))).appendingPathComponent("subagents")
-        return files(in: dir, fm, recursive: true).filter { $0.lastPathComponent == "agent-\(agentId).jsonl" }
-            .compactMap { (try? fm.attributesOfItem(atPath: $0.path))?[.modificationDate] as? Date }.max()
+        let name = "agent-\(agentId).jsonl"
+        if let d = mtime(dir.appendingPathComponent(name).path, fm) { return d }
+        if index == nil {
+            var built: [String: Date] = [:]
+            for url in files(in: dir, fm, recursive: true) where url.lastPathComponent.hasPrefix("agent-") {
+                if let d = mtime(url.path, fm), d > built[url.lastPathComponent] ?? .distantPast { built[url.lastPathComponent] = d }
+            }
+            index = built
+        }
+        return index?[name]
+    }
+
+    private static func mtime(_ path: String, _ fm: FileManager) -> Date? {
+        (try? fm.attributesOfItem(atPath: path))?[.modificationDate] as? Date
     }
 
     // MARK: Helpers

@@ -106,6 +106,43 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertNil(d?.lastActivity)
     }
 
+    /// The live folder on a real Mac holds one file per session ever run (~3500 + locks): load must read
+    /// only the open goals' families and never walk subagent trees of finished agents.
+    func testLoadStaysFastOnAHugeLiveFolder() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
+        try fm.createDirectory(at: support, withIntermediateDirectories: true)
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.goals, withIntermediateDirectories: true)
+        try fm.createDirectory(at: paths.live, withIntermediateDirectories: true)
+        // One shared transcript tree with many subagent files, as an old busy session leaves behind.
+        let transcript = home.appendingPathComponent("p/old")
+        let nested = transcript.appendingPathComponent("subagents/workflows/run")
+        try fm.createDirectory(at: nested, withIntermediateDirectories: true)
+        for i in 0..<300 { try Data("x".utf8).write(to: nested.appendingPathComponent("agent-x\(i).jsonl")) }
+        let deadAgents = "{" + (0..<20).map { #""x\#($0)": {"stato": "finito", "partito": "\#(local(600))"}"# }.joined(separator: ",") + "}"
+        let dead = liveJSON(deadAgents, transcript: transcript.path + ".jsonl", updated: 600)
+        for i in 0..<3000 {
+            try dead.write(to: paths.live.appendingPathComponent("old\(i).json"))
+            try Data().write(to: paths.live.appendingPathComponent("old\(i).lock"))
+        }
+        try goalJSON("m1").write(to: paths.goals.appendingPathComponent("m1.json"))
+        try sessionJSON("local_m", cli: "m1").write(to: support.appendingPathComponent("local_m.json"))
+        try sessionJSON("local_c", cli: "c1", parent: #""local_m""#).write(to: support.appendingPathComponent("local_c.json"))
+        let alive = #"{"x7": {"stato": "vivo", "partito": "\#(local(50))"}}"#  // found only in the nested tree
+        try liveJSON(alive, transcript: transcript.path + ".jsonl", updated: 50).write(to: paths.live.appendingPathComponent("c1.json"))
+
+        let start = Date()
+        let r = GoalSources.load(paths)
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssertEqual(Set(r.live.map(\.cliId)), ["c1"], "only the goal family's live files are read")
+        XCTAssertLessThan(Date().timeIntervalSince(r.live.first?.agents.first?.lastActivity ?? .distantPast), 120,
+                          "a nested subagent transcript still counts as activity")
+        XCTAssertLessThan(elapsed, 0.5, "load took \(elapsed) s")
+    }
+
     func testLoadReadsFoldersAndSkipsGarbage() throws {
         let fm = FileManager.default
         let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
