@@ -55,9 +55,6 @@ class SettingsWindowController {
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 
-        // Revert to accessory policy after close without hiding the entire app.
-        // Hiding here causes the panel to blink even though only the settings
-        // window is being dismissed.
         clearCloseObserver()
         closeObserver = NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification, object: window, queue: .main
@@ -65,9 +62,6 @@ class SettingsWindowController {
             Task { @MainActor [weak self] in
                 self?.window = nil
                 self?.clearCloseObserver()
-                DispatchQueue.main.async {
-                    NSApp.setActivationPolicy(.accessory)
-                }
             }
         }
 
