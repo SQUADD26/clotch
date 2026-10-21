@@ -10,8 +10,8 @@ struct ClotchNotchPage: View {
     @AppStorage(SettingsKey.allowHorizontalDrag) private var allowHorizontalDrag = SettingsDefaults.allowHorizontalDrag
     @AppStorage(SettingsKey.avoidMenuBarIcons) private var avoidMenuBarIcons = SettingsDefaults.avoidMenuBarIcons
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
-    @AppStorage(SettingsKey.notchOpenSpeed) private var notchOpenSpeed = SettingsDefaults.notchOpenSpeed
-    @AppStorage(SettingsKey.notchCloseSpeed) private var notchCloseSpeed = SettingsDefaults.notchCloseSpeed
+    @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
+    @AppStorage(SettingsKey.notchCloseMs) private var notchCloseMs = SettingsDefaults.notchCloseMs
     @State private var launchAtLogin: Bool
 
     init() {
@@ -57,8 +57,8 @@ struct ClotchNotchPage: View {
                         set: { collapsedWidthScale = Int($0) }
                     ), in: Double(NotchWidthScale.min)...Double(NotchWidthScale.max), step: Double(NotchWidthScale.step))
                 }
-                speedSlider(l10n["notch_open_speed"], $notchOpenSpeed)
-                speedSlider(l10n["notch_close_speed"], $notchCloseSpeed)
+                NotchTimeField(title: l10n["notch_open_ms"], ms: $notchOpenMs)
+                NotchTimeField(title: l10n["notch_close_ms"], ms: $notchCloseMs)
                 Toggle(l10n["allow_horizontal_drag"], isOn: $allowHorizontalDrag)
                     .onChange(of: allowHorizontalDrag) { _, enabled in
                         if !enabled { SettingsManager.shared.panelHorizontalOffset = 0 }
@@ -67,21 +67,5 @@ struct ClotchNotchPage: View {
             }
         }
         .formStyle(.grouped)
-    }
-
-    private func speedSlider(_ title: String, _ speed: Binding<Double>) -> some View {
-        let value = Binding(
-            get: { NotchAnimationSpeed.clamped(speed.wrappedValue) },
-            set: { speed.wrappedValue = NotchAnimationSpeed.clamped($0) }
-        )
-        return VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(title)
-                Spacer()
-                Text("\(value.wrappedValue, specifier: "%.1f")×").foregroundStyle(.secondary).monospacedDigit()
-            }
-            Slider(value: value, in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step)
-                .accessibilityLabel(Text(title))
-        }
     }
 }
