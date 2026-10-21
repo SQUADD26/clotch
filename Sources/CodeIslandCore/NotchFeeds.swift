@@ -25,11 +25,14 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }
 
-    /// How a request looks, the one place that decides it (#39): taken = at work, never struck; struck and ticked only once done.
+    /// How a request looks, the one place that decides it (#39, #67): taken = yellow «In lavorazione», never struck
+    /// nor green; struck, ticked and green only once done. Every view reads label, struck and ink from here.
     public enum Look: Equatable, Sendable {
         case waiting, working, done
-        public var label: String { switch self { case .waiting: "In attesa"; case .working: "Presa in carico"; case .done: "Fatta" } }
+        public enum Ink: Equatable, Sendable { case quiet, wait, go }
+        public var label: String { switch self { case .waiting: "In attesa"; case .working: "In lavorazione"; case .done: "Fatta" } }
         public var struck: Bool { self == .done }
+        public var ink: Ink { switch self { case .waiting: .quiet; case .working: .wait; case .done: .go } }
     }
 
     public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : .waiting }

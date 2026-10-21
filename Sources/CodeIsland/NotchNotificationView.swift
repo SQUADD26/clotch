@@ -2,7 +2,7 @@ import SwiftUI
 import CodeIslandCore
 
 /// One notification: a line under the closed notch. It arrives in its old state, the change lands
-/// (the request is struck through and turns green, the goal's ring fills, the PR turns «Unita»), then the
+/// (the request turns yellow «In lavorazione», struck and green only once done; the goal's ring fills, the PR turns «Unita»), then the
 /// line folds back into the notch and only the result symbol stays a moment (`ResultMark`).
 struct NotchNotificationView: View {
     let event: NotchEvent
@@ -96,7 +96,7 @@ struct Note {
             guard let request = requests.first(where: { $0.id == event.subject }) else { return nil }
             let look = request.look
             self.init(text: request.text, startLabel: UserRequest.Look.waiting.label, label: look.label, startSymbol: "circle",
-                      symbol: "checkmark.circle.fill", color: look.struck ? GoalTone.go.color : GoalInk.secondary,
+                      symbol: "checkmark.circle.fill", color: look.color,
                       strikes: look.struck, row: nil, before: nil)
         case .prMerged:
             let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
