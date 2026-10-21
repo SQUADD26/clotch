@@ -100,7 +100,7 @@ final class ESP32ProtocolTests: XCTestCase {
         let frame = BuddyWorkspacePayload(workspaceName: "Clotch")
         let data = frame.encode()
         XCTAssertEqual(data[0], ESP32Protocol.workspaceFrameMarker)
-        XCTAssertEqual(data[1], 10)
+        XCTAssertEqual(data[1], 6)
         XCTAssertEqual(String(data: data.subdata(in: 2..<data.count), encoding: .utf8), "Clotch")
     }
 
