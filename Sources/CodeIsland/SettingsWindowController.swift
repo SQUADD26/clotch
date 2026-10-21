@@ -43,6 +43,7 @@ class SettingsWindowController {
             forName: NSWindow.willCloseNotification, object: window, queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
+                NSApp.setActivationPolicy(.accessory)  // window closed: back to background, no Dock icon (#70)
                 self?.window = nil
                 self?.settings = nil
                 self?.clearCloseObserver()
