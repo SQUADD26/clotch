@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -22,6 +22,10 @@ public struct VoiceFiles {
         statusURL = voce.appendingPathComponent("stato.json")
         activeURL = voce.appendingPathComponent("clotch")  // contract with Clean View: see VoiceHooks
         queueURL = voce.appendingPathComponent("coda")
+        eventsURL = voce.appendingPathComponent("eventi.jsonl")  // claude-config#1854 writes it; Clotch only reads
+        alertsURL = voce.appendingPathComponent("avvisi.json")   // «Avvisami quando…»: the page and `avvisami` write it
+        judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
+        jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
     }
 
@@ -29,6 +33,18 @@ public struct VoiceFiles {
 
     public func saveKey(_ key: String) throws {
         try write(Data(key.trimmingCharacters(in: .whitespacesAndNewlines).utf8), to: keyURL)
+    }
+
+    public var hasJevKey: Bool { jevKey != nil }
+
+    public func saveJevKey(_ key: String) throws {
+        try write(Data(key.trimmingCharacters(in: .whitespacesAndNewlines).utf8), to: jevKeyURL)
+    }
+
+    /// The judge's key, for the judge only: trimmed, nil when missing or empty.
+    public var jevKey: String? {
+        let k = ((try? String(contentsOf: jevKeyURL, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return k.isEmpty || k.contains(where: \.isWhitespace) ? nil : k
     }
 
     /// The voice is on unless `spento` exists (`voce off`).
@@ -86,6 +102,14 @@ public struct VoiceFiles {
         } else {
             try write(Data(text.utf8), to: promptURL)
         }
+    }
+
+    /// One write in append, file 600 (a log line): two writers never mix their lines. Best effort.
+    public func append(_ data: Data, to url: URL) {
+        try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let fd = open(url.path, O_WRONLY | O_APPEND | O_CREAT, 0o600)
+        guard fd >= 0 else { return }
+        FileHandle(fileDescriptor: fd, closeOnDealloc: true).write(data)
     }
 
     /// Atomic write, file 600 and folder 700 (the key and its neighbours are never readable by others).

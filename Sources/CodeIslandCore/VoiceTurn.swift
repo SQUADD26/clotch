@@ -3,7 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// One end of turn, said out loud (#50): the Stop payload → the answer's text → yes or no → Haiku → ElevenLabs.
+/// One piece of news said out loud (#50, #57): the event's report → yes or no → Haiku → ElevenLabs.
 /// Pure: the app (`VoiceSpeaker`) runs the processes, the network and the audio. Same rules as Clean View's `voce.ts`.
 public enum VoiceTurn {
     public static let haikuModel = "claude-haiku-5-5"
@@ -74,21 +74,6 @@ public enum VoiceTurn {
             guard let data, let d = try? JSONDecoder().decode(Day.self, from: data), d.giorno == today else { return Day(giorno: today) }
             return d
         }
-    }
-
-    /// The session and the report for Haiku: the answer that closed the turn (`last_assistant_message`, else the last
-    /// assistant message in the transcript's tail), cleaned for the ear and cut to `maxSpoken`.
-    /// nil = nothing to say (no text, or Stop fired again by a blocking stop hook).
-    public static func report(payload: Data, transcriptTail: (String) -> Data?) -> (session: String, text: String)? {
-        guard let o = (try? JSONSerialization.jsonObject(with: payload)) as? [String: Any],
-              o["stop_hook_active"] as? Bool != true else { return nil }
-        let session = o["session_id"] as? String ?? ""
-        var text = o["last_assistant_message"] as? String ?? ""
-        if text.isEmpty, let path = o["transcript_path"] as? String, let tail = transcriptTail(path) {
-            text = lastAssistantText(tail) ?? ""
-        }
-        text = cut(VoiceClean.clean(String(text.prefix(maxRaw))), maxSpoken)
-        return text.isEmpty ? nil : (session, text)
     }
 
     /// The text blocks of the last `"type":"assistant"` line of a JSONL transcript tail.
