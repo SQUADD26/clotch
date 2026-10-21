@@ -109,3 +109,8 @@ Aperto: altezza = fondo del contenuto + 22.
 Nel disegno: Inter al posto di SF Pro. L’app usa SF Pro (Text fino a 19 pt, Display da 20 pt). Movimento: una sola molla per tutto, da provare nel laboratorio animazioni.
 Scorrimento: con il cursore sul notch aperto, due dita a destra o sinistra spostano di un solo passo, anche se lo scorrimento è forte; scorrendo, i dati si attenuano.
 Clic sul nome dell’obiettivo: apre la sessione master che lo insegue. Pull request: solo quelle aperte; una appena unita si colora di viola, poi esce.
+
+## File della voce (16–21, scuro, 2x)
+- 16-voce-prima: 0,5 s prima della prima parola (k = 0,6).
+- 17-voce-parla: mentre parla (k = 1).
+- 18–21: i colori girano e la luce segue la voce. 18 voce bassa (k 0,35, fase 0), 19 voce forte (k 1, fase 0,25), 20 voce media (k 0,65, fase 0,5), 21 pausa tra due frasi (k 0,2, fase 0,75). Fase = spostamento del gradiente lungo il bordo, da 0 a 1 per un giro.
