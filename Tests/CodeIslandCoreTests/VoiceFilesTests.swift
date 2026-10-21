@@ -57,16 +57,15 @@ final class VoiceFilesTests: XCTestCase {
     }
 
     func testEmptyPromptIsStock() throws {
-        try put("Istruzioni di serie\n", files.defaultPromptURL)
-        XCTAssertEqual(files.prompt, "Istruzioni di serie\n")
+        XCTAssertEqual(files.prompt, VoicePrompt.stock)
         try files.savePrompt("Parla piano")
         XCTAssertEqual(files.prompt, "Parla piano")
         XCTAssertEqual(try mode(files.promptURL), 0o600)
         try files.savePrompt("  \n")
         XCTAssertFalse(FileManager.default.fileExists(atPath: files.promptURL.path))
-        XCTAssertEqual(files.prompt, "Istruzioni di serie\n")
+        XCTAssertEqual(files.prompt, VoicePrompt.stock)
         try files.savePrompt("Parla piano")
-        try files.savePrompt("Istruzioni di serie")
+        try files.savePrompt(VoicePrompt.stock + "\n")
         XCTAssertFalse(FileManager.default.fileExists(atPath: files.promptURL.path), "the stock text = no own file")
     }
 }

@@ -29,6 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountQuotaFeed.shared.start()
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
+        VoiceSpeaker.shared.start()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present
@@ -65,6 +66,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        VoiceSpeaker.shared.stop()
     }
 
     // The notch panel is always a visible window, so the Dock click ignores the flag.
