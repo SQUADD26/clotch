@@ -54,24 +54,33 @@ struct Pager<Page: View, Footer: View>: View {
         monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
             // Our app's only panel is the notch; the settings window is a plain titled window.
             guard event.window is NSPanel else { return event }
-            let phase: PageSwipe.Phase
-            if !event.momentumPhase.isEmpty { phase = .momentum }
-            else if event.phase.contains(.began) || event.phase.contains(.mayBegin) { phase = .began }
-            else if event.phase.contains(.ended) || event.phase.contains(.cancelled) { phase = .ended }
-            else if event.phase.isEmpty { phase = .wheel }
-            else { phase = .changed }
-            // Every gesture start is seen, whatever its axis; only sideways travel counts and is swallowed.
-            let sideways = abs(event.scrollingDeltaX) > abs(event.scrollingDeltaY)
-            if let step = swipe.feed(dx: sideways ? Double(event.scrollingDeltaX) : 0, phase: phase, at: Date()) {
-                go(index + step)
-            }
-            return sideways ? nil : event
+            let step = swipe.feed(event)
+            guard !TabBarPointer.inside else { return event }  // over the tab bar, the scroll moves the tab
+            if let step { go(index + step) }
+            return event.isSideways ? nil : event
         }
     }
 
     private func stopSwipes() {
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
+    }
+}
+
+extension NSEvent {
+    var isSideways: Bool { abs(scrollingDeltaX) > abs(scrollingDeltaY) }
+}
+
+extension PageSwipe {
+    /// Every gesture start is seen, whatever its axis; only sideways travel counts.
+    mutating func feed(_ event: NSEvent) -> Int? {
+        let phase: Phase
+        if !event.momentumPhase.isEmpty { phase = .momentum }
+        else if event.phase.contains(.began) || event.phase.contains(.mayBegin) { phase = .began }
+        else if event.phase.contains(.ended) || event.phase.contains(.cancelled) { phase = .ended }
+        else if event.phase.isEmpty { phase = .wheel }
+        else { phase = .changed }
+        return feed(dx: event.isSideways ? Double(event.scrollingDeltaX) : 0, phase: phase, at: Date())
     }
 }
 
