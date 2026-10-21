@@ -11,7 +11,10 @@ struct NotchSections: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            NotchSectionsContent(store: store, quota: quota)
+            // Ticks only while the notch is open: the "since …" text is the only thing time moves.
+            TimelineView(.periodic(from: .now, by: 30)) { ctx in
+                NotchSectionsContent(store: store, quota: quota, now: ctx.date)
+            }
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
         }
         .frame(height: min(contentHeight, maxHeight))
@@ -24,12 +27,13 @@ struct NotchSections: View {
 struct NotchSectionsContent: View {
     @ObservedObject var store: GoalStore
     @ObservedObject var quota: AccountQuotaFeed
+    let now: Date
 
     var body: some View {
         GlassGroup(spacing: NotchSpace.inset) {
             VStack(spacing: NotchSpace.inset) {
-                AccountsPlate(feed: quota, now: store.now)
-                GoalPlate(rows: store.rows, now: store.now)
+                AccountsPlate(feed: quota, now: now)
+                GoalPlate(rows: store.rows, now: now)
                 RequestsPlate(requests: store.requests, active: store.requestsFolderExists)
             }
         }

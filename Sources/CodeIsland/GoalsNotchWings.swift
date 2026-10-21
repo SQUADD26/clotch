@@ -32,7 +32,7 @@ struct GoalsLeftWing: View {
         .padding(.trailing, 8)
         .frame(width: GoalsWing.width, alignment: .trailing)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(store.rows.accessibilitySummary(now: store.now))
+        .accessibilityLabel(store.rows.accessibilitySummary(now: Date()))
     }
 }
 
@@ -47,7 +47,7 @@ struct GoalsRightWing: View {
                     .foregroundStyle(GoalInk.primary)
                     .contentTransition(.numericText())
             } else if let hero = store.rows.hero {
-                SessionsLive(row: hero, size: 12, compact: true)
+                SessionsLive(row: hero, size: 12, compact: true, moves: false)
             }
         }
         .padding(.leading, 8)

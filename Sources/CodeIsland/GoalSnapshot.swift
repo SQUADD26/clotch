@@ -106,7 +106,7 @@ enum GoalSnapshot {
                 GoalsRightWing()
             }
             .frame(height: notchHeight)
-            NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared)
+            NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared, now: store.now)
         }
         .frame(width: 580)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: 24, bottomTrailingRadius: 24, style: .continuous).fill(.black))
