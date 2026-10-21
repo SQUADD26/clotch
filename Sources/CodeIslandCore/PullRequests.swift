@@ -15,6 +15,7 @@ public struct PRRef: Hashable, Sendable, Comparable, Codable {
 public struct SessionPR: Equatable, Sendable, Codable {
     public let ref: PRRef
     public let state: String?
+    public init(ref: PRRef, state: String?) { self.ref = ref; self.state = state }
     /// MERGED and CLOSED never come back, so they outrank OPEN; a stale OPEN loses to a newer MERGED.
     var rank: Int { ["OPEN": 1, "CLOSED": 2, "MERGED": 3][state ?? ""] ?? 0 }
 }
@@ -29,6 +30,7 @@ public struct PRInfo: Equatable, Sendable {
     public let title: String
     public let url: String
     public let state: PRState
+    public init(ref: PRRef, title: String, url: String, state: PRState) { self.ref = ref; self.title = title; self.url = url; self.state = state }
 }
 
 public enum PullRequests {
