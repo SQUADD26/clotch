@@ -49,12 +49,14 @@ struct NotchScreenLayout: Codable, Equatable {
         NotchZone.allCases.contains { elements(in: $0).contains(element) }
     }
 
-    /// An element sits in one place at most: placing it again moves it. False = the zone is unusable (centre on a notch screen).
+    /// An element sits in one place at most: placing it again moves it. `index` counts the zone without it
+    /// (`NotchReorder`). False = the zone is unusable (centre on a notch screen).
     @discardableResult
-    mutating func place(_ element: NotchElement, in zone: NotchZone, hasNotch: Bool) -> Bool {
+    mutating func place(_ element: NotchElement, in zone: NotchZone, at index: Int = .max, hasNotch: Bool) -> Bool {
         if zone == .centre && hasNotch { return false }
         remove(element)
-        self[keyPath: Self.path(zone)].append(element)
+        let count = elements(in: zone).count
+        self[keyPath: Self.path(zone)].insert(element, at: min(index, count))
         return true
     }
 
