@@ -36,7 +36,7 @@ final class VoiceStore: ObservableObject {
         }
         guard let s = FSEventStreamCreate(nil, callback, &context, [root.path, root.resolvingSymlinksInPath().path] as CFArray,
                                           FSEventStreamEventId(kFSEventStreamEventIdSinceNow), 0.05,
-                                          FSEventStreamCreateFlags(kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer)) else { return }
+                                          FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer)) else { return }
         FSEventStreamSetDispatchQueue(s, .main)
         FSEventStreamStart(s)
         stream = s
