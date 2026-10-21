@@ -25,7 +25,7 @@ struct AdhdQuestionRow: View {
             .lineLimit(1)
             Spacer(minLength: 12)
             Button(action: nudge) {
-                IconLabel(symbol: "paperplane", text: "Sollecita", font: .system(size: T.notchTesto11, weight: .medium), color: T.notchBiancoA92)
+                IconLabel(symbol: "paperplane", text: "Sollecita", font: .system(size: T.notchTesto11, weight: .semibold), color: T.notchBiancoA92)
                     .padding(.horizontal, 10)
                     .frame(height: 22)
                     .background(RoundedRectangle(cornerRadius: T.notchRaggio11).fill(T.notchBiancoA12))
