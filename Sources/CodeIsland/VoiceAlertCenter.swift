@@ -16,7 +16,7 @@ final class VoiceAlertCenter {
     private var goals: [GoalRecord]?
     private var requests: [UserRequest]?
     private var quotas: [AccountQuota]?
-    private var eventsOffset: Int?
+    private var eventsMark: VoiceEvents.Mark?
     private var clock: Timer?
 
     /// claude-config writes the events: Clotch derives none itself, so nothing is said twice.
@@ -32,12 +32,11 @@ final class VoiceAlertCenter {
 
     // MARK: Sources
 
-    /// New lines of eventi.jsonl (`VoiceStore` sees the file change). The first read only takes the size: old news stays old.
+    /// New lines of eventi.jsonl (`VoiceStore` sees the file change). The first read only takes the mark: old news stays old.
     func eventsChanged() {
-        guard let data = try? Data(contentsOf: files.eventsURL) else { eventsOffset = nil; return }
-        guard let from = eventsOffset else { eventsOffset = data.count; return }
-        let read = VoiceEvents.appended(data, from: from)
-        eventsOffset = read.offset
+        guard let data = try? Data(contentsOf: files.eventsURL) else { eventsMark = nil; return }
+        let read = VoiceEvents.newer(data, after: eventsMark)
+        eventsMark = read.mark
         offer(read.events)
     }
 
@@ -78,7 +77,7 @@ final class VoiceAlertCenter {
     private func checkRules(_ base: VoiceAlertRule.Facts) {
         guard !fromFile else { return }  // claude-config's heartbeat checks them and writes `avviso_custom`
         let rules = VoiceAlertRule.parse(try? Data(contentsOf: files.alertsURL))
-        guard rules.contains(where: { $0.fired == nil }) else { return }
+        guard rules.contains(where: { !$0.fired && $0.when != nil }) else { return }
         Task {
             var facts = base
             facts.sessions = await GoalStore.shared.allSessions()
@@ -89,13 +88,8 @@ final class VoiceAlertCenter {
                 fired.insert(r.id)
             }
             guard !events.isEmpty else { return }
-            // Re-read before writing: the page or `avvisami` may have changed the file meanwhile; only `scattato` is set.
-            let latest = VoiceAlertRule.parse(try? Data(contentsOf: files.alertsURL)).map { r in
-                var r = r
-                if fired.contains(r.id), r.fired == nil { r.fired = facts.now }
-                return r
-            }
-            try? files.write(VoiceAlertRule.encode(latest), to: files.alertsURL)
+            // Re-read before writing: the page or `avvisami` may have changed the file meanwhile; only `stato` is set.
+            if let next = VoiceAlertRule.firing(fired, in: try? Data(contentsOf: files.alertsURL)) { try? files.write(next, to: files.alertsURL) }
             offer(events)
         }
     }
@@ -107,9 +101,25 @@ final class VoiceAlertCenter {
         Task {
             let sessions = await GoalStore.shared.allSessions()
             let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
-            for e in events { _ = engine.offer(e, config: config, sessions: sessions, now: Date()) }
+            for e in events {
+                guard let e = await judged(e) else { continue }
+                _ = engine.offer(e, config: config, sessions: sessions, now: Date())
+            }
             pump()
         }
+    }
+
+    /// The Jev judge (`VoiceJudge`) for the kinds that can be noise; nil = it said no. Not reached: the fixed rules decide.
+    private func judged(_ e: VoiceEvent) async -> VoiceEvent? {
+        guard VoiceJudge.judges(e) else { return e }
+        let v = await VoiceJudge.judge(state: VoiceJudge.state(e, requests: requests ?? [], goals: goals ?? []), key: files.jevKey) {
+            try await URLSession.shared.data(for: $0).0
+        }
+        files.append(VoiceJudge.logLine(e, v, now: Date()), to: files.judgeLogURL)
+        guard v.say != false else { return nil }
+        var e = e
+        e.judged = true
+        return e
     }
 
     private func pump() {

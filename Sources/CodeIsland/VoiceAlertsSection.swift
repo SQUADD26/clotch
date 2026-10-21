@@ -23,11 +23,11 @@ struct VoiceAlertsSection: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(r.text)
-                        Text("\(label(r.when)): \(shown(r))").font(.system(size: 11)).foregroundStyle(.secondary)
+                        if let w = r.when { Text("\(label(w)): \(shown(r))").font(.system(size: 11)).foregroundStyle(.secondary) }
                     }
                     Spacer()
-                    if r.fired != nil { Text(l10n["voice_alert_fired"]).font(.system(size: 11)).foregroundStyle(.secondary) }
-                    Button { save(stored().filter { $0.id != r.id }, done: "voice_alert_removed") } label: { Image(systemName: "trash") }
+                    if r.fired { Text(l10n["voice_alert_fired"]).font(.system(size: 11)).foregroundStyle(.secondary) }
+                    Button { save(VoiceAlertRule.removing(r.id, from: file()), done: "voice_alert_removed") } label: { Image(systemName: "trash") }
                         .buttonStyle(.borderless)
                         .help(l10n["voice_alert_remove"])
                         .accessibilityLabel(l10n["voice_alert_remove"])
@@ -55,7 +55,7 @@ struct VoiceAlertsSection: View {
         } footer: {
             Text(l10n["voice_alerts_footer"])
         }
-        .onAppear { rules = stored() }
+        .onAppear { rules = VoiceAlertRule.parse(file()) }
         .onChange(of: when) { value = "" }
     }
 
@@ -81,20 +81,22 @@ struct VoiceAlertsSection: View {
     }
 
     private func add() {
-        let rule = VoiceAlertRule(id: "a-" + UUID().uuidString.prefix(8).lowercased(), text: text.trimmingCharacters(in: .whitespaces),
+        let rule = VoiceAlertRule(id: VoiceAlertRule.newId(), text: text.trimmingCharacters(in: .whitespaces),
                                   when: when, value: value.trimmingCharacters(in: .whitespaces), created: Date())
-        save(stored() + [rule], done: "voice_alert_added")
+        save(VoiceAlertRule.adding(rule, to: file()), done: "voice_alert_added")
         text = ""
         value = ""
     }
 
     /// Read again before each change: `avvisami` or the speaker may have written the file since the page opened.
-    private func stored() -> [VoiceAlertRule] { VoiceAlertRule.parse(try? Data(contentsOf: files.alertsURL)) }
+    private func file() -> Data? { try? Data(contentsOf: files.alertsURL) }
 
-    private func save(_ next: [VoiceAlertRule], done: String) {
+    /// nil = the file is broken: never overwritten.
+    private func save(_ next: Data?, done: String) {
         do {
-            try files.write(VoiceAlertRule.encode(next), to: files.alertsURL)
-            rules = next
+            guard let next else { throw CocoaError(.fileReadCorruptFile) }
+            try files.write(next, to: files.alertsURL)
+            rules = VoiceAlertRule.parse(next)
             note = l10n[done]
         } catch {
             note = l10n["voice_alert_not_saved"]

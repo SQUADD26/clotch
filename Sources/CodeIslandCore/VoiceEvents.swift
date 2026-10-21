@@ -5,10 +5,10 @@ import Foundation
 public struct VoiceEvent: Equatable, Sendable {
     public enum Kind: String, Sendable, CaseIterable {
         case requestDone = "richiesta_fatta", goalReached = "obiettivo_raggiunto", goalBlocked = "obiettivo_bloccato"
-        case question = "domanda", risk = "rischio", custom = "avviso_custom"
+        case question = "domanda", risk = "rischio", custom = "avviso_custom", endOfTurn = "fine_turno"
 
         /// Lower = said first when several wait.
-        var rank: Int { [.risk: 0, .question: 1, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5][self]! }
+        var rank: Int { [.risk: 0, .question: 1, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5, .endOfTurn: 6][self]! }
 
         /// How the report for Haiku names it.
         var label: String {
@@ -19,6 +19,7 @@ public struct VoiceEvent: Equatable, Sendable {
             case .question: return "Domanda per te"
             case .risk: return "Rischio"
             case .custom: return "Avviso che hai chiesto"
+            case .endOfTurn: return "Novità"
             }
         }
     }
@@ -33,7 +34,7 @@ public struct VoiceEvent: Equatable, Sendable {
     public var text = ""
     public var proof = ""     // for the eye: never said out loud
     public var level = "normale"  // alto | normale
-    public var judged: Bool? = nil  // `giudizio` already written by claude-config: not judged again
+    public var judged = false  // `giudizio` already written by claude-config (or by Clotch's judge): not judged again
 
     public init(kind: Kind, at: Date, session: String = "", subject: String = "", text: String = "", proof: String = "", level: String? = nil) {
         self.kind = kind; self.at = at; self.session = session; self.subject = subject; self.text = text; self.proof = proof
@@ -66,17 +67,8 @@ public enum VoiceEvents {
         e.id = o["id"] as? String ?? ""
         e.localId = s["local_id"] as? String ?? ""
         e.role = s["ruolo"] as? String ?? ""
-        e.judged = verdict(o["giudizio"])
+        e.judged = o["giudizio"] != nil
         return e
-    }
-
-    /// `giudizio` as a yes or no: a bool, «sì»/«no» at the start of a text, or an object with `avvisa` / `si`. nil = none.
-    static func verdict(_ v: Any?) -> Bool? {
-        if let b = v as? Bool { return b }
-        if let o = v as? [String: Any] { return verdict(o["avvisa"] ?? o["si"] ?? o["esito"]) }
-        guard let t = (v as? String)?.lowercased().trimmingCharacters(in: .whitespaces), !t.isEmpty else { return nil }
-        if t.hasPrefix("no") { return false }
-        return ["sì", "si", "yes", "true"].contains { t.hasPrefix($0) } ? true : nil
     }
 
     /// Where the reader stopped: the `t` and `id` of the last event seen, never a byte offset (the file is rewritten

@@ -16,7 +16,7 @@ final class VoiceAlertsTests: XCTestCase {
     }
     var sessions: [DesktopSession] { [session("local_m", cli: "m"), session("local_c", cli: "c", parent: "local_m")] }
 
-    func event(_ kind: VoiceEvent.Kind, _ subject: String, session: String = "m", ago: Double = 5, level: String = "") -> VoiceEvent {
+    func event(_ kind: VoiceEvent.Kind, _ subject: String, session: String = "m", ago: Double = 5, level: String? = nil) -> VoiceEvent {
         VoiceEvent(kind: kind, at: now.addingTimeInterval(-ago), session: session, subject: subject, text: subject, level: level)
     }
 
@@ -47,13 +47,14 @@ final class VoiceAlertsTests: XCTestCase {
     func testOneVoiceAtATimeRisksFirstAndAShortQueue() {
         var e = VoiceAlertEngine()
         XCTAssertNil(e.offer(event(.goalReached, "a"), config: main, sessions: sessions, now: now))
-        XCTAssertNil(e.offer(event(.requestDone, "b"), config: main, sessions: sessions, now: now))
+        XCTAssertNil(e.offer(event(.custom, "b"), config: main, sessions: sessions, now: now))
         XCTAssertNil(e.offer(event(.risk, "c"), config: main, sessions: sessions, now: now))
         XCTAssertNil(e.offer(event(.question, "d"), config: main, sessions: sessions, now: now), "a question pushes out the least important")
         XCTAssertEqual(e.waiting.map(\.subject), ["c", "d", "b"])
         XCTAssertEqual(e.offer(event(.goalReached, "e"), config: main, sessions: sessions, now: now), "coda piena")
         XCTAssertNil(e.offer(event(.goalReached, "f", level: "alto"), config: main, sessions: sessions, now: now), "livello alto goes ahead")
-        XCTAssertEqual(e.next(now: now)?.subject, "f")
+        XCTAssertEqual(e.waiting.map(\.subject), ["c", "d", "f"], "risks and questions are alto too: they stay first")
+        XCTAssertEqual(e.next(now: now)?.subject, "c")
         XCTAssertNil(e.offer(event(.goalReached, "e"), config: main, sessions: sessions, now: now), "refused before, so not a duplicate now")
     }
 
@@ -66,19 +67,24 @@ final class VoiceAlertsTests: XCTestCase {
 
     // MARK: eventi.jsonl
 
-    func testEventsFileLinesAndOffsets() {
-        let a = #"{"t": "2026-10-21T19:40:00+0200", "tipo": "richiesta_fatta", "sessione": {"cli": "m", "local_id": "local_m", "titolo": "T"}, "soggetto": "Timer", "testo": "Fatto il timer", "prova": "PR #51", "livello": "normale"}"#
-        let b = #"{"t": 1792000000, "tipo": "merge", "soggetto": "x"}"#
-        let c = #"{"t": 1792000000, "tipo": "rischio", "soggetto": "Account"#
+    func testEventsFileLinesAndMark() {
+        let a = #"{"v": 1, "id": "e-00000001", "t": 1792000000.5, "tipo": "richiesta_fatta", "sessione": {"cli": "m", "local_id": "local_m", "titolo": "T", "ruolo": "figlia"}, "soggetto": "Timer", "testo": "Fatto il timer", "prova": "PR #51", "livello": "normale", "giudizio": {"si": null, "motivo": "x"}}"#
+        let b = #"{"v": 1, "id": "e-00000002", "t": 1792000001, "tipo": "merge", "soggetto": "x"}"#
+        let c = #"{"v": 1, "id": "e-00000003", "t": 1792000002, "tipo": "rischio", "soggetto": "Account"#
         let data = Data((a + "\n" + b + "\nnot json\n" + c).utf8)
-        let first = VoiceEvents.appended(data, from: 0)
+        XCTAssertEqual(VoiceEvents.newer(data, after: nil).events, [], "the launch only takes the mark")
+        let first = VoiceEvents.newer(data, after: VoiceEvents.Mark(at: .distantPast, id: ""))
         XCTAssertEqual(first.events.count, 1, "a type the voice does not say, and a broken line, stay out")
-        XCTAssertEqual(first.events[0], VoiceEvent(kind: .requestDone, at: GoalSources.date("2026-10-21T19:40:00+0200")!, session: "m",
-                                                   subject: "Timer", text: "Fatto il timer", proof: "PR #51", level: "normale"))
-        XCTAssertEqual(first.events[0].report, "Richiesta fatta: Fatto il timer. Prova: la modifica.", "cleaned for the ear")
-        let rest = VoiceEvents.appended(data + Data(#"", "testo": "90%"}"#.utf8) + Data("\n".utf8), from: first.offset)
+        let e = first.events[0]
+        XCTAssertEqual([e.id, e.session, e.localId, e.role, e.subject, e.proof, e.level], ["e-00000001", "m", "local_m", "figlia", "Timer", "PR #51", "normale"])
+        XCTAssertTrue(e.judged, "giudizio present, even si null: never judged again")
+        XCTAssertFalse(e.report.contains("51"), "the proof is never said")
+        let rest = VoiceEvents.newer(data + Data(#""}"#.utf8) + Data("\n".utf8), after: first.mark)
         XCTAssertEqual(rest.events.map(\.kind), [.risk], "the half line waited for its end")
-        XCTAssertEqual(VoiceEvents.appended(Data((a + "\n").utf8), from: 10_000).events.count, 1, "a shorter file was rewritten: from the start")
+        XCTAssertEqual(rest.mark?.id, "e-00000003")
+        let rewritten = Data((c + "\"}\n").utf8)
+        XCTAssertEqual(VoiceEvents.newer(rewritten, after: first.mark).events.map(\.id), ["e-00000003"], "mark's line gone: what is newer than it")
+        XCTAssertEqual(VoiceEvents.newer(rewritten, after: rest.mark).events, [], "nothing after the mark")
     }
 
     // MARK: derived without eventi.jsonl
@@ -116,8 +122,8 @@ final class VoiceAlertsTests: XCTestCase {
 
     func testAccountRiskWhenAWindowCrosses80Or90() {
         let e = VoiceEvents.quotas(before: [quota(70, 85)], after: [quota(82, 91)], now: now)
-        XCTAssertEqual(e.map(\.subject), ["Account roberto, 5 ore", "Account roberto, 7 giorni"])
-        XCTAssertEqual(e.map(\.level), ["", "alto"])
+        XCTAssertEqual(e.map(\.subject), ["Account roberto, 5 ore", "Account roberto, settimana"])
+        XCTAssertEqual(e.map(\.level), ["alto", "alto"])
         XCTAssertEqual(VoiceEvents.quotas(before: [quota(82, 91)], after: [quota(85, 95)], now: now), [], "said once per threshold")
         XCTAssertEqual(VoiceEvents.quotas(before: nil, after: [quota(95, 95)], now: now), [])
     }
@@ -169,16 +175,60 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertNil(rule(.time, hhmm).fires(VoiceAlertRule.Facts(now: now)))
         XCTAssertNotNil(rule(.time, hhmm).fires(VoiceAlertRule.Facts(now: now.addingTimeInterval(180))))
         var fired = rule(.word, "deploy")
-        fired.fired = now
+        fired.fired = true
         XCTAssertNil(fired.fires(f), "one-shot")
+        var r = rule(.prMerged, "1854")
+        r.repo = "SQUADD26/claude-config"
+        f.mergedPRs = [PRRef(repo: "SQUADD26/claude-config", number: 1854)]
+        XCTAssertEqual(r.fires(f)?.proof, "pr-fusa 1854", "repo from its own field")
+        XCTAssertNil(VoiceAlertRule(id: "A-1", text: "t", when: nil, value: "", created: now).fires(f), "no `quando`: the Overseer's")
     }
 
-    func testRulesFileRoundTrip() {
-        var r = rule(.prMerged, "#51")
-        r.created = Date(timeIntervalSince1970: 1_792_000_000)
-        let back = VoiceAlertRule.parse(VoiceAlertRule.encode([r]))
-        XCTAssertEqual(back, [r])
-        XCTAssertEqual(VoiceAlertRule.parse(Data(#"{"avvisi": [{"id": "x", "testo": "t", "quando": "luna"}]}"#.utf8)), [], "an unknown kind stays out")
-        XCTAssertEqual(VoiceAlertRule.parse(nil), [])
+    func testRulesFileKeepsUnknownFieldsAndRefusesABrokenOne() throws {
+        let file = Data(#"{"v": 1, "nota": "mia", "regole": [{"id": "A-1b2c", "creata": 1792000000, "condizione": "quando 1854 è unita", "quando": {"tipo": "pr-fusa", "valore": "1854", "repo": "SQUADD26/claude-config"}, "stato": "attiva", "extra": 7}, {"id": "A-0000", "creata": 1792000000, "condizione": "a mano", "quando": null, "stato": "attiva"}]}"#.utf8)
+        let rules = VoiceAlertRule.parse(file)
+        XCTAssertEqual(rules.map(\.id), ["A-1b2c", "A-0000"])
+        XCTAssertEqual(rules[0], VoiceAlertRule(id: "A-1b2c", text: "quando 1854 è unita", when: .prMerged, value: "1854",
+                                                repo: "SQUADD26/claude-config", created: Date(timeIntervalSince1970: 1_792_000_000)))
+        XCTAssertNil(rules[1].when)
+        let fired = try XCTUnwrap(VoiceAlertRule.firing(["A-1b2c"], in: file))
+        let o = try XCTUnwrap(JSONSerialization.jsonObject(with: fired) as? [String: Any])
+        let first = try XCTUnwrap((o["regole"] as? [[String: Any]])?.first)
+        XCTAssertEqual(first["stato"] as? String, "scattata")
+        XCTAssertEqual(first["extra"] as? Int, 7, "a field Clotch does not know stays")
+        XCTAssertEqual(o["nota"] as? String, "mia")
+        let added = try XCTUnwrap(VoiceAlertRule.adding(VoiceAlertRule(id: "A-9999", text: "t", when: .time, value: "18:00", created: now), to: nil))
+        XCTAssertEqual(VoiceAlertRule.parse(added), [VoiceAlertRule(id: "A-9999", text: "t", when: .time, value: "18:00", created: now)])
+        XCTAssertEqual(VoiceAlertRule.parse(VoiceAlertRule.removing("A-0000", from: fired)).map(\.id), ["A-1b2c"])
+        XCTAssertNil(VoiceAlertRule.adding(rules[0], to: Data("not json".utf8)), "a broken file is never overwritten")
+        XCTAssertTrue(VoiceAlertRule.newId().hasPrefix("A-"))
+    }
+
+    // MARK: #1854 rules of the engine
+
+    func testHigherLevelSameSubjectAndTheClosingPair() {
+        var e = VoiceAlertEngine()
+        XCTAssertNil(e.offer(event(.goalReached, "Timer"), config: main, sessions: sessions, now: now))
+        XCTAssertNil(e.offer(event(.goalBlocked, "timer"), config: main, sessions: sessions, now: now), "livello più alto: said")
+        XCTAssertEqual(e.offer(event(.goalBlocked, "Timer"), config: main, sessions: sessions, now: now), "doppione")
+        var p = VoiceAlertEngine()
+        XCTAssertNil(p.offer(event(.requestDone, "Fixare il timer"), config: main, sessions: sessions, now: now))
+        XCTAssertEqual(p.offer(event(.goalReached, "Clotch"), config: main, sessions: sessions, now: now), "doppione",
+                       "a request done and a goal reached of one session: the first")
+        XCTAssertNil(p.offer(event(.goalReached, "Altro", session: "z"), config: VoiceTurn.Config(["parla_per": "tutte"]), sessions: sessions, now: now))
+    }
+
+    func testParlaPerUsesRoleAndLocalId() {
+        var e = event(.requestDone, "x", session: "c")
+        e.role = "master"
+        XCTAssertTrue(main.speaks(e, sessions: sessions), "ruolo master wins over the session file")
+        e.role = "figlia"
+        XCTAssertFalse(main.speaks(e, sessions: sessions))
+        e.role = "overseer"
+        XCTAssertTrue(main.speaks(e, sessions: sessions))
+        var one = event(.requestDone, "x", session: "zz")
+        one.localId = "local_q"
+        XCTAssertTrue(VoiceTurn.Config(["parla_per": "una", "sessione": "local_q"]).speaks(one, sessions: sessions))
+        XCTAssertFalse(VoiceTurn.Config(["parla_per": "una", "sessione": "local_m"]).speaks(one, sessions: sessions))
     }
 }

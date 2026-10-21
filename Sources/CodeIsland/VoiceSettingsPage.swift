@@ -10,6 +10,8 @@ struct VoiceSettingsPage: View {
     @State private var isOn = true
     @State private var hasKey = false
     @State private var newKey = ""
+    @State private var hasJevKey = false
+    @State private var newJevKey = ""
     @State private var voiceId = ""
     @State private var model = VoiceFiles.defaultModel
     @State private var speed = VoiceFiles.defaultSpeed
@@ -83,6 +85,26 @@ struct VoiceSettingsPage: View {
             }
 
             Section {
+                LabeledContent("Stato") {
+                    Text(hasJevKey ? "Chiave salvata" : "Manca la chiave")
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    SecureField("Incolla chiave", text: $newJevKey)
+                    Button("Salva") {
+                        run("Chiave non salvata", done: "Chiave salvata") { try files.saveJevKey(newJevKey) }
+                        newJevKey = ""
+                        hasJevKey = files.hasJevKey
+                    }
+                    .disabled(newJevKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            } header: {
+                Text("Chiave Jev")
+            } footer: {
+                Text("Prima di parlare, la voce chiede a Jev se la novità ti serve. Resta solo su questo Mac.")
+            }
+
+            Section {
                 TextField("ID voce", text: $voiceId, prompt: Text("Lascia vuoto per la voce di serie"))
                 TextField("Modello", text: $model)
                 LabeledContent("Velocità") {
@@ -146,6 +168,7 @@ struct VoiceSettingsPage: View {
     private func load() {
         isOn = files.isOn
         hasKey = files.hasKey
+        hasJevKey = files.hasJevKey
         prompt = files.prompt
         guard let config = try? files.readConfig() else { configBroken = true; return }
         voiceId = config["voice_id"] as? String ?? ""
