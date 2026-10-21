@@ -25,11 +25,11 @@ struct NotchZoneData {
     }
 }
 
-/// The colour a usage figure gets. Figma shows 25% green and 61–63% yellow, so yellow starts at 50.
+/// The colour a usage figure gets (Figma specs): green with room, yellow from 50%, red from 90%.
 enum NotchQuotaTone {
     static func tone(used: Double?) -> GoalTone? {
         guard let used else { return nil }
-        return used >= 80 ? .stop : used >= 50 ? .wait : .go
+        return used >= 90 ? .stop : used >= 50 ? .wait : .go
     }
 
     static func color(used: Double?) -> Color { tone(used: used)?.color ?? GoalInk.secondary }

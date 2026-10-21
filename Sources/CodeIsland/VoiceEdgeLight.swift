@@ -3,7 +3,7 @@ import CodeIslandCore
 
 // Issue #10: the light on the notch's border while the Overseer speaks. Approved Figma «Voce · Luce sul bordo»: a glow along the
 // outline, on 0.5 s before the first word, brighter and wider with the voice volume, colours turning slowly round the border.
-// It is its own colour family (pink, violet, blue, cyan, orange), never the green/yellow/red of the goal traffic light.
+// It is its own colour family (orange, pink, violet, blue: Figma specs), never the green/yellow/red of the goal traffic light.
 // Zero cost when silent: nothing is in the tree and no timeline runs. Reduce Motion: a steady glow, no rotation, no pulse.
 // Place it as an overlay on the notch OUTSIDE its `.clipped()`, with the notch's own shape, so the glow can spill past the edge.
 
@@ -43,11 +43,11 @@ struct VoiceEdgeLightLive<S: Shape>: View {
 /// Not generic on purpose: Swift has no static stored properties in generic types.
 private enum VoiceEdgeLook {
     static let period: TimeInterval = 14 // one slow turn of the colours
-    /// Pink → violet → blue → cyan → orange → pink: closes the loop, no green, yellow or red.
+    /// #FF9E0A → #FF3880 → #995CFF → #3399FF, back to orange so the turning loop has no seam.
     static let colors: [Color] = [
-        Color(red: 1.00, green: 0.31, blue: 0.63), Color(red: 0.67, green: 0.35, blue: 1.00),
-        Color(red: 0.24, green: 0.52, blue: 1.00), Color(red: 0.24, green: 0.82, blue: 1.00),
-        Color(red: 1.00, green: 0.58, blue: 0.24), Color(red: 1.00, green: 0.31, blue: 0.63),
+        Color(red: 1.00, green: 0.62, blue: 0.04), Color(red: 1.00, green: 0.22, blue: 0.50),
+        Color(red: 0.60, green: 0.36, blue: 1.00), Color(red: 0.20, green: 0.60, blue: 1.00),
+        Color(red: 1.00, green: 0.62, blue: 0.04),
     ]
 }
 
@@ -77,7 +77,7 @@ private struct VoiceGlow<S: Shape>: View {
         let l = Double(level)
         let gradient = AngularGradient(colors: VoiceEdgeLook.colors, center: .center, angle: .degrees(phase * 360))
         ZStack {
-            shape.stroke(gradient, lineWidth: 3 + 5 * l).blur(radius: 5 + 7 * l).opacity(0.45 + 0.55 * l)
+            shape.stroke(gradient, lineWidth: 3 + 6 * l).blur(radius: 5 + 6 * l).opacity(0.55 + 0.45 * l)
             shape.stroke(gradient, lineWidth: 1.5 + 1.5 * l).opacity(0.7 + 0.3 * l)
         }
     }

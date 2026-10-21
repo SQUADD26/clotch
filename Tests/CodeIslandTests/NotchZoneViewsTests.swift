@@ -38,7 +38,8 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertEqual(NotchQuotaTone.tone(used: 25), .go)
         XCTAssertEqual(NotchQuotaTone.tone(used: 61), .wait)
         XCTAssertEqual(NotchQuotaTone.tone(used: 63), .wait)
-        XCTAssertEqual(NotchQuotaTone.tone(used: 80), .stop)
+        XCTAssertEqual(NotchQuotaTone.tone(used: 89), .wait)
+        XCTAssertEqual(NotchQuotaTone.tone(used: 90), .stop)
         XCTAssertNil(NotchQuotaTone.tone(used: nil))
     }
 

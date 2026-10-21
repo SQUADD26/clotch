@@ -10,6 +10,7 @@ import CodeIslandCore
 /// is created after launch; other writers there wake it, and the filter drops them before any read.
 @MainActor
 final class VoiceStore: ObservableObject {
+    static let shared = VoiceStore()
     @Published private(set) var status: VoiceStatus?
 
     private let file: URL

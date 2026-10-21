@@ -106,20 +106,12 @@ struct QuotaMeter: View {
         let used = window.usedNow(now)
         HStack(spacing: 8) {
             Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
-            GoalBar(progress: used.map { $0 / 100 }, color: QuotaTone.color(used), height: 4)
+            GoalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used), height: 4)
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
                 .font(.system(size: 11, weight: (used ?? 0) >= 90 ? .semibold : .regular).monospacedDigit())
                 .foregroundStyle((used ?? 0) >= 90 ? GoalTone.stop.color : GoalInk.row)
                 .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
         }
-    }
-}
-
-/// Usage colour: green with room, yellow from half, red from 90%.
-enum QuotaTone {
-    static func color(_ used: Double?) -> Color {
-        guard let used else { return GoalInk.secondary }
-        return used >= 90 ? GoalTone.stop.color : used >= 50 ? GoalTone.wait.color : GoalTone.go.color
     }
 }

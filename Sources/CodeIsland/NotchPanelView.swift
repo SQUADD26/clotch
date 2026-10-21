@@ -152,6 +152,7 @@ struct NotchPanelView: View {
     @ObservedObject private var goals = GoalStore.shared
     /// A goal change or a request taken in charge, shown under the closed notch.
     @ObservedObject private var notifier = NotchNotifier.shared
+    @ObservedObject private var voice = VoiceStore.shared
     /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
     private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil && notifier.phase != .leave }
 
@@ -214,6 +215,14 @@ struct NotchPanelView: View {
             wing: compactWingWidth,
             statusExtra: collapsedStatusExtra,
             hasNotch: hasNotch
+        )
+    }
+
+    private var panelShape: NotchPanelShape {
+        NotchPanelShape(
+            topExtension: shouldShowExpanded || showsNote ? 14 : 3,
+            bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote ? NotchSpace.noteRadius : 12,
+            minHeight: notchHeight
         )
     }
 
@@ -299,14 +308,9 @@ struct NotchPanelView: View {
             .recordsCompletionCardChrome(in: cardSpace)
             .frame(width: panelWidth)
             .clipped()
-            .background(
-                NotchPanelShape(
-                    topExtension: shouldShowExpanded || showsNote ? 14 : 3,
-                    bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote ? NotchSpace.noteRadius : 12,
-                    minHeight: notchHeight
-                )
-                .fill(.black)
-            )
+            .background(panelShape.fill(.black))
+            // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
+            .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
             .onChange(of: showToolStatus) { _, newValue in

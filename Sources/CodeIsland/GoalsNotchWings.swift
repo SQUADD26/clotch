@@ -71,7 +71,7 @@ private struct AccountBar: View {
         ZStack(alignment: .bottom) {
             bar.fill(GoalInk.barTrack)
             if let used, used > 0 {
-                bar.fill(QuotaTone.color(used)).frame(height: max(4, 16 * CGFloat(min(used, 100)) / 100))
+                bar.fill(NotchQuotaTone.color(used: used)).frame(height: max(4, 16 * CGFloat(min(used, 100)) / 100))
             }
         }
         .frame(width: 6, height: 16)

@@ -59,20 +59,20 @@ private struct VerticalBar: View {
 /// «Account in uso su questo Mac»: per account its name, then 5 hours and week with a bar and a figure each.
 struct AccountsDetailCard: View {
     let data: NotchZoneData
-    private static let barWidth: CGFloat = 76
+    private static let barWidth: CGFloat = 52
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Account in uso su questo Mac").font(NotchType.secondary).foregroundStyle(GoalInk.secondary)
+        VStack(alignment: .leading, spacing: 10) {  // account rows 40 pt apart
+            Text("Account in uso su questo Mac").font(NotchType.small).foregroundStyle(GoalInk.secondary)
             ForEach(data.accountsInUse) { account in
                 VStack(alignment: .leading, spacing: NotchSpace.tight) {
                     Text(data.name(of: account))
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(NotchType.name)
                         .foregroundStyle(account.stale(data.now) ? GoalInk.secondary : GoalInk.primary)
                         .lineLimit(1)
                     if account.stale(data.now) {
                         Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: data.now) } ?? "Nessun dato")
-                            .font(NotchType.secondary).foregroundStyle(GoalInk.secondary)
+                            .font(NotchType.small).foregroundStyle(GoalInk.secondary)
                     } else {
                         HStack(spacing: 24) {
                             Meter(title: "5 ore", window: account.fiveHour, now: data.now, toned: false)
@@ -82,9 +82,9 @@ struct AccountsDetailCard: View {
                 }
             }
         }
-        .padding(NotchSpace.plate)
-        .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(.black))
-        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Color.white.opacity(0.16), lineWidth: 1))
+        .padding(16)
+        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.black))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
     }
 
     private struct Meter: View {
@@ -97,11 +97,11 @@ struct AccountsDetailCard: View {
         var body: some View {
             let used = window.usedNow(now)
             HStack(spacing: 8) {
-                Text(title).font(NotchType.label).foregroundStyle(GoalInk.secondary)
+                Text(title).font(.system(size: 10, weight: .medium)).foregroundStyle(GoalInk.secondary)
                 GoalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used), height: 4)
                     .frame(width: AccountsDetailCard.barWidth)
                 Text(used.map { "\(Int($0.rounded()))%" } ?? "")
-                    .font(NotchType.numbers)
+                    .font(.system(size: 11, weight: .medium).monospacedDigit())
                     .foregroundStyle(toned ? NotchQuotaTone.color(used: used) : GoalInk.primary)
                     .frame(width: NotchSpace.figureColumn, alignment: .trailing)
             }
