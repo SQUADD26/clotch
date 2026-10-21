@@ -41,24 +41,11 @@ private struct ProposalLine: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 8) {
-                pill("Rifiuta", GoalInk.secondary) { store.reject(row) }
-                pill("Accetta", GoalTone.go.color) { store.accept(row) }.disabled(busy).opacity(busy ? 0.5 : 1)
+                Button("Rifiuta") { store.reject(row) }.buttonStyle(.tone(.stop))
+                Button("Accetta") { store.accept(row) }.buttonStyle(.tone(.go)).disabled(busy).opacity(busy ? 0.5 : 1)
             }
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("\(row.title). \(text)")
-    }
-
-    private func pill(_ title: String, _ color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(NotchType.smallEmphasis)
-                .foregroundStyle(color)
-                .padding(.horizontal, 12)
-                .frame(height: 26)
-                .background(Capsule().fill(color.opacity(0.16)))
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.notchSmall)
     }
 }

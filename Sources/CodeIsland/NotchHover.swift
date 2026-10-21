@@ -8,20 +8,22 @@ struct HoverLift: ViewModifier {
     var small = false
     /// The notch is always black; the settings window follows the system (nil).
     var onDark: Bool? = true
+    /// False where the tap does nothing now (a row with no session to open).
+    var active = true
     @State private var hovered = false
     @Environment(\.isEnabled) private var enabled
     @Environment(\.colorScheme) private var scheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        let lit = hovered && enabled
+        let lit = hovered && enabled && active
         let lift = (onDark ?? (scheme == .dark)) ? 0.12 : -0.06
         return content
             .brightness(lit ? lift : 0)
             .scaleEffect(lit && small && !reduceMotion ? 1.03 : 1)
             .animation(reduceMotion ? NotchMotion.still : NotchMotion.hover, value: lit)
             .onHover { hovered = $0 }
-            .handPointer(enabled)
+            .handPointer(enabled && active)
     }
 }
 
@@ -46,10 +48,67 @@ extension ButtonStyle where Self == HoverButtonStyle {
     static var window: HoverButtonStyle { HoverButtonStyle(small: true, onDark: nil) }
 }
 
+// MARK: - Tone pill (#65)
+
+/// «Accetta» and «Rifiuta»: a pill tinted with its traffic-light tone. Under the pointer it fills with the
+/// tone and the text turns dark, on the hover spring; pressed, it darkens. Reduce Motion: colour only, a short fade.
+struct TonePillStyle: ButtonStyle {
+    let tone: GoalTone
+
+    func makeBody(configuration: Configuration) -> some View {
+        TonePillBody(label: configuration.label, tone: tone, pressed: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == TonePillStyle {
+    static func tone(_ tone: GoalTone) -> TonePillStyle { TonePillStyle(tone: tone) }
+}
+
+private struct TonePillBody<Label: View>: View {
+    let label: Label
+    let tone: GoalTone
+    let pressed: Bool
+    @State private var hovered = false
+    @Environment(\.isEnabled) private var enabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        let lit = hovered && enabled
+        let motion = reduceMotion ? NotchMotion.still : NotchMotion.hover
+        TonePill(label: label, tone: tone, lit: lit, pressed: pressed && enabled)
+            .scaleEffect(lit && !reduceMotion ? 1.03 : 1)
+            .animation(motion, value: lit)
+            .animation(motion, value: pressed)
+            .onHover { hovered = $0 }
+            .handPointer(enabled)
+    }
+}
+
+/// The pill in one state; the gallery draws all three still.
+struct TonePill<Label: View>: View {
+    let label: Label
+    let tone: GoalTone
+    var lit = false
+    var pressed = false
+
+    var body: some View {
+        let full = lit || pressed
+        label
+            .font(NotchType.smallEmphasis)
+            .foregroundStyle(full ? tone.ink : tone.color)
+            .padding(.horizontal, 12)
+            .frame(height: 26)
+            .background(Capsule().fill(tone.color.opacity(full ? 1 : 0.16)))
+            // -0.08 keeps the dark text above 4.5:1 on the pressed red.
+            .brightness(pressed ? -0.08 : 0)
+            .contentShape(Capsule())
+    }
+}
+
 extension View {
     /// The same hover for a tappable view that is not a Button (onTapGesture).
-    func notchHover(small: Bool = false, onDark: Bool? = true) -> some View {
-        modifier(HoverLift(small: small, onDark: onDark))
+    func notchHover(small: Bool = false, onDark: Bool? = true, active: Bool = true) -> some View {
+        modifier(HoverLift(small: small, onDark: onDark, active: active))
     }
 
     /// Hand cursor where one clicks.

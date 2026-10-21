@@ -940,9 +940,9 @@ private struct HooksPage: View {
                                 refreshCLIStatuses()
                                 refreshKey += 1
                             } label: {
-                                Image(systemName: "trash")
+                                Image(systemName: "trash").foregroundStyle(.red)
                             }
-                            .buttonStyle(.borderless)
+                            .buttonStyle(.window)
                         }
                     }
                 }
@@ -1091,9 +1091,9 @@ private struct ExtraConfigDirRow: View {
                 // The primary under another spelling: nothing to switch here.
                 .disabled(!status.sourceEnabled || status.sameAsPrimary)
             Button(role: .destructive, action: onRemove) {
-                Image(systemName: "trash")
+                Image(systemName: "trash").foregroundStyle(.red)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.window)
             .help(l10n["extra_config_dirs_remove_help"])
         }
     }
