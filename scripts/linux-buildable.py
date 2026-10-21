@@ -2,7 +2,7 @@
 """Prints the CodeIslandCore sources and tests that build on Linux, one path per line.
 
 Rule, no file names: a file is out when it uses an Apple-only API (the pattern below), or when it
-names a type, or calls a method an extension adds, that a file already out declares. Repeated
+names a type, or calls (`.name`) a method an extension adds, that a file already out declares. Repeated
 until nothing changes, so a new Core file joins by itself unless it depends on Apple-only code.
 """
 import re, sys
@@ -22,14 +22,15 @@ FUNC = re.compile(r"^\s+(?:(?:public|internal|mutating|@\w+)\s+)*func\s+(\w+)") 
 
 def declared(text):
     """Top-level types the file declares (nested ones are too generic to match), and methods it adds to other files' types through an extension."""
-    names, in_extension = set(TYPE.findall(text)), False
+    types, methods, in_extension = set(TYPE.findall(text)), set(), False
     for line in text.splitlines():
         if line and not line[0].isspace() and line[0] != "}":
             m = EXTENSION.match(line)
-            in_extension = bool(m) and m.group(1) not in names
+            in_extension = bool(m) and m.group(1) not in types
         elif in_extension and (m := FUNC.match(line)):
-            names.add(m.group(1))
-    return names
+            methods.add(m.group(1))
+    # A method only as a member call: a file's own function of the same name is not a use of it.
+    return {rf"\b{re.escape(n)}\b" for n in types} | {rf"\.{re.escape(n)}\b" for n in methods}
 
 
 root = Path(sys.argv[1])
@@ -37,7 +38,7 @@ files = {p: p.read_text() for d in ("Sources/CodeIslandCore", "Tests/CodeIslandC
 out = {p for p, t in files.items() if APPLE_ONLY.search(t) or (NETWORK.search(t) and "import FoundationNetworking" not in t)}
 while True:
     gone = set().union(*(declared(files[p]) for p in out)) if out else set()
-    pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(gone))) + r")\b") if gone else None
+    pattern = re.compile("|".join(sorted(gone))) if gone else None
     more = {p for p, t in files.items() if p not in out and pattern and pattern.search(t)}
     if not more:
         break
