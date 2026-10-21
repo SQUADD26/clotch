@@ -181,7 +181,7 @@ struct TabBar: View {
 /// The gear of the open notch: the app's settings window, the same as the menu bar's «Impostazioni…»
 /// (where «Personalizza il notch» lives too).
 struct NotchSettingsButton: View {
-    var open: @MainActor () -> Void = { SettingsWindowController.shared.show() }
+    var open: @MainActor () -> Void = { NotchExit.close(); SettingsWindowController.shared.show() }
 
     var body: some View {
         NotchIconButton(icon: "gearshape", tooltip: "Apri impostazioni") { open() }

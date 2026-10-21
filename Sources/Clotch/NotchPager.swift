@@ -30,12 +30,15 @@ struct Pager<Page: View, Footer: View>: View {
     @State private var keep: ClosedRange<Int>?
     @State private var swipe = PageSwipe()
     @State private var monitor: Any?
+    /// Where the scroll monitor goes: the newest copy of this view (see `Live`).
+    @State private var live = Live()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// From one page to the next, with the gap between them.
     private var pitch: CGFloat { width + NotchSpace.side }
 
     var body: some View {
+        let _ = connect()  // every update: the monitor never works from old values
         VStack(spacing: NotchSpace.section) {
             ZStack(alignment: .top) {
                 if reduceMotion {
@@ -115,23 +118,34 @@ struct Pager<Page: View, Footer: View>: View {
         spring = PageSpring()
     }
 
+    /// A copy of the pager made when the monitor was installed keeps that moment's `count`, `index` and
+    /// `pageID` for good: with pages that arrive later (the goals), it could never reach them (#119). So the
+    /// monitor calls this box, and every update of the view puts its own `scroll` in it.
+    private final class Live { var handle: ((NSEvent) -> NSEvent?)? }
+
     /// Scrolls over the open notch page. The monitor lives only while the pager is on screen, so it costs
     /// nothing with the notch closed.
     private func startSwipes() {
         guard monitor == nil else { return }
-        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
-            // Our app's only panel is the notch; the settings window is a plain titled window.
-            guard event.window is NSPanel else { return event }
-            let step = swipe.feed(event)  // fed always, so each gesture's start is seen
-            let trackpad = !event.phase.isEmpty
-            guard trackpad, event.momentumPhase.isEmpty, !reduceMotion else {
-                // The wheel, momentum after a swipe, or Reduce Motion: one step per gesture.
-                guard !TabBarPointer.inside else { return event }  // over the tab bar, the scroll moves the tab
-                if let step { go(index + step) }
-                return event.isSideways ? nil : event
-            }
-            return follow(event) ? nil : event
+        connect()
+        let live = live
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in live.handle?(event) ?? event }
+    }
+
+    private func connect() { live.handle = { event in scroll(event) } }
+
+    private func scroll(_ event: NSEvent) -> NSEvent? {
+        // Our app's only panel is the notch; the settings window is a plain titled window.
+        guard event.window is NSPanel else { return event }
+        let step = swipe.feed(event)  // fed always, so each gesture's start is seen
+        let trackpad = !event.phase.isEmpty
+        guard trackpad, event.momentumPhase.isEmpty, !reduceMotion else {
+            // The wheel, momentum after a swipe, or Reduce Motion: one step per gesture.
+            guard !TabBarPointer.inside else { return event }  // over the tab bar, the scroll moves the tab
+            if let step { go(index + step) }
+            return event.isSideways ? nil : event
         }
+        return follow(event) ? nil : event
     }
 
     /// A trackpad event: the pages follow the fingers. Returns whether the event was ours.
@@ -165,6 +179,7 @@ struct Pager<Page: View, Footer: View>: View {
     private func stopSwipes() {
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
+        live.handle = nil  // it holds a copy of this view, which holds this box
         ticker?.invalidate()
         ticker = nil
     }

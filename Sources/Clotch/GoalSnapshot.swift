@@ -128,6 +128,12 @@ enum GoalSnapshot {
                                     voice: (VoiceStatus.intensity(level), t / VoiceEdgeLook.period)) { EmptyView() },
                              "17-voce-\(Int(t))s")
                 }
+                // #110: every state of the voice-in pill with its light on the outline, named like the Figma notes.
+                for (name, input) in VoiceInputController.stills {
+                    try save(island(width: NotchSize.note, radius: NotchSpace.noteRadius, light: input.light) {
+                        VoiceInputPill(input: input)
+                    }, "21-pill-\(name)")
+                }
                 print("snapshot: the no-notch centre comes with #5")
                 try SettingsSnapshot.save(into: dir)
             }
@@ -169,7 +175,7 @@ enum GoalSnapshot {
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
-                                            voice: (level: Float, phase: Double)? = nil,
+                                            voice: (level: Float, phase: Double)? = nil, light: VoiceInputController.Light = .off,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
@@ -185,6 +191,9 @@ enum GoalSnapshot {
         .frame(width: width)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
         .overlay {
+            if light != .off {
+                VoiceInputLightLive(light: light, shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous))
+            }
             if let voice {
                 VoiceGlow(shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous),
                           level: voice.level, phase: voice.phase)

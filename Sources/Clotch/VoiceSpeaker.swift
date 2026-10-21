@@ -127,6 +127,13 @@ final class VoiceSpeaker {
         return await speak(VoiceTurn.testLine, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key) ?? "Voce provata."
     }
 
+    /// The answer to a spoken question (#110): the voice and speed of Roberto's settings, no daily cap (he asked), even with the
+    /// alerts switch off. nil = said; otherwise why not.
+    func speakAnswer(_ text: String) async -> String? {
+        guard let key = files.key else { return "Manca la chiave." }
+        return await speak(text, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key)
+    }
+
     // MARK: - Haiku, ElevenLabs, audio, light
 
     /// ElevenLabs → light on → audio → light off. nil = said; otherwise why not, for the page.
@@ -214,7 +221,7 @@ final class VoiceSpeaker {
     }
 
     /// A Dock-launched app has no ~/.local/bin in PATH: the usual places, then the newest installed version.
-    nonisolated private static func claudeBinary() -> String? {
+    nonisolated static func claudeBinary() -> String? {
         let fm = FileManager.default
         let home = fm.homeDirectoryForCurrentUser.path
         if let found = [home + "/.local/bin/claude", "/opt/homebrew/bin/claude", "/usr/local/bin/claude"].first(where: fm.isExecutableFile(atPath:)) {
