@@ -72,7 +72,8 @@ build_mac() {
     echo "Building $APP_NAME (arm64 only)..."
     swift build -c release --arch arm64
 
-    ARM_DIR=".build/arm64-apple-macosx/release"
+    # Newer SwiftPM puts products in .build/out/Products/Release: ask it instead of guessing.
+    ARM_DIR="$(swift build -c release --arch arm64 --show-bin-path)"
 
     echo "Creating app bundle..."
     rm -rf "$APP_BUNDLE"
@@ -117,7 +118,7 @@ build_mac() {
     cp "Sources/CodeIsland/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
     # Copy SPM resource bundles into Contents/Resources/ (required for code signing)
-    for bundle in .build/*/release/*.bundle; do
+    for bundle in "$ARM_DIR"/*.bundle; do
         if [ -e "$bundle" ]; then
             cp -R "$bundle" "$APP_BUNDLE/Contents/Resources/"
             break
@@ -127,19 +128,22 @@ build_mac() {
     ENTITLEMENTS="CodeIsland.entitlements"
 
     # Use SIGN_ID env var, or auto-detect: prefer "Developer ID Application" for distribution,
-    # fall back to any valid identity, then ad-hoc
+    # fall back to any valid identity, then ad-hoc. Sign by SHA-1: two certificates with the
+    # same name make the name ambiguous to codesign.
     if [ -z "${SIGN_ID:-}" ]; then
-        SIGN_ID=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)".*/\1/' 2>/dev/null || true)
-    fi
-    if [ -z "$SIGN_ID" ]; then
-        SIGN_ID=$(security find-identity -v -p codesigning | grep -v "REVOKED" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/' 2>/dev/null || true)
+        IDS=$(security find-identity -v -p codesigning 2>/dev/null | grep -v "REVOKED" | grep '"' || true)
+        LINE=$(echo "$IDS" | grep "Developer ID Application" | head -1 || true)
+        [ -n "$LINE" ] || LINE=$(echo "$IDS" | head -1)
+        SIGN_ID=$(echo "$LINE" | awk '{print $2}')
+        SIGN_NAME=$(echo "$LINE" | sed 's/.*"\(.*\)".*/\1/')
     fi
     if [ -z "$SIGN_ID" ]; then
         echo "No developer certificate found, using ad-hoc signing..."
         SIGN_ID="-"
     fi
+    SIGN_NAME="${SIGN_NAME:-$SIGN_ID}"
 
-    echo "Code signing ($SIGN_ID)..."
+    echo "Code signing ($SIGN_NAME)..."
     # Sign embedded frameworks first (inside-out).
     SPARKLE_FW="$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
     # Sign nested helpers inside Sparkle before the framework itself.
@@ -158,7 +162,7 @@ build_mac() {
     codesign --force --options runtime --sign "$SIGN_ID" "$APP_BUNDLE/Contents/Helpers/codeisland-bridge"
     codesign --force --options runtime --sign "$SIGN_ID" --entitlements "$ENTITLEMENTS" "$APP_BUNDLE"
 
-    if [ "$NOTARIZE" = true ] && [[ "$SIGN_ID" == *"Developer ID"* ]]; then
+    if [ "$NOTARIZE" = true ] && [[ "$SIGN_NAME" == *"Developer ID"* ]]; then
         echo "Creating ZIP for notarization..."
         ZIP_PATH="$BUILD_DIR/$APP_NAME.zip"
         ditto -c -k --keepParent "$APP_BUNDLE" "$ZIP_PATH"

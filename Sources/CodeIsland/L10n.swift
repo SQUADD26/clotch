@@ -358,7 +358,7 @@ final class L10n: ObservableObject {
         "usage_tooltip_title": "Claude tokens, from the local transcripts",
         "usage_tooltip_breakdown": "%1$@ new input + %2$@ cache writes · %3$@ cache reads",
         "quota_resets_in": "resets in %@",
-        "quit_confirm": "QUIT?",
+        "quit_confirm": "ESCI?",
         "quit_confirm_hint": "Click again to quit",
         "show_usage_stats": "Show Claude token usage",
         "show_usage_stats_desc": "Footer line aggregating token usage from the local Claude Code transcripts (5-hour window and today). Local files only — no network calls.",

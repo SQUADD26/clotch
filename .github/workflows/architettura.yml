@@ -1,0 +1,31 @@
+# ARCHITECTURE.md obbligatorio (SQUADD26/claude-config#982). Copia in linea del controllo riusabile:
+# questa repo è pubblica e non può chiamare un workflow della repo privata claude-config, né usare i runner self-hosted.
+name: architettura
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+
+concurrency:
+  group: architettura-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  architettura:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: ARCHITECTURE.md esiste e segue i cambi di setup
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -e
+          [ -f ARCHITECTURE.md ] || { echo "::error::ARCHITECTURE.md manca nella radice"; exit 1; }
+          [ -n "$BASE" ] || exit 0
+          files=$(git diff --name-only "$BASE"...HEAD)
+          setup=$(echo "$files" | grep -E '^(infra/|supabase/|\.github/workflows/)|(^|/)docker-compose[^/]*$|(^|/)\.env\.example$' | grep -v -E '^\.github/workflows/architettura\.yml$|^supabase/(migrations|functions|tests)/' || true)
+          if [ -n "$setup" ] && ! echo "$files" | grep -qx 'ARCHITECTURE.md'; then
+            echo "::error::La PR cambia il setup ma non ARCHITECTURE.md:"; echo "$setup"; exit 1
+          fi
