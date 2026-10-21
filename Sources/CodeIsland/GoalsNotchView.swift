@@ -105,10 +105,12 @@ extension Array where Element == GoalRow {
     /// Every session of every goal (the closed notch counts the ones at work).
     var allPulses: [GoalPulse] { flatMap(\.pulses) }
 
-    /// The pages of the open notch and the rings of the closed one: the goal chased now first.
+    /// The pages of the open notch and the rings of the closed one: confirmed goals of live sessions
+    /// (`GoalBoard.tab`), the goal chased now first.
     var pages: [GoalRow] {
-        guard let hero else { return self }
-        return [hero] + filter { $0.id != hero.id }
+        let goals = GoalBoard.tab(self).goals
+        guard let hero else { return goals }
+        return [hero] + goals.filter { $0.id != hero.id }
     }
 
     func accessibilitySummary(now: Date) -> String {

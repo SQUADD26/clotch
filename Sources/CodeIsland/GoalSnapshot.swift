@@ -54,6 +54,14 @@ enum GoalSnapshot {
                 } else {
                     print("snapshot: one goal only, no «scorrimento» frame")
                 }
+                let toConfirm = GoalBoard.tab(store.rows, rejected: store.rejected).toConfirm
+                if toConfirm.isEmpty {
+                    print("snapshot: no proposed goal, no «da confermare» frame")
+                } else {
+                    try save(open(.goals) {
+                        ProposalsPage(rows: Array(toConfirm.prefix(ProposalsPage.perPage)), total: toConfirm.count)
+                    }, "16-da-confermare")
+                }
                 try save(open(.requests), "07-richieste")
                 if store.requests.count > RequestsTab.perPage {
                     try save(open(.requests) {

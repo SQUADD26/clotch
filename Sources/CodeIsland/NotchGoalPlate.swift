@@ -2,26 +2,43 @@ import AppKit
 import SwiftUI
 import CodeIslandCore
 
-/// The Goals tab: one page per goal, the goal chased now first, paged sideways.
+/// The Goals tab: the proposals waiting for Roberto first («Da confermare», `ProposalsPage`), then one
+/// page per confirmed goal, the goal chased now first, paged sideways. Goals of closed sessions are only counted.
 struct GoalsTab: View {
     let rows: [GoalRow]
     let now: Date
-    /// The page shown, by goal id, so a reload that reorders the goals keeps it.
+    @ObservedObject private var store = GoalStore.shared
+    /// The page shown, by id, so a reload that reorders the goals keeps it.
     @State private var shownId: String?
 
     var body: some View {
+        let tab = GoalBoard.tab(rows, rejected: store.rejected)
         let pages = rows.pages
-        if pages.isEmpty {
-            EmptyState(text: "Nessun obiettivo aperto")
+        let asks = stride(from: 0, to: tab.toConfirm.count, by: ProposalsPage.perPage).map {
+            Array(tab.toConfirm[$0..<min($0 + ProposalsPage.perPage, tab.toConfirm.count)])
+        }
+        let ids = asks.indices.map { "da-confermare-\($0)" } + pages.map(\.id)
+        let closed = tab.closed == 0 ? nil : "\(tab.closed) di sessioni chiuse"
+        if ids.isEmpty {
+            EmptyState(text: "Nessun obiettivo aperto", detail: closed)
         } else {
             let index = Binding<Int>(
-                get: { pages.firstIndex { $0.id == shownId } ?? 0 },
-                set: { shownId = pages.indices.contains($0) ? pages[$0].id : nil }
+                get: { ids.firstIndex { $0 == shownId } ?? 0 },
+                set: { shownId = ids.indices.contains($0) ? ids[$0] : nil }
             )
-            Pager(count: pages.count, index: index) { i in
-                GoalPage(row: pages[i], position: i + 1, of: pages.count, now: now)
+            Pager(count: ids.count, index: index) { i in
+                if i < asks.count {
+                    ProposalsPage(rows: asks[i], total: tab.toConfirm.count)
+                } else {
+                    GoalPage(row: pages[i - asks.count], position: i - asks.count + 1, of: pages.count, now: now)
+                }
             } footer: { go in
-                if pages.count > 1 { PageControl(count: pages.count, index: index.wrappedValue, go: go) }
+                ZStack {
+                    if ids.count > 1 { PageControl(count: ids.count, index: index.wrappedValue, go: go) }
+                    if let closed {
+                        HStack { Spacer(); Text(closed).font(NotchType.label).foregroundStyle(GoalInk.quiet) }
+                    }
+                }
             }
         }
     }
