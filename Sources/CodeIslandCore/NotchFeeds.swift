@@ -52,11 +52,22 @@ extension GoalSources {
               let text = d["testo"] as? String else { return nil }
         return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
-                           text: text.split(whereSeparator: \.isWhitespace).joined(separator: " "),
+                           text: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
                            original: d["originale"] as? String ?? text,
                            state: d["stato"] as? String ?? "nuova", takenAt: date(d["t_presa"]),
                            takenBy: d["presa_da"] as? String ?? "", doneAt: date(d["t_fatta"]),
                            proof: d["prova"] as? String ?? "", notOurs: d["non_nostra"] as? Bool ?? false,
                            folder: d["cartella"] as? String ?? "", localId: d["local_id"] as? String ?? "")
+    }
+
+    /// Real text only (#39): blocks like <system-reminder>…</system-reminder> or <pasted_content …>…, an unclosed one up to
+    /// the end, and stray tags removed; the first piece left (its first line with `firstLine`), spaces collapsed.
+    /// nil when nothing is left, never a raw tag.
+    static func headline(_ s: String, firstLine: Bool = false) -> String? {
+        let bare = s.replacingOccurrences(of: #"(?s)<([A-Za-z_][\w-]*)\b[^>]*>(.*?</\1\s*>|.*$)"#, with: "\u{0}", options: .regularExpression)
+            .replacingOccurrences(of: #"</?[A-Za-z_][^>]*>"#, with: "\u{0}", options: .regularExpression)
+        return bare.split(whereSeparator: { $0 == "\u{0}" || (firstLine && $0.isNewline) }).lazy
+            .map { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }
+            .first { !$0.isEmpty }
     }
 }

@@ -132,10 +132,10 @@ extension NotchEvent {
     /// The centre text of the closed notch while this event is up (#39); nil = only the line under the notch.
     /// shortcut: «who» is the title of the session the request was written in, which is the one that takes it
     /// (`presa_da` = `sessione` today); read the taker's own title if requests ever change hands.
-    func notice(rows: [GoalRow], requests: [UserRequest]) -> String? {
+    func notice(rows: [GoalRow], requests: [UserRequest], withSession: Bool = true) -> String? {
         if kind == .requestTaken {
             return requests.first { $0.id == subject }.flatMap {
-                NotchEvents.notice(kind, title: $0.text, by: $0.sessionTitle, done: $0.look == .done)
+                NotchEvents.notice(kind, title: $0.text, by: withSession ? $0.sessionTitle : "", done: $0.look == .done)
             }
         }
         return rows.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.title) }

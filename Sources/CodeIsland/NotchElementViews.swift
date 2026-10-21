@@ -48,8 +48,13 @@ private struct ActiveGoalElement: View {
     var body: some View {
         Group {
             if let notice = data.notice {
-                Text(notice).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail)
-                    .transition(.blurFade)
+                // The session follows the title only when both fit; else the title alone, cut with «…».
+                ViewThatFits(in: .horizontal) {
+                    Text(notice).fixedSize()
+                    Text(data.noticeShort ?? notice).lineLimit(1).truncationMode(.tail)
+                }
+                .font(NotchType.name).foregroundStyle(GoalInk.primary)
+                .transition(.blurFade)
             } else {
                 goal.transition(.blurFade)
             }
