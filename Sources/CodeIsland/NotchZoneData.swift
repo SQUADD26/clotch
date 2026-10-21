@@ -19,6 +19,8 @@ struct NotchZoneData {
     var iconsOnly = false
     /// A notification folding back into the notch: its result symbol stands in the right zone a moment.
     var mark: NotchEvent?
+    /// The account bars ask for their card without the pointer: `--snapshot --gallery` draws it this way.
+    var accountsCardOpen = false
 
     /// The accounts in use here, in the dashboard's «next to use» order.
     var accountsInUse: [AccountQuota] { accounts.filter { inUse.contains($0.email) } }

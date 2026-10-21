@@ -24,6 +24,15 @@ public struct NotchEvent: Identifiable, Equatable, Sendable {
 }
 
 public enum NotchEvents {
+    /// How long a notification stays after its change lands, in seconds: reading time by the length of its text.
+    public static let minHold = 3.5
+    public static let maxHold = 8.0
+    public static let holdPerCharacter = 0.1
+
+    public static func hold(forText text: String) -> Double {
+        min(max(Double(text.count) * holdPerCharacter, minHold), maxHold)
+    }
+
     public static func goals(old: [GoalRow], new: [GoalRow]) -> [NotchEvent] {
         let before = Dictionary(old.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         return new.compactMap { row in

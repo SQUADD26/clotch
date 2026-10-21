@@ -1310,7 +1310,8 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.notchHeightMode) private var notchHeightModeRaw = SettingsDefaults.notchHeightMode
     @AppStorage(SettingsKey.customNotchHeight) private var customNotchHeight = SettingsDefaults.customNotchHeight
-    @AppStorage(SettingsKey.notchAnimationSpeed) private var notchAnimationSpeed = SettingsDefaults.notchAnimationSpeed
+    @AppStorage(SettingsKey.notchOpenSpeed) private var notchOpenSpeed = SettingsDefaults.notchOpenSpeed
+    @AppStorage(SettingsKey.notchCloseSpeed) private var notchCloseSpeed = SettingsDefaults.notchCloseSpeed
 
     private var notchHeightMode: Binding<NotchHeightMode> {
         Binding(
@@ -1326,11 +1327,27 @@ private struct AppearancePage: View {
         )
     }
 
-    private var notchAnimationSpeedBinding: Binding<Double> {
+    private func speedBinding(_ speed: Binding<Double>) -> Binding<Double> {
         Binding(
-            get: { NotchAnimationSpeed.clamped(notchAnimationSpeed) },
-            set: { notchAnimationSpeed = NotchAnimationSpeed.clamped($0) }
+            get: { NotchAnimationSpeed.clamped(speed.wrappedValue) },
+            set: { speed.wrappedValue = NotchAnimationSpeed.clamped($0) }
         )
+    }
+
+    private func speedSlider(_ title: String, _ speed: Binding<Double>) -> some View {
+        let value = speedBinding(speed)
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text("\(value.wrappedValue, specifier: "%.1f")×")
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Slider(value: value, in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step)
+                .accessibilityLabel(Text(title))
+                .accessibilityValue(Text("\(value.wrappedValue, specifier: "%.1f")×"))
+        }
     }
 
     var body: some View {
@@ -1345,25 +1362,11 @@ private struct AppearancePage: View {
             }
 
             Section(l10n["panel"]) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(l10n["notch_animation_speed"])
-                        Spacer()
-                        Text("\(notchAnimationSpeedBinding.wrappedValue, specifier: "%.1f")×")
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-                    Slider(
-                        value: notchAnimationSpeedBinding,
-                        in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum,
-                        step: NotchAnimationSpeed.step
-                    )
-                    .accessibilityLabel(Text(l10n["notch_animation_speed"]))
-                    .accessibilityValue(Text("\(notchAnimationSpeedBinding.wrappedValue, specifier: "%.1f")×"))
-                    Text(l10n["notch_animation_speed_desc"])
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                speedSlider(l10n["notch_open_speed"], $notchOpenSpeed)
+                speedSlider(l10n["notch_close_speed"], $notchCloseSpeed)
+                Text(l10n["notch_animation_speed_desc"])
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Picker(selection: $maxVisibleSessions) {
                     Text("3").tag(3)
                     Text("5").tag(5)

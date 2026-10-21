@@ -1,32 +1,11 @@
 import SwiftUI
 import CodeIslandCore
 
-// Issue #10: the light on the notch's border while the Overseer speaks. Approved Figma «Voce · Luce sul bordo»: a glow along the
-// outline, on 0.5 s before the first word, brighter and wider with the voice volume, colours turning slowly round the border.
-// It is its own colour family (orange, pink, violet, blue: Figma specs), never the green/yellow/red of the goal traffic light.
-// Zero cost when silent: nothing is in the tree and no timeline runs. Reduce Motion: a steady glow, no rotation, no pulse.
+// Issue #15 (first cut #10): the light on the notch's outline while the Overseer speaks, in the style of Apple Intelligence's
+// edge glow. Apple Intelligence's colours flow along the outline at one steady pace: a sharp line and two soft halos. The voice
+// only brightens and widens the halos, averaged over 0.4 s, so the light swells with the phrases and never pulses with syllables.
+// Zero cost when silent: nothing is in the tree and no timeline runs. Reduce Motion: a still glow at a steady level.
 // Place it as an overlay on the notch OUTSIDE its `.clipped()`, with the notch's own shape, so the glow can spill past the edge.
-
-/// Dependency-free input: `speaking` and the voice volume `level` 0…1. `shape` is the notch outline.
-struct VoiceEdgeLight<S: Shape>: View {
-    let speaking: Bool
-    let level: Float
-    let shape: S
-
-    var body: some View {
-        if speaking {
-            VoiceGlowDriver(shape: shape, level: { _ in level }).transition(.opacity).allowsHitTesting(false)
-        }
-    }
-}
-
-extension VoiceEdgeLight where S == UnevenRoundedRectangle {
-    /// Notch-like default outline: flat top, 24 pt bottom corners (the open island's).
-    init(speaking: Bool, level: Float) {
-        self.init(speaking: speaking, level: level,
-                  shape: UnevenRoundedRectangle(bottomLeadingRadius: 24, bottomTrailingRadius: 24))
-    }
-}
 
 /// Reads the store: the level comes off the clock from the player's envelope, so there is one timeline, not two.
 struct VoiceEdgeLightLive<S: Shape>: View {
@@ -34,21 +13,33 @@ struct VoiceEdgeLightLive<S: Shape>: View {
     let shape: S
 
     var body: some View {
-        if let s = voice.status {
-            VoiceGlowDriver(shape: shape, level: s.level(at:)).transition(.opacity).allowsHitTesting(false)
+        ZStack {
+            if let s = voice.status {
+                VoiceGlowDriver(shape: shape, level: s.level(at:)).transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.4), value: voice.status == nil)
+        .allowsHitTesting(false)
     }
 }
 
 /// Not generic on purpose: Swift has no static stored properties in generic types.
-private enum VoiceEdgeLook {
-    static let period: TimeInterval = 14 // one slow turn of the colours
-    /// #FF9E0A → #FF3880 → #995CFF → #3399FF, back to orange so the turning loop has no seam.
-    static let colors: [Color] = [
-        Color(red: 1.00, green: 0.62, blue: 0.04), Color(red: 1.00, green: 0.22, blue: 0.50),
-        Color(red: 0.60, green: 0.36, blue: 1.00), Color(red: 0.20, green: 0.60, blue: 1.00),
-        Color(red: 1.00, green: 0.62, blue: 0.04),
+enum VoiceEdgeLook {
+    static let period: TimeInterval = 6 // one lap of the colours round the outline
+    static let segments = 48 // one solid colour each; the round caps and the halos' blur hide the steps
+    static let window: TimeInterval = 0.4 // the voice is averaged over this span, centred on now
+    /// Apple Intelligence's palette as a loop: #FFBA71 → #FF6778 → #F5B9EA → #C686FF → #8D9FFF, then back to orange.
+    private static let palette: [(Double, Double, Double)] = [
+        (1.00, 0.73, 0.44), (1.00, 0.40, 0.47), (0.96, 0.73, 0.92), (0.78, 0.53, 1.00), (0.55, 0.62, 1.00),
     ]
+
+    /// The colour at `x` along the loop: any real number, only its fraction counts.
+    static func color(_ x: Double) -> Color {
+        let p = (x - x.rounded(.down)) * Double(palette.count)
+        let i = Int(p) % palette.count, f = p - p.rounded(.down)
+        let a = palette[i], b = palette[(i + 1) % palette.count]
+        return Color(red: a.0 + (b.0 - a.0) * f, green: a.1 + (b.1 - a.1) * f, blue: a.2 + (b.2 - a.2) * f)
+    }
 }
 
 /// The only place with a clock, and it exists only while this view is in the tree (= while speaking).
@@ -61,24 +52,58 @@ private struct VoiceGlowDriver<S: Shape>: View {
         if reduceMotion {
             VoiceGlow(shape: shape, level: VoiceStatus.steadyLevel, phase: 0)
         } else {
-            TimelineView(.animation) { ctx in
-                VoiceGlow(shape: shape, level: level(ctx.date), phase: ctx.date.timeIntervalSinceReferenceDate / VoiceEdgeLook.period)
+            TimelineView(.animation(minimumInterval: 1 / 60)) { ctx in
+                VoiceGlow(shape: shape, level: smoothed(at: ctx.date),
+                          phase: ctx.date.timeIntervalSinceReferenceDate / VoiceEdgeLook.period)
             }
         }
     }
+
+    /// The envelope is computed before the audio plays, so the average can look ahead: the swell comes on time, not late.
+    private func smoothed(at date: Date) -> Float {
+        let n = 9
+        let sum = (0..<n).reduce(Float(0)) { acc, i in
+            acc + level(date.addingTimeInterval(VoiceEdgeLook.window * (Double(i) / Double(n - 1) - 0.5)))
+        }
+        return sum / Float(n)
+    }
 }
 
-private struct VoiceGlow<S: Shape>: View {
+/// One frame of the light: `level` 0…1, `phase` in laps of the colours.
+struct VoiceGlow<S: Shape>: View {
     let shape: S
     let level: Float
     let phase: Double
 
     var body: some View {
-        let l = Double(level)
-        let gradient = AngularGradient(colors: VoiceEdgeLook.colors, center: .center, angle: .degrees(phase * 360))
+        let k = Double(level)
         ZStack {
-            shape.stroke(gradient, lineWidth: 3 + 6 * l).blur(radius: 5 + 6 * l).opacity(0.55 + 0.45 * l)
-            shape.stroke(gradient, lineWidth: 1.5 + 1.5 * l).opacity(0.7 + 0.3 * l)
+            VoiceRing(shape: shape, width: 8 + 6 * k, phase: phase).blur(radius: 9).opacity(0.3 + 0.5 * k)
+            VoiceRing(shape: shape, width: 4 + 2 * k, phase: phase).blur(radius: 3).opacity(0.5 + 0.4 * k)
+            VoiceRing(shape: shape, width: 1.5, phase: phase).opacity(0.9)
         }
+    }
+}
+
+/// The outline cut in `segments` pieces of one colour each, taken from where the piece sits on the loop: the colours flow
+/// along the edge at one speed (an angular gradient bunches them in the middle of a wide notch). One GPU pass; the padding
+/// gives the stroke room past the shape's frame, which the drawing group would cut.
+private struct VoiceRing<S: Shape>: View {
+    let shape: S
+    let width: CGFloat
+    let phase: Double
+
+    var body: some View {
+        let n = VoiceEdgeLook.segments, pad: CGFloat = 24
+        ZStack {
+            ForEach(0..<n, id: \.self) { i in
+                let a = CGFloat(i) / CGFloat(n)
+                shape.trim(from: a, to: a + 1 / CGFloat(n))
+                    .stroke(VoiceEdgeLook.color(Double(a) - phase), style: StrokeStyle(lineWidth: width, lineCap: .round))
+            }
+        }
+        .padding(pad)
+        .drawingGroup()
+        .padding(-pad)
     }
 }

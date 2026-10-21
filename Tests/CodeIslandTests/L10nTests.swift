@@ -102,19 +102,20 @@ final class L10nTests: XCTestCase {
     }
 
     func testNotchAnimationSpeedLabelsAreLocalized() {
-        let expected: [String: (title: String, description: String)] = [
-            "en": ("Open / Close Speed", "How fast the island expands and collapses"),
-            "de": ("Öffnungs-/Schließgeschwindigkeit", "Wie schnell die Insel auf- und zuklappt"),
-            "zh": ("展开 / 收起速度", "灵动岛展开和收起动画的快慢"),
-            "zh-Hant": ("展開 / 收合速度", "靈動島展開和收合動畫的快慢"),
-            "ja": ("開閉スピード", "アイランドが展開・収縮する速さ"),
-            "ko": ("열기 / 닫기 속도", "아일랜드가 펼쳐지고 접히는 속도"),
-            "tr": ("Açılma / Kapanma Hızı", "Adanın ne kadar hızlı açılıp kapandığı"),
+        let expected: [String: (open: String, close: String, description: String)] = [
+            "en": ("Opening speed", "Closing speed", "How fast the island expands and collapses"),
+            "de": ("Öffnungsgeschwindigkeit", "Schließgeschwindigkeit", "Wie schnell die Insel auf- und zuklappt"),
+            "zh": ("展开速度", "收起速度", "灵动岛展开和收起动画的快慢"),
+            "zh-Hant": ("展開速度", "收合速度", "靈動島展開和收合動畫的快慢"),
+            "ja": ("開くスピード", "閉じるスピード", "アイランドが展開・収縮する速さ"),
+            "ko": ("열기 속도", "닫기 속도", "아일랜드가 펼쳐지고 접히는 속도"),
+            "tr": ("Açılma Hızı", "Kapanma Hızı", "Adanın ne kadar hızlı açılıp kapandığı"),
         ]
 
         for (language, translation) in expected {
             L10n.shared.language = language
-            XCTAssertEqual(L10n.shared["notch_animation_speed"], translation.title)
+            XCTAssertEqual(L10n.shared["notch_open_speed"], translation.open)
+            XCTAssertEqual(L10n.shared["notch_close_speed"], translation.close)
             XCTAssertEqual(L10n.shared["notch_animation_speed_desc"], translation.description)
         }
     }

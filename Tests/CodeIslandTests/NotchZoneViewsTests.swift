@@ -120,6 +120,49 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertGreaterThan(image.count(white), 100, "title, names and figures")
     }
 
+    func testResetIsSaidWithTheTimeTodayAndTheDayOtherwise() {
+        // `now` is mid-afternoon in Europe and mid-day in UTC: a minute later is the same day.
+        let today = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(60)), now: now)
+        XCTAssertTrue(today.hasPrefix("si azzera alle "), today)
+        let later = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(3 * 86_400)), now: now)
+        XCTAssertTrue(later.hasPrefix("si azzera ") && !later.contains("alle"), later)
+        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(-1)), now: now), "", "already reset")
+        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: nil), now: now), "")
+    }
+
+    func testHoverCardHangsUnderTheBarsOnlyWhenAllowed() throws {
+        var d = data
+        d.rows = []  // nothing white in the bar itself: only the card's text is
+        d.accountsCardOpen = true
+        func closed(allowed: Bool) -> some View {
+            NotchZonesView(layout: .standard(hasNotch: true), hasNotch: true, notchWidth: 185, data: d)
+                .frame(width: 600)
+                .padding(.bottom, 330)
+                .accountsCard(allowed: allowed)
+        }
+        let shown = try render(closed(allowed: true), named: "account-passaggio")
+        let hidden = try render(closed(allowed: false), named: "account-passaggio-nascosto")
+        XCTAssertGreaterThan(shown.count(white), 100, "names, figures and reset times")
+        XCTAssertEqual(hidden.count(white), 0, "open notch or notification: no card")
+        XCTAssertEqual(shown.count(white, columns: 0..<0.25), 0, "the card hangs on the bars' side")
+    }
+
+    func testOpenNotchHasTheSettingsGearBesideTheTabs() throws {
+        let image = try render(TabBar(tab: .constant(.goals)).frame(width: 508), named: "pulsante-impostazioni")
+        XCTAssertGreaterThan(image.count(white, columns: 0.94..<1), 0, "the gear right of the centred tab bar")
+    }
+
+    func testSettingsButtonOpensTheSettingsWindow() {
+        _ = NSApplication.shared
+        let title = L10n.shared["settings_title"]
+        func shown() -> NSWindow? { NSApp.windows.first { $0.title == title && $0.isVisible } }
+        XCTAssertNil(shown())
+        NotchSettingsButton().open()
+        let window = shown()
+        XCTAssertNotNil(window, "the gear opens the same settings window as the menu bar")
+        window?.close()
+    }
+
     func testStaleAccountDrawsNoBars() throws {
         var d = data
         d.accounts = [quota("claudesquadd1@x.it", five: 50, seven: 90, age: 2 * 86_400)]

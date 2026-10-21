@@ -74,7 +74,23 @@ enum GoalSnapshot {
                     print("snapshot: \(store.requests.count) requests, no second page")
                 }
                 try save(open(.accounts), "08-account")
-                print("snapshot: «PR unita», no-notch centre and account hover come with #6 and #5")
+                let inUse = AccountQuotaFeed.shared.accounts.filter { AccountsInUseFeed.shared.emails.contains($0.email) }.count
+                if inUse > 0 {
+                    // Room under the island for the card, which hangs outside it as in the panel.
+                    try save(island(width: closedWidth, radius: 12, cardOpen: true) { EmptyView() }
+                        .padding(.bottom, CGFloat(inUse) * 90 + 60).background(surround)
+                        .accountsCard(allowed: true), "11-passaggio-account")
+                } else {
+                    print("snapshot: no account in use on this Mac, no «passaggio account» frame")
+                }
+                // The gear at the right of the tab bar: in every open frame, this one is named for it.
+                try save(open(.goals), "14-pulsante-impostazioni")
+                // The voice light at three moments 1 s apart (#15): the colours move along the edge, the halo follows the voice.
+                for (t, level) in [(0.0, VoiceStatus.steadyLevel), (1.0, 1), (2.0, 0.35)] as [(TimeInterval, Float)] {
+                    try save(island(width: closedWidth, radius: 12, voice: (level, t / VoiceEdgeLook.period)) { EmptyView() },
+                             "17-voce-\(Int(t))s")
+                }
+                print("snapshot: «PR unita» and the no-notch centre come with #6 and #5")
             }
             print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")
         } catch {
@@ -113,22 +129,29 @@ enum GoalSnapshot {
 
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
-    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil,
+    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, cardOpen: Bool = false,
+                                            voice: (level: Float, phase: Double)? = nil,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
                 layout: .standard(hasNotch: true), hasNotch: true, notchWidth: notchWidth,
                 data: NotchZoneData(rows: GoalStore.shared.rows, accounts: AccountQuotaFeed.shared.accounts,
                                     inUse: AccountsInUseFeed.shared.emails, now: GoalStore.shared.now,
-                                    barHeight: notchHeight, mark: mark)
+                                    barHeight: notchHeight, mark: mark, accountsCardOpen: cardOpen)
             )
             .frame(maxWidth: .infinity)
             below()
         }
         .frame(width: width)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
+        .overlay {
+            if let voice {
+                VoiceGlow(shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous),
+                          level: voice.level, phase: voice.phase)
+            }
+        }
         .padding(.horizontal, 48)
-        .padding(.bottom, 24)
+        .padding(.bottom, 40) // room for the voice light's halo
         .background(surround)
     }
 
