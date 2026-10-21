@@ -46,11 +46,6 @@ extension GoalRow {
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
     var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
-    /// The master session chasing the goal, opened in the Claude app; nil when it has none.
-    var masterLink: URL? {
-        pulses.first { $0.kind == .master }.flatMap { ClaudeDesktopCodeSession.deepLinkURL(hostSessionId: $0.id) }
-    }
-
     /// When work stopped: a still goal's counter stops at the moment it went still, and with no
     /// session at work at the last sign of work; it does not keep counting.
     var workEnd: Date? {

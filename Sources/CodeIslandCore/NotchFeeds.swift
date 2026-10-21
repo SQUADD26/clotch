@@ -18,6 +18,8 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public let proof: String          // #PR / sha, or the reason it was closed
     public let notOurs: Bool
     public let folder: String
+    /// The session that took it in charge (`takenBy` is its cli id), set by `GoalLoader`; nil when not taken or not found.
+    public var target: SessionTarget? = nil
 
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }

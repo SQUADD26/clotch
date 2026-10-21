@@ -90,9 +90,11 @@ private struct RequestLine: View {
                 .foregroundStyle(request.taken ? GoalTone.go.color : GoalInk.quiet)
         }
         .frame(height: 20)
-        .help(request.original)
+        .opensSession(request.target)
+        .help(request.target != nil ? "Apri la sessione che l'ha presa in carico" : request.original)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(request.text + (request.taken ? ". Presa in carico" : ". In attesa"))
+        .accessibilityAddTraits(request.target != nil ? .isLink : [])
     }
 }
 
