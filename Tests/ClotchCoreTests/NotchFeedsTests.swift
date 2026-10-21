@@ -25,7 +25,7 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertFalse(live.isRunning, "absent isRunning = not known running")
 
         let r = GoalBoard.rows(goals: [goal("old")], sessions: [archived, live], live: [], now: now)[0]
-        XCTAssertEqual(r.title, "Overseer")
+        XCTAssertEqual(r.title, "⭕ Overseer ⭕")
         XCTAssertEqual(r.pulses.map(\.id), ["local_new"], "the live session wins over the archived one")
         XCTAssertEqual(r.status, .moving, "activity time drives the status when isRunning is unknown")
         XCTAssertEqual(GoalBoard.reach(goals: [goal("old")], sessions: [archived, live]).live, ["old", "new"])
@@ -58,7 +58,7 @@ final class NotchFeedsTests: XCTestCase {
         """))!
         XCTAssertEqual(r.id, "Q-1a2b3c4d")
         XCTAssertEqual(r.at, Date(timeIntervalSince1970: 1_792_588_432.25))
-        XCTAssertEqual(r.sessionTitle, "Notch: goal")
+        XCTAssertEqual(r.sessionTitle, "★ Notch: goal")
         XCTAssertEqual(r.text, "Fai la barra")
         XCTAssertEqual(r.original, "fai la barra del notch, grazie")
         XCTAssertEqual(r.folder, "/Users/r/clotch")

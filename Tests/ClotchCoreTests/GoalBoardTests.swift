@@ -13,18 +13,18 @@ final class GoalBoardTests: GoalTestCase {
         XCTAssertEqual(r.at, GoalSources.date("2026-10-21T13:13:52+0000"))
     }
 
-    func testTitleDropsSignsAndEmoji() {
+    func testTitleKeepsIcons() {  // #79: the real title, icon included
         let t = { (titolo: String) in self.rows([self.g("m", titolo: titolo)], [])[0].title }
-        XCTAssertEqual(t("⭕ Overseer ⭕"), "Overseer")
-        XCTAssertEqual(t("★ Notch: goal sul notch"), "Notch: goal sul notch")
-        XCTAssertEqual(t("🛠️ Fix #12 · 3 step ✅"), "Fix #12 · 3 step")
-        XCTAssertEqual(t("👨‍💻  dentalspace  🇮🇹"), "dentalspace")
-        XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "Overseer", "session title too")
+        XCTAssertEqual(t("★ Setup: pipeline di sviluppo"), "★ Setup: pipeline di sviluppo")
+        XCTAssertEqual(t("◰\u{FE0E} Clotch: correzioni"), "◰\u{FE0E} Clotch: correzioni", "text variation selector kept")
+        XCTAssertEqual(t("🎨 Figma:  palette"), "🎨 Figma: palette", "only spaces collapsed")
+        XCTAssertEqual(t("👨‍💻 dentalspace 🇮🇹"), "👨‍💻 dentalspace 🇮🇹")
+        XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "⭕ Overseer ⭕", "session title too")
     }
 
     func testTitleIsNeverEmpty() {
         let t = { (titolo: String, session: String) in self.rows([self.g("m", titolo: titolo)], [self.s("local_m", cli: "m", title: session)])[0].title }
-        XCTAssertEqual(t("★ ⭕", "⭕ Overseer"), "Overseer", "signs-only register title: the session title")
+        XCTAssertEqual(t("★ ⭕", "⭕ Overseer"), "⭕ Overseer", "signs-only register title: the session title")
         XCTAssertEqual(t("", "★ · —"), "Fare il dato vivo", "signs-only session title: the goal's first words")
         XCTAssertEqual(rows([g("m")])[0].title, "Fare il dato vivo", "no session at all")
         XCTAssertEqual(GoalBoard.firstWords("uno due tre quattro cinque sei sette"), "uno due tre quattro cinque sei…")
@@ -128,7 +128,7 @@ final class GoalBoardTests: GoalTestCase {
         XCTAssertEqual(r.pulses.first { $0.id == "local_m" }?.kind, .master)
         XCTAssertEqual(r.pulses.first { $0.id == "local_gc" }?.kind, .child)
         XCTAssertEqual(r.status, .moving)
-        XCTAssertEqual(r.title, "Master", "falls back to the master session title without the star")
+        XCTAssertEqual(r.title, "★ Master", "falls back to the master session title, star included")
     }
 
     /// The loader ships only the sessions a goal reaches: rows over them must equal rows over all.

@@ -81,6 +81,15 @@ enum GoalSnapshot {
                         }
                     }
                 }, "19-bottoni-riposo-hover-premuto")
+                // #86: a merged PR, the light at a quarter, half and three quarters of its pass, then the line halfway out.
+                let merged = PRInfo(ref: PRRef(repo: "SQUADD26/clotch", number: 86), title: "Notch: luce sulle PR unite",
+                                    url: "https://github.com/SQUADD26/clotch/pull/86", state: .merged)
+                try save(open(.goals) {
+                    VStack(alignment: .leading, spacing: NotchSpace.row) {
+                        ForEach([0.25, 0.5, 0.75] as [CGFloat], id: \.self) { GoalPRRow(info: merged, shine: $0) }
+                        GoalPRRow(info: merged).modifier(RowExitModifier(amount: 0.5))
+                    }
+                }, "20-pr-unita-luce-e-uscita")
                 try save(open(.requests), "07-richieste")
                 if store.requests.count > RequestsTab.perPage {
                     try save(open(.requests) {
@@ -108,7 +117,7 @@ enum GoalSnapshot {
                                     voice: (VoiceStatus.intensity(level), t / VoiceEdgeLook.period)) { EmptyView() },
                              "17-voce-\(Int(t))s")
                 }
-                print("snapshot: «PR unita» and the no-notch centre come with #6 and #5")
+                print("snapshot: the no-notch centre comes with #5")
                 try SettingsSnapshot.save(into: dir)
             }
             print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")

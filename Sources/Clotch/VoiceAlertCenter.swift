@@ -112,7 +112,8 @@ final class VoiceAlertCenter {
     /// The Jev judge (`VoiceJudge`) for the kinds that can be noise; nil = it said no. Not reached: the fixed rules decide.
     private func judged(_ e: VoiceEvent) async -> VoiceEvent? {
         guard VoiceJudge.judges(e) else { return e }
-        let v = await VoiceJudge.judge(state: VoiceJudge.state(e, requests: requests ?? [], goals: goals ?? []), key: files.jevKey) {
+        let v = await VoiceJudge.judge(state: VoiceJudge.state(e, requests: requests ?? [], goals: goals ?? []), key: files.jevKey,
+                                       question: files.judgeQuestion) {
             try await URLSession.shared.data(for: $0).0
         }
         files.append(VoiceJudge.logLine(e, v, now: Date()), to: files.judgeLogURL)

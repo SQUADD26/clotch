@@ -260,10 +260,8 @@ public enum GoalBoard {
         switch r.status { case .blocked: return 0; case .still: return 1; case .moving: return 2; case .reached: return 4 }
     }
 
-    /// Title without signs and emoji (★, ⭕, 🛠️, flags…), spaces collapsed. Digits, # and * stay: they are emoji only with a keycap.
+    /// The title as written, icons included (★, ◰︎, 🎨, #79), spaces collapsed.
     static func clean(_ t: String) -> String {
-        t.filter { c in
-            !c.unicodeScalars.contains { $0.properties.generalCategory == .otherSymbol || $0.properties.isEmojiPresentation }
-        }.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        t.split(whereSeparator: \.isWhitespace).joined(separator: " ")
     }
 }

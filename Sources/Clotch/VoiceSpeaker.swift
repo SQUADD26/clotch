@@ -95,14 +95,14 @@ final class VoiceSpeaker {
     func say(_ event: VoiceEvent) async {
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
-        guard let key = files.key, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: files.isMuted(session: event.session),
+        // No canonical prompt from the config (#84): silent, never a copy of it.
+        guard let key = files.key, let prompt = files.prompt, VoiceTurn.refusal(isOn: files.isOn, hasKey: true, muted: files.isMuted(session: event.session),
                                                      day: day, config: config) == nil else { return }
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
         let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
-        let prompt = files.prompt
-        guard let spoken = await VoiceTurn.line(report: event.report, haiku: { await Self.haiku(prompt: prompt, input: input) }) else { return }
+        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input) }) else { return }
         let text = spoken.text
         day.caratteri += text.count
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
@@ -127,7 +127,7 @@ final class VoiceSpeaker {
 
     /// ElevenLabs → light on → audio → light off. nil = said; otherwise why not, for the page.
     private func speak(_ text: String, config: VoiceTurn.Config, key: String) async -> String? {
-        let request = VoiceTurn.speechRequest(text: text, config: config, key: key)
+        let request = VoiceTurn.speechRequest(text: text, config: config, key: key, pronunciation: files.pronunciation)
         guard let reply = try? await URLSession.shared.data(for: request) else { return "ElevenLabs non risponde. Riprova." }
         let data = reply.0
         let code = (reply.1 as? HTTPURLResponse)?.statusCode ?? 0
@@ -183,7 +183,7 @@ final class VoiceSpeaker {
         }
     }
 
-    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then says the cleaned report).
+    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then stays silent).
     nonisolated private static func haiku(prompt: String, input: String) async -> String? {
         await Task.detached { () -> String? in
             guard let bin = Self.claudeBinary() else { return nil }

@@ -8,6 +8,7 @@ struct ProposalsPage: View {
     let total: Int
     /// The first proposal's text open, as after a click (the gallery's still).
     var openFirst = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     static let perPage = 2
 
     var body: some View {
@@ -17,9 +18,10 @@ struct ProposalsPage: View {
                 Spacer()
                 Text("\(total) \(total == 1 ? "proposto" : "proposti")").font(NotchType.label).foregroundStyle(GoalInk.secondary)
             }
-            ForEach(rows) { ProposalLine(row: $0, open: openFirst && $0.id == rows.first?.id) }
+            ForEach(rows) { ProposalLine(row: $0, open: openFirst && $0.id == rows.first?.id).transition(.notchRow(reduce: reduceMotion)) }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: rows.map(\.id))
     }
 }
 

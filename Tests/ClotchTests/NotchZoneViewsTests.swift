@@ -142,15 +142,18 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertGreaterThan(image.count(white, columns: 0.94..<1), 0, "the gear right of the centred tab bar")
     }
 
-    func testSettingsButtonOpensTheSettingsWindow() {
+    func testSettingsButtonOpensOneSettingsWindow() {
         _ = NSApplication.shared
+        // Drawn transparent, no Dock icon: a test never puts a window in front of Roberto (#82).
+        SettingsWindowController.shared.present = { $0.alphaValue = 0; $0.orderFrontRegardless() }
         // The Finder-style window (#56) is titled after its page, so it is found by its toolbar.
-        func shown() -> NSWindow? { NSApp.windows.first { $0.toolbar?.identifier == "ClotchSettings" && $0.isVisible } }
-        XCTAssertNil(shown())
+        func shown() -> [NSWindow] { NSApp.windows.filter { $0.toolbar?.identifier == "ClotchSettings" && $0.isVisible } }
+        XCTAssertEqual(shown().count, 0, "no settings window before it is asked for")
         NotchSettingsButton().open()
-        let window = shown()
-        XCTAssertNotNil(window, "the gear opens the same settings window as the menu bar")
-        window?.close()
+        NotchSettingsButton().open()
+        XCTAssertEqual(shown().count, 1, "the gear opens the same one settings window as the menu bar, also when pressed twice")
+        XCTAssertEqual(shown().first?.alphaValue, 0)
+        shown().forEach { $0.close() }
     }
 
     func testStaleAccountDrawsNoBars() throws {

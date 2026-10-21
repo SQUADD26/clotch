@@ -7,6 +7,7 @@ struct RequestsTab: View {
     /// False until the requests register exists on this Mac.
     let active: Bool
     @State private var page: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     static let perPage = 5
 
     init(requests: [UserRequest], active: Bool, startPage: Int = 0) {
@@ -32,10 +33,12 @@ struct RequestsTab: View {
                 let pages = (requests.count + Self.perPage - 1) / Self.perPage
                 let index = Binding<Int>(get: { min(page, pages - 1) }, set: { page = $0 })
                 Pager(count: pages, index: index) { p in
+                    let shown = requests.dropFirst(p * Self.perPage).prefix(Self.perPage)
                     // Every page is as tall as a full one, so the footer never jumps.
                     VStack(alignment: .leading, spacing: 12) {  // rows 32 pt apart
-                        ForEach(requests.dropFirst(p * Self.perPage).prefix(Self.perPage)) { RequestLine(request: $0) }
+                        ForEach(shown) { RequestLine(request: $0).transition(.notchRow(reduce: reduceMotion)) }
                     }
+                    .animation(NotchMotion.animation(reduce: reduceMotion), value: shown.map(\.id))
                     .frame(minHeight: CGFloat(Self.perPage) * 20 + CGFloat(Self.perPage - 1) * 12, alignment: .top)
                 } footer: { go in
                     if pages > 1 { footer(pages: pages, index: index.wrappedValue, go: go) }

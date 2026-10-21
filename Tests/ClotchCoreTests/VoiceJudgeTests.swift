@@ -14,38 +14,45 @@ final class VoiceJudgeTests: XCTestCase {
     }
 
     func testYesAndNo() async {
-        let yes = await VoiceJudge.judge(state: state, key: "k", ask: answer(0.82))
+        let yes = await VoiceJudge.judge(state: state, key: "k", question: "q?", ask: answer(0.82))
         XCTAssertEqual(yes, VoiceJudge.Verdict(say: true, reason: "Jev: P=0.82, soglia 0.5", p: 0.82))
-        let no = await VoiceJudge.judge(state: state, key: "k", ask: answer(0.1))
+        let no = await VoiceJudge.judge(state: state, key: "k", question: "q?", ask: answer(0.1))
         XCTAssertEqual(no.say, false)
-        let odd = await VoiceJudge.judge(state: state, key: "k") { _ in Data("{}".utf8) }
+        let odd = await VoiceJudge.judge(state: state, key: "k", question: "q?") { _ in Data("{}".utf8) }
         XCTAssertNil(odd.say, "an unclear answer: not reached")
     }
 
     func testNoKeyNeverCalls() async {
-        let v = await VoiceJudge.judge(state: state, key: nil) { _ in XCTFail("called without a key"); return Data() }
+        let v = await VoiceJudge.judge(state: state, key: nil, question: "q?") { _ in XCTFail("called without a key"); return Data() }
         XCTAssertEqual(v.say, nil)
         XCTAssertEqual(v.reason, "giudice non raggiunto: nessuna chiave")
     }
 
+    func testNoQuestionFileNeverCalls() async {
+        // #84: the question is the config's file; without it the judge is not asked, never a copy.
+        let v = await VoiceJudge.judge(state: state, key: "k", question: nil) { _ in XCTFail("called without the question"); return Data() }
+        XCTAssertEqual(v, VoiceJudge.Verdict(say: nil, reason: "giudice non raggiunto: nessuna domanda", p: nil))
+    }
+
     func testTimeoutAndError() async {
         let start = Date()
-        let slow = await VoiceJudge.judge(state: state, key: "k", timeout: 0.2) { _ in
+        let slow = await VoiceJudge.judge(state: state, key: "k", question: "q?", timeout: 0.2) { _ in
             try await Task.sleep(nanoseconds: 5_000_000_000)
             return Data(#"{"answers": {"q": {"noul": 0.9}}}"#.utf8)
         }
         XCTAssertNil(slow.say)
         XCTAssertLessThan(Date().timeIntervalSince(start), 2, "it does not wait for Jev past the timeout")
-        let failed = await VoiceJudge.judge(state: state, key: "k") { _ in throw URLError(.notConnectedToInternet) }
+        let failed = await VoiceJudge.judge(state: state, key: "k", question: "q?") { _ in throw URLError(.notConnectedToInternet) }
         XCTAssertNil(failed.say)
     }
 
     func testRequestShapeAndLogNeverHoldTheKey() throws {
-        let r = VoiceJudge.request(key: "sekret", state: state)
+        let r = VoiceJudge.request(key: "sekret", question: "Serve dirlo?", state: state)
         XCTAssertEqual(r.value(forHTTPHeaderField: "Authorization"), "Bearer sekret")
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: r.httpBody ?? Data()) as? [String: Any])
         XCTAssertEqual(body["model"] as? String, "jev-1.13.0")
         XCTAssertEqual(((body["questions"] as? [String: Any])?["q"] as? [String: Any])?["type"] as? String, "noul")
+        XCTAssertEqual(((body["questions"] as? [String: Any])?["q"] as? [String: Any])?["instructions"] as? String, "Serve dirlo?")
         let line = String(decoding: VoiceJudge.logLine(VoiceEvent(kind: .requestDone, at: now, subject: "Timer"),
                                                        VoiceJudge.Verdict(say: true, reason: "Jev: P=0.82, soglia 0.5", p: 0.82), now: now), as: UTF8.self)
         XCTAssertTrue(line.hasSuffix("\n") && line.contains(#""si":true"#) && line.contains(#""tipo":"richiesta_fatta""#))

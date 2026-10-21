@@ -31,7 +31,7 @@ final class AudioDucker: DuckBackend {
         guard #available(macOS 14.2, *), tap == kAudioObjectUnknown else { return false }
         let others = Self.otherProcesses()
         guard !others.isEmpty, let output = Self.defaultOutputUID() else { return false }
-        let description = CATapDescription(stereoMixdownOfProcesses: others.map { NSNumber(value: $0) })
+        let description = CATapDescription(stereoMixdownOfProcesses: others)
         description.uuid = UUID()
         description.muteBehavior = .mutedWhenTapped
         description.isPrivate = true

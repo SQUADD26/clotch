@@ -8,7 +8,7 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public let id: String             // "Q-xxxxxxxx"
     public let at: Date?
     public let session: String        // cli id
-    public let sessionTitle: String   // signs and emoji removed, like goal titles
+    public let sessionTitle: String   // as written, icons included, like goal titles
     public let text: String           // short, imperative
     public let original: String       // Roberto's words, verbatim
     public let state: String          // nuova|presa|fatta

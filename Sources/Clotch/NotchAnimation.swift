@@ -61,6 +61,28 @@ extension AnyTransition {
     }
 }
 
+// MARK: - Row exit
+
+/// A row leaving a notch list because its state changed (#86): it fades and folds up from its top edge
+/// while the rows under it rise with the list's spring. `amount` 0 = in place, 1 = gone.
+struct RowExitModifier: ViewModifier {
+    let amount: CGFloat
+    func body(content: Content) -> some View {
+        content
+            .opacity(1 - amount)
+            .scaleEffect(x: 1 - 0.02 * amount, y: 1 - 0.6 * amount, anchor: .top)
+    }
+}
+
+extension AnyTransition {
+    /// Every row that leaves a notch list for a change of state. Reduce Motion: a fade only. The list
+    /// animates its rows' ids (`.animation(_:value:)`) so the others slide up with the same spring.
+    static func notchRow(reduce: Bool) -> AnyTransition {
+        .asymmetric(insertion: .opacity,
+                    removal: reduce ? .opacity : .modifier(active: RowExitModifier(amount: 1), identity: RowExitModifier(amount: 0)))
+    }
+}
+
 // MARK: - MorphText — blur morph on text change
 
 /// Text that briefly blurs when its content changes, creating a smooth "morph" effect.
