@@ -175,12 +175,13 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.waiting([]), [])
     }
 
-    /// #61: a question in chat or a note is never «presa in carico»: no row, no count, no notice. No `tipo` = a task.
+    /// #61, #90: a note never shows; a question shows but is never a task (no count, no notice). No `tipo` = a task.
     func testOnlyTasksAreRequests() {
         func parse(_ tipo: String) -> UserRequest? {
             GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "presa"\#(tipo)}"#))
         }
-        XCTAssertNil(parse(#", "tipo": "domanda""#))
+        XCTAssertEqual(parse(#", "tipo": "domanda""#)?.isQuestion, true)
+        XCTAssertEqual(parse("")?.isQuestion, false)
         XCTAssertNil(parse(#", "tipo": "nota""#))
         XCTAssertEqual(parse(#", "tipo": "compito""#)?.look, .working)
         XCTAssertEqual(parse("")?.look, .working, "an old file without tipo is a task")
@@ -197,7 +198,7 @@ final class NotchFeedsTests: XCTestCase {
                 .write(to: paths.requests.appendingPathComponent("\(id).json"))
         }
         let before = GoalSources.load(paths).requests
-        XCTAssertEqual(before.map(\.id), ["Q-c"])
+        XCTAssertEqual(Set(before.map(\.id)), ["Q-c", "Q-d"])
         for (id, tipo) in [("Q-d", "domanda"), ("Q-n", "nota"), ("Q-c", "compito")] {
             try data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "presa", "tipo": "\#(tipo)"}"#)
                 .write(to: paths.requests.appendingPathComponent("\(id).json"))
@@ -205,5 +206,39 @@ final class NotchFeedsTests: XCTestCase {
         let after = GoalSources.load(paths).requests
         XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-c"], "only the task is announced")
         XCTAssertEqual(UserRequest.waiting(after), [])
+    }
+
+    // MARK: answers (#90)
+
+    private func req(_ extra: String, state: String = "fatta") -> UserRequest {
+        GoalSources.parseRequest(data(#"{"id": "Q-1", "t": 1792580000, "testo": "x", "stato": "\#(state)"\#(extra)}"#))!
+    }
+
+    func testParseAnswerAndLabels() {
+        let r = req(#", "tipo": "domanda", "risposta": " Si, e' in dev. ", "t_risposta": 1792580100"#)
+        XCTAssertEqual(r.answer, "Si, e' in dev.")
+        XCTAssertEqual(r.answeredAt, Date(timeIntervalSince1970: 1_792_580_100))
+        XCTAssertEqual(r.statusLabel, "Risposta")
+        XCTAssertEqual(req(#", "tipo": "domanda""#, state: "nuova").statusLabel, "In attesa di risposta")
+        XCTAssertEqual(req("", state: "nuova").statusLabel, "In attesa", "a task keeps its look")
+        XCTAssertFalse(req("").answered, "an old file has no answer")
+    }
+
+    func testListedKeepsWaitingAndFreshAnswers() {
+        let now = Date(timeIntervalSince1970: 1_792_580_000 + 3600)
+        let fresh = req(#", "risposta": "ok", "t_risposta": 1792580000"#)
+        let old = GoalSources.parseRequest(data(#"{"id": "Q-2", "testo": "x", "stato": "fatta", "risposta": "ok", "t_risposta": 1792000000}"#))!
+        let doneNoAnswer = req(#", "tipo": "domanda""#)
+        let waiting = req("", state: "nuova")
+        XCTAssertEqual(UserRequest.listed([fresh, old, doneNoAnswer, waiting], now: now).map(\.id), ["Q-1", "Q-1"])
+        XCTAssertEqual(UserRequest.listed([old], now: now), [])
+        XCTAssertEqual(UserRequest.waiting([fresh, req(#", "tipo": "domanda""#, state: "nuova")]), [], "a question is no task")
+    }
+
+    func testNewAnswerOnlyAfterLastLook() {
+        let r = req(#", "risposta": "ok", "t_risposta": 1792580000"#)
+        XCTAssertTrue(r.isNewAnswer(since: Date(timeIntervalSince1970: 1_792_579_000)))
+        XCTAssertFalse(r.isNewAnswer(since: Date(timeIntervalSince1970: 1_792_580_000)), "opened at or after the answer")
+        XCTAssertFalse(req("").isNewAnswer(since: .distantPast), "no answer, nothing new")
     }
 }

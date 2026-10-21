@@ -1,27 +1,33 @@
 import SwiftUI
 import ClotchCore
 
-/// The Requests tab: the requests no session has taken in charge yet, 5 per page. A taken one leaves the list.
+/// The Requests tab: the requests no session has taken in charge yet, plus the ones with an answer, 5 per page.
+/// Under each text its answer (#90); a question waits as «In attesa di risposta». A taken task leaves the list.
 struct RequestsTab: View {
     let requests: [UserRequest]
     /// False until the requests register exists on this Mac.
     let active: Bool
     @State private var page: Int
+    /// When the tab was opened last, frozen at first show: the dots stay while Roberto reads, go at the next opening.
+    @State private var seenAt: Date
     static let perPage = 5
 
-    init(requests: [UserRequest], active: Bool, startPage: Int = 0) {
-        self.requests = UserRequest.waiting(requests)
+    init(requests: [UserRequest], active: Bool, now: Date = Date(), seenAt: Date = .distantFuture, startPage: Int = 0) {
+        self.requests = UserRequest.listed(requests, now: now)
+        _seenAt = State(initialValue: seenAt)
         self.active = active
         _page = State(initialValue: startPage)
     }
+
+    private var openCount: Int { requests.filter { !$0.answered }.count }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 IconLabel(symbol: "tray", text: "Richieste")
                 Spacer()
-                if !requests.isEmpty {
-                    Text("\(requests.count) in attesa")
+                if openCount > 0 {
+                    Text("\(openCount) in attesa")
                         .font(NotchType.label)
                         .foregroundStyle(GoalInk.secondary)
                 }
@@ -34,7 +40,7 @@ struct RequestsTab: View {
                 Pager(count: pages, index: index) { p in
                     // Every page is as tall as a full one, so the footer never jumps.
                     VStack(alignment: .leading, spacing: 12) {  // rows 32 pt apart
-                        ForEach(requests.dropFirst(p * Self.perPage).prefix(Self.perPage)) { RequestLine(request: $0) }
+                        ForEach(requests.dropFirst(p * Self.perPage).prefix(Self.perPage)) { RequestLine(request: $0, isNew: $0.isNewAnswer(since: seenAt)) }
                     }
                     .frame(minHeight: CGFloat(Self.perPage) * 20 + CGFloat(Self.perPage - 1) * 12, alignment: .top)
                 } footer: { go in
@@ -42,6 +48,7 @@ struct RequestsTab: View {
                 }
             }
         }
+        .onAppear { GoalStore.shared.markAnswersSeen() }
     }
 
     private func footer(pages: Int, index: Int, go: @escaping (Int) -> Void) -> some View {
@@ -73,24 +80,37 @@ struct RequestsTab: View {
 
 private struct RequestLine: View {
     let request: UserRequest
+    let isNew: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
-            RequestMark(look: request.look)
-            Text(request.text)
-                .font(NotchType.line)
-                .strikethrough(request.look.struck, color: GoalInk.quiet)
-                .foregroundStyle(GoalInk.row)
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text(request.look.label)
-                .font(NotchType.small)
-                .foregroundStyle(request.look.color)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 12) {
+                RequestMark(look: request.look)
+                Text(request.text)
+                    .font(NotchType.line)
+                    .strikethrough(request.look.struck, color: GoalInk.quiet)
+                    .foregroundStyle(GoalInk.row)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if isNew { Circle().fill(GoalTone.wait.color).frame(width: 6, height: 6) }
+                Text(request.statusLabel)
+                    .font(NotchType.small)
+                    .foregroundStyle(request.look.color)
+            }
+            .frame(height: 20)
+            if request.answered {
+                Text(request.answer)
+                    .font(NotchType.small)
+                    .foregroundStyle(GoalInk.secondary)
+                    .lineLimit(2)
+                    .padding(.leading, 28)  // under the text, past the 16 pt mark and the 12 pt gap
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
-        .frame(height: 20)
         .help(request.original)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(request.text + ". " + request.look.label)
+        .accessibilityLabel(request.text + ". " + request.statusLabel + (isNew ? ", nuova risposta" : "")
+                            + (request.answered ? ". " + request.answer : ""))
     }
 }
 
