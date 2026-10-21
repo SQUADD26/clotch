@@ -85,8 +85,6 @@ struct VoiceSettingsPage: View {
                 try files.saveJevKey($0)
             }
             Divider()
-            VoiceInputSettings()
-            Divider()
             reading
             Divider()
             SettingsRow("Scrive la frase") {
