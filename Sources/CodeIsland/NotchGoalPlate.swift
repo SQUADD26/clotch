@@ -18,7 +18,7 @@ struct GoalsTab: View {
             Array(tab.toConfirm[$0..<min($0 + ProposalsPage.perPage, tab.toConfirm.count)])
         }
         let ids = asks.indices.map { "da-confermare-\($0)" } + pages.map(\.id)
-        let closed = tab.closed == 0 ? nil : "\(tab.closed) di sessioni chiuse"
+        let closed = tab.closed == 0 ? nil : (tab.closed == 1 ? "1 obiettivo chiuso" : "\(tab.closed) obiettivi chiusi")
         if ids.isEmpty {
             EmptyState(text: "Nessun obiettivo aperto", detail: closed)
         } else {
