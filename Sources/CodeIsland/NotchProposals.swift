@@ -59,6 +59,6 @@ private struct ProposalLine: View {
                 .background(Capsule().fill(color.opacity(0.16)))
                 .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.notchSmall)
     }
 }

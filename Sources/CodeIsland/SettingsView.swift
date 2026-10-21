@@ -1127,7 +1127,7 @@ private struct ExtraConfigDirRow: View {
                         .font(.system(size: 11))
                         .foregroundStyle(.blue)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.window)
             }
         }
     }
@@ -1273,7 +1273,7 @@ private struct CLIStatusRow: View {
                                     .font(.system(size: 11))
                                     .foregroundStyle(.blue)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.window)
                         }
                     }
                 }
@@ -1949,7 +1949,7 @@ private struct SoundEventRow: View {
                     .font(.system(size: 22))
                     .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.window)
             Toggle("", isOn: $isOn)
                 .labelsHidden()
         }
@@ -2155,7 +2155,7 @@ private struct BuddyPage: View {
                         }
                         .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.window)
                 }
 
                 if bridge.discovered.isEmpty {
@@ -2358,8 +2358,8 @@ struct AboutPage: View {
                 AppLogoView(size: 100)
 
                 VStack(spacing: 6) {
-                    Text("Clotch")
-                        .font(.system(size: 26, weight: .bold))
+                    Text("clotch")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
                     Text("Version \(AppVersion.current)")
                         .font(.system(size: 13))
                         .foregroundStyle(.secondary)
@@ -2407,10 +2407,7 @@ struct AboutPage: View {
                             .fill(Color(nsColor: .controlBackgroundColor))
                     )
                 }
-                .buttonStyle(.plain)
-                .onHover { h in
-                    if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                }
+                .buttonStyle(.window)
             }
             .frame(maxWidth: .infinity)
 
@@ -2465,10 +2462,7 @@ struct AboutPage: View {
                     .fill(Color(nsColor: .controlBackgroundColor))
             )
         }
-        .buttonStyle(.plain)
-        .onHover { h in
-            if h { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-        }
+        .buttonStyle(.window)
     }
 
     private func aboutLink(_ title: String, icon: String, url: String) -> some View {
@@ -2870,27 +2864,44 @@ struct AppLogoView: View {
     var size: CGFloat = 100
     var showBackground: Bool = true
     private let orange = Color(red: 0.96, green: 0.65, blue: 0.14)
+    // Clotch logo 38 «La tacca in testa» (#58): same grid as AppIcon.icon/Assets/clotch.svg.
+    private static let omino = [
+        ".BBBB....BBBB.",
+        ".BBBBBBBBBBBB.",
+        ".BBBBBBBBBBBB.",
+        ".BBOWBBBBOWBB.",
+        ".BBOOBBBBOOBB.",
+        "BBBBBBBBBBBBBB",
+        ".BBBBBBBBBBBB.",
+        "..FFFFFFFFFF..",
+        "...FF....FF...",
+    ]
 
     var body: some View {
         Canvas { ctx, sz in
             // macOS icon standard: ~10% padding on each side
             let inset = sz.width * 0.1
             let contentRect = CGRect(x: inset, y: inset, width: sz.width - inset * 2, height: sz.height - inset * 2)
-            let px = contentRect.width / 16
             if showBackground {
                 let bgPath = Path(roundedRect: contentRect, cornerRadius: contentRect.width * 0.22, style: .continuous)
-                ctx.fill(bgPath, with: .color(.white))
+                ctx.fill(bgPath, with: .linearGradient(
+                    Gradient(colors: [Color(red: 0.91, green: 0.51, blue: 0.36), Color(red: 0.78, green: 0.35, blue: 0.20)]),
+                    startPoint: CGPoint(x: contentRect.midX, y: contentRect.minY),
+                    endPoint: CGPoint(x: contentRect.midX, y: contentRect.maxY)))
             }
-            // Notch pill
-            let pillColor = showBackground ? Color(white: 0.1) : Color(white: 0.5)
-            let pillRect = CGRect(x: contentRect.minX + px * 3, y: contentRect.minY + px * 6, width: px * 10, height: px * 4)
-            ctx.fill(Path(roundedRect: pillRect, cornerRadius: px * 2, style: .continuous), with: .color(pillColor))
-            // Eyes
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 5, y: contentRect.minY + px * 7, width: px * 2, height: px * 2)), with: .color(orange))
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 9, y: contentRect.minY + px * 7, width: px * 2, height: px * 2)), with: .color(orange))
-            // Pupils
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 6, y: contentRect.minY + px * 7, width: px, height: px)), with: .color(.white))
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 10, y: contentRect.minY + px * 7, width: px, height: px)), with: .color(.white))
+            // On the black notch (no background) the dark body would vanish, so it turns grey there.
+            let bodyColor = showBackground ? Color(red: 0.094, green: 0.094, blue: 0.106) : Color(white: 0.5)
+            let colors: [Character: Color] = ["B": bodyColor, "F": bodyColor.opacity(0.8), "O": orange, "W": .white]
+            let px = sz.width * 42 / 1024
+            let originX = (sz.width - px * 14) / 2
+            let originY = sz.height * 500 / 1024 - px * 4.5
+            for (row, line) in Self.omino.enumerated() {
+                for (col, cell) in line.enumerated() {
+                    guard let color = colors[cell] else { continue }
+                    let rect = CGRect(x: originX + CGFloat(col) * px, y: originY + CGFloat(row) * px, width: px, height: px)
+                    ctx.fill(Path(rect.insetBy(dx: -0.25, dy: -0.25)), with: .color(color))
+                }
+            }
         }
         .frame(width: size, height: size)
         .shadow(color: .black.opacity(showBackground ? 0.15 : 0), radius: size * 0.12, y: size * 0.04)
@@ -3007,13 +3018,14 @@ private struct ShortcutRow: View {
                         .padding(.vertical, 5)
                         .background(RoundedRectangle(cornerRadius: 6).fill(.quaternary))
                         .onTapGesture { onStartRecording() }
+                    .notchHover(small: true, onDark: nil)
 
                     Button(action: onClear) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
                             .font(.system(size: 14))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.window)
                 }
             } else {
                 Text(l10n["shortcut_none"])
@@ -3023,6 +3035,7 @@ private struct ShortcutRow: View {
                     .padding(.vertical, 5)
                     .background(RoundedRectangle(cornerRadius: 6).strokeBorder(.quaternary))
                     .onTapGesture { onStartRecording() }
+                    .notchHover(small: true, onDark: nil)
             }
         }
         .contentShape(Rectangle())
