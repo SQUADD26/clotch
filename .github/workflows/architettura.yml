@@ -1,0 +1,17 @@
+# ARCHITECTURE.md obbligatorio (SQUADD26/claude-config#982): una sola fonte, nel repo claude-config.
+name: architettura
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+
+# Un giro superato da un commit più recente sulla stessa PR si annulla (#761); i push mai.
+concurrency:
+  group: architettura-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  architettura:
+    uses: SQUADD26/claude-config/.github/workflows/architettura.yml@main
+    with:
+      runs-on: '["self-hosted","rise-deploy"]'
