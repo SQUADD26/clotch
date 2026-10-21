@@ -98,6 +98,7 @@ enum GoalSnapshot {
                              "17-voce-\(Int(t))s")
                 }
                 print("snapshot: «PR unita» and the no-notch centre come with #6 and #5")
+                try SettingsSnapshot.save(into: dir)
             }
             print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")
         } catch {

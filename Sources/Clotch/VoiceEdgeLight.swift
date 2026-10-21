@@ -12,13 +12,16 @@ import ClotchCore
 struct VoiceEdgeLightLive<S: Shape>: View {
     @ObservedObject var voice: VoiceStore
     let shape: S
+    @AppStorage(ClotchPrefs.voiceLight) private var on = ClotchPrefs.voiceLightDefault
+    @AppStorage(ClotchPrefs.voiceLightStrength) private var strength = ClotchPrefs.voiceLightStrengthDefault
 
     var body: some View {
         ZStack {
-            if let s = voice.status {
+            if on, let s = voice.status {  // «Luce della voce» off: nothing in the tree, no clock (#56)
                 VoiceGlowDriver(shape: shape, intensity: s.intensity(at:)).transition(.opacity)
             }
         }
+        .opacity(ClotchPrefs.strength(strength))
         .animation(.easeInOut(duration: 1.0), value: voice.status == nil) // long fade at the start and end of the voice
         .allowsHitTesting(false)
     }

@@ -144,8 +144,8 @@ final class NotchZoneViewsTests: XCTestCase {
 
     func testSettingsButtonOpensTheSettingsWindow() {
         _ = NSApplication.shared
-        let title = L10n.shared["settings_title"]
-        func shown() -> NSWindow? { NSApp.windows.first { $0.title == title && $0.isVisible } }
+        // The Finder-style window (#56) is titled after its page, so it is found by its toolbar.
+        func shown() -> NSWindow? { NSApp.windows.first { $0.toolbar?.identifier == "ClotchSettings" && $0.isVisible } }
         XCTAssertNil(shown())
         NotchSettingsButton().open()
         let window = shown()
