@@ -25,6 +25,7 @@ enum GoalSnapshot {
     static func run(into dir: URL) {
         let store = GoalStore.shared
         store.loadNow()
+        AccountQuotaFeed.shared.loadNow()
         var failed = false
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -42,7 +43,7 @@ enum GoalSnapshot {
                     }
                 }
             }
-            print("snapshot: \(store.rows.count) goals, \(store.usage.count) accounts, \(store.requests.count) requests -> \(dir.path)")
+            print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")
         } catch {
             print("snapshot failed: \(error)")
             failed = true
@@ -105,7 +106,7 @@ enum GoalSnapshot {
                 GoalsRightWing()
             }
             .frame(height: notchHeight)
-            NotchSectionsContent(rows: store.rows, usage: store.usage, requests: store.requests, now: store.now)
+            NotchSectionsContent(store: store, quota: AccountQuotaFeed.shared)
         }
         .frame(width: 580)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: 24, bottomTrailingRadius: 24, style: .continuous).fill(.black))

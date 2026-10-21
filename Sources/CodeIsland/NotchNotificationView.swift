@@ -13,14 +13,16 @@ struct NotchNotificationView: View {
 
     var body: some View {
         if let note = Note(event: event, rows: rows, requests: requests) {
-            GlassGroup(spacing: 10) {
-                HStack(spacing: 8) {
+            // 8 pt in from the island's 24 pt corners: 16 pt plates, concentric. The symbol drop is a
+            // circle as tall as the plate, so the two read as one shape splitting in two.
+            GlassGroup(spacing: NotchSpace.inset) {
+                HStack(spacing: NotchSpace.inset) {
                     Image(systemName: phase >= .settle ? note.symbol : note.startSymbol)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(note.color)
                         .contentTransition(.symbolEffect(.replace))
-                        .frame(width: 34, height: 34)
-                        .glassPlate(radius: 17, tint: note.color.opacity(0.28))
+                        .frame(width: 48, height: 48)
+                        .glassPlate(radius: 24, tint: note.color.opacity(0.28))
                         .glassID("symbol", in: glass)
                     if phase >= .reveal {
                         plate(note)
@@ -30,23 +32,21 @@ struct NotchNotificationView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: phase >= .reveal ? .leading : .center)
             }
-            .padding(.horizontal, 10)
-            .padding(.top, 4)
-            .padding(.bottom, 10)
+            .padding([.horizontal, .bottom], NotchSpace.inset)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(note.title + ". " + note.subtitle)
         }
     }
 
     private func plate(_ note: Note) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: NotchSpace.tight) {
             Text(note.title)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(GoalInk.primary)
             if let row = note.row {
-                HStack(spacing: 10) {
+                HStack(spacing: NotchSpace.row) {
                     Text(note.subtitle)
-                        .font(.system(size: 12))
+                        .font(NotchType.secondary)
                         .foregroundStyle(GoalInk.secondary)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,7 +54,7 @@ struct NotchNotificationView: View {
                         .frame(width: 64)
                     if let proofs = row.proofsText {
                         Text(proofs)
-                            .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                            .font(NotchType.numbers)
                             .foregroundStyle(GoalInk.primary)
                             .fixedSize()
                     }
@@ -63,10 +63,9 @@ struct NotchNotificationView: View {
                 StruckText(text: note.subtitle, drawn: phase >= .settle)
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .glassPlate(radius: 14)
+        .padding(.horizontal, NotchSpace.plate)
+        .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+        .glassPlate(radius: NotchSpace.radius)
     }
 }
 
@@ -77,7 +76,7 @@ private struct StruckText: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 12, weight: .medium))
+            .font(NotchType.secondary.weight(.medium))
             .foregroundStyle(drawn ? GoalInk.secondary : GoalInk.primary)
             .lineLimit(1)
             .overlay {

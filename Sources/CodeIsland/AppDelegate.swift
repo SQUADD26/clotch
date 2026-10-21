@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         panelController?.showPanel()
         GoalStore.shared.start()
         NotchNotifier.shared.start()
+        AccountQuotaFeed.shared.start()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present

@@ -12,6 +12,7 @@ No backend. The app runs on Roberto's Mac only and reads local files, read-only.
 | Goals register, one file per master session | `~/.claude/obiettivi/<cli>.json` (`cli`, `obiettivo`, `stato` aperto/raggiunto/bloccato/passato, `prova`, `t`, `titolo`, `prove` = `[{testo, fatta, t}]` when present) | claude-config `global/hooks/obiettivo_registro.py` |
 | Desktop app sessions | `~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json` (`sessionId`, `cliSessionId`, `spawnedFrom`, `title`, `isRunning`, `isArchived`, `lastActivityAt`) | Claude desktop app |
 | Live subagents per session | `~/.claude/handoff/live/<cli>.json` (`agenti`, `aggiornato`) | claude-config `global/hooks/live_state.py` |
+| Roberto's requests | `~/.claude/richieste/<id>.json` (`id`, `t`, `testo`, `stato` nuova/presa/fatta, `t_presa`, …); the folder arrives with a claude-config promotion, until then the plate says so | claude-config (Overseer) |
 
 Real time: FSEvents on these folders; a 30 s tick only re-evaluates time-based state (yellow after 30 min still).
 
@@ -19,7 +20,7 @@ Real time: FSEvents on these folders; a 30 s tick only re-evaluates time-based s
 - `Sources/CodeIslandCore/GoalBoard.swift`: pure logic, goal → progress, traffic light, reason, session pulses. Tests in `Tests/CodeIslandCoreTests/GoalBoardTests.swift`.
 - `Sources/CodeIslandCore/GoalSources.swift`: parses and reads the files above.
 - `Sources/CodeIsland/GoalStore.swift`: FSEvents watcher, publishes rows to the UI.
-- The notch view (issue #3), one Liquid Glass design inside CodeIsland's black notch (`NotchPanelView.swift`, `PanelWindowController.swift`): `NotchSections.swift` + `NotchRequestsPlate.swift` (open: account usage, the goal chased now with the other goals, Roberto's requests), `GoalsNotchWings.swift` (closed: state, bar and proofs of the goal chased now), `NotchNotificationView.swift` + `NotchNotifier.swift` (notifications under the closed notch: goal changes from `CodeIslandCore/NotchEvents.swift`, requests from `GoalStore.takenToAnimate`), `NotchGlass.swift` (real `glassEffect` on macOS 26+, a stand-in before and in snapshots), `GoalsNotchView.swift` (shared pieces).
+- The notch view (issue #3), one Liquid Glass design inside CodeIsland's black notch (`NotchPanelView.swift`, `PanelWindowController.swift`): `NotchSections.swift` (scale and plate) + `NotchAccountsPlate.swift`, `NotchGoalPlate.swift`, `NotchRequestsPlate.swift` (open: account usage, the goal chased now with the other goals, Roberto's requests), `GoalsNotchWings.swift` (closed: state, bar and proofs of the goal chased now), `NotchNotificationView.swift` + `NotchNotifier.swift` (notifications under the closed notch: goal changes from `CodeIslandCore/NotchEvents.swift`, requests from `GoalStore.takenToAnimate`), `NotchGlass.swift` (real `glassEffect` on macOS 26+, a stand-in before and in snapshots), `GoalsNotchView.swift` (shared pieces).
 - Everything else under `Sources/` is CodeIsland code kept for the shell; most of it is not reached at launch.
 - `android-watch/`, `ios/`, `windows/`, `hardware/`, `apple-companion/`: CodeIsland companions, not built or used by goal-notch.
 
@@ -39,4 +40,4 @@ Work branches → PR into `dev` → promotion PR `dev` → `main`. "Production" 
 None.
 
 ## External services
-None at runtime. CI: GitHub Actions (`architettura.yml`, an inline copy of the claude-config check on `ubuntu-latest`: this repo is public and cannot call a private reusable workflow or use the self-hosted runners; CodeIsland's own release/DMG workflows are manual and unused).
+At runtime one read-only HTTPS GET, no token: account usage from `https://claude.squaddbackend.com/dashboard/data` (the dashboard Roberto's Macchine app reads; same merge and order rules, `CodeIslandCore/AccountQuota.swift`, fetched by `AccountQuotaFeed.swift` at launch, every 60 s and when the notch opens; a failed fetch keeps the last good list and shows its age). CI: GitHub Actions (`architettura.yml`, an inline copy of the claude-config check on `ubuntu-latest`: this repo is public and cannot call a private reusable workflow or use the self-hosted runners; CodeIsland's own release/DMG workflows are manual and unused).

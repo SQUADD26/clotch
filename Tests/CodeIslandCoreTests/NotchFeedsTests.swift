@@ -1,7 +1,7 @@
 import XCTest
 @testable import CodeIslandCore
 
-/// Session identity across a cli change, account usage and requests, from real-shaped JSON.
+/// Session identity across a cli change, and requests, from real-shaped JSON.
 final class NotchFeedsTests: XCTestCase {
     private let now = GoalSources.date("2026-10-21T14:00:00+0000")!
     private func data(_ s: String) -> Data { Data(s.utf8) }
@@ -42,56 +42,6 @@ final class NotchFeedsTests: XCTestCase {
         let s = GoalSources.parseSession(data(#"{"sessionId": "local_s", "cliSessionId": "next"}"#), fileName: "local_s.json")!
         XCTAssertEqual(GoalBoard.rows(goals: [goal("gone", extra: #", "a": "next""#)], sessions: [s], live: [], now: now)[0]
             .pulses.map(\.id), ["local_s"])
-    }
-
-    // MARK: usage
-
-    func testParseUsageAsClaudeAccountsUsoWritesIt() {
-        let u = GoalSources.parseUsage(data("""
-        {"at": 1792588432.5, "five_hour": {"usato": 42.0, "reset": 1792600000.0}, "seven_day": {"usato": 7, "reset": null},
-         "extra": null, "src": "k", "exp": 1, "fails": 0, "riprova": null, "motivo": null, "scaduto": false}
-        """), fileName: "uso-acct-abc-123.json")!
-        XCTAssertEqual(u.id, "abc-123")
-        XCTAssertEqual(u.at, Date(timeIntervalSince1970: 1_792_588_432.5))
-        XCTAssertEqual(u.fiveHour, UsageWindow(used: 42, reset: Date(timeIntervalSince1970: 1_792_600_000)))
-        XCTAssertEqual(u.sevenDay, UsageWindow(used: 7, reset: nil))
-        XCTAssertFalse(u.expired)
-
-        let bad = GoalSources.parseUsage(data(#"{"five_hour": null, "motivo": "login scaduto", "scaduto": true}"#), fileName: "uso-acct-x.json")!
-        XCTAssertNil(bad.fiveHour)
-        XCTAssertTrue(bad.expired)
-        XCTAssertEqual(bad.reason, "login scaduto")
-    }
-
-    func testUsageGetsAccountNamesWithoutReadingSecrets() throws {
-        let fm = FileManager.default
-        let home = fm.temporaryDirectory.appendingPathComponent("names-\(UUID().uuidString)")
-        defer { try? fm.removeItem(at: home) }
-        let paths = GoalSources.defaultPaths(home: home)
-        for d in [paths.usage, home.appendingPathComponent(".config/claude-accounts"), home.appendingPathComponent(".claude-r"),
-                  home.appendingPathComponent(".claude-n")] {
-            try fm.createDirectory(at: d, withIntermediateDirectories: true)
-        }
-        try data("""
-        {"accounts": {"r-bondici": {"config": "~/.claude-r", "email": "old@x", "securestorage": "~/nope"},
-                      "plain": {"config": "~/.claude"}, "declared": {"config": "~/.claude-missing", "email": "d@x"},
-                      "nulled": {"config": "~/.claude-n"}}}
-        """).write(to: home.appendingPathComponent(".config/claude-accounts/accounts.json"))
-        // project history before the login, with braces and a decoy key inside strings
-        try data("""
-        {"projects": {"/a": {"history": [{"display": "{ oauthAccount }"}]}}, "oauthAccount": {"accountUuid": "u-1", "emailAddress": "r@x",
-         "organizationName": "S"}, "other": {"accountUuid": "decoy"}}
-        """).write(to: home.appendingPathComponent(".claude-r/.claude.json"))
-        try data(#"{"oauthAccount": {"accountUuid": "u-2"}}"#).write(to: home.appendingPathComponent(".claude.json"))
-        try data(#"{"oauthAccount": null, "x": {"accountUuid": "u-wrong"}}"#).write(to: home.appendingPathComponent(".claude-n/.claude.json"))
-        let usage = #"{"at": 1, "scaduto": false}"#
-        for id in ["u-1", "u-2", "d@x", "1234567890abcdef", "u-wrong"] {
-            try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-\(id).json"))
-        }
-        let r = GoalSources.load(paths).usage
-        XCTAssertEqual(Dictionary(uniqueKeysWithValues: r.map { ($0.id, $0.label) }),
-                       ["u-1": "r-bondici", "u-2": "plain", "d@x": "declared", "1234567890abcdef": "12345678", "u-wrong": "u-wrong"])
-        XCTAssertEqual(r.map(\.label), ["12345678", "declared", "plain", "r-bondici", "u-wrong"], "sorted by what the view shows")
     }
 
     // MARK: requests
@@ -146,21 +96,16 @@ final class NotchFeedsTests: XCTestCase {
 
     // MARK: folders
 
-    func testLoadReadsUsageAndRequestsAndSkipsTempFiles() throws {
+    func testLoadReadsRequestsAndSkipsTempFiles() throws {
         let fm = FileManager.default
         let home = fm.temporaryDirectory.appendingPathComponent("feeds-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: home) }
         let paths = GoalSources.defaultPaths(home: home)
         let empty = GoalSources.load(paths)
-        XCTAssertTrue(empty.usage.isEmpty && empty.requests.isEmpty, "missing folders = honest empty state")
+        XCTAssertTrue(empty.requests.isEmpty, "missing folder = honest empty state")
         XCTAssertFalse(fm.fileExists(atPath: paths.requests.path), "nothing is created")
 
-        for d in [paths.usage, paths.requests] { try fm.createDirectory(at: d, withIntermediateDirectories: true) }
-        let usage = #"{"at": 1, "five_hour": {"usato": 1, "reset": null}, "scaduto": false}"#
-        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-b.json"))
-        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-a.json"))
-        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-a.json.12345"))
-        try data(usage).write(to: paths.usage.appendingPathComponent("limits-acct-a.json"))
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
         try data(#"{"id": "old", "t": 1792580000, "testo": "a"}"#).write(to: paths.requests.appendingPathComponent("old.json"))
         try data(#"{"id": "new", "t": "2026-10-21T12:00:00+0000", "testo": "b"}"#).write(to: paths.requests.appendingPathComponent("new.json"))
         try data("{broken").write(to: paths.requests.appendingPathComponent("bad.json"))
@@ -168,27 +113,26 @@ final class NotchFeedsTests: XCTestCase {
         try data("errore").write(to: paths.requests.appendingPathComponent("errori.log"))
 
         let r = GoalSources.load(paths)
-        XCTAssertEqual(r.usage.map(\.id), ["a", "b"])
         XCTAssertEqual(r.requests.map(\.id), ["new", "old"], "newest first")
     }
 
-    func testAccountNameFromDesktopAppFolder() throws {
+    /// Fake register files, test only: a request goes nuova -> presa on disk; the next load strikes it
+    /// (taken) and fires «presa in carico» exactly once.
+    func testRequestTakenOnDiskStrikesAndFiresOnce() throws {
         let fm = FileManager.default
         let home = fm.temporaryDirectory.appendingPathComponent("feeds-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: home) }
-        let id = "f5c31b0f-80df-4c45-a343-71768151f6f4"
-        let support = home.appendingPathComponent("Library/Application Support")
-        try fm.createDirectory(at: support.appendingPathComponent("Claude-r-bondici/claude-code-sessions/\(id)/org"),
-                               withIntermediateDirectories: true)
-        try fm.createDirectory(at: support.appendingPathComponent("Claude/claude-code-sessions/1599c9b4-0000-4000-8000-000000000000"),
-                               withIntermediateDirectories: true)
         let paths = GoalSources.defaultPaths(home: home)
-        try fm.createDirectory(at: paths.usage, withIntermediateDirectories: true)
-        let usage = #"{"at": 1, "five_hour": {"usato": 1, "reset": null}, "scaduto": false}"#
-        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-\(id).json"))
-        try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-1599c9b4-0000-4000-8000-000000000000.json"))
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
+        let file = paths.requests.appendingPathComponent("Q-1.json")
+        try data(#"{"id": "Q-1", "t": 1792580000, "testo": "Barra le richieste", "stato": "nuova"}"#).write(to: file)
+        let before = GoalSources.load(paths).requests
+        XCTAssertEqual(before.map(\.taken), [false])
 
-        let labels = GoalSources.load(paths).usage.map(\.label)
-        XCTAssertEqual(labels, ["1599c9b4", "r-bondici"], "plain Claude folder: no name, short id")
+        try data(#"{"id": "Q-1", "t": 1792580000, "testo": "Barra le richieste", "stato": "presa", "t_presa": 1792580100}"#).write(to: file)
+        let after = GoalSources.load(paths).requests
+        XCTAssertEqual(after.map(\.taken), [true], "struck through")
+        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-1"])
+        XCTAssertEqual(UserRequest.newlyTaken(before: after, after: after, shown: []), [], "once")
     }
 }

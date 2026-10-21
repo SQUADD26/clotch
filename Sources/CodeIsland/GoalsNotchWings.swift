@@ -17,7 +17,7 @@ struct GoalsLeftWing: View {
 
     var body: some View {
         // Both wings always take their width, even empty, so the pair stays centred on the notch.
-        HStack(spacing: 5) {
+        HStack(spacing: 4) {
             if let hero = store.rows.hero {
                 // Without declared proofs an empty bar says nothing: the state shape stands alone, larger.
                 Image(systemName: hero.symbol)

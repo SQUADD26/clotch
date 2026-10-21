@@ -52,8 +52,7 @@ public enum GoalSources {
     // MARK: Folders
 
     public struct Paths: Sendable {
-        public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var usage: URL; public var requests: URL
-        public var home: URL   // accounts.json and its "~/…" config dirs resolve against it
+        public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var requests: URL
     }
 
     public static func defaultPaths(home: URL) -> Paths {
@@ -64,14 +63,13 @@ public enum GoalSources {
         }
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
-                     usage: home.appendingPathComponent(".cache/claude-accounts"),
-                     requests: home.appendingPathComponent(".claude/richieste"), home: home)
+                     requests: home.appendingPathComponent(".claude/richieste"))
     }
 
     /// Cost scales with the open goals, not with the history on disk: the live folder holds one file
     /// per session ever run (thousands), so only the live files of shown goals' families are read.
     public static func load(_ paths: Paths)
-        -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], usage: [AccountUsage], requests: [UserRequest]) {
+        -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest]) {
         let fm = FileManager.default
         let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
             .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
@@ -86,17 +84,10 @@ public enum GoalSources {
                 subagentMTime(transcript: transcript, agentId: aid, index: &index, fm)
             }
         }
-        let usage = files(in: paths.usage, fm).filter { $0.lastPathComponent.hasPrefix("uso-acct-") && $0.pathExtension == "json" }
-            .compactMap { url in (try? Data(contentsOf: url)).flatMap { parseUsage($0, fileName: url.lastPathComponent) } }
-        // accounts.json and the logins win; the desktop app's per-account folders fill the gaps.
-        let names = usage.isEmpty ? [:] : accountNames(home: paths.home)
-            .merging(desktopAccountNames(sessionRoots: paths.sessionRoots)) { declared, _ in declared }
-        let named = usage.map { u in var u = u; u.name = names[u.id]; return u }
-            .sorted { ($0.label, $0.id) < ($1.label, $1.id) }
         let requests = files(in: paths.requests, fm).filter { $0.pathExtension == "json" }
             .compactMap { (try? Data(contentsOf: $0)).flatMap(parseRequest) }
             .sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) }
-        return (goals, sessions, live, named, requests)
+        return (goals, sessions, live, requests)
     }
 
     private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {

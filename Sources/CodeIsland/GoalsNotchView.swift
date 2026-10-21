@@ -189,7 +189,7 @@ struct GoalReason: View {
 
     var body: some View {
         if let reason = row.reason(now: now) {
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: row.symbol).font(.system(size: size - 3, weight: .bold))
                 Text(reason).font(.system(size: size, weight: .medium)).lineLimit(1).truncationMode(.tail)
             }

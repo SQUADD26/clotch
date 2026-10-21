@@ -1,269 +1,101 @@
 import SwiftUI
 import CodeIslandCore
 
-/// The open notch: three glass plates in Roberto's order (accounts, the goal chased now, his
-/// requests). 8pt inset and 16pt plates: concentric with the island's 24pt bottom corners.
+/// The open notch: three glass plates in Roberto's order (accounts, the goal chased now, his requests).
 struct NotchSections: View {
     let maxHeight: CGFloat
     @ObservedObject private var store = GoalStore.shared
+    @ObservedObject private var quota = AccountQuotaFeed.shared
     @State private var contentHeight: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            NotchSectionsContent(rows: store.rows, usage: store.usage, requests: store.requests, now: store.now)
+            NotchSectionsContent(store: store, quota: quota)
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
         }
         .frame(height: min(contentHeight, maxHeight))
         .animation(reduceMotion ? nil : NotchAnimation.close, value: contentHeight)
+        .onAppear { quota.refresh() }  // opening the notch is when fresh numbers matter
     }
 }
 
 /// The plates without the scroll view: `--snapshot` draws this (ImageRenderer skips ScrollView content).
 struct NotchSectionsContent: View {
-    let rows: [GoalRow]
-    let usage: [AccountUsage]
-    let requests: [UserRequest]
-    let now: Date
+    @ObservedObject var store: GoalStore
+    @ObservedObject var quota: AccountQuotaFeed
 
     var body: some View {
-        GlassGroup(spacing: 8) {
-            VStack(spacing: 8) {
-                UsagePlate(usage: usage, now: now)
-                GoalPlate(rows: rows, now: now)
-                RequestsPlate(requests: requests)
+        GlassGroup(spacing: NotchSpace.inset) {
+            VStack(spacing: NotchSpace.inset) {
+                AccountsPlate(feed: quota, now: store.now)
+                GoalPlate(rows: store.rows, now: store.now)
+                RequestsPlate(requests: store.requests, active: store.requestsFolderExists)
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.top, 2)
-        .padding(.bottom, 8)
+        .padding([.horizontal, .bottom], NotchSpace.inset)
     }
 }
 
-struct PlateTitle: View {
-    let text: String
-    init(_ text: String) { self.text = text }
+// MARK: - Scale
 
-    var body: some View {
-        Text(text).font(.system(size: 11, weight: .semibold)).foregroundStyle(GoalInk.secondary)
-    }
+/// One spacing scale on a 4/8 pt grid. The island's bottom corners are 24 pt; plates sit 8 pt in,
+/// so their 16 pt corners are concentric with it (HIG: concentric margins).
+enum NotchSpace {
+    static let inset: CGFloat = 8      // panel edge to plate, plate to plate
+    static let plate: CGFloat = 16     // inside a plate
+    static let radius: CGFloat = 16
+    static let head: CGFloat = 12      // plate title to its content
+    static let row: CGFloat = 8        // between rows
+    static let tight: CGFloat = 4      // a line and what belongs to it (bar and its reason)
 }
 
-struct EmptyLine: View {
-    let text: String
-    init(_ text: String) { self.text = text }
-
-    var body: some View {
-        Text(text).font(.system(size: 12, weight: .medium)).foregroundStyle(GoalInk.secondary)
-    }
+/// One type scale (macOS text styles in points): 11 labels, 12 secondary, 13 body, 15 title, 22 figure.
+enum NotchType {
+    static let label = Font.system(size: 11, weight: .semibold)
+    static let caption = Font.system(size: 11, weight: .medium)
+    static let numbers = Font.system(size: 11, weight: .semibold).monospacedDigit()
+    static let secondary = Font.system(size: 12)
+    static let body = Font.system(size: 13)
+    static let bodyEmphasis = Font.system(size: 13, weight: .medium)
+    static let title = Font.system(size: 15, weight: .semibold)
+    static let figure = Font.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit()
+    static let figureUnit = Font.system(size: 13, weight: .medium, design: .rounded).monospacedDigit()
 }
 
-// MARK: - Accounts
+// MARK: - Plate parts
 
-private struct UsagePlate: View {
-    let usage: [AccountUsage]
-    let now: Date
-    static let meter: CGFloat = 128
+/// A plate: title row (with an optional trailing note), then the content, inside one glass shape.
+struct Plate<Trailing: View, Content: View>: View {
+    let title: String
+    var tint: Color? = nil
+    @ViewBuilder var trailing: Trailing
+    @ViewBuilder var content: Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 12) {
-                PlateTitle("Account").frame(maxWidth: .infinity, alignment: .leading)
-                if !usage.isEmpty {
-                    PlateTitle("5 ore").frame(width: Self.meter, alignment: .leading)
-                    PlateTitle("Settimana").frame(width: Self.meter, alignment: .leading)
-                }
+        VStack(alignment: .leading, spacing: NotchSpace.head) {
+            HStack(alignment: .firstTextBaseline, spacing: NotchSpace.row) {
+                Text(title).font(NotchType.label).foregroundStyle(GoalInk.secondary)
+                Spacer(minLength: NotchSpace.row)
+                trailing
             }
-            if usage.isEmpty { EmptyLine("Nessun dato sull'uso") }
-            // Fresh numbers first; accounts without fresh numbers keep their place below, muted.
-            ForEach(usage.filter { $0.fresh(now: now) } + usage.filter { !$0.fresh(now: now) }) {
-                AccountLine(account: $0, now: now)
-            }
+            content
         }
-        .padding(12)
+        .padding(NotchSpace.plate)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassPlate(radius: 16)
+        .glassPlate(radius: NotchSpace.radius, tint: tint)
     }
 }
 
-extension AccountUsage {
-    /// Numbers read in the last hour, with no "motivo" (claude-accounts sets it when they are missing
-    /// or could not be refreshed). Expired logins count as fresh: "Login scaduto" is the news.
-    func fresh(now: Date) -> Bool {
-        if expired { return true }
-        guard reason?.isEmpty ?? true, let at else { return false }
-        return now.timeIntervalSince(at) < 60 * 60
-    }
-}
-
-private struct AccountLine: View {
-    let account: AccountUsage
-    let now: Date
+/// An empty state: what is (or is not) there, and at most one line on why.
+struct EmptyState: View {
+    let text: String
+    var detail: String? = nil
 
     var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(account.label)
-                    .font(.system(size: 12.5, weight: .medium))
-                    .foregroundStyle(account.fresh(now: now) ? GoalInk.primary : GoalInk.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            if !account.fresh(now: now) {
-                // Old or missing numbers are never drawn as bars: they would read as real usage.
-                Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato")
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(GoalInk.secondary)
-                    .frame(width: UsagePlate.meter * 2 + 12, alignment: .leading)
-            } else if account.expired {
-                Label("Login scaduto", systemImage: "pause.fill")
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundStyle(GoalTone.wait.color)
-                    .frame(width: UsagePlate.meter * 2 + 12, alignment: .leading)
-            } else {
-                UsageMeter(window: account.fiveHour, now: now).frame(width: UsagePlate.meter)
-                UsageMeter(window: account.sevenDay, now: now).frame(width: UsagePlate.meter)
-            }
+        VStack(alignment: .leading, spacing: NotchSpace.tight) {
+            Text(text).font(NotchType.bodyEmphasis).foregroundStyle(GoalInk.secondary)
+            if let detail { Text(detail).font(NotchType.secondary).foregroundStyle(GoalInk.secondary) }
         }
-        .accessibilityElement(children: .combine)
-    }
-}
-
-private struct UsageMeter: View {
-    let window: UsageWindow?
-    let now: Date
-
-    /// A window whose reset is past counts as 0% used (claude-accounts reads it the same way).
-    private var used: Double? {
-        guard let window else { return nil }
-        if let reset = window.reset, reset < now { return 0 }
-        return min(max(window.used, 0), 100)
-    }
-
-    /// Plenty left is plain white; the colour only warns.
-    private var color: Color {
-        guard let used else { return GoalInk.secondary }
-        return used >= 90 ? GoalTone.stop.color : used >= 70 ? GoalTone.wait.color : Color.white.opacity(0.85)
-    }
-
-    var body: some View {
-        HStack(spacing: 8) {
-            GoalBar(progress: used.map { $0 / 100 }, color: color, height: 4)
-            Text(used.map { "\(Int($0.rounded()))%" } ?? "")
-                .font(.system(size: 11.5, weight: .semibold).monospacedDigit())
-                .foregroundStyle(used == nil ? GoalInk.secondary : GoalInk.primary)
-                .frame(width: 36, alignment: .trailing)
-                .contentTransition(.numericText())
-        }
-    }
-}
-
-// MARK: - Goals
-
-private struct GoalPlate: View {
-    let rows: [GoalRow]
-    let now: Date
-
-    var body: some View {
-        let hero = rows.hero
-        let others = rows.filter { $0.id != hero?.id }
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                PlateTitle("Obiettivo")
-                Spacer(minLength: 8)
-                if let hero { SessionsLive(row: hero) }
-            }
-            if let hero { HeroGoal(row: hero, now: now) } else { EmptyLine("Nessun obiettivo aperto") }
-            if !others.isEmpty {
-                Rectangle().fill(Color.white.opacity(0.1)).frame(height: 0.5).padding(.vertical, 2)
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(others) { OtherGoal(row: $0, now: now) }
-                }
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        // The plate takes the goal's traffic light as a faint tint: state, not decoration.
-        .glassPlate(radius: 16, tint: hero?.tone.color.opacity(0.16))
-    }
-}
-
-private struct HeroGoal: View {
-    let row: GoalRow
-    let now: Date
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text(row.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(GoalInk.primary)
-                    .lineLimit(2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if row.proofsTotal > 0 {
-                    HStack(alignment: .firstTextBaseline, spacing: 1) {
-                        Text("\(row.proofsDone)")
-                            .font(.system(size: 26, weight: .semibold, design: .rounded).monospacedDigit())
-                            .foregroundStyle(GoalInk.primary)
-                            .contentTransition(.numericText())
-                        Text("/\(row.proofsTotal)")
-                            .font(.system(size: 14, weight: .medium, design: .rounded).monospacedDigit())
-                            .foregroundStyle(GoalInk.secondary)
-                    }
-                    .fixedSize()
-                } else {
-                    Text("Nessuna prova").font(.system(size: 11.5, weight: .medium)).foregroundStyle(GoalInk.secondary).fixedSize()
-                }
-            }
-            if !row.title.isEmpty {
-                Text(row.goal).font(.system(size: 12)).foregroundStyle(GoalInk.secondary).lineLimit(2)
-            }
-            // The reason belongs to the bar: tight under it, never a separate block.
-            VStack(alignment: .leading, spacing: 5) {
-                GoalBar(progress: row.progress, tone: row.tone, height: 8)
-                GoalReason(row: row, now: now, size: 12)
-            }
-            .padding(.top, 2)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(row.accessibilityText(now: now))
-    }
-}
-
-private struct OtherGoal: View {
-    let row: GoalRow
-    let now: Date
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 10) {
-                Image(systemName: row.symbol)
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(row.tone.color)
-                    .frame(width: 12)
-                Text(row.displayTitle)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(GoalInk.primary)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                GoalBar(progress: row.progress, tone: row.tone, height: 4).frame(width: 96)
-                // No declared proofs: the bare track says it; the hero says it in words once.
-                Text(row.proofsText ?? "")
-                    .font(.system(size: 11.5, weight: .medium).monospacedDigit())
-                    .foregroundStyle(GoalInk.secondary)
-                    .frame(width: 30, alignment: .trailing)
-                SessionsLive(row: row, size: 11, compact: true).frame(width: 34, alignment: .trailing)
-            }
-            if let reason = row.reason(now: now) {
-                Text(reason)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(row.tone.color)
-                    .lineLimit(1)
-                    .padding(.leading, 22)
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(row.accessibilityText(now: now))
     }
 }
