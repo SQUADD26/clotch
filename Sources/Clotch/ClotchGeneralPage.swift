@@ -14,7 +14,7 @@ struct ClotchGeneralPage: View {
     }
 
     var body: some View {
-        SettingsPage {
+        SettingsForm {
             SettingsRow(l10n["display"]) {
                 Picker(l10n["display"], selection: $displayChoice) {
                     Text(l10n["auto"]).tag("auto")
@@ -56,7 +56,7 @@ struct ClotchNotificationsPage: View {
     @AppStorage(ClotchPrefs.noteLength) private var noteLength = ClotchPrefs.noteLengthDefault
 
     var body: some View {
-        SettingsPage {
+        SettingsForm {
             SettingsRow(l10n["notifications_page"]) {
                 SettingsCheckbox(title: l10n["show_notifications"], note: l10n["show_notifications_desc"], isOn: $notes)
             }

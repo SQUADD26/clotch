@@ -27,7 +27,7 @@ struct ClotchNotchPage: View {
 
     var body: some View {
         let _ = layouts  // re-render on every layout write
-        SettingsPage {
+        SettingsForm {
             SettingsRow(l10n["opening"]) {
                 SettingsCheckbox(title: l10n["open_on_hover"], note: l10n["open_on_hover_desc"], isOn: $openOnHover)
                 SettingsCheckbox(title: l10n["collapse_on_mouse_leave"], isOn: $collapseOnMouseLeave)

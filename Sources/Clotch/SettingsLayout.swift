@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The pieces of every «Impostazioni di Clotch» page, as the approved Figma (#95): label column 150 pt right-aligned,
 /// controls 12 pt to its right, rows 14 pt apart, groups split by a line, notes 11 pt under their control.
-struct SettingsPage<Content: View>: View {
+struct SettingsForm<Content: View>: View {
     @ViewBuilder var content: Content
 
     var body: some View {
@@ -72,13 +72,9 @@ struct SettingsSlider: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             VStack(spacing: 3) {
-                Group {
-                    if let step {
-                        Slider(value: $value, in: range, step: step, onEditingChanged: { if !$0 { onEnd() } })
-                    } else {
-                        Slider(value: $value, in: range, onEditingChanged: { if !$0 { onEnd() } })
-                    }
-                }
+                // Snapped here, not with `step:`, which draws a tick mark per step (the design has none).
+                Slider(value: Binding(get: { value }, set: { v in value = step.map { (v / $0).rounded() * $0 } ?? v }),
+                       in: range, onEditingChanged: { if !$0 { onEnd() } })
                 .labelsHidden()
                 .accessibilityLabel(Text(label))
                 HStack {
