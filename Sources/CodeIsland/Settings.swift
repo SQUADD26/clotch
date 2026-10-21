@@ -35,8 +35,8 @@ enum SettingsKey {
     static let hideWhenNoSession = "hideWhenNoSession"
     static let smartSuppress = "smartSuppress"
     static let collapseOnMouseLeave = "collapseOnMouseLeave"
-    static let notchOpenSpeed = "notchOpenSpeed"
-    static let notchCloseSpeed = "notchCloseSpeed"
+    static let notchOpenMs = NotchTiming.openKey
+    static let notchCloseMs = NotchTiming.closeKey
     static let autoCollapseAfterSessionJump = "autoCollapseAfterSessionJump"
     static let autoExpandOnPermission = "autoExpandOnPermission"
     static let autoExpandOnCompletion = "autoExpandOnCompletion"
@@ -178,8 +178,8 @@ struct SettingsDefaults {
     static let hideWhenNoSession = false
     static let smartSuppress = true
     static let collapseOnMouseLeave = true
-    static let notchOpenSpeed = NotchAnimationSpeed.normal
-    static let notchCloseSpeed = NotchAnimationSpeed.normal
+    static let notchOpenMs = NotchTiming.defaultOpenMs
+    static let notchCloseMs = NotchTiming.defaultCloseMs
     static let autoCollapseAfterSessionJump = false
     static let autoExpandOnPermission = true
     static let autoExpandOnCompletion = true
@@ -285,8 +285,8 @@ class SettingsManager {
             SettingsKey.hideWhenNoSession: SettingsDefaults.hideWhenNoSession,
             SettingsKey.smartSuppress: SettingsDefaults.smartSuppress,
             SettingsKey.collapseOnMouseLeave: SettingsDefaults.collapseOnMouseLeave,
-            SettingsKey.notchOpenSpeed: SettingsDefaults.notchOpenSpeed,
-            SettingsKey.notchCloseSpeed: SettingsDefaults.notchCloseSpeed,
+            SettingsKey.notchOpenMs: SettingsDefaults.notchOpenMs,
+            SettingsKey.notchCloseMs: SettingsDefaults.notchCloseMs,
             SettingsKey.autoCollapseAfterSessionJump: SettingsDefaults.autoCollapseAfterSessionJump,
             SettingsKey.autoExpandOnPermission: SettingsDefaults.autoExpandOnPermission,
             SettingsKey.autoExpandOnCompletion: SettingsDefaults.autoExpandOnCompletion,
@@ -407,16 +407,6 @@ class SettingsManager {
     var collapseOnMouseLeave: Bool {
         get { defaults.bool(forKey: SettingsKey.collapseOnMouseLeave) }
         set { defaults.set(newValue, forKey: SettingsKey.collapseOnMouseLeave) }
-    }
-
-    var notchOpenSpeed: Double {
-        get { NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchOpenSpeed)) }
-        set { defaults.set(NotchAnimationSpeed.clamped(newValue), forKey: SettingsKey.notchOpenSpeed) }
-    }
-
-    var notchCloseSpeed: Double {
-        get { NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchCloseSpeed)) }
-        set { defaults.set(NotchAnimationSpeed.clamped(newValue), forKey: SettingsKey.notchCloseSpeed) }
     }
 
     var hapticOnHover: Bool {

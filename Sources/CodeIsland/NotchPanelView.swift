@@ -242,9 +242,13 @@ struct NotchPanelView: View {
         )
     }
 
-    /// The open content and the notes come down from under the notch; Reduce Motion only fades them.
+    /// The open content and the notes fade in, a few points down, once the shell has made room;
+    /// they leave first, before the shell closes over them. Reduce Motion only fades them.
     private var contentTransition: AnyTransition {
-        reduceMotion ? .opacity : .blurFade.combined(with: .move(edge: .top))
+        let enter: AnyTransition = reduceMotion ? .opacity : .blurFade.combined(with: .offset(y: -6))
+        let leave: AnyTransition = reduceMotion ? .opacity : .blurFade
+        return .asymmetric(insertion: enter.animation(NotchAnimation.contentIn),
+                           removal: leave.animation(NotchAnimation.contentOut))
     }
 
     /// The panel window's width (PanelWindowController.panelSize).

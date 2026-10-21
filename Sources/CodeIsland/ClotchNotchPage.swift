@@ -9,8 +9,8 @@ struct ClotchNotchPage: View {
     @AppStorage(SettingsKey.hoverExpandDelay) private var hoverExpandDelay = SettingsDefaults.hoverExpandDelay
     @AppStorage(SettingsKey.collapseOnMouseLeave) private var collapseOnMouseLeave = SettingsDefaults.collapseOnMouseLeave
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
-    @AppStorage(SettingsKey.notchOpenSpeed) private var notchOpenSpeed = SettingsDefaults.notchOpenSpeed
-    @AppStorage(SettingsKey.notchCloseSpeed) private var notchCloseSpeed = SettingsDefaults.notchCloseSpeed
+    @AppStorage(SettingsKey.notchOpenMs) private var notchOpenMs = SettingsDefaults.notchOpenMs
+    @AppStorage(SettingsKey.notchCloseMs) private var notchCloseMs = SettingsDefaults.notchCloseMs
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @AppStorage(ClotchPrefs.voiceLight) private var voiceLight = ClotchPrefs.voiceLightDefault
@@ -34,8 +34,8 @@ struct ClotchNotchPage: View {
                 .disabled(!openOnHover)
                 Toggle(l10n["collapse_on_mouse_leave"], isOn: $collapseOnMouseLeave)
                 Toggle(l10n["haptic_on_hover"], isOn: $hapticOnHover)
-                speed(l10n["notch_open_speed"], $notchOpenSpeed)
-                speed(l10n["notch_close_speed"], $notchCloseSpeed)
+                NotchTimeField(title: l10n["notch_open_ms"], ms: $notchOpenMs)
+                NotchTimeField(title: l10n["notch_close_ms"], ms: $notchCloseMs)
             }
 
             Section(l10n["closed_notch"]) {
@@ -85,15 +85,6 @@ struct ClotchNotchPage: View {
                     }
                 Toggle(l10n["avoid_menu_bar_icons"], isOn: $avoidMenuBarIcons)
             }
-        }
-    }
-
-    private func speed(_ title: String, _ value: Binding<Double>) -> some View {
-        slider(title, value: Binding(
-            get: { NotchAnimationSpeed.clamped(value.wrappedValue) },
-            set: { value.wrappedValue = NotchAnimationSpeed.clamped($0) }
-        ), in: NotchAnimationSpeed.minimum...NotchAnimationSpeed.maximum, step: NotchAnimationSpeed.step) {
-            String(format: "%.1f×", $0)
         }
     }
 
