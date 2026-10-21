@@ -61,6 +61,31 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertEqual(NotchLayoutMetrics.islandWidth(fraction: 0.5, screenWidth: 100, notchWidth: 200), 200)
     }
 
+    func testWingFitsTheLayoutsElements() {
+        let standard = NotchScreenLayout.standard(hasNotch: true)
+        XCTAssertEqual(NotchLayoutMetrics.wing(standard), 84, "4 rings fill the Figma wing")
+        var wide = standard
+        wide.place(.activeGoal, in: .left, hasNotch: true)
+        XCTAssertGreaterThan(NotchLayoutMetrics.wing(wide), 84)
+        var icons = wide
+        icons.iconsOnly = true
+        XCTAssertLessThan(NotchLayoutMetrics.wing(icons), NotchLayoutMetrics.wing(wide))
+    }
+
+    func testCounterStopsWhenTheGoalIsStillOrNoSessionWorks() {
+        let started = now.addingTimeInterval(-3600)
+        func goal(_ status: GoalStatus, running: Bool) -> GoalRow {
+            var r = GoalRow(id: "a", title: "t", goal: "g", proofsDone: 0, proofsTotal: 0, progress: nil, status: status,
+                            lastActivity: now.addingTimeInterval(-600), pulses: [GoalPulse(id: "m", kind: .master, running: running)])
+            r.since = started
+            return r
+        }
+        XCTAssertNil(goal(.moving, running: true).workEnd, "at work: the clock runs")
+        XCTAssertEqual(goal(.moving, running: false).workEnd, now.addingTimeInterval(-600), "«Nessuna sessione al lavoro»")
+        XCTAssertEqual(goal(.still(since: now.addingTimeInterval(-300)), running: false).workEnd, now.addingTimeInterval(-300), "«Fermo»")
+        XCTAssertEqual([goal(.moving, running: true), goal(.moving, running: false)].allPulses.filter(\.running).count, 1)
+    }
+
     // MARK: Snapshots
 
     func testWideElementShowsTwoBarsPerAccountWithWeekInWarningColour() throws {
@@ -96,6 +121,29 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertGreaterThan(flat.count(white, columns: 0.33..<0.67), 100, "the active goal sits in the centre")
         XCTAssertEqual(notched.count(white, columns: 0.42..<0.58), 0, "beside a notch the middle stays empty")
         XCTAssertGreaterThan(notched.count(white), 0, "the goal moved to the left side")
+    }
+
+    func testSavedLayoutChangesWhatTheClosedNotchDraws() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "NotchZoneViewsTests-\(UUID().uuidString)"))
+        var moved = NotchScreenLayout.standard(hasNotch: true)
+        moved.place(.accounts, in: .left, hasNotch: true)
+        var store = NotchLayoutStore()
+        store.screens["sig"] = moved
+        store.save(to: defaults)
+        let saved = NotchLayoutStore.load(from: defaults)
+
+        var d = data
+        d.rows = []  // only the account bars colour the picture
+        func closed(_ signature: String) -> some View {
+            NotchZonesView(layout: saved.layout(for: signature, hasNotch: true), hasNotch: true, notchWidth: 200, data: d)
+                .frame(width: 600).background(Color.black)
+        }
+        let standard = try render(closed("other screen"), named: "disposizione-standard")
+        let mine = try render(closed("sig"), named: "disposizione-salvata")
+        XCTAssertEqual(standard.count(yellow, columns: 0..<0.5), 0, "standard: bars on the right")
+        XCTAssertGreaterThan(standard.count(yellow, columns: 0.5..<1), 0)
+        XCTAssertGreaterThan(mine.count(yellow, columns: 0..<0.5), 0, "saved: bars moved to the left")
+        XCTAssertEqual(mine.count(yellow, columns: 0.5..<1), 0)
     }
 
     // MARK: Pixels

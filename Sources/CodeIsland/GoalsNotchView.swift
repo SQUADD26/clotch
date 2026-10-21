@@ -51,10 +51,11 @@ extension GoalRow {
         pulses.first { $0.kind == .master }.flatMap { ClaudeDesktopCodeSession.deepLinkURL(hostSessionId: $0.id) }
     }
 
-    /// When work stopped: a still goal's counter stops at the moment it went still, it does not keep counting.
+    /// When work stopped: a still goal's counter stops at the moment it went still, and with no
+    /// session at work at the last sign of work; it does not keep counting.
     var workEnd: Date? {
         if case .still(let at) = status { return at }
-        return nil
+        return runningCount == 0 ? lastActivity ?? since : nil
     }
 
     /// Why the goal is not green, when it is not: shown under its text.
@@ -100,6 +101,9 @@ extension Array where Element == GoalRow {
     /// The goal being chased now (`GoalBoard.chased`). The rest keep GoalBoard's
     /// order (blocked, then still, then moving), so trouble stays on top right under it.
     var hero: GoalRow? { GoalBoard.chased(self) }
+
+    /// Every session of every goal (the closed notch counts the ones at work).
+    var allPulses: [GoalPulse] { flatMap(\.pulses) }
 
     /// The pages of the open notch and the rings of the closed one: the goal chased now first.
     var pages: [GoalRow] {

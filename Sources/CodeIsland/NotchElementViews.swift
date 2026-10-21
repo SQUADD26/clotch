@@ -51,7 +51,9 @@ private struct ActiveGoalElement: View {
                 if let since = data.workingSince {
                     HStack(spacing: 5) {
                         Image(systemName: "stopwatch").font(.system(size: 15))
-                        Text(since, style: .timer).font(NotchType.name.monospacedDigit()).tracking(0.26)
+                        // Work stopped (still, or no session at work): a fixed figure, no clock.
+                        (hero.workEnd.map { Text(GoalRow.clock(from: since, to: $0)) } ?? Text(since, style: .timer))
+                            .font(NotchType.name.monospacedDigit()).tracking(0.26)
                     }
                     .foregroundStyle(Color.white.opacity(0.75))
                 }
