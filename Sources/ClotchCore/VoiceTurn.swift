@@ -7,11 +7,9 @@ import FoundationNetworking
 /// Pure: the app (`VoiceSpeaker`) runs the processes, the network and the audio. Same rules as Clean View's `voce.ts`.
 public enum VoiceTurn {
     public static let haikuModel = "claude-haiku-5-5"
-    /// Haiku gets this long per try, two tries (#73); then the cleaned report is said.
+    /// Haiku gets this long per try, two tries (#73); then the voice is silent (#84).
     public static let haikuSeconds: TimeInterval = 22
     public static let haikuTries = 2
-    /// The cleaned report, when Haiku failed twice, is at most this many sentences.
-    static let plainSentences = 3
     /// The ceiling of one spoken line (~25 s of speech) and of the cleaned report Haiku reads.
     public static let maxSpoken = 320
     /// The raw text cleaned at most: the answer's opening, where the report leads.
@@ -109,9 +107,9 @@ public enum VoiceTurn {
         "<rapporto>\n\(report)\n</rapporto>\n" + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
     }
 
-    /// The line to say (#73): Haiku up to `haikuTries` times, each cut at `timeout`; when both fail, the report itself,
-    /// cleaned and cut to `plainSentences`. Never a fixed sentence: nil = nothing to say at all (silence).
-    public static func line(report: String, timeout: TimeInterval = haikuSeconds,
+    /// The line to say (#73): Haiku up to `haikuTries` times, each cut at `timeout`. When both fail: nil, silence (#84,
+    /// claude-config#1837: never the raw or cleaned report, never a fixed sentence).
+    public static func line(timeout: TimeInterval = haikuSeconds,
                             haiku: @escaping @Sendable () async -> String?) async -> (text: String, topic: String)? {
         for _ in 0..<haikuTries {
             let out: String? = await withTaskGroup(of: String?.self) { g in
@@ -123,15 +121,7 @@ public enum VoiceTurn {
             }
             if let out, let said = spoken(fromHaiku: out) { return said }
         }
-        let plain = plain(report)
-        return plain.isEmpty ? nil : (plain, "")
-    }
-
-    /// The report made fit for the ear without Haiku: no paths, links, hashes, PR numbers, orders; the first sentences.
-    static func plain(_ report: String) -> String {
-        let sentences = VoiceClean.spoken(report).replacingOccurrences(of: #"([.!?])\s+"#, with: "$1\n", options: .regularExpression)
-            .split(separator: "\n").prefix(plainSentences)
-        return cut(sentences.joined(separator: " "), maxSpoken)
+        return nil
     }
 
     /// What Haiku answered, cleaned again and ready to say, and its «ARGOMENTO:» line (kept for next time, never said).
@@ -165,15 +155,23 @@ public enum VoiceTurn {
         return String(w[..<(w.lastIndex(of: " ") ?? w.endIndex)]) + "."
     }
 
-    /// The ElevenLabs request: the key only in the `xi-api-key` header, never in the URL or the body.
-    public static func speechRequest(text: String, config: Config, key: String) -> URLRequest {
+    /// The pronunciation list applied (`VoiceFiles.pronunciation`): whole words, any case, the longest first.
+    public static func pronounced(_ text: String, _ words: [String: String]) -> String {
+        words.keys.sorted { $0.count > $1.count }.reduce(text) { t, w in
+            t.replacingOccurrences(of: #"(?<![\p{L}\p{N}_])"# + NSRegularExpression.escapedPattern(for: w) + #"(?![\p{L}\p{N}_])"#,
+                                   with: NSRegularExpression.escapedTemplate(for: words[w]!), options: [.regularExpression, .caseInsensitive])
+        }
+    }
+
+    /// The ElevenLabs request, the text said as the pronunciation list wants: the key only in the `xi-api-key` header, never in the URL or the body.
+    public static func speechRequest(text: String, config: Config, key: String, pronunciation: [String: String]) -> URLRequest {
         var r = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/text-to-speech/\(config.voiceId)?output_format=mp3_44100_64")!)
         r.httpMethod = "POST"
         r.timeoutInterval = 20
         r.setValue(key, forHTTPHeaderField: "xi-api-key")
         r.setValue("application/json", forHTTPHeaderField: "Content-Type")
         r.setValue("audio/mpeg", forHTTPHeaderField: "Accept")
-        let body: [String: Any] = ["text": text, "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
+        let body: [String: Any] = ["text": pronounced(text, pronunciation), "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
         r.httpBody = try? JSONSerialization.data(withJSONObject: body)
         return r
     }

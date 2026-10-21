@@ -1,7 +1,7 @@
 import XCTest
 @testable import ClotchCore
 
-/// #38: the «Voce» settings page keeps config.json's unknown fields, writes the key 600, empty instructions = stock ones.
+/// #38: the «Voce» settings page keeps config.json's unknown fields, writes the key 600; the prompt and the pronunciation list are the config's files (#84).
 final class VoiceFilesTests: XCTestCase {
     private var home: URL!
     private var files: VoiceFiles!
@@ -56,16 +56,22 @@ final class VoiceFilesTests: XCTestCase {
         XCTAssertTrue(files.isOn)
     }
 
-    func testEmptyPromptIsStock() throws {
-        XCTAssertEqual(files.prompt, VoicePrompt.stock)
-        try files.savePrompt("Parla piano")
-        XCTAssertEqual(files.prompt, "Parla piano")
-        XCTAssertEqual(try mode(files.promptURL), 0o600)
-        try files.savePrompt("  \n")
-        XCTAssertFalse(FileManager.default.fileExists(atPath: files.promptURL.path))
-        XCTAssertEqual(files.prompt, VoicePrompt.stock)
-        try files.savePrompt("Parla piano")
-        try files.savePrompt(VoicePrompt.stock + "\n")
-        XCTAssertFalse(FileManager.default.fileExists(atPath: files.promptURL.path), "the stock text = no own file")
+    func testPromptIsTheConfigFile() throws {
+        XCTAssertNil(files.prompt, "no config file: silence, no stock copy")
+        XCTAssertEqual(files.promptURL.path, home.appendingPathComponent(".claude/mods/clean-view/hooks/voce-parlatore.md").path)
+        try put("  \n", files.promptURL)
+        XCTAssertNil(files.prompt)
+        try put("Sei la voce.\n", files.promptURL)
+        XCTAssertEqual(files.prompt, "Sei la voce.")
+    }
+
+    func testPronunciationIsBaseListThenOwnFile() throws {
+        XCTAssertEqual(files.pronunciation, [:])
+        try put(#"{"Clotch": "Clocc", "PR": "pi erre"}"#, files.basePronunciationURL)
+        try put(#"{"PR": "richiesta", "notch": "nocc"}"#, files.pronunciationURL)
+        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "richiesta", "notch": "nocc"])
+        XCTAssertEqual(files.pronunciationURL.path, home.appendingPathComponent(".config/voce/pronuncia.json").path)
+        try put("non json", files.pronunciationURL)
+        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "pi erre"])
     }
 }

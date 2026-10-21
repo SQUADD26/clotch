@@ -2,7 +2,7 @@ import SwiftUI
 import ClotchCore
 
 /// «Voce» (#38, #50, #57): Clotch's voice: on/off, «Parla per», «Avvisami quando…», ElevenLabs key, voice, speed,
-/// daily limits, Haiku's instructions, a test.
+/// daily limits, a test. Haiku's instructions are the config's own file (#84), never edited here.
 /// Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`; the text is Italian like the rest of Clotch's own pages.
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
@@ -17,7 +17,7 @@ struct VoiceSettingsPage: View {
     @State private var speed = VoiceFiles.defaultSpeed
     @State private var maxCalls = VoiceFiles.defaultMaxCalls
     @State private var maxChars = VoiceFiles.defaultMaxChars
-    @State private var prompt = ""
+    @State private var hasPrompt = true
     @State private var audience = VoiceTurn.Config.Audience.main
     @State private var onlySession = ""
     @State private var sessions: [DesktopSession] = []
@@ -28,7 +28,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         Form {
             Section {
-                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima un aiutante Claude Haiku scrive una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
+                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude Haiku scrive una frase breve, con le stesse istruzioni della voce di Clean View. Poi ElevenLabs la legge con la voce scelta.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -37,6 +37,11 @@ struct VoiceSettingsPage: View {
                     isOn = files.isOn
                     VoiceSpeaker.shared.refresh()
                 }))
+                if !hasPrompt {
+                    Text("Istruzioni della voce mancanti. La voce tace.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section {
@@ -131,26 +136,6 @@ struct VoiceSettingsPage: View {
                      : "Oltre i limiti del giorno la voce tace fino a domani.")
             }
 
-            Section {
-                TextEditor(text: $prompt)
-                    .font(.system(size: 12, design: .monospaced))
-                    .frame(minHeight: 220)
-                HStack {
-                    Button("Ripristina") {
-                        run("Istruzioni non salvate", done: "Istruzioni ripristinate") { try files.savePrompt("") }
-                        prompt = files.prompt
-                    }
-                    Spacer()
-                    Button("Salva") {
-                        run("Istruzioni non salvate", done: "Istruzioni salvate") { try files.savePrompt(prompt) }
-                    }
-                }
-            } header: {
-                Text("Istruzioni di Haiku")
-            } footer: {
-                Text("Con il testo vuoto valgono le istruzioni di serie.")
-            }
-
             if let note {
                 Text(note).font(.system(size: 12)).foregroundStyle(.secondary)
             }
@@ -169,7 +154,7 @@ struct VoiceSettingsPage: View {
         isOn = files.isOn
         hasKey = files.hasKey
         hasJevKey = files.hasJevKey
-        prompt = files.prompt
+        hasPrompt = files.prompt != nil
         guard let config = try? files.readConfig() else { configBroken = true; return }
         voiceId = config["voice_id"] as? String ?? ""
         model = config["model_id"] as? String ?? VoiceFiles.defaultModel
