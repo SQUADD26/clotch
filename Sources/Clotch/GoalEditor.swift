@@ -29,7 +29,11 @@ struct EditableGoalText: View {
                             .scrollContentBackground(.hidden)
                             .padding(.horizontal, -5) // NSTextView's line padding: the words stay where they were
                             .focused($focused)
-                            .onAppear { focused = true }
+                            .onAppear {
+                                (NSApp.delegate as? AppDelegate)?.panelController?.takeKeyboard()
+                                focused = true
+                            }
+                            .onDisappear { (NSApp.delegate as? AppDelegate)?.panelController?.giveBackKeyboard() }
                             .onKeyPress(.return) { save(); return .handled }
                             .onKeyPress(.escape) { edit.cancel(); return .handled }
                     }
