@@ -119,6 +119,9 @@ public final class GoalLoader: @unchecked Sendable {
                 linked.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) })
     }
 
+    /// Every Claude app session parsed so far, not only those a goal reaches (the voice's «Parla per», #50).
+    public var allSessions: [DesktopSession] { sessions.all }
+
     /// What ties a session into a goal family; anything else (title, activity) matters only inside one.
     private static func link(_ s: DesktopSession) -> [String] {
         [s.localId, s.cliId, s.parentLocalId ?? "", s.isArchived ? "a" : ""] + s.priorCliIds

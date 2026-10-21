@@ -85,7 +85,7 @@ private struct RequestLine: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(request.look.label)
                 .font(NotchType.small)
-                .foregroundStyle(GoalInk.quiet)
+                .foregroundStyle(request.look.color)
         }
         .frame(height: 20)
         .help(request.original)
@@ -94,7 +94,18 @@ private struct RequestLine: View {
     }
 }
 
-/// A request's mark (#39): a thin white circle while it waits, a slowly pulsing dot while a session works on it,
+extension UserRequest.Look {
+    /// The colour of `ink` (#67): yellow while at work, green only once done.
+    var color: Color {
+        switch ink {
+        case .quiet: GoalInk.quiet
+        case .wait: GoalTone.wait.color
+        case .go: GoalTone.go.color
+        }
+    }
+}
+
+/// A request's mark (#39): a thin white circle while it waits, a slowly pulsing yellow dot while a session works on it,
 /// a green circle with a dark check only once done.
 struct RequestMark: View {
     let look: UserRequest.Look
@@ -105,12 +116,12 @@ struct RequestMark: View {
             if look == .working {
                 Image(systemName: "circle.circle")
                     .font(.system(size: 15))
-                    .foregroundStyle(GoalInk.secondary)
+                    .foregroundStyle(look.color)
                     .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
             } else if look == .done {
                 Image(systemName: "checkmark.circle.fill")
                     .symbolRenderingMode(.palette)
-                    .foregroundStyle(GoalInk.check, GoalTone.go.color)
+                    .foregroundStyle(GoalInk.check, look.color)
                     .font(.system(size: 16))
             } else {
                 Circle().stroke(Color.white.opacity(0.42), lineWidth: 1.5).frame(width: 15, height: 15)

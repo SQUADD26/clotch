@@ -1,7 +1,7 @@
 import Foundation
 
-/// The files of Roberto's voice (Clean View, claude-config `global/bin/voce` and `clean-view/hooks/voce*.ts`), as the
-/// «Voce» settings page reads and writes them (#38). The key is never read back: only whether it is there.
+/// The files of the voice, shared with Clean View (claude-config `global/bin/voce`, `clean-view/hooks/voce*.ts`): the «Voce»
+/// settings page (#38) and Clotch's own speaker (#50) read and write them. The page never reads the key back, only whether it is there.
 public struct VoiceFiles {
     public static let defaultModel = "eleven_v4_turbo"
     public static let defaultSpeed = 1.6       // voce-default.ts VELOCITA_DEFAULT
@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, defaultPromptURL, command: URL
+    public let keyURL, configURL, offURL, promptURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -17,14 +17,34 @@ public struct VoiceFiles {
         configURL = voce.appendingPathComponent("config.json")
         offURL = voce.appendingPathComponent("spento")
         promptURL = voce.appendingPathComponent("prompt.md")
-        defaultPromptURL = home.appendingPathComponent(".claude/mods/clean-view/hooks/voce-parlatore.md")
-        command = home.appendingPathComponent(".claude/bin/voce")
+        dayURL = voce.appendingPathComponent("giorno.json")
+        lastURL = voce.appendingPathComponent("ultima.json")
+        statusURL = voce.appendingPathComponent("stato.json")
+        activeURL = voce.appendingPathComponent("clotch")  // contract with Clean View: see VoiceHooks
+        queueURL = voce.appendingPathComponent("coda")
+        eventsURL = voce.appendingPathComponent("eventi.jsonl")  // claude-config#1854 writes it; Clotch only reads
+        alertsURL = voce.appendingPathComponent("avvisi.json")   // «Avvisami quando…»: the page and `avvisami` write it
+        judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
+        jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
+        voiceDir = voce
     }
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }
 
     public func saveKey(_ key: String) throws {
         try write(Data(key.trimmingCharacters(in: .whitespacesAndNewlines).utf8), to: keyURL)
+    }
+
+    public var hasJevKey: Bool { jevKey != nil }
+
+    public func saveJevKey(_ key: String) throws {
+        try write(Data(key.trimmingCharacters(in: .whitespacesAndNewlines).utf8), to: jevKeyURL)
+    }
+
+    /// The judge's key, for the judge only: trimmed, nil when missing or empty.
+    public var jevKey: String? {
+        let k = ((try? String(contentsOf: jevKeyURL, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return k.isEmpty || k.contains(where: \.isWhitespace) ? nil : k
     }
 
     /// The voice is on unless `spento` exists (`voce off`).
@@ -60,7 +80,19 @@ public struct VoiceFiles {
         return own.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? defaultPrompt : own
     }
 
-    public var defaultPrompt: String { (try? String(contentsOf: defaultPromptURL, encoding: .utf8)) ?? "" }
+    public var defaultPrompt: String { VoicePrompt.stock }
+
+    /// The key, for the speaker only: trimmed, nil when missing or not shaped like a key.
+    public var key: String? {
+        let k = ((try? String(contentsOf: keyURL, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return k.range(of: #"^[A-Za-z0-9_-]{10,200}$"#, options: .regularExpression) == nil ? nil : k
+    }
+
+    /// `voce muto <id>` silences one session.
+    public func isMuted(session: String) -> Bool {
+        let id = session.filter { $0.isLetter || $0.isNumber || $0 == "_" || $0 == "-" }
+        return !id.isEmpty && FileManager.default.fileExists(atPath: voiceDir.appendingPathComponent("muto-" + id).path)
+    }
 
     /// Empty text or the stock text removes prompt.md, so the stock instructions apply (and their updates reach Roberto).
     public func savePrompt(_ text: String) throws {
@@ -72,8 +104,16 @@ public struct VoiceFiles {
         }
     }
 
+    /// One write in append, file 600 (a log line): two writers never mix their lines. Best effort.
+    public func append(_ data: Data, to url: URL) {
+        try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let fd = open(url.path, O_WRONLY | O_APPEND | O_CREAT, 0o600)
+        guard fd >= 0 else { return }
+        FileHandle(fileDescriptor: fd, closeOnDealloc: true).write(data)
+    }
+
     /// Atomic write, file 600 and folder 700 (the key and its neighbours are never readable by others).
-    private func write(_ data: Data, to url: URL) throws {
+    public func write(_ data: Data, to url: URL) throws {
         let fm = FileManager.default
         let dir = url.deletingLastPathComponent()
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)

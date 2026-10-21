@@ -100,6 +100,11 @@ private final class GoalWatcher: @unchecked Sendable {
         queue.async(execute: item)
     }
 
+    /// Read on the loader's own queue (the loader is not thread-safe).
+    func allSessions(_ done: @escaping @Sendable ([DesktopSession]) -> Void) {
+        queue.async { [self] in done(loader.allSessions) }
+    }
+
     private static func existingAncestor(_ url: URL) -> URL {
         var u = url
         while u.path != "/", !FileManager.default.fileExists(atPath: u.path) { u = u.deletingLastPathComponent() }
@@ -159,6 +164,12 @@ private final class GoalWatcher: @unchecked Sendable {
         w.start()
     }
 
+    /// Every session of the Claude apps, for the voice (#50); empty before `start()`.
+    func allSessions() async -> [DesktopSession] {
+        guard let watcher else { return [] }
+        return await withCheckedContinuation { c in watcher.allSessions { c.resume(returning: $0) } }
+    }
+
     /// One synchronous read of the disk, for `--snapshot` (no watcher, no deadline).
     func loadNow() {
         apply(GoalSources.load(GoalSources.defaultPaths(home: FileManager.default.homeDirectoryForCurrentUser)))
@@ -173,6 +184,7 @@ private final class GoalWatcher: @unchecked Sendable {
         if exists != requestsFolderExists { requestsFolderExists = exists }
         if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
+        VoiceAlertCenter.shared.registersLoaded(goals: snap.goals, requests: snap.requests)
         let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
         if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()

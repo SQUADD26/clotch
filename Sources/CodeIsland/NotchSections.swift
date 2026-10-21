@@ -23,6 +23,13 @@ enum NotchTab: String, CaseIterable, Identifiable {
     }
 }
 
+extension NotchTab {
+    /// The tabs Roberto keeps on in Impostazioni (#56), in order; never none.
+    static func visible(hidden: String) -> [NotchTab] {
+        ClotchPrefs.visibleTabs(allCases.map(\.rawValue), hidden: hidden).compactMap(NotchTab.init)
+    }
+}
+
 /// The open notch: the tab bar, then the tab. The tab chosen last is kept for the next opening.
 struct NotchSections: View {
     let maxHeight: CGFloat
@@ -58,29 +65,32 @@ struct NotchSectionsContent: View {
     @ObservedObject var quota: AccountQuotaFeed
     let now: Date
     @Binding var tab: NotchTab
+    @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @State private var forward = true
     @State private var moving = false
     @State private var swipe = PageSwipe()
     @State private var monitor: Any?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// A tab turned off in Impostazioni is never shown, even if it was the last one open.
+    private var shown: NotchTab { tabs.contains(tab) ? tab : tabs[0] }
+    private var tabs: [NotchTab] { NotchTab.visible(hidden: hiddenTabs) }
+
     var body: some View {
         VStack(spacing: NotchSpace.section) {
-            TabBar(tab: Binding(get: { tab }, set: go))
+            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs)
             ZStack(alignment: .top) {
                 Group {
-                    switch tab {
+                    switch shown {
                     case .goals: GoalsTab(rows: store.rows, now: now)
                     case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
                     case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .id(tab)
+                .id(shown)
                 .transition(reduceMotion ? .opacity : .push(from: forward ? .trailing : .leading))
             }
-            .opacity(moving ? 0.45 : 1)  // as the Pager: nothing is read half-way
-            .blur(radius: moving && !reduceMotion ? 2.5 : 0)
             .clipped()
         }
         .padding(.horizontal, NotchSpace.side)
@@ -91,14 +101,14 @@ struct NotchSectionsContent: View {
     }
 
     private func go(_ target: NotchTab) {
-        guard target != tab else { return }
+        guard target != shown else { return }
         let all = NotchTab.allCases
-        forward = all.firstIndex(of: target)! > all.firstIndex(of: tab)!
+        forward = all.firstIndex(of: target)! > all.firstIndex(of: shown)!
         moving = true
         withAnimation(NotchMotion.animation(reduce: reduceMotion)) {
             tab = target
         } completion: {
-            withAnimation(NotchMotion.still) { moving = false }
+            moving = false
         }
     }
 
@@ -108,9 +118,9 @@ struct NotchSectionsContent: View {
         monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
             guard event.window is NSPanel else { return event }
             let step = swipe.feed(event)  // fed always, so each gesture's start is seen
-            let all = NotchTab.allCases
+            let all = tabs
             guard TabBarPointer.inside, !moving, let step,
-                  let i = PageSwipe.target(from: all.firstIndex(of: tab)!, step: step, count: all.count)
+                  let i = PageSwipe.target(from: all.firstIndex(of: shown) ?? 0, step: step, count: all.count)
             else { return event }
             go(all[i])
             return event
@@ -131,12 +141,13 @@ enum TabBarPointer {
 /// Three 142 × 30 segments in a 38 pt well; the chosen one lifts. One spring moves the highlight.
 struct TabBar: View {
     @Binding var tab: NotchTab
+    var tabs = NotchTab.allCases
     @Namespace private var highlight
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(NotchTab.allCases) { item in
+            ForEach(tabs) { item in
                 // withAnimation, so the notch's height follows the new tab with the same spring as the tab.
                 Button { withAnimation(NotchMotion.animation(reduce: reduceMotion)) { tab = item } } label: {
                     HStack(spacing: 6) {
