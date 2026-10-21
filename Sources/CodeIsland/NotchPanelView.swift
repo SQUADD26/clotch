@@ -159,7 +159,15 @@ struct NotchPanelView: View {
     @ObservedObject private var notifier = NotchNotifier.shared
     @ObservedObject private var voice = VoiceStore.shared
     /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
-    private var showsNote: Bool { showBar && !shouldShowExpanded && notifier.current != nil && notifier.phase != .leave }
+    private var showsNote: Bool {
+        showBar && !shouldShowExpanded && notifier.current != nil && notifier.phase != .leave && !noticeInWing
+    }
+    /// The goal element of the closed notch already says it (#39): no second line under the notch.
+    private var noticeInWing: Bool {
+        let zones = notchLayout.resolved(hasNotch: hasNotch)
+        return (zones.left + zones.centre + zones.right).contains(.activeGoal)
+            && notifier.current?.notice(rows: goals.rows, requests: goals.requests) != nil
+    }
 
     /// Gating: the island is live (and expands on hover) whenever it is shown,
     /// even with no open goal, so the empty state ("Nessun obiettivo aperto") is

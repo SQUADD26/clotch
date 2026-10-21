@@ -97,12 +97,13 @@ struct Note {
             let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
             self.init(text: title, startLabel: "In corso", label: "Unita", startSymbol: "arrow.triangle.pull",
                       symbol: "arrow.triangle.merge", color: NoteColor.merged, strikes: false, row: nil, before: nil)
-        case .proofDone, .still, .blocked, .reached:
+        case .proofDone, .still, .blocked, .reached, .confirmed:
             guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
             // The ring starts from the count before this proof, so the fill is the news.
             let before = event.kind == .proofDone && row.proofsTotal > 0
                 ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
-            let label = event.kind == .proofDone ? "Prova fatta, \(row.proofsDone) su \(row.proofsTotal)" : row.statusLabel
+            let label = event.kind == .proofDone ? "Prova fatta, \(row.proofsDone) su \(row.proofsTotal)"
+                : event.kind == .confirmed ? "Confermato" : row.statusLabel
             self.init(text: row.title, startLabel: row.proofsSentence, label: label, startSymbol: "", symbol: "",
                       color: row.ink, strikes: false, row: row, before: before)
         }
@@ -119,5 +120,17 @@ struct Note {
         self.strikes = strikes
         self.row = row
         self.before = before
+    }
+}
+
+extension NotchEvent {
+    /// The centre text of the closed notch while this event is up (#39); nil = only the line under the notch.
+    /// shortcut: «who» is the title of the session the request was written in, which is the one that takes it
+    /// (`presa_da` = `sessione` today); read the taker's own title if requests ever change hands.
+    func notice(rows: [GoalRow], requests: [UserRequest]) -> String? {
+        if kind == .requestTaken {
+            return requests.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.text, by: $0.sessionTitle) }
+        }
+        return rows.first { $0.id == subject }.flatMap { NotchEvents.notice(kind, title: $0.title) }
     }
 }

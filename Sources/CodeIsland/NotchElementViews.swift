@@ -43,8 +43,21 @@ private struct GoalRingsElement: View {
 /// is drawn by the system: no timer of ours.
 private struct ActiveGoalElement: View {
     let data: NotchZoneData
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        Group {
+            if let notice = data.notice {
+                Text(notice).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail)
+                    .transition(.blurFade)
+            } else {
+                goal.transition(.blurFade)
+            }
+        }
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: data.notice)
+    }
+
+    @ViewBuilder private var goal: some View {
         if let hero = data.rows.hero {
             HStack(spacing: 10) {
                 if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail) }
