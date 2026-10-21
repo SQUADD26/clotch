@@ -6,9 +6,9 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"
 rm -rf "$pkg"
 mkdir -p "$pkg/Sources/CodeIslandCore" "$pkg/Tests/CodeIslandCoreTests"
-ln -s "$root/Sources/CodeIslandCore/GoalBoard.swift" "$pkg/Sources/CodeIslandCore/GoalBoard.swift"
-ln -s "$root/Sources/CodeIslandCore/GoalSources.swift" "$pkg/Sources/CodeIslandCore/GoalSources.swift"
-ln -s "$root/Tests/CodeIslandCoreTests/GoalBoardTests.swift" "$pkg/Tests/CodeIslandCoreTests/GoalBoardTests.swift"
+# Every pure goal-notch file: the Goal* and Notch* sources and their tests.
+for f in "$root"/Sources/CodeIslandCore/{Goal,Notch}*.swift; do ln -s "$f" "$pkg/Sources/CodeIslandCore/"; done
+for f in "$root"/Tests/CodeIslandCoreTests/{Goal,Notch}*Tests.swift; do ln -s "$f" "$pkg/Tests/CodeIslandCoreTests/"; done
 cat > "$pkg/Package.swift" <<'EOF'
 // swift-tools-version: 5.9
 import PackageDescription
