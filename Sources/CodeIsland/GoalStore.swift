@@ -132,8 +132,7 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Never on a reload that changed nothing, so an idle board never redraws.
     @Published private(set) var now: Date = Date()
 
-    /// Goal cli -> its pull requests (family sessions' `prs` and PR numbers in its proofs); their state is `PullRequestFeed.shared.infos`.
-    @Published private(set) var goalPRs: [String: [PRRef]] = [:]
+    private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
     private var snapshot: GoalDiskData = ([], [], [], [])
     private var watcher: GoalWatcher?
     private var timer: Timer?

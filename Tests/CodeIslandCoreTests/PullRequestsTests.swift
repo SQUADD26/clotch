@@ -45,36 +45,97 @@ final class PullRequestsTests: XCTestCase {
 
     func testSessionPrsFieldShapes() {
         let url = "https://github.com/SQUADD26/goal-notch/pull/4"
-        XCTAssertEqual(PullRequests.parse([url, ["url": "\(url)/files"], ["number": 9, "repo": "o/r"], ["number": 3], 5, ["repository": "o/r", "number": 2]] as [Any]),
-                       [PRRef(repo: "SQUADD26/goal-notch", number: 4), PRRef(repo: "SQUADD26/goal-notch", number: 4),
-                        PRRef(repo: "o/r", number: 9), PRRef(repo: "o/r", number: 2)])
+        let real: [String: Any] = ["prNumber": 584, "repo": "SQUADD26/squadd-v2", "host": "github.com", "provider": "github",
+                                   "url": "https://github.com/SQUADD26/squadd-v2/pull/584", "branch": "dev", "baseRef": "main", "state": "MERGED", "own": true]
+        XCTAssertEqual(PullRequests.parse([real, ["prNumber": 1781, "repo": "SQUADD26/claude-config", "state": "OPEN"]] as [Any]),
+                       [SessionPR(ref: PRRef(repo: "SQUADD26/squadd-v2", number: 584), state: "MERGED"),
+                        SessionPR(ref: PRRef(repo: "SQUADD26/claude-config", number: 1781), state: "OPEN")])
+        XCTAssertEqual(PullRequests.parse([url, ["url": "\(url)/files"], ["number": 9, "repo": "o/r"], ["number": 3], 5] as [Any]).map(\.ref),
+                       [PRRef(repo: "SQUADD26/goal-notch", number: 4), PRRef(repo: "SQUADD26/goal-notch", number: 4), PRRef(repo: "o/r", number: 9)])
         XCTAssertEqual(PullRequests.parse(nil), [])
     }
 
     func testSessionFileCarriesPrs() throws {
-        let json = #"{"sessionId": "local_a", "cliSessionId": "cli-a", "prs": [{"number": 4, "repo": "o/r"}], "remoteMcpServersConfig": {"x": 1}}"#
+        let json = #"{"sessionId": "local_a", "cliSessionId": "cli-a", "prs": [{"prNumber": 4, "repo": "o/r", "state": "OPEN"}], "remoteMcpServersConfig": {"x": 1}}"#
         let s = try XCTUnwrap(GoalSources.parseSession(Data(json.utf8), fileName: "local_a.json"))
-        XCTAssertEqual(s.prs, [PRRef(repo: "o/r", number: 4)])
+        XCTAssertEqual(s.prs, [SessionPR(ref: PRRef(repo: "o/r", number: 4), state: "OPEN")])
     }
 
-    func testByGoalGathersFamilyIncludingArchivedAndProofs() {
-        func session(_ id: String, parent: String? = nil, archived: Bool = false, prs: [PRRef] = []) -> DesktopSession {
-            DesktopSession(localId: id, cliId: "cli-" + id, parentLocalId: parent, title: id, isRunning: false,
-                           isArchived: archived, lastActivity: nil, prs: prs)
-        }
+    private func session(_ id: String, parent: String? = nil, archived: Bool = false, prs: [SessionPR] = []) -> DesktopSession {
+        DesktopSession(localId: id, cliId: "cli-" + id, parentLocalId: parent, title: id, isRunning: false,
+                       isArchived: archived, lastActivity: nil, prs: prs)
+    }
+    private func pr(_ n: Int, _ state: String? = "OPEN", repo: String = "o/r") -> SessionPR { SessionPR(ref: PRRef(repo: repo, number: n), state: state) }
+
+    func testByGoalGathersFamilyIncludingArchivedAndProofsDroppingClosed() {
         let sessions = [
-            session("m", prs: [PRRef(repo: "o/r", number: 1)]),
-            session("c1", parent: "m", archived: true, prs: [PRRef(repo: "o/r", number: 2)]),
-            session("g1", parent: "c1", prs: [PRRef(repo: "o/r", number: 3)]),   // grandchild under an archived child
-            session("other", prs: [PRRef(repo: "o/r", number: 99)]),
+            session("m", prs: [pr(1), pr(6, "CLOSED")]),
+            session("c1", parent: "m", archived: true, prs: [pr(2, "MERGED"), pr(1, "MERGED")]),  // 1 merged here, stale OPEN in the master
+            session("g1", parent: "c1", prs: [pr(3)]),   // grandchild under an archived child
+            session("other", prs: [pr(99)]),
         ]
         let goal = GoalRecord(cli: "cli-m", goal: "g", state: "aperto", proof: "", at: nil, title: "",
                               proofs: [GoalProof(text: "PR #5 unita, vedi https://github.com/x/y/pull/8", done: true, at: nil)])
         XCTAssertEqual(PullRequests.byGoal(goals: [goal], sessions: sessions)["cli-m"],
-                       [PRRef(repo: "o/r", number: 1), PRRef(repo: "o/r", number: 2), PRRef(repo: "o/r", number: 3),
-                        PRRef(repo: "o/r", number: 5), PRRef(repo: "x/y", number: 8)])
+                       [pr(1, "MERGED"), pr(2, "MERGED"), pr(3), pr(5, nil), pr(8, nil, repo: "x/y")], "6 is closed: gone; 1 takes the newer MERGED")
         let hidden = GoalRecord(cli: "cli-m", goal: "g", state: "passato", proof: "", at: nil, title: "", proofs: nil)
         XCTAssertNil(PullRequests.byGoal(goals: [hidden], sessions: sessions)["cli-m"])
+    }
+
+    // MARK: PRTracker: only open PRs stay; a merge is news once
+
+    private func info(_ n: Int, _ state: PRState) -> PRInfo { PRInfo(ref: PRRef(repo: "o/r", number: n), title: "t\(n)", url: "u", state: state) }
+
+    func testLaunchIsABaselineNoBurst() {
+        let goals = ["g": [pr(1, "MERGED"), pr(2), pr(3), pr(4, "CLOSED")]]
+        var t = PRTracker()
+        XCTAssertEqual(t.toAsk(goals), [PRRef(repo: "o/r", number: 2), PRRef(repo: "o/r", number: 3)],
+                       "the app's MERGED is not asked again at launch")
+        // 3 merged while the app was off but the session file still says OPEN: GitHub says merged, still no event at launch.
+        let out = t.settle(goals, answers: [PRRef(repo: "o/r", number: 2): info(2, .green), PRRef(repo: "o/r", number: 3): info(3, .merged)])
+        XCTAssertEqual(out.merged, [])
+        XCTAssertEqual(out.open["g"]?.map(\.ref.number), [2], "merged and closed are not shown")
+        XCTAssertEqual(t.seen, [PRRef(repo: "o/r", number: 1), PRRef(repo: "o/r", number: 3)])
+    }
+
+    func testFreshMergeIsEmittedOnceThenDropped() {
+        var goals = ["g": [pr(2), pr(3)]]
+        var t = PRTracker(seen: [])
+        _ = t.toAsk(goals)
+        _ = t.settle(goals, answers: [PRRef(repo: "o/r", number: 2): info(2, .pending), PRRef(repo: "o/r", number: 3): info(3, .red)])  // baseline pass
+        // 2 merges: the session file says MERGED and GitHub confirms.
+        goals = ["g": [pr(2, "MERGED"), pr(3)]]
+        XCTAssertEqual(t.toAsk(goals).map(\.number), [2, 3])
+        var out = t.settle(goals, answers: [PRRef(repo: "o/r", number: 2): info(2, .merged), PRRef(repo: "o/r", number: 3): info(3, .red)])
+        XCTAssertEqual(out.merged.map(\.ref.number), [2], "news the first time")
+        XCTAssertEqual(out.open["g"]?.map(\.state), [.red])
+        XCTAssertEqual(t.toAsk(goals).map(\.number), [3], "a seen merge is not asked again")
+        out = t.settle(goals, answers: [PRRef(repo: "o/r", number: 3): info(3, .red)])
+        XCTAssertEqual(out.merged, [], "never twice")
+        // A restart remembers it from disk and, after its baseline, stays quiet.
+        var t2 = PRTracker(seen: t.seen)
+        _ = t2.toAsk(goals)
+        XCTAssertEqual(t2.settle(goals, answers: [:]).merged, [])
+        XCTAssertEqual(t2.toAsk(goals).map(\.number), [3])
+    }
+
+    func testOpenPrGoneMergedOnGitHubOnlyIsAlsoNews() {
+        var t = PRTracker(seen: [])
+        let open = ["g": [pr(7)]]
+        _ = t.toAsk(open); _ = t.settle(open, answers: [PRRef(repo: "o/r", number: 7): info(7, .green)])
+        let out = t.settle(open, answers: [PRRef(repo: "o/r", number: 7): info(7, .merged)])
+        XCTAssertEqual(out.merged.map(\.ref.number), [7], "the session file did not catch up yet; GitHub did")
+        XCTAssertNil(out.open["g"])
+    }
+
+    func testClosedUnmergedVanishesSilently() {
+        var t = PRTracker(seen: [])
+        let goals = ["g": [pr(9)]]
+        _ = t.toAsk(goals); _ = t.settle(goals, answers: [PRRef(repo: "o/r", number: 9): info(9, .green)])
+        let out = t.settle(goals, answers: [PRRef(repo: "o/r", number: 9): info(9, .closed)])
+        XCTAssertEqual(out.merged, [])
+        XCTAssertTrue(out.open.isEmpty)
+        XCTAssertTrue(t.seen.isEmpty)
     }
 
     func testBareHashNeedsASingleRepo() {

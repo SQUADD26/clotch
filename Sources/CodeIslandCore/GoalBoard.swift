@@ -26,7 +26,7 @@ public struct DesktopSession: Equatable, Sendable {
     public let isRunning: Bool    // false when the app did not write it: status then comes from activity time
     public let isArchived: Bool
     public let lastActivity: Date?
-    public var prs: [PRRef] = []  // the session's own pull requests (`prs` of the session file)
+    public var prs: [SessionPR] = []  // the session's own pull requests (`prs` of the session file)
 }
 
 /// One ~/.claude/handoff/live/<cli>.json

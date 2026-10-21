@@ -9,6 +9,15 @@ public struct PRRef: Hashable, Sendable, Comparable {
     public static func < (a: PRRef, b: PRRef) -> Bool { (a.repo, a.number) < (b.repo, b.number) }
 }
 
+/// A PR as a session file or a proof names it. `state` is the desktop app's last known state
+/// (OPEN|MERGED|CLOSED, may be stale); nil when only a proof named it.
+public struct SessionPR: Equatable, Sendable {
+    public let ref: PRRef
+    public let state: String?
+    /// MERGED and CLOSED never come back, so they outrank OPEN; a stale OPEN loses to a newer MERGED.
+    var rank: Int { ["OPEN": 1, "CLOSED": 2, "MERGED": 3][state ?? ""] ?? 0 }
+}
+
 public enum PRState: Equatable, Sendable {
     case merged, closed   // closed = closed without merge
     case green, pending, red, conflict  // open: checks passed / running / failed; cannot merge
@@ -35,19 +44,18 @@ public enum PullRequests {
         }
     }
 
-    /// The `prs` field of a session file. Tolerant: a link string, or an object with a link
-    /// (`url`/`html_url`/`prUrl`) or a `number` plus a repo (`repo`/`repository`/`nameWithOwner`); a list of either.
+    /// The `prs` field of a session file: `[{prNumber, repo, url, state OPEN|MERGED|CLOSED, …}]`.
+    /// Also tolerates a link string, or an object with only a link or a `number`; a list of either.
     /// Anything without a repo is dropped: it cannot be asked of GitHub.
-    public static func parse(_ raw: Any?) -> [PRRef] {
+    public static func parse(_ raw: Any?) -> [SessionPR] {
         switch raw {
-        case let s as String: return links(in: s)
+        case let s as String: return links(in: s).map { SessionPR(ref: $0, state: nil) }
         case let list as [Any]: return list.flatMap { parse($0) }
         case let d as [String: Any]:
-            let linked = ["url", "html_url", "prUrl"].compactMap { d[$0] as? String }.flatMap(links)
-            if !linked.isEmpty { return linked }
+            let state = (d["state"] as? String)?.uppercased()
             let repo = ["repo", "repository", "nameWithOwner"].compactMap { d[$0] as? String }.first { $0.split(separator: "/").count == 2 }
-            guard let repo, let n = d["number"] as? Int else { return [] }
-            return [PRRef(repo: repo, number: n)]
+            if let repo, let n = (d["prNumber"] ?? d["number"]) as? Int { return [SessionPR(ref: PRRef(repo: repo, number: n), state: state)] }
+            return ["url", "html_url", "prUrl"].compactMap { d[$0] as? String }.flatMap(links).map { SessionPR(ref: $0, state: state) }
         default: return []
         }
     }
@@ -69,17 +77,21 @@ public enum PullRequests {
         }
     }
 
-    /// goal cli -> its PRs, unique, sorted: the family's session `prs` (archived children too: their PRs are the merged ones)
-    /// plus PR links and `#N` in the goal's proofs.
-    public static func byGoal(goals: [GoalRecord], sessions: [DesktopSession]) -> [String: [PRRef]] {
+    /// goal cli -> its PRs, unique and sorted, the freshest known state of each: the family's session `prs`
+    /// (archived children too) plus PR links and `#N` in the goal's proofs. CLOSED ones are left out: nobody wants them.
+    public static func byGoal(goals: [GoalRecord], sessions: [DesktopSession]) -> [String: [SessionPR]] {
         let masters = GoalBoard.index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
-        var out: [String: [PRRef]] = [:]
+        var out: [String: [SessionPR]] = [:]
         for g in goals where GoalBoard.shown.contains(g.state) {
             let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
             let own = GoalBoard.family(of: master, children: children, includeArchived: true).flatMap(\.prs)
             let texts = (g.proofs ?? []).map(\.text) + [g.proof]
-            let all = Set(own + refs(inProofs: texts, sessionRefs: own)).sorted()
+            var best: [PRRef: SessionPR] = [:]
+            for p in own + refs(inProofs: texts, sessionRefs: own.map(\.ref)).map({ SessionPR(ref: $0, state: nil) }) where p.rank >= best[p.ref]?.rank ?? 0 {
+                best[p.ref] = p
+            }
+            let all = best.values.filter { $0.state != "CLOSED" }.sorted { $0.ref < $1.ref }
             if !all.isEmpty { out[g.cli] = all }
         }
         return out
