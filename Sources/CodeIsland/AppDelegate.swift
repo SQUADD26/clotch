@@ -27,6 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         GoalStore.shared.start()
         NotchNotifier.shared.start()
         AccountQuotaFeed.shared.start()
+        AccountsInUseFeed.shared.start()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present

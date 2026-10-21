@@ -1,70 +1,7 @@
 import XCTest
 @testable import CodeIslandCore
 
-/// Fixtures are real-shaped JSON strings: the register as obiettivo_registro.py writes it,
-/// desktop-app local_*.json, and handoff live/<cli>.json as live_state.py writes it.
-final class GoalBoardTests: XCTestCase {
-    private let now = GoalSources.date("2026-10-21T14:00:00+0000")!
-
-    // MARK: fixtures
-
-    private func minutesAgo(_ m: Double) -> Date { now.addingTimeInterval(-m * 60) }
-    private func ms(_ m: Double) -> Int { Int(minutesAgo(m).timeIntervalSince1970 * 1000) }
-    private func local(_ m: Double) -> String {  // live_state.now(): local time, no zone
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "en_US_POSIX")
-        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        return f.string(from: minutesAgo(m))
-    }
-
-    private func goalJSON(_ cli: String, stato: String = "aperto", prova: String = "", titolo: String = "", prove: String? = nil,
-                          t: String = "2026-10-21T13:13:52+0000") -> Data {
-        // Keys and indent as obiettivo_registro.scrivi (json.dump(ensure_ascii=False, indent=1)).
-        let extra = prove.map { ",\n \"prove\": \($0)" } ?? ""
-        return Data("""
-        {
-         "cli": "\(cli)",
-         "storia": [
-          {"obiettivo": "vecchio", "da": "roberto", "stato": "passato", "prova": "", "t": "2026-10-20T09:00:00+0200"}
-         ],
-         "obiettivo": "Fare  il\\n   dato   vivo",
-         "da": "master",
-         "stato": "\(stato)",
-         "prova": "\(prova)",
-         "t": "\(t)",
-         "titolo": "\(titolo)",
-         "visto": "ab12cd34ef"\(extra)
-        }
-        """.utf8)
-    }
-
-    private func sessionJSON(_ local: String, cli: String, parent: String? = nil, running: Bool = false, archived: Bool = false,
-                             ago: Double = 5, title: String = "") -> Data {
-        Data("""
-        {"sessionId": "\(local)", "cliSessionId": "\(cli)", "title": "\(title)", "isRunning": \(running), "isArchived": \(archived),
-         "lastActivityAt": \(ms(ago)), "cwd": "/x"\(parent.map { ", \"spawnedFrom\": \($0)" } ?? "")}
-        """.utf8)
-    }
-
-    private func g(_ cli: String, stato: String = "aperto", prova: String = "", titolo: String = "", prove: String? = nil) -> GoalRecord {
-        GoalSources.parseGoal(goalJSON(cli, stato: stato, prova: prova, titolo: titolo, prove: prove))!
-    }
-
-    private func s(_ local: String, cli: String, parent: String? = nil, running: Bool = false, archived: Bool = false,
-                   ago: Double = 5, title: String = "") -> DesktopSession {
-        GoalSources.parseSession(sessionJSON(local, cli: cli, parent: parent, running: running, archived: archived, ago: ago, title: title),
-                                 fileName: "\(local).json")!
-    }
-
-    private func liveJSON(_ agents: String, transcript: String = "", updated: Double = 1) -> Data {
-        Data("""
-        {"aggiornato": "\(local(updated))", "transcript": "\(transcript)", "cwd": "/x", "agenti": \(agents)}
-        """.utf8)
-    }
-
-    private func rows(_ goals: [GoalRecord], _ sessions: [DesktopSession] = [], _ live: [LiveState] = []) -> [GoalRow] {
-        GoalBoard.rows(goals: goals, sessions: sessions, live: live, now: now)
-    }
+final class GoalBoardTests: GoalTestCase {
 
     // MARK: parsing
 
@@ -117,124 +54,29 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertNil(GoalSources.parseSession(Data(#"{"cliSessionId":"c","scheduledTaskId":"t"}"#.utf8), fileName: "local_a.json"), "scheduled task")
     }
 
+    /// Only the board's keys are parsed; the MCP config (98 % of a real file) is skipped, brackets and
+    /// escaped quotes inside its strings included.
+    func testSessionParseSkipsBigValues() {
+        let big = #""remoteMcpServersConfig": {"a": ["x\\\"}]", {"b": "{[\\"}], "n": [1, 2.5e3, true, null]}, "#
+        let text = #"{ "title" : "T\u00e9 \"q\"", "# + big
+            + #""cliSessionId": "c1", "spawnedFrom": {"sessionId": "local_p"}, "priorRemoteCliSessionIds": ["o1"],"#
+            + #" "isRunning": true, "isArchived": false, "lastActivityAt": 1760000000000, "enabledMcpTools": {"z": [[]]}}"#
+        let viaJSON = (try? JSONSerialization.jsonObject(with: Data(text.utf8))) as? [String: Any]
+        XCTAssertNotNil(viaJSON, "the fixture is valid JSON")
+        let d = GoalSources.parseSession(Data(text.utf8), fileName: "local_x.json")
+        XCTAssertEqual(d, DesktopSession(localId: "local_x", cliId: "c1", parentLocalId: "local_p", priorCliIds: ["o1"],
+                                         title: "Té \"q\"", isRunning: true, isArchived: false,
+                                         lastActivity: Date(timeIntervalSince1970: 1_760_000_000)))
+        XCTAssertNil(GoalSources.parseSession(Data(text.utf8.dropLast(3)), fileName: "local_x.json"), "a file caught mid-write")
+        XCTAssertEqual(GoalSources.topLevel(Data(#"{"a":1,"b":[{"c":"]"}],"d":"e"}"#.utf8), keys: ["d"])?["d"] as? String, "e")
+    }
+
     func testSessionIdFallsBackToFileName() {
         let d = GoalSources.parseSession(Data(#"{"cliSessionId":"c1"}"#.utf8), fileName: "local_abc.json")
         XCTAssertEqual(d?.localId, "local_abc")
         XCTAssertNil(d?.lastActivity)
     }
 
-    /// The live folder on a real Mac holds one file per session ever run (~3500 + locks): load must read
-    /// only the open goals' families and never walk subagent trees of finished agents.
-    func testLoadStaysFastOnAHugeLiveFolder() throws {
-        let fm = FileManager.default
-        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
-        defer { try? fm.removeItem(at: home) }
-        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
-        try fm.createDirectory(at: support, withIntermediateDirectories: true)
-        let paths = GoalSources.defaultPaths(home: home)
-        try fm.createDirectory(at: paths.goals, withIntermediateDirectories: true)
-        try fm.createDirectory(at: paths.live, withIntermediateDirectories: true)
-        // One shared transcript tree with many subagent files, as an old busy session leaves behind.
-        let transcript = home.appendingPathComponent("p/old")
-        let nested = transcript.appendingPathComponent("subagents/workflows/run")
-        try fm.createDirectory(at: nested, withIntermediateDirectories: true)
-        for i in 0..<300 { try Data("x".utf8).write(to: nested.appendingPathComponent("agent-x\(i).jsonl")) }
-        let deadAgents = "{" + (0..<20).map { #""x\#($0)": {"stato": "finito", "partito": "\#(local(600))"}"# }.joined(separator: ",") + "}"
-        let dead = liveJSON(deadAgents, transcript: transcript.path + ".jsonl", updated: 600)
-        for i in 0..<3000 {
-            try dead.write(to: paths.live.appendingPathComponent("old\(i).json"))
-            try Data().write(to: paths.live.appendingPathComponent("old\(i).lock"))
-        }
-        try goalJSON("m1").write(to: paths.goals.appendingPathComponent("m1.json"))
-        try sessionJSON("local_m", cli: "m1").write(to: support.appendingPathComponent("local_m.json"))
-        try sessionJSON("local_c", cli: "c1", parent: #""local_m""#).write(to: support.appendingPathComponent("local_c.json"))
-        let alive = #"{"x7": {"stato": "vivo", "partito": "\#(local(50))"}}"#  // found only in the nested tree
-        try liveJSON(alive, transcript: transcript.path + ".jsonl", updated: 50).write(to: paths.live.appendingPathComponent("c1.json"))
-
-        let start = Date()
-        let r = GoalSources.load(paths)
-        let elapsed = Date().timeIntervalSince(start)
-        XCTAssertEqual(Set(r.live.map(\.cliId)), ["c1"], "only the goal family's live files are read")
-        XCTAssertLessThan(Date().timeIntervalSince(r.live.first?.agents.first?.lastActivity ?? .distantPast), 120,
-                          "a nested subagent transcript still counts as activity")
-        XCTAssertLessThan(elapsed, 0.5, "load took \(elapsed) s")
-    }
-
-    /// The desktop apps rewrite a few session files every minute among thousands: a reload touches only
-    /// the paths file events named, whatever their spelling (/var vs /private/var on macOS).
-    func testReloadParsesOnlyChangedFiles() throws {
-        let fm = FileManager.default
-        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
-        defer { try? fm.removeItem(at: home) }
-        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct")
-        try fm.createDirectory(at: support, withIntermediateDirectories: true)
-        let paths = GoalSources.defaultPaths(home: home)
-        try fm.createDirectory(at: paths.goals, withIntermediateDirectories: true)
-        try goalJSON("c1").write(to: paths.goals.appendingPathComponent("c1.json"))
-        let old = Date(timeIntervalSinceNow: -3600)
-        for i in 0..<2000 {
-            let url = support.appendingPathComponent("local_\(i).json")
-            try sessionJSON("local_\(i)", cli: "c\(i)").write(to: url)
-            try fm.setAttributes([.modificationDate: old], ofItemAtPath: url.path)
-        }
-        let loader = GoalLoader(paths: paths)
-        XCTAssertEqual(loader.load(changed: nil)?.sessions.count, 2000)
-        XCTAssertEqual(loader.sessions.parses, 2000)
-
-        let nine = support.appendingPathComponent("local_9.json"), ten = support.appendingPathComponent("local_10.json")
-        try sessionJSON("local_9", cli: "c9", title: "nove").write(to: nine)
-        try fm.removeItem(at: ten)
-        let outside = home.appendingPathComponent("elsewhere/local_x.json").path
-        let start = Date()
-        // FSEvents names resolved paths: on macOS /private/var/… for a /var/… temp dir.
-        let r = loader.load(changed: [nine.resolvingSymlinksInPath().path, support.resolvingSymlinksInPath().path + "/local_10.json", outside])
-        let elapsed = Date().timeIntervalSince(start)
-        XCTAssertEqual(loader.sessions.parses, 2001, "only the named changed file is parsed")
-        XCTAssertEqual(r?.sessions.count, 1999, "a named deleted file is dropped")
-        XCTAssertEqual(r?.sessions.first { $0.localId == "local_9" }?.title, "nove")
-        XCTAssertLessThan(elapsed, 0.05, "event reload took \(elapsed) s")
-
-        // Same content rewritten (only the mtime moves): parsed once, no new board.
-        try sessionJSON("local_9", cli: "c9", title: "nove").write(to: nine)
-        try fm.setAttributes([.modificationDate: Date(timeIntervalSinceNow: 5)], ofItemAtPath: nine.path)
-        XCTAssertNil(loader.load(changed: [nine.path]), "nothing the board reads changed")
-        XCTAssertEqual(loader.sessions.parses, 2002)
-        XCTAssertNil(loader.load(changed: [home.appendingPathComponent("Library/Application Support/Chrome/x").path]),
-                     "a foreign path costs nothing")
-        XCTAssertEqual(loader.sessions.parses, 2002)
-    }
-
-    func testLoadReadsFoldersAndSkipsGarbage() throws {
-        let fm = FileManager.default
-        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
-        defer { try? fm.removeItem(at: home) }
-        let none = GoalSources.defaultPaths(home: home)
-        XCTAssertTrue(GoalSources.load(none).goals.isEmpty, "missing dirs = no data, and nothing is created")
-        XCTAssertFalse(fm.fileExists(atPath: none.goals.path))
-
-        let support = home.appendingPathComponent("Library/Application Support/Claude/claude-code-sessions/acct/org")
-        let transcript = home.appendingPathComponent("p/t1")
-        try fm.createDirectory(at: support, withIntermediateDirectories: true)
-        let paths = GoalSources.defaultPaths(home: home)  // roots are discovered from what exists
-        for d in [paths.goals, paths.live, support, transcript.appendingPathComponent("subagents/deep")] {
-            try fm.createDirectory(at: d, withIntermediateDirectories: true)
-        }
-        try goalJSON("m1").write(to: paths.goals.appendingPathComponent("m1.json"))
-        try Data("{broken".utf8).write(to: paths.goals.appendingPathComponent("bad.json"))
-        try sessionJSON("local_m", cli: "m1").write(to: support.appendingPathComponent("local_m.json"))
-        try Data("nope".utf8).write(to: support.appendingPathComponent("local_bad.json"))
-        // the subagent is "vivo" since 50 min, but its transcript was written just now
-        let agents = #"{"a1": {"stato": "vivo", "partito": "\#(local(50))"}}"#
-        try liveJSON(agents, transcript: transcript.path + ".jsonl", updated: 50).write(to: paths.live.appendingPathComponent("m1.json"))
-        try Data("x".utf8).write(to: transcript.appendingPathComponent("subagents/deep/agent-a1.jsonl"))
-
-        let r = GoalSources.load(paths)
-        XCTAssertEqual(r.goals.map(\.cli), ["m1"])
-        XCTAssertEqual(r.sessions.map(\.localId), ["local_m"])
-        XCTAssertEqual(r.live.first?.agents.first?.alive, true)
-        let fresh = Date().timeIntervalSince(r.live.first?.agents.first?.lastActivity ?? .distantPast)
-        XCTAssertLessThan(fresh, 60, "subagent transcript mtime counts as activity")
-    }
 
     // MARK: visibility
 
@@ -287,6 +129,33 @@ final class GoalBoardTests: XCTestCase {
         XCTAssertEqual(r.pulses.first { $0.id == "local_gc" }?.kind, .child)
         XCTAssertEqual(r.status, .moving)
         XCTAssertEqual(r.title, "Master", "falls back to the master session title without the star")
+    }
+
+    /// The loader ships only the sessions a goal reaches: rows over them must equal rows over all.
+    func testRowsOverReachedSessionsEqualRowsOverAll() {
+        let sessions = [
+            s("local_u", cli: "u", ago: 1, title: "estranea"),
+            s("local_x", cli: "x", archived: true, ago: 3).withPrior(["old"]),
+            s("local_m", cli: "m", ago: 90, title: "★ Master").withPrior(["old"]),
+            s("local_a", cli: "a", parent: #""local_m""#, archived: true, ago: 1),       // archived link
+            s("local_gc", cli: "gc", parent: #""local_a""#, running: true, ago: 2),     // reached through it
+            s("local_n", cli: "n", parent: #""local_u""#, ago: 4),
+        ]
+        let goals = [g("old"), g("gc", stato: "bloccato", prova: "x"), g("none"), g("u", stato: "passato")]
+        let live = [LiveState(cliId: "gc", updated: minutesAgo(1), agents: [LiveAgent(id: "s", alive: true, lastActivity: minutesAgo(2))])]
+        let reach = GoalBoard.reach(goals: goals, sessions: sessions)
+        XCTAssertEqual(reach.sessions, ["local_m", "local_a", "local_gc"])
+        XCTAssertEqual(reach.live, ["old", "gc", "m", "none"], "an archived child's live file is never read")
+        let subset = sessions.filter { reach.sessions.contains($0.localId) }
+        XCTAssertEqual(rows(goals, subset, live), rows(goals, sessions, live))
+        XCTAssertEqual(rows(goals, subset, live).first { $0.id == "old" }?.pulses.map(\.id).sorted(), ["gc:s", "local_gc", "local_m"])
+    }
+
+    func testNextChangeIsWhenTimeAloneMovesARow() {
+        let live = [LiveState(cliId: "m", updated: minutesAgo(40), agents: [LiveAgent(id: "s", alive: true, lastActivity: minutesAgo(25))])]
+        let at = GoalBoard.nextChange(goals: [g("m")], sessions: [s("local_m", cli: "m", ago: 10)], live: live, now: now)
+        XCTAssertEqual(at, minutesAgo(25).addingTimeInterval(GoalBoard.stillAfter), "the subagent dies first, at 30 min of silence")
+        XCTAssertNil(GoalBoard.nextChange(goals: [], sessions: [s("local_m", cli: "m", ago: 31)], live: [], now: now))
     }
 
     func testCycleInSpawnedFromTerminates() {

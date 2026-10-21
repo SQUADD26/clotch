@@ -3,7 +3,7 @@ import Foundation
 // Pure logic for the pull requests under each goal: which PRs belong to a goal, the GitHub query
 // for all of them at once, and the state mapping. No I/O: the app's `PullRequestFeed` runs the query.
 
-public struct PRRef: Hashable, Sendable, Comparable {
+public struct PRRef: Hashable, Sendable, Comparable, Codable {
     public let repo: String  // owner/name
     public let number: Int
     public init(repo: String, number: Int) { self.repo = repo; self.number = number }
@@ -12,7 +12,7 @@ public struct PRRef: Hashable, Sendable, Comparable {
 
 /// A PR as a session file or a proof names it. `state` is the desktop app's last known state
 /// (OPEN|MERGED|CLOSED, may be stale); nil when only a proof named it.
-public struct SessionPR: Equatable, Sendable {
+public struct SessionPR: Equatable, Sendable, Codable {
     public let ref: PRRef
     public let state: String?
     /// MERGED and CLOSED never come back, so they outrank OPEN; a stale OPEN loses to a newer MERGED.
