@@ -14,6 +14,8 @@ public struct GoalRecord: Equatable, Sendable {
     public let title: String      // may start with "★ ", may be ""
     public let proofs: [GoalProof]?   // nil when the "prove" key is absent
     public var successor: String? = nil  // "a": the cli that took this goal's place
+    public var proposal: String? = nil   // "proposta.testo": a new goal proposed beside the open one, not confirmed yet
+    public var lastSeen: Date? = nil     // "ultima_attivita": the hook's sign of life at each prompt and Stop of the live session
 }
 
 /// One local_*.json of the Claude desktop app.
@@ -69,6 +71,8 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public let pulses: [GoalPulse]
     public var proposed = false   // "proposto": not accepted yet, shown quieter, never the goal chased now
     public var since: Date? = nil  // when the goal took its present text and state: the work-time counter starts here
+    public var proposal: String? = nil  // text waiting for Roberto's yes: the proposed goal, or a proposal beside the open one
+    public var closed = false  // its master session is archived or gone: kept out of the list, only counted
     public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
 }
 
@@ -108,6 +112,7 @@ public enum GoalBoard {
                     busy = true
                 }
             }
+            if let t = g.lastSeen { times.append(t) }  // follows the session that works on it, whatever its id
             let last = times.max() ?? g.at
 
             let status: GoalStatus
@@ -134,6 +139,7 @@ public enum GoalBoard {
                 proofsDone: done, proofsTotal: total,
                 progress: g.state == "raggiunto" ? 1.0 : (total == 0 ? nil : Double(done) / Double(total)),
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
+                proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
                 master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) }))
         }
         return out.sorted {
@@ -166,7 +172,7 @@ public enum GoalBoard {
     /// a silent subagent stops counting): the store recomputes then, never on a periodic tick.
     public static func nextChange(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> Date? {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
-        var times = goals.compactMap(\.at)
+        var times = goals.compactMap(\.at) + goals.compactMap(\.lastSeen)
         for s in sessions {
             if let t = s.lastActivity { times.append(t) }
             guard let l = liveByCli[s.cliId] else { continue }
@@ -205,12 +211,20 @@ public enum GoalBoard {
     public static func chased(_ rows: [GoalRow]) -> GoalRow? {
         let open = rows.filter { r in
             if case .reached = r.status { return false }
-            return !r.proposed
+            return !r.proposed && !r.closed
         }
         let pool = [open.filter { 0 < $0.proofsDone && $0.proofsDone < $0.proofsTotal },
                     open.filter { $0.proofsTotal > 0 }, open].first { !$0.isEmpty } ?? []
         return pool.max { ($0.lastActivity ?? .distantPast) < ($1.lastActivity ?? .distantPast) }
-            ?? rows.first { !$0.proposed }
+            ?? rows.first { !$0.proposed && !$0.closed }
+    }
+
+    /// The Goals tab (#20): confirmed goals of live sessions; proposals waiting for Roberto, minus the ones he
+    /// rejected (`GoalDecision.key`); and how many goals of archived or gone sessions are left out.
+    public static func tab(_ rows: [GoalRow], rejected: Set<String> = []) -> (goals: [GoalRow], toConfirm: [GoalRow], closed: Int) {
+        let live = rows.filter { !$0.closed }
+        let toConfirm = live.filter { r in r.proposal.map { !rejected.contains(GoalDecision.key(cli: r.id, text: $0)) } ?? false }
+        return (live.filter { !$0.proposed }, toConfirm, rows.count - live.count)
     }
 
     static func firstWords(_ t: String, _ n: Int = 6) -> String {
@@ -218,8 +232,9 @@ public enum GoalBoard {
         return words.prefix(n).joined(separator: " ") + (words.count > n ? "…" : "")
     }
 
-    /// Blocked, still, moving, then proposed (quiet), then reached.
+    /// Blocked, still, moving, then proposed (quiet), then reached, then goals of closed sessions.
     private static func rank(_ r: GoalRow) -> Int {
+        if r.closed { return 5 }
         if r.proposed { return 3 }
         switch r.status { case .blocked: return 0; case .still: return 1; case .moving: return 2; case .reached: return 4 }
     }

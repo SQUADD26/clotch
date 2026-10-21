@@ -134,6 +134,12 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
     /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
+    /// Proposals Roberto rejected in the notch (`GoalDecision.key`): hidden here at once, whether or not the
+    /// register took the refusal (#20). A new proposal text from the same session shows again.
+    @Published private(set) var rejected = Set(UserDefaults.standard.stringArray(forKey: GoalStore.rejectedKey) ?? [])
+    @Published private(set) var accepting: Set<String> = []
+    @Published private(set) var acceptFailed: Set<String> = []
+    private nonisolated static let rejectedKey = "goalnotch.rejectedProposals"
 
     private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
     private var snapshot: GoalDiskData = ([], [], [], [])
@@ -167,6 +173,47 @@ private final class GoalWatcher: @unchecked Sendable {
         let prs = PullRequests.byGoal(goals: snap.goals, sessions: snap.sessions)
         if prs != goalPRs { goalPRs = prs; PullRequestFeed.shared.track(prs) }
         refresh()
+    }
+
+    func reject(_ row: GoalRow) {
+        guard let text = row.proposal else { return }
+        rejected.insert(GoalDecision.key(cli: row.id, text: text))
+        UserDefaults.standard.set(rejected.sorted(), forKey: Self.rejectedKey)
+        if let args = GoalDecision.rejectArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path) {
+            Task.detached { _ = Self.python(args) }
+        }
+    }
+
+    /// Roberto's «sì» from the notch: `obiettivo-guard.py conferma`, off the main thread. On success the watcher
+    /// sees the register change and the goal moves among the confirmed ones.
+    func accept(_ row: GoalRow) {
+        guard let args = GoalDecision.acceptArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path),
+              accepting.insert(row.id).inserted else { return }
+        acceptFailed.remove(row.id)
+        Task.detached {
+            let ok = Self.python(args)
+            await MainActor.run {
+                self.accepting.remove(row.id)
+                if !ok { self.acceptFailed.insert(row.id) }
+            }
+        }
+    }
+
+    private nonisolated static func python(_ args: [String]) -> Bool {
+        guard let py = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
+            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return false }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: py)
+        process.arguments = args
+        var env = ProcessInfo.processInfo.environment
+        env["CLAUDE_CODE_SESSION_ID"] = nil  // Roberto, not a master: with it the command refuses (exit 3)
+        process.environment = env
+        process.standardInput = FileHandle.nullDevice  // a mode obiettivo-guard.py does not know yet reads stdin as a hook
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return false }
+        process.waitUntilExit()
+        return process.terminationStatus == 0
     }
 
     func takenAnimationShown(_ id: String) {
