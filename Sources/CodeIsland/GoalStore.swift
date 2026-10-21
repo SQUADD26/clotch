@@ -105,6 +105,11 @@ private final class GoalWatcher: @unchecked Sendable {
     @Published private(set) var usage: [AccountUsage] = []
     /// Newest first; empty until the Overseer writes ~/.claude/richieste.
     @Published private(set) var requests: [UserRequest] = []
+    /// Requests that just went nuova -> presa/fatta, oldest first. The view plays «presa in carico» once
+    /// for each, then calls `takenAnimationShown(id)`; a shown id never comes back while the app runs.
+    @Published private(set) var takenToAnimate: [String] = []
+    private var takenShown: Set<String> = []
+    private var requestsLoaded = false
     /// Refreshed on every reload and every 30 s tick; views compute "since …" against this.
     @Published private(set) var now: Date = Date()
 
@@ -136,8 +141,17 @@ private final class GoalWatcher: @unchecked Sendable {
     private func apply(_ snap: GoalDiskData) {
         snapshot = snap
         if snap.usage != usage { usage = snap.usage }
+        let fresh = UserRequest.newlyTaken(before: requestsLoaded ? requests : nil, after: snap.requests,
+                                           shown: takenShown.union(takenToAnimate))
+        requestsLoaded = true
+        if !fresh.isEmpty { takenToAnimate += fresh }
         if snap.requests != requests { requests = snap.requests }
         refresh()
+    }
+
+    func takenAnimationShown(_ id: String) {
+        takenShown.insert(id)
+        takenToAnimate.removeAll { $0 == id }
     }
 
     private func refresh() {

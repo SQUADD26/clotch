@@ -65,19 +65,52 @@ final class NotchFeedsTests: XCTestCase {
 
     // MARK: requests
 
-    func testParseRequest() {
+    func testParseRequestAsRichiestePyWritesIt() {
+        // richieste.aggiungi + cambia(PRESA): epoch seconds, extra fields the notch ignores.
         let r = GoalSources.parseRequest(data("""
-        {"id": "r1", "t": "2026-10-21T13:00:00+0300", "sessione": "local_m", "titolo_sessione": "★ Notch: goal",
-         "testo": "Fai  la\\nbarra", "stato": "presa", "t_presa": "2026-10-21T13:05:00+0300", "presa_da": "local_c", "t_fatta": null}
+        {
+         "id": "Q-1a2b3c4d", "t": 1792588432.25, "data": "2026-10-21T13:13:52+00:00", "sessione": "cli-m",
+         "titolo_sessione": "★ Notch: goal", "testo": "Fai  la\\nbarra", "originale": "fai la barra del notch, grazie",
+         "cartella": "/Users/r/goal-notch", "stato": "presa", "t_presa": 1792588500, "presa_da": "Notch: goal",
+         "t_fatta": null, "prova": "", "non_nostra": false, "aggiornato": 1792588500, "futuro": {"x": 1}
+        }
         """))!
+        XCTAssertEqual(r.id, "Q-1a2b3c4d")
+        XCTAssertEqual(r.at, Date(timeIntervalSince1970: 1_792_588_432.25))
         XCTAssertEqual(r.sessionTitle, "Notch: goal")
         XCTAssertEqual(r.text, "Fai la barra")
+        XCTAssertEqual(r.original, "fai la barra del notch, grazie")
+        XCTAssertEqual(r.folder, "/Users/r/goal-notch")
         XCTAssertTrue(r.taken)
-        XCTAssertEqual(r.takenBy, "local_c")
-        XCTAssertNotNil(r.takenAt)
+        XCTAssertEqual(r.takenBy, "Notch: goal")
+        XCTAssertEqual(r.takenAt, Date(timeIntervalSince1970: 1_792_588_500))
         XCTAssertNil(r.doneAt)
-        XCTAssertFalse(GoalSources.parseRequest(data(#"{"id": "r2", "testo": "x"}"#))!.taken, "no stato = nuova")
+
+        let done = GoalSources.parseRequest(data("""
+        {"id": "Q-2", "t": "2026-10-21T13:00:00+0300", "testo": "x", "stato": "fatta", "t_fatta": "2026-10-21T13:05:00Z",
+         "prova": "non nostra", "non_nostra": true}
+        """))!
+        XCTAssertTrue(done.taken && done.notOurs)
+        XCTAssertEqual(done.proof, "non nostra")
+        XCTAssertNotNil(done.at)
+        XCTAssertNotNil(done.doneAt)
+        let bare = GoalSources.parseRequest(data(#"{"id": "Q-3", "testo": "x"}"#))!
+        XCTAssertFalse(bare.taken, "no stato = nuova")
+        XCTAssertEqual(bare.original, "x")
         XCTAssertNil(GoalSources.parseRequest(data(#"{"testo": "no id"}"#)))
+    }
+
+    func testNewlyTakenFiresOncePerRequest() {
+        func req(_ id: String, _ stato: String) -> UserRequest {
+            GoalSources.parseRequest(data(#"{"id": "\#(id)", "testo": "x", "stato": "\#(stato)"}"#))!
+        }
+        let first = [req("a", "nuova"), req("old", "presa")]
+        XCTAssertEqual(UserRequest.newlyTaken(before: nil, after: first, shown: []), [], "launch is the baseline")
+        let second = [req("a", "presa"), req("old", "presa"), req("b", "nuova"), req("fast", "presa"), req("c", "fatta")]
+        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: []), ["a", "fast", "c"],
+                       "nuova -> presa, born and taken between loads, straight to fatta")
+        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: ["a"]), ["fast", "c"], "a shown id never repeats")
+        XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
     }
 
     // MARK: folders
@@ -97,9 +130,11 @@ final class NotchFeedsTests: XCTestCase {
         try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-a.json"))
         try data(usage).write(to: paths.usage.appendingPathComponent("uso-acct-a.json.12345"))
         try data(usage).write(to: paths.usage.appendingPathComponent("limits-acct-a.json"))
-        try data(#"{"id": "old", "t": "2026-10-21T10:00:00+0000", "testo": "a"}"#).write(to: paths.requests.appendingPathComponent("old.json"))
+        try data(#"{"id": "old", "t": 1792580000, "testo": "a"}"#).write(to: paths.requests.appendingPathComponent("old.json"))
         try data(#"{"id": "new", "t": "2026-10-21T12:00:00+0000", "testo": "b"}"#).write(to: paths.requests.appendingPathComponent("new.json"))
         try data("{broken").write(to: paths.requests.appendingPathComponent("bad.json"))
+        try data(#"{"id": "tmp", "testo": "c"}"#).write(to: paths.requests.appendingPathComponent("tmp.json.tmp"))
+        try data("errore").write(to: paths.requests.appendingPathComponent("errori.log"))
 
         let r = GoalSources.load(paths)
         XCTAssertEqual(r.usage.map(\.id), ["a", "b"])
