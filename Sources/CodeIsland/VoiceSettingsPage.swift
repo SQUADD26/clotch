@@ -1,7 +1,8 @@
 import SwiftUI
 import CodeIslandCore
 
-/// «Voce» (#38, #50): Clotch's voice: ElevenLabs key, on/off, voice, speed, daily limits, Haiku's instructions, a test.
+/// «Voce» (#38, #50, #57): Clotch's voice: on/off, «Parla per», «Avvisami quando…», ElevenLabs key, voice, speed,
+/// daily limits, Haiku's instructions, a test.
 /// Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`; the text is Italian like the rest of Clotch's own pages.
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
@@ -9,6 +10,8 @@ struct VoiceSettingsPage: View {
     @State private var isOn = true
     @State private var hasKey = false
     @State private var newKey = ""
+    @State private var hasJevKey = false
+    @State private var newJevKey = ""
     @State private var voiceId = ""
     @State private var model = VoiceFiles.defaultModel
     @State private var speed = VoiceFiles.defaultSpeed
@@ -25,7 +28,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         Form {
             Section {
-                Text("A fine turno Claude ti dice a voce cosa ha fatto. Prima un aiutante Claude Haiku riscrive la risposta in una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
+                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima un aiutante Claude Haiku scrive una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -58,6 +61,8 @@ struct VoiceSettingsPage: View {
                 Text("Principali: quelle aperte da te, non da un'altra sessione.")
             }
 
+            VoiceAlertsSection(sessions: sessions, note: $note)
+
             Section {
                 LabeledContent("Stato") {
                     Text(hasKey ? "Chiave salvata" : "Manca la chiave")
@@ -77,6 +82,26 @@ struct VoiceSettingsPage: View {
                 Text("Chiave ElevenLabs")
             } footer: {
                 Text("Creala su elevenlabs.io, in Developers › API Keys. Resta solo su questo Mac.")
+            }
+
+            Section {
+                LabeledContent("Stato") {
+                    Text(hasJevKey ? "Chiave salvata" : "Manca la chiave")
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    SecureField("Incolla chiave", text: $newJevKey)
+                    Button("Salva") {
+                        run("Chiave non salvata", done: "Chiave salvata") { try files.saveJevKey(newJevKey) }
+                        newJevKey = ""
+                        hasJevKey = files.hasJevKey
+                    }
+                    .disabled(newJevKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            } header: {
+                Text("Chiave Jev")
+            } footer: {
+                Text("Prima di parlare, la voce chiede a Jev se la novità ti serve. Resta solo su questo Mac.")
             }
 
             Section {
@@ -143,6 +168,7 @@ struct VoiceSettingsPage: View {
     private func load() {
         isOn = files.isOn
         hasKey = files.hasKey
+        hasJevKey = files.hasJevKey
         prompt = files.prompt
         guard let config = try? files.readConfig() else { configBroken = true; return }
         voiceId = config["voice_id"] as? String ?? ""
