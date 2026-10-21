@@ -3,8 +3,12 @@ import XCTest
 
 /// clotch#114: the engine's state of a session reaches the notch: parsing, colour per phase, timer, order.
 final class SessionMotorTests: GoalTestCase {
-    func motor(_ phase: String, why: String = "", since: Double = 12, cli: String = "m") -> SessionMotor {
-        GoalSources.parseMotor(Data(#"{"stato": "\#(phase)", "perche": "\#(why)", "da": "\#(local(since))"}"#.utf8), cli: cli)!
+    /// A state file as claude-config's stato_sessione.py writes it (contract of #1924).
+    func motor(_ phase: String, why: String = "", since: Double = 12, cli: String = "m", localId: String = "", seen: Double = 1, what: String = "") -> SessionMotor {
+        GoalSources.parseMotor(Data("""
+        {"cli": "\(cli)", "local_id": "\(localId)", "stato": "\(phase)", "perche": "\(why)", "da": "\(local(since))",
+         "visto": "\(local(seen))", "titolo": "", "domande": [], "cosa": "\(what)", "muove": "", "errori": 0}
+        """.utf8), cli: cli)!
     }
 
     func row(_ m: SessionMotor?, stato: String = "aperto", ago: Double = 5) -> GoalRow {
@@ -31,6 +35,15 @@ final class SessionMotorTests: GoalTestCase {
         XCTAssertEqual(m.why, "il test fallisce")
         XCTAssertEqual(m.since?.timeIntervalSince(minutesAgo(30)) ?? 99, 0, accuracy: 1)
         XCTAssertEqual(m.cli, "m")
+    }
+
+    func testParseReadsTheRestOfTheContract() {
+        let m = motor("aspetta_altro", why: "Aspetta 2 cose in background", cli: "c1", localId: "local_x", seen: 3, what: "la CI; il deploy")
+        XCTAssertEqual(m.what, "la CI; il deploy")
+        XCTAssertEqual(m.localId, "local_x")
+        XCTAssertEqual(m.seen?.timeIntervalSince(minutesAgo(3)) ?? 99, 0, accuracy: 1)
+        XCTAssertEqual(GoalSources.parseMotor(Data(#"{"cli": "from-file", "stato": "ferma"}"#.utf8), cli: "name")?.cli, "from-file")
+        XCTAssertEqual(GoalSources.parseMotor(Data(#"{"stato": "ferma"}"#.utf8), cli: "name")?.cli, "name", "no cli inside: the file name")
     }
 
     func testParseNeedsAKnownPhase() {
@@ -89,6 +102,15 @@ final class SessionMotorTests: GoalTestCase {
         XCTAssertEqual(r[0].phase, .aspettaRoberto)
     }
 
+    func testEngineFileIsFoundByTheClaudeAppIdAndTheNewestWins() {
+        let master = s("local_m", cli: "new").withPrior(["older"])
+        let old = motor("problema", cli: "older", localId: "local_m", seen: 90)
+        let fresh = motor("aspetta_roberto", cli: "newer", localId: "local_m", seen: 2)
+        let other = motor("lavora", cli: "x", localId: "local_other", seen: 1)
+        let r = GoalBoard.rows(goals: [g("older")], sessions: [master], live: [], motor: [old, other, fresh], now: now)
+        XCTAssertEqual(r[0].motor?.cli, "newer", "after a /clear two files name one session; the latest sign of life wins")
+    }
+
     func testTimerCountsTimeInTheStateAndKeepsRunningWhileWaiting() {
         let r = row(motor("aspetta_roberto", since: 12), ago: 180)
         XCTAssertEqual(try XCTUnwrap(r.clockStart).timeIntervalSince(minutesAgo(12)), 0, accuracy: 1, "from entering the state, not from the goal's start")
@@ -126,6 +148,7 @@ final class SessionMotorTests: GoalTestCase {
         try Data(#"{"stato": "aspetta_roberto", "perche": "scegli A o B", "da": "2026-10-21T13:00:00+0000"}"#.utf8).write(to: file)
         let loader = GoalLoader(paths: paths)
         XCTAssertEqual(loader.load(changed: nil)?.motor.map(\.phase), [.aspettaRoberto])
+        XCTAssertTrue(paths.states.path.hasSuffix(".claude/sessioni-stato"))
 
         try Data(#"{"stato": "lavora", "da": "2026-10-21T13:30:00+0000"}"#.utf8).write(to: file)
         try fm.setAttributes([.modificationDate: Date(timeIntervalSinceNow: 5)], ofItemAtPath: file.path)

@@ -112,7 +112,6 @@ public enum GoalBoard {
         let masters = index(sessions)
         let children = Dictionary(grouping: sessions.filter { $0.parentLocalId != nil }, by: { $0.parentLocalId! })
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
-        let motorByCli = Dictionary(motor.map { ($0.cli, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
         for g in goals where shown.contains(g.state) {
@@ -169,7 +168,7 @@ public enum GoalBoard {
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
                 proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
                 master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) },
-                motor: motorByCli[g.cli] ?? master.flatMap { motorByCli[$0.cliId] }))
+                motor: engineState(of: g.cli, master: master, in: motor)))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
@@ -177,6 +176,13 @@ public enum GoalBoard {
             if $0.lastActivity != $1.lastActivity { return ($0.lastActivity ?? .distantPast) > ($1.lastActivity ?? .distantPast) }
             return $0.id < $1.id
         }
+    }
+
+    /// The engine's file for a goal's master: by the goal's cli, the master's current cli, or its Claude app id
+    /// (a /clear leaves the old file beside the new one); the one with the latest sign of life wins.
+    static func engineState(of cli: String, master: DesktopSession?, in motor: [SessionMotor]) -> SessionMotor? {
+        motor.filter { $0.cli == cli || $0.cli == master?.cliId || (!$0.localId.isEmpty && $0.localId == master?.localId) }
+            .max { ($0.seen ?? .distantPast) < ($1.seen ?? .distantPast) }
     }
 
     /// What a shown goal can read. `sessions`: the local ids of every master and descendant, archived links

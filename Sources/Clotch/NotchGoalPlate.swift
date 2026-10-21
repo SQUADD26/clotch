@@ -76,7 +76,7 @@ struct GoalPage: View {
                     StatusPill(text: row.statusLabel, color: row.ink)
                 }
                 .opensSession(row.master)
-                .help(row.reason(now: now) ?? row.statusLabel)
+                .help(row.detail(now: now))
             }
             HStack(alignment: .center, spacing: NotchSpace.section) {
                 VStack(alignment: .leading, spacing: 6) {

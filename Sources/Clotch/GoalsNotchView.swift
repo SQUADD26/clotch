@@ -46,6 +46,12 @@ extension GoalRow {
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
     var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
+    /// The mouse-over text: the reason, and for a session waiting on something else what it waits for.
+    func detail(now: Date) -> String {
+        let parts = [reason(now: now), phase == .aspettaAltro ? motor?.what : nil].compactMap { $0 }.filter { !$0.isEmpty }
+        return parts.isEmpty ? statusLabel : parts.joined(separator: ": ")
+    }
+
     /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
         switch status {
@@ -53,7 +59,7 @@ extension GoalRow {
             return nil
         case .moving, .still:
             // The engine's reason (what it waits for, what went wrong) beats a guess from silence.
-            if let why = motor?.why, !why.isEmpty, phase != .lavora { return why }
+            if let motor, !motor.why.isEmpty, phase != .lavora { return motor.why }
             if motor == nil, case .still(let since) = status { return "Fermo da " + Self.elapsed(from: since, to: now) }
             return nil
         case .blocked(let reason):

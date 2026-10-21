@@ -69,7 +69,7 @@ public enum GoalSources {
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
                      requests: home.appendingPathComponent(".claude/richieste"),
-                     states: home.appendingPathComponent(".claude/handoff/stato"))
+                     states: home.appendingPathComponent(".claude/sessioni-stato"))
     }
 
     /// One full read (launch of `--snapshot`, tests). The app's watcher keeps one `GoalLoader` instead.

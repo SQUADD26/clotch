@@ -41,6 +41,21 @@ final class SessionPhaseIndicatorTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(c).greenComponent, 159 / 255, accuracy: 0.01)
     }
 
+    func testWordsAndMouseOverTextPerPhase() {
+        func row(_ phase: SessionPhase, why: String = "", what: String = "") -> GoalRow {
+            GoalRow(id: "m", title: "t", goal: "g", proofsDone: 0, proofsTotal: 0, progress: nil, status: .moving, lastActivity: nil,
+                    pulses: [], motor: SessionMotor(cli: "m", phase: phase, why: why, what: what))
+        }
+        let now = Date()
+        XCTAssertEqual(row(.lavora).statusLabel, "In lavorazione")
+        XCTAssertEqual(row(.aspettaRoberto, why: "Ti chiede: A o B?").detail(now: now), "Ti chiede: A o B?")
+        XCTAssertEqual(row(.aspettaAltro, why: "Aspetta 1 cosa in background", what: "la CI").detail(now: now),
+                       "Aspetta 1 cosa in background: la CI", "waiting on something else: what, on mouse-over")
+        XCTAssertEqual(row(.problema, why: "Si è fermata per un errore: 529").reason(now: now), "Si è fermata per un errore: 529")
+        XCTAssertEqual(row(.ferma).detail(now: now), "Ferma")
+        XCTAssertEqual(Color(SessionPhase.problema.rgb), GoalTone.stop.color, "the red is the notch's red")
+    }
+
     func testPulseStopsOnceRobertoOpensTheSession() {
         let since = Date(timeIntervalSinceNow: -600)
         let row = GoalRow(id: "m", title: "t", goal: "g", proofsDone: 0, proofsTotal: 0, progress: nil, status: .moving,

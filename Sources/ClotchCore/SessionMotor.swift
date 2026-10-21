@@ -54,18 +54,30 @@ public struct RGB: Equatable, Sendable {
 /// One state file: what the session does now, why, and since when.
 public struct SessionMotor: Equatable, Sendable {
     public let cli: String
+    /// The Claude app's session id, when the hook knew it: it survives a /clear, the cli id does not.
+    public let localId: String
     public let phase: SessionPhase
-    /// «perche»: for `problema` what went wrong, for `aspetta_altro` what it waits for. May be empty.
+    /// «perche»: one plain sentence, the same the notch shows (what went wrong, what is asked). May be empty.
     public let why: String
     /// When the session entered this state: the timer counts from here.
     public let since: Date?
+    /// «cosa»: for `aspetta_altro`, what it waits for, in short.
+    public let what: String
+    /// «visto»: the session's last sign of life; the newest file wins when a /clear left two for one session.
+    public let seen: Date?
+
+    public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil) {
+        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen) = (cli, localId, phase, why, since, what, seen)
+    }
 }
 
 extension GoalSources {
     /// nil for a file with no known `stato`: the row then falls back to what its activity says.
     public static func parseMotor(_ data: Data, cli: String) -> SessionMotor? {
         guard let d = object(data), let raw = d["stato"] as? String, let phase = SessionPhase(contract: raw) else { return nil }
-        let why = (d["perche"] as? String ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ")
-        return SessionMotor(cli: cli, phase: phase, why: why, since: date(d["da"]))
+        func line(_ key: String) -> String { (d[key] as? String ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ") }
+        let file = (d["cli"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? cli
+        return SessionMotor(cli: file, localId: line("local_id"), phase: phase, why: line("perche"), since: date(d["da"]),
+                            what: line("cosa"), seen: date(d["visto"]))
     }
 }
