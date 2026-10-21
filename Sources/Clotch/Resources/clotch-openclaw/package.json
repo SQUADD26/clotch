@@ -1,0 +1,10 @@
+{
+  "name": "clotch",
+  "version": "1.0.0",
+  "description": "Clotch bridge plugin for OpenClaw",
+  "private": true,
+  "type": "module",
+  "openclaw": {
+    "extensions": ["./index.ts"]
+  }
+}

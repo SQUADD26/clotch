@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Runs the CodeIslandCore tests without macOS: a throwaway SwiftPM package under
+# Runs the ClotchCore tests without macOS: a throwaway SwiftPM package under
 # .build/goals-linux that symlinks the Core sources and tests Linux can build.
 set -euo pipefail
 bash "$(dirname "$0")/check-hover.sh"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"
 rm -rf "$pkg"
-mkdir -p "$pkg/Sources/CodeIslandCore" "$pkg/Tests/CodeIslandCoreTests"
+mkdir -p "$pkg/Sources/ClotchCore" "$pkg/Tests/ClotchCoreTests"
 # Every Core source and test Linux can build, chosen by rule (scripts/linux-buildable.py): a new Core
 # file joins by itself.
 python3 "$root/scripts/linux-buildable.py" "$root" | while read -r f; do
@@ -18,8 +18,8 @@ import PackageDescription
 let package = Package(
     name: "GoalsLinux",
     targets: [
-        .target(name: "CodeIslandCore", path: "Sources/CodeIslandCore"),
-        .testTarget(name: "CodeIslandCoreTests", dependencies: ["CodeIslandCore"], path: "Tests/CodeIslandCoreTests"),
+        .target(name: "ClotchCore", path: "Sources/ClotchCore"),
+        .testTarget(name: "ClotchCoreTests", dependencies: ["ClotchCore"], path: "Tests/ClotchCoreTests"),
     ]
 )
 EOF
