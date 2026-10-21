@@ -1,8 +1,8 @@
 import SwiftUI
 import CodeIslandCore
 
-/// «Voce» (#38): set up Roberto's voice (Clean View): ElevenLabs key, on/off, voice, speed, daily limits, Haiku's
-/// instructions, a test. Files and rules live in `VoiceFiles`; the text is Italian like the rest of Clotch's own pages.
+/// «Voce» (#38, #50): Clotch's voice: ElevenLabs key, on/off, voice, speed, daily limits, Haiku's instructions, a test.
+/// Files and rules live in `VoiceFiles`, the speaking in `VoiceSpeaker`; the text is Italian like the rest of Clotch's own pages.
 struct VoiceSettingsPage: View {
     private let files = VoiceFiles()
 
@@ -22,13 +22,14 @@ struct VoiceSettingsPage: View {
     var body: some View {
         Form {
             Section {
-                Text("L'Overseer ti dice a voce cosa è successo. Prima un aiutante Claude Haiku riscrive il messaggio in una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
+                Text("A fine turno Claude ti dice a voce cosa ha fatto. Prima un aiutante Claude Haiku riscrive la risposta in una frase breve, con le istruzioni qui sotto. Poi ElevenLabs la legge con la voce scelta.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Toggle("Voce accesa", isOn: Binding(get: { isOn }, set: { on in
                     run("Voce non salvata") { try files.setOn(on) }
                     isOn = files.isOn
+                    VoiceSpeaker.shared.refresh()
                 }))
             }
 
@@ -43,6 +44,7 @@ struct VoiceSettingsPage: View {
                         run("Chiave non salvata", done: "Chiave salvata") { try files.saveKey(newKey) }
                         newKey = ""
                         hasKey = files.hasKey
+                        VoiceSpeaker.shared.refresh()
                     }
                     .disabled(newKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -53,7 +55,7 @@ struct VoiceSettingsPage: View {
             }
 
             Section {
-                TextField("ID voce", text: $voiceId, prompt: Text("Copia da ElevenLabs › Voices"))
+                TextField("ID voce", text: $voiceId, prompt: Text("Lascia vuoto per la voce di serie"))
                 TextField("Modello", text: $model)
                 LabeledContent("Velocità") {
                     HStack {
@@ -135,35 +137,13 @@ struct VoiceSettingsPage: View {
         do { try write(); note = done } catch { note = "\(failure). Riprova." }
     }
 
-    /// `voce prova` with the values on screen: save first, then the command speaks one sentence (even with the voice off).
+    /// Saves the values on screen, then says one fixed sentence with them (even with the voice off).
     private func test() {
         if !configBroken { saveConfig() }
         testing = true
-        let command = files.command.path
         Task {
-            note = await Self.prova(command)
+            note = await VoiceSpeaker.shared.test()
             testing = false
         }
-    }
-
-    /// The last line `voce prova` prints («detta: …» or what is missing), off the main thread.
-    private nonisolated static func prova(_ command: String) async -> String {
-        guard FileManager.default.fileExists(atPath: command) else {
-            return "Comando della voce non trovato. Installa la voce di Clean View."
-        }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/bash")
-        process.arguments = [command, "prova"]
-        var env = ProcessInfo.processInfo.environment
-        // ffmpeg (speed above 1.2) lives in Homebrew, which a Dock-launched app does not have in PATH.
-        env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
-        process.environment = env
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = pipe
-        guard (try? process.run()) != nil else { return "Prova non riuscita. Riprova." }
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        return String(decoding: data, as: UTF8.self).split(separator: "\n").last.map(String.init) ?? ""
     }
 }
