@@ -84,10 +84,12 @@ struct GoalPRList: View {
         let rows = open.sorted { $0.ref.number > $1.ref.number } + merged
         VStack(alignment: .leading, spacing: 0) {
             if !rows.isEmpty {
+                Rectangle().fill(Color.white.opacity(0.1)).frame(height: 0.5)  // the rule under the goal's summary (Figma A3)
+                    .padding(.horizontal, NotchSpace.row).padding(.bottom, NotchSpace.row)
                 Label("Pull request", systemImage: "arrow.triangle.branch")
                     .font(NotchType.secondary)
                     .foregroundStyle(GoalInk.secondary)
-                    .padding(.bottom, NotchSpace.tight)
+                    .padding(.horizontal, NotchSpace.row).padding(.bottom, NotchSpace.tight)
                 ForEach(rows, id: \.ref) { info in
                     GoalPRRow(info: info)
                         .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96, anchor: .leading)))

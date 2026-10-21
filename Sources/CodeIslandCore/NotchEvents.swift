@@ -4,17 +4,20 @@ import Foundation
 // charge come from GoalStore.takenToAnimate. Pure: the caller keeps the previous load and passes both.
 
 public struct NotchEvent: Identifiable, Equatable, Sendable {
-    public enum Kind: Equatable, Sendable { case proofDone, still, blocked, reached, requestTaken }
+    public enum Kind: Equatable, Sendable { case proofDone, still, blocked, reached, requestTaken, prMerged }
     public let kind: Kind
     /// Goal id (`GoalRow.id`) or request id (`UserRequest.id`): the view reads the live data from it.
     public let subject: String
-    /// Proofs done when the event fired, so two proofs in a row are two events.
+    /// Proofs done when the event fired, so two proofs in a row are two events; the PR number for `prMerged`.
     public let count: Int
+    /// What the line says when no live data names it: the PR title for `prMerged`.
+    public let text: String
 
-    public init(kind: Kind, subject: String, count: Int) {
+    public init(kind: Kind, subject: String, count: Int, text: String = "") {
         self.kind = kind
         self.subject = subject
         self.count = count
+        self.text = text
     }
 
     public var id: String { "\(kind)-\(subject)-\(count)" }

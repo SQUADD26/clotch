@@ -1,137 +1,111 @@
 import SwiftUI
 import CodeIslandCore
 
-/// One notification under the closed notch. A glass drop falls out of the notch (arrive), splits into
-/// the symbol and a text plate (reveal), then the change lands (settle): the request is struck through
-/// by a drawn line, or the goal's bar fills to its new proof count, and the symbol turns into the result.
+/// One notification: a line under the closed notch. It arrives in its old state, the change lands
+/// (the request is struck through and turns green, the goal's ring fills, the PR turns «Unita»), then the
+/// line folds back into the notch and only the result symbol stays a moment (`ResultMark`).
 struct NotchNotificationView: View {
     let event: NotchEvent
     let phase: NotePhase
     let rows: [GoalRow]
     let requests: [UserRequest]
-    @Namespace private var glass
 
     var body: some View {
         if let note = Note(event: event, rows: rows, requests: requests) {
-            // 8 pt in from the island's 24 pt corners: 16 pt plates, concentric. The symbol drop is a
-            // circle as tall as the plate, so the two read as one shape splitting in two.
-            GlassGroup(spacing: NotchSpace.inset) {
-                HStack(spacing: NotchSpace.inset) {
-                    Image(systemName: phase >= .settle ? note.symbol : note.startSymbol)
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(note.color)
-                        .contentTransition(.symbolEffect(.replace))
-                        .frame(width: 48, height: 48)
-                        .glassPlate(radius: 24, tint: note.color.opacity(0.28))
-                        .glassID("symbol", in: glass)
-                    if phase >= .reveal {
-                        plate(note)
-                            .glassID("plate", in: glass)
-                            .transition(.opacity.combined(with: .scale(scale: 0.5, anchor: .leading)))
+            let done = phase >= .settle
+            HStack(spacing: 10) {
+                Group {
+                    if let row = note.row {
+                        GoalRing(progress: done ? row.progress : note.before, color: row.ink, size: 15, line: 2.5)
+                    } else {
+                        Image(systemName: done ? note.symbol : note.startSymbol)
+                            .font(.system(size: 15))
+                            .foregroundStyle(done ? note.color : GoalInk.secondary)
+                            .contentTransition(.symbolEffect(.replace))
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: phase >= .reveal ? .leading : .center)
+                .frame(width: 16)
+                Text(note.text)
+                    .font(NotchType.bodyEmphasis)
+                    .strikethrough(done && note.strikes, color: GoalInk.secondary)
+                    .foregroundStyle(done && note.strikes ? GoalInk.secondary : GoalInk.primary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(done ? note.label : note.startLabel)
+                    .font(NotchType.caption)
+                    .foregroundStyle(done ? note.color : GoalInk.secondary)
+                    .contentTransition(.interpolate)
             }
-            .padding([.horizontal, .bottom], NotchSpace.inset)
+            .padding(.horizontal, 18)
+            .frame(height: 36)
+            .padding(.bottom, 4)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(note.title + ". " + note.subtitle)
+            .accessibilityLabel(note.text + ". " + note.label)
         }
-    }
-
-    private func plate(_ note: Note) -> some View {
-        VStack(alignment: .leading, spacing: NotchSpace.tight) {
-            Text(note.title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(GoalInk.primary)
-            if let row = note.row {
-                HStack(spacing: NotchSpace.row) {
-                    Text(note.subtitle)
-                        .font(NotchType.secondary)
-                        .foregroundStyle(GoalInk.secondary)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    GoalBar(progress: phase >= .settle ? row.progress : note.before, tone: row.tone, height: 5)
-                        .frame(width: 64)
-                    if let proofs = row.proofsText {
-                        Text(proofs)
-                            .font(NotchType.numbers)
-                            .foregroundStyle(GoalInk.primary)
-                            .fixedSize()
-                    }
-                }
-            } else {
-                StruckText(text: note.subtitle, drawn: phase >= .settle)
-            }
-        }
-        .padding(.horizontal, NotchSpace.plate)
-        .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
-        .glassPlate(radius: NotchSpace.radius)
     }
 }
 
-/// The request text with a line drawn across it, left to right, once it is taken in charge.
-private struct StruckText: View {
-    let text: String
-    let drawn: Bool
+/// The result symbol left in the closed notch while the line folds away.
+struct ResultMark: View {
+    let event: NotchEvent
+    let rows: [GoalRow]
 
     var body: some View {
-        Text(text)
-            .font(NotchType.secondary.weight(.medium))
-            .foregroundStyle(drawn ? GoalInk.secondary : GoalInk.primary)
-            .lineLimit(1)
-            .overlay {
-                GeometryReader { geo in
-                    Capsule()
-                        .fill(Color.white.opacity(0.85))
-                        .frame(width: drawn ? geo.size.width : 0, height: 1.5)
-                        .offset(y: geo.size.height / 2 - 0.75)
-                }
-            }
+        let color = event.kind == .prMerged ? NoteColor.merged
+            : rows.first { $0.id == event.subject }.map(\.ink) ?? GoalTone.go.color
+        Image(systemName: event.kind == .prMerged ? "arrow.triangle.merge" : "checkmark.circle.fill")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(color)
     }
+}
+
+enum NoteColor {
+    /// GitHub's merged purple, lifted for black.
+    static let merged = Color(red: 191 / 255, green: 90 / 255, blue: 242 / 255)
 }
 
 /// What a notification says, read from the live data at display time.
 private struct Note {
-    let title: String
-    let subtitle: String
+    let text: String
+    let startLabel: String
+    let label: String
     let startSymbol: String
     let symbol: String
     let color: Color
+    let strikes: Bool
     let row: GoalRow?
     let before: Double?
 
     init?(event: NotchEvent, rows: [GoalRow], requests: [UserRequest]) {
-        if event.kind == .requestTaken {
-            guard let request = requests.first(where: { $0.id == event.subject }) else { return nil }
-            self.init(title: "Richiesta presa in carico", subtitle: request.text, startSymbol: "circle",
-                      symbol: "checkmark", color: GoalTone.go.color, row: nil, before: nil)
-            return
-        }
-        guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
-        let title: String
         switch event.kind {
-        case .proofDone: title = "Prova fatta"
-        case .still: title = "Obiettivo fermo"
-        case .blocked: title = "Obiettivo bloccato"
-        case .reached: title = "Obiettivo raggiunto"
-        case .requestTaken: return nil
+        case .requestTaken:
+            guard let request = requests.first(where: { $0.id == event.subject }) else { return nil }
+            self.init(text: request.text, startLabel: "In attesa", label: "Presa in carico", startSymbol: "circle",
+                      symbol: "checkmark.circle.fill", color: GoalTone.go.color, strikes: true, row: nil, before: nil)
+        case .prMerged:
+            let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
+            self.init(text: title, startLabel: "In corso", label: "Unita", startSymbol: "arrow.triangle.pull",
+                      symbol: "arrow.triangle.merge", color: NoteColor.merged, strikes: false, row: nil, before: nil)
+        case .proofDone, .still, .blocked, .reached:
+            guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
+            // The ring starts from the count before this proof, so the fill is the news.
+            let before = event.kind == .proofDone && row.proofsTotal > 0
+                ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
+            let label = event.kind == .proofDone ? "Prova fatta, \(row.proofsDone) su \(row.proofsTotal)" : row.statusLabel
+            self.init(text: row.title, startLabel: row.proofsSentence, label: label, startSymbol: "", symbol: "",
+                      color: row.ink, strikes: false, row: row, before: before)
         }
-        // The bar starts from the count before this proof, so the fill is the news.
-        let before = event.kind == .proofDone && row.proofsTotal > 0
-            ? Double(max(row.proofsDone - 1, 0)) / Double(row.proofsTotal) : row.progress
-        // A goal's shape is its state from the first frame; only a request turns from open circle to check.
-        let symbol = event.kind == .proofDone ? "checkmark" : row.symbol
-        self.init(title: title, subtitle: row.title, startSymbol: symbol, symbol: symbol,
-                  color: row.tone.color, row: row, before: before)
     }
 
-    private init(title: String, subtitle: String, startSymbol: String, symbol: String, color: Color,
-                 row: GoalRow?, before: Double?) {
-        self.title = title
-        self.subtitle = subtitle
+    private init(text: String, startLabel: String, label: String, startSymbol: String, symbol: String, color: Color,
+                 strikes: Bool, row: GoalRow?, before: Double?) {
+        self.text = text
+        self.startLabel = startLabel
+        self.label = label
         self.startSymbol = startSymbol
         self.symbol = symbol
         self.color = color
+        self.strikes = strikes
         self.row = row
         self.before = before
     }

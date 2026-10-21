@@ -2,7 +2,7 @@ import Foundation
 import CodeIslandCore
 
 /// Account usage from the dashboard Roberto's Macchine app reads (public, no token). Fetched at
-/// launch, every 60 s and when the notch opens. A failed fetch keeps the last good list and the time
+/// launch and when the notch opens (no polling: the numbers are shown only in the open notch). A failed fetch keeps the last good list and the time
 /// it was read, so the view says how old it is instead of showing nothing or inventing numbers.
 @MainActor final class AccountQuotaFeed: ObservableObject {
     static let shared = AccountQuotaFeed()
@@ -12,18 +12,10 @@ import CodeIslandCore
     /// When the shown list was read; nil until the first success.
     @Published private(set) var fetchedAt: Date?
     @Published private(set) var lastFetchFailed = false
-    private var timer: Timer?
     private var inFlight = false
 
     func start() {
-        guard timer == nil else { return }
         refresh()
-        let t = Timer(timeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refresh() }
-        }
-        t.tolerance = 10
-        RunLoop.main.add(t, forMode: .common)
-        timer = t
     }
 
     func refresh() {
@@ -36,7 +28,7 @@ import CodeIslandCore
         }
     }
 
-    /// One blocking read, for `--snapshot` (no timer).
+    /// One blocking read, for `--snapshot`.
     func loadNow() {
         final class Box: @unchecked Sendable { var data: Data? }
         let box = Box(), done = DispatchSemaphore(value: 0)

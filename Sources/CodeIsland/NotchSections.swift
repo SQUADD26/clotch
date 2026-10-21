@@ -1,21 +1,40 @@
 import SwiftUI
 import CodeIslandCore
 
-/// The open notch: three glass plates in Roberto's order (accounts, the goal chased now, his requests).
+enum NotchTab: String, CaseIterable, Identifiable {
+    case goals, requests, accounts
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .goals: return "Obiettivi"
+        case .requests: return "Richieste"
+        case .accounts: return "Account"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .goals: return "scope"
+        case .requests: return "tray"
+        case .accounts: return "person.2"
+        }
+    }
+}
+
+/// The open notch: the tab bar, then the tab. The tab chosen last is kept for the next opening.
 struct NotchSections: View {
     let maxHeight: CGFloat
     @ObservedObject private var store = GoalStore.shared
     @ObservedObject private var quota = AccountQuotaFeed.shared
-    @State private var contentHeight: CGFloat = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("notchTab") private var tab: NotchTab = .goals
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            NotchSectionsContent(store: store, quota: quota)
-                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
+        // Ticks only while the notch is open: "since …" and "updated … ago" are what time moves.
+        TimelineView(.periodic(from: .now, by: 30)) { ctx in
+            NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
         }
-        .frame(height: min(contentHeight, maxHeight))
-        .animation(reduceMotion ? nil : NotchAnimation.close, value: contentHeight)
+        .frame(maxHeight: maxHeight, alignment: .top)
         .onAppear {  // opening the notch is when fresh numbers matter
             quota.refresh()
             PullRequestFeed.shared.refresh()
@@ -23,44 +42,64 @@ struct NotchSections: View {
     }
 }
 
-/// The plates without the scroll view: `--snapshot` draws this (ImageRenderer skips ScrollView content).
+/// The tab bar and the tab, without the clock: `--snapshot` draws this.
 struct NotchSectionsContent: View {
     @ObservedObject var store: GoalStore
     @ObservedObject var quota: AccountQuotaFeed
+    let now: Date
+    @Binding var tab: NotchTab
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        GlassGroup(spacing: NotchSpace.inset) {
-            VStack(spacing: NotchSpace.inset) {
-                AccountsPlate(feed: quota, now: store.now)
-                GoalPlate(rows: store.rows, now: store.now)
-                RequestsPlate(requests: store.requests, active: store.requestsFolderExists)
+        VStack(spacing: NotchSpace.section) {
+            TabBar(tab: $tab)
+            Group {
+                switch tab {
+                case .goals: GoalsTab(rows: store.rows, now: now)
+                case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
+                case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .transition(.opacity)
         }
-        .padding([.horizontal, .bottom], NotchSpace.inset)
+        .padding(.horizontal, NotchSpace.side)
+        .padding(.top, 6)
+        .padding(.bottom, 20)
+        .animation(NotchMotion.animation(reduce: reduceMotion), value: tab)
     }
 }
 
-// MARK: - Plate parts
-
-/// A plate: title row (with an optional trailing note), then the content, inside one glass shape.
-struct Plate<Trailing: View, Content: View>: View {
-    let title: String
-    var tint: Color? = nil
-    @ViewBuilder var trailing: Trailing
-    @ViewBuilder var content: Content
+/// Three segments in a dark well; the chosen one lifts. One spring moves the highlight.
+struct TabBar: View {
+    @Binding var tab: NotchTab
+    @Namespace private var highlight
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NotchSpace.head) {
-            HStack(alignment: .firstTextBaseline, spacing: NotchSpace.row) {
-                Text(title).font(NotchType.label).foregroundStyle(GoalInk.secondary)
-                Spacer(minLength: NotchSpace.row)
-                trailing
+        HStack(spacing: 0) {
+            ForEach(NotchTab.allCases) { item in
+                Button { tab = item } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: item.symbol)
+                        Text(item.title)
+                    }
+                    .font(NotchType.tab)
+                    .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .background {
+                        if item == tab {
+                            Capsule().fill(GoalInk.selected).matchedGeometryEffect(id: "tab", in: highlight)
+                        }
+                    }
+                    .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(item == tab ? .isSelected : [])
             }
-            content
         }
-        .padding(NotchSpace.plate)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .glassPlate(radius: NotchSpace.radius, tint: tint)
+        .padding(4)
+        .background(Capsule().fill(GoalInk.well))
+        .frame(maxWidth: 464)
     }
 }
 
@@ -72,7 +111,8 @@ struct EmptyState: View {
     var body: some View {
         VStack(alignment: .leading, spacing: NotchSpace.tight) {
             Text(text).font(NotchType.bodyEmphasis).foregroundStyle(GoalInk.secondary)
-            if let detail { Text(detail).font(NotchType.secondary).foregroundStyle(GoalInk.secondary) }
+            if let detail { Text(detail).font(NotchType.body).foregroundStyle(GoalInk.secondary) }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
