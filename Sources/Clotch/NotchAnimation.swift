@@ -63,14 +63,43 @@ extension AnyTransition {
 
 // MARK: - Row exit
 
-/// A row leaving a notch list because its state changed (#86): it fades and folds up from its top edge
-/// while the rows under it rise with the list's spring. `amount` 0 = in place, 1 = gone.
-struct RowExitModifier: ViewModifier {
-    let amount: CGFloat
+/// A row leaving a notch list because its state changed (#86, #100): its text fades from left to right
+/// (`RowWipe`) and it folds up from its top edge while the rows under it rise with the list's spring.
+/// `amount` 0 = in place, 1 = gone.
+struct RowExitModifier: ViewModifier, Animatable {
+    var amount: CGFloat
+    var animatableData: CGFloat {
+        get { amount }
+        set { amount = newValue }
+    }
     func body(content: Content) -> some View {
         content
-            .opacity(1 - amount)
+            .modifier(RowWipe(progress: amount))
             .scaleEffect(x: 1 - 0.02 * amount, y: 1 - 0.6 * amount, anchor: .top)
+    }
+}
+
+/// A soft edge that runs from left to right and hides the row behind it: the start of the line goes
+/// first. 0 = all visible, 1 = all hidden.
+struct RowWipe: ViewModifier, Animatable {
+    var progress: CGFloat
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+    func body(content: Content) -> some View {
+        content.mask {
+            GeometryReader { g in
+                let w = g.size.width, edge = max(w * 0.35, 1)
+                // [hidden w][soft edge][shown w], slid right so the visible window moves from «shown» to «hidden».
+                HStack(spacing: 0) {
+                    Color.clear.frame(width: w)
+                    LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing).frame(width: edge)
+                    Color.black.frame(width: w)
+                }
+                .offset(x: -(w + edge) * (1 - progress))
+            }
+        }
     }
 }
 

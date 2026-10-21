@@ -81,7 +81,7 @@ enum GoalSnapshot {
                         }
                     }
                 }, "19-bottoni-riposo-hover-premuto")
-                // #86: a merged PR, the light at a quarter, half and three quarters of its pass, then the line halfway out.
+                // #86: a merged PR, the light at a quarter, half and three quarters of its pass, then the line halfway out (#100: the text gone on the left).
                 let merged = PRInfo(ref: PRRef(repo: "SQUADD26/clotch", number: 86), title: "Notch: luce sulle PR unite",
                                     url: "https://github.com/SQUADD26/clotch/pull/86", state: .merged)
                 try save(open(.goals) {
