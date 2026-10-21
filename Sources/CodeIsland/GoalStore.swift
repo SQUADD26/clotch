@@ -134,8 +134,8 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
     /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
-    /// Proposals Roberto rejected in the notch (`GoalDecision.key`): hidden here, because the register has no
-    /// refusal yet (#20). A new proposal text from the same session shows again.
+    /// Proposals Roberto rejected in the notch (`GoalDecision.key`): hidden here at once, whether or not the
+    /// register took the refusal (#20). A new proposal text from the same session shows again.
     @Published private(set) var rejected = Set(UserDefaults.standard.stringArray(forKey: GoalStore.rejectedKey) ?? [])
     @Published private(set) var accepting: Set<String> = []
     @Published private(set) var acceptFailed: Set<String> = []
@@ -179,6 +179,9 @@ private final class GoalWatcher: @unchecked Sendable {
         guard let text = row.proposal else { return }
         rejected.insert(GoalDecision.key(cli: row.id, text: text))
         UserDefaults.standard.set(rejected.sorted(), forKey: Self.rejectedKey)
+        if let args = GoalDecision.rejectArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path) {
+            Task.detached { _ = Self.python(args) }
+        }
     }
 
     /// Roberto's «sì» from the notch: the register's `conferma`, off the main thread. On success the watcher
@@ -201,6 +204,7 @@ private final class GoalWatcher: @unchecked Sendable {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: py)
         process.arguments = args
+        process.standardInput = FileHandle.nullDevice  // a mode obiettivo-guard.py does not know yet reads stdin as a hook
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
         guard (try? process.run()) != nil else { return false }

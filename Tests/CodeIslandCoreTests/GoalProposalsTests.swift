@@ -35,6 +35,13 @@ final class GoalProposalsTests: GoalTestCase {
         XCTAssertNil(GoalDecision.acceptArguments(rows([g("a")], [s("l", cli: "a")])[0]), "nothing to accept on a confirmed goal")
     }
 
+    func testRejectRunsRifiutaWithTheRowCli() {
+        let row = rows([g("cli-123", stato: "proposto")], [s("local_x", cli: "cli-123")])[0]
+        XCTAssertEqual(GoalDecision.rejectArguments(row, home: "/Users/r"),
+                       ["/Users/r/.claude/hooks/obiettivo-guard.py", "rifiuta", "--sessione", "cli-123"])
+        XCTAssertNil(GoalDecision.rejectArguments(rows([g("a")], [s("l", cli: "a")])[0], home: "/Users/r"))
+    }
+
     func testClosedSessionsLastAndOutOfTheList() {
         let goals = [g("archiviata", stato: "bloccato", prova: "x"), g("sparita"), g("viva"), g("proposta-vecchia", stato: "proposto")]
         let sessions = [s("l1", cli: "archiviata", archived: true), s("l2", cli: "viva"), s("l3", cli: "proposta-vecchia", archived: true)]
