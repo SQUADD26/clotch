@@ -37,32 +37,6 @@ struct NotchSectionsContent: View {
     }
 }
 
-// MARK: - Scale
-
-/// One spacing scale on a 4/8 pt grid. The island's bottom corners are 24 pt; plates sit 8 pt in,
-/// so their 16 pt corners are concentric with it (HIG: concentric margins).
-enum NotchSpace {
-    static let inset: CGFloat = 8      // panel edge to plate, plate to plate
-    static let plate: CGFloat = 16     // inside a plate
-    static let radius: CGFloat = 16
-    static let head: CGFloat = 12      // plate title to its content
-    static let row: CGFloat = 8        // between rows
-    static let tight: CGFloat = 4      // a line and what belongs to it (bar and its reason)
-}
-
-/// One type scale (macOS text styles in points): 11 labels, 12 secondary, 13 body, 15 title, 22 figure.
-enum NotchType {
-    static let label = Font.system(size: 11, weight: .semibold)
-    static let caption = Font.system(size: 11, weight: .medium)
-    static let numbers = Font.system(size: 11, weight: .semibold).monospacedDigit()
-    static let secondary = Font.system(size: 12)
-    static let body = Font.system(size: 13)
-    static let bodyEmphasis = Font.system(size: 13, weight: .medium)
-    static let title = Font.system(size: 15, weight: .semibold)
-    static let figure = Font.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit()
-    static let figureUnit = Font.system(size: 13, weight: .medium, design: .rounded).monospacedDigit()
-}
-
 // MARK: - Plate parts
 
 /// A plate: title row (with an optional trailing note), then the content, inside one glass shape.

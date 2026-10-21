@@ -4,29 +4,6 @@ import CodeIslandCore
 // The notch shows goals only: one row per open goal, read from GoalStore.
 // Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
 
-// MARK: - Tone (traffic light)
-
-/// The three colours of the traffic light: Apple's dark-appearance system green, yellow and red,
-/// so they sit on the black notch like the Dynamic Island's own tints (all above 4.5:1 on black).
-enum GoalTone {
-    case go, wait, stop
-
-    var color: Color {
-        switch self {
-        case .go: return Color(red: 48 / 255, green: 209 / 255, blue: 88 / 255)
-        case .wait: return Color(red: 1, green: 214 / 255, blue: 10 / 255)
-        case .stop: return Color(red: 1, green: 69 / 255, blue: 58 / 255)
-        }
-    }
-}
-
-/// Text levels on black. Secondary stays at 0.62 so 11pt text keeps AA contrast.
-enum GoalInk {
-    static let primary = Color.white.opacity(0.94)
-    static let secondary = Color.white.opacity(0.62)
-    static let track = Color.white.opacity(0.14)
-}
-
 extension GoalRow {
     var tone: GoalTone {
         switch status {
