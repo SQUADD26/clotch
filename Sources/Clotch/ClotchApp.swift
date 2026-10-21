@@ -5,9 +5,9 @@ struct ClotchApp: App {
     @ObservedObject private var l10n = L10n.shared
 
     var body: some Scene {
-        Settings {
-            EmptyView()
-        }
+        // A scene with no window, only to hold the menus: a `Settings {}` scene opened its own empty
+        // «Clotch Settings» window beside the real one (#82).
+        MenuBarExtra("Clotch", isInserted: .constant(false)) { EmptyView() }
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button(l10n["settings"] + "…") { SettingsWindowController.shared.show() }
