@@ -49,6 +49,6 @@ final class ScribeSession: @unchecked Sendable {
     private func fail() {
         guard !closed else { return }
         closed = true
-        onEvent?(.failure("ElevenLabs non risponde. Riprova."))
+        onEvent?(.failure(.network))
     }
 }
