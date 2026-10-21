@@ -77,7 +77,9 @@ enum NotePhase: Int, CaseIterable, Comparable {
                 withAnimation(motion) { phase = .settle }
             }
             let (rows, requests) = (GoalStore.shared.rows, GoalStore.shared.requests)
-            let text = event.notice(rows: rows, requests: requests) ?? Note(event: event, rows: rows, requests: requests)?.text ?? ""
+            // The longer of the notch's notice and the full line under it: the line is no longer clipped (#102).
+            let text = [event.notice(rows: rows, requests: requests), Note(event: event, rows: rows, requests: requests)?.text]
+                .compactMap { $0 }.max { $0.count < $1.count } ?? ""
             await pause(NotchEvents.hold(forText: text) * ClotchPrefs.noteScale(UserDefaults.standard.string(forKey: ClotchPrefs.noteLength) ?? ""))
             while pointerOver { await pause(0.25) }
             if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }

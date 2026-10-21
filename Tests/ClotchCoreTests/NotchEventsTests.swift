@@ -30,6 +30,16 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 500)), NotchEvents.maxHold + 3, "capped")
     }
 
+    func testThreeLineNoteGetsItsReadingTime() {
+        // #102: the line wraps up to three lines, never more, and a third line still adds reading time.
+        XCTAssertEqual(NotchEvents.noteLines, 3)
+        let twoLines = NotchEvents.hold(forText: String(repeating: "a", count: 74))
+        let threeLines = NotchEvents.hold(forText: String(repeating: "a", count: 110))
+        XCTAssertGreaterThan(twoLines, NotchEvents.hold(forText: String(repeating: "a", count: 37)), "two lines: longer than one")
+        XCTAssertGreaterThan(threeLines, twoLines, "three lines: longer than two")
+        XCTAssertEqual(NotchEvents.hold(forText: String(repeating: "a", count: 300)), threeLines, "past three lines: the cap")
+    }
+
     func testProposedGoalAnnouncesNothing() {
         var still = row("p", .still(since: t), done: 1)
         still.proposed = true
