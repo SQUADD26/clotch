@@ -12,7 +12,6 @@ const IN = join(root, 'design/tokens.json'), OUT = join(root, 'Sources/Clotch/Fi
 
 // «macOS 27 · Golden Gate» -> MacOS27GoldenGate; «finestra/fondo» -> finestraFondo
 // «_» resta: «raggio/1_5» diventa notchRaggio1_5, mai notchRaggio15 come «raggio/15»
-// «_» resta nel nome: «raggio/1_5» diventa notchRaggio1_5 e non si scontra con «raggio/15» (notchRaggio15)
 const parole = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^A-Za-z0-9_]+/).filter(Boolean);
 const tipoSwift = p => p.map(w => w[0].toUpperCase() + w.slice(1)).join('').replace(/^\d/, '_$&');
 const nomeSwift = p => { const n = tipoSwift(p); return n[0].toLowerCase() + n.slice(1); };
