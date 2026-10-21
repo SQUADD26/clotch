@@ -85,9 +85,11 @@ enum GoalSnapshot {
                 }
                 // The gear at the right of the tab bar: in every open frame, this one is named for it.
                 try save(open(.goals), "14-pulsante-impostazioni")
-                // The voice light at three moments 1 s apart (#15): the colours move along the edge, the halo follows the voice.
+                // The voice light at three moments 1 s apart (#15, #29): the colours move along the edge; the brightness stays
+                // in its high band (before the first word, loud, quiet), as `VoiceStatus.intensity` gives it.
                 for (t, level) in [(0.0, VoiceStatus.steadyLevel), (1.0, 1), (2.0, 0.35)] as [(TimeInterval, Float)] {
-                    try save(island(width: closedWidth, radius: 12, voice: (level, t / VoiceEdgeLook.period)) { EmptyView() },
+                    try save(island(width: closedWidth, radius: 12,
+                                    voice: (VoiceStatus.intensity(level), t / VoiceEdgeLook.period)) { EmptyView() },
                              "17-voce-\(Int(t))s")
                 }
                 print("snapshot: «PR unita» and the no-notch centre come with #6 and #5")
