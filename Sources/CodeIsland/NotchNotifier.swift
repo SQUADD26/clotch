@@ -26,6 +26,8 @@ enum NotePhase: Int, CaseIterable, Comparable {
     private var primedUntil = Date.distantFuture
     private var bag: Set<AnyCancellable> = []
     private var draining = false
+    /// True while the pointer is on the island: a notification under it stays until the pointer leaves.
+    var pointerOver = false
 
     func start(store: GoalStore = .shared) {
         guard bag.isEmpty else { return }
@@ -69,7 +71,9 @@ enum NotePhase: Int, CaseIterable, Comparable {
                 await pause(0.9)
                 withAnimation(motion) { phase = .settle }
             }
-            await pause(2.6)
+            let text = Note(event: event, rows: GoalStore.shared.rows, requests: GoalStore.shared.requests)?.text ?? ""
+            await pause(NotchEvents.hold(forText: text))
+            while pointerOver { await pause(0.25) }
             if event.kind == .requestTaken { GoalStore.shared.takenAnimationShown(event.subject) }
             withAnimation(motion) { phase = .leave }
             await pause(1.0)

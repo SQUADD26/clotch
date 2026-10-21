@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import CodeIslandCore
 
@@ -50,32 +51,81 @@ extension View {
     }
 }
 
-/// The tab bar and the tab, without the clock: `--snapshot` draws this.
+/// The tab bar and the tab, without the clock: `--snapshot` draws this. A sideways scroll over the
+/// tab bar moves one tab per gesture; gestures during the slide are dropped, so steps never add up.
 struct NotchSectionsContent: View {
     @ObservedObject var store: GoalStore
     @ObservedObject var quota: AccountQuotaFeed
     let now: Date
     @Binding var tab: NotchTab
+    @State private var forward = true
+    @State private var moving = false
+    @State private var swipe = PageSwipe()
+    @State private var monitor: Any?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: NotchSpace.section) {
-            TabBar(tab: $tab)
-            Group {
-                switch tab {
-                case .goals: GoalsTab(rows: store.rows, now: now)
-                case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
-                case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
+            TabBar(tab: Binding(get: { tab }, set: go))
+            ZStack(alignment: .top) {
+                Group {
+                    switch tab {
+                    case .goals: GoalsTab(rows: store.rows, now: now)
+                    case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists)
+                    case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .id(tab)
+                .transition(reduceMotion ? .opacity : .push(from: forward ? .trailing : .leading))
             }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .transition(.opacity)
+            .opacity(moving ? 0.45 : 1)  // as the Pager: nothing is read half-way
+            .blur(radius: moving && !reduceMotion ? 2.5 : 0)
+            .clipped()
         }
         .padding(.horizontal, NotchSpace.side)
         .padding(.top, 10)
         .padding(.bottom, NotchSpace.bottom)
-        .animation(NotchMotion.animation(reduce: reduceMotion), value: tab)
+        .onAppear { startSwipes() }
+        .onDisappear { stopSwipes() }
     }
+
+    private func go(_ target: NotchTab) {
+        guard target != tab else { return }
+        let all = NotchTab.allCases
+        forward = all.firstIndex(of: target)! > all.firstIndex(of: tab)!
+        moving = true
+        withAnimation(NotchMotion.animation(reduce: reduceMotion)) {
+            tab = target
+        } completion: {
+            withAnimation(NotchMotion.still) { moving = false }
+        }
+    }
+
+    /// Never swallows: over the tab bar the event reaches only buttons, elsewhere the Pager owns it.
+    private func startSwipes() {
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
+            guard event.window is NSPanel else { return event }
+            let step = swipe.feed(event)  // fed always, so each gesture's start is seen
+            let all = NotchTab.allCases
+            guard TabBarPointer.inside, !moving, let step,
+                  let i = PageSwipe.target(from: all.firstIndex(of: tab)!, step: step, count: all.count)
+            else { return event }
+            go(all[i])
+            return event
+        }
+    }
+
+    private func stopSwipes() {
+        if let monitor { NSEvent.removeMonitor(monitor) }
+        monitor = nil
+    }
+}
+
+/// Whether the pointer is over the tab bar: there a sideways scroll moves the tab, not the page.
+enum TabBarPointer {
+    static var inside = false
 }
 
 /// Three 142 × 30 segments in a 38 pt well; the chosen one lifts. One spring moves the highlight.
@@ -110,6 +160,8 @@ struct TabBar: View {
         .padding(4)
         .background(Capsule().fill(GoalInk.well))
         .frame(maxWidth: 434)
+        .onHover { TabBarPointer.inside = $0 }
+        .onDisappear { TabBarPointer.inside = false }  // closing the notch sends no hover-out
     }
 }
 

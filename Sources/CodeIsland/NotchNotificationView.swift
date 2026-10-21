@@ -74,7 +74,7 @@ enum NoteColor {
 }
 
 /// What a notification says, read from the live data at display time.
-private struct Note {
+struct Note {
     let text: String
     let startLabel: String
     let label: String
