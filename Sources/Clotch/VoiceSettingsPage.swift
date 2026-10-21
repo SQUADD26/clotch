@@ -22,6 +22,8 @@ struct VoiceSettingsPage: View {
     @State private var onlySession = ""
     @State private var sessions: [DesktopSession] = []
     @State private var duck = false
+    @State private var rewriterModel = VoiceTurn.models[0]
+    @State private var rewriterEffort = VoiceTurn.efforts[0]
     @State private var duckPercent = VoiceDuck.defaultLevel * 100
     @State private var configBroken = false
     @State private var testing = false
@@ -30,7 +32,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         Form {
             Section {
-                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude Haiku scrive una frase breve, con le stesse istruzioni della voce di Clean View. Poi ElevenLabs la legge con la voce scelta.")
+                Text("La voce parla solo quando serve: richiesta fatta, obiettivo raggiunto o bloccato, domanda per te, rischio, avviso che hai chiesto. Prima Claude scrive una frase breve, con le stesse istruzioni della voce di Clean View. Poi ElevenLabs la legge con la voce scelta.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -89,6 +91,27 @@ struct VoiceSettingsPage: View {
                 Text("Altri suoni")
             } footer: {
                 Text("Musica e video scendono mezzo secondo prima della voce e risalgono mezzo secondo dopo. Al primo uso macOS chiede il permesso per l'audio di sistema.")
+            }
+
+            Section {
+                Picker("Modello", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
+                    Text("Haiku 5.5").tag("claude-haiku-5-5")
+                    Text("Sonnet 5.5").tag("claude-sonnet-5-5")
+                    Text("Opus 5.5").tag("claude-opus-5-5")
+                }
+                .disabled(configBroken)
+                Picker("Ragionamento", selection: Binding(get: { rewriterEffort }, set: { rewriterEffort = $0; saveRewriter() })) {
+                    Text("Basso").tag("low")
+                    Text("Medio").tag("medium")
+                    Text("Alto").tag("high")
+                    Text("Molto alto").tag("xhigh")
+                    Text("Massimo").tag("max")
+                }
+                .disabled(configBroken)
+            } header: {
+                Text("Frase")
+            } footer: {
+                Text("Il modello che scrive la frase da leggere. Più ragionamento: frase più curata, ma più lenta.")
             }
 
             VoiceAlertsSection(sessions: sessions, note: $note)
@@ -191,11 +214,19 @@ struct VoiceSettingsPage: View {
         onlySession = parsed.onlySession
         duck = parsed.duck
         duckPercent = (parsed.duckLevel * 100).rounded()
+        rewriterModel = parsed.rewriterModel
+        rewriterEffort = parsed.rewriterEffort
     }
 
     private func saveDuck() {
         run("Impostazioni non salvate", done: "Impostazioni salvate") {
             try files.updateConfig(["abbassa_audio": duck, "abbassa_livello": Int(duckPercent)])
+        }
+    }
+
+    private func saveRewriter() {
+        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+            try files.updateConfig(["riscrittore_modello": rewriterModel, "riscrittore_ragionamento": rewriterEffort])
         }
     }
 

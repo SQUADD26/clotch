@@ -102,7 +102,7 @@ final class VoiceSpeaker {
         day.chiamate += 1
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
         let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
-        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input) }) else { return }
+        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else { return }
         let text = spoken.text
         day.caratteri += text.count
         try? files.write(JSONEncoder().encode(day), to: files.dayURL)
@@ -184,12 +184,12 @@ final class VoiceSpeaker {
     }
 
     /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then stays silent).
-    nonisolated private static func haiku(prompt: String, input: String) async -> String? {
+    nonisolated private static func haiku(prompt: String, input: String, config: VoiceTurn.Config) async -> String? {
         await Task.detached { () -> String? in
             guard let bin = Self.claudeBinary() else { return nil }
             let p = Process()
             p.executableURL = URL(fileURLWithPath: bin)
-            p.arguments = VoiceTurn.haikuArguments(prompt: prompt)
+            p.arguments = VoiceTurn.haikuArguments(prompt: prompt, config: config)
             var env = ProcessInfo.processInfo.environment
             env["CLOTCH_VOCE_INTERNA"] = "1"  // the hook skips Clotch's own call, even without safe mode
             p.environment = env
