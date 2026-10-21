@@ -41,6 +41,12 @@ enum NotchHoverInteraction {
         return min(max(raw, expandDelayRange.lowerBound), expandDelayRange.upperBound)
     }
 
+    /// Same range and guard for the exit delay (#125): how long an open island waits after the pointer leaves.
+    static func collapseDelay(forSetting raw: Double) -> TimeInterval {
+        guard raw.isFinite else { return collapseDelay }
+        return min(max(raw, expandDelayRange.lowerBound), expandDelayRange.upperBound)
+    }
+
     /// Whether an elapsed hover delay may still open the session list. A card
     /// the island opened during the delay (an approval, or a question the user
     /// just clicked open) is waiting on the user; swapping it for the list
@@ -112,6 +118,7 @@ struct NotchPanelView: View {
     @AppStorage(SettingsKey.hapticIntensity) private var hapticIntensity = SettingsDefaults.hapticIntensity
     @AppStorage(SettingsKey.showSessionRecap) private var showSessionRecap = SettingsDefaults.showSessionRecap
     @AppStorage(SettingsKey.hoverExpandDelay) private var hoverExpandDelay = SettingsDefaults.hoverExpandDelay
+    @AppStorage(SettingsKey.hoverCollapseDelay) private var hoverCollapseDelay = SettingsDefaults.hoverCollapseDelay
     @AppStorage(ClotchPrefs.openOnHover) private var openOnHover = ClotchPrefs.openOnHoverDefault
     @AppStorage(SettingsKey.showProjectName) private var showProjectName = SettingsDefaults.showProjectName
 
@@ -347,7 +354,7 @@ struct NotchPanelView: View {
             // …and collapse an expanded panel after a grace delay so an
             // accidental mouse-out doesn't flicker it shut.
             hoverTimer?.invalidate()
-            hoverTimer = Timer.scheduledTimer(withTimeInterval: NotchHoverInteraction.collapseDelay, repeats: false) { _ in
+            hoverTimer = Timer.scheduledTimer(withTimeInterval: NotchHoverInteraction.collapseDelay(forSetting: hoverCollapseDelay), repeats: false) { _ in
                 Task { @MainActor in
                     guard !isHovered else { return }
                     hoverPhase = NotchHoverInteraction.nextPhase(from: hoverPhase, event: .collapseDelayElapsed)
