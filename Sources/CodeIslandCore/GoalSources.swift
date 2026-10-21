@@ -1,0 +1,122 @@
+import Foundation
+
+/// Parsing and folder reading for the goal notch. Strictly read-only: a missing or
+/// unreadable file means "no data", never an error, and nothing is ever created.
+public enum GoalSources {
+    // MARK: Parsing
+
+    public static func parseGoal(_ data: Data) -> GoalRecord? {
+        guard let d = object(data), let cli = d["cli"] as? String, !cli.isEmpty,
+              let goal = d["obiettivo"] as? String else { return nil }
+        let proofs = (d["prove"] as? [Any]).map { list in
+            list.compactMap { item -> GoalProof? in
+                guard let p = item as? [String: Any], let text = p["testo"] as? String else { return nil }
+                return GoalProof(text: text, done: p["fatta"] as? Bool ?? false, at: date(p["t"]))
+            }
+        }
+        return GoalRecord(cli: cli, goal: goal, state: d["stato"] as? String ?? "aperto",
+                          proof: d["prova"] as? String ?? "", at: date(d["t"]),
+                          title: d["titolo"] as? String ?? "", proofs: proofs)
+    }
+
+    /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).
+    public static func parseSession(_ data: Data, fileName: String) -> DesktopSession? {
+        guard let d = object(data), (d["scheduledTaskId"] as? String ?? "").isEmpty,
+              let cli = d["cliSessionId"] as? String, !cli.isEmpty else { return nil }
+        let parent = (d["spawnedFrom"] as? [String: Any])?["sessionId"] as? String ?? d["spawnedFrom"] as? String
+        let fileId = fileName.hasSuffix(".json") ? String(fileName.dropLast(5)) : fileName
+        return DesktopSession(localId: d["sessionId"] as? String ?? fileId, cliId: cli,
+                              parentLocalId: parent?.isEmpty == false ? parent : nil,
+                              title: d["title"] as? String ?? "", isRunning: d["isRunning"] as? Bool ?? false,
+                              isArchived: d["isArchived"] as? Bool ?? false, lastActivity: date(d["lastActivityAt"]))
+    }
+
+    public static func parseLive(_ data: Data, cliId: String) -> LiveState? {
+        parseLive(data, cliId: cliId, transcriptMTime: { _ in nil })
+    }
+
+    /// `transcriptMTime(agentId)` lets the folder reader add a subagent transcript's mtime to its activity.
+    static func parseLive(_ data: Data, cliId: String, transcriptMTime: (String) -> Date?) -> LiveState? {
+        guard let d = object(data) else { return nil }
+        let agents = (d["agenti"] as? [String: Any] ?? [:]).compactMap { id, v -> LiveAgent? in
+            guard let a = v as? [String: Any] else { return nil }
+            let times = [date(a["partito"]), date((a["ultimo_tool"] as? [String: Any])?["quando"]), transcriptMTime(id)]
+            return LiveAgent(id: id, alive: a["stato"] as? String == "vivo", lastActivity: times.compactMap { $0 }.max())
+        }.sorted { $0.id < $1.id }
+        return LiveState(cliId: cliId, updated: date(d["aggiornato"]), agents: agents)
+    }
+
+    // MARK: Folders
+
+    public struct Paths: Sendable { public var goals: URL; public var live: URL; public var sessionRoots: [URL] }
+
+    public static func defaultPaths(home: URL) -> Paths {
+        let support = home.appendingPathComponent("Library/Application Support")
+        let apps = (try? FileManager.default.contentsOfDirectory(atPath: support.path)) ?? []
+        let roots = apps.filter { $0.hasPrefix("Claude") || $0.hasPrefix("claude") }.sorted().map {
+            support.appendingPathComponent($0).appendingPathComponent("claude-code-sessions")
+        }
+        return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
+                     live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots)
+    }
+
+    public static func load(_ paths: Paths) -> (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState]) {
+        let fm = FileManager.default
+        let goals = files(in: paths.goals, fm).filter { $0.pathExtension == "json" }
+            .compactMap { (try? Data(contentsOf: $0)).flatMap(parseGoal) }
+        let live = files(in: paths.live, fm).filter { $0.pathExtension == "json" }.compactMap { url -> LiveState? in
+            guard let data = try? Data(contentsOf: url) else { return nil }
+            let transcript = object(data)?["transcript"] as? String ?? ""
+            return parseLive(data, cliId: url.deletingPathExtension().lastPathComponent) { aid in
+                subagentMTime(transcript: transcript, agentId: aid, fm)
+            }
+        }
+        let sessions = paths.sessionRoots.flatMap { root in
+            files(in: root, fm, recursive: true).filter { $0.lastPathComponent.hasPrefix("local_") && $0.pathExtension == "json" }
+        }.compactMap { url in (try? Data(contentsOf: url)).flatMap { parseSession($0, fileName: url.lastPathComponent) } }
+        return (goals, sessions, live)
+    }
+
+    private static func files(in dir: URL, _ fm: FileManager, recursive: Bool = false) -> [URL] {
+        if recursive {
+            return (fm.enumerator(at: dir, includingPropertiesForKeys: nil)?.allObjects as? [URL] ?? []).sorted { $0.path < $1.path }
+        }
+        return ((try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []).sorted { $0.path < $1.path }
+    }
+
+    /// `<transcript without .jsonl>/subagents/**/agent-<id>.jsonl` (live_state.scaduti).
+    private static func subagentMTime(transcript: String, agentId: String, _ fm: FileManager) -> Date? {
+        guard transcript.hasSuffix(".jsonl") else { return nil }
+        let dir = URL(fileURLWithPath: String(transcript.dropLast(6))).appendingPathComponent("subagents")
+        return files(in: dir, fm, recursive: true).filter { $0.lastPathComponent == "agent-\(agentId).jsonl" }
+            .compactMap { (try? fm.attributesOfItem(atPath: $0.path))?[.modificationDate] as? Date }.max()
+    }
+
+    // MARK: Helpers
+
+    private static func object(_ data: Data) -> [String: Any]? {
+        (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+    }
+
+    /// "2026-10-21T13:13:52+0300" | "…+03:00" | "…Z" | "2026-10-21T13:13:52" (local time) | epoch milliseconds (or seconds).
+    static func date(_ v: Any?) -> Date? {
+        if let n = v as? NSNumber, !(v is Bool) {
+            return Date(timeIntervalSince1970: n.doubleValue > 1e11 ? n.doubleValue / 1000 : n.doubleValue)
+        }
+        guard let s = (v as? String)?.trimmingCharacters(in: .whitespaces), s.count >= 19 else { return nil }
+        let head = s.prefix(19), zone = s.dropFirst(19)
+        let n = head.split(whereSeparator: { "-T: ".contains($0) }).compactMap { Int($0) }
+        guard n.count == 6 else { return nil }
+        var tz = TimeZone.current
+        if zone == "Z" { tz = TimeZone(secondsFromGMT: 0)! }
+        else if let sign = zone.first, "+-".contains(sign) {
+            let d = zone.dropFirst().filter(\.isNumber)
+            guard d.count == 4, let h = Int(d.prefix(2)), let m = Int(d.suffix(2)),
+                  let z = TimeZone(secondsFromGMT: (sign == "-" ? -1 : 1) * (h * 3600 + m * 60)) else { return nil }
+            tz = z
+        } else if !zone.isEmpty { return nil }
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = tz
+        return cal.date(from: DateComponents(year: n[0], month: n[1], day: n[2], hour: n[3], minute: n[4], second: n[5]))
+    }
+}
