@@ -10,6 +10,9 @@ actor LocalTranscriber {
     private var manager: SlidingWindowAsrManager?
     private var updates: Task<Void, Never>?
 
+    /// False until the first use: the pill says the model is being downloaded.
+    var isLoaded: Bool { models != nil }
+
     /// `onText` gets the whole text so far (confirmed, then still changing) after every update.
     func start(onText: @escaping @Sendable (String) -> Void) async throws {
         let m = SlidingWindowAsrManager(config: .streaming)

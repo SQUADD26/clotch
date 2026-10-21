@@ -58,7 +58,7 @@ extension AppState {
             openPendingQuestionCard(sessionId: sid)
             return .opened(.questionCard(sessionId: sid))
 
-        case .togglePanel, .jumpToTerminal:
+        case .togglePanel, .jumpToTerminal, .voiceInput:
             return .ignored
         }
     }

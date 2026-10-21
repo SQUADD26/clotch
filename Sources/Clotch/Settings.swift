@@ -579,6 +579,8 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     case deny
     case skipQuestion
     case jumpToTerminal
+    /// Talk to Clotch (#110): press to speak, press again to finish.
+    case voiceInput
 
     var id: String { rawValue }
 
@@ -590,12 +592,13 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
         case .approveAlways:  return nil
         case .skipQuestion:   return nil
         case .jumpToTerminal: return nil
+        case .voiceInput:     return ShortcutBinding(keyCode: 49, modifiers: [.control, .option]) // ⌃⌥Spazio
         }
     }
 
     var defaultEnabled: Bool {
         switch self {
-        case .togglePanel: return true
+        case .togglePanel, .voiceInput: return true
         default: return false
         }
     }

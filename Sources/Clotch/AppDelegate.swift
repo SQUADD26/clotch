@@ -89,8 +89,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Collect all enabled shortcut bindings, skip duplicates (first wins)
         var bindings: [(keyCode: UInt16, mods: NSEvent.ModifierFlags, action: ShortcutAction)] = []
         var seen: Set<String> = []
-        // Clotch: only the panel toggle; the card shortcuts would grab keys system-wide for cards that never show.
-        for action in [ShortcutAction.togglePanel] {
+        // Clotch: only the panel toggle and the voice; the card shortcuts would grab keys system-wide for cards that never show.
+        for action in [ShortcutAction.togglePanel, .voiceInput] {
             guard action.isEnabled else { continue }
             let b = action.binding
             let key = "\(b.keyCode)-\(b.modifiers.rawValue)"
@@ -143,6 +143,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                 }
             }
+        case .voiceInput:
+            if appState.surface.isExpanded { withAnimation(NotchAnimation.close) { appState.surface = .collapsed } }
+            VoiceInputController.shared.toggle()
         // Card shortcuts act only on the card on screen (#308); with the
         // request hidden they open its card instead of acting unseen.
         case .approve, .approveAlways, .deny, .skipQuestion:
