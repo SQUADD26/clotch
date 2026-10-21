@@ -76,3 +76,78 @@ final class NotchPagingTests: XCTestCase {
         for i in 0..<13 { XCTAssertTrue(PageDots.window(count: 13, index: i).contains(i)) }
     }
 }
+
+final class PageDragTests: XCTestCase {
+    private let t0 = Date(timeIntervalSince1970: 1_000)
+    private let w = 460.0
+
+    /// Feeds `steps` equal events of `dx` points, `dt` seconds apart; returns the drag and the last event time.
+    private func drag(_ dx: Double, steps: Int, dt: Double) -> (PageDrag, Date) {
+        var d = PageDrag()
+        var t = t0
+        for _ in 0..<steps { t = t.addingTimeInterval(dt); d.move(dx: dx, at: t) }
+        return (d, t)
+    }
+
+    func testFollowsTheFingersOneToOneInside() {
+        XCTAssertEqual(PageDrag.offset(travel: -120, index: 1, count: 3, width: w), -120)
+        XCTAssertEqual(PageDrag.offset(travel: 80, index: 1, count: 3, width: w), 80)
+        XCTAssertEqual(PageDrag.offset(travel: -900, index: 1, count: 3, width: w), -w)  // one page at most
+    }
+
+    func testRubberBandsPastTheEdges() {
+        let first = PageDrag.offset(travel: 200, index: 0, count: 3, width: w)
+        let last = PageDrag.offset(travel: -200, index: 2, count: 3, width: w)
+        XCTAssertGreaterThan(first, 0); XCTAssertLessThan(first, 100)
+        XCTAssertEqual(last, -first, accuracy: 0.001)
+        XCTAssertLessThan(PageDrag.offset(travel: 5_000, index: 0, count: 3, width: w), w)
+        XCTAssertLessThan(abs(PageDrag.offset(travel: 60, index: 0, count: 1, width: w)), 60)  // one page: both edges
+    }
+
+    func testShortSlowGestureStays() {
+        let (d, end) = drag(-4, steps: 10, dt: 0.016)  // 40 pt at 250 pt/s
+        let v = d.releaseVelocity(at: end.addingTimeInterval(0.01))
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: d.travel, velocity: v, width: w, count: 3), 1)
+    }
+
+    func testShortFastGestureMoves() {
+        let (d, end) = drag(-20, steps: 3, dt: 0.016)  // 60 pt at 1250 pt/s
+        let v = d.releaseVelocity(at: end.addingTimeInterval(0.01))
+        XCTAssertEqual(v, -1250, accuracy: 1)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: d.travel, velocity: v, width: w, count: 3), 2)
+        let (back, endBack) = drag(20, steps: 3, dt: 0.016)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: back.travel, velocity: back.releaseVelocity(at: endBack), width: w, count: 3), 0)
+    }
+
+    func testFlickThenRestBeforeLiftingCarriesNoSpeed() {
+        let (d, end) = drag(-20, steps: 3, dt: 0.016)
+        let v = d.releaseVelocity(at: end.addingTimeInterval(0.3))
+        XCTAssertEqual(v, 0)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: d.travel, velocity: v, width: w, count: 3), 1)
+    }
+
+    func testLongSlowDragPastHalfMoves() {
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: -240, velocity: 0, width: w, count: 3), 2)
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: -220, velocity: 0, width: w, count: 3), 1)
+    }
+
+    func testFlickAgainstTheDragGoesBack() {
+        XCTAssertEqual(PageDrag.settle(index: 1, offset: -300, velocity: 800, width: w, count: 3), 1)
+    }
+
+    func testEdgesHoldAndOnePageAtMost() {
+        XCTAssertEqual(PageDrag.settle(index: 0, offset: 100, velocity: 3_000, width: w, count: 3), 0)
+        XCTAssertEqual(PageDrag.settle(index: 2, offset: -100, velocity: -3_000, width: w, count: 3), 2)
+        XCTAssertEqual(PageDrag.settle(index: 0, offset: -w, velocity: -10_000, width: w, count: 5), 1)
+        XCTAssertEqual(PageDrag.settle(index: 0, offset: -300, velocity: 0, width: 0, count: 3), 0)  // not laid out yet
+    }
+}
+
+final class PageSpringTests: XCTestCase {
+    func testCarriesOnlySpeedTowardThePageCapped() {
+        XCTAssertEqual(PageDrag.springVelocity(-800, travel: -400), 2)
+        XCTAssertEqual(PageDrag.springVelocity(800, travel: -400), 0)  // flick away: the spring starts still
+        XCTAssertEqual(PageDrag.springVelocity(3_000, travel: 20), 12)
+        XCTAssertEqual(PageDrag.springVelocity(500, travel: 0), 0)
+    }
+}
