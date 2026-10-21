@@ -63,6 +63,11 @@ enum GoalSnapshot {
                     print("snapshot: \(store.requests.count) requests, no second page")
                 }
                 try save(open(.accounts), "08-account")
+                // The voice light at three moments 1 s apart (#15): the colours move along the edge, the halo follows the voice.
+                for (t, level) in [(0.0, VoiceStatus.steadyLevel), (1.0, 1), (2.0, 0.35)] as [(TimeInterval, Float)] {
+                    try save(island(width: closedWidth, radius: 12, voice: (level, t / VoiceEdgeLook.period)) { EmptyView() },
+                             "17-voce-\(Int(t))s")
+                }
                 print("snapshot: «PR unita», no-notch centre and account hover come with #6 and #5")
             }
             print("snapshot: \(store.rows.count) goals, \(AccountQuotaFeed.shared.accounts.count) accounts, \(store.requests.count) requests -> \(dir.path)")
@@ -103,6 +108,7 @@ enum GoalSnapshot {
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
     private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil,
+                                            voice: (level: Float, phase: Double)? = nil,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
             NotchZonesView(
@@ -116,8 +122,14 @@ enum GoalSnapshot {
         }
         .frame(width: width)
         .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
+        .overlay {
+            if let voice {
+                VoiceGlow(shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous),
+                          level: voice.level, phase: voice.phase)
+            }
+        }
         .padding(.horizontal, 48)
-        .padding(.bottom, 24)
+        .padding(.bottom, 40) // room for the voice light's halo
         .background(surround)
     }
 

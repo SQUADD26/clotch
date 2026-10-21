@@ -25,6 +25,9 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// Struck through in the view once a session has taken it in charge.
     public var taken: Bool { state == "presa" || state == "fatta" }
 
+    /// The requests Roberto still waits on: the Requests tab shows only these (taken ones are announced once, then hidden).
+    public static func waiting(_ all: [UserRequest]) -> [UserRequest] { all.filter { !$0.taken } }
+
     /// Ids to play the «presa in carico» animation for: taken now, seen as nuova (or not seen at all) on the
     /// previous load, not shown yet. The first load (`before` nil) is the baseline: nothing animates at launch.
     public static func newlyTaken(before: [UserRequest]?, after: [UserRequest], shown: Set<String>) -> [String] {

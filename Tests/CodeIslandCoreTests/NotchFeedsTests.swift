@@ -135,4 +135,13 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-1"])
         XCTAssertEqual(UserRequest.newlyTaken(before: after, after: after, shown: []), [], "once")
     }
+
+    /// The Requests tab lists only the ones nobody has taken; a done one is taken too.
+    func testWaitingDropsTakenAndDone() {
+        let all = ["nuova", "presa", "fatta", "nuova"].enumerated().map { i, state in
+            GoalSources.parseRequest(data(#"{"id": "Q-\#(i)", "testo": "x", "stato": "\#(state)"}"#))!
+        }
+        XCTAssertEqual(UserRequest.waiting(all).map(\.id), ["Q-0", "Q-3"])
+        XCTAssertEqual(UserRequest.waiting([]), [])
+    }
 }
