@@ -3,52 +3,53 @@ import CodeIslandCore
 
 // MARK: - Collapsed and header wings
 
-/// Left wing: collapsed = one tiny bar per goal (up to 4), expanded = the section title.
+/// Left wing: collapsed = the design's leading view, snug against the notch (HIG compact
+/// presentation: no padding to the camera beyond its rounded corner); expanded = the section title.
 struct GoalsLeftWing: View {
     let expanded: Bool
+    var design: GoalDesign = .current
     @ObservedObject private var store = GoalStore.shared
 
     var body: some View {
-        Group {
-            if expanded {
-                Text("Obiettivi")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.6))
-            } else if !store.rows.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(Array(store.rows.prefix(4))) { row in
-                        GoalBar(progress: row.progress, tone: row.tone, height: 3)
-                            .frame(width: 24)
-                    }
-                }
+        if expanded {
+            Text("Obiettivi")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(GoalInk.secondary)
+                .padding(.leading, 22)
+        } else {
+            design.collapsedLeading(store.rows)
+                .padding(.trailing, 8)
+                .frame(width: design.wing, alignment: .trailing)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(store.rows.count) obiettivi aperti")
-            }
+                .accessibilityLabel(store.rows.accessibilitySummary(now: store.now))
         }
-        .padding(.leading, 10)
     }
 }
 
-/// Right wing: collapsed = sessions running now across all goals (nothing at 0),
+/// Right wing: collapsed = the design's trailing view, snug against the notch;
 /// expanded = the quit button, the only control kept from the old header.
 struct GoalsRightWing: View {
     let expanded: Bool
+    var design: GoalDesign = .current
     @ObservedObject private var store = GoalStore.shared
 
-    private var running: Int { store.rows.reduce(0) { $0 + $1.runningCount } }
-
     var body: some View {
-        Group {
-            if expanded {
-                GoalsQuitButton()
-            } else if running > 0 {
-                Text("\(running)")
-                    .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                    .foregroundStyle(Color.white.opacity(0.85))
-                    .help("\(running) in corso")
-            }
+        if expanded {
+            GoalsQuitButton().padding(.trailing, 10)
+        } else {
+            design.collapsedTrailing(store.rows)
+                .padding(.leading, 8)
+                .frame(width: design.wing, alignment: .leading)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(sessionsLabel)
         }
-        .padding(.trailing, 10)
+    }
+}
+
+private extension GoalsRightWing {
+    var sessionsLabel: String {
+        let n = store.rows.allPulses.count
+        return n == 0 ? "Nessuna sessione attiva" : "\(n) \(n == 1 ? "sessione attiva" : "sessioni attive")"
     }
 }
 

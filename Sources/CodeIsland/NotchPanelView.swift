@@ -219,7 +219,8 @@ struct NotchPanelView: View {
     private var collapsedBarWidth: CGFloat {
         // Immediate hover acknowledgement: a slight widen while the expand delay runs
         let prehoverExtra: CGFloat = shouldShowPrehover ? NotchHoverInteraction.prehoverWidthDelta : 0
-        return effectiveNotchW + compactWingWidth * 2 + prehoverExtra
+        // Goal wings: the chosen design's width, never narrower than the shell's own wing.
+        return effectiveNotchW + max(compactWingWidth, GoalDesign.current.wing) * 2 + prehoverExtra
     }
 
     /// Status and tool-status reserves, split evenly between the two wings.
@@ -276,11 +277,6 @@ struct NotchPanelView: View {
 
                 // Below-notch expanded content
                 if shouldShowExpanded {
-                    Line()
-                        .stroke(.white.opacity(0.15), style: StrokeStyle(lineWidth: 0.5, dash: [4, 3]))
-                        .frame(height: 0.5)
-                        .padding(.horizontal, 12)
-
                     GoalsNotchView(maxHeight: cardSpace.windowHeight > 0 ? max(120, cardSpace.windowHeight - notchHeight - 8) : 300)
                         .transition(.blurFade.combined(with: .move(edge: .top)))
                 }
@@ -5149,15 +5145,6 @@ struct PixelText: View {
         guard count > 0 else { return 0 }
         let px = pixelSize
         return CGFloat(count) * (CGFloat(Self.W) * px + px) - px
-    }
-}
-
-private struct Line: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        p.move(to: CGPoint(x: rect.minX, y: rect.midY))
-        p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
-        return p
     }
 }
 
