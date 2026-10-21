@@ -145,8 +145,32 @@ struct ScreenDetector {
     }
 
     static func signature(for screen: NSScreen) -> String {
-        let frame = screen.frame.integral
+        signature(of: screen.frame)
+    }
+
+    static func signature(of frame: CGRect) -> String {
+        let frame = frame.integral
         return "\(Int(frame.origin.x)):\(Int(frame.origin.y)):\(Int(frame.width)):\(Int(frame.height))"
+    }
+
+    /// displayChoice values: "auto" (active work screen), "mouse" (variable: the screen under the pointer),
+    /// "sig:<signature>" (fixed on one screen), legacy "screen_<index>".
+    static let followMouseChoice = "mouse"
+    static let fixedPrefix = "sig:"
+
+    /// Index of the screen the choice names. nil = "auto", or the named screen is gone: the caller falls back to `preferredScreen`.
+    static func selectedIndex(choice: String, frames: [CGRect], mouse: CGPoint) -> Int? {
+        if choice == followMouseChoice {
+            return frames.firstIndex { $0.contains(mouse) }
+        }
+        if choice.hasPrefix(fixedPrefix) {
+            let target = String(choice.dropFirst(fixedPrefix.count))
+            return frames.firstIndex { signature(of: $0) == target }
+        }
+        if choice.hasPrefix("screen_"), let index = Int(choice.dropFirst(7)), index < frames.count {
+            return index
+        }
+        return nil
     }
 
     private static func overlapArea(lhs: CGRect, rhs: CGRect) -> CGFloat {

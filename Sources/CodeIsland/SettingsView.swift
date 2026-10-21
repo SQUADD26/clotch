@@ -349,6 +349,7 @@ private struct GeneralPage: View {
                     Text("日本語").tag("ja")
                     Text("한국어").tag("ko")
                     Text("Türkçe").tag("tr")
+                    Text("Italiano").tag("it")
                 }
                 Toggle(l10n["launch_at_login"], isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, v in
@@ -369,11 +370,12 @@ private struct GeneralPage: View {
                     .foregroundStyle(.secondary)
                 Picker(l10n["display"], selection: $displayChoice) {
                     Text(l10n["auto"]).tag("auto")
-                    ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { index, screen in
+                    Text(l10n["follow_mouse"]).tag(ScreenDetector.followMouseChoice)
+                    ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { _, screen in
                         let name = screen.localizedName
                         let isBuiltin = name.contains("Built-in") || name.contains("内置")
                         let label = isBuiltin ? l10n["builtin_display"] : name
-                        Text(label).tag("screen_\(index)")
+                        Text(label).tag(ScreenDetector.fixedPrefix + ScreenDetector.signature(for: screen))
                     }
                 }
             }

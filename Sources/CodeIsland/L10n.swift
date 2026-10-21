@@ -22,6 +22,7 @@ final class L10n: ObservableObject {
             if preferred.hasPrefix("ja") { return "ja" }
             if preferred.hasPrefix("tr") { return "tr" }
             if preferred.hasPrefix("ko") { return "ko" }
+            if preferred.hasPrefix("it") { return "it" }
             return "en"
         }
         return language
@@ -41,6 +42,7 @@ final class L10n: ObservableObject {
         "ja": ja,
         "ko": ko,
         "tr": tr,
+        "it": it,
     ]
 
     private static let en: [String: String] = [
@@ -67,6 +69,7 @@ final class L10n: ObservableObject {
         "display": "Display",
         "auto": "Auto",
         "builtin_display": "Built-in Display",
+        "follow_mouse": "Follow Mouse",
         "notch": "(Notch)",
 
         // Behavior
@@ -618,6 +621,14 @@ final class L10n: ObservableObject {
         "reply_failed_placeholder": "Reply failed",
         "reply_aborted_placeholder": "Reply interrupted",
         "hosted_by_harness_hint": "Running under %@",
+    ]
+
+    // Partial on purpose: missing keys fall back to English.
+    private static let it: [String: String] = [
+        "display": "Schermo",
+        "auto": "Automatico",
+        "builtin_display": "Schermo integrato",
+        "follow_mouse": "Segui il mouse",
     ]
 
     private static let de: [String: String] = en.merging([
