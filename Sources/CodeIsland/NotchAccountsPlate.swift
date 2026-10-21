@@ -105,14 +105,14 @@ struct QuotaMeter: View {
     var body: some View {
         let used = window.usedNow(now)
         HStack(spacing: 8) {
-            Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary).frame(width: 64, alignment: .leading)
+            Text(name).font(NotchType.small).foregroundStyle(GoalInk.secondary).frame(width: 58, alignment: .leading)
             GoalBar(progress: used.map { $0 / 100 }, color: NotchQuotaTone.color(used: used), height: 4)
             Text(used.map { "\(Int($0.rounded()))%" } ?? "")
                 .font(.system(size: 11, weight: (used ?? 0) >= 90 ? .semibold : .regular).monospacedDigit())
                 .foregroundStyle((used ?? 0) >= 90 ? GoalTone.stop.color : GoalInk.row)
                 .frame(width: 36, alignment: .trailing)
                 .contentTransition(.numericText())
-            if let reset = window.reset { ResetCountdownLabel(reset: reset) }
+            if let reset = window.reset { ResetCountdownLabel(reset: reset) } else { Color.clear.frame(width: 80, height: 1) }
         }
     }
 }
@@ -130,7 +130,7 @@ struct ResetCountdownLabel: View {
             }
             .foregroundStyle(GoalInk.secondary)
             .lineLimit(1)
-            .fixedSize()
+            .frame(width: 80, alignment: .trailing)  // fits «↻ 6 g 23:59:59»: the bars above and below line up
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Si azzera tra " + text)
         }

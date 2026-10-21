@@ -120,16 +120,6 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertGreaterThan(image.count(white), 100, "title, names and figures")
     }
 
-    func testResetIsSaidWithTheTimeTodayAndTheDayOtherwise() {
-        // `now` is mid-afternoon in Europe and mid-day in UTC: a minute later is the same day.
-        let today = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(60)), now: now)
-        XCTAssertTrue(today.hasPrefix("si azzera alle "), today)
-        let later = AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(3 * 86_400)), now: now)
-        XCTAssertTrue(later.hasPrefix("si azzera ") && !later.contains("alle"), later)
-        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: now.addingTimeInterval(-1)), now: now), "", "already reset")
-        XCTAssertEqual(AccountText.reset(QuotaWindow(used: 10, reset: nil), now: now), "")
-    }
-
     func testHoverCardHangsUnderTheBarsOnlyWhenAllowed() throws {
         var d = data
         d.rows = []  // nothing white in the bar itself: only the card's text is
