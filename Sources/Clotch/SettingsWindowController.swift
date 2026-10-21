@@ -10,6 +10,16 @@ class SettingsWindowController {
 
     private var closeObserver: NSObjectProtocol?
 
+    /// How the window comes up. The tests swap it for a transparent window with no Dock icon (#82).
+    var present: @MainActor (NSWindow) -> Void = { window in
+        // Switch to regular activation policy so the window can receive focus
+        NSApp.setActivationPolicy(.regular)
+        // Use the actual bundle app icon so Dock matches the packaged asset catalog icon.
+        NSApp.applicationIconImage = SettingsWindowController.bundleAppIcon()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     private func clearCloseObserver() {
         if let closeObserver {
             NotificationCenter.default.removeObserver(closeObserver)
@@ -18,14 +28,8 @@ class SettingsWindowController {
     }
 
     func show() {
-        // Switch to regular activation policy so the window can receive focus
-        NSApp.setActivationPolicy(.regular)
-        // Use the actual bundle app icon so Dock matches the packaged asset catalog icon.
-        NSApp.applicationIconImage = Self.bundleAppIcon()
-
         if let window = window {
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
+            present(window)
             return
         }
 
@@ -35,8 +39,7 @@ class SettingsWindowController {
         let window = settings.window
         window.center()
         window.isReleasedWhenClosed = false
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        present(window)
 
         clearCloseObserver()
         closeObserver = NotificationCenter.default.addObserver(
