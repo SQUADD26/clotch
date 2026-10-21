@@ -21,6 +21,8 @@ struct VoiceSettingsPage: View {
     @State private var audience = VoiceTurn.Config.Audience.main
     @State private var onlySession = ""
     @State private var sessions: [DesktopSession] = []
+    @State private var duck = false
+    @State private var duckPercent = VoiceDuck.defaultLevel * 100
     @State private var configBroken = false
     @State private var testing = false
     @State private var note: String?
@@ -64,6 +66,29 @@ struct VoiceSettingsPage: View {
                 Text("Sessioni")
             } footer: {
                 Text("Principali: quelle aperte da te, non da un'altra sessione.")
+            }
+
+            Section {
+                Toggle("Abbassa l'audio mentre parlo", isOn: Binding(get: { duck }, set: { duck = $0; saveDuck() }))
+                    .disabled(configBroken)
+                if duck {
+                    LabeledContent("Livello") {
+                        HStack {
+                            Slider(value: $duckPercent, in: (VoiceDuck.levelRange.lowerBound * 100)...(VoiceDuck.levelRange.upperBound * 100), step: 5) { editing in
+                                if !editing { saveDuck() }
+                            }
+                            Text("\(Int(duckPercent)) %")
+                                .font(.system(size: 12, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 44, alignment: .trailing)
+                        }
+                    }
+                    .disabled(configBroken)
+                }
+            } header: {
+                Text("Altri suoni")
+            } footer: {
+                Text("Musica e video scendono mezzo secondo prima della voce e risalgono mezzo secondo dopo. Al primo uso macOS chiede il permesso per l'audio di sistema.")
             }
 
             VoiceAlertsSection(sessions: sessions, note: $note)
@@ -164,6 +189,14 @@ struct VoiceSettingsPage: View {
         let parsed = VoiceTurn.Config(config)
         audience = parsed.audience
         onlySession = parsed.onlySession
+        duck = parsed.duck
+        duckPercent = (parsed.duckLevel * 100).rounded()
+    }
+
+    private func saveDuck() {
+        run("Impostazioni non salvate", done: "Impostazioni salvate") {
+            try files.updateConfig(["abbassa_audio": duck, "abbassa_livello": Int(duckPercent)])
+        }
     }
 
     private func saveAudience() {

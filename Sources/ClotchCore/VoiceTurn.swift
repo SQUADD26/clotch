@@ -25,6 +25,10 @@ public enum VoiceTurn {
         /// «Parla per» (`parla_per`): every session, only the main ones (no parent session), or only `sessione` (a local id).
         public var audience: Audience
         public var onlySession: String
+        /// «Abbassa l'audio mentre parlo» (`abbassa_audio`, off by default: the first use asks macOS for a permission) and how
+        /// much of their volume the other apps keep meanwhile (`abbassa_livello`, percent).
+        public var duck: Bool
+        public var duckLevel: Double
 
         public enum Audience: String { case all = "tutte", main = "principali", one = "una" }
 
@@ -41,6 +45,9 @@ public enum VoiceTurn {
             maxDayChars = (c["tetto_caratteri"] as? NSNumber)?.intValue ?? VoiceFiles.defaultMaxChars
             audience = Audience(rawValue: c["parla_per"] as? String ?? "") ?? .main
             onlySession = c["sessione"] as? String ?? ""
+            duck = c["abbassa_audio"] as? Bool ?? false
+            let percent = (c["abbassa_livello"] as? NSNumber)?.doubleValue ?? VoiceDuck.defaultLevel * 100
+            duckLevel = min(VoiceDuck.levelRange.upperBound, max(VoiceDuck.levelRange.lowerBound, percent / 100))
         }
 
         /// Whether this end of turn is said. `sessions` = the Claude app's session files; the turn's `cliId` is found
