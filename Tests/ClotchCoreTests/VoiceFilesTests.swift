@@ -73,5 +73,14 @@ final class VoiceFilesTests: XCTestCase {
         XCTAssertEqual(files.pronunciationURL.path, home.appendingPathComponent(".config/voce/pronuncia.json").path)
         try put("non json", files.pronunciationURL)
         XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "pi erre"])
+        try put(#"{"API": "èi pi ài", "n": 3}"#, files.pronunciationURL)
+        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "pi erre", "API": "èi pi ài"], "an entry that is not text is skipped")
+    }
+
+    func testJudgeQuestionIsTheConfigFile() throws {
+        XCTAssertNil(files.judgeQuestion, "no config file: the judge is not asked")
+        XCTAssertEqual(files.judgeQuestionURL.path, home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt").path)
+        try put("E' necessario avvisare l'utente adesso?\n", files.judgeQuestionURL)
+        XCTAssertEqual(files.judgeQuestion, "E' necessario avvisare l'utente adesso?")
     }
 }

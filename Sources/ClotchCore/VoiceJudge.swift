@@ -5,17 +5,15 @@ import FoundationNetworking
 
 /// The judge before the voice speaks (#57, claude-config#1854 «Giudice»): Jev (typesafe.ai, system one) gets three blocks,
 /// Roberto's requests on the subject word for word, the state now and the signal, and answers one question:
-/// «is it necessary to tell the user now?». Same question, state and `giudizio` as claude-config's `voce_giudice.py`.
-/// Without a key, on an error or past the timeout: nil, and the fixed rules decide (better one voice too many).
+/// «is it necessary to tell the user now?». The question is the config's own file (`VoiceFiles.judgeQuestion`, #84); same state
+/// and `giudizio` as claude-config's `voce_giudice.py`. Without the question or a key, on an error or past the timeout: nil,
+/// and the fixed rules decide (better one voice too many).
 public enum VoiceJudge {
     public static let url = URL(string: "https://api.typesafe.ai/v1/systemone")!
     public static let model = "jev-1.13.0"
     public static let threshold = 0.5
     public static let seconds: TimeInterval = 5
     static let maxRequests = 5
-    static let question = "`segnale` e' un cambio di stato del lavoro che un assistente sta facendo per l'utente. `richieste` sono le parole dell'utente sull'argomento, `stato` e' come stanno le cose adesso. "
-        + "E' necessario avvisare l'utente adesso, a voce? Si' solo se gli serve per decidere o agire, se e' qualcosa che ha chiesto o aspettava, o se e' un rischio. "
-        + "No se e' routine, un passaggio intermedio, o cio' che sa gia'."
 
     public struct Verdict: Equatable, Sendable {
         public var say: Bool?   // nil = the judge was not reached
@@ -51,7 +49,7 @@ public enum VoiceJudge {
                 "segnale": "\(e.kind.rawValue): \(e.text.isEmpty ? e.subject : e.text)" + (e.proof.isEmpty ? "" : " (prova: \(e.proof))")]
     }
 
-    public static func request(key: String, state: [String: String]) -> URLRequest {
+    public static func request(key: String, question: String, state: [String: String]) -> URLRequest {
         var r = URLRequest(url: url, timeoutInterval: seconds)
         r.httpMethod = "POST"
         r.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
@@ -62,10 +60,11 @@ public enum VoiceJudge {
     }
 
     /// Asks Jev. `ask` does the network (`URLSession` in the app, a fake in the tests); it never sees past `timeout`.
-    public static func judge(state: [String: String], key: String?, timeout: TimeInterval = seconds,
+    public static func judge(state: [String: String], key: String?, question: String?, timeout: TimeInterval = seconds,
                              ask: @escaping @Sendable (URLRequest) async throws -> Data) async -> Verdict {
+        guard let question else { return Verdict(say: nil, reason: "giudice non raggiunto: nessuna domanda") }
         guard let key, !key.isEmpty else { return Verdict(say: nil, reason: "giudice non raggiunto: nessuna chiave") }
-        let req = request(key: key, state: state)
+        let req = request(key: key, question: question, state: state)
         let data: Data? = await withTaskGroup(of: Data?.self) { g in
             g.addTask { try? await ask(req) }
             g.addTask { try? await Task.sleep(nanoseconds: UInt64(timeout * 1e9)); return nil }

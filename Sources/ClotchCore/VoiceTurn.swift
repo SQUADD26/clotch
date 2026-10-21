@@ -155,12 +155,24 @@ public enum VoiceTurn {
         return String(w[..<(w.lastIndex(of: " ") ?? w.endIndex)]) + "."
     }
 
-    /// The pronunciation list applied (`VoiceFiles.pronunciation`): whole words, any case, the longest first.
+    /// The pronunciation list applied (`VoiceFiles.pronunciation`), as claude-config `voce-pronuncia.ts` does: whole words,
+    /// the longest key first, one pass (a replacement is never read again); an all-capitals key (a sigla) matches capitals
+    /// only («CI» yes, «ci vediamo» stays), any other key matches in any case.
     public static func pronounced(_ text: String, _ words: [String: String]) -> String {
-        words.keys.sorted { $0.count > $1.count }.reduce(text) { t, w in
-            t.replacingOccurrences(of: #"(?<![\p{L}\p{N}_])"# + NSRegularExpression.escapedPattern(for: w) + #"(?![\p{L}\p{N}_])"#,
-                                   with: NSRegularExpression.escapedTemplate(for: words[w]!), options: [.regularExpression, .caseInsensitive])
+        let keys = words.keys.filter { !$0.isEmpty }.sorted { $0.utf16.count > $1.utf16.count }
+        let alternatives = keys.map { "(" + NSRegularExpression.escapedPattern(for: $0) + ")" }.joined(separator: "|")
+        guard !keys.isEmpty, let re = try? NSRegularExpression(pattern: #"(?<![\p{L}\p{N}])(?:"# + alternatives + #")(?![\p{L}\p{N}])"#,
+                                                               options: .caseInsensitive) else { return text }
+        let ns = text as NSString
+        var out = "", last = 0
+        for m in re.matches(in: text, range: NSRange(location: 0, length: ns.length)) {
+            let found = ns.substring(with: m.range)
+            let k = keys[(1...keys.count).first { m.range(at: $0).location != NSNotFound }! - 1]
+            let sigla = k == k.uppercased() && k.contains(where: \.isLetter)
+            out += ns.substring(with: NSRange(location: last, length: m.range.location - last)) + (sigla && found != k ? found : words[k]!)
+            last = m.range.location + m.range.length
         }
+        return out + ns.substring(from: last)
     }
 
     /// The ElevenLabs request, the text said as the pronunciation list wants: the key only in the `xi-api-key` header, never in the URL or the body.

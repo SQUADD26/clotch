@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, pronunciationURL, basePronunciationURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -21,6 +21,7 @@ public struct VoiceFiles {
         promptURL = mod.appendingPathComponent("voce-parlatore.md")
         basePronunciationURL = mod.appendingPathComponent("voce-pronuncia.json")
         pronunciationURL = voce.appendingPathComponent("pronuncia.json")
+        judgeQuestionURL = home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt")  // the same question as `voce_giudice.py`
         dayURL = voce.appendingPathComponent("giorno.json")
         lastURL = voce.appendingPathComponent("ultima.json")
         statusURL = voce.appendingPathComponent("stato.json")
@@ -79,15 +80,21 @@ public struct VoiceFiles {
     }
 
     /// The instructions Haiku follows: the config's canonical `voce-parlatore.md` (#84). nil (missing or empty) = the voice is silent.
-    public var prompt: String? {
-        let t = ((try? String(contentsOf: promptURL, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    public var prompt: String? { text(promptURL) }
+
+    /// The judge's question: the config's `voce_giudice_domanda.txt` (#84). nil = the judge is not asked.
+    public var judgeQuestion: String? { text(judgeQuestionURL) }
+
+    private func text(_ url: URL) -> String? {
+        let t = ((try? String(contentsOf: url, encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         return t.isEmpty ? nil : t
     }
 
     /// How words are said (`{"parola": "come si dice"}`): the config's base list, then Roberto's `pronuncia.json` on top.
-    /// A missing or broken file counts as empty.
+    /// A missing or broken file counts as empty; an entry that is not text is skipped.
     public var pronunciation: [String: String] {
-        let read = { (u: URL) in (try? Data(contentsOf: u)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: String] } ?? [:] }
+        let read = { (u: URL) in ((try? Data(contentsOf: u)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:])
+            .compactMapValues { $0 as? String } }
         return read(basePronunciationURL).merging(read(pronunciationURL)) { _, own in own }
     }
 

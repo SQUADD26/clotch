@@ -214,21 +214,24 @@ final class VoiceTurnTests: XCTestCase {
     }
 
     func testPronunciationAppliedBeforeElevenLabs() throws {
-        let words = ["Clotch": "Clocc", "notch": "nocc", "PR": "pi erre"]
-        let r = VoiceTurn.speechRequest(text: "Clotch sul notch, la PR e il NOTCH. Clotchino resta.", config: VoiceTurn.Config([:]), key: "k", pronunciation: words)
+        let words = ["Clotch": "Clocc", "notch": "nocc", "PR": "pi àr", "CI": "si ai", "pi": "PI"]
+        let r = VoiceTurn.speechRequest(text: "Clotch sul notch, la PR e il NOTCH. Clotchino resta, la CI ci vede, la pr no.",
+                                        config: VoiceTurn.Config([:]), key: "k", pronunciation: words)
         let o = try JSONSerialization.jsonObject(with: XCTUnwrap(r.httpBody)) as! [String: Any]
-        XCTAssertEqual(o["text"] as? String, "Clocc sul nocc, la pi erre e il nocc. Clotchino resta.")
+        XCTAssertEqual(o["text"] as? String, "Clocc sul nocc, la pi àr e il nocc. Clotchino resta, la si ai ci vede, la pr no.",
+                       "a sigla matches capitals only; one pass: «pi» of «pi àr» is not read again")
+        XCTAssertEqual(VoiceTurn.pronounced("niente", [:]), "niente")
         XCTAssertEqual(VoiceTurn.pronounced("costa 5$", ["5$": "cinque dollari $1"]), "costa cinque dollari $1")
     }
 
     func testNoCopyOfTheVoicePromptInClotch() throws {
-        // #84: the prompt is the config's file; a line of it inside Clotch's sources is a copy.
+        // #84: the prompt and the judge question are the config's files; a line of them inside Clotch's sources is a copy.
         let sources = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../Sources").standardized
         let all = FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil)!.compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" }
         XCTAssertFalse(all.isEmpty)
         for f in all {
             let src = try String(contentsOf: f, encoding: .utf8)
-            for line in ["Sei la voce di Roberto", "Come rispondi: prima riga la frase da dire"] {
+            for line in ["Sei la voce di Roberto", "Come rispondi: prima riga la frase da dire", "E' necessario avvisare l'utente adesso"] {
                 XCTAssertNil(src.range(of: line), f.lastPathComponent)
             }
         }
