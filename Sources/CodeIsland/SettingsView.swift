@@ -378,6 +378,7 @@ private struct GeneralPage: View {
                         Text(label).tag(ScreenDetector.fixedPrefix + ScreenDetector.signature(for: screen))
                     }
                 }
+                Button(l10n["customize_notch"]) { NotchCustomizeWindowController.shared.show() }
             }
         }
         .formStyle(.grouped)

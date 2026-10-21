@@ -24,6 +24,7 @@ enum SettingsKey {
     // General - System
     static let launchAtLogin = "launchAtLogin"
     static let displayChoice = "displayChoice"             // "auto", "mouse", "sig:<signature>" (ScreenDetector.selectedIndex)
+    static let notchLayouts = "notchLayouts"               // JSON NotchLayoutStore, one layout per screen signature
     static let allowHorizontalDrag = "allowHorizontalDrag"
     static let avoidMenuBarIcons = "avoidMenuBarIcons"
     static let panelHorizontalOffset = "panelHorizontalOffset"
