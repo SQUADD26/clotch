@@ -476,7 +476,8 @@ struct NotchPanelView: View {
         .environment(\.sessionGroupingTabsRoom, SessionGroupingTabsLayout.room(
             panelWidth: panelWidth, notchWidth: notchW, hasNotch: hasNotch
         ))
-        .animation(NotchAnimation.open, value: appState.surface)
+        // Closing is its own spring: this modifier would otherwise win over `withAnimation(.close)`.
+        .animation(appState.surface.isExpanded ? NotchAnimation.open : NotchAnimation.close, value: appState.surface)
     }
 }
 

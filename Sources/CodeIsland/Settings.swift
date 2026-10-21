@@ -35,7 +35,8 @@ enum SettingsKey {
     static let hideWhenNoSession = "hideWhenNoSession"
     static let smartSuppress = "smartSuppress"
     static let collapseOnMouseLeave = "collapseOnMouseLeave"
-    static let notchAnimationSpeed = "notchAnimationSpeed"
+    static let notchOpenSpeed = "notchOpenSpeed"
+    static let notchCloseSpeed = "notchCloseSpeed"
     static let autoCollapseAfterSessionJump = "autoCollapseAfterSessionJump"
     static let autoExpandOnPermission = "autoExpandOnPermission"
     static let autoExpandOnCompletion = "autoExpandOnCompletion"
@@ -177,7 +178,8 @@ struct SettingsDefaults {
     static let hideWhenNoSession = false
     static let smartSuppress = true
     static let collapseOnMouseLeave = true
-    static let notchAnimationSpeed = NotchAnimationSpeed.normal
+    static let notchOpenSpeed = NotchAnimationSpeed.normal
+    static let notchCloseSpeed = NotchAnimationSpeed.normal
     static let autoCollapseAfterSessionJump = false
     static let autoExpandOnPermission = true
     static let autoExpandOnCompletion = true
@@ -283,7 +285,8 @@ class SettingsManager {
             SettingsKey.hideWhenNoSession: SettingsDefaults.hideWhenNoSession,
             SettingsKey.smartSuppress: SettingsDefaults.smartSuppress,
             SettingsKey.collapseOnMouseLeave: SettingsDefaults.collapseOnMouseLeave,
-            SettingsKey.notchAnimationSpeed: SettingsDefaults.notchAnimationSpeed,
+            SettingsKey.notchOpenSpeed: SettingsDefaults.notchOpenSpeed,
+            SettingsKey.notchCloseSpeed: SettingsDefaults.notchCloseSpeed,
             SettingsKey.autoCollapseAfterSessionJump: SettingsDefaults.autoCollapseAfterSessionJump,
             SettingsKey.autoExpandOnPermission: SettingsDefaults.autoExpandOnPermission,
             SettingsKey.autoExpandOnCompletion: SettingsDefaults.autoExpandOnCompletion,
@@ -406,9 +409,14 @@ class SettingsManager {
         set { defaults.set(newValue, forKey: SettingsKey.collapseOnMouseLeave) }
     }
 
-    var notchAnimationSpeed: Double {
-        get { NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchAnimationSpeed)) }
-        set { defaults.set(NotchAnimationSpeed.clamped(newValue), forKey: SettingsKey.notchAnimationSpeed) }
+    var notchOpenSpeed: Double {
+        get { NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchOpenSpeed)) }
+        set { defaults.set(NotchAnimationSpeed.clamped(newValue), forKey: SettingsKey.notchOpenSpeed) }
+    }
+
+    var notchCloseSpeed: Double {
+        get { NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchCloseSpeed)) }
+        set { defaults.set(NotchAnimationSpeed.clamped(newValue), forKey: SettingsKey.notchCloseSpeed) }
     }
 
     var hapticOnHover: Bool {

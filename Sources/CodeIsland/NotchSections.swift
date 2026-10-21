@@ -34,11 +34,19 @@ struct NotchSections: View {
         TimelineView(.periodic(from: .now, by: 30)) { ctx in
             NotchSectionsContent(store: store, quota: quota, now: ctx.date, tab: $tab)
         }
-        .frame(maxHeight: maxHeight, alignment: .top)
+        .hugging(maxHeight: maxHeight)
         .onAppear {  // opening the notch is when fresh numbers matter
             quota.refresh()
             PullRequestFeed.shared.refresh()
         }
+    }
+}
+
+extension View {
+    /// As tall as its content, up to `maxHeight`. A bare `.frame(maxHeight:)` takes all the room it is
+    /// offered up to the cap, which left black under a short tab.
+    func hugging(maxHeight: CGFloat) -> some View {
+        frame(maxHeight: maxHeight, alignment: .top).fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -74,11 +82,13 @@ struct NotchSectionsContent: View {
 struct TabBar: View {
     @Binding var tab: NotchTab
     @Namespace private var highlight
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(NotchTab.allCases) { item in
-                Button { tab = item } label: {
+                // withAnimation, so the notch's height follows the new tab with the same spring as the tab.
+                Button { withAnimation(NotchMotion.animation(reduce: reduceMotion)) { tab = item } } label: {
                     HStack(spacing: 6) {
                         Image(systemName: item.symbol)
                         Text(item.title)

@@ -24,18 +24,16 @@ enum NotchAnimationMetrics {
     static let baseCloseResponse: TimeInterval = 0.38
 
     static var openResponse: TimeInterval {
-        NotchAnimationSpeed.response(base: baseOpenResponse, speed: storedSpeed)
+        NotchAnimationSpeed.response(base: baseOpenResponse, speed: storedSpeed(SettingsKey.notchOpenSpeed))
     }
 
     static var closeResponse: TimeInterval {
-        NotchAnimationSpeed.response(base: baseCloseResponse, speed: storedSpeed)
+        NotchAnimationSpeed.response(base: baseCloseResponse, speed: storedSpeed(SettingsKey.notchCloseSpeed))
     }
 
-    private static var storedSpeed: Double {
+    private static func storedSpeed(_ key: String) -> Double {
         let defaults = UserDefaults.standard
-        guard defaults.object(forKey: SettingsKey.notchAnimationSpeed) != nil else {
-            return NotchAnimationSpeed.normal
-        }
-        return NotchAnimationSpeed.clamped(defaults.double(forKey: SettingsKey.notchAnimationSpeed))
+        guard defaults.object(forKey: key) != nil else { return NotchAnimationSpeed.normal }
+        return NotchAnimationSpeed.clamped(defaults.double(forKey: key))
     }
 }
