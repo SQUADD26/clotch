@@ -178,7 +178,9 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     }
 
     private var visibilityTimer: Timer?
-    private var autoScreenPoller: Timer?
+    private var mouseMoveMonitor: Any?
+    private var mouseScreenFrame = CGRect.zero
+    private var mouseHopPending = false
     private var fullscreenPoller: Timer?
     private var isSessionObservationArmed = false
     private var goalsObservation: AnyCancellable?
@@ -255,6 +257,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
         self.panel = panel
         self.lastChosenScreenSignature = ScreenDetector.signature(for: screen)
+        self.mouseScreenFrame = screen.frame
         // A follow-up for the card under the pointer would remind someone who
         // is already reading it. The island's own hover says whether the
         // pointer is on the card (`pointerOverIsland`); the window frame —
@@ -334,7 +337,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
         // Observe settings changes (display choice, panel height)
         observeSettingsChanges()
-        configureAutoScreenPolling()
+        configureMouseFollow()
 
         // Global click monitor: close panel + repost click when clicking outside
         globalClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
@@ -392,6 +395,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
         let screen = chosenScreen()
         let signature = ScreenDetector.signature(for: screen)
+        mouseScreenFrame = screen.frame
 
         if forceRebuild {
             rebuildForCurrentScreen(screen)
@@ -484,7 +488,7 @@ class PanelWindowController: NSObject, NSWindowDelegate {
                 if newChoice != self.lastDisplayChoice {
                     self.lastDisplayChoice = newChoice
                     self.refreshCurrentScreen(forceRebuild: true)
-                    self.configureAutoScreenPolling()
+                    self.configureMouseFollow()
                 } else if newHeightMode != self.lastNotchHeightMode
                     || abs(newCustomHeight - self.lastCustomNotchHeight) > 0.001 {
                     self.lastNotchHeightMode = newHeightMode
@@ -499,19 +503,23 @@ class PanelWindowController: NSObject, NSWindowDelegate {
         settingsObservers.append(observer)
     }
 
-    private func configureAutoScreenPolling() {
-        autoScreenPoller?.invalidate()
-        autoScreenPoller = nil
+    /// "Variabile" mode: the island follows the pointer. The monitor exists only in that mode; each move costs
+    /// one rect test, and the screen is re-chosen only when the pointer enters a different screen.
+    private func configureMouseFollow() {
+        if let monitor = mouseMoveMonitor {
+            NSEvent.removeMonitor(monitor)
+            mouseMoveMonitor = nil
+        }
+        guard SettingsManager.shared.displayChoice == ScreenDetector.followMouseChoice else { return }
 
-        guard SettingsManager.shared.displayChoice == "auto" else { return }
-
-        // Screen-parameter / Space-change / frontmost-app notifications already cover the
-        // common cases. This poller is a fallback for the rare path where a window is
-        // dragged to another display without switching focus — a low cadence is enough
-        // and every tick runs a full CGWindowListCopyWindowInfo, which was measurably
-        // contributing to Energy Impact (#92).
-        autoScreenPoller = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+        mouseMoveMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] _ in
+            guard let self, !self.mouseHopPending else { return }
+            let pointer = NSEvent.mouseLocation
+            guard !self.mouseScreenFrame.contains(pointer),
+                  NSScreen.screens.contains(where: { $0.frame.contains(pointer) }) else { return }
+            self.mouseHopPending = true
+            Task { @MainActor [weak self] in
+                self?.mouseHopPending = false
                 self?.refreshCurrentScreen()
             }
         }
@@ -610,16 +618,15 @@ class PanelWindowController: NSObject, NSWindowDelegate {
 
     /// Choose which screen to display on based on displayChoice setting
     private func chosenScreen() -> NSScreen {
-        let choice = SettingsManager.shared.displayChoice
-
-        // Handle specific screen index: "screen_0", "screen_1", etc.
-        if choice.hasPrefix("screen_"),
-           let index = Int(choice.dropFirst(7)),
-           index < NSScreen.screens.count {
-            return NSScreen.screens[index]
+        let screens = NSScreen.screens
+        if let index = ScreenDetector.selectedIndex(
+            choice: SettingsManager.shared.displayChoice,
+            frames: screens.map(\.frame),
+            mouse: NSEvent.mouseLocation
+        ) {
+            return screens[index]
         }
-
-        // "auto" — prefer notch screen, fallback to main
+        // "auto", or the chosen screen is gone — prefer the active work screen, then notch, then main
         return ScreenDetector.preferredScreen
     }
 
@@ -727,7 +734,6 @@ class PanelWindowController: NSObject, NSWindowDelegate {
     }
 
     deinit {
-        autoScreenPoller?.invalidate()
         fullscreenPoller?.invalidate()
         for observer in settingsObservers {
             NotificationCenter.default.removeObserver(observer)
@@ -736,6 +742,9 @@ class PanelWindowController: NSObject, NSWindowDelegate {
             NSEvent.removeMonitor(monitor)
         }
         if let monitor = localDragMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        if let monitor = mouseMoveMonitor {
             NSEvent.removeMonitor(monitor)
         }
     }

@@ -22,6 +22,7 @@ final class L10n: ObservableObject {
             if preferred.hasPrefix("ja") { return "ja" }
             if preferred.hasPrefix("tr") { return "tr" }
             if preferred.hasPrefix("ko") { return "ko" }
+            if preferred.hasPrefix("it") { return "it" }
             return "en"
         }
         return language
@@ -41,6 +42,7 @@ final class L10n: ObservableObject {
         "ja": ja,
         "ko": ko,
         "tr": tr,
+        "it": it,
     ]
 
     private static let en: [String: String] = [
@@ -67,6 +69,29 @@ final class L10n: ObservableObject {
         "display": "Display",
         "auto": "Auto",
         "builtin_display": "Built-in Display",
+        "follow_mouse": "Follows Mouse",
+        "window_appearance": "Appearance",
+        "appearance_dark": "Dark",
+        "appearance_light": "Light",
+        "appearance_system": "System",
+        "customize_notch": "Customize Notch",
+        "customize_notch_hint": "Drag the elements into the notch.",
+        "notch_centre_hint": "Centre is free only on screens without a notch",
+        "notch_el_goalRings": "Goal rings",
+        "notch_el_activeGoal": "Active goal and time",
+        "notch_el_accounts": "Account in use",
+        "notch_el_accountsWide": "Account in use, expanded",
+        "notch_el_pendingRequests": "Pending requests",
+        "notch_el_workingSessions": "Sessions at work",
+        "notch_screen_with": "%@, with notch",
+        "notch_screen_without": "%@, no notch",
+        "notch_position": "Position",
+        "notch_position_fixed": "Fixed",
+        "notch_width": "Width",
+        "notch_width_low": "Covers little of the menu bar",
+        "notch_width_mid": "Covers up to half of the menu bar",
+        "notch_width_high": "Covers most of the menu bar",
+        "notch_done": "Done",
         "notch": "(Notch)",
 
         // Behavior
@@ -618,6 +643,36 @@ final class L10n: ObservableObject {
         "reply_failed_placeholder": "Reply failed",
         "reply_aborted_placeholder": "Reply interrupted",
         "hosted_by_harness_hint": "Running under %@",
+    ]
+
+    // Partial on purpose: missing keys fall back to English.
+    private static let it: [String: String] = [
+        "display": "Schermo",
+        "auto": "Automatico",
+        "builtin_display": "Schermo integrato",
+        "follow_mouse": "Segue il mouse",
+        "window_appearance": "Aspetto",
+        "appearance_dark": "Scuro",
+        "appearance_light": "Chiaro",
+        "appearance_system": "Sistema",
+        "customize_notch": "Personalizza il notch",
+        "customize_notch_hint": "Trascina gli elementi nel notch.",
+        "notch_centre_hint": "Centro libero solo sugli schermi senza notch",
+        "notch_el_goalRings": "Anelli degli obiettivi",
+        "notch_el_activeGoal": "Obiettivo attivo e tempo",
+        "notch_el_accounts": "Account in uso",
+        "notch_el_accountsWide": "Account in uso, esteso",
+        "notch_el_pendingRequests": "Richieste in attesa",
+        "notch_el_workingSessions": "Sessioni al lavoro",
+        "notch_screen_with": "%@, con notch",
+        "notch_screen_without": "%@, senza notch",
+        "notch_position": "Posizione",
+        "notch_position_fixed": "Fissa",
+        "notch_width": "Larghezza",
+        "notch_width_low": "Copre poco della barra dei menu",
+        "notch_width_mid": "Copre fino a metà della barra dei menu",
+        "notch_width_high": "Copre quasi tutta la barra dei menu",
+        "notch_done": "Fine",
     ]
 
     private static let de: [String: String] = en.merging([
