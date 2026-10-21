@@ -151,3 +151,66 @@ final class PageSpringTests: XCTestCase {
         XCTAssertEqual(PageDrag.springVelocity(500, travel: 0), 0)
     }
 }
+
+final class PageSpringHandoverTests: XCTestCase {
+    private let t0 = Date(timeIntervalSince1970: 1_000)
+
+    private func run(_ s: inout PageSpring, _ seconds: Double) {
+        for _ in 0..<Int(seconds * 120) { s.advance(by: 1.0 / 120) }
+    }
+
+    func testSettlesOnTheRestPlace() {
+        var s = PageSpring(offset: 440, velocity: 0)
+        run(&s, 1.5)
+        XCTAssertTrue(s.isAtRest)
+    }
+
+    func testStartSpeedIsKept() {
+        var still = PageSpring(offset: 440), fast = PageSpring(offset: 440, velocity: -3_000)
+        run(&still, 0.05); run(&fast, 0.05)
+        XCTAssertLessThan(fast.offset, still.offset - 50)
+    }
+
+    func testGestureDuringTheSpringTakesItWhereItIs() {
+        var s = PageSpring(offset: 440)  // a page turn just began: the pages are one pitch behind
+        run(&s, 0.1)
+        XCTAssertGreaterThan(s.offset, 50)  // still on its way
+        // The fingers land: the drag starts from the pages' real place, so nothing jumps.
+        var d = PageDrag(travel: s.offset)
+        XCTAssertEqual(PageDrag.offset(travel: d.travel, index: 1, count: 3, width: 440), s.offset, accuracy: 0.001)
+        d.move(dx: -10, at: t0)
+        XCTAssertEqual(PageDrag.offset(travel: d.travel, index: 1, count: 3, width: 440), s.offset - 10, accuracy: 0.001)
+    }
+
+    func testTwoQuickGesturesMakeTwoPages() {
+        let pitch = 440.0
+        var index = 0
+        // First flick: lets go with speed, the page turn starts at once.
+        var first = PageDrag(), t = t0
+        for _ in 0..<5 { t += 0.016; first.move(dx: -40, at: t) }
+        let target1 = PageDrag.settle(index: index, offset: first.travel, velocity: first.releaseVelocity(at: t), width: pitch, count: 3)
+        XCTAssertEqual(target1, 1)
+        var s = PageSpring(offset: first.travel + Double(index - target1) * pitch, velocity: first.releaseVelocity(at: t))
+        index = target1
+        // 0.1 s later, still moving: a second flick takes the pages and turns once more.
+        run(&s, 0.1)
+        XCTAssertFalse(s.isAtRest)
+        var second = PageDrag(travel: s.offset)
+        for _ in 0..<5 { t += 0.016; second.move(dx: -40, at: t) }
+        let offset = PageDrag.offset(travel: second.travel, index: index, count: 3, width: pitch)
+        let target2 = PageDrag.settle(index: index, offset: offset, velocity: second.releaseVelocity(at: t), width: pitch, count: 3)
+        XCTAssertEqual(target2, 2)
+        s = PageSpring(offset: offset + Double(index - target2) * pitch, velocity: second.releaseVelocity(at: t))
+        run(&s, 1.5)
+        XCTAssertTrue(s.isAtRest)
+    }
+
+    func testWheelTwoSpinsCloseTogetherMakeTwoSteps() {
+        var s = PageSwipe()
+        XCTAssertEqual(s.feed(dx: -1, phase: .wheel, at: t0), 1)
+        XCTAssertNil(s.feed(dx: -1, phase: .wheel, at: t0.addingTimeInterval(0.1)))  // same spin
+        XCTAssertEqual(s.feed(dx: -1, phase: .wheel, at: t0.addingTimeInterval(0.1 + PageSwipe.wheelGap + 0.01)), 1)
+        XCTAssertEqual(s.feed(dx: 1, phase: .wheel, at: t0.addingTimeInterval(0.8)), -1)
+        XCTAssertEqual(s.feed(dx: -1, phase: .wheel, at: t0.addingTimeInterval(0.82)), 1)  // turned back at once
+    }
+}

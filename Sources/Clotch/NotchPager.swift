@@ -6,7 +6,9 @@ import ClotchCore
 /// with a rubber band past the first and last page; on release they settle on the page distance and speed
 /// point to (`PageDrag`) with a spring that keeps the gesture's speed. The mouse wheel (one step per spin,
 /// `PageSwipe`), the ‹ › buttons and the dots move with the same spring: the next page comes in while the
-/// other leaves. Reduce Motion: a short fade.
+/// other leaves. The spring is `PageSpring`, run here tick by tick, so `offset` is always where the pages
+/// really are: any new gesture, of any kind, takes them from there, with their speed (#119).
+/// Reduce Motion: a short fade.
 struct Pager<Page: View, Footer: View>: View {
     let count: Int
     @Binding var index: Int
@@ -17,13 +19,15 @@ struct Pager<Page: View, Footer: View>: View {
     @ViewBuilder let footer: (_ go: @escaping (Int) -> Void) -> Footer
     /// The pages' shift from their rest place, in points (negative = toward the next page).
     @State private var offset: CGFloat = 0
+    @State private var spring = PageSpring()
+    @State private var ticker: Timer?
+    @State private var tickedAt = Date()
     @State private var width: CGFloat = 0
     @State private var drag: PageDrag?
     /// The trackpad gesture's axis, fixed by its first move: sideways moves the pages, else it passes through.
     @State private var sideways: Bool?
     /// Pages still drawn while a move settles, so none pops out mid-way.
     @State private var keep: ClosedRange<Int>?
-    @State private var moves = 0
     @State private var swipe = PageSwipe()
     @State private var monitor: Any?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -75,23 +79,40 @@ struct Pager<Page: View, Footer: View>: View {
         if reduceMotion {
             withAnimation(NotchMotion.still) { index = target }
         } else {
-            settle(on: target, velocity: 0)
+            settle(on: target, fingers: nil)
         }
     }
 
-    /// Moves to `target` from wherever the pages are, carrying `velocity` (points per second).
-    private func settle(on target: Int, velocity: Double) {
-        let travel = CGFloat(index - target) * pitch - offset
+    /// Moves to `target` from wherever the pages are. `index` and `offset` trade one pitch per page, so
+    /// nothing jumps on screen (the animation is only for the notch's height); then the spring runs from
+    /// there, with the speed of the fingers that let go, or else the one it already had.
+    private func settle(on target: Int, fingers: Double?) {
+        let from = Double(offset) + Double(index - target) * Double(pitch)
+        let speed = fingers.map { PageDrag.springVelocity($0, travel: -from) * -from } ?? spring.velocity
         let low = min(index, target) - 1, high = max(index, target) + 1
         keep = keep.map { min($0.lowerBound, low)...max($0.upperBound, high) } ?? low...high
-        moves += 1
-        let move = moves
-        withAnimation(NotchMotion.page(velocity: PageDrag.springVelocity(velocity, travel: Double(travel)))) {
-            if target != index { index = target }
-            offset = 0
-        } completion: {
-            if moves == move { keep = nil }
+        withAnimation(NotchMotion.spring) {
+            index = target
+            offset = CGFloat(from)
         }
+        spring = PageSpring(offset: from, velocity: speed)
+        ticker?.invalidate()
+        tickedAt = Date()
+        let timer = Timer(timeInterval: 1.0 / 120, repeats: true) { timer in
+            let now = Date()
+            spring.advance(by: now.timeIntervalSince(tickedAt))
+            tickedAt = now
+            offset = CGFloat(spring.offset)
+            if spring.isAtRest { timer.invalidate(); keep = nil }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        ticker = timer
+    }
+
+    /// A gesture takes the pages where they are: the spring stops, `offset` stays.
+    private func grab() {
+        ticker?.invalidate()
+        spring = PageSpring()
     }
 
     /// Scrolls over the open notch page. The monitor lives only while the pager is on screen, so it costs
@@ -123,8 +144,8 @@ struct Pager<Page: View, Footer: View>: View {
         if sideways == nil, event.scrollingDeltaX != 0 || event.scrollingDeltaY != 0 {
             sideways = event.isSideways && !TabBarPointer.inside  // over the tab bar, the scroll moves the tab
             if sideways == true {
-                drag = PageDrag()
-                moves += 1  // a settle in flight is taken over: its pages stay drawn
+                grab()  // a settle in flight is taken over: its pages stay drawn
+                drag = PageDrag(travel: Double(offset))
             }
         }
         guard sideways == true, var d = drag else { return false }
@@ -132,20 +153,20 @@ struct Pager<Page: View, Footer: View>: View {
             drag = nil
             let target = PageDrag.settle(index: index, offset: Double(offset), velocity: d.releaseVelocity(at: now),
                                          width: Double(pitch), count: count)
-            settle(on: target, velocity: d.releaseVelocity(at: now))
+            settle(on: target, fingers: d.releaseVelocity(at: now))
             return true
         }
         d.move(dx: Double(event.scrollingDeltaX), at: now)
         drag = d
-        withAnimation(NotchMotion.follow) {
-            offset = CGFloat(PageDrag.offset(travel: d.travel, index: index, count: count, width: Double(pitch)))
-        }
+        offset = CGFloat(PageDrag.offset(travel: d.travel, index: index, count: count, width: Double(pitch)))
         return true
     }
 
     private func stopSwipes() {
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
+        ticker?.invalidate()
+        ticker = nil
     }
 }
 

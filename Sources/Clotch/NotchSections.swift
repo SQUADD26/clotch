@@ -59,7 +59,7 @@ extension View {
 }
 
 /// The tab bar and the tab, without the clock: `--snapshot` draws this. A sideways scroll over the
-/// tab bar moves one tab per gesture; gestures during the slide are dropped, so steps never add up.
+/// tab bar moves one tab per gesture; a gesture during the slide starts at once (#119).
 struct NotchSectionsContent: View {
     @ObservedObject var store: GoalStore
     @ObservedObject var quota: AccountQuotaFeed
@@ -67,7 +67,6 @@ struct NotchSectionsContent: View {
     @Binding var tab: NotchTab
     @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @State private var forward = true
-    @State private var moving = false
     @State private var swipe = PageSwipe()
     @State private var monitor: Any?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -104,12 +103,7 @@ struct NotchSectionsContent: View {
         guard target != shown else { return }
         let all = NotchTab.allCases
         forward = all.firstIndex(of: target)! > all.firstIndex(of: shown)!
-        moving = true
-        withAnimation(NotchMotion.animation(reduce: reduceMotion)) {
-            tab = target
-        } completion: {
-            moving = false
-        }
+        withAnimation(NotchMotion.animation(reduce: reduceMotion)) { tab = target }
     }
 
     /// Never swallows: over the tab bar the event reaches only buttons, elsewhere the Pager owns it.
@@ -119,7 +113,7 @@ struct NotchSectionsContent: View {
             guard event.window is NSPanel else { return event }
             let step = swipe.feed(event)  // fed always, so each gesture's start is seen
             let all = tabs
-            guard TabBarPointer.inside, !moving, let step,
+            guard TabBarPointer.inside, let step,
                   let i = PageSwipe.target(from: all.firstIndex(of: shown) ?? 0, step: step, count: all.count)
             else { return event }
             go(all[i])
