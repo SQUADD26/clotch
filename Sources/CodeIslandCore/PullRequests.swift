@@ -6,6 +6,7 @@ import Foundation
 public struct PRRef: Hashable, Sendable, Comparable {
     public let repo: String  // owner/name
     public let number: Int
+    public init(repo: String, number: Int) { self.repo = repo; self.number = number }
     public static func < (a: PRRef, b: PRRef) -> Bool { (a.repo, a.number) < (b.repo, b.number) }
 }
 
