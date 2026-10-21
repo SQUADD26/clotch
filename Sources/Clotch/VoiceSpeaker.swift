@@ -15,6 +15,8 @@ final class VoiceSpeaker {
     private var source: DispatchSourceFileSystemObject?
     private var player: AVAudioPlayer?
     private var heartbeat: Timer?
+    /// The one lowering of the other apps' audio running now (#83); a second speech while it runs does not start another tap.
+    private var ducker: AudioDucker?
 
     func start() {
         refresh()
@@ -27,6 +29,7 @@ final class VoiceSpeaker {
     func stop() {
         heartbeat?.invalidate()
         try? FileManager.default.removeItem(at: files.activeURL)
+        ducker?.end()  // the others' audio back at once, never left lowered by a quit
     }
 
     /// The hooks follow the switch and the key: on with a key = installed (once) in every Claude Code folder and the
@@ -138,16 +141,22 @@ final class VoiceSpeaker {
         p.prepareToPlay()
         let levels = await Task.detached { Self.levels(data, rate: rate) }.value
         let length = p.duration / Double(rate)
-        let id = UUID().uuidString
-        let start = Date().addingTimeInterval(VoiceStatus.lead)
-        writeStatus(id: id, speaking: true, start: start, end: start.addingTimeInterval(length), levels: levels)
-        player = p
-        try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
-        p.play()
-        try? await Task.sleep(nanoseconds: UInt64(length * 1e9))
-        player = nil
-        writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
-        return nil
+        let ducking = config.duck && ducker == nil ? AudioDucker(level: config.duckLevel) : nil
+        ducker = ducking
+        defer { if ducker === ducking { ducker = nil } }
+        // Others fall for `VoiceDuck.fadeDown` while the light lead runs, the voice at full volume, then they rise (see `VoiceDuck.around`).
+        return await VoiceDuck.around(ducking, level: config.duckLevel, sleep: { _ = try? await Task.sleep(nanoseconds: UInt64($0 * 1e9)) }) {
+            let id = UUID().uuidString
+            let start = Date().addingTimeInterval(VoiceStatus.lead)
+            writeStatus(id: id, speaking: true, start: start, end: start.addingTimeInterval(length), levels: levels)
+            player = p
+            try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
+            p.play()
+            try? await Task.sleep(nanoseconds: UInt64(length * 1e9))
+            player = nil
+            writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
+            return nil
+        }
     }
 
     /// `stato.json`, the contract the edge light reads (`NotchVoice.swift`).
