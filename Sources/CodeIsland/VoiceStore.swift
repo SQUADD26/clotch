@@ -55,7 +55,7 @@ final class VoiceStore: ObservableObject {
         let next = (try? Data(contentsOf: file)).flatMap(VoiceStatus.parse)
         guard let next, next.isSpeaking(at: Date()) else { status = nil; return }
         if next != status { status = next }
-        let item = DispatchWorkItem { [weak self] in self?.status = nil }
+        let item = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.status = nil } }
         expiry = item
         DispatchQueue.main.asyncAfter(deadline: .now() + max(0, next.end.timeIntervalSinceNow), execute: item)
     }

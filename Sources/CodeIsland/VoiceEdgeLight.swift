@@ -40,19 +40,29 @@ struct VoiceEdgeLightLive<S: Shape>: View {
     }
 }
 
+/// Not generic on purpose: Swift has no static stored properties in generic types.
+private enum VoiceEdgeLook {
+    static let period: TimeInterval = 14 // one slow turn of the colours
+    /// Pink → violet → blue → cyan → orange → pink: closes the loop, no green, yellow or red.
+    static let colors: [Color] = [
+        Color(red: 1.00, green: 0.31, blue: 0.63), Color(red: 0.67, green: 0.35, blue: 1.00),
+        Color(red: 0.24, green: 0.52, blue: 1.00), Color(red: 0.24, green: 0.82, blue: 1.00),
+        Color(red: 1.00, green: 0.58, blue: 0.24), Color(red: 1.00, green: 0.31, blue: 0.63),
+    ]
+}
+
 /// The only place with a clock, and it exists only while this view is in the tree (= while speaking).
 private struct VoiceGlowDriver<S: Shape>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let shape: S
     let level: (Date) -> Float
-    private static let period: TimeInterval = 14 // one slow turn of the colours
 
     var body: some View {
         if reduceMotion {
             VoiceGlow(shape: shape, level: VoiceStatus.steadyLevel, phase: 0)
         } else {
             TimelineView(.animation) { ctx in
-                VoiceGlow(shape: shape, level: level(ctx.date), phase: ctx.date.timeIntervalSinceReferenceDate / Self.period)
+                VoiceGlow(shape: shape, level: level(ctx.date), phase: ctx.date.timeIntervalSinceReferenceDate / VoiceEdgeLook.period)
             }
         }
     }
@@ -63,16 +73,9 @@ private struct VoiceGlow<S: Shape>: View {
     let level: Float
     let phase: Double
 
-    /// Pink → violet → blue → cyan → orange → pink: closes the loop, no green, yellow or red.
-    private static let colors: [Color] = [
-        Color(red: 1.00, green: 0.31, blue: 0.63), Color(red: 0.67, green: 0.35, blue: 1.00),
-        Color(red: 0.24, green: 0.52, blue: 1.00), Color(red: 0.24, green: 0.82, blue: 1.00),
-        Color(red: 1.00, green: 0.58, blue: 0.24), Color(red: 1.00, green: 0.31, blue: 0.63),
-    ]
-
     var body: some View {
         let l = Double(level)
-        let gradient = AngularGradient(colors: Self.colors, center: .center, angle: .degrees(phase * 360))
+        let gradient = AngularGradient(colors: VoiceEdgeLook.colors, center: .center, angle: .degrees(phase * 360))
         ZStack {
             shape.stroke(gradient, lineWidth: 3 + 5 * l).blur(radius: 5 + 7 * l).opacity(0.45 + 0.55 * l)
             shape.stroke(gradient, lineWidth: 1.5 + 1.5 * l).opacity(0.7 + 0.3 * l)
