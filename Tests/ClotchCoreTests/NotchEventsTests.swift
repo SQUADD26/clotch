@@ -64,4 +64,12 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(long, "Presa in carico: " + String(repeating: "a", count: 39) + "… · " + String(repeating: "s", count: 23) + "…",
                        "long title and session are clipped with …, the session stays")
     }
+
+    /// #111: six proofs in a row while the notch is busy read «6 su 6» six times; they must be one notice.
+    func testProofsWaitingInTheQueueBecomeOneNotice() {
+        var queue: [NotchEvent] = []
+        for n in 1...10 { queue = NotchEvents.merge(queue: queue, adding: [NotchEvent(kind: .proofDone, subject: "a", count: n)]) }
+        queue = NotchEvents.merge(queue: queue, adding: [NotchEvent(kind: .blocked, subject: "a", count: 0)])
+        XCTAssertEqual(queue.map(\.id), ["proofDone-a-10", "blocked-a-0"])
+    }
 }

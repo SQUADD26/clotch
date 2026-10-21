@@ -57,7 +57,7 @@ enum NotePhase: Int, CaseIterable, Comparable {
             fresh.filter { $0.kind == .requestTaken }.forEach { GoalStore.shared.takenAnimationShown($0.subject) }
             fresh = []
         }
-        queue += fresh
+        queue = NotchEvents.merge(queue: queue, adding: fresh)
         guard !draining, !queue.isEmpty else { return }
         draining = true
         Task { await drain() }
