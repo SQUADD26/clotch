@@ -117,11 +117,25 @@ final class VoiceAlertCenter {
     }
 
     private func pump() {
+        // The microphone is open: an alert said now would be heard and transcribed as Roberto's words (prove dal vivo 22/10).
+        guard !VoiceInputController.shared.micOpen else { return retryWhenMicClosed() }
         guard !speaking, let e = engine.next(now: Date()) else { return }
         speaking = true
         Task {
             await VoiceSpeaker.shared.say(e)
             speaking = false
+            pump()
+        }
+    }
+
+    private var retrying = false
+
+    private func retryWhenMicClosed() {
+        guard !retrying else { return }
+        retrying = true
+        Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            retrying = false
             pump()
         }
     }

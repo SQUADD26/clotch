@@ -63,6 +63,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupGlobalShortcut()
         // #239: the same press as ⌥V from a local command, with no Accessibility asked of the sender (distributed
         // notifications stay inside this login session): live tests open and close the dictation this way.
+        // #247: live test of the outgoing voice (ElevenLabs, Roberto's settings, Italian): says «Prova voce», no text on screen.
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.prova-voce"), object: nil, queue: .main) { _ in
+            Task { _ = await VoiceSpeaker.shared.test() }
+        }
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.dettatura"), object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
                 // Not Roberto's key: with the dictation off it does nothing, it never paints his screen red (#245).

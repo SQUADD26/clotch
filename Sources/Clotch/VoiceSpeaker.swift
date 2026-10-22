@@ -153,6 +153,8 @@ final class VoiceSpeaker {
     /// ElevenLabs → light on → audio → light off. nil = said; otherwise why not, for the page.
     private func speak(_ text: String, config: VoiceTurn.Config, key: String) async -> String? {
         let request = VoiceTurn.speechRequest(text: text, config: config, key: key, pronunciation: files.pronunciation)
+        let language = (try? JSONSerialization.jsonObject(with: request.httpBody ?? Data()) as? [String: Any])?["language_code"] as? String ?? "none"
+        Self.log.notice("voice request: voice \(config.voiceId, privacy: .public), model \(config.model, privacy: .public), language \(language, privacy: .public)")
         guard let reply = try? await URLSession.shared.data(for: request) else { return Self.failed("ElevenLabs non risponde. Riprova.") }
         let data = reply.0
         let code = (reply.1 as? HTTPURLResponse)?.statusCode ?? 0
