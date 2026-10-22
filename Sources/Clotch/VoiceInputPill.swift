@@ -55,8 +55,9 @@ struct VoiceInputPill: View {
                 CancelButton(since: input.sendingSince, seconds: VoiceInputController.cancelSeconds) { input.cancel() }
             }
         case .result(let message):
+            // An answer is read whole: it wraps, never cut mid-sentence (#245); the hold already grows with its length.
             Text(message).font(NotchType.note).foregroundStyle(GoalInk.primary)
-                .lineLimit(NotchEvents.noteLines).fixedSize(horizontal: false, vertical: true)
+                .lineLimit(nil).fixedSize(horizontal: false, vertical: true)
         case .failure(let why):
             row(Image(systemName: why == .mic ? "mic.slash.fill" : "exclamationmark.circle.fill").font(.system(size: 15))
                     .foregroundStyle(Color(red: 1, green: 0.27, blue: 0.23)), why.title) { EmptyView() }
