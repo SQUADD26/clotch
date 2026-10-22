@@ -175,4 +175,44 @@ final class EngineContractTests: XCTestCase {
         let next = try XCTUnwrap(JSONSerialization.jsonObject(with: XCTUnwrap(VoiceTurn.Day(giorno: "2026-10-22").merged(into: mod))) as? [String: Any])
         XCTAssertNil(next["ultimo"], "a new day, like Clean View"); XCTAssertNotNil(next["recenti"])
     }
+
+    // MARK: the engine's vocabulary (clotch#167): a new type or state in the engine is a red test here
+
+    private func vocabulary(_ key: String) throws -> [String: Any] {
+        let all = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("vocabolario.json")) as? [String: Any])
+        return try XCTUnwrap(all[key] as? [String: Any], key)
+    }
+
+    func testEveryEventTypeOfTheEngineIsReadOrIgnoredOnPurpose() throws {
+        let types = try vocabulary("evento.tipo")
+        for (tipo, how) in types {
+            let verdict = (how as? [String: Any])?["clotch"] as? String ?? ""
+            XCTAssertTrue(VoiceEvent.Kind(rawValue: tipo) != nil || verdict.hasPrefix("ignorato:"),
+                          "engine event type «\(tipo)» is neither a VoiceEvent.Kind nor ignored with a reason")
+        }
+        for kind in VoiceEvent.Kind.allCases { XCTAssertNotNil(types[kind.rawValue], "«\(kind.rawValue)» is not in the engine's vocabulary") }
+    }
+
+    func testEverySessionStateOfTheEngineIsAPhase() throws {
+        let states = try vocabulary("stato-sessione.stato")
+        for raw in states.keys { XCTAssertNotNil(SessionPhase(contract: raw), "session state «\(raw)»") }
+        XCTAssertEqual(Set(states.keys), Set(SessionPhase.allCases.map(\.rawValue)))
+    }
+
+    func testSessionStateFileIsRead() throws {
+        let m = try XCTUnwrap(GoalSources.parseMotor(fixture("stato-sessione.json"), cli: "x"))
+        XCTAssertEqual([m.cli, m.phase.rawValue, m.why], ["cli-9", "aspetta_roberto", "Ti chiede: posso fondere?"])
+        XCTAssertEqual(m.questions, ["Posso fondere?"]); XCTAssertEqual(m.errors, 0); XCTAssertNotNil(m.since); XCTAssertNotNil(m.seen)
+        XCTAssertEqual(m.askLine, "Ti chiede: Posso fondere?")
+    }
+
+    func testEveryRequestAndAdhdStateParses() throws {
+        for name in ["richiesta-compito", "richiesta-domanda", "richiesta-adhd", "richiesta-ferma"] {
+            XCTAssertNotNil(GoalSources.parseRequest(try fixture(name + ".json")), name)
+        }
+        let known: Set<String> = ["nuova", "presa", "fatta", "ferma"]
+        XCTAssertTrue(Set(try vocabulary("richiesta.stato").keys).isSubset(of: known), "a new request state needs a look in UserRequest")
+        let adhd = Set(try vocabulary("adhd.stato").keys)
+        XCTAssertEqual(adhd, ["aperta", "con_risposta", "sollecitata"], "a new ADHD state needs a look")
+    }
 }
