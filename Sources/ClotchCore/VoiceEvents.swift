@@ -1,7 +1,7 @@
 import Foundation
 
 /// The news the voice may say (#57). Everything else stays silent. One event = one line of
-/// `~/.config/voce/eventi.jsonl` (claude-config#1854), or the same thing Clotch derives from what it already reads.
+/// `~/.config/voce/eventi.jsonl` (claude-config#1854). The engine is the only producer of facts (#202): Clotch only says them.
 public struct VoiceEvent: Equatable, Sendable {
     public enum Kind: String, Sendable, CaseIterable {
         case requestDone = "richiesta_fatta", goalReached = "obiettivo_raggiunto", goalBlocked = "obiettivo_bloccato"
@@ -100,52 +100,6 @@ public enum VoiceEvents {
     private static func entry(line: Substring) -> (at: Date, id: String, type: String, event: VoiceEvent?)? {
         guard let o = (try? JSONSerialization.jsonObject(with: Data(line.utf8))) as? [String: Any], let at = GoalSources.date(o["t"]) else { return nil }
         return (at, o["id"] as? String ?? "", o["tipo"] as? String ?? "", parse(line: line))
-    }
-
-    // MARK: Derived from what Clotch reads (no eventi.jsonl)
-
-    /// A goal that went raggiunto or bloccato since the last load. `before` nil = the launch baseline: nothing.
-    public static func goals(before: [GoalRecord]?, after: [GoalRecord], now: Date) -> [VoiceEvent] {
-        guard let before else { return [] }
-        let was = Dictionary(before.map { ($0.cli, $0.state) }, uniquingKeysWith: { a, _ in a })
-        return after.compactMap { g in
-            let kind: VoiceEvent.Kind
-            switch g.state {
-            case "raggiunto": kind = .goalReached
-            case "bloccato": kind = .goalBlocked
-            default: return nil
-            }
-            guard was[g.cli] != g.state else { return nil }
-            let title = GoalBoard.clean(g.title)
-            let goal = g.goal.split(whereSeparator: \.isWhitespace).joined(separator: " ")
-            return VoiceEvent(kind: kind, at: g.at ?? now, session: g.cli, subject: title.isEmpty ? goal : title, text: goal, proof: g.proof)
-        }
-    }
-
-    /// A request of Roberto's that went fatta since the last load (`before` nil = baseline).
-    public static func requests(before: [UserRequest]?, after: [UserRequest], now: Date) -> [VoiceEvent] {
-        guard let before else { return [] }
-        let was = Dictionary(before.map { ($0.id, $0.state) }, uniquingKeysWith: { a, _ in a })
-        return after.filter { !$0.isQuestion && $0.state == "fatta" && was[$0.id] != "fatta" && !$0.notOurs
-            && UserRequest.isNews($0.doneAt, now: now) }.map {
-            VoiceEvent(kind: .requestDone, at: $0.doneAt ?? now, session: $0.session, subject: $0.text, text: $0.text, proof: $0.proof)
-        }
-    }
-
-    /// An account window that reached its threshold since the last reading (#1854: 80 % of the 5 hours, 90 % of the week).
-    /// `before` nil = baseline.
-    public static func quotas(before: [AccountQuota]?, after: [AccountQuota], now: Date) -> [VoiceEvent] {
-        guard let before else { return [] }
-        let was = Dictionary(before.map { ($0.email, $0) }, uniquingKeysWith: { a, _ in a })
-        var out: [VoiceEvent] = []
-        for a in after where !a.stale(now) {
-            for (name, limit, w, old) in [("5 ore", 80.0, a.fiveHour, was[a.email]?.fiveHour), ("settimana", 90.0, a.sevenDay, was[a.email]?.sevenDay)] {
-                guard let used = w.usedNow(now), used >= limit, (old?.usedNow(now) ?? 0) < limit else { continue }
-                out.append(VoiceEvent(kind: .risk, at: now, subject: "Account \(a.label), \(name)",
-                                      text: "L'account \(a.label) ha usato il \(Int(used)) per cento della \(name == "5 ore" ? "finestra di 5 ore" : name)"))
-            }
-        }
-        return out
     }
 
     /// An end of turn (the Stop payload Clotch's hook queued): its session, the answer's text, and the question in it.

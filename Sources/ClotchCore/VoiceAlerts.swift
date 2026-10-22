@@ -12,7 +12,16 @@ public struct VoiceAlertEngine {
     public private(set) var waiting: [VoiceEvent] = []
     private var seen: [String: (at: Date, urgent: Bool)] = [:]  // subject key → when it was last let through
 
-    public init() {}
+    /// `memory` = what a previous run saved: the same subject is not said again after a relaunch (#202).
+    public init(memory: Data? = nil) {
+        let saved = (memory.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: [Double]]) ?? [:]
+        seen = saved.compactMapValues { $0.count == 2 ? (Date(timeIntervalSince1970: $0[0]), $0[1] == 1) : nil }
+    }
+
+    /// The memory of the doppioni, to save after each offer.
+    public var memory: Data {
+        (try? JSONSerialization.data(withJSONObject: seen.mapValues { [$0.at.timeIntervalSince1970, $0.urgent ? 1 : 0] })) ?? Data()
+    }
 
     /// nil = queued; otherwise why it stays silent.
     public mutating func offer(_ e: VoiceEvent, config: VoiceTurn.Config, sessions: [DesktopSession], now: Date) -> String? {
