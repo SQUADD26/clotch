@@ -39,6 +39,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         VoiceInputController.shared.prewarm()
         AfkStore.shared.start()
+        MacBridge.shared.start()
+        MacPermissionsAsker.askOnceWhenFree()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present
@@ -87,6 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         VoiceSpeaker.shared.stop()
+        MacBridge.shared.stop()
     }
 
     // Closing the settings window (X, Cmd+W) leaves Clotch running; only Quit ends it (#70).
