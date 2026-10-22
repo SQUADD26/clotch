@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let dir = GoalSnapshot.requestedDirectory() {
             GoalSnapshot.run(into: dir)
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { VoiceInputController.shared.debugShowFailure() }
         ProcessInfo.processInfo.disableAutomaticTermination("Clotch must stay running")
         ProcessInfo.processInfo.disableSuddenTermination()
         // Pre-set app icon so Dock/menu bar use the packaged bundle icon.

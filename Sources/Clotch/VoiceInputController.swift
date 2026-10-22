@@ -54,6 +54,7 @@ final class VoiceInputController: ObservableObject {
         return c
     }
 
+    func debugShowFailure() { phase = .failure(.network) }
     let files = VoiceFiles()
     var config = VoiceInput.Config([:])
     private let local = LocalTranscriber()
