@@ -46,6 +46,8 @@ public struct VoiceFiles {
     /// Orders for the Overseer (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
     public var inboxURL: URL { voiceDir.appendingPathComponent(VoiceRoute.inboxFolder) }
     public var inboxListenerURL: URL { inboxURL.appendingPathComponent(".ascolta") }
+    /// The engine's outcome of each order, `<same file name>` inside (#262, see `VoiceRoute.delivery`).
+    public var outcomesURL: URL { inboxURL.appendingPathComponent(".esiti") }
     public let overseerURL: URL
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }

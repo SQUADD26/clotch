@@ -248,10 +248,15 @@ final class VoiceInputController: ObservableObject {
         disarmEscape()
         if let helper {
             phase = .thinking
+            let started = Date()
             let reply = await VoiceAsk.run(said, helper: helper)
             guard me == run else { return }
-            if case .success(let answer) = reply {
-                return answered(answer)
+            // #262: the helper's words are not the outcome of an order; the engine's `.esiti` is
+            if case .success = reply {
+                let outcome = await OverseerDelivery.afterHelper(said, since: started, files: files)
+                guard me == run else { return }
+                Self.log.notice("order: helper, \(String(describing: outcome), privacy: .public)")
+                return show(Self.sentence(outcome))
             }
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
@@ -259,7 +264,16 @@ final class VoiceInputController: ObservableObject {
         let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
-        show(outcome == .sent ? "Inviato all’Overseer" : outcome == .queued ? "In coda per l’Overseer" : "Testo copiato. Incolla con ⌘V")
+        show(Self.sentence(outcome))
+    }
+
+    private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
+        switch outcome {
+        case .sent: return "Inviato all’Overseer"
+        case .queued: return "In coda per l’Overseer"
+        case .copied: return "Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato all’Overseer. Testo copiato. Incolla con ⌘V"
+        }
     }
 
     func fail(_ why: VoiceInput.Failure, run me: Int) {
