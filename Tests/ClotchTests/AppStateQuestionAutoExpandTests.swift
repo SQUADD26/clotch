@@ -23,16 +23,6 @@ final class AppStateQuestionAutoExpandTests: XCTestCase {
         super.tearDown()
     }
 
-    func testDefaultIsOnSoNothingChangesUnlessAsked() {
-        let suite = "AppStateQuestionAutoExpandTests.default"
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.removePersistentDomain(forName: suite)
-        XCTAssertTrue(AppState.autoExpandOnQuestion(defaults))
-        defaults.set(false, forKey: SettingsKey.autoExpandOnQuestion)
-        XCTAssertFalse(AppState.autoExpandOnQuestion(defaults))
-        defaults.removePersistentDomain(forName: suite)
-    }
-
     func testAskUserQuestionStillOpensItsCardWhenOn() async throws {
         UserDefaults.standard.set(true, forKey: SettingsKey.autoExpandOnQuestion)
         let appState = AppState()

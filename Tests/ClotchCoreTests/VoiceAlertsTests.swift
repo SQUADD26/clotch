@@ -58,6 +58,48 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertNil(e.offer(event(.goalReached, "e"), config: main, sessions: sessions, now: now), "refused before, so not a duplicate now")
     }
 
+    /// #205: a session's question is said once until it asks something else or moves on; the time that passed does not count.
+    func testAQuestionOfTheSameSessionIsSaidOnceNotEveryElevenMinutes() {
+        var e = VoiceAlertEngine()
+        var said = 0
+        for i in 0..<14 {
+            let t = now.addingTimeInterval(Double(i) * 660)
+            let q = VoiceEvent(kind: .question, at: t, session: "m", subject: "clotch, correzioni notch", text: "Procedo con le correzioni?")
+            if e.offer(q, config: main, sessions: sessions, now: t) == nil { said += 1 }
+            _ = e.next(now: t)
+        }
+        XCTAssertEqual(said, 1, "14 identical questions, 11+ minutes apart: said once")
+        let later = now.addingTimeInterval(14 * 660)
+        func ask(_ text: String, _ kind: VoiceEvent.Kind = .question) -> String? {
+            e.offer(VoiceEvent(kind: kind, at: later, session: "m", subject: text, text: text), config: main, sessions: sessions, now: later)
+        }
+        XCTAssertNil(ask("Un'altra domanda?"), "a different text is news")
+        XCTAssertEqual(ask("Un'altra domanda?"), "doppione")
+        XCTAssertNil(ask("Fatto", .requestDone), "the session moved on...")
+        XCTAssertNil(ask("Un'altra domanda?"), "...so the same question is news again")
+    }
+
+    /// #205: five alike events at the same moment are one phrase, nothing refused.
+    func testAlikeEventsArrivingTogetherAreOnePhrase() {
+        var e = VoiceAlertEngine()
+        for i in 1...5 {
+            XCTAssertNil(e.offer(event(.risk, "limite \(i)", session: ""), config: main, sessions: sessions, now: now), "risk \(i) is not refused")
+        }
+        XCTAssertEqual(e.waiting.count, 1)
+        XCTAssertEqual(e.next(now: now)?.text, "limite 1; limite 2; limite 3; limite 4; limite 5")
+        XCTAssertNil(e.next(now: now))
+    }
+
+    /// #205/#204: questions and oks of two sessions are never joined: two voices.
+    func testQuestionsOfTwoSessionsStayTwoVoices() {
+        for kind in [VoiceEvent.Kind.question, .waitsForOk] {
+            var e = VoiceAlertEngine()
+            XCTAssertNil(e.offer(event(kind, "prima", session: "m"), config: main, sessions: sessions, now: now))
+            XCTAssertNil(e.offer(event(kind, "seconda", session: "c"), config: VoiceTurn.Config(["parla_per": "tutte"]), sessions: sessions, now: now))
+            XCTAssertEqual(e.waiting.map(\.text), ["prima", "seconda"], "\(kind): two voices in the queue")
+        }
+    }
+
     func testOldNewsIsNeverSaid() {
         var e = VoiceAlertEngine()
         XCTAssertEqual(e.offer(event(.goalReached, "a", ago: 400), config: main, sessions: sessions, now: now), "vecchio")
@@ -89,47 +131,36 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertEqual(VoiceEvents.newer(rewritten, after: rest.mark).events, [], "nothing after the mark")
     }
 
-    // MARK: derived without eventi.jsonl
+    // MARK: the engine is the only producer of facts (#202)
 
-    func goal(_ state: String, cli: String = "m") -> GoalRecord {
-        GoalSources.parseGoal(Data(#"{"cli": "\#(cli)", "obiettivo": "Timer  che scorre", "stato": "\#(state)", "titolo": "★ Clotch", "prova": "PR #51"}"#.utf8))!
+    /// The lines claude-config writes (eventi_voce.py via avvisi_voce.py:175, obiettivo_registro.py:462, richieste.py:326):
+    /// Clotch says them as they are, and derives no second event from the registers or the account readings.
+    func testTheEnginesGoalRequestAndLimitLinesAreSaid() {
+        func line(_ tipo: String, _ id: String, _ soggetto: String) -> String {
+            #"{"v":1,"id":"\#(id)","t":1792000000,"tipo":"\#(tipo)","livello":"normale","sessione":{"cli":"m"},"soggetto":"\#(soggetto)","testo":"x","prova":""}"# + "\n"
+        }
+        let data = Data((line("rischio", "e1", "Limite dell'account r-bondici (five_hour)") + line("obiettivo_raggiunto", "e2", "Timer")
+                         + line("richiesta_fatta", "e3", "Fixare il timer")).utf8)
+        let mark = VoiceEvents.Mark(at: Date(timeIntervalSince1970: 1_791_999_000), id: "")
+        XCTAssertEqual(VoiceEvents.newer(data, after: mark).events.map(\.kind), [.risk, .goalReached, .requestDone])
     }
 
-    func testGoalReachedOrBlockedSinceTheLastLoad() {
-        XCTAssertEqual(VoiceEvents.goals(before: nil, after: [goal("raggiunto")], now: now), [], "launch baseline")
-        let e = VoiceEvents.goals(before: [goal("aperto"), goal("aperto", cli: "z")], after: [goal("raggiunto"), goal("bloccato", cli: "z")], now: now)
-        XCTAssertEqual(e.map(\.kind), [.goalReached, .goalBlocked])
-        XCTAssertEqual(e[0].subject, "★ Clotch")
-        XCTAssertEqual(e[0].text, "Timer che scorre")
-        XCTAssertEqual(e[0].proof, "PR #51")
-        XCTAssertEqual(VoiceEvents.goals(before: [goal("raggiunto")], after: [goal("raggiunto")], now: now), [], "no change, no news")
+    func testRememberedSubjectIsNotSaidAgainAfterARelaunch() {
+        var first = VoiceAlertEngine()
+        XCTAssertNil(first.offer(event(.risk, "Limite dell'account r (five_hour)", session: ""), config: main, sessions: sessions, now: now))
+        var relaunched = VoiceAlertEngine(memory: first.memory)
+        XCTAssertEqual(relaunched.offer(event(.risk, "Limite dell'account r (five_hour)", session: ""), config: main, sessions: sessions,
+                                        now: now.addingTimeInterval(60)), "doppione")
+        let later = now.addingTimeInterval(VoiceAlertEngine.sameSubject + 1)
+        let again = VoiceEvent(kind: .risk, at: later, subject: "Limite dell'account r (five_hour)")
+        XCTAssertNil(relaunched.offer(again, config: main, sessions: sessions, now: later), "after 10 minutes it is news again")
+        var broken = VoiceAlertEngine(memory: Data("rotto".utf8))
+        XCTAssertNil(broken.offer(event(.risk, "x", session: ""), config: main, sessions: sessions, now: now), "a broken memory is an empty one")
     }
 
-    func request(_ state: String, notOurs: Bool = false) -> UserRequest {
-        GoalSources.parseRequest(Data(#"{"id": "Q-1", "testo": "Fixare il timer", "sessione": "m", "stato": "\#(state)", "prova": "PR #51", "non_nostra": \#(notOurs)}"#.utf8))!
-    }
-
-    func testRequestDoneSinceTheLastLoad() {
-        let e = VoiceEvents.requests(before: [request("presa")], after: [request("fatta")], now: now)
-        XCTAssertEqual(e.map(\.kind), [.requestDone])
-        XCTAssertEqual(e.first?.proof, "PR #51")
-        XCTAssertEqual(VoiceEvents.requests(before: nil, after: [request("fatta")], now: now), [])
-        XCTAssertEqual(VoiceEvents.requests(before: [request("presa")], after: [request("fatta", notOurs: true)], now: now), [])
-        let doneLongAgo = GoalSources.parseRequest(Data(#"{"id": "Q-1", "testo": "x", "stato": "fatta", "t_fatta": 1791990000}"#.utf8))!
-        XCTAssertEqual(VoiceEvents.requests(before: [], after: [doneLongAgo], now: now), [], "#173: an old fact coming back is not news")
-    }
-
-    func quota(_ five: Double, _ seven: Double) -> AccountQuota {
-        AccountQuota(email: "roberto@x", at: now, fiveHour: QuotaWindow(used: five, reset: now.addingTimeInterval(3600)),
-                     sevenDay: QuotaWindow(used: seven, reset: now.addingTimeInterval(86_400)))
-    }
-
-    func testAccountRiskWhenAWindowCrosses80Or90() {
-        let e = VoiceEvents.quotas(before: [quota(70, 85)], after: [quota(82, 91)], now: now)
-        XCTAssertEqual(e.map(\.subject), ["Account roberto, 5 ore", "Account roberto, settimana"])
-        XCTAssertEqual(e.map(\.level), ["alto", "alto"])
-        XCTAssertEqual(VoiceEvents.quotas(before: [quota(82, 91)], after: [quota(85, 95)], now: now), [], "said once per threshold")
-        XCTAssertEqual(VoiceEvents.quotas(before: nil, after: [quota(95, 95)], now: now), [])
+    func testMemoryFileIsUnderTheVoiceFolder() {
+        let home = URL(fileURLWithPath: "/tmp/h")
+        XCTAssertEqual(VoiceFiles(home: home).seenURL.path, "/tmp/h/.config/voce/clotch-detti.json")
     }
 
     func testQuestionFromTheDeclarationOrAnAnswerEndingWithAQuestionMark() {

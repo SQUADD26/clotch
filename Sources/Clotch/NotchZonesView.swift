@@ -65,7 +65,7 @@ struct NotchLiveZones: View {
             data: NotchZoneData(
                 rows: store.rows, accounts: quota.accounts, inUse: inUse.emails,
                 requestsWaiting: UserRequest.waiting(store.requests).count,
-                workingSessions: store.rows.allPulses.filter(\.running).count,
+                workingSessions: store.rows.reduce(0) { $0 + $1.workingSessions },
                 workingSince: workingSince, now: store.now, barHeight: barHeight,
                 iconsOnly: layout.iconsOnly == true, mark: notifier.phase == .leave ? notifier.current : nil,
                 notice: notifier.current?.notice(rows: store.rows, requests: store.requests),

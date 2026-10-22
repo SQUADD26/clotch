@@ -33,6 +33,24 @@ final class SessionMotorTests: GoalTestCase {
         XCTAssertEqual(GoalBoard.nextChange(goals: [], sessions: [], live: [], motor: [m], now: now), m.seen!.addingTimeInterval(GoalBoard.stillAfter))
     }
 
+    // MARK: one state per session (#206)
+
+    func testCountAndLabelAgree() {
+        // The engine saw it 1 min ago and says it works, the app does not run it: the label and the count say the same.
+        let calm = row(motor("lavora", since: 37, seen: 1), ago: 5)
+        XCTAssertEqual(calm.phase, .lavora)
+        XCTAssertEqual(calm.workingSessions, 1, "was 0 while the label said «In lavorazione»")
+        // Waiting for Roberto, even with a subagent alive: not at work.
+        let waiting = GoalBoard.rows(goals: [g("m")], sessions: [s("local_m", cli: "m", running: true)], live: [], motor: [motor("aspetta_roberto")], now: now)[0]
+        XCTAssertEqual(waiting.workingSessions, 0)
+        // The app sees it running: a «lavora» last seen 40 min ago is not aged to «ferma» (an old engine state does not beat a live app).
+        let running = GoalBoard.rows(goals: [g("m")], sessions: [s("local_m", cli: "m", running: true)], live: [], motor: [motor("lavora", seen: 40)], now: now)[0]
+        XCTAssertEqual(running.phase, .lavora)
+        XCTAssertEqual(running.workingSessions, 1)
+        // App silent and engine silent for 40 min: still, count 0.
+        XCTAssertEqual(row(motor("lavora", since: 37, seen: 40), ago: 5).workingSessions, 0)
+    }
+
     // MARK: parsing
 
     func testParsesEveryPhaseOfTheContract() {

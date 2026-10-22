@@ -11,7 +11,7 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public let sessionTitle: String   // as written, icons included, like goal titles
     public let text: String           // short, imperative
     public let original: String       // Roberto's words, verbatim
-    public let state: String          // nuova|presa|fatta
+    public let state: String          // nuova|presa|ferma|fatta (the engine's word, never re-derived here)
     public let takenAt: Date?
     public let takenBy: String
     public let doneAt: Date?
@@ -25,6 +25,11 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// `testo_da` "ripiego" (claude-config#2045): `text` is still Roberto's own words, not a title. Never listed nor announced:
     /// `GoalLoader` drops it until the engine writes the real title.
     public var titleReady = true
+    /// The engine's line under the title (`punto`, claude-config#2020: for «ferma» its reason); the answer for files without it.
+    public var point = ""
+    /// `esce_t`: a done request leaves the list at this time, none = at once. `aspetta_te`: a taken one the session wants Roberto for.
+    public var leavesAt: Date? = nil
+    public var waitsForYou = false
     /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its cli id); nil when not taken or unknown.
     public var target: SessionTarget? = nil
 
@@ -34,33 +39,40 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// How a request looks, the one place that decides it (#39, #67): taken = yellow «In lavorazione», never struck
     /// nor green; struck, ticked and green only once done. Every view reads label, struck and ink from here.
     public enum Look: Equatable, Sendable {
-        case waiting, working, done
-        public enum Ink: Equatable, Sendable { case quiet, wait, go }
-        public var label: String { switch self { case .waiting: "In attesa"; case .working: "In lavorazione"; case .done: "Fatta" } }
+        case waiting, working, stuck, done
+        public enum Ink: Equatable, Sendable { case quiet, wait, stop, go }
+        public var label: String { switch self { case .waiting: "In attesa"; case .working: "In lavorazione"; case .stuck: "Ferma"; case .done: "Fatta" } }
         public var struck: Bool { self == .done }
-        public var ink: Ink { switch self { case .waiting: .quiet; case .working: .wait; case .done: .go } }
+        public var ink: Ink { switch self { case .waiting: .quiet; case .working: .wait; case .stuck: .stop; case .done: .go } }
     }
 
-    public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : .waiting }
+    public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : state == "ferma" ? .stuck : .waiting }
 
     public var isQuestion: Bool { kind == "domanda" }
     public var answered: Bool { !answer.isEmpty }
 
     /// Label under the look: a question never «takes charge», it waits for its answer (#90).
-    public var statusLabel: String { isQuestion ? (answered ? "Risposta" : "In attesa di risposta") : look.label }
+    public var statusLabel: String {
+        look == .stuck ? look.label : waitsForYou ? "In attesa di te" : isQuestion ? (answered ? "Risposta" : "In attesa di risposta") : look.label
+    }
 
-    /// The tasks Roberto still waits on (zone count, taken ones are announced once, then hidden).
-    public static func waiting(_ all: [UserRequest]) -> [UserRequest] { all.filter { !$0.isQuestion && !$0.taken } }
+    /// What waits for Roberto, the one count of the zone and of the tab header (#209): a new task, or a taken one while its
+    /// session wants him (`aspetta_te`). Not «ferma», not a question, not a plain taken one.
+    public static func waiting(_ all: [UserRequest]) -> [UserRequest] {
+        all.filter { !$0.isQuestion && ($0.state == "nuova" || ($0.state == "presa" && $0.waitsForYou)) }
+    }
 
-    /// How long an answered request stays in the Requests tab.
-    public static let answerStays: TimeInterval = 48 * 3600
-
-    /// What the Requests tab lists (#90): everything not taken (tasks waiting, questions without answer), plus every
-    /// request with an answer from the last 48 hours; a question that is closed without an answer is not listed.
+    /// What the Requests tab lists (#199): the requests the engine leaves open, in its own words. «ferma» is listed, with its
+    /// reason; a taken one only while its session waits for Roberto (`aspetta_te`); a done one until `esce_t`, none = out at once.
     public static func listed(_ all: [UserRequest], now: Date) -> [UserRequest] {
-        all.filter { r in
-            r.answered ? now.timeIntervalSince(r.answeredAt ?? r.at ?? now) < answerStays : !r.taken
+        let live = all.filter { r in
+            switch r.state {
+            case "fatta": (r.leavesAt ?? .distantPast) > now
+            case "presa": r.waitsForYou
+            default: true
+            }
         }
+        return live.filter { $0.state != "fatta" } + live.filter { $0.state == "fatta" }  // open first, the done ones after
     }
 
     /// An answer written after Roberto last opened the tab (#90).
@@ -100,6 +112,8 @@ extension GoalSources {
                            answer: (d["risposta"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
                            answeredAt: date(d["t_risposta"]), localId: d["local_id"] as? String ?? "")
         r.titleReady = d["testo_da"] as? String != "ripiego"
+        r.point = (d["punto"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? r.answer
+        r.leavesAt = date(d["esce_t"]); r.waitsForYou = d["aspetta_te"] as? Bool ?? false
         return r
     }
 

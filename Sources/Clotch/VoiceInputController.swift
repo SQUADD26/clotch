@@ -64,6 +64,11 @@ final class VoiceInputController: ObservableObject {
     private var spare: VoiceCapture?
     /// The tests hand in a recorded voice instead of the microphone.
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
+    /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
+    var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
+    /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
+    var finishLocal: (() async -> String)?
+    var localWait = VoiceInput.commitWait
     private var audioSeconds = 0.0
     var scribe: ScribeSession?
     private var feed: AsyncStream<AVAudioPCMBuffer>.Continuation?
@@ -84,23 +89,24 @@ final class VoiceInputController: ObservableObject {
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
-    /// At launch and after each utterance: the slow part of the microphone's start, done while nobody waits.
+    /// At launch and after each utterance: the slow part of the microphone's start and the local model, done while nobody waits.
     func prewarm() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        if current.enabled, current.engine == .local { Task { [local] in try? await local.preload() } }
         guard current.enabled, spare?.microphone != current.microphone else { return }
         spare = makeCapture(current.microphone)
         spare?.prepare()
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
-    /// send: nothing (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
+    /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
-        guard current.enabled else { return }
+        guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
         switch phase {
         // Thinking: a new utterance is worth more than the answer still coming (it would only block the key).
-        case .idle, .result, .failure, .thinking:
+        case .idle, .result, .failure, .thinking, .finishing, .sending:
             holds = current.mode == .hold
             pressedAt = Date()
             releasedAt = nil
@@ -110,7 +116,6 @@ final class VoiceInputController: ObservableObject {
             let me = run
             Task { if me == run { await begin() } }
         case .ready, .listening: finish()
-        case .finishing, .sending: break
         }
     }
 
@@ -163,7 +168,7 @@ final class VoiceInputController: ObservableObject {
             feeding = Task { [local] in
                 // The model loads while the microphone already runs: its first buffers wait in the stream.
                 if !(await local.isLoaded) { hint = "Scarico il modello. Succede solo la prima volta." }
-                do { try await local.start { text in Task { @MainActor [weak self] in self?.localText(text, run: me) } } } catch {
+                do { try await local.start(language: config.language) { text in Task { @MainActor [weak self] in self?.localText(text, run: me) } } } catch {
                     return fail(.local, run: me)
                 }
                 hint = nil
@@ -219,8 +224,9 @@ final class VoiceInputController: ObservableObject {
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
-        Self.log.notice("route: \(VoiceRoute.classify(said) == .question ? "question" : "order", privacy: .public)")
-        if VoiceRoute.classify(said) == .question {
+        let isQuestion = VoiceRoute.classify(said) == .question
+        Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public)")
+        if isQuestion {
             phase = .thinking
             let reply = await VoiceAsk.run(said)
             guard me == run else { return }
@@ -228,7 +234,7 @@ final class VoiceInputController: ObservableObject {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
                 return
             }
-            if config.spoken { Task { _ = await VoiceSpeaker.shared.speakAnswer(answer) } }
+            if config.spoken { Task { [speak] in await speak(answer) } }
             return show(answer, seconds: max(6, Double(answer.count) * 0.07))
         }
         sendingSince = Date()
@@ -236,9 +242,10 @@ final class VoiceInputController: ObservableObject {
         try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
-        let outcome = await OverseerDelivery.send(said)
+        let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
-        show(outcome == .sent ? "Inviato all’Overseer" : "Testo copiato. Incolla con ⌘V")
+        Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
+        show(outcome == .sent ? "Inviato all’Overseer" : outcome == .queued ? "In coda per l’Overseer" : "Testo copiato. Incolla con ⌘V")
     }
 
     func fail(_ why: VoiceInput.Failure, run me: Int) {
@@ -278,9 +285,6 @@ final class VoiceInputController: ObservableObject {
         hint = nil
         levels = [Double](repeating: 0, count: levels.count)
     }
-
-    /// A line on the pill for a while, then the pill folds away.
-    func show(_ message: String, seconds: Double = 3) { end(.result(message), seconds: seconds) }
 
     /// Closes the engines and puts `next` on the pill for `seconds`.
     func end(_ next: Phase, seconds: Double) {

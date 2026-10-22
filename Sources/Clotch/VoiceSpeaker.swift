@@ -104,7 +104,7 @@ final class VoiceSpeaker {
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1
         saveDay(day)
-        let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
+        let input = VoiceTurn.haikuInput(report: event.report, context: event.context, previousTopic: lastTopic())
         guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else {
             return Self.log.error("news not said: no usable line from Haiku (see ClaudeRun)")
         }
@@ -123,7 +123,10 @@ final class VoiceSpeaker {
 
     private func lastTopic() -> String {
         guard let data = try? Data(contentsOf: files.lastURL) else { return "" }
-        return ((try? JSONSerialization.jsonObject(with: data)) as? [String: Any])?["argomento"] as? String ?? ""
+        let last = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+        // Like the mod: the topic of a line said more than a minute ago is no topic to follow (voce-io.ts:121).
+        guard let t = last?["t"] as? Double, Date().timeIntervalSince1970 * 1000 - t < 60_000 else { return "" }
+        return last?["argomento"] as? String ?? ""
     }
 
     /// The AFK summary on return (#106): its sentence as written, no Haiku; only with the switch on and a key.

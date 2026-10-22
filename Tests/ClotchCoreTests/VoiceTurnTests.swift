@@ -53,7 +53,7 @@ final class VoiceTurnTests: XCTestCase {
         XCTAssertTrue(args.contains("--safe-mode"), "no hooks in Haiku's own run: it cannot trigger the voice again")
         XCTAssertFalse(args.joined().contains("Rapporto segreto"))
         let input = VoiceTurn.haikuInput(report: "Rapporto segreto", previousTopic: "la voce")
-        XCTAssertEqual(input, "<rapporto>\nRapporto segreto\n</rapporto>\n<argomento_precedente>la voce</argomento_precedente>\n")
+        XCTAssertEqual(input, "<rapporto>\nRapporto segreto\n</rapporto>\n<dire_argomento>no</dire_argomento>\n<argomento_precedente>la voce</argomento_precedente>\n")
     }
 
     func testRewriterRunsWithTheChosenModelAndEffort() {

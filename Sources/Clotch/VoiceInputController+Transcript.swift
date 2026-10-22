@@ -29,9 +29,21 @@ extension VoiceInputController {
             scribe = nil
             return dictation.text
         case .local:
-            await feeding?.value
-            let final = await local.finish()
-            return final.isEmpty ? dictation.text : final
+            // At most `localWait` s, as Scribe's commit: the words heard so far go, or the error says the model did not answer (#197).
+            var final: String?
+            Task { @MainActor [self] in
+                await feeding?.value
+                if let f = finishLocal { final = await f() } else { final = await local.finish() }
+            }
+            for _ in 0..<Int(localWait * 20) where final == nil { try? await Task.sleep(nanoseconds: 50_000_000) }
+            guard let done = final else { return dictation.text.isEmpty ? failed() : dictation.text }
+            return done.isEmpty ? dictation.text : done
         }
+    }
+
+    /// The engine never answered and nothing was heard: the bar says so instead of waiting on.
+    private func failed() -> String {
+        fail(.local, run: run)
+        return ""
     }
 }

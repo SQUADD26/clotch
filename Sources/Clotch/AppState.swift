@@ -1266,17 +1266,16 @@ final class AppState {
 
     /// Three-way completion notification style. Migration: the pre-glance
     /// boolean `autoExpandOnCompletion` (#146) maps false → .off; anything
-    /// else (including "never set", which registers as true) → .expand.
+    /// else → .expand; "never set" follows SettingsDefaults (#207, off).
     nonisolated static func completionStyle(defaults: UserDefaults = .standard) -> CompletionStyle {
         if let raw = defaults.string(forKey: SettingsKey.completionNotificationStyle),
            let style = CompletionStyle(rawValue: raw) {
             return style
         }
-        if defaults.object(forKey: SettingsKey.autoExpandOnCompletion) != nil,
-           defaults.bool(forKey: SettingsKey.autoExpandOnCompletion) == false {
-            return .off
+        if defaults.object(forKey: SettingsKey.autoExpandOnCompletion) != nil {
+            return defaults.bool(forKey: SettingsKey.autoExpandOnCompletion) ? .expand : .off
         }
-        return .expand
+        return SettingsDefaults.autoExpandOnCompletion ? .expand : .off
     }
 
     /// `turnFailed`: the turn ended on an error (StopFailure, a failed AiWork

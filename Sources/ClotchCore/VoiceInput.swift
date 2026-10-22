@@ -122,6 +122,8 @@ public enum VoiceInput {
     /// Never a code or a raw message.
     public enum Failure: Equatable, Sendable {
         case mic, key, credits, network, local
+        /// The key is pressed with «Dettatura accesa» off / the shortcut could not be registered: never a silent key (#198).
+        case off, shortcut
 
         public var title: String {
             switch self {
@@ -130,6 +132,8 @@ public enum VoiceInput {
             case .credits: return "Crediti ElevenLabs finiti"
             case .network: return "Non riesco a trascrivere"
             case .local: return "Il modello locale non parte"
+            case .off: return "Dettatura spenta"
+            case .shortcut: return "Scorciatoia non disponibile"
             }
         }
 
@@ -140,6 +144,8 @@ public enum VoiceInput {
             case .credits: return "Non posso più trascrivere in rete."
             case .network: return "Niente connessione, oppure il servizio è lento."
             case .local: return "Riprova. Se non basta, passa a ElevenLabs nelle impostazioni."
+            case .off: return "Accendila nelle impostazioni per dettare."
+            case .shortcut: return "Un altro programma usa questo tasto. Scegline un altro nelle impostazioni."
             }
         }
 
@@ -151,12 +157,13 @@ public enum VoiceInput {
             case .credits: return [.useLocal]
             case .network: return [.retry, .useLocal]
             case .local: return [.retry]
+            case .off, .shortcut: return [.openDictation]
             }
         }
     }
 
     public enum Action: Equatable, Sendable {
-        case openPrivacy, checkKey, useLocal, retry
+        case openPrivacy, checkKey, useLocal, retry, openDictation
 
         public var label: String {
             switch self {
@@ -164,6 +171,7 @@ public enum VoiceInput {
             case .checkKey: return "Controlla la chiave"
             case .useLocal: return "Usa il modello locale"
             case .retry: return "Riprova"
+            case .openDictation: return "Apri Dettatura"
             }
         }
     }
