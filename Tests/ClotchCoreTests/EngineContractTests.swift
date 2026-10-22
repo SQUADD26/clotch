@@ -109,10 +109,21 @@ final class EngineContractTests: XCTestCase {
         XCTAssertFalse(VoiceJudge.judges(e), "Roberto asked for it: never judged as noise")
     }
 
+    func testStalledDependencyIsSaidUrgent() throws {
+        // eventi_voce.py scrivi dipendenza_ferma "Una sessione aspetta te da troppo: …" --soggetto … --prova D-… --cli cli-8 (dipendenze.py#L210, #164)
+        let e = try engineLine(#"{"v": 1, "id": "e-b04289c4", "t": 1792653719.404, "tipo": "dipendenza_ferma", "livello": "alto", "sessione": {"cli": "cli-8", "local_id": "", "titolo": "", "ruolo": ""}, "soggetto": "Clotch, voce", "testo": "Una sessione aspetta te da troppo: la chiave di ElevenLabs.", "prova": "D-1a2b3c4d"}"#)
+        XCTAssertEqual(e.kind, .stalledDependency)
+        XCTAssertEqual([e.level, e.session, e.subject, e.proof], ["alto", "cli-8", "Clotch, voce", "D-1a2b3c4d"])
+        XCTAssertTrue(e.report.contains("la chiave di ElevenLabs"))
+        XCTAssertFalse(e.report.contains("D-1a2b3c4d"), "the proof is never said")
+        XCTAssertEqual(VoiceEvent(kind: .stalledDependency, at: e.at).level, "alto")
+        XCTAssertFalse(VoiceJudge.judges(e), "it waits on Roberto: never judged as noise")
+    }
+
     func testEveryKindTheEngineWritesIsKnown() {
         // claude-config eventi_voce.LIVELLO
         let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom",
-                                   "risposta_adhd"]
+                                   "risposta_adhd", "dipendenza_ferma"]
         XCTAssertEqual(Set(VoiceEvent.Kind.allCases.map(\.rawValue)), engine)
     }
 
