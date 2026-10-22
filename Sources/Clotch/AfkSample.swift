@@ -47,4 +47,24 @@ enum AfkSample {
     static var nothing: AfkReport {
         AfkReport(summary: AfkSummary(t: at(15, 34), inizio: at(15, 9), n: 0, frase: AfkSummary.nothing), items: [])
     }
+
+    private static let watch = [
+        AfkWatch(tipo: "rischio", testo: "L'account Roberto ha usato il 92% del limite di 5 ore."),
+        AfkWatch(tipo: "aspetta_ok", testo: "Clotch: avviso aspetta un tuo ok per fondere la PR."),
+        AfkWatch(tipo: "dipendenza_ferma", testo: "Config: eventi voce aspetta la chiave di ElevenLabs da 3 ore."),
+        AfkWatch(tipo: "risposta_adhd", testo: "Risposta a: quale account usa la voce? Il principale."),
+    ]
+
+    /// «Da guardare» above the things done (#185, Figma 66-60766).
+    static var withWatch: AfkReport {
+        AfkReport(summary: AfkSummary(t: at(15, 34), inizio: at(13, 52), n: 1, frase: "Mentre eri via è successa una cosa.", watch: watch),
+                  items: [AfkItem(t: at(15, 20), tipo: "fine_turno", sessione: "⌘ Clotch: avviso di aggiornamento", localId: "local_afk1",
+                                  titolo: "Avviso di versione nuova", testo: "Avviso pronto: compare in alto nel notch.")])
+    }
+
+    /// Nothing done, something to look at: only the block (#185).
+    static var onlyWatch: AfkReport {
+        AfkReport(summary: AfkSummary(t: at(15, 34), inizio: at(15, 9), n: 0, frase: AfkSummary.nothing + " Da guardare: 2, un limite vicino.",
+                                      watch: Array(watch.prefix(2))), items: [])
+    }
 }

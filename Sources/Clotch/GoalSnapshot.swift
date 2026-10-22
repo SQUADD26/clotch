@@ -139,7 +139,8 @@ enum GoalSnapshot {
                 try save(open(.goals, afkOn: false) { GoalsTab(rows: store.rows, now: store.now) }, "22-afk-aperto-spento")
                 try save(open(.goals, afkOn: true, afk: 4) { GoalsTab(rows: store.rows, now: store.now) }, "23-afk-aperto-acceso")
                 try save(island(width: closedWidth, radius: 12, afk: 4) { EmptyView() }, "24-afk-chiuso-acceso")
-                for (name, report) in [("riepilogo", AfkSample.summary), ("lista-lunga", AfkSample.long), ("niente", AfkSample.nothing)] {
+                for (name, report) in [("riepilogo", AfkSample.summary), ("lista-lunga", AfkSample.long), ("niente", AfkSample.nothing),
+                                       ("da-guardare", AfkSample.withWatch), ("solo-da-guardare", AfkSample.onlyWatch)] {
                     try save(island(width: openWidth, radius: NotchSpace.radius) {
                         AfkSummaryView(report: report, animated: false, dismiss: {})
                     }, "25-afk-\(name)")

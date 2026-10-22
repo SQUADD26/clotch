@@ -22,6 +22,26 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(r.look, .done)
     }
 
+    /// #132: the plan the session wrote when it took the request; shown only under a taken task.
+    func testTakenTaskCarriesItsPlan() throws {
+        func req(_ name: String, _ edit: (inout [String: Any]) -> Void = { _ in }) throws -> UserRequest {
+            var d = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture(name)) as? [String: Any])
+            edit(&d)
+            return try XCTUnwrap(GoalSources.parseRequest(JSONSerialization.data(withJSONObject: d)))
+        }
+        let done = try req("richiesta-compito.json")
+        XCTAssertEqual(done.plan, "Cambio il colore del notch in Clotch; si vede nella schermata Prove.")
+        XCTAssertNil(done.planLine, "done: the plan is not shown")
+        let taken = try req("richiesta-compito.json") { $0["stato"] = "presa" }
+        XCTAssertEqual(taken.planLine, "Cambio il colore del notch in Clotch; si vede nella schermata Prove.")
+        let noPlan = try req("richiesta-compito.json") { $0["stato"] = "presa"; $0["piano"] = "" }
+        XCTAssertEqual(noPlan.planLine, "Non ha ancora detto cosa farà")
+        let oldFile = try req("richiesta-compito.json") { $0["stato"] = "presa"; $0["piano"] = nil }
+        XCTAssertEqual(oldFile.plan, "", "a file from before #1946 has no key"); XCTAssertEqual(oldFile.planLine, "Non ha ancora detto cosa farà")
+        XCTAssertNil(try req("richiesta-domanda.json").planLine); XCTAssertNil(try req("richiesta-adhd.json").planLine)
+        XCTAssertNil(try req("richiesta-domanda.json") { $0["stato"] = "presa" }.planLine, "a question is never taken")
+    }
+
     func testQuestionRequestIsListedWhileUnanswered() throws {
         let r = try XCTUnwrap(GoalSources.parseRequest(fixture("richiesta-domanda.json")))
         XCTAssertTrue(r.isQuestion)
@@ -253,6 +273,9 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual([m.cli, m.phase.rawValue, m.why], ["cli-9", "aspetta_roberto", "Ti chiede: posso fondere?"])
         XCTAssertEqual(m.questions, ["Posso fondere?"]); XCTAssertEqual(m.errors, 0); XCTAssertNotNil(m.since); XCTAssertNotNil(m.seen)
         XCTAssertEqual(m.askLine, "Ti chiede: Posso fondere?")
+        XCTAssertEqual(m.plan, "", "the fixture's session has no plan"); XCTAssertEqual(m.aged(at: .distantFuture).plan, m.plan)
+        let planned = try XCTUnwrap(GoalSources.parseMotor(Data(#"{"stato":"lavora","piano":"  Cambio il   colore. "}"#.utf8), cli: "c"))
+        XCTAssertEqual(planned.plan, "Cambio il colore.")
     }
 
     func testEveryRequestAndAdhdStateParses() throws {

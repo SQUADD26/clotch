@@ -113,4 +113,38 @@ final class AfkTests: XCTestCase {
         XCTAssertTrue(p.back(idle: 0.5))
         XCTAssertFalse(p.back(idle: 0.5))  // once
     }
+
+    /// #185 (claude-config#2038): `da_guardare` is read, the tail of the sentence goes, the lines for Roberto are not things done.
+    func testWatchSectionFromTheEngine() throws {
+        try put(#"{"v":1,"t":1792609320,"inizio":1792603200,"n":1,"da_guardare":[{"tipo":"rischio","testo":"L'account Roberto è al 92%."},{"tipo":"risposta_adhd","testo":"Risposta a: x"},{"tipo":"altro","testo":"no"},{"testo":"senza tipo"}],"frase":"Mentre eri via è successa una cosa. Titolo: fatto. Da guardare: 2, L'account Roberto è al 92%; Risposta a: x.","gruppi":[{"titolo":"Titolo","n":1}]}"#, files.summaryURL)
+        try put("""
+        {"v":1,"t":1792604000,"tipo":"fine_turno","titolo":"Titolo","testo":"fatto"}
+        {"v":1,"t":1792604100,"tipo":"rischio","titolo":"Uso","testo":"L'account Roberto è al 92%."}
+        {"v":1,"t":1792604200,"tipo":"aspetta_ok","titolo":"Ok","testo":"aspetta"}
+        """, files.doneURL)
+        let report = try XCTUnwrap(files.report)
+        XCTAssertEqual(report.watch.map(\.tipo), ["rischio", "risposta_adhd"], "an unknown kind or a broken entry is skipped")
+        XCTAssertEqual(report.watch.map(\.label), ["Limite vicino", "Risposta arrivata"])
+        XCTAssertEqual([AfkWatch(tipo: "aspetta_ok", testo: "").label, AfkWatch(tipo: "dipendenza_ferma", testo: "").label], ["Aspetta te", "Lavoro fermo"])
+        XCTAssertEqual(report.sentence, "Mentre eri via è successa una cosa. Titolo: fatto.", "the tail lives in the block")
+        XCTAssertEqual(report.count, 1, "only what got done")
+        XCTAssertEqual(report.groups.map(\.title), ["Titolo"])
+        XCTAssertTrue(report.showsSentence)
+    }
+
+    func testOnlyWatchHidesTheNothingSentence() {
+        let watch = [AfkWatch(tipo: "aspetta_ok", testo: "Clotch aspetta un tuo ok.")]
+        let report = AfkReport(summary: AfkSummary(t: 1500, inizio: 0, n: 0, frase: AfkSummary.nothing + " Da guardare: 1, Clotch aspetta un tuo ok.", watch: watch), items: [])
+        XCTAssertEqual(report.sentence, AfkSummary.nothing)
+        XCTAssertFalse(report.showsSentence)
+        XCTAssertEqual(report.heading, "via per 25 min")
+        XCTAssertTrue(AfkReport(summary: AfkSummary(t: 1500, inizio: 0, n: 0, frase: ""), items: []).showsSentence, "nothing at all keeps its sentence")
+    }
+
+    func testSummaryWithoutWatchStillReads() throws {
+        try put(#"{"v":1,"t":1792609320,"inizio":1792603200,"n":2,"frase":"Sono entrate 2 PR."}"#, files.summaryURL)
+        XCTAssertEqual(files.summary?.watch, [])
+        XCTAssertEqual(AfkReport(summary: AfkSummary(t: 1, inizio: 0, n: 0, frase: "Una frase con Da guardare: nulla."), items: []).sentence,
+                       "Una frase con Da guardare: nulla.", "only the engine's «Da guardare: N,» tail is cut")
+    }
 }
