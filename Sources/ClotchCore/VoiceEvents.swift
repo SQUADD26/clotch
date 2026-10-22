@@ -49,8 +49,14 @@ public struct VoiceEvent: Equatable, Sendable {
 
     /// What Haiku turns into one spoken line: cleaned for the ear, cut like a turn's report. The proof stays out (#1854).
     public var report: String {
-        VoiceTurn.cut(VoiceClean.clean(String("\(kind.label): \(text.isEmpty ? subject : text)".prefix(VoiceTurn.maxRaw))), VoiceTurn.maxSpoken)
+        let body = text.isEmpty ? subject : text
+        // The engine already writes «Obiettivo raggiunto:» in front of its text (obiettivo_registro.py): the prefix is said once (#204).
+        let said = body.range(of: kind.label + ":", options: [.anchored, .caseInsensitive]) != nil ? body : "\(kind.label): \(body)"
+        return VoiceTurn.cut(VoiceClean.clean(String(said.prefix(VoiceTurn.maxRaw))), VoiceTurn.maxSpoken)
     }
+
+    /// The job, for the parlatore's `<contesto>` (#204): the subject, which `report` only carries when there is no text.
+    public var context: String { text.isEmpty ? "" : VoiceClean.clean(String(subject.prefix(200))) }
 
     var urgent: Bool { level == "alto" }
 }

@@ -124,8 +124,12 @@ public enum VoiceTurn {
          "--max-budget-usd", "0.02", "--system-prompt", prompt]
     }
 
-    public static func haikuInput(report: String, previousTopic: String) -> String {
-        "<rapporto>\n\(report)\n</rapporto>\n" + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
+    /// The input Clean View's parlatore gives Haiku (voce-parlatore.ts:100). `dire_argomento` = the line must say what it is
+    /// about: there is no recent topic to follow (#204).
+    public static func haikuInput(report: String, context: String = "", previousTopic: String) -> String {
+        "<rapporto>\n\(report)\n</rapporto>\n" + (context.isEmpty ? "" : "<contesto>\(context)</contesto>\n")
+            + "<dire_argomento>\(previousTopic.isEmpty ? "sì" : "no")</dire_argomento>\n"
+            + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
     }
 
     /// The line to say (#73): Haiku up to `haikuTries` times, each cut at `timeout`. When both fail: nil, silence (#84,
