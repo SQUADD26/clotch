@@ -191,7 +191,7 @@ private final class GoalWatcher: @unchecked Sendable {
     private func apply(_ snap: GoalDiskData) {
         snapshot = snap
         let fresh = UserRequest.newlyTaken(before: requestsLoaded ? requests : nil, after: snap.requests,
-                                           shown: takenShown.union(takenToAnimate))
+                                           shown: takenShown.union(takenToAnimate), now: Date())
         requestsLoaded = true
         let exists = FileManager.default.fileExists(atPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude/richieste").path)
         if exists != requestsFolderExists { requestsFolderExists = exists }

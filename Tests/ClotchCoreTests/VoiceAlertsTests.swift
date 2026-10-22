@@ -113,6 +113,8 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertEqual(e.first?.proof, "PR #51")
         XCTAssertEqual(VoiceEvents.requests(before: nil, after: [request("fatta")], now: now), [])
         XCTAssertEqual(VoiceEvents.requests(before: [request("presa")], after: [request("fatta", notOurs: true)], now: now), [])
+        let doneLongAgo = GoalSources.parseRequest(Data(#"{"id": "Q-1", "testo": "x", "stato": "fatta", "t_fatta": 1791990000}"#.utf8))!
+        XCTAssertEqual(VoiceEvents.requests(before: [], after: [doneLongAgo], now: now), [], "#173: an old fact coming back is not news")
     }
 
     func quota(_ five: Double, _ seven: Double) -> AccountQuota {

@@ -63,12 +63,18 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// An answer written after Roberto last opened the tab (#90).
     public func isNewAnswer(since seen: Date) -> Bool { answered && (answeredAt ?? .distantPast) > seen }
 
+    /// A fact older than this is not news (#173): a record rewritten later (migration, new fields, a read caught
+    /// mid-write, a restart) never announces it again. No time on the record = cannot tell, so it counts as new.
+    public static let newsWindow: TimeInterval = 300
+    public static func isNews(_ fact: Date?, now: Date) -> Bool { fact.map { now.timeIntervalSince($0) <= newsWindow } ?? true }
+
     /// Ids to play the «presa in carico» animation for: taken now, seen as nuova (or not seen at all) on the
-    /// previous load, not shown yet. The first load (`before` nil) is the baseline: nothing animates at launch.
-    public static func newlyTaken(before: [UserRequest]?, after: [UserRequest], shown: Set<String>) -> [String] {
+    /// previous load, not shown yet, taken within `newsWindow`. The first load (`before` nil) is the baseline.
+    public static func newlyTaken(before: [UserRequest]?, after: [UserRequest], shown: Set<String>, now: Date) -> [String] {
         guard let before else { return [] }
         let was = Dictionary(before.map { ($0.id, $0.taken) }, uniquingKeysWith: { a, _ in a })
-        return after.filter { !$0.isQuestion && $0.taken && was[$0.id] != true && !shown.contains($0.id) }.map(\.id)
+        return after.filter { !$0.isQuestion && $0.taken && was[$0.id] != true && !shown.contains($0.id)
+            && isNews($0.takenAt ?? $0.doneAt, now: now) }.map(\.id)
     }
 }
 
