@@ -7,7 +7,9 @@ extension VoiceInputController {
     /// The microphone error waits for the permission; the others fold after a while.
     func show(failure why: VoiceInput.Failure) {
         end(.failure(why), seconds: why == .mic ? 300 : 20)
-        if why == .mic { timers.append(watchMicrophone()) }
+        // Only a missing permission is waited for. With the permission given, a microphone that will not start restarted the
+        // dictation every second, and the red light with it, for hours (#168).
+        if why == .mic, AVCaptureDevice.authorizationStatus(for: .audio) != .authorized { timers.append(watchMicrophone()) }
     }
 
     /// The button under the error.
