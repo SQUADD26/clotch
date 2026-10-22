@@ -34,6 +34,9 @@ final class VoiceSpeaker {
         ducker?.end()  // the others' audio back at once, never left lowered by a quit
     }
 
+    /// Called once, when the next voice makes its first sound (the dictation's answer waits on it, #271).
+    var onPlay: (() -> Void)?
+
     /// The microphone opens: the voice that is speaking stops at once, or Roberto's dictation would carry its words.
     func hush() { player?.stop() }
 
@@ -183,6 +186,8 @@ final class VoiceSpeaker {
             player = p
             try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
             p.play()
+            onPlay?()  // #271: the first sound, for whoever waits to fold its «Penso…»
+            onPlay = nil
             let playStart = Date()
             let end = Date().addingTimeInterval(length + 1)
             while p.isPlaying, Date() < end { try? await Task.sleep(nanoseconds: 100_000_000) }  // stops early when `hush()` silences it
