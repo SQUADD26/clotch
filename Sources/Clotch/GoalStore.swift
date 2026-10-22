@@ -265,7 +265,7 @@ private final class GoalWatcher: @unchecked Sendable {
         let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, motor: snapshot.motor, now: t)
         deadline?.invalidate()
         deadline = nil
-        if watcher != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {
+        if watcher != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, motor: snapshot.motor, now: t) {
             let d = Timer(fire: at.addingTimeInterval(1), interval: 0, repeats: false) { [weak self] _ in
                 Task { @MainActor in self?.refresh() }
             }

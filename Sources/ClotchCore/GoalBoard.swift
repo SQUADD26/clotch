@@ -173,7 +173,7 @@ public enum GoalBoard {
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
                 proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
                 master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) },
-                motor: engineState(of: g.cli, master: master, in: motor)))
+                motor: engineState(of: g.cli, master: master, in: motor)?.aged(at: now)))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
@@ -210,9 +210,9 @@ public enum GoalBoard {
 
     /// The first instant after `now` when time alone can change a row (30 min of silence turns it still,
     /// a silent subagent stops counting): the store recomputes then, never on a periodic tick.
-    public static func nextChange(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], now: Date) -> Date? {
+    public static func nextChange(goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], motor: [SessionMotor] = [], now: Date) -> Date? {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
-        var times = goals.compactMap(\.at) + goals.compactMap(\.lastSeen)
+        var times = goals.compactMap(\.at) + goals.compactMap(\.lastSeen) + motor.filter { $0.phase == .lavora }.compactMap(\.seen)
         for s in sessions {
             if let t = s.lastActivity { times.append(t) }
             guard let l = liveByCli[s.cliId] else { continue }
