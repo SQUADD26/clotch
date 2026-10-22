@@ -2,7 +2,11 @@ import Foundation
 
 // Pure goal logic for the Clotch: no file I/O, no clock reads (the caller passes `now`).
 
-public struct GoalProof: Equatable, Sendable { public let text: String; public let done: Bool; public let at: Date? }
+public struct GoalProof: Equatable, Sendable {
+    public let text: String; public let done: Bool; public let at: Date?
+    /// A proof with no command (`cmd` empty): only Roberto or the Overseer can tick it (#171). No view yet: the button goes through Figma.
+    public var waitsForRoberto = false
+}
 
 /// One ~/.claude/obiettivi/<cli>.json
 public struct GoalRecord: Equatable, Sendable {
@@ -18,6 +22,7 @@ public struct GoalRecord: Equatable, Sendable {
     public var lastSeen: Date? = nil     // "ultima_attivita": the hook's sign of life at each prompt and Stop of the live session
     public var stalledSince: Date? = nil // "fermo_da" (#1916): when the engine saw the open goal stop with proofs undone
     public var stalledReason = ""        // "perche": the proof that fails, with its real output
+    public var valid = true              // "valido" (#183): false = the engine treats the file as unsigned; no field = valid
 }
 
 /// One local_*.json of the Claude desktop app.
@@ -119,7 +124,7 @@ public enum GoalBoard {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
-        for g in goals where shown.contains(g.state) {
+        for g in goals where shown.contains(g.state) && g.valid {  // an invalid one is hidden (#183)
             let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
             if g.state == "raggiunto", master == nil || master!.isArchived { continue }
 
@@ -260,10 +265,10 @@ public enum GoalBoard {
     }
 
     /// The Goals tab (#20): confirmed goals of live sessions; proposals waiting for Roberto, minus the ones he
-    /// rejected (`GoalDecision.key`); and how many goals of archived or gone sessions are left out.
-    public static func tab(_ rows: [GoalRow], rejected: Set<String> = []) -> (goals: [GoalRow], toConfirm: [GoalRow], closed: Int) {
+    /// the register no longer holds (a refusal drops the proposal there, #171); and how many goals of archived or gone sessions are left out.
+    public static func tab(_ rows: [GoalRow], ) -> (goals: [GoalRow], toConfirm: [GoalRow], closed: Int) {
         let live = rows.filter { !$0.closed }
-        let toConfirm = live.filter { r in r.proposal.map { !rejected.contains(GoalDecision.key(cli: r.id, text: $0)) } ?? false }
+        let toConfirm = live.filter { $0.proposal != nil }
         return (live.filter { !$0.proposed }, toConfirm, rows.count - live.count)
     }
 

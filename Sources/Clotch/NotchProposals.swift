@@ -40,10 +40,14 @@ private struct ProposalLine: View {
                 if store.acceptFailed.contains(row.id) {
                     Text("Non accettato. Riprova.").font(NotchType.caption).foregroundStyle(GoalTone.stop.color)
                 }
+                if store.rejectFailed.contains(row.id) {
+                    Text("Non rifiutato. Riprova.").font(NotchType.caption).foregroundStyle(GoalTone.stop.color)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 8) {
-                Button("Rifiuta") { store.reject(row) }.buttonStyle(.tone(.stop))
+                let refusing = store.rejecting.contains(row.id)
+                Button("Rifiuta") { store.reject(row) }.buttonStyle(.tone(.stop)).disabled(refusing).opacity(refusing ? 0.5 : 1)
                 Button("Accetta") { store.accept(row) }.buttonStyle(.tone(.go)).disabled(busy).opacity(busy ? 0.5 : 1)
             }
         }

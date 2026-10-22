@@ -11,7 +11,8 @@ import FoundationNetworking
 public enum VoiceJudge {
     public static let url = URL(string: "https://api.typesafe.ai/v1/systemone")!
     public static let model = "jev-1.13.0"
-    public static let threshold = 0.5
+    /// claude-config `voce_giudice.py` SOGLIA (taratura voce_giudice_set.json). shortcut: a copy, the engine has no shared file for it yet.
+    public static let threshold = 0.55
     public static let seconds: TimeInterval = 5
     static let maxRequests = 5
 
@@ -78,7 +79,7 @@ public enum VoiceJudge {
         guard let p = (q?["noul"] as? NSNumber)?.doubleValue, (0...1).contains(p) else {
             return Verdict(say: nil, reason: "giudice non raggiunto: risposta di Jev non chiara")
         }
-        return Verdict(say: p >= threshold, reason: String(format: "Jev: P=%.2f, soglia %.1f", p, threshold), p: p)
+        return Verdict(say: p >= threshold, reason: String(format: "Jev: P=%.2f, soglia %.2f", p, threshold), p: p)
     }
 
     /// One line of `giudice-log.jsonl` (#1854): `{"t","tipo","soggetto","si","motivo","p"}`. Never the key.

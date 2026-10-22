@@ -11,14 +11,15 @@ public enum GoalSources {
         let proofs = (d["prove"] as? [Any]).map { list in
             list.compactMap { item -> GoalProof? in
                 guard let p = item as? [String: Any], let text = p["testo"] as? String else { return nil }
-                return GoalProof(text: text, done: p["fatta"] as? Bool ?? false, at: date(p["t"]))
+                let done = p["fatta"] as? Bool ?? false
+                return GoalProof(text: text, done: done, at: date(p["t"]), waitsForRoberto: !done && (p["cmd"] as? String ?? "").isEmpty)
             }
         }
         return GoalRecord(cli: cli, goal: goal, state: d["stato"] as? String ?? "aperto",
                           proof: d["prova"] as? String ?? "", at: date(d["t"]),
                           title: d["titolo"] as? String ?? "", proofs: proofs, successor: d["a"] as? String,
                           proposal: (d["proposta"] as? [String: Any])?["testo"] as? String, lastSeen: date(d["ultima_attivita"]),
-                          stalledSince: date(d["fermo_da"]), stalledReason: d["perche"] as? String ?? "")
+                          stalledSince: date(d["fermo_da"]), stalledReason: d["perche"] as? String ?? "", valid: d["valido"] as? Bool ?? true)
     }
 
     /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).

@@ -65,7 +65,7 @@ enum GoalSnapshot {
                 } else {
                     print("snapshot: one goal only, no «scorrimento» frame")
                 }
-                let toConfirm = GoalBoard.tab(store.rows, rejected: store.rejected).toConfirm
+                let toConfirm = GoalBoard.tab(store.rows).toConfirm
                 if toConfirm.isEmpty {
                     print("snapshot: no proposed goal, no «da confermare» frame")
                 } else {

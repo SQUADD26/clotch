@@ -19,7 +19,11 @@ public enum VoiceInput {
     /// «auto»: Scribe detects the language; Parakeet detects it too. Anything else is an ISO 639-1 code.
     public static let languages: [(code: String, name: String)] = [("it", "Italiano"), ("en", "English"), ("auto", "Automatica")]
     /// One utterance ends here, whatever the engine says: a forgotten shortcut never keeps the microphone open.
-    public static let maxSeconds: TimeInterval = 60
+    public static let maxSeconds: TimeInterval = 300
+    /// After the second press the microphone keeps going this long: the last word and the audio still on its way are kept (#174).
+    public static let tailSeconds: TimeInterval = 0.4
+    /// Scribe: the longest wait for the text of the closing commit; it usually comes in well under a second.
+    public static let commitWait: TimeInterval = 10
 
     public struct Config: Equatable, Sendable {
         public var engine: Engine

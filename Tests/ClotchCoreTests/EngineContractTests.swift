@@ -42,11 +42,19 @@ final class EngineContractTests: XCTestCase {
     func testAdhdWhoAnsweredAndWhichSessionOwesIt() throws {
         let r = try XCTUnwrap(GoalSources.parseAdhd(try fixture("adhd-elenco.json")).first)
         XCTAssertEqual([r.answeredBy, r.state, r.session, r.localId, r.sessionTitle], ["ereditata", "con_risposta", "cli-1", "", ""])
-        XCTAssertEqual(r.ids, ["Q-bfeb734d", "Q-b532a544"]); XCTAssertEqual(r.nudgedAt, Date(timeIntervalSince1970: 1792613319.8736444))
+        XCTAssertEqual(r.ids, ["Q-bfeb734d", "Q-b532a544"]); XCTAssertEqual(r.nudgedAt, Date(timeIntervalSince1970: 1792654603.828331))
         XCTAssertEqual(r.answerNote, "Già risposta prima")
         let h = try XCTUnwrap(GoalSources.parseAdhd(Data(#"[{"id":"Q-2","domanda_chiara":"D?","risposta":"x","risposta_da":"haiku","local_id":"local_a","titolo_sessione":"⌘ Clotch: x"}]"#.utf8)).first)
         XCTAssertEqual([h.answerNote, h.localId], ["Risposta provvisoria", "local_a"])
         XCTAssertNil(GoalSources.parseAdhd(Data(#"[{"id":"Q-3","domanda_chiara":"D?","risposta_da":"sessione"}]"#.utf8))[0].answerNote, "the session's own answer says nothing")
+    }
+
+    func testMarkAllReadSendsOnlyTheIdsShown() {
+        let list = GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"A?","risposta":"x"},{"id":"Q-2","domanda_chiara":"B?"},{"id":"Q-3","domanda_chiara":"C?","risposta":"y"}]"#.utf8))
+        XCTAssertEqual(AdhdRequest.markReadArguments(nil, in: list, home: "/h"),
+                       [["/h/.claude/hooks/richieste.py", "letta", "Q-1"], ["/h/.claude/hooks/richieste.py", "letta", "Q-3"]],
+                       "never `--tutte`: an answer that landed after the list was drawn stays unread (#171)")
+        XCTAssertEqual(AdhdRequest.markReadArguments("Q-3", in: list, home: "/h"), [["/h/.claude/hooks/richieste.py", "letta", "Q-3"]])
     }
 
     func testAdhdWaitingLabelAndBadge() {
@@ -68,6 +76,23 @@ final class EngineContractTests: XCTestCase {
         XCTAssertNotNil(g.proofs?.first?.at, "proof `t` is ISO with +0000")
         XCTAssertNotNil(g.at); XCTAssertNotNil(g.lastSeen, "`ultima_attivita`")
         XCTAssertEqual(g.proposal, "Il notch mostra anche le richieste: la pagina R mostra S e il test passa")
+        XCTAssertTrue(g.valid, "`valido`: true in the engine's own file")
+    }
+
+    /// clotch#183: `valido: false` (wrong signature, lost key, expired legacy date) = the engine treats it as unsigned; never a live goal.
+    func testGoalTheEngineCallsInvalidIsNotShown() throws {
+        var o = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("obiettivo.json")) as? [String: Any])
+        o["valido"] = false
+        let bad = try XCTUnwrap(GoalSources.parseGoal(JSONSerialization.data(withJSONObject: o)))
+        XCTAssertFalse(bad.valid)
+        let session = DesktopSession(localId: "local_x", cliId: "cli-9", parentLocalId: nil, priorCliIds: [], title: "", isRunning: true,
+                                     isArchived: false, lastActivity: Date(), prs: [])
+        let now = Date()
+        let good = try XCTUnwrap(GoalSources.parseGoal(fixture("obiettivo.json")))
+        XCTAssertEqual(GoalBoard.rows(goals: [good], sessions: [session], live: [], now: now).map(\.id), ["cli-9"])
+        XCTAssertEqual(GoalBoard.rows(goals: [bad], sessions: [session], live: [], now: now), [], "hidden, never alive with a bar")
+        o["valido"] = nil
+        XCTAssertTrue(try XCTUnwrap(GoalSources.parseGoal(JSONSerialization.data(withJSONObject: o))).valid, "an older file with no field stays valid")
     }
 
     func testGoalStalledFieldsAreRead() throws {
@@ -90,9 +115,9 @@ final class EngineContractTests: XCTestCase {
         let line = String(decoding: try JSONSerialization.data(withJSONObject: o), as: UTF8.self)
         let e = try XCTUnwrap(VoiceEvents.parse(line: Substring(line)))
         XCTAssertEqual(e.kind, .question)
-        XCTAssertEqual([e.id, e.session, e.level, e.subject, e.proof], ["e-81788521", "cli-9", "alto", "fondere la PR", "PR #12"])
+        XCTAssertEqual([e.id, e.session, e.level, e.subject, e.proof], ["e-cb57711e", "cli-9", "alto", "fondere la PR", "PR #12"])
         XCTAssertFalse(e.judged)
-        XCTAssertEqual(e.at.timeIntervalSince1970, 1792610025.501, accuracy: 0.001)
+        XCTAssertEqual(e.at.timeIntervalSince1970, 1792654603.866, accuracy: 0.001)
     }
 
     /// A line the engine's own `eventi_voce.py scrivi` wrote (claude-config main 478b6df), parsed by Clotch.
@@ -174,5 +199,45 @@ final class EngineContractTests: XCTestCase {
         XCTAssertNotNil(o["recenti"]); XCTAssertEqual(o["avvisato"] as? String, "x"); XCTAssertNotNil(o["ultimo"])
         let next = try XCTUnwrap(JSONSerialization.jsonObject(with: XCTUnwrap(VoiceTurn.Day(giorno: "2026-10-22").merged(into: mod))) as? [String: Any])
         XCTAssertNil(next["ultimo"], "a new day, like Clean View"); XCTAssertNotNil(next["recenti"])
+    }
+
+    // MARK: the engine's vocabulary (clotch#167): a new type or state in the engine is a red test here
+
+    private func vocabulary(_ key: String) throws -> [String: Any] {
+        let all = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("vocabolario.json")) as? [String: Any])
+        return try XCTUnwrap(all[key] as? [String: Any], key)
+    }
+
+    func testEveryEventTypeOfTheEngineIsReadOrIgnoredOnPurpose() throws {
+        let types = try vocabulary("evento.tipo")
+        for (tipo, how) in types {
+            let verdict = (how as? [String: Any])?["clotch"] as? String ?? ""
+            XCTAssertTrue(VoiceEvent.Kind(rawValue: tipo) != nil || verdict.hasPrefix("ignorato:"),
+                          "engine event type «\(tipo)» is neither a VoiceEvent.Kind nor ignored with a reason")
+        }
+        for kind in VoiceEvent.Kind.allCases { XCTAssertNotNil(types[kind.rawValue], "«\(kind.rawValue)» is not in the engine's vocabulary") }
+    }
+
+    func testEverySessionStateOfTheEngineIsAPhase() throws {
+        let states = try vocabulary("stato-sessione.stato")
+        for raw in states.keys { XCTAssertNotNil(SessionPhase(contract: raw), "session state «\(raw)»") }
+        XCTAssertEqual(Set(states.keys), Set(SessionPhase.allCases.map(\.rawValue)))
+    }
+
+    func testSessionStateFileIsRead() throws {
+        let m = try XCTUnwrap(GoalSources.parseMotor(fixture("stato-sessione.json"), cli: "x"))
+        XCTAssertEqual([m.cli, m.phase.rawValue, m.why], ["cli-9", "aspetta_roberto", "Ti chiede: posso fondere?"])
+        XCTAssertEqual(m.questions, ["Posso fondere?"]); XCTAssertEqual(m.errors, 0); XCTAssertNotNil(m.since); XCTAssertNotNil(m.seen)
+        XCTAssertEqual(m.askLine, "Ti chiede: Posso fondere?")
+    }
+
+    func testEveryRequestAndAdhdStateParses() throws {
+        for name in ["richiesta-compito", "richiesta-domanda", "richiesta-adhd", "richiesta-ferma"] {
+            XCTAssertNotNil(GoalSources.parseRequest(try fixture(name + ".json")), name)
+        }
+        let known: Set<String> = ["nuova", "presa", "fatta", "ferma"]
+        XCTAssertTrue(Set(try vocabulary("richiesta.stato").keys).isSubset(of: known), "a new request state needs a look in UserRequest")
+        let adhd = Set(try vocabulary("adhd.stato").keys)
+        XCTAssertEqual(adhd, ["aperta", "con_risposta", "sollecitata"], "a new ADHD state needs a look")
     }
 }
