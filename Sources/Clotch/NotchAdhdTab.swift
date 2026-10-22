@@ -95,7 +95,7 @@ private enum Line {
     static let header: CGFloat = 13, question: CGFloat = 17, detail: CGFloat = 14
 }
 
-private extension View {
+extension View {
     /// Every line of the text in a box of `height`, as in the frame (12 pt text sets 15 pt lines by default, the frame's box is 14).
     /// shortcut: before macOS 26 the lines keep the default height, a pixel or two taller per line.
     @ViewBuilder func lineBox(_ height: CGFloat) -> some View {

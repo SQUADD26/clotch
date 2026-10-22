@@ -101,8 +101,11 @@ private struct AlertLine: View {
 
     var body: some View {
         Text(text).font(.system(size: size, weight: weight)).foregroundStyle(color)
-            .fixedSize(horizontal: false, vertical: true)
+            .lineBox(Self.box[size] ?? size + 3).fixedSize(horizontal: false, vertical: true)
     }
+
+    /// The frames' text boxes per size (78-61703, 78-62207): 11 → 13, 12 → 14, 14 → 17.
+    private static let box: [CGFloat: CGFloat] = [T.notchTesto11: 13, T.notchTesto12: 14, T.notchTesto14: T.notchInterlinea17]
 }
 
 /// The white button first (the move), the grey ones after; nil action = a label that cannot be pressed (sending).
