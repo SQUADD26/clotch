@@ -50,8 +50,11 @@ enum NotchHoverInteraction {
     /// Whether an elapsed hover delay may still open the session list. A card
     /// the island opened during the delay (an approval, or a question the user
     /// just clicked open) is waiting on the user; swapping it for the list
-    /// would hide the one thing that needs an answer.
-    static func hoverExpansionMayReplace(_ surface: IslandSurface) -> Bool {
+    /// would hide the one thing that needs an answer. The same holds for content
+    /// with buttons under the notch (the voice bar, #146): the pointer going to
+    /// press them must not open the island over them.
+    static func hoverExpansionMayReplace(_ surface: IslandSurface, interactiveOverlay: Bool = false) -> Bool {
+        if interactiveOverlay { return false }
         switch surface {
         case .approvalCard, .questionCard: return false
         default: return true
@@ -345,6 +348,7 @@ struct NotchPanelView: View {
             CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)) { return }
         isHovered = hovering
         if hovering {
+            guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput) else { return }
             // Immediate lightweight acknowledgement; a quick pass-through
             // only ever plays this first stage and reverses.
             withAnimation(NotchAnimation.hoverPrehover) {
@@ -387,7 +391,7 @@ struct NotchPanelView: View {
             Task { @MainActor in
                 // Guard: mouse may have left during the delay, or rests on the account bars (their card shows)
                 guard isHovered, !accountsHover else { return }
-                guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface) else { return }
+                guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput) else { return }
                 if hapticOnHover {
                     let performer = NSHapticFeedbackManager.defaultPerformer
                     switch hapticIntensity {

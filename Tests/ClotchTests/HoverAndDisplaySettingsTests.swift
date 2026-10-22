@@ -63,6 +63,14 @@ final class HoverAndDisplaySettingsTests: XCTestCase {
         XCTAssertTrue(NotchHoverInteraction.hoverExpansionMayReplace(.completionCard(sessionId: "s")))
     }
 
+    /// #146: while the voice bar (or any content with buttons) is in front, hovering must not open the island over it.
+    func testHoverNeverOpensOverInteractiveContent() {
+        for surface in [IslandSurface.collapsed, .sessionList, .completionCard(sessionId: "s")] {
+            XCTAssertFalse(NotchHoverInteraction.hoverExpansionMayReplace(surface, interactiveOverlay: true))
+        }
+        XCTAssertTrue(NotchHoverInteraction.hoverExpansionMayReplace(.collapsed, interactiveOverlay: false))
+    }
+
     // MARK: - Content font size
 
     func testContentFontSizeGoesUpTo16pt() {
