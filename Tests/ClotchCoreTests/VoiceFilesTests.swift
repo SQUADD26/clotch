@@ -85,6 +85,17 @@ final class VoiceFilesTests: XCTestCase {
         XCTAssertEqual(files.prompt, "Sei la voce.")
     }
 
+    func testEngineFilesComeFromTheEngineFolder() throws {
+        // #251 (claude-config#1998): the engine's copy wins; without it, the old mod folder still works
+        try put("Dal motore.\n", home.appendingPathComponent(".claude/hooks/voce-parlatore.md"))
+        try put(#"{"PR": "pi erre"}"#, home.appendingPathComponent(".claude/hooks/voce-pronuncia.json"))
+        try put("Dalla mod.\n", home.appendingPathComponent(".claude/mods/clean-view/hooks/voce-parlatore.md"))
+        let f = VoiceFiles(home: home)
+        XCTAssertEqual(f.promptURL.path, home.appendingPathComponent(".claude/hooks/voce-parlatore.md").path)
+        XCTAssertEqual(f.prompt, "Dal motore.")
+        XCTAssertEqual(f.pronunciation, ["PR": "pi erre"])
+    }
+
     func testPronunciationIsBaseListThenOwnFile() throws {
         XCTAssertEqual(files.pronunciation, [:])
         try put(#"{"Clotch": "Clocc", "PR": "pi erre"}"#, files.basePronunciationURL)
