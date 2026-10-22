@@ -201,6 +201,14 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.waiting([]), [])
     }
 
+    /// #209: «N in attesa» counts what waits for Roberto: nuova, and presa only while `aspetta_te`. Not ferma, not a plain presa.
+    func testWaitingCountsOnlyWhatWaitsForRoberto() {
+        let all = [("nuova", ""), ("ferma", ""), ("presa", ""), ("presa", #", "aspetta_te": true"#), ("fatta", "")].enumerated().map { i, s in
+            GoalSources.parseRequest(data(#"{"id": "Q-\#(i)", "testo": "x", "stato": "\#(s.0)"\#(s.1)}"#))!
+        }
+        XCTAssertEqual(UserRequest.waiting(all).map(\.id), ["Q-0", "Q-3"])
+    }
+
     /// #61, #90: a note never shows; a question shows but is never a task (no count, no notice). No `tipo` = a task.
     func testOnlyTasksAreRequests() {
         func parse(_ tipo: String) -> UserRequest? {
