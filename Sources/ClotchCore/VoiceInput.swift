@@ -102,6 +102,28 @@ public enum VoiceInput {
         return String(decoding: (try? JSONSerialization.data(withJSONObject: body)) ?? Data(), as: UTF8.self)
     }
 
+    /// The system's names, as the engines mishear them in Italian (#242: «Allover Saird», «Oversayer», «Cloche»): the helper and
+    /// the Overseer read the right word. Whole words only, so «game over» or «lover» stay as they are.
+    static let names: [(pattern: String, name: String)] = [
+        (#"(?i)\b(?:(all|dell|nell)'?\s?)?o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?\b"#, "Overseer"),
+        (#"(?i)\bclo(?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
+    ]
+
+    public static func fixNames(_ text: String) -> String {
+        names.reduce(text) { t, n in
+            guard let re = try? NSRegularExpression(pattern: n.pattern) else { return t }
+            var out = t
+            // From the end, so the ranges still to replace keep their place.
+            for m in re.matches(in: t, range: NSRange(t.startIndex..., in: t)).reversed() {
+                guard let whole = Range(m.range, in: out) else { continue }
+                var prep = (m.numberOfRanges > 1 ? Range(m.range(at: 1), in: out) : nil).map { out[$0].lowercased() + "'" } ?? ""
+                if whole.lowerBound == out.startIndex { prep = prep.prefix(1).uppercased() + prep.dropFirst() }
+                out.replaceSubrange(whole, with: prep + n.name)
+            }
+            return out
+        }
+    }
+
     public static func scribeEvent(_ text: String) -> ScribeEvent {
         guard let o = (try? JSONSerialization.jsonObject(with: Data(text.utf8))) as? [String: Any],
               let type = o["message_type"] as? String else { return .ignored }
