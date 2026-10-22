@@ -35,17 +35,13 @@ final class AfkStore: ObservableObject {
     /// The switch in the notch and in the settings: the engine's command is the only writer of the state.
     func set(_ on: Bool) {
         isOn = on  // at once; the file confirms it a moment later
-        let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/bin/bash")
-        p.arguments = [FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/voce").path, "afk", on ? "on" : "off"]
-        var env = ProcessInfo.processInfo.environment
+        let voce = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/voce").path
         // A Dock-launched app has no Homebrew nor ~/.local/bin in PATH.
-        env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:\(NSHomeDirectory())/.local/bin:" + (env["PATH"] ?? "/usr/bin:/bin")
-        p.environment = env
-        p.standardOutput = FileHandle.nullDevice
-        p.standardError = FileHandle.nullDevice
-        p.terminationHandler = { _ in DispatchQueue.main.async { AfkStore.shared.reload() } }
-        if (try? p.run()) == nil { reload() }
+        let path = "/opt/homebrew/bin:/usr/local/bin:\(NSHomeDirectory())/.local/bin:" + (ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin")
+        Task.detached {
+            _ = EngineCommand.run("/bin/bash", [voce, "afk", on ? "on" : "off"], env: ["PATH": path])
+            await MainActor.run { AfkStore.shared.reload() }
+        }
     }
 
     func dismiss(closing: Bool = true) {
