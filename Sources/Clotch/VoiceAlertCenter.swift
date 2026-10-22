@@ -39,6 +39,7 @@ final class VoiceAlertCenter {
         let read = VoiceEvents.newer(data, after: eventsMark)
         eventsMark = read.mark
         for type in read.unknown { Self.log.error("voice event not said: unknown type «\(type, privacy: .public)» in eventi.jsonl") }
+        VoiceAlertBar.shared.remember(read.events)  // what waits on Roberto stays in the open notch, voice on or off (#236)
         offer(read.events)
     }
 
@@ -121,8 +122,10 @@ final class VoiceAlertCenter {
         guard !VoiceInputController.shared.micOpen else { return retryWhenMicClosed() }
         guard !speaking, let e = engine.next(now: Date()) else { return }
         speaking = true
+        VoiceAlertBar.shared.speaking(e)  // the line under the notch while it is said (#235, #236)
         Task {
             await VoiceSpeaker.shared.say(e)
+            VoiceAlertBar.shared.spoke(e)
             speaking = false
             pump()
         }

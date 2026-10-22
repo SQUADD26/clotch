@@ -35,6 +35,7 @@ public struct VoiceEvent: Equatable, Sendable {
     public var id = ""        // "e-xxxxxxxx" in eventi.jsonl; "" for a derived event
     public var session = ""   // cli id; "" = not tied to a session (an account, a custom alert): «Parla per» lets it through
     public var localId = ""   // `local_…` of the Claude app
+    public var title = ""     // the session's title (`sessione.titolo`), for the line under the notch
     public var role = ""      // master | figlia | overseer | "" (unknown: «Parla per» uses the session file)
     public var subject = ""   // what it is about, in plain words: the key of «no duplicates»
     public var text = ""
@@ -78,6 +79,7 @@ public enum VoiceEvents {
                            text: o["testo"] as? String ?? "", proof: o["prova"] as? String ?? "", level: o["livello"] as? String)
         e.id = o["id"] as? String ?? ""
         e.localId = s["local_id"] as? String ?? ""
+        e.title = s["titolo"] as? String ?? ""
         e.role = s["ruolo"] as? String ?? ""
         e.judged = o["giudizio"] != nil
         return e

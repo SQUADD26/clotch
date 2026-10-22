@@ -153,11 +153,16 @@ struct NotchPanelView: View {
     @ObservedObject private var voice = VoiceStore.shared
     /// Roberto speaks to Clotch (#110): the pill takes the place of a note.
     @ObservedObject private var voiceInput = VoiceInputController.shared
+    /// What the voice says that needs Roberto stays written under the notch (#235, #236).
+    @ObservedObject private var alertBar = VoiceAlertBar.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
     private var showsNote: Bool {
-        showBar && !shouldShowExpanded && !showsVoiceInput && notifier.current != nil && notifier.phase != .leave && !noticeInWing
+        showBar && !shouldShowExpanded && !showsVoiceInput && !showsAlert && notifier.current != nil && notifier.phase != .leave && !noticeInWing
     }
+    /// Shown even when the bar is hidden, like the pill: the voice is saying it.
+    private var showsAlert: Bool { !shouldShowExpanded && !showsVoiceInput && alertBar.current != nil }
+    private var alertFailed: Bool { if case .failed = alertBar.state { return true } else { return false } }
     /// Shown even when the bar is hidden: he is speaking and must see it.
     private var showsVoiceInput: Bool { !shouldShowExpanded && voiceInput.phase != .idle }
     /// The goal element of the closed notch already says it (#39): no second line under the notch.
@@ -202,7 +207,7 @@ struct NotchPanelView: View {
     /// Total panel width — adapts based on state and screen geometry
     private var panelWidth: CGFloat {
         let nw = notchW
-        if showsVoiceInput { return min(max(collapsedBarWidth, NotchSize.note), maxPanelWidth) }
+        if showsVoiceInput || showsAlert { return min(max(collapsedBarWidth, NotchSize.note), maxPanelWidth) }
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
         // Never narrower than the closed notch: opening only grows, width and height on one spring (#99).
@@ -227,8 +232,8 @@ struct NotchPanelView: View {
     private var panelShape: NotchPanelShape {
         NotchPanelShape(
             width: panelWidth,
-            topExtension: shouldShowExpanded || showsNote || showsVoiceInput ? 14 : 3,
-            bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote || showsVoiceInput ? NotchSpace.noteRadius : 12,
+            topExtension: shouldShowExpanded || showsNote || showsVoiceInput || showsAlert ? 14 : 3,
+            bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote || showsVoiceInput || showsAlert ? NotchSpace.noteRadius : 12,
             minHeight: notchHeight
         )
     }
@@ -294,6 +299,7 @@ struct NotchPanelView: View {
         // hover then does to the surface below.
         appState.followUps.pointerOverIsland = hovering
         notifier.pointerOver = hovering
+        alertBar.pointerOver = hovering
         // Idle indicator hover — delay un-hover to prevent oscillation when
         // the animated width change crosses the mouse position (#52).
         if showIdleIndicator {
@@ -348,7 +354,7 @@ struct NotchPanelView: View {
             CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)) { return }
         isHovered = hovering
         if hovering {
-            guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput) else { return }
+            guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput || showsAlert) else { return }
             // Immediate lightweight acknowledgement; a quick pass-through
             // only ever plays this first stage and reverses.
             withAnimation(NotchAnimation.hoverPrehover) {
@@ -376,8 +382,22 @@ struct NotchPanelView: View {
     }
 
     /// With «Apri al passaggio del mouse» off, a click on the closed notch opens it (#56).
+    /// A button of the line under the notch: the ok through dai-ok, the chat, or the ADHD tab open on that question.
+    private func alertAct(_ e: VoiceEvent, _ a: VoiceAlertText.Action) {
+        switch a {
+        case .giveOk: alertBar.giveOk(e)
+        case .openChat: alertBar.openChat(e)
+        case .openAdhd:
+            alertBar.dismiss()
+            let row = AdhdStore.shared.items.first { $0.id == e.proof }
+            AdhdStore.shared.show(question: row?.question ?? e.subject)
+            UserDefaults.standard.set(NotchTab.adhd.rawValue, forKey: "notchTab")
+            withAnimation(NotchAnimation.open) { appState.surface = .sessionList }
+        }
+    }
+
     private func openOnClick() {
-        guard !openOnHover, !appState.surface.isExpanded else { return }
+        guard !openOnHover, !appState.surface.isExpanded, !showsAlert else { return }  // the line's own click acts (#236)
         withAnimation(NotchAnimation.open) { appState.surface = .sessionList }
     }
 
@@ -391,7 +411,7 @@ struct NotchPanelView: View {
             Task { @MainActor in
                 // Guard: mouse may have left during the delay, or rests on the account bars (their card shows)
                 guard isHovered, !accountsHover else { return }
-                guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput) else { return }
+                guard NotchHoverInteraction.hoverExpansionMayReplace(appState.surface, interactiveOverlay: showsVoiceInput || showsAlert) else { return }
                 if hapticOnHover {
                     let performer = NSHapticFeedbackManager.defaultPerformer
                     switch hapticIntensity {
@@ -454,6 +474,11 @@ struct NotchPanelView: View {
                     VoiceInputPill(input: voiceInput)
                         .frame(width: panelWidth)
                         .transition(contentTransition)
+                } else if showsAlert, let event = alertBar.current {
+                    NotchAlertNote(event: event, state: alertBar.state) { alertAct(event, $0) }
+                        .frame(width: panelWidth)
+                        .id(event.id)
+                        .transition(contentTransition)
                 } else if showsNote, let event = notifier.current {
                     NotchNotificationView(event: event, phase: notifier.phase, rows: goals.rows, requests: goals.requests)
                         .frame(width: panelWidth)
@@ -469,6 +494,7 @@ struct NotchPanelView: View {
             // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
             .overlay { VoiceInputLightLive(light: voiceInput.light, shape: panelShape) }
+            .overlay { VoiceInputLightLive(light: showsAlert && alertFailed ? .red : .off, shape: panelShape) }
             .simultaneousGesture(TapGesture().onEnded { openOnClick() })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
@@ -517,7 +543,7 @@ struct NotchPanelView: View {
         .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
         // The account bars' card hangs under the closed island, over the whole window so the island's clip
         // does not cut it; leaving the bars with the pointer still on the island opens the notch as usual.
-        .accountsCard(allowed: showBar && !shouldShowExpanded && !showsNote && !showsVoiceInput)
+        .accountsCard(allowed: showBar && !shouldShowExpanded && !showsNote && !showsVoiceInput && !showsAlert)
         .onPreferenceChange(AccountsHoverKey.self) { on in
             MainActor.assumeIsolated {  // SwiftUI delivers preferences on the main thread
                 accountsHover = on
