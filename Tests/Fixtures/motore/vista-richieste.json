@@ -4,12 +4,12 @@
   "domanda_per_te": "",
   "ferma_perche": "La sessione è chiusa.",
   "id": "Q-5ef8766d",
-  "presa_da": "cli-3",
+  "presa_da": "Login da rifare",
   "punto": "La sessione è chiusa.",
   "stato": "ferma",
   "t": 1792000003.5,
   "testo": "Rifai il login",
   "tipo": "compito",
-  "titolo_sessione": ""
+  "titolo_sessione": "Login da rifare"
  }
 ]
