@@ -54,6 +54,26 @@ final class VoiceInputController: ObservableObject {
         return c
     }
 
+    func debugShowFailure() {
+        phase = .failure(.network)
+        var n = 0
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            n += 1
+            let st = (NSApp.delegate as? AppDelegate)?.debugSurface() ?? "?"
+            print("DBG t=\(n) phase=\(self.phase) surface=\(st)"); fflush(stdout)
+            let opts: CGWindowListOption = [.optionOnScreenOnly]
+            if let list = CGWindowListCopyWindowInfo(opts, kCGNullWindowID) as? [[String: Any]] {
+                for w in list where (w[kCGWindowOwnerPID as String] as? Int) == Int(ProcessInfo.processInfo.processIdentifier) {
+                    print("DBG win \(w[kCGWindowNumber as String] ?? 0) \(w[kCGWindowBounds as String] ?? "")")
+                    if let id = w[kCGWindowNumber as String] as? UInt32,
+                       let img = CGWindowListCreateImage(.null, .optionIncludingWindow, id, [.boundsIgnoreFraming]) {
+                        let rep = NSBitmapImageRep(cgImage: img)
+                        try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: "/private/tmp/claude-501/win-\(id)-t\(n).png"))
+                    }
+                }
+            }
+        }
+    }
     let files = VoiceFiles()
     var config = VoiceInput.Config([:])
     private let local = LocalTranscriber()
