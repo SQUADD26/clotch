@@ -90,6 +90,16 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertNil(e.next(now: now))
     }
 
+    /// #205/#204: questions and oks of two sessions are never joined: two voices.
+    func testQuestionsOfTwoSessionsStayTwoVoices() {
+        for kind in [VoiceEvent.Kind.question, .waitsForOk] {
+            var e = VoiceAlertEngine()
+            XCTAssertNil(e.offer(event(kind, "prima", session: "m"), config: main, sessions: sessions, now: now))
+            XCTAssertNil(e.offer(event(kind, "seconda", session: "c"), config: VoiceTurn.Config(["parla_per": "tutte"]), sessions: sessions, now: now))
+            XCTAssertEqual(e.waiting.map(\.text), ["prima", "seconda"], "\(kind): two voices in the queue")
+        }
+    }
+
     func testOldNewsIsNeverSaid() {
         var e = VoiceAlertEngine()
         XCTAssertEqual(e.offer(event(.goalReached, "a", ago: 400), config: main, sessions: sessions, now: now), "vecchio")

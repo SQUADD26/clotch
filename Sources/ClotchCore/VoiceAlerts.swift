@@ -34,7 +34,8 @@ public struct VoiceAlertEngine {
         seen[key] = (e.kind == .question && !e.session.isEmpty ? .distantFuture : now, e.urgent)
         if let mine = Self.closing(e, other: false) { seen[mine] = (now, e.urgent) }
         // #205: alike news arriving together is one phrase (five limit risks, not four phrases and a «coda piena»).
-        if let j = waiting.firstIndex(where: { $0.kind == e.kind }) {
+        // Not the questions (and oks): each session's asks for its own work said (#204), joined and cut they make no sense.
+        if ![.question, .waitsForOk].contains(e.kind), let j = waiting.firstIndex(where: { $0.kind == e.kind }) {
             waiting[j].text = [waiting[j], e].map { $0.text.isEmpty ? $0.subject : $0.text }.joined(separator: "; ")
             if e.urgent { waiting[j].level = "alto" }
             return nil
