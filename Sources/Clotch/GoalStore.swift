@@ -152,15 +152,15 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Refreshed only when the board changes, so an idle board never redraws. The open notch ticks
     /// its own "since …" text (TimelineView); `--snapshot` reads this.
     @Published private(set) var now: Date = Date()
-    /// Proposals Roberto rejected in the notch (`GoalDecision.key`): hidden here at once, whether or not the
-    /// register took the refusal (#20). A new proposal text from the same session shows again.
-    @Published private(set) var rejected = Set(UserDefaults.standard.stringArray(forKey: GoalStore.rejectedKey) ?? [])
+    /// A refusal waits for the register (#171): the proposal leaves the notch when the engine drops it, never before,
+    /// so a refusal the register did not take is shown as failed, not hidden for good.
+    @Published private(set) var rejecting: Set<String> = []
+    @Published private(set) var rejectFailed: Set<String> = []
     @Published private(set) var accepting: Set<String> = []
     @Published private(set) var acceptFailed: Set<String> = []
     /// Goals Roberto is writing from the notch (#36), and the ones the register refused.
     @Published private(set) var writing: Set<String> = []
     @Published private(set) var writeFailed: Set<String> = []
-    private nonisolated static let rejectedKey = "clotch.rejectedProposals"
 
     private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
     private var snapshot: GoalDiskData = ([], [], [], [], [])
@@ -204,12 +204,8 @@ private final class GoalWatcher: @unchecked Sendable {
     }
 
     func reject(_ row: GoalRow) {
-        guard let text = row.proposal else { return }
-        rejected.insert(GoalDecision.key(cli: row.id, text: text))
-        UserDefaults.standard.set(rejected.sorted(), forKey: Self.rejectedKey)
-        if let args = GoalDecision.rejectArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path) {
-            Task.detached { _ = Self.python(args) }
-        }
+        guard let args = GoalDecision.rejectArguments(row, home: FileManager.default.homeDirectoryForCurrentUser.path) else { return }
+        launch(args, row.id, busy: \.rejecting, failed: \.rejectFailed)
     }
 
     /// Roberto's «sì» from the notch: `obiettivo-guard.py conferma`, off the main thread. On success the watcher
