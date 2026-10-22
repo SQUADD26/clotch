@@ -68,6 +68,7 @@ private struct AdhdRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             trailing
         }
+        .fixedSize(horizontal: false, vertical: true)  // a row never shrinks under a capped height: it would stack its lines (#301)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
     }
