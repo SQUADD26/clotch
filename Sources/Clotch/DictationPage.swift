@@ -1,3 +1,4 @@
+// figma: 91-64184
 import SwiftUI
 import AppKit
 import AVFoundation
@@ -8,98 +9,115 @@ import ClotchCore
 /// read by `VoiceInput.Config`); the shortcut is the app's `ShortcutAction.voiceInput`. The ElevenLabs key is changed in «Voce».
 /// Every change is saved at once.
 struct DictationPage: View {
-    private let files = VoiceFiles()
+    private typealias T = FigmaToken.MacOS27GoldenGate
+    private let files: VoiceFiles
+    private let width: CGFloat?
+    /// Set while the local model downloads; nil when there is nothing to show (the app has no download source yet).
+    private let localDownload: LocalModelDownload?
+    /// nil = ask the system; the parity test sets it so the page does not depend on the Mac that draws it.
+    private let accessOverride: AVAuthorizationStatus?
     @State private var config = VoiceInput.Config([:])
     @State private var binding = ShortcutAction.voiceInput.binding
     @State private var recording = false
     @State private var monitor: Any?
     @State private var note: String?
-    @State private var access = AVCaptureDevice.authorizationStatus(for: .audio)
+    @State private var access: AVAuthorizationStatus
     @State private var hasKey = false
+    @State private var configBroken = false
     @State private var inputs: [(id: String, name: String)] = []
 
+    init(files: VoiceFiles = VoiceFiles(), width: CGFloat? = nil, localDownload: LocalModelDownload? = nil,
+         accessOverride: AVAuthorizationStatus? = nil) {
+        self.files = files
+        self.width = width
+        self.localDownload = localDownload
+        self.accessOverride = accessOverride
+        _access = State(initialValue: accessOverride ?? AVCaptureDevice.authorizationStatus(for: .audio))
+    }
+
     var body: some View {
-        SettingsForm {
-            SettingsRow("Dettatura") {
-                SettingsCheckbox(title: "Dettatura accesa", note: "Spenta, la scorciatoia non fa nulla.",
-                                 isOn: Binding(get: { config.enabled }, set: { config.enabled = $0; save() }))
-            }
-            SettingsRow("Stato microfono") {
-                HStack(spacing: 6) {
-                    Circle().fill(access == .authorized ? Color.green : Color.orange).frame(width: 8, height: 8)
-                    Text(accessText)
-                    if access == .denied || access == .restricted { Button("Apri Privacy", action: openPrivacy) }
+        SettingsCardPage(symbol: "mic.fill", tint: T.impostazioniIconaArancio, title: "Dettatura",
+                     summary: "Premi la scorciatoia e parla: il notch ascolta, trascrive in diretta e manda il testo all’Overseer.", width: width ?? ClotchSettingsWindow.width) {
+            SettingsGroup {
+                CardRow(title: "Dettatura accesa", note: "Spenta, la scorciatoia non fa nulla.") {
+                    CardSwitch(label: "Dettatura accesa", isOn: Binding(get: { config.enabled }, set: { config.enabled = $0; save() }))
                 }
-            }
-            Divider()
-            SettingsRow("Scorciatoia") {
-                HStack(spacing: 8) {
-                    Text(binding.displayString).font(.system(size: 13, weight: .medium))
-                    Button(recording ? "Premi i tasti…" : "Cambia…", action: record)
-                }
-                SettingsNote(ShortcutAction.voiceInput.conflictingAction().map { _ in "Questa scorciatoia è già usata." } ?? modeNote)
-            }
-            SettingsRow("Modo") {
-                Picker("Modo", selection: Binding(get: { config.mode }, set: { config.mode = $0; save() })) {
-                    Text("Tieni premuto").tag(VoiceInput.Mode.hold)
-                    Text("Premi e ripremi").tag(VoiceInput.Mode.toggle)
-                }
-                .labelsHidden().frame(width: 200)
-            }
-            Divider()
-            SettingsRow("Motore") {
-                Picker("Motore", selection: Binding(get: { config.engine }, set: { config.engine = $0; save() })) {
-                    Text("ElevenLabs Scribe v2").tag(VoiceInput.Engine.scribe)
-                    Text("Su questo Mac (Parakeet v3)").tag(VoiceInput.Engine.local)
-                }
-                .labelsHidden().frame(width: 260)
-            }
-            if config.engine == .scribe {
-                SettingsRow("Chiave") {
-                    HStack(spacing: 6) {
-                        Circle().fill(hasKey ? Color.green : Color.orange).frame(width: 8, height: 8)
-                        Text(hasKey ? "Chiave salvata" : "Manca la chiave")
+                CardDivider()
+                CardRow(title: "Stato microfono") {
+                    HStack(spacing: T.notchSpazio8) {
+                        if access == .denied || access == .restricted { CardButton(title: "Apri Privacy", action: openPrivacy) }
+                        CardStatus(ok: access == .authorized, text: accessText)
                     }
-                    SettingsNote("Il testo compare mentre parli. Si cambia in Voce.")
-                }
-            } else {
-                SettingsRow("Modello locale") {
-                    Text("Parakeet v3")
-                    SettingsNote("Resta sul Mac, senza rete. La prima volta scarica il modello, circa 480 MB.")
                 }
             }
-            SettingsRow("Lingua") {
-                Picker("Lingua", selection: Binding(get: { config.language }, set: { config.language = $0; save() })) {
-                    ForEach(VoiceInput.languages, id: \.code) { Text($0.name).tag($0.code) }
-                }
-                .labelsHidden().frame(width: 200)
-            }
-            Divider()
-            SettingsRow("Invia a") {
-                Text("Overseer")
-                SettingsNote("Un ordine arriva all’Overseer. Una domanda riceve risposta.")
-            }
-            SettingsRow("Microfono") {
-                Picker("Microfono", selection: Binding(get: { config.microphone }, set: { config.microphone = $0; save() })) {
-                    Text("Quello del sistema").tag("")
-                    // A device that is gone stays listed, so the choice is not silently lost.
-                    if !config.microphone.isEmpty, !inputs.contains(where: { $0.id == config.microphone }) {
-                        Text("Non collegato").tag(config.microphone)
+            SettingsGroup {
+                CardRow(title: "Scorciatoia", note: ShortcutAction.voiceInput.conflictingAction().map { _ in "Questa scorciatoia è già usata." } ?? modeNote) {
+                    HStack(spacing: T.notchSpazio8) {
+                        CardField(width: T.impostazioniMisura90) {
+                            Text(binding.displayString).font(.settings(T.notchTesto13)).foregroundStyle(T.testoPrimario)
+                        }
+                        CardButton(title: recording ? "Premi i tasti…" : "Cambia…", action: record)
                     }
-                    ForEach(inputs, id: \.id) { Text($0.name).tag($0.id) }
                 }
-                .labelsHidden().frame(width: 260)
+                CardDivider()
+                CardRow(title: "Modo") {
+                    CardMenu(label: "Modo", selection: Binding(get: { config.mode }, set: { config.mode = $0; save() }),
+                             options: [(.hold, "Tieni premuto"), (.toggle, "Premi e ripremi")])
+                }
             }
-            SettingsRow("Risposte") {
-                SettingsCheckbox(title: "Rispondi a voce",
-                                 note: "Una domanda riceve una risposta parlata.",
-                                 isOn: Binding(get: { config.spoken }, set: { config.spoken = $0; save() }))
+            SettingsGroup {
+                CardRow(title: "Motore") {
+                    CardMenu(label: "Motore", selection: Binding(get: { config.engine }, set: { config.engine = $0; save() }),
+                             options: [(.scribe, "ElevenLabs Scribe v2 (in rete)"), (.local, "Su questo Mac (Parakeet v3)")],
+                             width: T.impostazioniMisura230)
+                }
+                CardDivider()
+                if config.engine == .scribe {
+                    CardRow(title: "Chiave", note: "Il testo compare mentre parli. Si cambia in Voce.") {
+                        CardStatus(ok: hasKey, text: hasKey ? "Chiave salvata" : "Manca la chiave")
+                    }
+                } else {
+                    CardRow(title: "Modello locale", note: localDownload.map(\.note) ?? "Resta sul Mac, senza rete. La prima volta scarica il modello.") {
+                        if let localDownload { LocalDownloadBar(fraction: localDownload.fraction) }
+                    }
+                }
+                CardDivider()
+                CardRow(title: "Lingua", note: "Capisce la lingua mentre parli (italiano, inglese e altre). Scegline una per più precisione.") {
+                    CardMenu(label: "Lingua", selection: Binding(get: { config.language }, set: { config.language = $0; save() }),
+                             options: VoiceInput.languages.map { ($0.code, $0.name) })
+                }
             }
-            if let note { SettingsNote(note).frame(maxWidth: .infinity, alignment: .trailing) }
+            SettingsGroup(title: "Overseer") {
+                CardRow(title: "Modello Overseer",
+                        note: configBroken ? "Impostazioni illeggibili. Correggi a mano il file config.json della voce."
+                        : "Risponde sullo stato del lavoro, scrive alle sessioni, sblocca le chat ferme e apre lavoro nuovo.\nPiù forte: capisce meglio, ma risponde più lento e costa di più.") {
+                    CardMenu(label: "Modello Overseer", selection: Binding(get: { config.overseerModel }, set: { config.overseerModel = $0; save() }),
+                             options: [("claude-haiku-5-5", "Haiku 5.5"), ("claude-sonnet-5-5", "Sonnet 5.5"), ("claude-opus-5-5", "Opus 5.5")])
+                        .disabled(configBroken)
+                }
+            }
+            SettingsGroup {
+                CardRow(title: "Microfono", note: "Segue la scelta di Impostazioni di Sistema.") {
+                    CardMenu(label: "Microfono", selection: Binding(get: { config.microphone }, set: { config.microphone = $0; save() }),
+                             options: microphoneOptions, width: T.impostazioniMisura200)
+                }
+                CardDivider()
+                CardRow(title: "Rispondi a voce", note: "Una domanda riceve una risposta parlata.") {
+                    CardSwitch(label: "Rispondi a voce", isOn: Binding(get: { config.spoken }, set: { config.spoken = $0; save() }))
+                }
+            }
+            if let note { Text(note).font(.settings(T.notchTesto11)).foregroundStyle(T.testoSecondario).frame(maxWidth: .infinity, alignment: .trailing) }
         }
         .onAppear(perform: refresh)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in refresh() }
         .onDisappear(perform: stopRecording)
+    }
+
+    /// A device that is gone stays listed, so the choice is not silently lost.
+    private var microphoneOptions: [(String, String)] {
+        var all = [("", "Quello del sistema")]
+        if !config.microphone.isEmpty, !inputs.contains(where: { $0.id == config.microphone }) { all.append((config.microphone, "Non collegato")) }
+        return all + inputs.map { ($0.id, $0.name) }
     }
 
     private var modeNote: String {
@@ -115,8 +133,10 @@ struct DictationPage: View {
     }
 
     private func refresh() {
-        config = VoiceInput.Config((try? files.readConfig()) ?? [:])
-        access = AVCaptureDevice.authorizationStatus(for: .audio)
+        let read = try? files.readConfig()
+        configBroken = read == nil
+        config = VoiceInput.Config(read ?? [:])
+        access = accessOverride ?? AVCaptureDevice.authorizationStatus(for: .audio)
         hasKey = files.hasKey
         inputs = VoiceCapture.inputs()
     }
@@ -127,10 +147,16 @@ struct DictationPage: View {
 
     private func save() {
         do {
-            try files.updateConfig(["ingresso_motore": config.engine.rawValue, "ingresso_lingua": config.language, "ingresso_a_voce": config.spoken,
-                                    "ingresso_modo": config.mode.rawValue, "ingresso_acceso": config.enabled, "ingresso_microfono": config.microphone])
+            try files.updateConfig(Self.changes(config))
             note = nil
         } catch { note = "Impostazioni non salvate. Riprova." }
+    }
+
+    /// What one change writes to config.json: every `ingresso_*` key plus the Overseer's model (`overseer_modello`, clotch#286).
+    static func changes(_ config: VoiceInput.Config) -> [String: Any] {
+        ["ingresso_motore": config.engine.rawValue, "ingresso_lingua": config.language, "ingresso_a_voce": config.spoken,
+         "ingresso_modo": config.mode.rawValue, "ingresso_acceso": config.enabled, "ingresso_microfono": config.microphone,
+         "overseer_modello": config.overseerModel]
     }
 
     /// The next key press with ⌘, ⌃ or ⌥ becomes the shortcut; Esc cancels.
@@ -155,5 +181,27 @@ struct DictationPage: View {
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
         recording = false
+    }
+}
+
+/// The local model's download as the page shows it: «Scarico… 42% (270 di 640 MB)».
+struct LocalModelDownload {
+    let doneMB: Int
+    let totalMB: Int
+    var fraction: Double { Double(doneMB) / Double(max(totalMB, 1)) }
+    var note: String { "Scarico… \(Int((fraction * 100).rounded()))% (\(doneMB) di \(totalMB) MB). Intanto la dettatura usa ElevenLabs." }
+}
+
+private struct LocalDownloadBar: View {
+    private typealias T = FigmaToken.MacOS27GoldenGate
+    let fraction: Double
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Rectangle().fill(T.accento).frame(width: T.notchMisura120 * fraction)
+            Rectangle().fill(T.traccia)
+        }
+        .frame(width: T.notchMisura120, height: T.impostazioniMisura4)
+        .clipShape(RoundedRectangle(cornerRadius: T.notchRaggio2))
     }
 }

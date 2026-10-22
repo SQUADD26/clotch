@@ -311,6 +311,7 @@ final class VoiceInputController: ObservableObject {
     /// Stops everything and drops what the engines hold. Also the end of a press made before the microphone was ready.
     /// The answer is said and its text is not shown (#247: Roberto does not want the words in the notch). Voice off: the text is the only way.
     private func answered(_ answer: String) {
+        Self.log.notice("answer: \(answer, privacy: .public)")  // #286: what the Overseer told Roberto, the proof of a live test
         guard config.spoken else { return show(answer, seconds: max(6, Double(answer.count) * 0.07)) }
         // #271: «Penso…» stays until the voice is heard (or the speaking ends with no sound at all), not a bar that folds before it
         let me = run

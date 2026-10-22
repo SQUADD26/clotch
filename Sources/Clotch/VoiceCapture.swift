@@ -8,13 +8,15 @@ import ClotchCore
 /// `prepare` does the slow part (the input unit, the device) before the key is pressed, so `start` only turns the microphone on (#174).
 /// Not final: the tests feed a recorded voice through a subclass.
 class VoiceCapture: @unchecked Sendable {
-    private let engine = AVAudioEngine()
+    private(set) var engine = AVAudioEngine()
     private let target = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: Double(VoiceInput.sampleRate), channels: 1, interleaved: false)!
     private var converter: AVAudioConverter?
     var onAudio: ((AVAudioPCMBuffer, Data) -> Void)?
     /// Unique id of the input device chosen in «Dettatura»; "" = the system's. A device that is gone falls back to the system's.
     let microphone: String
     private var prepared = false
+    private var preparedAt = Date()
+    private var observer: NSObjectProtocol?
     /// When this one was made: the spare is bound to the audio setup of that moment (#269).
     let madeAt = Date()
     /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A spare made before it hears nothing.
@@ -65,6 +67,7 @@ class VoiceCapture: @unchecked Sendable {
     func prepare() {
         guard !prepared else { return }
         prepared = true
+        preparedAt = Date()
         let input = engine.inputNode
         if !microphone.isEmpty, var device = Self.deviceID(uid: microphone), let unit = input.audioUnit {
             AudioUnitSetProperty(unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &device, UInt32(MemoryLayout<AudioDeviceID>.size))
@@ -74,6 +77,16 @@ class VoiceCapture: @unchecked Sendable {
 
     func start() throws {
         guard !DoNotDisturb().isOn else { throw CocoaError(.userCancelled) }  // clotch#266: the one place the microphone turns on
+        // A device came or went while the key was not down (or while macOS asked for a permission): the prepared engine hears the old one.
+        if Self.audioChangedAt > preparedAt { rebuild() }
+        try run()
+        // AirPods, headphones or the default input changing under an open microphone stops the engine: start it again on the new one.
+        observer = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
+            self?.recover()
+        }
+    }
+
+    func run() throws {
         prepare()
         // The device's own format, read now: after `prepare` the node's output format can follow the speakers (96 kHz against a
         // 48 kHz microphone), and a tap that does not match the hardware throws and leaves the bar stuck (#174).
@@ -83,7 +96,28 @@ class VoiceCapture: @unchecked Sendable {
         try engine.start()
     }
 
+    /// A fresh engine bound to whatever the system's audio setup is now.
+    private func rebuild() {
+        engine.inputNode.removeTap(onBus: 0)
+        engine.stop()
+        engine = AVAudioEngine()
+        prepared = false
+    }
+
+    func recover() {
+        guard observer != nil else { return }
+        NotificationCenter.default.removeObserver(observer!)
+        rebuild()
+        converter = nil
+        try? run()
+        observer = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
+            self?.recover()
+        }
+    }
+
     func stop() {
+        observer.map(NotificationCenter.default.removeObserver)
+        observer = nil
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         converter = nil
