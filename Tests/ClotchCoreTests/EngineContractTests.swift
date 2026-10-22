@@ -11,6 +11,13 @@ final class EngineContractTests: XCTestCase {
         return try Data(contentsOf: dir.appendingPathComponent("Fixtures/motore/\(name)"))
     }
 
+    /// clotch#260: the contract number `scripts/controlla-motore.sh` compares with `motore versione` ("N <fingerprint of the other files>").
+    func testContractVersionNumber() throws {
+        let words = try XCTUnwrap(String(data: fixture("VERSIONE"), encoding: .utf8)).split(whereSeparator: \.isWhitespace)
+        XCTAssertEqual(words.count, 2)
+        XCTAssertGreaterThanOrEqual(Int(words[0]) ?? 0, 1)
+    }
+
     func testTaskRequestTakenAnsweredAndDone() throws {
         let r = try XCTUnwrap(GoalSources.parseRequest(fixture("richiesta-compito.json")))
         XCTAssertEqual(r.id, "Q-a2ab1959")
