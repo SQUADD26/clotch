@@ -86,12 +86,12 @@ final class NotchFeedsTests: XCTestCase {
             GoalSources.parseRequest(data(#"{"id": "\#(id)", "testo": "x", "stato": "\#(stato)"}"#))!
         }
         let first = [req("a", "nuova"), req("old", "presa")]
-        XCTAssertEqual(UserRequest.newlyTaken(before: nil, after: first, shown: []), [], "launch is the baseline")
+        XCTAssertEqual(UserRequest.newlyTaken(before: nil, after: first, shown: [], now: now), [], "launch is the baseline")
         let second = [req("a", "presa"), req("old", "presa"), req("b", "nuova"), req("fast", "presa"), req("c", "fatta")]
-        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: []), ["a", "fast", "c"],
+        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: [], now: now), ["a", "fast", "c"],
                        "nuova -> presa, born and taken between loads, straight to fatta")
-        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: ["a"]), ["fast", "c"], "a shown id never repeats")
-        XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: []), [], "no change, no event")
+        XCTAssertEqual(UserRequest.newlyTaken(before: first, after: second, shown: ["a"], now: now), ["fast", "c"], "a shown id never repeats")
+        XCTAssertEqual(UserRequest.newlyTaken(before: second, after: second, shown: [], now: now), [], "no change, no event")
     }
 
     func testTitleIsRealTextNeverATag() {
@@ -175,8 +175,21 @@ final class NotchFeedsTests: XCTestCase {
         try data(#"{"id": "Q-1", "t": 1792580000, "testo": "Barra le richieste", "stato": "presa", "t_presa": 1792580100}"#).write(to: file)
         let after = GoalSources.load(paths).requests
         XCTAssertEqual(after.map(\.taken), [true], "struck through")
-        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-1"])
-        XCTAssertEqual(UserRequest.newlyTaken(before: after, after: after, shown: []), [], "once")
+        let soon = Date(timeIntervalSince1970: 1_792_580_160)
+        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: [], now: soon), ["Q-1"])
+        XCTAssertEqual(UserRequest.newlyTaken(before: after, after: after, shown: [], now: soon), [], "once")
+    }
+
+    /// #173: a record that drops out for one load (rewritten, migrated, read mid-write) and comes back is not news;
+    /// only a take within `newsWindow` is announced.
+    func testRewrittenOldTakeNeverAnnounced() {
+        func req(_ id: String, presa: Double) -> UserRequest {
+            GoalSources.parseRequest(data(#"{"id": "\#(id)", "testo": "x", "stato": "presa", "t_presa": \#(presa)}"#))!
+        }
+        let now = Date(timeIntervalSince1970: 1_792_653_938)
+        let old = req("Q-188a7aee", presa: 1_792_652_113), fresh = req("Q-new", presa: 1_792_653_900)
+        XCTAssertEqual(UserRequest.newlyTaken(before: [], after: [old, fresh], shown: [], now: now), ["Q-new"],
+                       "taken 30 min ago, back after a rewrite: silent; taken 38 s ago: announced")
     }
 
     /// The Requests tab lists only the ones nobody has taken; a done one is taken too.
@@ -217,7 +230,7 @@ final class NotchFeedsTests: XCTestCase {
                 .write(to: paths.requests.appendingPathComponent("\(id).json"))
         }
         let after = GoalSources.load(paths).requests
-        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: []), ["Q-c"], "only the task is announced")
+        XCTAssertEqual(UserRequest.newlyTaken(before: before, after: after, shown: [], now: now), ["Q-c"], "only the task is announced")
         XCTAssertEqual(UserRequest.waiting(after), [])
     }
 
