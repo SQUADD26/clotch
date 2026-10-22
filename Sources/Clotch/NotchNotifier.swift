@@ -2,6 +2,9 @@ import AppKit
 import Combine
 import SwiftUI
 import ClotchCore
+import os
+
+private let log = Logger(subsystem: "com.squadd.clotch", category: "NotchNotifier")
 
 /// The steps of one notification in the closed notch. Each step is a still frame,
 /// so `--snapshot` can draw the animation frame by frame.
@@ -25,6 +28,9 @@ enum NotePhase: Int, CaseIterable, Comparable {
     private var lastRows: [GoalRow] = []
     private var primedUntil = Date.distantFuture
     private var bag: Set<AnyCancellable> = []
+    private var lastSteps: [String: HeartbeatSteps.Step] = [:]
+    // shortcut: the engine's default folder only; read CODA_OVERSEER_DIR too if Clotch is ever launched with it.
+    static let stepsFile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/coda-overseer/battito/passi.json")
     private var draining = false
     /// True while the pointer is on the island: a notification under it stays until the pointer leaves.
     var pointerOver = false
@@ -37,6 +43,16 @@ enum NotePhase: Int, CaseIterable, Comparable {
         store.$rows.sink { [weak self] rows in Task { @MainActor in self?.take(rows: rows) } }.store(in: &bag)
         // GoalStore already keeps the baseline for requests and hands over only the fresh ones.
         store.$takenToAnimate.sink { [weak self] ids in Task { @MainActor in self?.take(taken: ids) } }.store(in: &bag)
+        stepsChanged()
+    }
+
+    /// The Overseer heartbeat's steps (#184); VoiceStore's ~/.config stream calls it when the file changes.
+    func stepsChanged() {
+        guard let steps = (try? Data(contentsOf: Self.stepsFile)).flatMap(HeartbeatSteps.parse) else { return }
+        defer { lastSteps = steps }
+        let stuck = HeartbeatSteps.stuck(old: lastSteps, new: steps)
+        for e in stuck { log.error("passo del battito fermo: \(e.subject, privacy: .public): \(steps[e.subject]?.error ?? "", privacy: .public)") }
+        enqueue(stuck)
     }
 
     private var priming: Bool { Date() < primedUntil }

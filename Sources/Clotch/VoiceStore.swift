@@ -35,6 +35,8 @@ final class VoiceStore: ObservableObject {
             if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged() } }
             // And AFK's files (#106).
             if paths.contains(where: { $0.hasSuffix("/voce/afk.json") || $0.contains("/clotch/afk-") }) { MainActor.assumeIsolated { AfkStore.shared.reload() } }
+            // And the Overseer heartbeat's steps (#184).
+            if paths.contains(where: { $0.hasSuffix("/coda-overseer/battito/passi.json") }) { MainActor.assumeIsolated { NotchNotifier.shared.stepsChanged() } }
             guard paths.contains(where: { $0.hasSuffix("/voce/stato.json") }) else { return }
             let store = Unmanaged<VoiceStore>.fromOpaque(info).takeUnretainedValue()
             MainActor.assumeIsolated { store.reload() } // the stream runs on the main queue
