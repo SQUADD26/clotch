@@ -1,4 +1,4 @@
-// figma: 58:56709
+// figma: 58:56744
 import SwiftUI
 import ClotchCore
 
@@ -46,6 +46,12 @@ struct SessionStrip: View {
     let go: (Int) -> Void
     @State private var hovered: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// `hovered` starts a name under the mouse: the parity render draws the strip in that state.
+    init(entries: [Entry], index: Int, summary: (text: String, tone: SessionTone), go: @escaping (Int) -> Void, hovered: String? = nil) {
+        (self.entries, self.index, self.summary, self.go) = (entries, index, summary, go)
+        _hovered = State(initialValue: hovered)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: T.notchSpazio6) {
