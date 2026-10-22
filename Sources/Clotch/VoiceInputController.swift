@@ -212,7 +212,7 @@ final class VoiceInputController: ObservableObject {
             capture?.stop()
             capture = nil
             feed?.finish()
-            let said = await transcript()
+            let said = VoiceInput.fixNames(await transcript())  // #242: «Allover Saird» → «all'Overseer»
             guard me == run else { return }
             Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds), privacy: .public) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
             await route(said, run: me)
