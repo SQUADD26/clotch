@@ -30,7 +30,7 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// `esce_t`: a done request leaves the list at this time, none = at once. `aspetta_te`: a taken one the session wants Roberto for.
     public var leavesAt: Date? = nil
     public var waitsForYou = false
-    /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its cli id); nil when not taken or unknown.
+    /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its title, or a cli id in old files); nil when not taken or unknown.
     public var target: SessionTarget? = nil
 
     /// Struck through in the view once a session has taken it in charge.
@@ -63,14 +63,11 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     }
 
     /// What the Requests tab lists (#199): the requests the engine leaves open, in its own words. «ferma» is listed, with its
-    /// reason; a taken one only while its session waits for Roberto (`aspetta_te`); a done one until `esce_t`, none = out at once.
+    /// reason; every taken one (#261: `presa_da` is its taker's title, `point` its point); a done one a few minutes (`newsWindow`) after
+    /// `t_fatta`, never past `esce_t` (the engine's own 24 h), none = out at once.
     public static func listed(_ all: [UserRequest], now: Date) -> [UserRequest] {
         let live = all.filter { r in
-            switch r.state {
-            case "fatta": (r.leavesAt ?? .distantPast) > now
-            case "presa": r.waitsForYou
-            default: true
-            }
+            r.state != "fatta" || min(r.leavesAt ?? .distantPast, (r.doneAt ?? .distantFuture).addingTimeInterval(newsWindow)) > now
         }
         return live.filter { $0.state != "fatta" } + live.filter { $0.state == "fatta" }  // open first, the done ones after
     }

@@ -104,6 +104,7 @@ final class VoiceInputController: ObservableObject {
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
     /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }  // clotch#266: Roberto in a call, the microphone stays closed
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
@@ -140,6 +141,7 @@ final class VoiceInputController: ObservableObject {
     // MARK: - Listening
 
     func begin() async {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }
         reset()
         run += 1
         let me = run

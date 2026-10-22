@@ -269,6 +269,15 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(UserRequest.waiting([fresh, req(#", "tipo": "domanda""#, state: "nuova")]), [], "a question is no task")
     }
 
+    /// clotch#261: a taken request is listed with its taker's title (`presa_da`), asking or not; a done one leaves after a few minutes, not at `esce_t` (24 h).
+    func testListedShowsEveryTakenAndDropsDoneSoon() {
+        let taken = req(#", "presa_da": "⌘ Clotch: richieste", "punto": "Sto scrivendo il test""#, state: "presa")
+        let done = req(#", "t_fatta": 1792580000, "esce_t": 1792666400"#)
+        XCTAssertEqual(UserRequest.listed([taken], now: Date(timeIntervalSince1970: 1_792_580_000)).map(\.takenBy), ["⌘ Clotch: richieste"])
+        XCTAssertEqual(UserRequest.listed([done], now: Date(timeIntervalSince1970: 1_792_580_060)).count, 1, "just done: still there")
+        XCTAssertEqual(UserRequest.listed([done], now: Date(timeIntervalSince1970: 1_792_580_000 + UserRequest.newsWindow + 1)), [], "done 5 min ago: gone")
+    }
+
     func testNewAnswerOnlyAfterLastLook() {
         let r = req(#", "risposta": "ok", "t_risposta": 1792580000"#)
         XCTAssertTrue(r.isNewAnswer(since: Date(timeIntervalSince1970: 1_792_579_000)))
