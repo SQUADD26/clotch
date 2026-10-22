@@ -17,6 +17,18 @@ public enum EngineCommand {
             case .exit: return "Il motore non ha risposto. Dettagli nel log di Clotch."
             }
         }
+
+        /// The exact sentence for a screen that has nothing else to say (#1967): which command, its exit status, the last line of
+        /// stderr (cut at 120). Roberto sees what broke, not only that something did.
+        public func precise(what: String) -> String {
+            switch self {
+            case .notStarted: return "Il comando \(what) non è partito. Riprova tra poco."
+            case .exit(let status, let stderr):
+                let last = stderr.split(whereSeparator: \.isNewline).last.map { $0.trimmingCharacters(in: .whitespaces) } ?? ""
+                let shown = last.count > 120 ? String(last.prefix(120)) + "…" : last
+                return "Il comando \(what) è uscito con errore \(status)" + (shown.isEmpty ? "" : ": «\(shown)»") + ". Riprova tra poco."
+            }
+        }
     }
 
     /// `python3` of the Mac running `args` (the script first). A Dock-launched app has no Homebrew in PATH, so it is looked up.

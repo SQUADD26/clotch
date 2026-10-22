@@ -9,12 +9,16 @@ private typealias T = FigmaToken.MacOS27GoldenGate
 struct AdhdTab: View {
     let items: [AdhdRequest]
     var error: String? = nil
+    var readError: String? = nil
     var markRead: (String?) -> Void = { _ in }
     var nudge: (String) -> Void = { _ in }
+    var retry: () -> Void = {}
 
     var body: some View {
+        let screen = AdhdScreen.of(items: items, readError: readError)
         VStack(alignment: .leading, spacing: T.notchSpazio18) {
-            if let error {
+            // The «Lettura non riuscita» frame (78-62944) says the read error itself: not repeated in yellow above it.
+            if let error, screen != .readFailed(error) {
                 Text(error).font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchGiallo)
             }
             if items.contains(where: \.answered) {
@@ -27,10 +31,10 @@ struct AdhdTab: View {
                     .buttonStyle(.notch)
                 }
             }
-            if items.isEmpty {
-                EmptyState(text: "Nessuna domanda")
-            } else {
-                ForEach(items) { AdhdRow(item: $0, markRead: { markRead($0) }, nudge: nudge) }
+            switch screen {
+            case .readFailed(let message): AdhdReadFailed(error: message, retry: retry)
+            case .empty: EmptyState(text: "Nessuna domanda")
+            case .list: ForEach(items) { AdhdRow(item: $0, markRead: { markRead($0) }, nudge: nudge) }
             }
         }
     }
