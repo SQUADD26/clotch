@@ -12,11 +12,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var localShortcutMonitor: Any?
     let appState = AppState()
 
+    func debugSurface() -> String { "\(String(describing: appState.surface))" }
     func applicationDidFinishLaunching(_ notification: Notification) {
         if let dir = GoalSnapshot.requestedDirectory() {
             GoalSnapshot.run(into: dir)
         }
         SingleInstance.replaceOthers()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { VoiceInputController.shared.debugShowFailure() }
         ProcessInfo.processInfo.disableAutomaticTermination("Clotch must stay running")
         ProcessInfo.processInfo.disableSuddenTermination()
         // Pre-set app icon so Dock/menu bar use the packaged bundle icon.
