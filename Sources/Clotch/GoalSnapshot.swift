@@ -184,7 +184,7 @@ enum GoalSnapshot {
 
     /// The closed island (wings beside the notch) with `below` hanging under it; `mark` stands in for
     /// the notifier's `.leave` step, which the right wing reads from the live notifier.
-    private static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
+    static func island<Below: View>(width: CGFloat, radius: CGFloat, mark: NotchEvent? = nil, notice: String? = nil, noticeShort: String? = nil, cardOpen: Bool = false,
                                             afk: Int? = nil, expanded: Bool = false, voice: (level: Float, phase: Double)? = nil, light: VoiceInputController.Light = .off,
                                             @ViewBuilder below: () -> Below) -> some View {
         VStack(spacing: 0) {
