@@ -108,7 +108,7 @@ public enum VoiceInput {
     /// The system's names, as the engines mishear them in Italian (#242: «Allover Saird», «Oversayer», «Cloche»): the helper and
     /// the Overseer read the right word. Whole words only, so «game over» or «lover» stay as they are.
     static let names: [(pattern: String, name: String)] = [
-        (#"(?i)\b(?:(all|dell|nell)'?\s?)?o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?\b"#, "Overseer"),
+        (#"(?i)\b(?:(all|dell|nell)'?\s?)?(?:o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?|fr[ae]?i?d[ae]i?[iy]?)\b"#, "Friday"),
         (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
         (#"(?i)\bap(?:i|ri)[\s-]+master\b"#, "apri-master"),  // «API Master», «apri master» (#271)
     ]
@@ -120,7 +120,7 @@ public enum VoiceInput {
             // From the end, so the ranges still to replace keep their place.
             for m in re.matches(in: t, range: NSRange(t.startIndex..., in: t)).reversed() {
                 guard let whole = Range(m.range, in: out) else { continue }
-                var prep = (m.numberOfRanges > 1 ? Range(m.range(at: 1), in: out) : nil).map { out[$0].lowercased() + "'" } ?? ""
+                var prep = (m.numberOfRanges > 1 ? Range(m.range(at: 1), in: out) : nil).map { ["all": "a ", "dell": "di ", "nell": "in "][out[$0].lowercased()] ?? "" } ?? ""
                 if whole.lowerBound == out.startIndex { prep = prep.prefix(1).uppercased() + prep.dropFirst() }
                 out.replaceSubrange(whole, with: prep + n.name)
             }
@@ -153,13 +153,6 @@ public enum VoiceInput {
         seconds > heardAfter && (words == 0 || peak == 0)
     }
 
-    /// A spare microphone made at `madeAt` is bound to the audio setup of that moment: after a change (`changedAt`) or past
-    /// `spareMaxAge` it is made again (#269).
-    public static let spareMaxAge: TimeInterval = 300
-    public static func spareIsStale(madeAt: Date, changedAt: Date, now: Date) -> Bool {
-        changedAt > madeAt || now.timeIntervalSince(madeAt) > spareMaxAge
-    }
-
     /// Why a dictation stopped, as the pill says it (Figma #110, note 5 and 6): what happened, why, and what Roberto can do.
     /// Never a code or a raw message.
     public enum Failure: Equatable, Sendable {
@@ -170,6 +163,8 @@ public enum VoiceInput {
         case doNotDisturb
         /// A dictation of more than `heardAfter` s with no words or no level at all (#269): never a bar that closes mute.
         case nothingHeard
+        /// #314: ElevenLabs answered with an error of its own (rate_limited, transcriber_error, …), or refused the audio (input_error).
+        case service, audio
 
         public var title: String {
             switch self {
@@ -182,6 +177,8 @@ public enum VoiceInput {
             case .shortcut: return "Scorciatoia non disponibile"
             case .doNotDisturb: return "Non disturbare acceso"
             case .nothingHeard: return "Non ho sentito niente"
+            case .service: return "ElevenLabs non trascrive"
+            case .audio: return "ElevenLabs rifiuta l'audio"
             }
         }
 
@@ -196,6 +193,8 @@ public enum VoiceInput {
             case .shortcut: return "Un altro programma usa questo tasto. Scegline un altro nelle impostazioni."
             case .doNotDisturb: return "Spegnilo con non-disturbare off, poi riprova."
             case .nothingHeard: return "Il microfono non mi ha dato voce. Riprova, o scegli un altro microfono."
+            case .service: return "Riprova tra poco, o usa il modello locale."
+            case .audio: return "Riprova, o scegli un altro microfono."
             }
         }
 
@@ -205,10 +204,10 @@ public enum VoiceInput {
             case .mic: return [.openPrivacy]
             case .key: return [.checkKey, .useLocal]
             case .credits: return [.useLocal]
-            case .network: return [.retry, .useLocal]
+            case .network, .service: return [.retry, .useLocal]
             case .local, .doNotDisturb: return [.retry]
             case .off, .shortcut: return [.openDictation]
-            case .nothingHeard: return [.retry, .openDictation]
+            case .nothingHeard, .audio: return [.retry, .openDictation]
             }
         }
     }
@@ -232,7 +231,20 @@ public enum VoiceInput {
         switch type {
         case "auth_error", "unaccepted_terms": return .key
         case "quota_exceeded": return .credits
-        default: return .network  // rate_limited, resource_exhausted, transcriber_error, …
+        // #314: under 0.3 s of audio at the commit: the microphone gave nothing, the connection is fine
+        case "commit_throttled": return .nothingHeard
+        case "input_error": return .audio
+        default: return .service  // rate_limited, resource_exhausted, transcriber_error, …
+        }
+    }
+
+    /// The socket closed without a message: refused at the handshake (HTTP status), else the connection itself.
+    public static func failure(httpStatus: Int) -> Failure {
+        switch httpStatus {
+        case 401, 403: return .key
+        case 402: return .credits
+        case 400...599: return .service
+        default: return .network
         }
     }
 

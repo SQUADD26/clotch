@@ -130,6 +130,8 @@ struct NotchPanelView: View {
     @State private var isHovered = false
     /// #117: an enter with a still pointer waits for a real move inside the island.
     @State private var hoverGate = NotchHoverGate()
+    /// The pointer is in the hover area (#264): enter and leave, as `onHover` gave them before the area was split from the clicks (#314).
+    @State private var pointerInArea = false
     @State private var idleHovered = false
     /// Three-stage hover: collapsed → prehover (immediate ack) → expanded (after delay)
     @State private var hoverPhase: NotchHoverPhase = .collapsed
@@ -152,7 +154,7 @@ struct NotchPanelView: View {
     @ObservedObject private var notifier = NotchNotifier.shared
     @ObservedObject private var voice = VoiceStore.shared
     /// Roberto speaks to Clotch (#110): the pill takes the place of a note.
-    @ObservedObject private var voiceInput = VoiceInputController.shared
+    @ObservedObject var voiceInput = VoiceInputController.shared
     /// A script is about to take the screen (clotch#292): the line under the notch counts down to it.
     @ObservedObject private var screenNotice = ScreenNoticeStore.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -380,6 +382,12 @@ struct NotchPanelView: View {
         }
     }
 
+    /// The part of the island where the pointer opens it, in the island column's own coordinates (#264).
+    private func inHoverArea(_ p: CGPoint) -> Bool {
+        let column = NotchIslandGeometry.column(in: CGRect(x: 0, y: 0, width: maxPanelWidth, height: .greatestFiniteMagnitude), width: panelWidth)
+        return NotchHoverArea.opens(at: p, column: column, notchHeight: notchHeight, expanded: shouldShowExpanded)
+    }
+
     /// With «Apri al passaggio del mouse» off, a click on the closed notch opens it (#56).
     private func openOnClick() {
         guard !openOnHover, !appState.surface.isExpanded else { return }
@@ -475,11 +483,11 @@ struct NotchPanelView: View {
             .frame(width: maxPanelWidth)
             .clipShape(IslandColumn(width: panelWidth))
             .background(panelShape.fill(.black))
-            // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
+            // The Friday's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
             .overlay { VoiceInputLightLive(light: voiceInput.light, shape: panelShape) }
             .overlay { ScreenNoticeLight(phase: showsScreenNotice ? screenNotice.phase : nil, shape: panelShape) }
-            .simultaneousGesture(TapGesture().onEnded { openOnClick() })
+            .simultaneousGesture(SpatialTapGesture().onEnded { if inHoverArea($0.location) { openOnClick() } })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
             .onChange(of: showToolStatus) { _, newValue in
@@ -502,10 +510,13 @@ struct NotchPanelView: View {
             }
             .onAppear { displayedToolStatus = showToolStatus }
             .scaleEffect(shouldShowPrehover ? NotchHoverInteraction.prehoverScale : 1, anchor: .top)
-            .contentShape(IslandHoverArea(width: panelWidth, notchHeight: notchHeight, expanded: shouldShowExpanded))
-            .onHover { handleHover($0) }
+            // Clicks reach the whole island, the buttons under the closed bar included (#314: the voice pill's «Riprova»);
+            // the pointer opens it only from the bar (#264), so hover is filtered by place, not by the hit shape.
+            .contentShape(IslandColumn(width: panelWidth))
             .onContinuousHover { phase in
-                if case .active = phase, hoverGate.move(to: NSEvent.mouseLocation) { handleHover(true) }
+                var inside = false
+                if case .active(let p) = phase { inside = inHoverArea(p) }
+                if inside != pointerInArea { pointerInArea = inside; handleHover(inside) } else if inside, hoverGate.move(to: NSEvent.mouseLocation) { handleHover(true) }
             }
             .onChange(of: appState.surface) { _, newSurface in
                 // The surface can change from outside the hover flow (auto-expand
@@ -4143,22 +4154,6 @@ private struct IslandColumn: Shape {
     }
 
     func path(in rect: CGRect) -> Path { Path(NotchIslandGeometry.column(in: rect, width: width)) }
-}
-
-/// Where the pointer opens the island (#264): the rule is `NotchHoverArea`; closed, only the bar, not the note line or buttons under it.
-private struct IslandHoverArea: Shape {
-    var width: CGFloat
-    var notchHeight: CGFloat
-    var expanded: Bool
-    var animatableData: CGFloat {
-        get { width }
-        set { width = newValue }
-    }
-
-    func path(in rect: CGRect) -> Path {
-        let column = NotchIslandGeometry.column(in: rect, width: width)
-        return Path(NotchHoverArea.region(column: column, notchHeight: notchHeight, expanded: expanded))
-    }
 }
 
 private struct NotchPanelShape: Shape {

@@ -35,7 +35,7 @@ final class SessionStripTests: XCTestCase {
             throw XCTSkip("FIGMA_PARITA_DIR not set — parity render is opt-in")
         }
         let rows = [row("Clotch", .lavora), row("SEO", .lavora), row("Setup", .aspettaRoberto, why: "scegliere come fare i test."),
-                    row("Overseer", .lavora), row("dentalspace", .lavora)]
+                    row("Friday", .lavora), row("dentalspace", .lavora)]
         let entries = rows.enumerated().map { k, r in
             SessionStrip.Entry(id: r.id, name: r.title, tone: r.tone, pages: k..<(k + 1), line: r.hoverLine(now: now))
         }

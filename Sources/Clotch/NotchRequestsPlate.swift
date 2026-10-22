@@ -107,6 +107,7 @@ struct RequestLine: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)  // never squeezed under a capped height (#301)
         .help(request.original)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(request.text + ". " + request.statusLabel + (isNew ? ", nuova risposta" : "")

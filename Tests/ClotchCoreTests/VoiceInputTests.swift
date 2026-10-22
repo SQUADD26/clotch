@@ -73,7 +73,13 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"committed_transcript_with_timestamps","text":"x","words":[]}"#), .committed("x"))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"auth_error","error":"bad key"}"#), .failure(.key))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"quota_exceeded","error":"x"}"#), .failure(.credits))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure(.network))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure(.service))
+        // #314: what the Mac got when the microphone sent nothing, word for word
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"commit_throttled","error":"Commit request ignored: only 0.10s of uncommitted audio. You need at least 0.3s of uncommitted audio before committing."}"#), .failure(.nothingHeard))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"input_error","error":"x"}"#), .failure(.audio))
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 401), .key)
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 429), .service)
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 0), .network)
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"warning","warning":"w"}"#), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent("not json"), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"something_new"}"#), .ignored)
@@ -91,7 +97,7 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.Failure.credits.actions, [.useLocal])
         XCTAssertEqual(VoiceInput.Failure.network.actions, [.retry, .useLocal])
         XCTAssertEqual(VoiceInput.Failure.mic.actions.map(\.label), ["Apri Privacy › Microfono"])
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.network))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.service))
         // #147: no voice to hear is Roberto's choice, not a failure.
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .quiet)
     }
@@ -105,16 +111,6 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertFalse(VoiceInput.heardNothing(seconds: VoiceInput.heardAfter, words: 0, peak: 0), "after more than the threshold, not at it")
         XCTAssertFalse(VoiceInput.heardNothing(seconds: 16, words: 12, peak: 0.4), "a normal dictation")
         XCTAssertEqual(VoiceInput.Failure.nothingHeard.title, "Non ho sentito niente")
-    }
-
-    /// #269: the spare microphone made before an audio change is bound to the old setup and hears nothing.
-    func testASpareOlderThanTheAudioChangeIsMadeAgain() {
-        let now = Date(timeIntervalSince1970: 10_000)
-        let made = now.addingTimeInterval(-60)
-        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-10), now: now), "changed after it was made")
-        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-120), now: now), "changed before it was made")
-        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: .distantPast, now: now), "no change seen")
-        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: now.addingTimeInterval(-VoiceInput.spareMaxAge - 1), changedAt: .distantPast, now: now), "too old")
     }
 
     func testDictationKeepsCommittedAndShowsThePartial() {
@@ -238,13 +234,13 @@ final class VoiceInputTests: XCTestCase {
     /// #242: the sentences the local engine heard in the live tests of 22/10, and words that must stay.
     func testSystemNamesAreFixedAfterTheEngine() {
         XCTAssertEqual(VoiceInput.fixNames("Di Allover Saird e la prova dal vivo della dettatura di Cloche è passata."),
-                       "Di all'Overseer e la prova dal vivo della dettatura di Clotch è passata.")
+                       "Di a Friday e la prova dal vivo della dettatura di Clotch è passata.")
         XCTAssertEqual(VoiceInput.fixNames("Di Allover Seyer che la prova della dettatura di Cloce è passata"),
-                       "Di all'Overseer che la prova della dettatura di Clotch è passata")
-        XCTAssertEqual(VoiceInput.fixNames("Oversayer, questa è una prova dettata da Cloch."), "Overseer, questa è una prova dettata da Clotch.")
+                       "Di a Friday che la prova della dettatura di Clotch è passata")
+        XCTAssertEqual(VoiceInput.fixNames("Oversayer, questa è una prova dettata da Cloch."), "Friday, questa è una prova dettata da Clotch.")
         XCTAssertEqual(VoiceInput.fixNames("Che cosa fanno le sessioni di cloch?"), "Che cosa fanno le sessioni di Clotch?")
-        XCTAssertEqual(VoiceInput.fixNames("Over sire, chiudi"), "Overseer, chiudi")
-        for same in ["game over", "un lover", "la sessione dell'Overseer", "Overseer", "clock e orologio"] {
+        XCTAssertEqual(VoiceInput.fixNames("Over sire, chiudi"), "Friday, chiudi")
+        for same in ["game over", "un lover", "la sessione di Friday", "Friday", "clock e orologio"] {
             XCTAssertEqual(VoiceInput.fixNames(same), same)
         }
     }

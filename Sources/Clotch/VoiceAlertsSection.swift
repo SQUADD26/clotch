@@ -1,3 +1,4 @@
+// figma: 91-64814
 import SwiftUI
 import ClotchCore
 
@@ -5,48 +6,48 @@ import ClotchCore
 /// Claude sets the alerts; the page only shows them and removes one (Roberto, #95: «Sarà il Claude dell'utente […] che imposta ste cose qui»).
 /// Each one is said once, when its fact happens (`VoiceAlertRule.fires`).
 struct VoiceAlertsSection: View {
+    private typealias T = FigmaToken.MacOS27GoldenGate
     let sessions: [DesktopSession]
     @Binding var note: String?
     @ObservedObject private var l10n = L10n.shared
-    private let files = VoiceFiles()
+    var files = VoiceFiles()
 
     @State private var rules: [VoiceAlertRule] = []
 
     var body: some View {
-        SettingsRow(l10n["voice_alerts"]) {
+        CardStackRow(title: l10n["voice_alerts"], note: l10n["voice_alerts_ask"] + " " + l10n["voice_alerts_footer"]) {
             VStack(spacing: 0) {
                 if rules.isEmpty {
-                    Text(l10n["voice_alerts_empty"]).foregroundStyle(.secondary)
+                    Text(l10n["voice_alerts_empty"]).font(.settings(T.notchTesto13)).foregroundStyle(T.testoSecondario)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(EdgeInsets(top: 7, leading: 10, bottom: 7, trailing: 10))
+                        .padding(.horizontal, T.notchSpazio10).padding(.vertical, T.impostazioniSpazio7)
                 }
                 ForEach(Array(rules.enumerated()), id: \.element.id) { i, r in
-                    if i > 0 { Divider() }
+                    if i > 0 { Rectangle().fill(T.lineaSeparatore).frame(height: T.notchSpessore1) }
                     row(r)
                 }
             }
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color(nsColor: .controlBackgroundColor)))
-            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(nsColor: .separatorColor)))
-            SettingsNote(l10n["voice_alerts_ask"] + " " + l10n["voice_alerts_footer"])
+            .background(RoundedRectangle(cornerRadius: T.impostazioniRaggio8).fill(T.campoFondo))
+            .overlay(RoundedRectangle(cornerRadius: T.impostazioniRaggio8).strokeBorder(T.campoBordo, lineWidth: T.notchSpessore1))
         }
         .onAppear { rules = VoiceAlertRule.parse(file()) }
     }
 
     private func row(_ r: VoiceAlertRule) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(r.when.map { "\(label($0)) · \(shown(r))" } ?? r.text)
+            VStack(alignment: .leading, spacing: T.notchSpazio1) {
+                Text(r.when.map { "\(label($0)) · \(shown(r))" } ?? r.text).font(.settings(T.notchTesto13)).foregroundStyle(T.testoPrimario)
+                    .frame(height: T.notchInterlinea17)
                 Text("\(l10n["voice_alert_text"]): \(r.text)" + (r.fired ? " · \(l10n["voice_alert_fired"])" : ""))
-                    .font(.system(size: 11)).foregroundStyle(.secondary)
+                    .font(.settings(T.notchTesto11)).foregroundStyle(T.testoSecondario).frame(height: T.impostazioniInterlinea15)
             }
             Spacer()
-            Button { remove(r) } label: { Image(systemName: "trash") }
-                .buttonStyle(.borderless)
-                .foregroundStyle(.secondary)
+            Button { remove(r) } label: { Image(systemName: "trash").font(.settings(T.notchTesto12)).foregroundStyle(T.icona) }
+                .buttonStyle(.plain)
                 .help(l10n["voice_alert_remove"])
                 .accessibilityLabel(l10n["voice_alert_remove"])
         }
-        .padding(EdgeInsets(top: 7, leading: 10, bottom: 7, trailing: 10))
+        .padding(.horizontal, T.notchSpazio10).padding(.vertical, T.impostazioniSpazio7)
     }
 
     private func label(_ w: VoiceAlertRule.When) -> String {

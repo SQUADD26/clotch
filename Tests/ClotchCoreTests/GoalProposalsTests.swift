@@ -50,7 +50,7 @@ final class GoalProposalsTests: GoalTestCase {
         XCTAssertEqual(rows(states.map { g($0, stato: $0) }, states.map { s("l\($0)", cli: $0) }).map(\.id), ["proposto"])
     }
 
-    /// «Overseer fermo da 2 h»: its session data is old, but the hook wrote `ultima_attivita` a minute ago.
+    /// «Friday fermo da 2 h»: its session data is old, but the hook wrote `ultima_attivita` a minute ago.
     func testStillComesFromUltimaAttivita() {
         func record(_ extra: String) -> GoalRecord {
             let json = String(decoding: goalJSON("o"), as: UTF8.self)

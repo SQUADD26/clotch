@@ -5,12 +5,12 @@ import ClotchCore
 
 /// Voice in (#110): one shortcut, press to speak, press again to finish. Microphone → Scribe v2 Realtime or Parakeet on the Mac
 /// (`VoiceInput.Config`, from the «Voce» page) → text on the pill while Roberto speaks → `VoiceRoute.classify`: a question is answered
-/// aloud by a read-only model (`VoiceAsk`), an order waits `cancelSeconds` for an «Annulla» and goes to the Overseer (`OverseerDelivery`).
+/// aloud by a read-only model (`VoiceAsk`), an order waits `cancelSeconds` for an «Annulla» and goes to the Friday (`OverseerDelivery`).
 /// The pill follows the Figma design of #110 (`VoiceInputPill`, light on the outline: `VoiceInputLight`).
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
-    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
+    static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.
@@ -63,14 +63,14 @@ final class VoiceInputController: ObservableObject {
     var config = VoiceInput.Config([:])
     let local = LocalTranscriber()
     private var capture: VoiceCapture?
-    /// The next utterance's microphone, already prepared: the first syllable is not lost to the start (#174).
-    private var spare: VoiceCapture?
     /// The tests hand in a recorded voice instead of the microphone.
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
     /// Asks `claude -p` (question, helper prompt or nil); the tests hand in a fake that records the call and launches nothing (#270).
     var ask: (String, String?) async -> Result<String, ClaudeLogin.Failure> = { await VoiceAsk.run($0, helper: $1) }
+    /// The error pill's buttons: the click test (#314) records the action instead of opening Privacy or Settings.
+    var act: ((VoiceInput.Action) -> Void)?
     /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
     var finishLocal: (() async -> String)?
     var localWait = VoiceInput.commitWait
@@ -97,27 +97,12 @@ final class VoiceInputController: ObservableObject {
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
-    /// At launch and after each utterance: the slow part of the microphone's start and the local model, done while nobody waits.
+    /// At launch and after each utterance: the local model, loaded while nobody waits. No microphone: an open one, even only
+    /// prepared, puts AirPods and every Bluetooth headset in call mode and ruins the audio (#304). It opens at the press.
     func prewarm() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         if current.enabled, current.engine == .local { Task { [local] in try? await local.preload() } }
-        guard current.enabled else { return }
-        if !watchingAudio {  // #269: a change of the audio setup makes the spare again, not only the next press
-            watchingAudio = true
-            VoiceCapture.watchAudioChanges()
-            NotificationCenter.default.addObserver(forName: VoiceCapture.audioChanged, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { if let self, !self.micOpen { self.prewarm() } }
-            }
-        }
-        guard freshSpare?.microphone != current.microphone else { return }
-        spare = makeCapture(current.microphone)
-        spare?.prepare()
-    }
-
-    private var watchingAudio = false
-    /// The spare, unless the audio setup changed since it was made: then it is bound to the old one and hears nothing (#269).
-    private var freshSpare: VoiceCapture? {
-        spare.flatMap { VoiceInput.spareIsStale(madeAt: $0.madeAt, changedAt: VoiceCapture.audioChangedAt, now: Date()) ? nil : $0 }
+        if current.enabled { VoiceCapture.watchAudioChanges() }  // a device that moves while macOS asks: `start` rebuilds (#269)
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
@@ -169,9 +154,7 @@ final class VoiceInputController: ObservableObject {
         if config.engine == .scribe, key == nil { return show(failure: .key) }
         phase = .ready
         armEscape()
-        let ready = freshSpare
-        let capture = ready?.microphone == config.microphone ? ready! : makeCapture(config.microphone)
-        spare = nil
+        let capture = makeCapture(config.microphone)
         guard await capture.authorized() else { return show(failure: .mic) }
         guard me == run, phase == .ready else { return }  // pressed again while macOS asked: finished or aborted already
         audioSeconds = 0
@@ -240,7 +223,7 @@ final class VoiceInputController: ObservableObject {
             capture?.stop()
             capture = nil
             feed?.finish()
-            let said = VoiceInput.fixNames(await transcript())  // #242: «Allover Saird» → «all'Overseer»
+            let said = VoiceInput.fixNames(await transcript())  // #242: «Allover Saird» → «a Friday»
             guard me == run else { return }
             Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds), privacy: .public) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
             await route(said, run: me)
@@ -253,7 +236,7 @@ final class VoiceInputController: ObservableObject {
         if VoiceInput.heardNothing(seconds: listened, words: said.split(separator: " ").count, peak: peak) { return fail(.nothingHeard, run: me) }
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
-        // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
+        // A short confirmation («va bene», «sì vai») may answer the Friday: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
         let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
         Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
@@ -295,10 +278,10 @@ final class VoiceInputController: ObservableObject {
 
     private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
         switch outcome {
-        case .sent: return "Inviato all’Overseer"
-        case .queued: return "In coda per l’Overseer"
+        case .sent: return "Inviato a Friday"
+        case .queued: return "In coda per Friday"
         case .copied: return "Testo copiato. Incolla con ⌘V"
-        case .notDelivered: return "Non risulta consegnato all’Overseer. Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato a Friday. Testo copiato. Incolla con ⌘V"
         }
     }
 
@@ -311,6 +294,7 @@ final class VoiceInputController: ObservableObject {
     /// Stops everything and drops what the engines hold. Also the end of a press made before the microphone was ready.
     /// The answer is said and its text is not shown (#247: Roberto does not want the words in the notch). Voice off: the text is the only way.
     private func answered(_ answer: String) {
+        Self.log.notice("answer: \(answer, privacy: .public)")  // #286: what the Friday told Roberto, the proof of a live test
         guard config.spoken else { return show(answer, seconds: max(6, Double(answer.count) * 0.07)) }
         // #271: «Penso…» stays until the voice is heard (or the speaking ends with no sound at all), not a bar that folds before it
         let me = run
