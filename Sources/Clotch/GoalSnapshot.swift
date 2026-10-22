@@ -135,6 +135,12 @@ enum GoalSnapshot {
                         VoiceInputPill(input: input)
                     }, "21-pill-\(name)")
                 }
+                // #235, #236: the line under the notch in each state of the Figma, the red light on «Ok non dato».
+                for (name, event, state) in VoiceAlertBar.stills {
+                    try save(island(width: NotchSize.note, radius: NotchSpace.noteRadius, light: VoiceAlertBar.light(state)) {
+                        NotchAlertNote(event: event, state: state)
+                    }, "26-avviso-\(name)")
+                }
                 // AFK (#106), with the Figma's examples: the moon off and on, the closed sign, the summary long, short and empty.
                 try save(open(.goals, afkOn: false) { GoalsTab(rows: store.rows, now: store.now) }, "22-afk-aperto-spento")
                 try save(open(.goals, afkOn: true, afk: 4) { GoalsTab(rows: store.rows, now: store.now) }, "23-afk-aperto-acceso")

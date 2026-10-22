@@ -1,0 +1,181 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "78:61932",
+  "nome": "avviso",
+  "w": 440,
+  "h": 89
+ },
+ "variabili": {
+  "notch/nero": "#000000",
+  "notch/raggio/20": 20,
+  "notch/spazio/6": 6,
+  "notch/spazio/20": 20,
+  "notch/spazio/4": 4,
+  "notch/spazio/16": 16,
+  "notch/misura/440": 440,
+  "notch/bianco": "#ffffff",
+  "notch/testo/14": 14,
+  "notch/bianco-a60": "#ffffff99",
+  "notch/testo/12": 12,
+  "notch/spazio/8": 8,
+  "notch/bianco-a94": "#fffffff0",
+  "notch/raggio/11": 11,
+  "notch/spazio/10": 10,
+  "notch/misura/22": 22,
+  "notch/testo/11": 11,
+  "notch/bianco-a12": "#ffffff1f",
+  "notch/bianco-a92": "#ffffffeb"
+ },
+ "nodi": [
+  {
+   "id": "78:61932",
+   "nome": "avviso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 440,
+    "h": 89
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "bottomLeftRadius": "notch/raggio/20",
+    "bottomRightRadius": "notch/raggio/20",
+    "itemSpacing": "notch/spazio/6",
+    "paddingLeft": "notch/spazio/20",
+    "paddingRight": "notch/spazio/20",
+    "paddingTop": "notch/spazio/4",
+    "paddingBottom": "notch/spazio/16",
+    "width": "notch/misura/440"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:61933",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 20,
+    "y": 4,
+    "w": 400,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Ok non dato",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:61934",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 20,
+    "y": 27,
+    "w": 400,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "La chat di Setup non si è aperta: l’app Claude è chiusa.",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:61935",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 20,
+    "y": 47,
+    "w": 139,
+    "h": 26
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/8",
+    "paddingTop": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:61936",
+   "nome": "bottone Riprova",
+   "tipo": "FRAME",
+   "box": {
+    "x": 20,
+    "y": 51,
+    "w": 61,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a94",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:61937",
+   "nome": "testo Riprova",
+   "tipo": "TEXT",
+   "box": {
+    "x": 30,
+    "y": 55.5,
+    "w": 41,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Riprova",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:61938",
+   "nome": "bottone Apri chat",
+   "tipo": "FRAME",
+   "box": {
+    "x": 89,
+    "y": 51,
+    "w": 70,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a12",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:61939",
+   "nome": "testo Apri chat",
+   "tipo": "TEXT",
+   "box": {
+    "x": 99,
+    "y": 55.5,
+    "w": 50,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Apri chat",
+   "font": "SF Pro Semibold"
+  }
+ ]
+}

@@ -161,6 +161,10 @@ private final class GoalWatcher: @unchecked Sendable {
     /// Goals Roberto is writing from the notch (#36), and the ones the register refused.
     @Published private(set) var writing: Set<String> = []
     @Published private(set) var writeFailed: Set<String> = []
+    /// Proofs Roberto ticks from the goal page (#237), by goal id; `failureLine` is the engine's last line of the refusal.
+    @Published private(set) var confirming: Set<String> = []
+    @Published private(set) var confirmFailed: Set<String> = []
+    @Published private(set) var failureLine: [String: String] = [:]
 
     private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
     private var snapshot: GoalDiskData = ([], [], [], [], [])
@@ -221,22 +225,30 @@ private final class GoalWatcher: @unchecked Sendable {
         launch(args, row.id, busy: \.writing, failed: \.writeFailed)
     }
 
+    /// Roberto's «Conferma» on a proof with no command (#237): `prove fatta N`. The proof leaves the page when the register shows it done.
+    func confirmProof(_ row: GoalRow, _ proof: GoalProof) {
+        guard let args = GoalDecision.proofArguments(row, proof: proof, home: FileManager.default.homeDirectoryForCurrentUser.path) else { return }
+        launch(args, row.id, busy: \.confirming, failed: \.confirmFailed)
+    }
+
     private func launch(_ args: [String], _ id: String, busy: ReferenceWritableKeyPath<GoalStore, Set<String>>,
                         failed: ReferenceWritableKeyPath<GoalStore, Set<String>>) {
         guard self[keyPath: busy].insert(id).inserted else { return }
         self[keyPath: failed].remove(id)
+        failureLine[id] = nil
         Task.detached {
-            let ok = Self.python(args)
+            let (ok, line) = Self.python(args)
             await MainActor.run {
                 self[keyPath: busy].remove(id)
-                if !ok { self[keyPath: failed].insert(id) }
+                if !ok { self[keyPath: failed].insert(id); self.failureLine[id] = line.isEmpty ? nil : line }
             }
         }
     }
 
-    private nonisolated static func python(_ args: [String]) -> Bool {
+    /// `line`: the last line of stdout, where the engine says why it refused.
+    private nonisolated static func python(_ args: [String]) -> (ok: Bool, line: String) {
         guard let py = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
-            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return false }
+            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return (false, "") }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: py)
         process.arguments = args
@@ -244,11 +256,14 @@ private final class GoalWatcher: @unchecked Sendable {
         env["CLAUDE_CODE_SESSION_ID"] = nil  // Roberto, not a master: with it the command refuses (exit 3)
         process.environment = env
         process.standardInput = FileHandle.nullDevice  // a mode obiettivo-guard.py does not know yet reads stdin as a hook
-        process.standardOutput = FileHandle.nullDevice
+        let out = Pipe()
+        process.standardOutput = out
         process.standardError = FileHandle.nullDevice
-        guard (try? process.run()) != nil else { return false }
+        guard (try? process.run()) != nil else { return (false, "") }
+        let text = String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
         process.waitUntilExit()
-        return process.terminationStatus == 0
+        let line = text.split(whereSeparator: \.isNewline).last.map { $0.trimmingCharacters(in: .whitespaces) } ?? ""
+        return (process.terminationStatus == 0, line)
     }
 
     func takenAnimationShown(_ id: String) {

@@ -1,0 +1,593 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "78:62856",
+  "nome": "ADHD · lettura non riuscita – Chiaro",
+  "w": 578,
+  "h": 207
+ },
+ "variabili": {
+  "notch/nero": "#000000",
+  "notch/raggio/40": 40,
+  "notch/spazio/18": 18,
+  "notch/spazio/35": 35,
+  "notch/spazio/42": 42,
+  "notch/spazio/26": 26,
+  "notch/misura/578": 578,
+  "notch/bianco-a7": "#ffffff12",
+  "notch/raggio/19": 19,
+  "notch/spazio/4": 4,
+  "notch/misura/422": 422,
+  "notch/raggio/15": 15,
+  "notch/spazio/6": 6,
+  "notch/misura/103_5": 103.5,
+  "notch/misura/30": 30,
+  "notch/bianco-a60": "#ffffff99",
+  "notch/spessore/1_1667": 1.1666666269302368,
+  "notch/testo/13": 13,
+  "notch/bianco-a16": "#ffffff29",
+  "notch/bianco": "#ffffff",
+  "notch/spazio/12": 12,
+  "notch/misura/86": 86,
+  "notch/raggio/18": 18,
+  "notch/misura/36": 36,
+  "notch/bianco-a92": "#ffffffeb",
+  "notch/spessore/1_3333": 1.3333333730697632,
+  "notch/misura/38": 38,
+  "notch/testo/14": 14,
+  "notch/testo/12": 12,
+  "notch/bianco-a94": "#fffffff0",
+  "notch/raggio/11": 11,
+  "notch/spazio/10": 10,
+  "notch/misura/22": 22,
+  "notch/testo/11": 11
+ },
+ "nodi": [
+  {
+   "id": "78:62856",
+   "nome": "ADHD · lettura non riuscita – Chiaro",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 578,
+    "h": 207
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "bottomLeftRadius": "notch/raggio/40",
+    "bottomRightRadius": "notch/raggio/40",
+    "itemSpacing": "notch/spazio/18",
+    "paddingLeft": "notch/spazio/35",
+    "paddingRight": "notch/spazio/35",
+    "paddingTop": "notch/spazio/42",
+    "paddingBottom": "notch/spazio/26",
+    "width": "notch/misura/578"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62857",
+   "nome": "barra schede",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 42,
+    "w": 508,
+    "h": 38
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62858",
+   "nome": "schede",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 42,
+    "w": 422,
+    "h": 38
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/19",
+    "paddingLeft": "notch/spazio/4",
+    "paddingRight": "notch/spazio/4",
+    "paddingTop": "notch/spazio/4",
+    "paddingBottom": "notch/spazio/4",
+    "width": "notch/misura/422"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62859",
+   "nome": "scheda Obiettivi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 39,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62860",
+   "nome": "icona target",
+   "tipo": "FRAME",
+   "box": {
+    "x": 54.916015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62861",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 54.916015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 11.666666030883789
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62862",
+   "nome": "Obiettivi",
+   "tipo": "TEXT",
+   "box": {
+    "x": 72.583984375,
+    "y": 53,
+    "w": 54,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Obiettivi",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62863",
+   "nome": "scheda Richieste",
+   "tipo": "FRAME",
+   "box": {
+    "x": 142.5,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62864",
+   "nome": "icona inbox",
+   "tipo": "FRAME",
+   "box": {
+    "x": 156.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62865",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 156.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 9.333333015441895
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62866",
+   "nome": "Richieste",
+   "tipo": "TEXT",
+   "box": {
+    "x": 174.083984375,
+    "y": 53,
+    "w": 58,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Richieste",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62867",
+   "nome": "scheda ADHD",
+   "tipo": "FRAME",
+   "box": {
+    "x": 246,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a16",
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62868",
+   "nome": "icona brain",
+   "tipo": "FRAME",
+   "box": {
+    "x": 269.416015625,
+    "y": 54,
+    "w": 11.667608261108398,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62869",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 269.416015625,
+    "y": 54,
+    "w": 11.667608261108398,
+    "h": 11.669331550598145
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62870",
+   "nome": "ADHD",
+   "tipo": "TEXT",
+   "box": {
+    "x": 287.083984375,
+    "y": 53,
+    "w": 39,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "ADHD",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62872",
+   "nome": "scheda Account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 349.5,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62873",
+   "nome": "icona users",
+   "tipo": "FRAME",
+   "box": {
+    "x": 366.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62874",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 366.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 10.5
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62875",
+   "nome": "Account",
+   "tipo": "TEXT",
+   "box": {
+    "x": 384.083984375,
+    "y": 53,
+    "w": 52,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62876",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 457,
+    "y": 42,
+    "w": 86,
+    "h": 38
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/12",
+    "width": "notch/misura/86"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62877",
+   "nome": "bottone impostazioni (ingranaggio)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 457,
+    "y": 43,
+    "w": 36,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/18",
+    "width": "notch/misura/36",
+    "height": "notch/misura/36"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62878",
+   "nome": "icona impostazioni (ingranaggio)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 468.98828125,
+    "y": 53,
+    "w": 12.02344036102295,
+    "h": 16
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62879",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 468.98828125,
+    "y": 53,
+    "w": 12.02344036102295,
+    "h": 13.333333969116211
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1_3333"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62880",
+   "nome": "bottone AFK (luna)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 505,
+    "y": 42,
+    "w": 38,
+    "h": 38
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/19",
+    "width": "notch/misura/38",
+    "height": "notch/misura/38"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62881",
+   "nome": "icona AFK (luna)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 518,
+    "y": 53,
+    "w": 12.00000286102295,
+    "h": 16
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62882",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 518,
+    "y": 53,
+    "w": 12.00000286102295,
+    "h": 12.000003814697266
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1_3333"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62883",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 98,
+    "w": 508,
+    "h": 83
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/18"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62911",
+   "nome": "errore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 98,
+    "w": 508,
+    "h": 83
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/6"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62912",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 98,
+    "w": 508,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Domande non caricate",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62913",
+   "nome": "errore preciso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 121,
+    "w": 508,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Il comando delle richieste è uscito con errore 1: «richieste.py: file non trovat",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62914",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 155,
+    "w": 61,
+    "h": 26
+   },
+   "variabili": {
+    "paddingTop": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62915",
+   "nome": "bottone Riprova",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 159,
+    "w": 61,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a94",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62916",
+   "nome": "testo Riprova",
+   "tipo": "TEXT",
+   "box": {
+    "x": 45,
+    "y": 163.5,
+    "w": 41,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Riprova",
+   "font": "SF Pro Semibold"
+  }
+ ]
+}

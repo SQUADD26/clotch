@@ -34,6 +34,8 @@ private struct VoiceInputGlow<S: Shape>: View {
     var body: some View {
         shape.stroke(color.opacity(line), lineWidth: 3)
             .background(shape.stroke(color.opacity(halo), lineWidth: 9).blur(radius: 11))
+            // Only outside the island: the halo never tints the black under the words (Roberto, 22/10: «Overlay messo lì a cazzo di cane»).
+            .mask(Rectangle().padding(-40).overlay(shape.blendMode(.destinationOut)).compositingGroup())
     }
 }
 

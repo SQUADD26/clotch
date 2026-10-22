@@ -78,6 +78,7 @@ struct NotchSectionsContent: View {
     let now: Date
     @Binding var tab: NotchTab
     @ObservedObject private var adhd = AdhdStore.shared
+    @ObservedObject private var alerts = VoiceAlertBar.shared
     @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @State private var forward = true
     @State private var swipe = PageSwipe()
@@ -92,6 +93,13 @@ struct NotchSectionsContent: View {
         VStack(spacing: NotchSpace.section) {
             TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, badge: store.newAnswerCount > 0 ? (.requests, store.newAnswerCount) : nil,
                    adhdCount: adhd.unanswered)
+            // What waits on Roberto, above every tab, only while something waits (#236).
+            if !alerts.waiting.isEmpty {
+                NotchAlertInbox(items: alerts.waiting, sending: alerts.state == .sending ? alerts.current : nil,
+                                failed: alerts.failure) { e, action in
+                    if action == .giveOk { alerts.giveOk(e) } else { alerts.openChat(e) }
+                }
+            }
             ZStack(alignment: .top) {
                 Group {
                     switch shown {
