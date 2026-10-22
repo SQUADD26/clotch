@@ -39,6 +39,16 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(GoalSources.parseAdhd(Data("[]".utf8)), []); XCTAssertEqual(GoalSources.parseAdhd(Data("no".utf8)), [])
     }
 
+    func testAdhdWhoAnsweredAndWhichSessionOwesIt() throws {
+        let r = try XCTUnwrap(GoalSources.parseAdhd(try fixture("adhd-elenco.json")).first)
+        XCTAssertEqual([r.answeredBy, r.state, r.session, r.localId, r.sessionTitle], ["ereditata", "con_risposta", "cli-1", "", ""])
+        XCTAssertEqual(r.ids, ["Q-bfeb734d", "Q-b532a544"]); XCTAssertEqual(r.nudgedAt, Date(timeIntervalSince1970: 1792613319.8736444))
+        XCTAssertEqual(r.answerNote, "Già risposta prima")
+        let h = try XCTUnwrap(GoalSources.parseAdhd(Data(#"[{"id":"Q-2","domanda_chiara":"D?","risposta":"x","risposta_da":"haiku","local_id":"local_a","titolo_sessione":"⌘ Clotch: x"}]"#.utf8)).first)
+        XCTAssertEqual([h.answerNote, h.localId], ["Risposta provvisoria", "local_a"])
+        XCTAssertNil(GoalSources.parseAdhd(Data(#"[{"id":"Q-3","domanda_chiara":"D?","risposta_da":"sessione"}]"#.utf8))[0].answerNote, "the session's own answer says nothing")
+    }
+
     func testAdhdWaitingLabelAndBadge() {
         func one(_ extra: String) -> AdhdRequest {
             GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"Domanda?","risposta":"",\#(extra)}]"#.utf8))[0]
