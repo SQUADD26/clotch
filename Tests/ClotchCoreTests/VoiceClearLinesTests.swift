@@ -46,4 +46,11 @@ final class VoiceClearLinesTests: XCTestCase {
         XCTAssertTrue(VoiceTurn.role.contains("Le parole tecniche vanno bene"))
         XCTAssertTrue(VoiceTurn.role.contains("niente numeri di PR"))
     }
+
+    /// #299: every spoken line goes through `speechRequest`, so the English names are respelled in all of them.
+    func testFridayGoesToElevenLabsRespelled() throws {
+        let r = VoiceTurn.speechRequest(text: "Ho aperto Friday sul nodo giusto", config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation)
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
+        XCTAssertEqual(body["text"] as? String, "Ho aperto fràidei sul nodo giusto")
+    }
 }
