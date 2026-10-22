@@ -96,10 +96,10 @@ final class VoiceInputController: ObservableObject {
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
-    /// send: nothing (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
+    /// send: nothing (Esc and «Annulla» take it back). «Dettatura accesa» off: the pill says so (#198).
     func press() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
-        guard current.enabled else { return }
+        guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
         switch phase {
         // Thinking: a new utterance is worth more than the answer still coming (it would only block the key).

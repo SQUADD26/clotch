@@ -27,14 +27,15 @@ class SettingsWindowController {
         }
     }
 
-    func show() {
+    func show(tab: ClotchSettingsTab? = nil) {
         if let window = window {
+            if let tab { settings?.select(tab) }
             present(window)
             return
         }
 
         // Finder-style window (#56): toolbar with one item per page, height follows the page.
-        let settings = ClotchSettingsWindow()
+        let settings = ClotchSettingsWindow(tab: tab ?? .general)
         self.settings = settings  // the toolbar's delegate: NSToolbar holds it weakly
         let window = settings.window
         window.center()

@@ -13,6 +13,9 @@ extension VoiceInputController {
         if why == .mic { timers.append(watchMicrophone()) }
     }
 
+    /// RegisterEventHotKey said no (another program owns the key): the pill says it instead of a key that does nothing (#198).
+    func shortcutNotRegistered() { show(failure: .shortcut) }
+
     /// The button under the error.
     func perform(_ action: VoiceInput.Action) {
         switch action {
@@ -20,6 +23,9 @@ extension VoiceInputController {
             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!)
         case .checkKey:
             SettingsWindowController.shared.show()
+            cancel()
+        case .openDictation:
+            SettingsWindowController.shared.show(tab: .dictation)
             cancel()
         case .useLocal:
             try? files.updateConfig(["ingresso_motore": VoiceInput.Engine.local.rawValue])
