@@ -139,7 +139,8 @@ final class NotchZoneViewsTests: XCTestCase {
 
     func testOpenNotchHasTheSettingsGearBesideTheTabs() throws {
         let image = try render(TabBar(tab: .constant(.goals)).frame(width: 508), named: "pulsante-impostazioni")
-        XCTAssertGreaterThan(image.count(white, columns: 0.94..<1), 0, "the gear right of the centred tab bar")
+        // #106: the gear right of the tab bar, the AFK moon (38 pt) at the far right.
+        XCTAssertGreaterThan(image.count(white, columns: 0.84..<0.92), 0, "the gear right of the tab bar, left of the moon")
     }
 
     func testSettingsButtonOpensOneSettingsWindow() {
@@ -154,6 +155,38 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertEqual(shown().count, 1, "the gear opens the same one settings window as the menu bar, also when pressed twice")
         XCTAssertEqual(shown().first?.alphaValue, 0)
         shown().forEach { $0.close() }
+    }
+
+    /// «Non chiudere quando il puntatore esce» attivo: un clic che porta fuori dal notch lo chiude lo stesso (#126).
+    func testClicksLeavingTheNotchCloseItEvenWhenItStaysOpenOnPointerExit() {
+        _ = NSApplication.shared
+        let settings = SettingsManager.shared
+        let before = settings.collapseOnMouseLeave
+        settings.collapseOnMouseLeave = false
+        defer { settings.collapseOnMouseLeave = before }
+        let appState = AppState()
+        let controller = SettingsWindowController.shared
+        controller.appState = appState
+        controller.present = { $0.alphaValue = 0; $0.orderFrontRegardless() }
+        var launched = 0
+        SessionOpener.launch = { _, _ in launched += 1 }
+        defer {
+            NSApp.windows.filter { $0.toolbar?.identifier == "ClotchSettings" }.forEach { $0.close() }
+            SessionOpener.launch = { _, _ in }
+        }
+
+        appState.surface = .sessionList
+        NotchSettingsButton().open()
+        XCTAssertEqual(appState.surface, .collapsed, "the gear closes the notch")
+
+        appState.surface = .sessionList
+        SessionOpener.open(SessionTarget(localId: "local_1b3f4741-928c-4f60-bf7c-984f7219eaee", profile: ""))
+        XCTAssertEqual(launched, 1)
+        XCTAssertEqual(appState.surface, .collapsed, "a session row closes the notch")
+
+        appState.surface = .questionCard(sessionId: "s")
+        NotchExit.close()
+        XCTAssertEqual(appState.surface, .questionCard(sessionId: "s"), "a question waits for its answer")
     }
 
     func testStaleAccountDrawsNoBars() throws {

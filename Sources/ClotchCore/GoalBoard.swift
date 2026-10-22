@@ -16,6 +16,8 @@ public struct GoalRecord: Equatable, Sendable {
     public var successor: String? = nil  // "a": the cli that took this goal's place
     public var proposal: String? = nil   // "proposta.testo": a new goal proposed beside the open one, not confirmed yet
     public var lastSeen: Date? = nil     // "ultima_attivita": the hook's sign of life at each prompt and Stop of the live session
+    public var stalledSince: Date? = nil // "fermo_da" (#1916): when the engine saw the open goal stop with proofs undone
+    public var stalledReason = ""        // "perche": the proof that fails, with its real output
 }
 
 /// One local_*.json of the Claude desktop app.

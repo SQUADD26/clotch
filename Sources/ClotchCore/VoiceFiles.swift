@@ -33,7 +33,13 @@ public struct VoiceFiles {
         judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
         jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
+        overseerURL = home.appendingPathComponent(".claude/overseer/attuale.json")
     }
+
+    /// Orders for the Overseer (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
+    public var inboxURL: URL { voiceDir.appendingPathComponent(VoiceRoute.inboxFolder) }
+    public var inboxListenerURL: URL { inboxURL.appendingPathComponent(".ascolta") }
+    public let overseerURL: URL
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }
 
@@ -139,6 +145,21 @@ public struct VoiceFiles {
         let fd = open(url.path, O_WRONLY | O_APPEND | O_CREAT, 0o600)
         guard fd >= 0 else { return }
         FileHandle(fileDescriptor: fd, closeOnDealloc: true).write(data)
+    }
+
+    /// Read, change and write one shared file under the flock the engine takes on `lock` (claude-config `avvisi.lock`):
+    /// neither side loses the other's update. `change` returns nil to leave the file as it is. Blocks while the engine holds it (a few ms).
+    @discardableResult
+    public func modify(_ url: URL, lock: String, _ change: (Data?) -> Data?) throws -> Data? {
+        try FileManager.default.createDirectory(at: voiceDir, withIntermediateDirectories: true)
+        let fd = open(voiceDir.appendingPathComponent(lock).path, O_WRONLY | O_CREAT, 0o600)
+        guard fd >= 0 else { throw CocoaError(.fileWriteUnknown) }
+        defer { close(fd) }
+        flock(fd, LOCK_EX)
+        defer { flock(fd, LOCK_UN) }
+        guard let next = change(try? Data(contentsOf: url)) else { return nil }
+        try write(next, to: url)
+        return next
     }
 
     /// Atomic write, file 600 and folder 700 (the key and its neighbours are never readable by others).

@@ -21,6 +21,11 @@ public enum ClotchPrefs {
     public static let voiceLightStrength = "clotchVoiceLightStrength"
     public static let voiceLightStrengthDefault = 1.0
     public static let voiceLightStrengthRange = 0.3...1.0
+    /// AFK (#106): off by itself when Roberto is back at the Mac, and the summary said aloud.
+    public static let afkEndOnReturn = "clotchAfkEndOnReturn"
+    public static let afkEndOnReturnDefault = true
+    public static let afkReadAloud = "clotchAfkReadAloud"
+    public static let afkReadAloudDefault = true
 
     public enum NoteLength: String, CaseIterable, Sendable {
         case short, normal, long

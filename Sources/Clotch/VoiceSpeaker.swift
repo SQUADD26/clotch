@@ -93,6 +93,7 @@ final class VoiceSpeaker {
 
     /// One piece of news the engine let through. The rules of the moment it is said: switch, key, muted session, daily caps.
     func say(_ event: VoiceEvent) async {
+        guard !AfkFiles().isOn else { return }  // AFK (#106): Clotch is silent while Roberto is away
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
         // No canonical prompt from the config (#84): silent, never a copy of it.
@@ -100,16 +101,20 @@ final class VoiceSpeaker {
                                                      day: day, config: config) == nil else { return }
         // Counted before the calls: a loop of failures never spends more than the cap.
         day.chiamate += 1
-        try? files.write(JSONEncoder().encode(day), to: files.dayURL)
+        saveDay(day)
         let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
         guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else { return }
         let text = spoken.text
         day.caratteri += text.count
-        try? files.write(JSONEncoder().encode(day), to: files.dayURL)
+        saveDay(day)
         if await speak(text, config: config, key: key) == nil, !spoken.topic.isEmpty {
             let last: [String: Any] = ["argomento": spoken.topic, "frase": text, "t": Int(Date().timeIntervalSince1970 * 1000)]
             try? files.write(JSONSerialization.data(withJSONObject: last), to: files.lastURL)
         }
+    }
+
+    private func saveDay(_ day: VoiceTurn.Day) {
+        if let data = day.merged(into: try? Data(contentsOf: files.dayURL)) { try? files.write(data, to: files.dayURL) }
     }
 
     private func lastTopic() -> String {
@@ -117,10 +122,23 @@ final class VoiceSpeaker {
         return ((try? JSONSerialization.jsonObject(with: data)) as? [String: Any])?["argomento"] as? String ?? ""
     }
 
+    /// The AFK summary on return (#106): its sentence as written, no Haiku; only with the switch on and a key.
+    func sayAloud(_ text: String) async {
+        guard files.isOn, let key = files.key else { return }
+        _ = await speak(text, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key)
+    }
+
     /// «Prova voce»: one fixed sentence, no Haiku, even with the switch off.
     func test() async -> String {
         guard let key = files.key else { return "Manca la chiave." }
         return await speak(VoiceTurn.testLine, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key) ?? "Voce provata."
+    }
+
+    /// The answer to a spoken question (#110): the voice and speed of Roberto's settings, no daily cap (he asked), even with the
+    /// alerts switch off. nil = said; otherwise why not.
+    func speakAnswer(_ text: String) async -> String? {
+        guard let key = files.key else { return "Manca la chiave." }
+        return await speak(text, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key)
     }
 
     // MARK: - Haiku, ElevenLabs, audio, light
@@ -210,7 +228,7 @@ final class VoiceSpeaker {
     }
 
     /// A Dock-launched app has no ~/.local/bin in PATH: the usual places, then the newest installed version.
-    nonisolated private static func claudeBinary() -> String? {
+    nonisolated static func claudeBinary() -> String? {
         let fm = FileManager.default
         let home = fm.homeDirectoryForCurrentUser.path
         if let found = [home + "/.local/bin/claude", "/opt/homebrew/bin/claude", "/usr/local/bin/claude"].first(where: fm.isExecutableFile(atPath:)) {

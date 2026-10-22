@@ -46,6 +46,7 @@ enum SettingsKey {
     static let hapticOnHover = "hapticOnHover"
     static let hapticIntensity = "hapticIntensity"      // 1=light, 2=medium, 3=strong
     static let hoverExpandDelay = "hoverExpandDelay"    // seconds the pointer rests before the island opens (0.1–1.0)
+    static let hoverCollapseDelay = "hoverCollapseDelay" // seconds the island stays open after the pointer leaves (0.1–1.0, #125)
     static let showProjectName = "showProjectName"      // false = cards lead with the session title instead of the folder
     static let autoExpandOnQuestion = "autoExpandOnQuestion"
     static let sessionTimeout = "sessionTimeout"
@@ -187,6 +188,7 @@ struct SettingsDefaults {
     static let hapticOnHover = false
     static let hapticIntensity = 1          // 1=light
     static let hoverExpandDelay = NotchHoverInteraction.expandDelay
+    static let hoverCollapseDelay = NotchHoverInteraction.collapseDelay
     static let showProjectName = true
     static let autoExpandOnQuestion = true
     static let sessionTimeout = 30
@@ -293,6 +295,7 @@ class SettingsManager {
             SettingsKey.hapticOnHover: SettingsDefaults.hapticOnHover,
             SettingsKey.hapticIntensity: SettingsDefaults.hapticIntensity,
             SettingsKey.hoverExpandDelay: SettingsDefaults.hoverExpandDelay,
+            SettingsKey.hoverCollapseDelay: SettingsDefaults.hoverCollapseDelay,
             SettingsKey.showProjectName: SettingsDefaults.showProjectName,
             SettingsKey.autoExpandOnQuestion: SettingsDefaults.autoExpandOnQuestion,
             SettingsKey.sessionTimeout: SettingsDefaults.sessionTimeout,
@@ -576,6 +579,8 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     case deny
     case skipQuestion
     case jumpToTerminal
+    /// Talk to Clotch (#110): press to speak, press again to finish.
+    case voiceInput
 
     var id: String { rawValue }
 
@@ -587,12 +592,13 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
         case .approveAlways:  return nil
         case .skipQuestion:   return nil
         case .jumpToTerminal: return nil
+        case .voiceInput:     return ShortcutBinding(keyCode: 49, modifiers: [.option]) // ⌥Spazio
         }
     }
 
     var defaultEnabled: Bool {
         switch self {
-        case .togglePanel: return true
+        case .togglePanel, .voiceInput: return true
         default: return false
         }
     }

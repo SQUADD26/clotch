@@ -2,12 +2,15 @@ import SwiftUI
 import AppKit
 import ClotchCore
 
-/// «Generale» (#56, Figma #95): screen, look, start at login.
+/// «Generale» (#56, Figma #95): screen, look, start at login, AFK (#106).
 struct ClotchGeneralPage: View {
     @ObservedObject private var l10n = L10n.shared
     @AppStorage(SettingsKey.displayChoice) private var displayChoice = SettingsDefaults.displayChoice
     @AppStorage(SettingsKey.windowAppearance) private var windowAppearance = AppearanceChoice.dark.rawValue
     @State private var launchAtLogin: Bool
+    @ObservedObject private var afk = AfkStore.shared
+    @AppStorage(ClotchPrefs.afkEndOnReturn) private var afkEndOnReturn = ClotchPrefs.afkEndOnReturnDefault
+    @AppStorage(ClotchPrefs.afkReadAloud) private var afkReadAloud = ClotchPrefs.afkReadAloudDefault
 
     init() {
         _launchAtLogin = State(initialValue: SettingsManager.shared.launchAtLogin)
@@ -44,6 +47,17 @@ struct ClotchGeneralPage: View {
             SettingsRow(l10n["startup"]) {
                 SettingsCheckbox(title: l10n["launch_at_login"], isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, v in SettingsManager.shared.launchAtLogin = v }
+            }
+            Divider()
+            // #106: the same switch as the moon in the notch.
+            SettingsRow("AFK") {
+                VStack(alignment: .leading, spacing: 8) {
+                    SettingsCheckbox(title: "Attiva AFK", note: "Spegne la voce e raccoglie le cose fatte. Al ritorno le vedi nel notch.",
+                                     isOn: Binding(get: { afk.isOn }, set: { afk.set($0) }))
+                    SettingsCheckbox(title: "Spegni AFK quando torni al Mac", isOn: $afkEndOnReturn)
+                        .onChange(of: afkEndOnReturn) { _, _ in afk.reload() }
+                    SettingsCheckbox(title: "Leggi il riepilogo a voce", isOn: $afkReadAloud)
+                }
             }
         }
     }

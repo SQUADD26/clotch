@@ -3,14 +3,20 @@ import SwiftUI
 import ClotchCore
 
 /// The one click for every notch row that belongs to a Claude session (a goal's title, a request taken in charge).
-enum SessionOpener {
+@MainActor enum SessionOpener {
     /// Opens `target` in the copy of the Claude app that owns it. `claude://` is registered by every copy, so a plain
     /// open lands in whichever the system prefers and shows nothing of another account's session: the link goes to the
     /// copy whose launcher fixes the session's data folder. No copy matches (the plain Claude.app has no launcher): the default app.
     static func open(_ target: SessionTarget) {
         guard let url = target.url else { return }
         SessionSeen.shared.markOpened(target.localId)
-        guard let app = appCopy(owning: target.profile) else {
+        NotchExit.close()
+        launch(url, appCopy(owning: target.profile))
+    }
+
+    /// The tests swap it: a test never opens the Claude app in front of Roberto.
+    static var launch: (URL, URL?) -> Void = { url, app in
+        guard let app else {
             NSWorkspace.shared.open(url)
             return
         }
@@ -33,6 +39,23 @@ enum SessionOpener {
             }
         }
         return nil
+    }
+}
+
+/// Every click in the notch that leads outside it (the gear, a session, a link) closes it, whatever the setting for the
+/// pointer leaving says: that setting is about the pointer, not about a click that already took Roberto elsewhere (#126).
+/// An approval or a question stays up: it waits for an answer, as the click outside the notch also leaves it.
+enum NotchExit {
+    @MainActor static func close() {
+        guard let appState = SettingsWindowController.shared.appState else { return }
+        switch appState.surface {
+        case .collapsed, .approvalCard, .questionCard: return
+        default: break
+        }
+        withAnimation(NotchAnimation.close) {
+            appState.surface = .collapsed
+            appState.cancelCompletionQueue()
+        }
     }
 }
 

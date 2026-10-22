@@ -8,7 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "AppDelegate")
 
     var panelController: PanelWindowController?
-    private let hotKeyManager = GlobalHotKeyManager()
+    let hotKeyManager = GlobalHotKeyManager()
     private var localShortcutMonitor: Any?
     let appState = AppState()
 
@@ -30,6 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
         VoiceSpeaker.shared.start()
+        AfkStore.shared.start()
 
         #if DEBUG
         // Preview mode: inject mock data if --preview flag is present
@@ -50,22 +51,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         #endif
 
+        // #117: no boot expand; the notch opens only for Roberto.
         setupGlobalShortcut()
-
-        // Boot animation: brief expand to confirm app is running
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            guard appState.surface == .collapsed else { return }
-            withAnimation(NotchAnimation.pop) {
-                appState.surface = .sessionList
-            }
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            if case .sessionList = appState.surface {
-                withAnimation(NotchAnimation.close) {
-                    appState.surface = .collapsed
-                }
-            }
-        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -89,8 +76,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Collect all enabled shortcut bindings, skip duplicates (first wins)
         var bindings: [(keyCode: UInt16, mods: NSEvent.ModifierFlags, action: ShortcutAction)] = []
         var seen: Set<String> = []
-        // Clotch: only the panel toggle; the card shortcuts would grab keys system-wide for cards that never show.
-        for action in [ShortcutAction.togglePanel] {
+        // Clotch: only the panel toggle and the voice; the card shortcuts would grab keys system-wide for cards that never show.
+        for action in [ShortcutAction.togglePanel, .voiceInput] {
             guard action.isEnabled else { continue }
             let b = action.binding
             let key = "\(b.keyCode)-\(b.modifiers.rawValue)"
@@ -103,7 +90,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // and — unlike an NSEvent global keyboard monitor — needs no
         // Accessibility permission. This is the primary handler. See #217.
         for b in bindings {
-            hotKeyManager.register(keyCode: b.keyCode, modifiers: b.mods) { [weak self] in
+            // The voice is push to talk too: Carbon also tells when the key goes up.
+            let up: (() -> Void)? = b.action == .voiceInput ? { Task { @MainActor in VoiceInputController.shared.release() } } : nil
+            _ = hotKeyManager.registerID(keyCode: b.keyCode, modifiers: b.mods, onRelease: up) { [weak self] in
                 Task { @MainActor in self?.executeShortcut(b.action) }
             }
         }
@@ -143,6 +132,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                 }
             }
+        case .voiceInput:
+            if appState.surface.isExpanded { withAnimation(NotchAnimation.close) { appState.surface = .collapsed } }
+            VoiceInputController.shared.press()
         // Card shortcuts act only on the card on screen (#308); with the
         // request hidden they open its card instead of acting unseen.
         case .approve, .approveAlways, .deny, .skipQuestion:

@@ -4,6 +4,7 @@
 set -euo pipefail
 bash "$(dirname "$0")/check-hover.sh"
 bash "$(dirname "$0")/check-windows.sh"
+bash "$(dirname "$0")/check-focus.sh"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"
 rm -rf "$pkg"
@@ -13,6 +14,7 @@ mkdir -p "$pkg/Sources/ClotchCore" "$pkg/Tests/ClotchCoreTests"
 python3 "$root/scripts/linux-buildable.py" "$root" | while read -r f; do
   ln -s "$f" "$pkg/${f#"$root"/}"
 done
+ln -s "$root/Tests/Fixtures" "$pkg/Tests/Fixtures"  # the engine contract fixtures (#115)
 cat > "$pkg/Package.swift" <<'EOF'
 // swift-tools-version: 5.9
 import PackageDescription

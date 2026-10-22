@@ -80,6 +80,14 @@ public enum VoiceTurn {
             return "\(c.year!)-\(c.month!)-\(c.day!)"
         }
 
+        /// The file with this day's counters over what Clean View keeps in it (`recenti`, `avvisato`, `ultimo`): not ours to drop.
+        public func merged(into data: Data?) -> Data? {
+            var o = (data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]) ?? [:]
+            if o["giorno"] as? String != giorno { o["ultimo"] = nil }  // a new day: like Clean View, counters restart, `recenti` and `avvisato` stay
+            o["giorno"] = giorno; o["chiamate"] = chiamate; o["caratteri"] = caratteri
+            return try? JSONSerialization.data(withJSONObject: o)
+        }
+
         public static func load(_ data: Data?, now: Date) -> Day {
             let today = key(now)
             guard let data, let d = try? JSONDecoder().decode(Day.self, from: data), d.giorno == today else { return Day(giorno: today) }

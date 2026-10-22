@@ -18,20 +18,14 @@ private class KeyablePanel: NSPanel {
     }
 }
 
-/// Ensures first click on a nonactivatingPanel fires SwiftUI actions
-/// instead of being consumed for key-window activation.
-/// Also guards against NSHostingView constraint-update re-entrancy crash:
+/// Guards against NSHostingView constraint-update re-entrancy crash:
 /// during updateConstraints(), SwiftUI may invalidate the view graph and
 /// call setNeedsUpdateConstraints again, which AppKit forbids.
 private class NotchHostingView<Content: View>: NSHostingView<Content> {
     /// When true, the deferred handler is setting super — don't re-defer.
     private var applyingDeferred = false
 
-    override func mouseDown(with event: NSEvent) {
-        window?.makeKey()
-        super.mouseDown(with: event)
-    }
-
+    /// The first click on the panel fires SwiftUI actions; it never makes the panel key (#117).
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     /// Latest requested value awaiting its deferred apply, or nil when nothing
@@ -244,6 +238,8 @@ class PanelWindowController: NSObject, NSWindowDelegate {
             defer: false
         )
         panel.isFloatingPanel = true
+        // #117: a click takes the keyboard only on a text field (NSView.needsPanelToBecomeKey), never on a button.
+        panel.becomesKeyOnlyIfNeeded = true
         panel.acceptsMouseMovedEvents = true
         panel.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.mainMenuWindow)) + 2)
         panel.backgroundColor = .clear
@@ -707,10 +703,22 @@ class PanelWindowController: NSObject, NSWindowDelegate {
         return false
     }
 
-    /// Whether the island currently holds keyboard focus. It only becomes key
-    /// when the user clicks into it (NotchHostingView.mouseDown).
+    /// Whether the island currently holds keyboard focus: only while Roberto types in it.
     var isPanelKeyWindow: Bool {
         panel?.isKeyWindow == true
+    }
+
+    /// Roberto opened a text field in the notch (the goal editor): the keyboard comes here, Clotch stays behind.
+    func takeKeyboard() {
+        panel?.makeKey()
+    }
+
+    /// The field closed: the keyboard goes back to the app in front. Ordering the panel out ends its key
+    /// status without activating anything; it is back on screen in the same turn.
+    func giveBackKeyboard() {
+        guard let panel, panel.isKeyWindow else { return }
+        panel.orderOut(nil)
+        panel.orderFrontRegardless()
     }
 
     /// Fast check: is the terminal running the active session the foreground app?
