@@ -34,8 +34,10 @@ public enum VoiceInput {
         public var enabled: Bool
         /// Unique id of the input device; "" = the system's.
         public var microphone: String
+        /// The model that is the Overseer when Roberto speaks (clotch#286): one of `VoiceTurn.models`, Haiku by default.
+        public var overseerModel: String
 
-        /// config.json keys `ingresso_motore`, `ingresso_lingua`, `ingresso_a_voce`, `ingresso_modo`, `ingresso_acceso`, `ingresso_microfono`;
+        /// config.json keys `ingresso_motore`, `ingresso_lingua`, `ingresso_a_voce`, `ingresso_modo`, `ingresso_acceso`, `ingresso_microfono`, `overseer_modello`;
         /// a missing or odd value is the default (cloud engine, Italian, answers spoken, hold the key, on, the system's microphone).
         public init(_ config: [String: Any]) {
             engine = (config["ingresso_motore"] as? String).flatMap(Engine.init(rawValue:)) ?? .scribe
@@ -45,6 +47,7 @@ public enum VoiceInput {
             mode = (config["ingresso_modo"] as? String).flatMap(Mode.init(rawValue:)) ?? .hold
             enabled = config["ingresso_acceso"] as? Bool ?? true
             microphone = config["ingresso_microfono"] as? String ?? ""
+            overseerModel = VoiceTurn.models.first { $0 == config["overseer_modello"] as? String } ?? VoiceTurn.models[0]
         }
     }
 

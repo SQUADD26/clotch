@@ -177,6 +177,18 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceRoute.helperPromptPath, ".claude/hooks/helper_voce_prompt.md")
     }
 
+    func testOverseerModelIsChosenInTheSettings() {
+        XCTAssertEqual(VoiceInput.Config([:]).overseerModel, "claude-haiku-5-5")
+        XCTAssertEqual(VoiceInput.Config(["overseer_modello": "claude-opus-5-5"]).overseerModel, "claude-opus-5-5")
+        XCTAssertEqual(VoiceInput.Config(["overseer_modello": "gpt-9"]).overseerModel, "claude-haiku-5-5", "a model Clotch does not know: Haiku")
+        let a = VoiceRoute.helperArguments(prompt: "p", model: "claude-opus-5-5")
+        XCTAssertEqual(a[a.firstIndex(of: "--model")! + 1], "claude-opus-5-5")
+        XCTAssertEqual(a[a.firstIndex(of: "--max-budget-usd")! + 1], "0.60")
+        XCTAssertEqual(VoiceRoute.budget("claude-sonnet-5-5"), "0.30")
+        XCTAssertEqual(VoiceRoute.helperSeconds("claude-haiku-5-5"), 90)
+        XCTAssertEqual(VoiceRoute.helperSeconds("claude-sonnet-5-5"), 150)
+    }
+
     func testAskGetsTheSessionsClotchSees() {
         let now = Date()
         let line = VoiceRoute.sessionLine(title: "Clotch: voce", status: .running, lastActivity: now.addingTimeInterval(-180), now: now)
