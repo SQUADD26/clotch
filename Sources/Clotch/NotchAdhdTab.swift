@@ -55,7 +55,7 @@ private struct AdhdRow: View {
         HStack(alignment: .top, spacing: T.notchSpazio16) {
             VStack(alignment: .leading, spacing: T.notchSpazio4) {
                 Text(item.question).font(.system(size: T.notchTesto14, weight: .medium)).foregroundStyle(T.notchBiancoA92)
-                    .fixedSize(horizontal: false, vertical: true).frame(minHeight: Line.question, alignment: .top)
+                    .frame(minHeight: Line.question, alignment: .top).fixedSize(horizontal: false, vertical: true)
                 Group {
                     if item.answered {
                         Text(item.answer).font(.system(size: T.notchTesto12, weight: .medium)).foregroundStyle(T.notchBiancoA60)
@@ -63,11 +63,12 @@ private struct AdhdRow: View {
                         Text(item.waitingLabel).font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchGiallo)
                     }
                 }
-                .fixedSize(horizontal: false, vertical: true).frame(minHeight: Line.detail, alignment: .top)
+                .frame(minHeight: Line.detail, alignment: .top).fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             trailing
         }
+        .fixedSize(horizontal: false, vertical: true)  // a row never shrinks under a capped height: it would stack its lines (#301)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
     }
