@@ -95,9 +95,24 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(e.at.timeIntervalSince1970, 1792610025.501, accuracy: 0.001)
     }
 
+    /// A line the engine's own `eventi_voce.py scrivi` wrote (claude-config main 478b6df), parsed by Clotch.
+    private func engineLine(_ json: String) throws -> VoiceEvent { try XCTUnwrap(VoiceEvents.parse(line: Substring(json))) }
+
+    func testAdhdAnswerIsSaidUrgent() throws {
+        // eventi_voce.py scrivi risposta_adhd "Risposta a: …" --soggetto … --prova Q-b532a544 (richieste_adhd.py#L111, #163)
+        let e = try engineLine(#"{"v": 1, "id": "e-9d76d56c", "t": 1792653719.373, "tipo": "risposta_adhd", "livello": "alto", "soggetto": "Perche' il notch e' nero?", "testo": "Risposta a: Perche' il notch e' nero? Perche' manca il tema scuro.", "prova": "Q-b532a544"}"#)
+        XCTAssertEqual(e.kind, .adhdAnswer)
+        XCTAssertEqual([e.level, e.subject, e.proof], ["alto", "Perche' il notch e' nero?", "Q-b532a544"])
+        XCTAssertTrue(e.report.contains("manca il tema scuro"))
+        XCTAssertFalse(e.report.contains("Q-b532a544"), "the proof is never said")
+        XCTAssertEqual(VoiceEvent(kind: .adhdAnswer, at: e.at).level, "alto", "derived like the engine: alto")
+        XCTAssertFalse(VoiceJudge.judges(e), "Roberto asked for it: never judged as noise")
+    }
+
     func testEveryKindTheEngineWritesIsKnown() {
         // claude-config eventi_voce.LIVELLO
-        let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom"]
+        let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom",
+                                   "risposta_adhd"]
         XCTAssertEqual(Set(VoiceEvent.Kind.allCases.map(\.rawValue)), engine)
     }
 
