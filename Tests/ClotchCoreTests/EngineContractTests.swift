@@ -120,10 +120,28 @@ final class EngineContractTests: XCTestCase {
         XCTAssertFalse(VoiceJudge.judges(e), "it waits on Roberto: never judged as noise")
     }
 
+    func testWaitsForOkIsSaidAsAQuestion() throws {
+        // eventi_voce.py scrivi aspetta_ok "<sessione> aspetta un tuo ok per …" --soggetto … --prova <local_id> --cli cli-7 (dipendenze.py#L84-L89, #162)
+        let e = try engineLine(#"{"v": 1, "id": "e-78ce5792", "t": 1792653719.331, "tipo": "aspetta_ok", "livello": "alto", "sessione": {"cli": "cli-7", "local_id": "", "titolo": "", "ruolo": ""}, "soggetto": "Clotch, correzioni", "testo": "Clotch, correzioni aspetta un tuo ok per fondere la PR: vuoi che glielo dia io?", "prova": "local_abc123"}"#)
+        XCTAssertEqual(e.kind, .waitsForOk)
+        XCTAssertEqual([e.level, e.session, e.subject, e.proof], ["alto", "cli-7", "Clotch, correzioni", "local_abc123"])
+        XCTAssertTrue(e.report.contains("vuoi che glielo dia io?"))
+        XCTAssertFalse(e.report.contains("local_abc123"), "the proof is never said")
+        XCTAssertEqual(e.kind.rank, VoiceEvent.Kind.question.rank, "said like a question")
+        XCTAssertFalse(VoiceJudge.judges(e))
+        // MAI_UNITI: another urgent event of the same session never covers it (#1982).
+        var engine = VoiceAlertEngine()
+        let now = e.at.addingTimeInterval(1), all = VoiceTurn.Config(["parla_per": "tutte"])
+        let blocked = VoiceEvent(kind: .goalBlocked, at: e.at, session: "cli-7", subject: "Clotch, correzioni", text: "bloccato")
+        XCTAssertNil(engine.offer(blocked, config: all, sessions: [], now: now))
+        XCTAssertNil(engine.offer(e, config: all, sessions: [], now: now), "not a duplicate of the other event")
+        XCTAssertEqual(engine.offer(e, config: all, sessions: [], now: now), "doppione", "the same ok twice is said once")
+    }
+
     func testEveryKindTheEngineWritesIsKnown() {
         // claude-config eventi_voce.LIVELLO
         let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom",
-                                   "risposta_adhd", "dipendenza_ferma"]
+                                   "risposta_adhd", "dipendenza_ferma", "aspetta_ok"]
         XCTAssertEqual(Set(VoiceEvent.Kind.allCases.map(\.rawValue)), engine)
     }
 
