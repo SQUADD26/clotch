@@ -1,0 +1,43 @@
+{
+ "_come": "Ogni tipo di evento e ogni valore di «stato» che il motore scrive nei file letti da Clotch. Valore = come lo tratta Clotch: «letto», «clotch#N» (manca, issue aperta), o «ignorato: <perche'>». Lo controlla test_contratto_clotch.py (claude-config#2024): un tipo o uno stato nuovo o rinominato nel motore senza una riga qui = CI rossa. Le forme dei file (campi) stanno nelle altre fixture di questa cartella, che fanno da esempio.",
+ "evento.tipo": {
+  "aspetta_ok": {"livello": "alto", "clotch": "clotch#162"},
+  "avviso_custom": {"livello": "normale", "clotch": "letto"},
+  "dipendenza_ferma": {"livello": "alto", "clotch": "clotch#164"},
+  "domanda": {"livello": "alto", "clotch": "letto"},
+  "fine_turno": {"livello": "normale", "clotch": "letto"},
+  "obiettivo_bloccato": {"livello": "alto", "clotch": "letto"},
+  "obiettivo_raggiunto": {"livello": "normale", "clotch": "letto"},
+  "richiesta_fatta": {"livello": "normale", "clotch": "letto"},
+  "risposta_adhd": {"livello": "alto", "clotch": "clotch#163"},
+  "rischio": {"livello": "alto", "clotch": "letto"}
+ },
+ "richiesta.stato": {
+  "fatta": "letto",
+  "ferma": "clotch#157",
+  "nuova": "letto",
+  "presa": "letto"
+ },
+ "stato-sessione.stato": {
+  "aspetta_altro": "letto",
+  "aspetta_roberto": "letto",
+  "ferma": "letto",
+  "lavora": "letto",
+  "problema": "letto"
+ },
+ "obiettivo.stato": {
+  "aperto": "letto",
+  "bloccato": "letto",
+  "nessuno": "ignorato: sessione fuori perimetro, nessun obiettivo da mostrare",
+  "non firmato": "ignorato: record non valido",
+  "passato": "ignorato: obiettivo chiuso dalla pulizia o preso da un'altra sessione",
+  "proposto": "letto",
+  "raggiunto": "letto",
+  "rifiutato": "ignorato: Roberto l'ha rifiutato"
+ },
+ "adhd.stato": {
+  "aperta": "clotch#166",
+  "con_risposta": "clotch#166",
+  "sollecitata": "letto"
+ }
+}
