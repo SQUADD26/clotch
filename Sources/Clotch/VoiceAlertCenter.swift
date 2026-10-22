@@ -3,8 +3,8 @@ import os.log
 import ClotchCore
 
 /// Where the voice's news comes in (#57). With `~/.config/voce/eventi.jsonl` (claude-config#1854) only its new lines
-/// count; without it Clotch derives the same events from what it already reads: the end of a turn (a question for
-/// Roberto), the goals and requests registers, account usage, merged PRs and the «Avvisami quando…» rules.
+/// count (#202: goals, requests and account limits are the engine's facts, Clotch never recomputes them); without it
+/// Clotch derives only the end of a turn (a question for Roberto), merged PRs and the «Avvisami quando…» rules.
 /// `VoiceAlertEngine` decides what is said; `VoiceSpeaker.say` says it, one at a time.
 @MainActor
 final class VoiceAlertCenter {
@@ -12,12 +12,11 @@ final class VoiceAlertCenter {
     private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
 
     private let files = VoiceFiles()
-    private var engine = VoiceAlertEngine()
+    private lazy var engine = VoiceAlertEngine(memory: try? Data(contentsOf: files.seenURL))
     private var speaking = false
-    /// The last state seen of each register: nil until the first load (the baseline, so a launch says nothing).
+    /// The last registers loaded, for the judge's state only.
     private var goals: [GoalRecord]?
     private var requests: [UserRequest]?
-    private var quotas: [AccountQuota]?
     private var eventsMark: VoiceEvents.Mark?
     private var clock: Timer?
 
@@ -52,20 +51,10 @@ final class VoiceAlertCenter {
         checkRules(facts)
     }
 
-    /// Every load of the goals and requests registers (`GoalStore`).
+    /// Every load of the goals and requests registers (`GoalStore`): kept for the judge, nothing is derived from them.
     func registersLoaded(goals next: [GoalRecord], requests nextRequests: [UserRequest]) {
-        let now = Date()
-        let events = VoiceEvents.goals(before: goals, after: next, now: now) + VoiceEvents.requests(before: requests, after: nextRequests, now: now)
         goals = next
         requests = nextRequests
-        if !fromFile { offer(events) }
-    }
-
-    /// Every account reading (`AccountQuotaFeed`).
-    func quotasRead(_ next: [AccountQuota]) {
-        let events = VoiceEvents.quotas(before: quotas, after: next, now: Date())
-        quotas = next
-        if !fromFile { offer(events) }
     }
 
     /// PRs seen merged for the first time (`PullRequestFeed`).
@@ -108,6 +97,7 @@ final class VoiceAlertCenter {
                 guard let e = await judged(e) else { continue }
                 _ = engine.offer(e, config: config, sessions: sessions, now: Date())
             }
+            try? files.write(engine.memory, to: files.seenURL)  // survives a relaunch: the same subject is not said again
             pump()
         }
     }

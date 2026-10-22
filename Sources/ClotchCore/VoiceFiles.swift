@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, ownPromptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, ownPromptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, seenURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -30,6 +30,7 @@ public struct VoiceFiles {
         queueURL = voce.appendingPathComponent("coda")
         eventsURL = voce.appendingPathComponent("eventi.jsonl")  // claude-config#1854 writes it; Clotch only reads
         alertsURL = voce.appendingPathComponent("avvisi.json")   // «Avvisami quando…»: the page and `avvisami` write it
+        seenURL = voce.appendingPathComponent("clotch-detti.json")  // the alert engine's memory of what it let through (#202)
         judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
         jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
