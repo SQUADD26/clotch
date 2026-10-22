@@ -160,6 +160,7 @@ final class VoiceInputController: ObservableObject {
     private func scribeEvent(_ event: VoiceInput.ScribeEvent, run me: Int) {
         guard me == run else { return }
         if case .failure(let why) = event { return fail(why, run: me) }
+        if case .quiet = event { return abort() }
         if case .committed = event { scribeCommitted = true }
         dictation.take(event)
         publishText()
@@ -208,9 +209,9 @@ final class VoiceInputController: ObservableObject {
         }
     }
 
-    private func route(_ said: String, run me: Int) async {
+    func route(_ said: String, run me: Int) async {
         let said = said.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !said.isEmpty else { return show(failure: .silence) }
+        guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         if VoiceRoute.classify(said) == .question {
