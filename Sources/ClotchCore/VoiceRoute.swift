@@ -30,12 +30,24 @@ public enum VoiceRoute {
 
     public static let inboxFolder = "ingresso"
 
-    /// One file per order, `<ms>-<id>.json`: atomic write (the caller's `write`), consumed and deleted by the mod; deleted = received.
+    /// One file per order, `<ms>-<id>.json`: atomic write (the caller's `write`), taken by the engine's reader, which says the outcome in `.esiti` (gone = only taken, #262).
     public static func inboxName(id: String, at: Date) -> String { "\(Int(at.timeIntervalSince1970 * 1000))-\(id).json" }
 
     public static func inboxPayload(id: String, text: String, at: Date) -> Data {
         let o: [String: Any] = ["v": 1, "id": id, "t": Int(at.timeIntervalSince1970 * 1000), "testo": text, "da": "clotch-voce"]
         return (try? JSONSerialization.data(withJSONObject: o, options: [.sortedKeys])) ?? Data()
+    }
+
+    /// What Roberto may be told about an order (#262). Only the engine's own `ingresso/.esiti/<same name>` says it (claude-config
+    /// `ingresso_voce.py` #2105: `stato` in_consegna / consegnato / non_consegnato); «file gone from the inbox» is only «taken» and the
+    /// model's words are no proof. No esito, an unreadable one or in_consegna = `unproven`.
+    public enum Delivery: Equatable, Sendable { case delivered, notDelivered, unproven }
+
+    /// One order, or all the orders a helper run made: one `non_consegnato` is enough to say so, `delivered` needs every one `consegnato`.
+    public static func delivery(esiti: [Data]) -> Delivery {
+        let states = esiti.map { ((try? JSONSerialization.jsonObject(with: $0)) as? [String: Any])?["stato"] as? String }
+        if states.contains("non_consegnato") { return .notDelivered }
+        return !states.isEmpty && states.allSatisfy { $0 == "consegnato" } ? .delivered : .unproven
     }
 
     /// Seconds the order may sit in the inbox before Clotch falls back to the clipboard and the Overseer's chat.

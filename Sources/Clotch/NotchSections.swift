@@ -97,7 +97,7 @@ struct NotchSectionsContent: View {
                     switch shown {
                     case .goals: GoalsTab(rows: store.rows, now: now)
                     case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists, now: now, seenAt: store.answersSeenAt)
-                    case .adhd: AdhdTab(items: adhd.items, markRead: adhd.markRead, nudge: adhd.nudge)
+                    case .adhd: AdhdTab(items: adhd.items, error: adhd.error, markRead: adhd.markRead, nudge: adhd.nudge)
                     case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
                     }
                 }

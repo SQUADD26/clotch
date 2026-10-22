@@ -4,7 +4,7 @@ import SwiftUI
 import ClotchCore
 import os
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "NotchNotifier")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "NotchNotifier")
 
 /// The steps of one notification in the closed notch. Each step is a still frame,
 /// so `--snapshot` can draw the animation frame by frame.

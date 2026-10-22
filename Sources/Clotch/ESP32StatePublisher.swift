@@ -14,7 +14,7 @@ import ClotchCore
 final class ESP32StatePublisher {
     static let shared = ESP32StatePublisher()
 
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "esp32-publisher")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "esp32-publisher")
 
     private weak var appState: AppState?
     private let bridge: ESP32BridgeManager

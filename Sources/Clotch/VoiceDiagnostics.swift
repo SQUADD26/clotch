@@ -5,7 +5,7 @@ import ClotchCore
 /// Live checks of the outgoing voice, run by local commands (#251). They log, never print the key: it only goes in the `xi-api-key` header.
 @MainActor
 enum VoiceDiagnostics {
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "Voice")
 
     private static func get(_ url: String, key: String) async -> [String: Any]? {
         guard let u = URL(string: url) else { return nil }

@@ -13,8 +13,12 @@ enum VoiceAsk {
     static let helperTimeout: TimeInterval = 90
 
     /// The helper's instructions (claude-config#2116), read at every utterance so a config update needs no restart; nil = the way of before.
-    static func helperPrompt() -> String? {
-        let url = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(VoiceRoute.helperPromptPath)
+    /// Read from `files`; a test that reaches the real home's prompt would launch the real helper (#270), so it stops here.
+    static func helperPrompt(files: VoiceFiles) -> String? {
+        let url = files.helperPromptURL
+        if RuntimeEnvironment.isRunningTests, url.standardizedFileURL == VoiceFiles().helperPromptURL.standardizedFileURL {
+            fatalError("Un test ha letto il prompt vero dell'helper vocale (\(url.path)): usa VoiceFiles(home: <cartella temporanea>) (#270)")
+        }
         guard let s = try? String(contentsOf: url, encoding: .utf8), !s.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return s
     }

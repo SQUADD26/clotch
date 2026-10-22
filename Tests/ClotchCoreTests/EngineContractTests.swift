@@ -11,6 +11,13 @@ final class EngineContractTests: XCTestCase {
         return try Data(contentsOf: dir.appendingPathComponent("Fixtures/motore/\(name)"))
     }
 
+    /// clotch#260: the contract number `scripts/controlla-motore.sh` compares with `motore versione` ("N <fingerprint of the other files>").
+    func testContractVersionNumber() throws {
+        let words = try XCTUnwrap(String(data: fixture("VERSIONE"), encoding: .utf8)).split(whereSeparator: \.isWhitespace)
+        XCTAssertEqual(words.count, 2)
+        XCTAssertGreaterThanOrEqual(Int(words[0]) ?? 0, 1)
+    }
+
     func testTaskRequestTakenAnsweredAndDone() throws {
         let r = try XCTUnwrap(GoalSources.parseRequest(fixture("richiesta-compito.json")))
         XCTAssertEqual(r.id, "Q-a2ab1959")
@@ -40,16 +47,17 @@ final class EngineContractTests: XCTestCase {
         let stuck = try req("richiesta-ferma.json"), question = try req("richiesta-domanda.json")
         let doneInTime = try req("richiesta-compito.json")                      // esce_t = t_fatta + 24 h
         let doneNoExit = try req("richiesta-compito.json") { $0["esce_t"] = NSNull(); $0["id"] = "Q-1" }
-        let takenQuiet = try req("richiesta-compito.json") { $0["stato"] = "presa"; $0["esce_t"] = NSNull(); $0["id"] = "Q-2" }
+        let takenQuiet = try req("richiesta-compito.json") { $0["stato"] = "presa"; $0["esce_t"] = NSNull(); $0["id"] = "Q-2" }  // listed since #261
         let takenAsking = try req("richiesta-compito.json") {
             $0["stato"] = "presa"; $0["esce_t"] = NSNull(); $0["id"] = "Q-3"
             $0["aspetta_te"] = true; $0["punto"] = "Tengo il colore o lo cambio?"
         }
         let exit = try XCTUnwrap(doneInTime.leavesAt), all = [stuck, question, doneInTime, doneNoExit, takenQuiet, takenAsking]
-        XCTAssertEqual(UserRequest.listed(all, now: exit.addingTimeInterval(-60)).map(\.id), [stuck.id, question.id, "Q-3", doneInTime.id],
-                       "open ones first, then the done one until esce_t; a done one without esce_t and a taken one nobody waits on are out")
-        XCTAssertEqual(UserRequest.listed(all, now: exit.addingTimeInterval(60)).map(\.id), [stuck.id, question.id, "Q-3"],
-                       "no 48 h rule of ours: past esce_t the done one is gone")
+        let justDone = try XCTUnwrap(doneInTime.doneAt).addingTimeInterval(60)
+        XCTAssertEqual(UserRequest.listed(all, now: justDone).map(\.id), [stuck.id, question.id, "Q-2", "Q-3", doneInTime.id],
+                       "open ones first (every taken one, asking or not), then the done one; a done one without esce_t is out")
+        XCTAssertEqual(UserRequest.listed(all, now: exit.addingTimeInterval(-60)).map(\.id), [stuck.id, question.id, "Q-2", "Q-3"],
+                       "#261: a done one leaves a few minutes after t_fatta, not at esce_t (24 h)")
         XCTAssertEqual([stuck.statusLabel, takenAsking.statusLabel], ["Ferma", "In attesa di te"])
         XCTAssertEqual([stuck.point, takenAsking.point, doneInTime.point], ["La sessione è chiusa.", "Tengo il colore o lo cambio?", "Fatto: il notch si vede."])
     }
@@ -62,7 +70,11 @@ final class EngineContractTests: XCTestCase {
         let list = try rows.map { try XCTUnwrap(GoalSources.parseRequest(JSONSerialization.data(withJSONObject: $0))) }
         XCTAssertEqual(list.count, rows.count)
         let r = try XCTUnwrap(list.first)
-        XCTAssertEqual([r.id, r.state, r.kind, r.takenBy, r.point], ["Q-5ef8766d", "ferma", "compito", "cli-3", "La sessione è chiusa."])
+        XCTAssertEqual([r.id, r.state, r.kind, r.takenBy, r.point], ["Q-5ef8766d", "ferma", "compito", "Login da rifare", "La sessione è chiusa."])
+        // clotch#261: `presa_da` is the taker's title, never a cli id; the same row taken (nobody waits on it) is listed with who does it.
+        var row = rows[0]; row["stato"] = "presa"; row["ferma_perche"] = ""; row["punto"] = "Sto rifacendo il login."
+        let taken = try XCTUnwrap(GoalSources.parseRequest(JSONSerialization.data(withJSONObject: row)))
+        XCTAssertEqual(UserRequest.listed([taken], now: Date(timeIntervalSince1970: 1792000100)).map { [$0.takenBy, $0.point] }, [["Login da rifare", "Sto rifacendo il login."]])
         XCTAssertEqual(r.look, .stuck); XCTAssertFalse(r.waitsForYou)
         XCTAssertEqual(try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("richiesta-compito.json")) as? [String: Any])["titolo_prove"] as? Int, 1)
     }
