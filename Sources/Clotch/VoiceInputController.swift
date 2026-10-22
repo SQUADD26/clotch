@@ -238,8 +238,7 @@ final class VoiceInputController: ObservableObject {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
                 return
             }
-            if config.spoken { Task { [speak] in await speak(answer) } }
-            return show(answer, seconds: max(6, Double(answer.count) * 0.07))
+            return answered(answer)
         }
         sendingSince = Date()
         phase = .sending
@@ -251,8 +250,7 @@ final class VoiceInputController: ObservableObject {
             let reply = await VoiceAsk.run(said, helper: helper)
             guard me == run else { return }
             if case .success(let answer) = reply {
-                if config.spoken { Task { [speak] in await speak(answer) } }
-                return show(answer, seconds: max(6, Double(answer.count) * 0.07))
+                return answered(answer)
             }
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
@@ -270,6 +268,13 @@ final class VoiceInputController: ObservableObject {
     }
 
     /// Stops everything and drops what the engines hold. Also the end of a press made before the microphone was ready.
+    /// The answer is said and its text is not shown (#247: Roberto does not want the words in the notch). Voice off: the text is the only way.
+    private func answered(_ answer: String) {
+        guard config.spoken else { return show(answer, seconds: max(6, Double(answer.count) * 0.07)) }
+        Task { [speak] in await speak(answer) }
+        abort()
+    }
+
     private func abort() {
         run += 1
         teardown()
