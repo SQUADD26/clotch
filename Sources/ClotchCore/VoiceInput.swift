@@ -153,13 +153,6 @@ public enum VoiceInput {
         seconds > heardAfter && (words == 0 || peak == 0)
     }
 
-    /// A spare microphone made at `madeAt` is bound to the audio setup of that moment: after a change (`changedAt`) or past
-    /// `spareMaxAge` it is made again (#269).
-    public static let spareMaxAge: TimeInterval = 300
-    public static func spareIsStale(madeAt: Date, changedAt: Date, now: Date) -> Bool {
-        changedAt > madeAt || now.timeIntervalSince(madeAt) > spareMaxAge
-    }
-
     /// Why a dictation stopped, as the pill says it (Figma #110, note 5 and 6): what happened, why, and what Roberto can do.
     /// Never a code or a raw message.
     public enum Failure: Equatable, Sendable {
