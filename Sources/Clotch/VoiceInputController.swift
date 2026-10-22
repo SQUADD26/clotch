@@ -216,9 +216,12 @@ final class VoiceInputController: ObservableObject {
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         if VoiceRoute.classify(said) == .question {
             phase = .thinking
-            let answer = await VoiceAsk.run(said)
+            let reply = await VoiceAsk.run(said)
             guard me == run else { return }
-            guard let answer else { return show("Nessuna risposta. Riprova.") }
+            guard case .success(let answer) = reply else {
+                if case .failure(let why) = reply { show(why.message, seconds: 5) }
+                return
+            }
             if config.spoken { Task { _ = await VoiceSpeaker.shared.speakAnswer(answer) } }
             return show(answer, seconds: max(6, Double(answer.count) * 0.07))
         }

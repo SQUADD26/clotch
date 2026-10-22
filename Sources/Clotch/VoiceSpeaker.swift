@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import os.log
 import ClotchCore
 
 /// Clotch's own voice (#50): with the switch on and a key set, a Stop hook in every Claude Code folder queues each end of
@@ -9,6 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceSpeaker {
     static let shared = VoiceSpeaker()
+    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
 
     private let files = VoiceFiles()
     private let home = FileManager.default.homeDirectoryForCurrentUser
@@ -103,7 +105,9 @@ final class VoiceSpeaker {
         day.chiamate += 1
         saveDay(day)
         let input = VoiceTurn.haikuInput(report: event.report, previousTopic: lastTopic())
-        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else { return }
+        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else {
+            return Self.log.error("news not said: no usable line from Haiku (see ClaudeRun)")
+        }
         let text = spoken.text
         day.caratteri += text.count
         saveDay(day)
@@ -130,14 +134,14 @@ final class VoiceSpeaker {
 
     /// «Prova voce»: one fixed sentence, no Haiku, even with the switch off.
     func test() async -> String {
-        guard let key = files.key else { return "Manca la chiave." }
+        guard let key = files.key else { return Self.failed("Manca la chiave.") }
         return await speak(VoiceTurn.testLine, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key) ?? "Voce provata."
     }
 
     /// The answer to a spoken question (#110): the voice and speed of Roberto's settings, no daily cap (he asked), even with the
     /// alerts switch off. nil = said; otherwise why not.
     func speakAnswer(_ text: String) async -> String? {
-        guard let key = files.key else { return "Manca la chiave." }
+        guard let key = files.key else { return Self.failed("Manca la chiave.") }
         return await speak(text, config: VoiceTurn.Config((try? files.readConfig()) ?? [:]), key: key)
     }
 
@@ -146,14 +150,14 @@ final class VoiceSpeaker {
     /// ElevenLabs → light on → audio → light off. nil = said; otherwise why not, for the page.
     private func speak(_ text: String, config: VoiceTurn.Config, key: String) async -> String? {
         let request = VoiceTurn.speechRequest(text: text, config: config, key: key, pronunciation: files.pronunciation)
-        guard let reply = try? await URLSession.shared.data(for: request) else { return "ElevenLabs non risponde. Riprova." }
+        guard let reply = try? await URLSession.shared.data(for: request) else { return Self.failed("ElevenLabs non risponde. Riprova.") }
         let data = reply.0
         let code = (reply.1 as? HTTPURLResponse)?.statusCode ?? 0
         guard code == 200, data.count > 500 else {
-            return code == 401 ? "Chiave non valida. Controllala su ElevenLabs." : "ElevenLabs non ha dato audio (errore \(code))."
+            return Self.failed(code == 401 ? "Chiave non valida. Controllala su ElevenLabs." : "ElevenLabs non ha dato audio (errore \(code)).")
         }
         let rate = VoiceTurn.playbackRate(config)
-        guard let p = try? AVAudioPlayer(data: data) else { return "Audio non leggibile. Riprova." }
+        guard let p = try? AVAudioPlayer(data: data) else { return Self.failed("Audio non leggibile. Riprova.") }
         p.enableRate = true
         p.rate = rate
         p.prepareToPlay()
@@ -175,6 +179,12 @@ final class VoiceSpeaker {
             writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
             return nil
         }
+    }
+
+    /// Every voice that is not said lands in the log (#159): the news and the spoken answer have no page to show it on.
+    private static func failed(_ why: String) -> String {
+        log.error("voice not said: \(why, privacy: .public)")
+        return why
     }
 
     /// `stato.json`, the contract the edge light reads (`NotchVoice.swift`).
@@ -201,30 +211,10 @@ final class VoiceSpeaker {
         }
     }
 
-    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure (`VoiceTurn.line` tries again, then stays silent).
+    /// `claude -p` with Haiku, the report on stdin, killed after `haikuSeconds`. nil = any failure, logged by `ClaudeRun`
+    /// (`VoiceTurn.line` tries again, then stays silent: a news line has no bar to show it on).
     nonisolated private static func haiku(prompt: String, input: String, config: VoiceTurn.Config) async -> String? {
-        await Task.detached { () -> String? in
-            guard let bin = Self.claudeBinary() else { return nil }
-            let p = Process()
-            p.executableURL = URL(fileURLWithPath: bin)
-            p.arguments = VoiceTurn.haikuArguments(prompt: prompt, config: config)
-            var env = ProcessInfo.processInfo.environment
-            env["CLOTCH_VOCE_INTERNA"] = "1"  // the hook skips Clotch's own call, even without safe mode
-            p.environment = env
-            let stdin = Pipe(), stdout = Pipe()
-            p.standardInput = stdin
-            p.standardOutput = stdout
-            p.standardError = FileHandle.nullDevice
-            guard (try? p.run()) != nil else { return nil }
-            stdin.fileHandleForWriting.write(Data(input.utf8))
-            try? stdin.fileHandleForWriting.close()
-            let timer = DispatchWorkItem { p.terminate() }
-            DispatchQueue.global().asyncAfter(deadline: .now() + VoiceTurn.haikuSeconds, execute: timer)
-            let out = stdout.fileHandleForReading.readDataToEndOfFile()
-            p.waitUntilExit()
-            timer.cancel()
-            return p.terminationStatus == 0 ? String(decoding: out, as: UTF8.self) : nil
-        }.value
+        try? await ClaudeRun.run(VoiceTurn.haikuArguments(prompt: prompt, config: config), input: input, timeout: VoiceTurn.haikuSeconds).get()
     }
 
     /// A Dock-launched app has no ~/.local/bin in PATH: the usual places, then the newest installed version.
