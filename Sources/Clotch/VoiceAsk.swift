@@ -9,9 +9,21 @@ enum VoiceAsk {
     /// The sessions Clotch sees, one line each (set at launch): the answer starts from them, not from thousands of files (#174).
     @MainActor static var sessions: () -> [String] = { [] }
 
-    static func run(_ question: String) async -> Result<String, ClaudeLogin.Failure> {
+    /// The helper may wait for `dai-ok` to start a session's turn (claude-config#2116).
+    static let helperTimeout: TimeInterval = 90
+
+    /// The helper's instructions (claude-config#2116), read at every utterance so a config update needs no restart; nil = the way of before.
+    static func helperPrompt() -> String? {
+        let url = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(VoiceRoute.helperPromptPath)
+        guard let s = try? String(contentsOf: url, encoding: .utf8), !s.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return s
+    }
+
+    /// With `helper`, the helper's `claude -p` (answers, talks to the sessions, passes new work to the Overseer); without, read-only.
+    static func run(_ question: String, helper: String? = nil) async -> Result<String, ClaudeLogin.Failure> {
         let sessions = await MainActor.run { Self.sessions() }
-        return await ClaudeRun.run(VoiceRoute.askArguments(), input: VoiceRoute.askInput(question, sessions: sessions), timeout: timeout,
+        return await ClaudeRun.run(helper.map { VoiceRoute.helperArguments(prompt: $0) } ?? VoiceRoute.askArguments(),
+                            input: VoiceRoute.askInput(question, sessions: sessions), timeout: helper == nil ? timeout : helperTimeout,
                             directory: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude"))
     }
 }
