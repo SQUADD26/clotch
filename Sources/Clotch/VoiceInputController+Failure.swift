@@ -7,9 +7,9 @@ extension VoiceInputController {
     /// A line on the pill for a while, then the pill folds away.
     func show(_ message: String, seconds: Double = 3) { end(.result(message), seconds: seconds) }
 
-    /// The microphone error waits for the permission; the others fold after a while.
+    /// Every error folds after 8 s; the microphone's watcher goes on in the background and restarts when macOS says yes.
     func show(failure why: VoiceInput.Failure) {
-        end(.failure(why), seconds: why == .mic ? 300 : 20)
+        end(.failure(why), seconds: 8)
         if why == .mic { timers.append(watchMicrophone()) }
     }
 
@@ -41,7 +41,7 @@ extension VoiceInputController {
         return Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
-                guard let self, me == run, phase == .failure(.mic) else { return }
+                guard let self, me == run, phase == .failure(.mic) || phase == .idle else { return }  // idle: the error folded, the watch goes on
                 if AVCaptureDevice.authorizationStatus(for: .audio) == .authorized { return await begin() }
             }
         }

@@ -66,6 +66,9 @@ final class VoiceInputController: ObservableObject {
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
+    /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
+    var finishLocal: (() async -> String)?
+    var localWait = VoiceInput.commitWait
     private var audioSeconds = 0.0
     var scribe: ScribeSession?
     private var feed: AsyncStream<AVAudioPCMBuffer>.Continuation?
@@ -96,14 +99,14 @@ final class VoiceInputController: ObservableObject {
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
-    /// send: nothing (Esc and «Annulla» take it back). «Dettatura accesa» off: the pill says so (#198).
+    /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
         switch phase {
         // Thinking: a new utterance is worth more than the answer still coming (it would only block the key).
-        case .idle, .result, .failure, .thinking:
+        case .idle, .result, .failure, .thinking, .finishing, .sending:
             holds = current.mode == .hold
             pressedAt = Date()
             releasedAt = nil
@@ -113,7 +116,6 @@ final class VoiceInputController: ObservableObject {
             let me = run
             Task { if me == run { await begin() } }
         case .ready, .listening: finish()
-        case .finishing, .sending: break
         }
     }
 
@@ -166,7 +168,7 @@ final class VoiceInputController: ObservableObject {
             feeding = Task { [local] in
                 // The model loads while the microphone already runs: its first buffers wait in the stream.
                 if !(await local.isLoaded) { hint = "Scarico il modello. Succede solo la prima volta." }
-                do { try await local.start { text in Task { @MainActor [weak self] in self?.localText(text, run: me) } } } catch {
+                do { try await local.start(language: config.language) { text in Task { @MainActor [weak self] in self?.localText(text, run: me) } } } catch {
                     return fail(.local, run: me)
                 }
                 hint = nil

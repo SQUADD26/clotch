@@ -95,6 +95,42 @@ final class VoiceInputCaptureTests: XCTestCase {
         c.cancel()
     }
 
+    // MARK: - Every phase has an exit (#197)
+
+    /// Roberto's 22/10: «press in listening», then the local engine's end never came back and the bar stayed on «Trascrivo» for 100 s.
+    func testLocalEngineThatNeverFinishesEndsWithAnError() async throws {
+        let c = VoiceInputController(files: VoiceFiles(home: home))
+        c.makeCapture = { _ in RecordedVoice([]) }
+        c.finishLocal = { try? await Task.sleep(nanoseconds: 600_000_000_000); return "" }
+        c.localWait = 1
+        c.press()
+        try await waitFor { c.phase == .listening }
+        c.press()
+        XCTAssertEqual(c.phase, .finishing)
+        try await waitFor(seconds: 4) { c.phase != .finishing }
+        XCTAssertEqual(c.phase, .failure(.local))
+        c.cancel()
+    }
+
+    /// ⌥V while the text is being transcribed or the order waits for its «Annulla» is never swallowed: a new utterance starts.
+    func testPressWhileFinishingOrSendingStartsANewUtterance() async throws {
+        for phase in [VoiceInputController.Phase.finishing, .sending] {
+            let c = VoiceInputController.still(phase, files: VoiceFiles(home: home))
+            c.makeCapture = { _ in RecordedVoice([]) }
+            c.press()
+            try await waitFor { c.phase == .listening }
+            c.cancel()
+        }
+    }
+
+    /// An error folds by itself after 8 s (the microphone's too: same line; not tried here, its watcher would open the real microphone).
+    func testErrorFoldsByItself() async throws {
+        let c = VoiceInputController(files: VoiceFiles(home: home))
+        c.show(failure: .network)
+        XCTAssertEqual(c.phase, .failure(.network))
+        try await waitFor(seconds: 9) { c.phase == .idle }
+    }
+
     /// Scribe's «no voice» while Roberto still speaks is not the end of the utterance.
     func testScribeQuietDoesNotEndTheUtterance() {
         let c = VoiceInputController.still(.listening, files: VoiceFiles(home: home))
