@@ -70,6 +70,8 @@ struct ResultMark: View {
             RequestMark(look: GoalStore.shared.requests.first { $0.id == event.subject }?.look ?? .working)
         } else if event.kind == .prMerged {
             Image(systemName: "arrow.triangle.merge").font(.system(size: 14, weight: .semibold)).foregroundStyle(color)
+        } else if event.kind == .stepStuck {
+            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 14, weight: .semibold)).foregroundStyle(GoalTone.stop.color)
         } else {
             Image(systemName: "checkmark.circle.fill")
                 .symbolRenderingMode(.palette)
@@ -108,6 +110,9 @@ struct Note {
             let title = event.text.isEmpty ? "Pull request #\(event.count)" : "#\(event.count) \(event.text)"
             self.init(text: title, startLabel: "In corso", label: "Unita", startSymbol: "arrow.triangle.pull",
                       symbol: "arrow.triangle.merge", color: NoteColor.merged, strikes: false, row: nil, before: nil)
+        case .stepStuck:  // #184: the line is built in ClotchCore (HeartbeatSteps), the step is not live data here
+            self.init(text: event.text, startLabel: "Fermo", label: "Fermo", startSymbol: "exclamationmark.triangle",
+                      symbol: "exclamationmark.triangle.fill", color: GoalTone.stop.color, strikes: false, row: nil, before: nil)
         case .proofDone, .still, .blocked, .reached, .confirmed:
             guard let row = rows.first(where: { $0.id == event.subject }) else { return nil }
             // The ring starts from the count before this proof, so the fill is the news.

@@ -1,0 +1,1 @@
+{"avvisi_voce": {"ok": 0, "falliti": 3, "errore": "ValueError: riga guasta in avvisi.json"}, "afk": {"ok": 1792655037, "falliti": 0, "errore": ""}, "osservatore": {"ok": 0, "falliti": 1, "errore": "ValueError: riga guasta in avvisi.json"}}
