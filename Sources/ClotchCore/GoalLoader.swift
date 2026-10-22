@@ -55,7 +55,7 @@ public final class GoalLoader: @unchecked Sendable {
             goals.replace(with: GoalSources.files(in: paths.goals, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseGoal(d) }
         }
         if touched(paths.requests) {
-            requests.replace(with: GoalSources.files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseRequest(d) }
+            requests.replace(with: GoalSources.files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseRequest(d).flatMap { $0.titleReady ? $0 : nil } }
         }
         if touched(paths.states) {
             motor.replace(with: GoalSources.files(in: paths.states, fm).filter { $0.pathExtension == "json" }) { d, u in
