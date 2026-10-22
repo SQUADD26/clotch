@@ -20,11 +20,12 @@ public struct AfkFiles {
     public var isOn: Bool { state?.attivo == true }
     public var summary: AfkSummary? { (try? Data(contentsOf: summaryURL)).flatMap { try? JSONDecoder().decode(AfkSummary.self, from: $0) } }
 
-    /// The things done from `since` to `until`; a line that is not one is skipped, never fatal.
+    /// The things done from `since` to `until`; a line that is not one is skipped, never fatal. The lines that are
+    /// for Roberto to look at (`AfkWatch.kinds`, claude-config#2038) are not things done: the summary's `da_guardare` carries them.
     public func items(since: Double, until: Double = .infinity) -> [AfkItem] {
         let text = (try? String(contentsOf: doneURL, encoding: .utf8)) ?? ""
         return text.split(separator: "\n").compactMap { try? JSONDecoder().decode(AfkItem.self, from: Data($0.utf8)) }
-            .filter { $0.t >= since && $0.t <= until }
+            .filter { $0.t >= since && $0.t <= until && !AfkWatch.kinds.contains($0.tipo) }
     }
 
     /// What the notch shows on return: the summary and the list of its absence.
@@ -40,15 +41,56 @@ public struct AfkState: Decodable, Equatable {
     public let fine: Double?
 }
 
-/// `afk-riepilogo.json`: `t` = when AFK ended, `frase` = what the voice says (at most 4 sentences).
+/// One entry of `da_guardare` (claude-config#2038): what Roberto must look at, not something done.
+public struct AfkWatch: Decodable, Equatable, Identifiable {
+    public let tipo, testo: String
+    public var id: String { "\(tipo)|\(testo)" }
+
+    /// The engine's four kinds; any other word is not shown (the engine adds a kind, the Figma adds its label).
+    public static let kinds: Set<String> = ["rischio", "aspetta_ok", "dipendenza_ferma", "risposta_adhd"]
+
+    public init(tipo: String, testo: String) { self.tipo = tipo; self.testo = testo }
+
+    /// The state label of Figma «Da guardare» (66-60766).
+    public var label: String {
+        switch tipo {
+        case "rischio": return "Limite vicino"
+        case "aspetta_ok": return "Aspetta te"
+        case "dipendenza_ferma": return "Lavoro fermo"
+        default: return "Risposta arrivata"
+        }
+    }
+
+    /// Orange like «Obiettivo bloccato» for the three that wait on Roberto or a limit; grey for an answer that came.
+    public var isAnswer: Bool { tipo == "risposta_adhd" }
+}
+
+/// `afk-riepilogo.json`: `t` = when AFK ended, `frase` = what the voice says (at most 4 sentences), `da_guardare` = what to look at.
 public struct AfkSummary: Decodable, Equatable {
     public let t: Double
     public let inizio: Double
     public let n: Int
     public let frase: String
+    public let watch: [AfkWatch]
 
-    public init(t: Double, inizio: Double, n: Int, frase: String) {
-        self.t = t; self.inizio = inizio; self.n = n; self.frase = frase
+    public init(t: Double, inizio: Double, n: Int, frase: String, watch: [AfkWatch] = []) {
+        self.t = t; self.inizio = inizio; self.n = n; self.frase = frase; self.watch = watch
+    }
+
+    private enum CodingKeys: String, CodingKey { case t, inizio, n, frase, da_guardare }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        // A file from before #2038 has no `da_guardare`; a broken or unknown entry is skipped, never fatal.
+        let entries = ((try? c.decodeIfPresent([Lenient<AfkWatch>].self, forKey: .da_guardare)) ?? nil) ?? []
+        self.init(t: try c.decode(Double.self, forKey: .t), inizio: try c.decode(Double.self, forKey: .inizio),
+                  n: try c.decode(Int.self, forKey: .n), frase: try c.decode(String.self, forKey: .frase),
+                  watch: entries.compactMap(\.value).filter { AfkWatch.kinds.contains($0.tipo) })
+    }
+
+    private struct Lenient<T: Decodable>: Decodable {
+        let value: T?
+        init(from decoder: Decoder) throws { value = try? T(from: decoder) }
     }
 
     public static let nothing = "Mentre eri via non è successo niente di importante."
@@ -143,6 +185,7 @@ public struct AfkReport: Equatable {
     public let summary: AfkSummary
     public let groups: [AfkGroup]
     public let count: Int
+    public var watch: [AfkWatch] { summary.watch }
 
     public init(summary: AfkSummary, items: [AfkItem]) {
         self.summary = summary
@@ -150,10 +193,17 @@ public struct AfkReport: Equatable {
         count = items.isEmpty ? summary.n : items.count
     }
 
+    /// The sentence without its tail «Da guardare: N, …» (the block under it says that, #185).
     public var sentence: String {
-        let s = summary.frase.trimmingCharacters(in: .whitespacesAndNewlines)
+        var s = summary.frase.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let tail = s.range(of: "Da guardare: ", options: .backwards), s[tail.upperBound...].first?.isNumber == true {
+            s = String(s[..<tail.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         return s.isEmpty ? AfkSummary.nothing : s
     }
+
+    /// Nothing done but something to look at: only the block, no «non è successo niente» (#185).
+    public var showsSentence: Bool { count > 0 || watch.isEmpty }
 
     /// «5 cose · via per 1 h 42 min»; with nothing done, only how long.
     public var heading: String {

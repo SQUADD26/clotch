@@ -60,11 +60,13 @@ public struct SessionMotor: Equatable, Sendable {
     public let questions: [String]
     /// «errori»: service errors in a row for a `problema`; `why` already says «(N volte di fila)».
     public let errors: Int
+    /// «piano» (claude-config#1946): what the session said it will do for the most recent request it took; "" when it said nothing.
+    public let plan: String
 
     public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil, mover: String = "",
-                questions: [String] = [], errors: Int = 0) {
-        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover, self.questions, self.errors) =
-            (cli, localId, phase, why, since, what, seen, mover, questions, errors)
+                questions: [String] = [], errors: Int = 0, plan: String = "") {
+        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover, self.questions, self.errors, self.plan) =
+            (cli, localId, phase, why, since, what, seen, mover, questions, errors, plan)
     }
 
     /// What a session waiting for Roberto asks, every question whole: «Ti chiede: X», or a list of them. nil = no questions to show.
@@ -78,7 +80,7 @@ public struct SessionMotor: Equatable, Sendable {
     /// `GoalBoard.rows` skips it when the app sees the session running: a live app beats a stale engine state (#206).
     public func aged(at now: Date) -> SessionMotor {
         guard phase == .lavora, let seen, now.timeIntervalSince(seen) > GoalBoard.stillAfter else { return self }
-        return SessionMotor(cli: cli, localId: localId, phase: .ferma, why: why, since: since, what: what, seen: seen, mover: "roberto", questions: questions, errors: errors)
+        return SessionMotor(cli: cli, localId: localId, phase: .ferma, why: why, since: since, what: what, seen: seen, mover: "roberto", questions: questions, errors: errors, plan: plan)
     }
 
     /// The phase's tone, except a still session that only Roberto can move: it waits for him, so yellow.
@@ -94,7 +96,7 @@ extension GoalSources {
         return SessionMotor(cli: file, localId: line("local_id"), phase: phase, why: line("perche"), since: date(d["da"]),
                             what: line("cosa"), seen: date(d["visto"]), mover: line("muove"),
                             questions: (d["domande"] as? [String] ?? []).map { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }.filter { !$0.isEmpty },
-                            errors: d["errori"] as? Int ?? 0)
+                            errors: d["errori"] as? Int ?? 0, plan: line("piano"))
     }
 }
 

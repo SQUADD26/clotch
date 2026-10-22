@@ -30,6 +30,8 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// `esce_t`: a done request leaves the list at this time, none = at once. `aspetta_te`: a taken one the session wants Roberto for.
     public var leavesAt: Date? = nil
     public var waitsForYou = false
+    /// `piano` (claude-config#1946): what the session said it will do, one sentence of at most 200 characters; "" = not written (or no key).
+    public var plan = ""
     /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its cli id); nil when not taken or unknown.
     public var target: SessionTarget? = nil
 
@@ -49,6 +51,14 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public var look: Look { state == "fatta" ? .done : state == "presa" ? .working : state == "ferma" ? .stuck : .waiting }
 
     public var isQuestion: Bool { kind == "domanda" }
+
+    /// The line under a taken task (#132): the session's plan, or «Non ha ancora detto cosa farà». nil for anything else:
+    /// a done request needs no plan any more (its answer and proof say how it went), a question is never «taken».
+    public var planLine: String? {
+        guard state == "presa", !isQuestion else { return nil }
+        return plan.isEmpty ? "Non ha ancora detto cosa farà" : plan
+    }
+
     public var answered: Bool { !answer.isEmpty }
 
     /// Label under the look: a question never «takes charge», it waits for its answer (#90).
@@ -114,6 +124,7 @@ extension GoalSources {
         r.titleReady = d["testo_da"] as? String != "ripiego"
         r.point = (d["punto"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? r.answer
         r.leavesAt = date(d["esce_t"]); r.waitsForYou = d["aspetta_te"] as? Bool ?? false
+        r.plan = (d["piano"] as? String ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ")
         return r
     }
 

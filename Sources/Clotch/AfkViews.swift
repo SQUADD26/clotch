@@ -72,7 +72,7 @@ struct AfkSummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if report.groups.isEmpty { empty } else { full }
+            if report.groups.isEmpty && report.watch.isEmpty { empty } else { full }
         }
         .padding(.horizontal, NotchSpace.side)
         .padding(.top, 14)
@@ -115,7 +115,7 @@ struct AfkSummaryView: View {
         AfkColumn(tallest: min(maxHeight, Self.tallest) - 14 - 20) {
             VStack(alignment: .leading, spacing: 0) {
                 header
-                sentence.padding(.top, 9)
+                if report.showsSentence { sentence.padding(.top, 9) }
                 Rectangle().fill(GoalInk.divider).frame(height: 1).padding(.top, 14)
             }
             .padding(.bottom, 14)
@@ -144,6 +144,7 @@ struct AfkSummaryView: View {
 
     private var list: some View {
         VStack(alignment: .leading, spacing: 22) {
+            if !report.watch.isEmpty { AfkWatchBlock(watch: report.watch) }
             ForEach(Array(report.groups.enumerated()), id: \.element.id) { i, group in
                 AfkGroupView(group: group)
                     .opacity(shown || !animated ? 1 : 0)
@@ -203,6 +204,30 @@ private struct TopClip: Layout {
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: nil))
+    }
+}
+
+/// «Da guardare» (Figma AFK 66-60766, #185): what Roberto must look at, above the things done. Title and count, then a state
+/// label and the engine's text for each: orange when it waits on him or a limit, grey for an answer that came.
+private struct AfkWatchBlock: View {
+    let watch: [AfkWatch]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Da guardare").font(.system(size: 14, weight: .semibold)).foregroundStyle(GoalInk.primary)
+                Spacer(minLength: 8)
+                Text(AfkReport.count(watch.count)).font(NotchType.label).foregroundStyle(GoalInk.secondary)
+            }
+            ForEach(watch) { entry in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(entry.label).font(NotchType.caption).foregroundStyle(entry.isAnswer ? GoalInk.off : AfkInk.blocked)
+                    Text(entry.testo).font(NotchType.bodyEmphasis).foregroundStyle(Color.white.opacity(0.85)).lineSpacing(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 
