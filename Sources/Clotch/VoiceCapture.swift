@@ -5,7 +5,6 @@ import ClotchCore
 
 /// The microphone as 16 kHz mono (#110): every tap buffer is converted once and handed over both as the buffer (the local
 /// model takes it as is) and as 16-bit PCM (Scribe's socket and the level meter). `onAudio` runs on the audio thread.
-/// `prepare` does the slow part (the input unit, the device) before the key is pressed, so `start` only turns the microphone on (#174).
 /// Not final: the tests feed a recorded voice through a subclass.
 class VoiceCapture: @unchecked Sendable {
     private(set) var engine = AVAudioEngine()
@@ -17,9 +16,7 @@ class VoiceCapture: @unchecked Sendable {
     private var prepared = false
     private var preparedAt = Date()
     private var observer: NSObjectProtocol?
-    /// When this one was made: the spare is bound to the audio setup of that moment (#269).
-    let madeAt = Date()
-    /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A spare made before it hears nothing.
+    /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A prepared engine made before it hears nothing.
     nonisolated(unsafe) private(set) static var audioChangedAt = Date.distantPast
     static let audioChanged = Notification.Name("ClotchAudioChanged")
     private static let watching: Void = {

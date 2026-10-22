@@ -63,8 +63,6 @@ final class VoiceInputController: ObservableObject {
     var config = VoiceInput.Config([:])
     let local = LocalTranscriber()
     private var capture: VoiceCapture?
-    /// The next utterance's microphone, already prepared: the first syllable is not lost to the start (#174).
-    private var spare: VoiceCapture?
     /// The tests hand in a recorded voice instead of the microphone.
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
@@ -97,27 +95,12 @@ final class VoiceInputController: ObservableObject {
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
-    /// At launch and after each utterance: the slow part of the microphone's start and the local model, done while nobody waits.
+    /// At launch and after each utterance: the local model, loaded while nobody waits. No microphone: an open one, even only
+    /// prepared, puts AirPods and every Bluetooth headset in call mode and ruins the audio (#304). It opens at the press.
     func prewarm() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         if current.enabled, current.engine == .local { Task { [local] in try? await local.preload() } }
-        guard current.enabled else { return }
-        if !watchingAudio {  // #269: a change of the audio setup makes the spare again, not only the next press
-            watchingAudio = true
-            VoiceCapture.watchAudioChanges()
-            NotificationCenter.default.addObserver(forName: VoiceCapture.audioChanged, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { if let self, !self.micOpen { self.prewarm() } }
-            }
-        }
-        guard freshSpare?.microphone != current.microphone else { return }
-        spare = makeCapture(current.microphone)
-        spare?.prepare()
-    }
-
-    private var watchingAudio = false
-    /// The spare, unless the audio setup changed since it was made: then it is bound to the old one and hears nothing (#269).
-    private var freshSpare: VoiceCapture? {
-        spare.flatMap { VoiceInput.spareIsStale(madeAt: $0.madeAt, changedAt: VoiceCapture.audioChangedAt, now: Date()) ? nil : $0 }
+        if current.enabled { VoiceCapture.watchAudioChanges() }  // a device that moves while macOS asks: `start` rebuilds (#269)
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
@@ -169,9 +152,7 @@ final class VoiceInputController: ObservableObject {
         if config.engine == .scribe, key == nil { return show(failure: .key) }
         phase = .ready
         armEscape()
-        let ready = freshSpare
-        let capture = ready?.microphone == config.microphone ? ready! : makeCapture(config.microphone)
-        spare = nil
+        let capture = makeCapture(config.microphone)
         guard await capture.authorized() else { return show(failure: .mic) }
         guard me == run, phase == .ready else { return }  // pressed again while macOS asked: finished or aborted already
         audioSeconds = 0

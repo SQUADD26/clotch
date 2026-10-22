@@ -107,16 +107,6 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.Failure.nothingHeard.title, "Non ho sentito niente")
     }
 
-    /// #269: the spare microphone made before an audio change is bound to the old setup and hears nothing.
-    func testASpareOlderThanTheAudioChangeIsMadeAgain() {
-        let now = Date(timeIntervalSince1970: 10_000)
-        let made = now.addingTimeInterval(-60)
-        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-10), now: now), "changed after it was made")
-        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-120), now: now), "changed before it was made")
-        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: .distantPast, now: now), "no change seen")
-        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: now.addingTimeInterval(-VoiceInput.spareMaxAge - 1), changedAt: .distantPast, now: now), "too old")
-    }
-
     func testDictationKeepsCommittedAndShowsThePartial() {
         var d = VoiceInput.Dictation()
         d.take(.partial("a che pun"))
