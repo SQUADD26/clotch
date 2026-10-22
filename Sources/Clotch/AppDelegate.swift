@@ -100,9 +100,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for b in bindings {
             // The voice is push to talk too: Carbon also tells when the key goes up.
             let up: (() -> Void)? = b.action == .voiceInput ? { Task { @MainActor in VoiceInputController.shared.release() } } : nil
-            _ = hotKeyManager.registerID(keyCode: b.keyCode, modifiers: b.mods, onRelease: up) { [weak self] in
+            let id = hotKeyManager.registerID(keyCode: b.keyCode, modifiers: b.mods, onRelease: up) { [weak self] in
                 Task { @MainActor in self?.executeShortcut(b.action) }
             }
+            if id == nil, b.action == .voiceInput { VoiceInputController.shared.shortcutNotRegistered() }
         }
 
         // Local monitor: same-app fallback so the shortcut still works (and is

@@ -81,7 +81,7 @@ final class VoiceInputTests: XCTestCase {
 
     /// Figma #110 note 5 and 6: a title, a cause and the move that fixes it; never a code.
     func testFailuresSpeakPlainlyAndOfferTheFix() {
-        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local]
+        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local, .off, .shortcut]
         for f in all {
             XCTAssertNil((f.title + f.detail).range(of: #"\d{3}|HTTP|error|errore"#, options: .regularExpression), "\(f)")
             XCTAssertFalse(f.actions.isEmpty)
