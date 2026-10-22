@@ -155,6 +155,8 @@ struct NotchPanelView: View {
     @ObservedObject private var voice = VoiceStore.shared
     /// Roberto speaks to Clotch (#110): the pill takes the place of a note.
     @ObservedObject var voiceInput = VoiceInputController.shared
+    /// A script is about to take the screen (clotch#292): the line under the notch counts down to it.
+    @ObservedObject private var screenNotice = ScreenNoticeStore.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The line is up until it folds back (`.leave`): then only its result mark stays, in the right wing.
     private var showsNote: Bool {
@@ -162,6 +164,8 @@ struct NotchPanelView: View {
     }
     /// Shown even when the bar is hidden: he is speaking and must see it.
     private var showsVoiceInput: Bool { !shouldShowExpanded && voiceInput.phase != .idle }
+    /// Shown even when the bar is hidden: the screen is about to be used. Below the voice pill, which he is talking to.
+    private var showsScreenNotice: Bool { !shouldShowExpanded && !showsVoiceInput && screenNotice.phase != nil }
     /// The goal element of the closed notch already says it (#39): no second line under the notch.
     private var noticeInWing: Bool {
         let zones = notchLayout.resolved(hasNotch: hasNotch)
@@ -205,6 +209,7 @@ struct NotchPanelView: View {
     private var panelWidth: CGFloat {
         let nw = notchW
         if showsVoiceInput { return min(max(collapsedBarWidth, NotchSize.note), maxPanelWidth) }
+        if showsScreenNotice { return min(max(collapsedBarWidth, ScreenNoticePill.width), maxPanelWidth) }
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return hasNotch ? nw - 20 : nw }
         // Never narrower than the closed notch: opening only grows, width and height on one spring (#99).
@@ -229,8 +234,8 @@ struct NotchPanelView: View {
     private var panelShape: NotchPanelShape {
         NotchPanelShape(
             width: panelWidth,
-            topExtension: shouldShowExpanded || showsNote || showsVoiceInput ? 14 : 3,
-            bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote || showsVoiceInput ? NotchSpace.noteRadius : 12,
+            topExtension: shouldShowExpanded || showsNote || showsVoiceInput || showsScreenNotice ? 14 : 3,
+            bottomRadius: shouldShowExpanded ? NotchSpace.radius : showsNote || showsVoiceInput || showsScreenNotice ? NotchSpace.noteRadius : 12,
             minHeight: notchHeight
         )
     }
@@ -462,6 +467,10 @@ struct NotchPanelView: View {
                     VoiceInputPill(input: voiceInput)
                         .frame(width: panelWidth)
                         .transition(contentTransition)
+                } else if showsScreenNotice, let phase = screenNotice.phase {
+                    ScreenNoticePill(phase: phase)
+                        .frame(width: panelWidth)
+                        .transition(contentTransition)
                 } else if showsNote, let event = notifier.current {
                     NotchNotificationView(event: event, phase: notifier.phase, rows: goals.rows, requests: goals.requests)
                         .frame(width: panelWidth)
@@ -477,6 +486,7 @@ struct NotchPanelView: View {
             // The Friday's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
             .overlay { VoiceInputLightLive(light: voiceInput.light, shape: panelShape) }
+            .overlay { ScreenNoticeLight(phase: showsScreenNotice ? screenNotice.phase : nil, shape: panelShape) }
             .simultaneousGesture(SpatialTapGesture().onEnded { if inHoverArea($0.location) { openOnClick() } })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
@@ -528,7 +538,7 @@ struct NotchPanelView: View {
         .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
         // The account bars' card hangs under the closed island, over the whole window so the island's clip
         // does not cut it; leaving the bars with the pointer still on the island opens the notch as usual.
-        .accountsCard(allowed: showBar && !shouldShowExpanded && !showsNote && !showsVoiceInput)
+        .accountsCard(allowed: showBar && !shouldShowExpanded && !showsNote && !showsVoiceInput && !showsScreenNotice)
         .onPreferenceChange(AccountsHoverKey.self) { on in
             MainActor.assumeIsolated {  // SwiftUI delivers preferences on the main thread
                 accountsHover = on
