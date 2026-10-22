@@ -7,9 +7,10 @@ public struct VoiceEvent: Equatable, Sendable {
         case requestDone = "richiesta_fatta", goalReached = "obiettivo_raggiunto", goalBlocked = "obiettivo_bloccato"
         case question = "domanda", risk = "rischio", custom = "avviso_custom", endOfTurn = "fine_turno"
         case adhdAnswer = "risposta_adhd"  // the answer to a question Roberto chased in the ADHD tab (claude-config#1945)
+        case stalledDependency = "dipendenza_ferma"  // a session has waited on Roberto past the threshold (dipendenze.py)
 
         /// Lower = said first when several wait.
-        var rank: Int { [.risk: 0, .question: 1, .adhdAnswer: 1, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5, .endOfTurn: 6][self]! }
+        var rank: Int { [.risk: 0, .question: 1, .adhdAnswer: 1, .stalledDependency: 2, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5, .endOfTurn: 6][self]! }
 
         /// How the report for Haiku names it.
         var label: String {
@@ -22,6 +23,7 @@ public struct VoiceEvent: Equatable, Sendable {
             case .custom: return "Avviso che hai chiesto"
             case .endOfTurn: return "Novità"
             case .adhdAnswer: return "Risposta alla tua domanda"
+            case .stalledDependency: return "Una sessione aspetta te"
             }
         }
     }
@@ -53,7 +55,7 @@ public struct VoiceEvent: Equatable, Sendable {
 
 extension VoiceEvent.Kind {
     /// The `livello` claude-config gives each type (#1854).
-    var level: String { [.goalBlocked, .question, .risk, .adhdAnswer].contains(self) ? "alto" : "normale" }
+    var level: String { [.goalBlocked, .question, .risk, .adhdAnswer, .stalledDependency].contains(self) ? "alto" : "normale" }
 }
 
 public enum VoiceEvents {
