@@ -86,9 +86,9 @@ final class PilotScreensTests: XCTestCase {
         let byState = Dictionary(grouping: all, by: { "\($0.state)/\($0.kind)" }).mapValues(\.count).sorted { $0.key < $1.key }
         add("registro: \(all.count) richieste (cartella \(store.requestsFolderExists ? "presente" : "assente")); per stato/tipo: "
             + byState.map { "\($0.key)=\($0.value)" }.joined(separator: ", "))
-        add("«In lavorazione» (stato presa, non fatta): \(all.filter { $0.look == .working }.count) nel registro, \(listed.filter { $0.look == .working }.count) nella scheda (una presa senza risposta esce dalla lista, con risposta resta 48 h)")
-        add("Nella scheda: \(listed.count) righe in \(pages) pagine da \(RequestsTab.perPage); intestazione «\(listed.filter { !$0.answered }.count) in attesa»; "
-            + "righe con uno stato che l'app non conosce (letto come «In attesa»): \(listed.filter { !["nuova", "presa", "fatta"].contains($0.state) }.count)")
+        add("«In lavorazione» (stato presa, non fatta): \(all.filter { $0.look == .working }.count) nel registro, \(listed.filter { $0.look == .working }.count) nella scheda (una presa resta nella scheda solo mentre aspetta_te)")
+        add("Nella scheda: \(listed.count) righe in \(pages) pagine da \(RequestsTab.perPage); intestazione «\(UserRequest.waiting(listed).count) in attesa»; "
+            + "righe con uno stato che l'app non conosce (letto come «In attesa»): \(listed.filter { !["nuova", "presa", "ferma", "fatta"].contains($0.state) }.count)")
         add("Ogni riga mostra: testo, stato, e sotto la risposta se c'è. NON mostra chi la fa né da quanto tempo.")
         add("Le 5 più vecchie tra le mostrate:")
         for r in listed.sorted(by: { ($0.at ?? .distantFuture) < ($1.at ?? .distantFuture) }).prefix(5) { add("  \(r.id) \(ago(r.at)) «\(r.text)»") }

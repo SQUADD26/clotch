@@ -20,7 +20,7 @@ struct RequestsTab: View {
         _page = State(initialValue: startPage)
     }
 
-    private var openCount: Int { requests.filter { !$0.answered }.count }
+    private var openCount: Int { UserRequest.waiting(requests).count }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

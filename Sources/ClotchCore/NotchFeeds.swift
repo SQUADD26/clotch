@@ -56,8 +56,11 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
         look == .stuck ? look.label : waitsForYou ? "In attesa di te" : isQuestion ? (answered ? "Risposta" : "In attesa di risposta") : look.label
     }
 
-    /// The tasks Roberto still waits on (zone count, taken ones are announced once, then hidden).
-    public static func waiting(_ all: [UserRequest]) -> [UserRequest] { all.filter { !$0.isQuestion && !$0.taken } }
+    /// What waits for Roberto, the one count of the zone and of the tab header (#209): a new task, or a taken one while its
+    /// session wants him (`aspetta_te`). Not «ferma», not a question, not a plain taken one.
+    public static func waiting(_ all: [UserRequest]) -> [UserRequest] {
+        all.filter { !$0.isQuestion && ($0.state == "nuova" || ($0.state == "presa" && $0.waitsForYou)) }
+    }
 
     /// What the Requests tab lists (#199): the requests the engine leaves open, in its own words. «ferma» is listed, with its
     /// reason; a taken one only while its session waits for Roberto (`aspetta_te`); a done one until `esce_t`, none = out at once.

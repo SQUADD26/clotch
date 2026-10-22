@@ -224,8 +224,9 @@ final class VoiceInputController: ObservableObject {
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
-        Self.log.notice("route: \(VoiceRoute.classify(said) == .question ? "question" : "order", privacy: .public)")
-        if VoiceRoute.classify(said) == .question {
+        let isQuestion = VoiceRoute.classify(said) == .question
+        Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public)")
+        if isQuestion {
             phase = .thinking
             let reply = await VoiceAsk.run(said)
             guard me == run else { return }
