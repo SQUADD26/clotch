@@ -143,7 +143,7 @@ private final class GoalWatcher: @unchecked Sendable {
         return t > 0 ? Date(timeIntervalSince1970: t) : Date()
     }()
     private nonisolated static let answersSeenKey = "clotch.answersSeenAt"
-    var hasNewAnswer: Bool { requests.contains { $0.isNewAnswer(since: answersSeenAt) } }
+    var newAnswerCount: Int { requests.filter { $0.isNewAnswer(since: answersSeenAt) }.count }
 
     func markAnswersSeen() {
         answersSeenAt = Date()

@@ -31,22 +31,30 @@ struct GoalsTab: View {
                 get: { ids.firstIndex { $0 == shownId } ?? 0 },
                 set: { shownId = ids.indices.contains($0) ? ids[$0] : nil }
             )
-            Pager(count: ids.count, index: index, pageID: { ids[$0] }) { i in
+            Pager(count: ids.count, index: index, pageID: { ids[$0] }, above: { go in
+                AnyView(SessionStrip(entries: entries(asks: asks.count, pages: pages), index: index.wrappedValue,
+                                     summary: GoalBoard.sessionSummary(pages), go: go))
+            }) { i in
                 if i < asks.count {
                     ProposalsPage(rows: asks[i], total: toConfirm.count)
                 } else {
                     GoalPage(row: pages[i - asks.count], position: i - asks.count + 1, of: pages.count, now: now)
                 }
-            } footer: { go in
-                ZStack {
-                    if ids.count > 1 { PageControl(count: ids.count, index: index.wrappedValue, go: go) }
-                    if let closed {
-                        HStack { Spacer(); Text(closed).font(NotchType.label).foregroundStyle(GoalInk.quiet) }
-                    }
+            } footer: { _ in
+                if let closed {
+                    HStack { Spacer(); Text(closed).font(NotchType.label).foregroundStyle(GoalInk.quiet) }
                 }
             }
             .onAppear { remember(freshAsks, freshPages, first: ids.first) }
             .onChange(of: freshAsks + [""] + freshPages) { remember(freshAsks, freshPages, first: ids.first) }
+        }
+    }
+
+    /// One name per open goal, after «Da confermare» when proposals wait (they are the first pages).
+    private func entries(asks: Int, pages: [GoalRow]) -> [SessionStrip.Entry] {
+        let proposals = asks == 0 ? [] : [SessionStrip.Entry(id: "da-confermare", name: "Da confermare", tone: .attention, pages: 0..<asks, line: nil)]
+        return proposals + pages.enumerated().map { k, row in
+            SessionStrip.Entry(id: row.id, name: row.title, tone: row.tone, pages: (asks + k)..<(asks + k + 1), line: row.hoverLine(now: now))
         }
     }
 
@@ -71,12 +79,9 @@ struct GoalPage: View {
             HStack {
                 IconLabel(symbol: "target", text: "Obiettivo \(position) di \(of)")
                 Spacer()
-                HStack(spacing: 6) {
-                    if row.showsPhase { RowPhase(row: row, size: 14) }
-                    StatusPill(text: row.statusLabel, color: row.ink)
-                }
-                .opensSession(row.master)
-                .help(row.detail(now: now))
+                StatusPill(text: row.statusLabel, color: row.ink)
+                    .opensSession(row.master)
+                    .help(row.detail(now: now))
             }
             HStack(alignment: .center, spacing: NotchSpace.section) {
                 VStack(alignment: .leading, spacing: 6) {

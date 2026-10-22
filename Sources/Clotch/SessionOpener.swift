@@ -9,7 +9,6 @@ import ClotchCore
     /// copy whose launcher fixes the session's data folder. No copy matches (the plain Claude.app has no launcher): the default app.
     static func open(_ target: SessionTarget) {
         guard let url = target.url else { return }
-        SessionSeen.shared.markOpened(target.localId)
         NotchExit.close()
         launch(url, appCopy(owning: target.profile))
     }

@@ -6,18 +6,11 @@ import ClotchCore
 // Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
 
 extension GoalRow {
-    /// A proposed goal is drawn quiet: grey. A reached one is green; any other takes its session's phase colour (#114).
+    /// A proposed goal is drawn quiet: grey. A reached one is green; any other takes its session's tone: grey, yellow or red (#114).
     var ink: Color {
         if proposed { return GoalInk.secondary }
         if case .reached = status { return GoalTone.go.color }
-        return Color(phaseRGB)
-    }
-
-    /// The phase mark shows on goals still being worked, never on proposed or reached ones.
-    var showsPhase: Bool {
-        if proposed { return false }
-        if case .reached = status { return false }
-        return true
+        return tone.ink
     }
 
     /// The ring and the proofs count: coloured by the share of proofs done (Figma thresholds), never by state.
@@ -32,6 +25,16 @@ extension GoalRow {
         if proposed { return "Proposto" }
         if case .reached = status { return "Raggiunto" }
         return phase.label
+    }
+
+    /// What the mouse-over line says: «Setup aspetta te: scegliere come fare i test.» A quiet session has no line.
+    func hoverLine(now: Date) -> String? {
+        let why = reason(now: now)
+        switch tone {
+        case .attention: return "\(title) aspetta te" + (why.map { ": \($0)" } ?? ".")
+        case .problem: return "\(title) ha un problema" + (why.map { ": \($0)" } ?? ".")
+        case .quiet: return nil
+        }
     }
 
     /// The goal text under the title, unless the title already is it.

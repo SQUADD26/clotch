@@ -57,28 +57,19 @@ final class SessionMotorTests: GoalTestCase {
 
     // MARK: colours and words per phase
 
-    func testEachPhaseHasItsOwnColour() {
-        XCTAssertEqual(SessionPhase.lavora.rgb, RGB(48, 209, 88), "green")
-        XCTAssertEqual(SessionPhase.aspettaRoberto.rgb, RGB(255, 159, 10), "orange: needs Roberto")
-        XCTAssertEqual(SessionPhase.aspettaAltro.rgb, RGB(199, 199, 204), "light neutral")
-        XCTAssertEqual(SessionPhase.ferma.rgb, RGB(142, 142, 147), "grey")
-        XCTAssertEqual(SessionPhase.problema.rgb, RGB(255, 69, 58), "red")
-        XCTAssertEqual(Set(SessionPhase.allCases.map { "\($0.rgb)" }).count, 5, "no two phases share a colour")
+    func testToneIsGreyYellowRed() {
+        XCTAssertEqual(SessionPhase.allCases.map(\.tone), [.quiet, .attention, .quiet, .quiet, .problem],
+                       "grey works, waits for something else or stands still; yellow waits for Roberto; red is a problem")
     }
 
     func testStillSessionOnlyRobertoCanMoveIsYellow() {
         let robertoMoves = GoalSources.parseMotor(Data(#"{"stato": "ferma", "muove": "roberto"}"#.utf8), cli: "m")!
         let overseerMoves = GoalSources.parseMotor(Data(#"{"stato": "ferma", "muove": "overseer"}"#.utf8), cli: "m")!
-        XCTAssertEqual(robertoMoves.rgb, RGB(255, 214, 10), "yellow: it waits for him")
-        XCTAssertEqual(overseerMoves.rgb, SessionPhase.ferma.rgb, "grey")
-        XCTAssertEqual(motor("problema").rgb, SessionPhase.problema.rgb, "muove counts for ferma only")
+        XCTAssertEqual(robertoMoves.tone, .attention, "yellow: it waits for him")
+        XCTAssertEqual(overseerMoves.tone, .quiet)
+        XCTAssertEqual(motor("problema").tone, .problem, "muove counts for ferma only")
         let r = GoalBoard.rows(goals: [g("m")], sessions: [s("local_m", cli: "m")], live: [], motor: [robertoMoves], now: now)[0]
-        XCTAssertEqual(r.phaseRGB, RGB(255, 214, 10))
-    }
-
-    func testOnlyWaitingForRobertoPulsesOnlyWorkingAnimates() {
-        XCTAssertEqual(SessionPhase.allCases.filter(\.pulses), [.aspettaRoberto])
-        XCTAssertEqual(SessionPhase.allCases.filter(\.animates), [.lavora])
+        XCTAssertEqual(r.tone, .attention)
     }
 
     func testLabelsAreStatesNotSentences() {
@@ -163,5 +154,22 @@ final class SessionMotorTests: GoalTestCase {
         try Data(#"{"stato": "lavora", "da": "2026-10-21T13:30:00+0000"}"#.utf8).write(to: file)
         try fm.setAttributes([.modificationDate: Date(timeIntervalSinceNow: 5)], ofItemAtPath: file.path)
         XCTAssertEqual(loader.load(changed: [file.path])?.motor.map(\.phase), [.lavora], "a rewrite of the state file ships a new board")
+    }
+
+    // MARK: the session strip's words
+
+    private func row(_ name: String, _ phase: String, why: String = "") -> GoalRow {
+        GoalBoard.rows(goals: [g(name, titolo: name)], sessions: [s("local_\(name)", cli: name)], live: [],
+                       motor: [motor(phase, why: why, cli: name)], now: now)[0]
+    }
+
+    func testSummaryNamesWhatNeedsRoberto() {
+        XCTAssertEqual(GoalBoard.sessionSummary([row("a", "lavora"), row("b", "lavora")]).text, "Tutte al lavoro")
+        XCTAssertEqual(GoalBoard.sessionSummary([row("a", "lavora"), row("b", "aspetta_roberto")]).text, "1 aspetta te")
+        XCTAssertEqual(GoalBoard.sessionSummary([row("a", "aspetta_roberto"), row("b", "aspetta_roberto")]).text, "2 aspettano te")
+        let both = GoalBoard.sessionSummary([row("a", "problema"), row("b", "aspetta_roberto"), row("c", "lavora")])
+        XCTAssertEqual(both.text, "1 problema · 1 aspetta te")
+        XCTAssertEqual(both.tone, .problem, "red beats yellow")
+        XCTAssertEqual(GoalBoard.sessionSummary([row("a", "lavora"), row("b", "ferma")]).text, "1 su 2 al lavoro")
     }
 }

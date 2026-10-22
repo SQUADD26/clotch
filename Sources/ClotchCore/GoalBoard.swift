@@ -101,8 +101,8 @@ extension GoalRow {
         }
     }
 
-    /// The colour of the mark: the engine's, else the phase's.
-    public var phaseRGB: RGB { motor.flatMap { $0.phase == phase ? $0.rgb : nil } ?? phase.rgb }
+    /// The tone of the name: the engine's, else the phase's.
+    public var tone: SessionTone { motor.flatMap { $0.phase == phase ? $0.tone : nil } ?? phase.tone }
 
     /// The timer counts the time in the state; without an engine file it falls back to the goal's own start.
     public var clockStart: Date? { motor?.since ?? since }

@@ -27,29 +27,18 @@ public enum SessionPhase: String, Sendable, CaseIterable {
         }
     }
 
-    /// Only a session that needs Roberto asks for his eye: it breathes until he opens it.
-    public var pulses: Bool { self == .aspettaRoberto }
-
-    /// Only a working session animates.
-    public var animates: Bool { self == .lavora }
-
-    /// Apple's dark-appearance tints, like `GoalTone`: green working, orange for Roberto, light neutral when
-    /// it waits for something else, grey when still, red for a problem. Text-sized uses stay above 4.5:1 on black.
-    public var rgb: RGB {
+    /// How the notch draws it (Figma «Stato delle sessioni»): grey while it works, waits for something else or stands
+    /// still; yellow when it waits for Roberto; red for a problem. No dots: only the name's colour.
+    public var tone: SessionTone {
         switch self {
-        case .lavora: return RGB(48, 209, 88)
-        case .aspettaRoberto: return RGB(255, 159, 10)
-        case .aspettaAltro: return RGB(199, 199, 204)
-        case .ferma: return RGB(142, 142, 147)
-        case .problema: return RGB(255, 69, 58)
+        case .aspettaRoberto: return .attention
+        case .problema: return .problem
+        case .lavora, .aspettaAltro, .ferma: return .quiet
         }
     }
 }
 
-public struct RGB: Equatable, Sendable {
-    public let r: Int, g: Int, b: Int
-    public init(_ r: Int, _ g: Int, _ b: Int) { (self.r, self.g, self.b) = (r, g, b) }
-}
+public enum SessionTone: Sendable { case quiet, attention, problem }
 
 /// One state file: what the session does now, why, and since when.
 public struct SessionMotor: Equatable, Sendable {
@@ -72,8 +61,8 @@ public struct SessionMotor: Equatable, Sendable {
         (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover) = (cli, localId, phase, why, since, what, seen, mover)
     }
 
-    /// The phase colour, except a still session that only Roberto can move: yellow, like the old «still» light.
-    public var rgb: RGB { phase == .ferma && mover == "roberto" ? RGB(255, 214, 10) : phase.rgb }
+    /// The phase's tone, except a still session that only Roberto can move: it waits for him, so yellow.
+    public var tone: SessionTone { phase == .ferma && mover == "roberto" ? .attention : phase.tone }
 }
 
 extension GoalSources {

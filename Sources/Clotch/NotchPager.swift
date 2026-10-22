@@ -14,6 +14,8 @@ struct Pager<Page: View, Footer: View>: View {
     @Binding var index: Int
     /// Who a page is: a page keeps its identity (and what is open on it) when others arrive before it (#36).
     var pageID: (Int) -> String = { String($0) }
+    /// Something over the pages that steps like a swipe (the goals' name strip); nil = nothing.
+    var above: ((_ go: @escaping (Int) -> Void) -> AnyView)? = nil
     @ViewBuilder let page: (Int) -> Page
     /// Gets `go`, so the page buttons step like a swipe.
     @ViewBuilder let footer: (_ go: @escaping (Int) -> Void) -> Footer
@@ -40,6 +42,7 @@ struct Pager<Page: View, Footer: View>: View {
     var body: some View {
         let _ = connect()  // every update: the monitor never works from old values
         VStack(spacing: NotchSpace.section) {
+            if let above { above(go) }
             ZStack(alignment: .top) {
                 if reduceMotion {
                     page(index).id(pageID(index)).transition(.opacity)
