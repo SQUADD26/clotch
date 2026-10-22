@@ -37,18 +37,51 @@ final class OverseerDeliveryTests: XCTestCase {
         XCTAssertTrue(fallbacks.isEmpty)
     }
 
-    func testReaderTakingTheOrderWithinTheGraceIsSent() async throws {
-        try listen()
-        let mod = Task { @MainActor in
+    /// The engine's reader (ingresso_voce.py #2105): takes the file, writes `.esiti/<same name>` with `stato`. nil = takes it and says nothing.
+    private func reader(esito stato: String?) -> Task<Void, Never> {
+        Task { @MainActor in
+            let esiti = self.files.inboxURL.appendingPathComponent(".esiti")
             while !Task.isCancelled {
-                for n in self.inbox() { try? FileManager.default.removeItem(at: self.files.inboxURL.appendingPathComponent(n)) }
+                for n in self.inbox() {
+                    try? FileManager.default.removeItem(at: self.files.inboxURL.appendingPathComponent(n))
+                    guard let stato else { continue }
+                    try? FileManager.default.createDirectory(at: esiti, withIntermediateDirectories: true)
+                    try? Data(#"{"v":1,"id":"x","t":1,"stato":"\#(stato)","perche":""}"#.utf8).write(to: esiti.appendingPathComponent(n))
+                }
                 try? await Task.sleep(nanoseconds: 50_000_000)
             }
         }
-        defer { mod.cancel() }
+    }
+
+    func testReaderDeliveringTheOrderIsSent() async throws {
+        try listen()
+        let mod = reader(esito: "consegnato"); defer { mod.cancel() }
         let outcome = await OverseerDelivery.send("chiudi le sessioni", files: files, grace: 5)
         XCTAssertEqual(outcome, .sent)
         XCTAssertTrue(fallbacks.isEmpty)
+    }
+
+    /// #262: «sparito dalla cartella» is only «taken»; the true outcome is `.esiti`.
+    func testFileGoneWithNonConsegnatoIsNotSent() async throws {
+        try listen()
+        let mod = reader(esito: "non_consegnato"); defer { mod.cancel() }
+        let outcome = await OverseerDelivery.send("chiudi le sessioni", files: files, grace: 2)
+        XCTAssertNotEqual(outcome, .sent, "the engine said non_consegnato")
+        XCTAssertEqual(fallbacks, ["chiudi le sessioni"], "the text stays on the clipboard")
+    }
+
+    func testFileGoneWithNoEsitoIsNotSent() async throws {
+        try listen()
+        let mod = reader(esito: nil); defer { mod.cancel() }
+        let outcome = await OverseerDelivery.send("chiudi le sessioni", files: files, grace: 0.6)
+        XCTAssertNotEqual(outcome, .sent, "no proof of delivery")
+    }
+
+    func testStuckInConsegnaIsNotSentWhenTheGraceEnds() async throws {
+        try listen()
+        let mod = reader(esito: "in_consegna"); defer { mod.cancel() }
+        let outcome = await OverseerDelivery.send("chiudi le sessioni", files: files, grace: 0.6)
+        XCTAssertNotEqual(outcome, .sent)
     }
 
     func testNoReaderFallsBack() async {

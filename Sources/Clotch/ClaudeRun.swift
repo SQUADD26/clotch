@@ -5,13 +5,15 @@ import ClotchCore
 /// Every `claude -p` Clotch starts (#159): with the CLAUDE_CONFIG_DIR of an account that has a login (`ClaudeLogin`),
 /// stderr and exit status in the log, and a failure that says why instead of a silent nil.
 enum ClaudeRun {
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "ClaudeRun")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "ClaudeRun")
     private static let lock = NSLock()
     nonisolated(unsafe) private static var chosen: (folder: String, at: Date)?
     /// A pick is kept this long; a login failure drops it at once.
     static let keep: TimeInterval = 600
 
     static func run(_ arguments: [String], input: String, timeout: TimeInterval, directory: URL? = nil) async -> Result<String, ClaudeLogin.Failure> {
+        // A test never starts the real `claude -p`: the voice helper behind it can send real orders to the sessions (#270). Hand in a fake launcher.
+        if RuntimeEnvironment.isRunningTests { return failed(.failed, "refused under xctest: a test reached the real claude launcher (#270)") }
         let ranked = await MainActor.run { AccountQuotaFeed.shared.accounts.map(\.email) }
         return await Task.detached { () -> Result<String, ClaudeLogin.Failure> in
             guard let bin = VoiceSpeaker.claudeBinary() else { return failed(.noBinary, "no claude binary") }

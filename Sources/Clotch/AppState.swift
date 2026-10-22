@@ -5,7 +5,7 @@ import SQLite3
 import CryptoKit
 import ClotchCore
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "AppState")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "AppState")
 
 /// FSEventStream context target. Callbacks hold an unretained pointer to this
 /// box (not `AppState`), and reach the owner only through `weak`, so queued

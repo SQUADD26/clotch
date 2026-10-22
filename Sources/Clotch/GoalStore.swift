@@ -226,29 +226,12 @@ private final class GoalWatcher: @unchecked Sendable {
         guard self[keyPath: busy].insert(id).inserted else { return }
         self[keyPath: failed].remove(id)
         Task.detached {
-            let ok = Self.python(args)
+            let ok = (try? EngineCommand.python(args).get()) != nil
             await MainActor.run {
                 self[keyPath: busy].remove(id)
                 if !ok { self[keyPath: failed].insert(id) }
             }
         }
-    }
-
-    private nonisolated static func python(_ args: [String]) -> Bool {
-        guard let py = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
-            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return false }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: py)
-        process.arguments = args
-        var env = ProcessInfo.processInfo.environment
-        env["CLAUDE_CODE_SESSION_ID"] = nil  // Roberto, not a master: with it the command refuses (exit 3)
-        process.environment = env
-        process.standardInput = FileHandle.nullDevice  // a mode obiettivo-guard.py does not know yet reads stdin as a hook
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        guard (try? process.run()) != nil else { return false }
-        process.waitUntilExit()
-        return process.terminationStatus == 0
     }
 
     func takenAnimationShown(_ id: String) {
