@@ -41,6 +41,7 @@ Real time: one FSEvents stream with file-level events, batched by FSEvents to on
 - `Clotch.app/Contents/MacOS/Clotch --snapshot <dir> [--gallery]` renders the real notch from the live data to PNG and quits: closed, open, and with `--gallery` three frames of each notification today's data can produce (`GoalSnapshot.swift`). ImageRenderer cannot sample a backdrop, so the glass shows as its stand-in there; the real glass shows only in the running app.
 - `scripts/installa.sh` builds and installs into `/Applications/Clotch.app`, only from a branch that contains `origin/dev` (#174: a build from `main` once removed a fix in dev), and writes the commit to `~/Library/Application Support/Clotch/installata.txt`.
 - Live tests open and close the dictation with the distributed notification `com.squadd.clotch.dettatura` (same as ⌥V, no Accessibility asked of the sender, #239): `osascript -l JavaScript -e 'ObjC.import("Foundation"); $.NSDistributedNotificationCenter.defaultCenter.postNotificationNameObjectUserInfoDeliverImmediately("com.squadd.clotch.dettatura", $(), $(), true)'`.
+- Live test of the outgoing voice: post `com.squadd.clotch.prova-voce` the same way; Clotch says «Ciao, questa è una prova della voce.» with ElevenLabs (language `it`) and logs `voice request: voice …, model …, language it` (category `Voice`). A spoken answer shows no text in the notch (#247), unless «risposte a voce» is off.
 - Linux sandboxes cannot build the app. They can run the goal logic tests: `bash scripts/test-goals-linux.sh`.
 
 ## Domains, ports, machines
