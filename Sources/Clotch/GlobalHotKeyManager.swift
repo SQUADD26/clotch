@@ -72,6 +72,7 @@ final class GlobalHotKeyManager {
             Self.log.warning("RegisterEventHotKey failed (status \(status)) for keyCode \(keyCode)")
             return nil
         }
+        Self.log.notice("hotkey \(id) registered: keyCode \(keyCode) mods \(modifiers.rawValue)")
         entries[id] = Entry(ref: ref, handler: handler, onRelease: onRelease)
         return id
     }
@@ -95,6 +96,7 @@ final class GlobalHotKeyManager {
 
     /// Dispatch a fired hotkey to its handler. Called from the C trampoline.
     fileprivate func handle(id: UInt32, released: Bool) {
+        Self.log.notice("hotkey \(id) \(released ? "released" : "pressed")")
         if released { entries[id]?.onRelease?() } else { entries[id]?.handler() }
     }
 

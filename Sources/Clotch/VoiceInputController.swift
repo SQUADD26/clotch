@@ -1,5 +1,6 @@
 import AVFoundation
 import SwiftUI
+import os.log
 import ClotchCore
 
 /// Voice in (#110): one shortcut, press to speak, press again to finish. Microphone → Scribe v2 Realtime or Parakeet on the Mac
@@ -9,6 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
+    nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and fast on an error, none otherwise.
@@ -79,6 +81,7 @@ final class VoiceInputController: ObservableObject {
     /// (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
     func press() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        Self.log.notice("press: enabled \(current.enabled) phase \(String(describing: self.phase)) mic \(AVCaptureDevice.authorizationStatus(for: .audio).rawValue)")
         guard current.enabled else { return }
         switch phase {
         case .idle, .result, .failure:

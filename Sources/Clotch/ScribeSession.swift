@@ -1,9 +1,11 @@
 import Foundation
+import os.log
 import ClotchCore
 
 /// One utterance on ElevenLabs Scribe v2 Realtime (#110): the socket, the key in the `xi-api-key` header only (never in the URL),
 /// audio chunks in, partial and committed text out (`VoiceInput.scribeEvent`). The wire format and its tests live in the Core.
 final class ScribeSession: @unchecked Sendable {
+    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Scribe")
     private var task: URLSessionWebSocketTask?
     private var closed = false
     /// Called on a background thread: the owner hops to the main actor.
@@ -21,7 +23,7 @@ final class ScribeSession: @unchecked Sendable {
     /// Sends are queued by the task, so the order of the calls is the order on the wire.
     func send(_ pcm: Data, commit: Bool = false) {
         task?.send(.string(VoiceInput.scribeChunk(pcm: pcm, commit: commit))) { [weak self] error in
-            if error != nil { self?.fail() }
+            if let error { Self.log.notice("scribe send failed: \(error.localizedDescription, privacy: .public)"); self?.fail() }
         }
     }
 
@@ -39,9 +41,13 @@ final class ScribeSession: @unchecked Sendable {
             guard let self, !closed else { return }
             switch result {
             case .success(let message):
-                if case .string(let text) = message { onEvent?(VoiceInput.scribeEvent(text)) }
+                if case .string(let text) = message {
+                    let event = VoiceInput.scribeEvent(text)
+                    if case .failure = event { Self.log.notice("scribe error message: \(text.prefix(200), privacy: .public)") }
+                    onEvent?(event)
+                }
                 receive(t)
-            case .failure: fail()
+            case .failure(let error): Self.log.notice("scribe receive failed: \(error.localizedDescription, privacy: .public) http \((t.response as? HTTPURLResponse)?.statusCode ?? -1)"); fail()
             }
         }
     }
