@@ -4,6 +4,12 @@ import ClotchCore
 
 /// The error pills of #110 (Figma note 5 and 6), their buttons, and Esc for the length of a dictation.
 extension VoiceInputController {
+    /// The phase without the answer's text: a result's words stay out of the log.
+    static func label(_ phase: Phase) -> String {
+        if case .result = phase { return "result" }
+        return String(describing: phase)
+    }
+
     /// A line on the pill for a while, then the pill folds away.
     func show(_ message: String, seconds: Double = 3) { end(.result(message), seconds: seconds) }
 
