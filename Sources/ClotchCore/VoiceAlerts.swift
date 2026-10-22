@@ -27,6 +27,7 @@ public struct VoiceAlertEngine {
     public mutating func offer(_ e: VoiceEvent, config: VoiceTurn.Config, sessions: [DesktopSession], now: Date) -> String? {
         if !config.speaks(e, sessions: sessions) { return "fuori da «Parla per»" }
         if now.timeIntervalSince(e.at) > Self.maxAge { return "vecchio" }
+        if e.nothingToDo { return "niente da fare per Roberto" }
         seen = seen.filter { now.timeIntervalSince($0.value.at) < Self.sameSubject }
         let key = Self.key(e)
         // #205: a session's question is said once while it stays the same: its memory never expires (`distantFuture`);
