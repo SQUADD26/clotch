@@ -141,6 +141,22 @@ public enum VoiceInput {
         }
     }
 
+    /// Recording longer than this with no words, or a level that never moved, is not Roberto's silence: the microphone gave nothing (#269).
+    public static let heardAfter: TimeInterval = 2
+
+    /// «Non ho sentito niente» (#269): `seconds` of recording, the words that came out and the loudest level the meter saw (0…1).
+    /// A quick tap stays a choice not to speak (#147); 16 s of nothing is a deaf microphone.
+    public static func heardNothing(seconds: TimeInterval, words: Int, peak: Double) -> Bool {
+        seconds > heardAfter && (words == 0 || peak == 0)
+    }
+
+    /// A spare microphone made at `madeAt` is bound to the audio setup of that moment: after a change (`changedAt`) or past
+    /// `spareMaxAge` it is made again (#269).
+    public static let spareMaxAge: TimeInterval = 300
+    public static func spareIsStale(madeAt: Date, changedAt: Date, now: Date) -> Bool {
+        changedAt > madeAt || now.timeIntervalSince(madeAt) > spareMaxAge
+    }
+
     /// Why a dictation stopped, as the pill says it (Figma #110, note 5 and 6): what happened, why, and what Roberto can do.
     /// Never a code or a raw message.
     public enum Failure: Equatable, Sendable {
@@ -149,6 +165,8 @@ public enum VoiceInput {
         case off, shortcut
         /// `~/.config/voce/non-disturbare` exists (clotch#266): no microphone, nothing to dictate.
         case doNotDisturb
+        /// A dictation of more than `heardAfter` s with no words or no level at all (#269): never a bar that closes mute.
+        case nothingHeard
 
         public var title: String {
             switch self {
@@ -160,6 +178,7 @@ public enum VoiceInput {
             case .off: return "Dettatura spenta"
             case .shortcut: return "Scorciatoia non disponibile"
             case .doNotDisturb: return "Non disturbare acceso"
+            case .nothingHeard: return "Non ho sentito niente"
             }
         }
 
@@ -173,6 +192,7 @@ public enum VoiceInput {
             case .off: return "Accendila nelle impostazioni per dettare."
             case .shortcut: return "Un altro programma usa questo tasto. Scegline un altro nelle impostazioni."
             case .doNotDisturb: return "Spegnilo con non-disturbare off, poi riprova."
+            case .nothingHeard: return "Il microfono non mi ha dato voce. Riprova, o scegli un altro microfono."
             }
         }
 
@@ -185,6 +205,7 @@ public enum VoiceInput {
             case .network: return [.retry, .useLocal]
             case .local, .doNotDisturb: return [.retry]
             case .off, .shortcut: return [.openDictation]
+            case .nothingHeard: return [.retry, .openDictation]
             }
         }
     }

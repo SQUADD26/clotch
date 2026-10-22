@@ -15,6 +15,22 @@ class VoiceCapture: @unchecked Sendable {
     /// Unique id of the input device chosen in «Dettatura»; "" = the system's. A device that is gone falls back to the system's.
     let microphone: String
     private var prepared = false
+    /// When this one was made: the spare is bound to the audio setup of that moment (#269).
+    let madeAt = Date()
+    /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A spare made before it hears nothing.
+    nonisolated(unsafe) private(set) static var audioChangedAt = Date.distantPast
+    static let audioChanged = Notification.Name("ClotchAudioChanged")
+    private static let watching: Void = {
+        for selector in [kAudioHardwarePropertyDefaultInputDevice, kAudioHardwarePropertyDefaultOutputDevice, kAudioHardwarePropertyDevices] {
+            var address = AudioObjectPropertyAddress(mSelector: selector, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+            AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, .main) { _, _ in
+                VoiceCapture.audioChangedAt = Date()
+                NotificationCenter.default.post(name: VoiceCapture.audioChanged, object: nil)
+            }
+        }
+    }()
+    /// Starts listening to the system's audio changes (once, whoever asks).
+    static func watchAudioChanges() { _ = watching }
 
     init(microphone: String = "") { self.microphone = microphone }
 

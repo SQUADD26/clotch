@@ -75,6 +75,9 @@ final class VoiceInputController: ObservableObject {
     var finishLocal: (() async -> String)?
     var localWait = VoiceInput.commitWait
     private var audioSeconds = 0.0
+    /// Seconds from the microphone on to the second press, and the loudest level the meter saw: «Non ho sentito niente» (#269).
+    var listened = 0.0
+    var peak = 0.0
     var scribe: ScribeSession?
     private var feed: AsyncStream<AVAudioPCMBuffer>.Continuation?
     var feeding: Task<Void, Never>?
@@ -98,9 +101,23 @@ final class VoiceInputController: ObservableObject {
     func prewarm() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         if current.enabled, current.engine == .local { Task { [local] in try? await local.preload() } }
-        guard current.enabled, spare?.microphone != current.microphone else { return }
+        guard current.enabled else { return }
+        if !watchingAudio {  // #269: a change of the audio setup makes the spare again, not only the next press
+            watchingAudio = true
+            VoiceCapture.watchAudioChanges()
+            NotificationCenter.default.addObserver(forName: VoiceCapture.audioChanged, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { if let self, !self.micOpen { self.prewarm() } }
+            }
+        }
+        guard freshSpare?.microphone != current.microphone else { return }
         spare = makeCapture(current.microphone)
         spare?.prepare()
+    }
+
+    private var watchingAudio = false
+    /// The spare, unless the audio setup changed since it was made: then it is bound to the old one and hears nothing (#269).
+    private var freshSpare: VoiceCapture? {
+        spare.flatMap { VoiceInput.spareIsStale(madeAt: $0.madeAt, changedAt: VoiceCapture.audioChangedAt, now: Date()) ? nil : $0 }
     }
 
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
@@ -152,7 +169,8 @@ final class VoiceInputController: ObservableObject {
         if config.engine == .scribe, key == nil { return show(failure: .key) }
         phase = .ready
         armEscape()
-        let capture = spare?.microphone == config.microphone ? spare! : makeCapture(config.microphone)
+        let ready = freshSpare
+        let capture = ready?.microphone == config.microphone ? ready! : makeCapture(config.microphone)
         spare = nil
         guard await capture.authorized() else { return show(failure: .mic) }
         guard me == run, phase == .ready else { return }  // pressed again while macOS asked: finished or aborted already
@@ -197,6 +215,7 @@ final class VoiceInputController: ObservableObject {
 
     private func push(_ level: Double) {
         guard phase == .listening else { return }
+        peak = max(peak, level)
         levels = Array(levels.dropFirst()) + [level]
     }
 
@@ -214,6 +233,7 @@ final class VoiceInputController: ObservableObject {
         levels = [Double](repeating: 0, count: levels.count)
         phase = .finishing
         let stopped = Date()
+        listened = stopped.timeIntervalSince(startedAt)
         Task {
             try? await Task.sleep(nanoseconds: UInt64(VoiceInput.tailSeconds * 1e9))
             guard me == run else { return }
@@ -229,6 +249,8 @@ final class VoiceInputController: ObservableObject {
 
     func route(_ said: String, run me: Int) async {
         let said = said.trimmingCharacters(in: .whitespacesAndNewlines)
+        // #269: a long recording with no words or no level is a deaf microphone, not a choice: the bar says so instead of closing mute
+        if VoiceInput.heardNothing(seconds: listened, words: said.split(separator: " ").count, peak: peak) { return fail(.nothingHeard, run: me) }
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
@@ -290,8 +312,13 @@ final class VoiceInputController: ObservableObject {
     /// The answer is said and its text is not shown (#247: Roberto does not want the words in the notch). Voice off: the text is the only way.
     private func answered(_ answer: String) {
         guard config.spoken else { return show(answer, seconds: max(6, Double(answer.count) * 0.07)) }
-        Task { [speak] in await speak(answer) }
-        abort()
+        // #271: «Penso…» stays until the voice is heard (or the speaking ends with no sound at all), not a bar that folds before it
+        let me = run
+        VoiceSpeaker.shared.onPlay = { [weak self] in if let self, me == self.run { self.abort() } }
+        Task { [speak] in
+            await speak(answer)
+            if me == run { abort() }
+        }
     }
 
     private func abort() {
@@ -322,6 +349,7 @@ final class VoiceInputController: ObservableObject {
         scribeCommitted = false
         (sure, maybe) = ("", "")
         hint = nil
+        (listened, peak) = (0, 0)
         levels = [Double](repeating: 0, count: levels.count)
     }
 
