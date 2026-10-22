@@ -181,8 +181,8 @@ struct SettingsDefaults {
     static let notchOpenMs = NotchTiming.defaultOpenMs
     static let notchCloseMs = NotchTiming.defaultCloseMs
     static let autoCollapseAfterSessionJump = false
-    static let autoExpandOnPermission = true
-    static let autoExpandOnCompletion = true
+    static let autoExpandOnPermission = false
+    static let autoExpandOnCompletion = false
     static let pluginSessionMode = "separate"
     static let trackClaudeDesktopCowork = true
     static let hapticOnHover = false
@@ -190,7 +190,7 @@ struct SettingsDefaults {
     static let hoverExpandDelay = NotchHoverInteraction.expandDelay
     static let hoverCollapseDelay = NotchHoverInteraction.collapseDelay
     static let showProjectName = true
-    static let autoExpandOnQuestion = true
+    static let autoExpandOnQuestion = false
     static let sessionTimeout = 30
 
     static let maxPanelHeight = 560
