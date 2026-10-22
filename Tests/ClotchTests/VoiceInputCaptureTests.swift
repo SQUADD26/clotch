@@ -61,6 +61,19 @@ final class VoiceInputCaptureTests: XCTestCase {
         c.cancel()
     }
 
+    /// #304: no microphone is opened while Roberto does not dictate (AirPods would switch to call mode): not at launch,
+    /// not after an utterance, not after an audio change. Only the press makes one.
+    func testNoMicrophoneOutsideDictation() async throws {
+        let c = VoiceInputController(files: VoiceFiles(home: home))
+        var made = 0
+        c.makeCapture = { made += 1; return VoiceCapture(microphone: $0) }
+        c.prewarm()
+        NotificationCenter.default.post(name: VoiceCapture.audioChanged, object: nil)
+        c.press()
+        c.cancel()
+        XCTAssertEqual(made, 0, "a microphone was made outside a press")
+    }
+
     // MARK: - Presses
 
     func testDoublePressBeforeTheMicrophoneEndsQuietly() async throws {
