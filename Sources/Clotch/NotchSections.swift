@@ -86,7 +86,7 @@ struct NotchSectionsContent: View {
 
     var body: some View {
         VStack(spacing: NotchSpace.section) {
-            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, dotted: store.hasNewAnswer ? .requests : nil)
+            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, badge: store.newAnswerCount > 0 ? (.requests, store.newAnswerCount) : nil)
             ZStack(alignment: .top) {
                 Group {
                     switch shown {
@@ -145,8 +145,8 @@ enum TabBarPointer {
 struct TabBar: View {
     @Binding var tab: NotchTab
     var tabs = NotchTab.allCases
-    /// The tab with a small yellow dot (a new answer, #90); never the open one.
-    var dotted: NotchTab? = nil
+    /// The tab with a yellow number, no box (new answers, #90, #114); never the open one.
+    var badge: (tab: NotchTab, count: Int)? = nil
     /// The AFK moon's state for `--snapshot`; nil = live.
     var afkOn: Bool? = nil
     @Namespace private var highlight
@@ -160,8 +160,11 @@ struct TabBar: View {
                     HStack(spacing: 6) {
                         Image(systemName: item.symbol)
                         Text(item.title)
-                        if item == dotted && item != tab {
-                            Circle().fill(GoalTone.wait.color).frame(width: 6, height: 6).accessibilityLabel("Nuova risposta")
+                        if let badge, badge.tab == item, item != tab {
+                            Text("\(badge.count)")
+                                .font(.system(size: FigmaToken.MacOS27GoldenGate.notchTesto11, weight: .semibold))
+                                .foregroundStyle(FigmaToken.MacOS27GoldenGate.notchGiallo)
+                                .accessibilityLabel(badge.count == 1 ? "1 nuova risposta" : "\(badge.count) nuove risposte")
                         }
                     }
                     .font(item == tab ? NotchType.tab : NotchType.tabOff)
