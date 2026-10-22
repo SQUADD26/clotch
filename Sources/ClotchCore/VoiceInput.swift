@@ -106,7 +106,8 @@ public enum VoiceInput {
     /// the Overseer read the right word. Whole words only, so «game over» or «lover» stay as they are.
     static let names: [(pattern: String, name: String)] = [
         (#"(?i)\b(?:(all|dell|nell)'?\s?)?o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?\b"#, "Overseer"),
-        (#"(?i)\bclo(?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
+        (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
+        (#"(?i)\bap(?:i|ri)[\s-]+master\b"#, "apri-master"),  // «API Master», «apri master» (#271)
     ]
 
     public static func fixNames(_ text: String) -> String {
