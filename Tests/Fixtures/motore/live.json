@@ -1,23 +1,23 @@
 {
  "agenti": {
   "a1": {
-   "partito": "2026-10-21T19:13:45",
+   "partito": "2026-10-22T07:36:43",
    "stato": "vivo",
    "tipo": "worker",
    "ultimo_tool": {
     "cosa": "ls",
     "nome": "Bash",
-    "quando": "2026-10-21T19:13:45"
+    "quando": "2026-10-22T07:36:43"
    }
   },
   "a2": {
-   "finito": "2026-10-21T19:13:45",
-   "partito": "2026-10-21T19:13:45",
+   "finito": "2026-10-22T07:36:43",
+   "partito": "2026-10-22T07:36:43",
    "stato": "finito",
    "tipo": "worker"
   }
  },
- "aggiornato": "2026-10-21T19:13:45",
+ "aggiornato": "2026-10-22T07:36:43",
  "github": {},
  "sid": "cli-9",
  "transcript": "/t/cli-9.jsonl"
