@@ -41,7 +41,7 @@ final class PilotVoicePathsTests: XCTestCase {
         let (c, d, files) = try await rig("locale", .real, say: question)
         let now = Date()
         VoiceAsk.sessions = { [VoiceRoute.sessionLine(title: "Clotch, voce", status: .processing, lastActivity: now),
-                               VoiceRoute.sessionLine(title: "Overseer", status: .idle, lastActivity: now.addingTimeInterval(-600)),
+                               VoiceRoute.sessionLine(title: "Friday", status: .idle, lastActivity: now.addingTimeInterval(-600)),
                                VoiceRoute.sessionLine(title: "Squadd CRM", status: .waitingQuestion, lastActivity: now.addingTimeInterval(-120))] }
         defer { VoiceAsk.sessions = { [] } }
         var spoken = false

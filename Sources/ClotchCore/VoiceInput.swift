@@ -108,7 +108,7 @@ public enum VoiceInput {
     /// The system's names, as the engines mishear them in Italian (#242: «Allover Saird», «Oversayer», «Cloche»): the helper and
     /// the Overseer read the right word. Whole words only, so «game over» or «lover» stay as they are.
     static let names: [(pattern: String, name: String)] = [
-        (#"(?i)\b(?:(all|dell|nell)'?\s?)?o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?\b"#, "Overseer"),
+        (#"(?i)\b(?:(all|dell|nell)'?\s?)?(?:o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?|fr[ae]?i?d[ae]i?[iy]?)\b"#, "Friday"),
         (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
         (#"(?i)\bap(?:i|ri)[\s-]+master\b"#, "apri-master"),  // «API Master», «apri master» (#271)
     ]
@@ -120,7 +120,7 @@ public enum VoiceInput {
             // From the end, so the ranges still to replace keep their place.
             for m in re.matches(in: t, range: NSRange(t.startIndex..., in: t)).reversed() {
                 guard let whole = Range(m.range, in: out) else { continue }
-                var prep = (m.numberOfRanges > 1 ? Range(m.range(at: 1), in: out) : nil).map { out[$0].lowercased() + "'" } ?? ""
+                var prep = (m.numberOfRanges > 1 ? Range(m.range(at: 1), in: out) : nil).map { ["all": "a ", "dell": "di ", "nell": "in "][out[$0].lowercased()] ?? "" } ?? ""
                 if whole.lowerBound == out.startIndex { prep = prep.prefix(1).uppercased() + prep.dropFirst() }
                 out.replaceSubrange(whole, with: prep + n.name)
             }

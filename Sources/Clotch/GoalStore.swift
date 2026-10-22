@@ -126,7 +126,7 @@ private final class GoalWatcher: @unchecked Sendable {
     static let shared = GoalStore()
 
     @Published private(set) var rows: [GoalRow] = []
-    /// Newest first; empty until the Overseer writes ~/.claude/richieste.
+    /// Newest first; empty until the Friday writes ~/.claude/richieste.
     @Published private(set) var requests: [UserRequest] = []
     /// Requests that just went nuova -> presa/fatta, oldest first. The view plays «presa in carico» once
     /// for each, then calls `takenAnimationShown(id)`; a shown id never comes back while the app runs.

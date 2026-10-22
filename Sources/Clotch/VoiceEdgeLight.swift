@@ -1,7 +1,7 @@
 import SwiftUI
 import ClotchCore
 
-// Issue #15 (first cut #10): the light on the notch's outline while the Overseer speaks, in the style of Apple Intelligence's
+// Issue #15 (first cut #10): the light on the notch's outline while the Friday speaks, in the style of Apple Intelligence's
 // edge glow. Apple Intelligence's colours flow along the outline at one steady pace: a sharp line and two soft halos. The motion
 // is the flow of the colours. The voice only drifts the halos within a narrow, high band (`VoiceStatus.intensity(at:)`, #29),
 // so the light never pulses. Long fades in and out. Zero cost when silent: nothing is in the tree and no timeline runs.

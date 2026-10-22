@@ -28,7 +28,7 @@ public enum VoiceJudge {
     }
 
     /// The three blocks. (a) requests of the same session, taken by it, naming the same #N or sharing two long words with
-    /// the subject: at most 5, the newest. (b) the session's goal. shortcut: no Overseer queue nor gh state, as the Mac
+    /// the subject: at most 5, the newest. (b) the session's goal. shortcut: no Friday queue nor gh state, as the Mac
     /// app does not read them; add them if the judge says no too often.
     public static func state(_ e: VoiceEvent, requests: [UserRequest], goals: [GoalRecord]) -> [String: String] {
         let numbers = Set(matches(#"#(\d{2,5})"#, in: "\(e.text) \(e.subject)"))

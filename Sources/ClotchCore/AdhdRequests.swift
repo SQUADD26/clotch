@@ -10,7 +10,7 @@ public struct AdhdRequest: Identifiable, Equatable, Sendable {
     public let answer: String        // "" while there is none
     public let responsible: String
     public let origin: String
-    public let toSort: Bool          // `da_smistare`: no session to ask yet, the Overseer sorts it
+    public let toSort: Bool          // `da_smistare`: no session to ask yet, the Friday sorts it
     public var nudged: Bool          // `stato` "sollecitata"
     // The rest of the engine's contract (#166): who answered and which session owes the answer.
     public var answeredBy: String = ""   // `risposta_da`: sessione | ereditata | haiku
@@ -30,7 +30,7 @@ public struct AdhdRequest: Identifiable, Equatable, Sendable {
 
     /// The yellow line under an unanswered question.
     public var waitingLabel: String {
-        nudged ? "Sollecitata · aspetto la risposta" : toSort ? "Da smistare · Overseer" : "In attesa di \([responsible, origin].first { !$0.isEmpty } ?? "una sessione")"
+        nudged ? "Sollecitata · aspetto la risposta" : toSort ? "Da smistare · Friday" : "In attesa di \([responsible, origin].first { !$0.isEmpty }?.asFriday ?? "una sessione")"
     }
 
     /// The number in the tab: the questions still without an answer.

@@ -46,7 +46,7 @@ enum NotePhase: Int, CaseIterable, Comparable {
         stepsChanged()
     }
 
-    /// The Overseer heartbeat's steps (#184); VoiceStore's ~/.config stream calls it when the file changes.
+    /// The Friday heartbeat's steps (#184); VoiceStore's ~/.config stream calls it when the file changes.
     func stepsChanged() {
         guard let steps = (try? Data(contentsOf: Self.stepsFile)).flatMap(HeartbeatSteps.parse) else { return }
         defer { lastSteps = steps }

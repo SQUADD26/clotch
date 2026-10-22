@@ -203,13 +203,13 @@ public enum VoiceTurn {
     /// English words of the engine, said the Italian way (#299). Above the config's base list (its «òuversir» came out French),
     /// below Roberto's own `pronuncia.json`.
     public static let builtInPronunciation: [String: String] = [
-        "Overseer": "ouver sìr", "handoff": "hènd off", "worktree": "uòrk trì", "branch": "brànc", "issue": "ìsciu",
+        "Friday": "fràidei", "handoff": "hènd off", "worktree": "uòrk trì", "branch": "brànc", "issue": "ìsciu",
         "pull request": "pul richièst", "pipeline": "pàiplain", "webhook": "uèb huk", "backend": "bèk end", "frontend": "frònt end",
         "staging": "stèigin", "rebase": "ribèis", "push": "pusc", "build": "bild", "token": "tòuken",
     ]
 
     /// The voice's name: ONE place (#299), Roberto will pick another.
-    public static let voiceName = "Overseer"
+    public static let voiceName = "Friday"
 
     /// Who speaks (#299): Roberto's right hand, not a loudspeaker for the sessions' sentences.
     static let role = "Sei \(voiceName), il braccio destro di Roberto: tieni in mano tutti i lavori e parli a lui in prima persona («ho sbloccato…», «mi serve un tuo sì su…»). Non leggi le frasi delle sessioni: le riassumi, decidi da solo ciò che puoi e gli porti solo le scelte sue, sempre col nome del lavoro. Dici solo ciò che serve a Roberto, in parole semplici: niente numeri di PR o di issue, sha, percorsi. Le parole tecniche vanno bene, se servono. Se non cambia niente per lui, taci. Una frase è una frase: mai una domanda a cui rispondi tu."

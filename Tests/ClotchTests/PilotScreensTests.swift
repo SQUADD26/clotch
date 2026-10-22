@@ -265,7 +265,7 @@ final class PilotScreensTests: XCTestCase {
         battito(real, dir)
     }
 
-    /// L'unica fonte di notifiche sotto il notch che si legge da un file: i passi fermi del battito dell'Overseer (#184).
+    /// L'unica fonte di notifiche sotto il notch che si legge da un file: i passi fermi del battito di Friday (#184).
     private func battito(_ real: URL, _ dir: URL) {
         add("\nNotifiche sotto il notch dal battito (passi.json vero, come a un avvio):")
         let steps = (try? Data(contentsOf: real.appendingPathComponent(".config/coda-overseer/battito/passi.json"))).flatMap(HeartbeatSteps.parse) ?? [:]
