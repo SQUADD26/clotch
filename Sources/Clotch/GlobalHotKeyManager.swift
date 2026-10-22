@@ -69,10 +69,11 @@ final class GlobalHotKeyManager {
             &ref
         )
         guard status == noErr, let ref else {
-            Self.log.warning("RegisterEventHotKey failed (status \(status)) for keyCode \(keyCode)")
+            Self.log.error("RegisterEventHotKey failed (status \(status)) for keyCode \(keyCode)")
             return nil
         }
         entries[id] = Entry(ref: ref, handler: handler, onRelease: onRelease)
+        Self.log.notice("RegisterEventHotKey ok: id \(id) keyCode \(keyCode) mods \(modifiers.rawValue)")
         return id
     }
 
