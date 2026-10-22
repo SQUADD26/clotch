@@ -58,9 +58,11 @@ class VoiceCapture: @unchecked Sendable {
 
     func start() throws {
         prepare()
-        guard engine.inputNode.outputFormat(forBus: 0).sampleRate > 0 else { throw CocoaError(.featureUnsupported) }
-        // nil = the device's format now: a device switched since `prepare` never trips the tap's format check.
-        engine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] buffer, _ in self?.convert(buffer) }
+        // The device's own format, read now: after `prepare` the node's output format can follow the speakers (96 kHz against a
+        // 48 kHz microphone), and a tap that does not match the hardware throws and leaves the bar stuck (#174).
+        let format = engine.inputNode.inputFormat(forBus: 0)
+        guard format.sampleRate > 0 else { throw CocoaError(.featureUnsupported) }
+        engine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in self?.convert(buffer) }
         try engine.start()
     }
 
