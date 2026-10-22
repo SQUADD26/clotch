@@ -75,6 +75,7 @@ public struct SessionMotor: Equatable, Sendable {
 
     /// The engine's own rule (`stato_sessione.py`, MORTO_S): a «lavora» with no sign of life for 30 min is dead, so it reads
     /// «ferma» (only Roberto can move it) even before the engine's heartbeat rewrites the file.
+    /// `GoalBoard.rows` skips it when the app sees the session running: a live app beats a stale engine state (#206).
     public func aged(at now: Date) -> SessionMotor {
         guard phase == .lavora, let seen, now.timeIntervalSince(seen) > GoalBoard.stillAfter else { return self }
         return SessionMotor(cli: cli, localId: localId, phase: .ferma, why: why, since: since, what: what, seen: seen, mover: "roberto", questions: questions, errors: errors)
@@ -95,4 +96,10 @@ extension GoalSources {
                             questions: (d["domande"] as? [String] ?? []).map { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }.filter { !$0.isEmpty },
                             errors: d["errori"] as? Int ?? 0)
     }
+}
+
+extension GoalRow {
+    /// Sessions at work, from the one state `phase`: the closed notch's count and the row's «N sessioni al lavoro» both read this.
+    /// A working goal counts at least its master, even when the app leaves `isRunning` out (#49, #206).
+    public var workingSessions: Int { phase == .lavora ? max(1, pulses.filter(\.running).count) : 0 }
 }

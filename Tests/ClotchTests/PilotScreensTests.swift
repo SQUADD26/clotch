@@ -167,7 +167,7 @@ final class PilotScreensTests: XCTestCase {
             VStack(alignment: .leading, spacing: 18) { ForEach(Array(pages.enumerated()), id: \.element.id) { GoalPage(row: $0.element, position: $0.offset + 1, of: pages.count, now: store.now) } }
         }, "obiettivi-tutte-le-pagine", dir, "le \(pages.count) pagine una sotto l'altra")
         add("\nObiettivi: \(rows.count) righe vive, \(pages.count) pagine nel notch aperto; in primo piano: «\(rows.hero?.title ?? "nessuno")»")
-        add("Sessioni al lavoro contate dal notch chiuso: \(rows.allPulses.filter(\.running).count)")
+        add("Sessioni al lavoro contate dal notch chiuso: \(rows.reduce(0) { $0 + $1.workingSessions })")
         for (i, r) in pages.enumerated() {
             let m = r.motor
             add("  \(i + 1). «\(r.title)» · stato mostrato: \(r.statusLabel) · motore: \(m.map { "\($0.phase.rawValue) da \(ago($0.since))" } ?? "nessun file di stato")"
