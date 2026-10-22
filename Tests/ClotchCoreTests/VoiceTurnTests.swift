@@ -258,6 +258,12 @@ final class VoiceTurnTests: XCTestCase {
             XCTAssertNil(src.range(of: "c’è una novità", options: .caseInsensitive), f)
         }
     }
+
+    /// #271: a voice that was cut short logged its nominal length as if it had played all of it.
+    func testSaidLogTellsWhatReallyPlayed() {
+        XCTAssertEqual(VoiceTurn.saidLog(chars: 80, length: 6.0, played: 1.4), "voice said: 80 chars, 1.4 s played of 6.0 s, interrotta")
+        XCTAssertEqual(VoiceTurn.saidLog(chars: 80, length: 6.0, played: 6.05), "voice said: 80 chars, 6.0 s of audio")
+    }
 }
 
 actor Counter {
