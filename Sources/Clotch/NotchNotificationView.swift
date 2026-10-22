@@ -13,7 +13,7 @@ struct NotchNotificationView: View {
     var body: some View {
         if let note = Note(event: event, rows: rows, requests: requests) {
             let done = phase >= .settle
-            // The text wraps up to three lines instead of clipping (#102); mark and label stay on its first line.
+            // The text wraps to as many lines as it needs, never clipped (#102, #156); mark and label stay on its first line.
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Group {
                     if let row = note.row {
@@ -35,7 +35,6 @@ struct NotchNotificationView: View {
                     .tracking(-0.14)
                     .strikethrough(done && note.strikes, color: GoalInk.quiet)
                     .foregroundStyle(done && note.strikes ? Color.white.opacity(0.5) : GoalInk.primary)
-                    .lineLimit(NotchEvents.noteLines)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(done ? note.label : note.startLabel)

@@ -81,7 +81,8 @@ extension GoalSources {
               d["tipo"] as? String != "nota" else { return nil }
         return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
-                           text: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
+                           text: firstSentence(of: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
+                                               whenRaw: d["originale"] as? String == text),
                            original: d["originale"] as? String ?? text,
                            state: d["stato"] as? String ?? "nuova", takenAt: date(d["t_presa"]),
                            takenBy: d["presa_da"] as? String ?? "", doneAt: date(d["t_fatta"]),
@@ -89,6 +90,13 @@ extension GoalSources {
                            folder: d["cartella"] as? String ?? "", kind: d["tipo"] as? String ?? "compito",
                            answer: (d["risposta"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
                            answeredAt: date(d["t_risposta"]), localId: d["local_id"] as? String ?? "")
+    }
+
+    /// A file the engine never shortened (`testo` == `originale`) and that is long: its first sentence, whole, never
+    /// cut with «…» (#156). shortcut: no sentence end found = the whole text, the engine always writes `testo` short.
+    static func firstSentence(of s: String, whenRaw raw: Bool) -> String {
+        guard raw, s.count > 140, let end = s.range(of: #"[.?!](\s|$)"#, options: .regularExpression) else { return s }
+        return String(s[..<end.upperBound]).trimmingCharacters(in: .whitespaces)
     }
 
     /// Real text only (#39): blocks like <system-reminder>…</system-reminder> or <pasted_content …>…, an unclosed one up to

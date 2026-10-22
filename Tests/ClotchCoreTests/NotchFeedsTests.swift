@@ -108,6 +108,19 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertEqual(title("<system-reminder>", "<system-reminder>solo tag"), "una richiesta", "nothing real left")
     }
 
+    func testLongTitleIsNeverCut_RawOnlyGivesItsFirstSentence() {
+        func title(_ testo: String, _ originale: String?) -> String {
+            var d: [String: Any] = ["id": "Q-1", "testo": testo]
+            if let originale { d["originale"] = originale }
+            return GoalSources.parseRequest(try! JSONSerialization.data(withJSONObject: d))!.text
+        }
+        let written = "Puntare il motore e una skill a scrivere sempre il testo breve all'ingresso di ogni richiesta, intero e a capo"
+        XCTAssertEqual(title(written, "tutto il messaggio. altro. altro"), written, "a written short title stays whole")
+        let raw = "Hai capito cosa voglio io? " + String(repeating: "Voglio puntare te e una skill a fare altro. ", count: 6)
+        XCTAssertEqual(title(raw, raw), "Hai capito cosa voglio io?", "raw message (testo == originale), long: first sentence, no «…»")
+        XCTAssertEqual(title("Correggere notch. Poi altro.", "Correggere notch. Poi altro."), "Correggere notch. Poi altro.", "raw but short: whole")
+    }
+
     func testLookStrikesOnlyWhenDone() {
         func look(_ stato: String) -> UserRequest.Look {
             GoalSources.parseRequest(data(#"{"id": "Q-1", "testo": "x", "stato": "\#(stato)"}"#))!.look
