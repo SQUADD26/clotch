@@ -58,6 +58,48 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertNil(e.offer(event(.goalReached, "e"), config: main, sessions: sessions, now: now), "refused before, so not a duplicate now")
     }
 
+    /// #205: a session's question is said once until it asks something else or moves on; the time that passed does not count.
+    func testAQuestionOfTheSameSessionIsSaidOnceNotEveryElevenMinutes() {
+        var e = VoiceAlertEngine()
+        var said = 0
+        for i in 0..<14 {
+            let t = now.addingTimeInterval(Double(i) * 660)
+            let q = VoiceEvent(kind: .question, at: t, session: "m", subject: "clotch, correzioni notch", text: "Procedo con le correzioni?")
+            if e.offer(q, config: main, sessions: sessions, now: t) == nil { said += 1 }
+            _ = e.next(now: t)
+        }
+        XCTAssertEqual(said, 1, "14 identical questions, 11+ minutes apart: said once")
+        let later = now.addingTimeInterval(14 * 660)
+        func ask(_ text: String, _ kind: VoiceEvent.Kind = .question) -> String? {
+            e.offer(VoiceEvent(kind: kind, at: later, session: "m", subject: text, text: text), config: main, sessions: sessions, now: later)
+        }
+        XCTAssertNil(ask("Un'altra domanda?"), "a different text is news")
+        XCTAssertEqual(ask("Un'altra domanda?"), "doppione")
+        XCTAssertNil(ask("Fatto", .requestDone), "the session moved on...")
+        XCTAssertNil(ask("Un'altra domanda?"), "...so the same question is news again")
+    }
+
+    /// #205: five alike events at the same moment are one phrase, nothing refused.
+    func testAlikeEventsArrivingTogetherAreOnePhrase() {
+        var e = VoiceAlertEngine()
+        for i in 1...5 {
+            XCTAssertNil(e.offer(event(.risk, "limite \(i)", session: ""), config: main, sessions: sessions, now: now), "risk \(i) is not refused")
+        }
+        XCTAssertEqual(e.waiting.count, 1)
+        XCTAssertEqual(e.next(now: now)?.text, "limite 1; limite 2; limite 3; limite 4; limite 5")
+        XCTAssertNil(e.next(now: now))
+    }
+
+    /// #205/#204: questions and oks of two sessions are never joined: two voices.
+    func testQuestionsOfTwoSessionsStayTwoVoices() {
+        for kind in [VoiceEvent.Kind.question, .waitsForOk] {
+            var e = VoiceAlertEngine()
+            XCTAssertNil(e.offer(event(kind, "prima", session: "m"), config: main, sessions: sessions, now: now))
+            XCTAssertNil(e.offer(event(kind, "seconda", session: "c"), config: VoiceTurn.Config(["parla_per": "tutte"]), sessions: sessions, now: now))
+            XCTAssertEqual(e.waiting.map(\.text), ["prima", "seconda"], "\(kind): two voices in the queue")
+        }
+    }
+
     func testOldNewsIsNeverSaid() {
         var e = VoiceAlertEngine()
         XCTAssertEqual(e.offer(event(.goalReached, "a", ago: 400), config: main, sessions: sessions, now: now), "vecchio")
