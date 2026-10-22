@@ -47,6 +47,8 @@ enum FigmaToken {
         static let notchRaggio16: CGFloat = 16  // notch/raggio/16
         static let notchRaggio19: CGFloat = 19  // notch/raggio/19
         static let notchRaggio20: CGFloat = 20  // notch/raggio/20
+        static let notchRaggio28: CGFloat = 28  // notch/raggio/28
+        static let notchRaggio40: CGFloat = 40  // notch/raggio/40
         static let notchRaggio1_5: CGFloat = 1.5  // notch/raggio/1_5
         static let notchBianco: Color = Color(nsColor: rgb(0xffffff))  // notch/bianco
         static let notchGiallo: Color = Color(nsColor: rgb(0xffd60a))  // notch/giallo
@@ -111,11 +113,22 @@ enum FigmaToken {
         static let notchGialloA90: Color = Color(nsColor: rgb(0xffd60a, 0.898))  // notch/giallo-a90
         static let notchSpazio1: CGFloat = 1  // notch/spazio/1
         static let notchSpazio2: CGFloat = 2  // notch/spazio/2
+        static let notchSpazio3: CGFloat = 3  // notch/spazio/3
         static let notchSpazio4: CGFloat = 4  // notch/spazio/4
         static let notchSpazio6: CGFloat = 6  // notch/spazio/6
+        static let notchSpazio8: CGFloat = 8  // notch/spazio/8
+        static let notchSpazio9: CGFloat = 9  // notch/spazio/9
         static let notchSpazio10: CGFloat = 10  // notch/spazio/10
         static let notchSpazio12: CGFloat = 12  // notch/spazio/12
+        static let notchSpazio14: CGFloat = 14  // notch/spazio/14
+        static let notchSpazio16: CGFloat = 16  // notch/spazio/16
+        static let notchSpazio18: CGFloat = 18  // notch/spazio/18
         static let notchSpazio20: CGFloat = 20  // notch/spazio/20
+        static let notchSpazio21: CGFloat = 21  // notch/spazio/21
+        static let notchSpazio24: CGFloat = 24  // notch/spazio/24
+        static let notchSpazio26: CGFloat = 26  // notch/spazio/26
+        static let notchSpazio35: CGFloat = 35  // notch/spazio/35
+        static let notchSpazio42: CGFloat = 42  // notch/spazio/42
         static let notchSpazio16_5: CGFloat = 16.5  // notch/spazio/16_5
         static let notchBiancoA95: Color = Color(nsColor: rgb(0xffffff, 0.949))  // notch/bianco-a95
         static let notchBiancoA80: Color = Color(nsColor: rgb(0xffffff, 0.8))  // notch/bianco-a80
@@ -126,8 +139,19 @@ enum FigmaToken {
         static let notchBiancoA62: Color = Color(nsColor: rgb(0xffffff, 0.62))  // notch/bianco-a62
         static let notchBiancoA40: Color = Color(nsColor: rgb(0xffffff, 0.4))  // notch/bianco-a40
         static let notchMisura22: CGFloat = 22  // notch/misura/22
+        static let notchMisura24: CGFloat = 24  // notch/misura/24
+        static let notchMisura28: CGFloat = 28  // notch/misura/28
+        static let notchMisura30: CGFloat = 30  // notch/misura/30
         static let notchMisura40: CGFloat = 40  // notch/misura/40
         static let notchMisura54: CGFloat = 54  // notch/misura/54
+        static let notchMisura120: CGFloat = 120  // notch/misura/120
+        static let notchMisura420: CGFloat = 420  // notch/misura/420
+        static let notchMisura458: CGFloat = 458  // notch/misura/458
+        static let notchMisura488: CGFloat = 488  // notch/misura/488
+        static let notchMisura578: CGFloat = 578  // notch/misura/578
+        static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
+        static let notchFontMedio: String = "Medium"  // notch/font/medio
+        static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
     }
 }
 
