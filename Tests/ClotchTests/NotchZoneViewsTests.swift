@@ -101,7 +101,7 @@ final class NotchZoneViewsTests: XCTestCase {
         XCTAssertNil(goal(.moving, running: true).workEnd, "at work: the clock runs")
         XCTAssertNil(goal(.moving, running: false).workEnd, "isRunning left out but recent activity: still counts (#49)")
         XCTAssertEqual(goal(.still(since: now.addingTimeInterval(-300)), running: false).workEnd, now.addingTimeInterval(-300), "«Fermo»")
-        XCTAssertEqual([goal(.moving, running: true), goal(.moving, running: false)].allPulses.filter(\.running).count, 1)
+        XCTAssertEqual([goal(.moving, running: true), goal(.moving, running: false)].reduce(0) { $0 + $1.workingSessions }, 2, "one state: a moving goal counts, running flag or not (#49, #206)")
     }
 
     // MARK: Snapshots

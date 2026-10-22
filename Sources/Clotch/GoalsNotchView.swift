@@ -18,7 +18,6 @@ extension GoalRow {
         guard !proposed, let p = progress else { return GoalInk.secondary }
         return p >= 0.75 ? GoalTone.go.color : p >= 0.4 ? GoalTone.wait.color : GoalTone.stop.color
     }
-    var runningCount: Int { pulses.filter { $0.running }.count }
 
     /// The state as a label (app-copy: adjective or participle).
     var statusLabel: String {
@@ -41,7 +40,7 @@ extension GoalRow {
     var hasSubtitle: Bool { !goal.isEmpty && goal != title }
 
     var sessionsText: String {
-        let n = runningCount
+        let n = workingSessions
         if n == 0 { return "Nessuna sessione al lavoro" }
         return "\(n) \(n == 1 ? "sessione" : "sessioni") al lavoro"
     }
@@ -102,9 +101,6 @@ extension Array where Element == GoalRow {
     /// The goal being chased now (`GoalBoard.chased`). The rest keep GoalBoard's
     /// order (blocked, then still, then moving), so trouble stays on top right under it.
     var hero: GoalRow? { GoalBoard.chased(self) }
-
-    /// Every session of every goal (the closed notch counts the ones at work).
-    var allPulses: [GoalPulse] { flatMap(\.pulses) }
 
     /// The pages of the open notch and the rings of the closed one: confirmed goals of live sessions
     /// (`GoalBoard.tab`), the goal chased now first.

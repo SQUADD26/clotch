@@ -178,7 +178,7 @@ public enum GoalBoard {
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
                 proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
                 master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) },
-                motor: engineState(of: g.cli, master: master, in: motor)?.aged(at: now)))
+                motor: engineState(of: g.cli, master: master, in: motor).map { busy ? $0 : $0.aged(at: now) }))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
