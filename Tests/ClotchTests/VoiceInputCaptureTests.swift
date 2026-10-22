@@ -33,7 +33,7 @@ final class VoiceInputCaptureTests: XCTestCase {
     }
 
     func testLongUtteranceIsKeptWhole() async throws {
-        let text = "Correggi la barra della dettatura in Clotch, poi controlla che la voce arrivi all'Overseer, "
+        let text = "Correggi la barra della dettatura in Clotch, poi controlla che la voce arrivi a Friday, "
             + "apri la pull request su dev e scrivi nel rapporto quanto tempo serve per accendere il microfono, alla fine chiudi tutto stasera"
         let said = try await dictate(text, stopBeforeEnd: 0.2)
         XCTAssertTrue(said.contains("correggi"), said)

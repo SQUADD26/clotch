@@ -25,9 +25,9 @@ final class VoiceClearLinesTests: XCTestCase {
         XCTAssertFalse(VoiceTurn.vague("Mi serve il tuo sì per il merge.", subject: question.subject))
     }
 
-    func testOverseerIsNotLeftToTheFrench() {
-        let said = VoiceTurn.pronounced("L'Overseer apre un worktree dopo l'handoff", VoiceTurn.builtInPronunciation)
-        XCTAssertEqual(said, "L'ouver sìr apre un uòrk trì dopo l'hènd off")
+    func testFridayIsSaidTheEnglishWay() {
+        let said = VoiceTurn.pronounced("Friday apre un worktree dopo l'handoff", VoiceTurn.builtInPronunciation)
+        XCTAssertEqual(said, "fràidei apre un uòrk trì dopo l'hènd off")
     }
 
     func testVoiceKnowsItIsTheRightHand() {

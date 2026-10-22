@@ -2,7 +2,7 @@ import SwiftUI
 import ClotchCore
 
 /// The pill under the notch while Roberto speaks to Clotch (#110), as drawn in Figma: «Parla pure» → «Ti ascolto» with the level
-/// bars → his words as they come (three lines at most, the oldest fades out) → «Invio all’Overseer» with «Annulla · 2» → or an error
+/// bars → his words as they come (three lines at most, the oldest fades out) → «Invio a Friday» with «Annulla · 2» → or an error
 /// with the move that fixes it. Same black as the notch notes, 440 pt wide (`NotchSize.note`).
 struct VoiceInputPill: View {
     @ObservedObject var input: VoiceInputController
@@ -51,7 +51,7 @@ struct VoiceInputPill: View {
         case .thinking:
             row(Image(systemName: "ellipsis").font(.system(size: 15)).foregroundStyle(GoalInk.secondary), "Penso…") { EmptyView() }
         case .sending:
-            row(mic(0.45), "Invio all’Overseer") {
+            row(mic(0.45), "Invio a Friday") {
                 CancelButton(since: input.sendingSince, seconds: VoiceInputController.cancelSeconds) { input.cancel() }
             }
         case .result(let message):

@@ -1,7 +1,7 @@
 import AppKit
 import ClotchCore
 
-/// An order for the Overseer (#110): a file in the inbox, which the Clean View mod in the Overseer's chat submits as a message and
+/// An order for the Friday (#110): a file in the inbox, which the Clean View mod in the Friday's chat submits as a message and
 /// takes it away (gone = only taken: the outcome is the engine's `.esiti`, #262). The mod touches `.ascolta` while it listens: with that sign the file is never taken back, even
 /// if the reader is busy past `inboxGrace` (#200). Without it the text goes to the clipboard, so nothing is lost.
 @MainActor

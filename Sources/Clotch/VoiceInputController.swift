@@ -5,7 +5,7 @@ import ClotchCore
 
 /// Voice in (#110): one shortcut, press to speak, press again to finish. Microphone → Scribe v2 Realtime or Parakeet on the Mac
 /// (`VoiceInput.Config`, from the «Voce» page) → text on the pill while Roberto speaks → `VoiceRoute.classify`: a question is answered
-/// aloud by a read-only model (`VoiceAsk`), an order waits `cancelSeconds` for an «Annulla» and goes to the Overseer (`OverseerDelivery`).
+/// aloud by a read-only model (`VoiceAsk`), an order waits `cancelSeconds` for an «Annulla» and goes to the Friday (`OverseerDelivery`).
 /// The pill follows the Figma design of #110 (`VoiceInputPill`, light on the outline: `VoiceInputLight`).
 @MainActor
 final class VoiceInputController: ObservableObject {
@@ -240,7 +240,7 @@ final class VoiceInputController: ObservableObject {
             capture?.stop()
             capture = nil
             feed?.finish()
-            let said = VoiceInput.fixNames(await transcript())  // #242: «Allover Saird» → «all'Overseer»
+            let said = VoiceInput.fixNames(await transcript())  // #242: «Allover Saird» → «a Friday»
             guard me == run else { return }
             Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds), privacy: .public) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
             await route(said, run: me)
@@ -253,7 +253,7 @@ final class VoiceInputController: ObservableObject {
         if VoiceInput.heardNothing(seconds: listened, words: said.split(separator: " ").count, peak: peak) { return fail(.nothingHeard, run: me) }
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
-        // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
+        // A short confirmation («va bene», «sì vai») may answer the Friday: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
         let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
         Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
@@ -295,10 +295,10 @@ final class VoiceInputController: ObservableObject {
 
     private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
         switch outcome {
-        case .sent: return "Inviato all’Overseer"
-        case .queued: return "In coda per l’Overseer"
+        case .sent: return "Inviato a Friday"
+        case .queued: return "In coda per Friday"
         case .copied: return "Testo copiato. Incolla con ⌘V"
-        case .notDelivered: return "Non risulta consegnato all’Overseer. Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato a Friday. Testo copiato. Incolla con ⌘V"
         }
     }
 
@@ -311,7 +311,7 @@ final class VoiceInputController: ObservableObject {
     /// Stops everything and drops what the engines hold. Also the end of a press made before the microphone was ready.
     /// The answer is said and its text is not shown (#247: Roberto does not want the words in the notch). Voice off: the text is the only way.
     private func answered(_ answer: String) {
-        Self.log.notice("answer: \(answer, privacy: .public)")  // #286: what the Overseer told Roberto, the proof of a live test
+        Self.log.notice("answer: \(answer, privacy: .public)")  // #286: what the Friday told Roberto, the proof of a live test
         guard config.spoken else { return show(answer, seconds: max(6, Double(answer.count) * 0.07)) }
         // #271: «Penso…» stays until the voice is heard (or the speaking ends with no sound at all), not a bar that folds before it
         let me = run

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The Overseer heartbeat's steps (claude-config#2031): `~/.config/coda-overseer/battito/passi.json`,
+/// The Friday heartbeat's steps (claude-config#2031): `~/.config/coda-overseer/battito/passi.json`,
 /// `{"<passo>": {"ok": <epoch of the last success>, "falliti": <beats failed in a row>, "errore": "<text>"}}`.
 /// A step failed `stuckAfter` beats in a row gets one notice in the notch (#184). Pure: the caller keeps the previous read.
 public enum HeartbeatSteps {
@@ -32,6 +32,6 @@ public enum HeartbeatSteps {
     }
 
     static func line(_ step: String, failed: Int) -> String {
-        "Overseer: «\(step.replacingOccurrences(of: "_", with: " "))» non riesce da \(failed) giri"
+        "Friday: «\(step.replacingOccurrences(of: "_", with: " "))» non riesce da \(failed) giri"
     }
 }

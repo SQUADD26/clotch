@@ -17,7 +17,7 @@ final class PagerNoDotsTests: XCTestCase {
     }
 
     func testOpenNotchWithManyPagesShowsNoDots() throws {
-        let rows = ["Clotch", "SEO", "Setup", "Overseer", "dentalspace"].map { name in
+        let rows = ["Clotch", "SEO", "Setup", "Friday", "dentalspace"].map { name in
             GoalRow(id: name, title: name, goal: "Obiettivo di \(name)", proofsDone: 1, proofsTotal: 3, progress: 1.0 / 3, status: .moving,
                     lastActivity: now, pulses: [], motor: SessionMotor(cli: name, phase: name == "Setup" ? .aspettaRoberto : .lavora, why: "scegliere come fare i test."))
         }
