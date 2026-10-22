@@ -177,7 +177,7 @@ final class VoiceSpeaker {
             try? await Task.sleep(nanoseconds: UInt64(length * 1e9))
             player = nil
             writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
-            Self.log.notice("voice said: \(text.count) chars, \(String(format: "%.1f", length)) s of audio")
+            Self.log.notice("voice said: \(text.count) chars, \(String(format: "%.1f", length), privacy: .public) s of audio")
             return nil
         }
     }
