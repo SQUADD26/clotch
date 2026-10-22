@@ -42,13 +42,13 @@ extension VoiceInputController {
 
     /// Esc takes the dictation back while it is open (Carbon hotkey, as the shortcut itself: no Accessibility permission).
     func armEscape() {
-        guard escapeID == nil, let keys = (NSApp.delegate as? AppDelegate)?.hotKeyManager else { return }
+        guard escapeID == nil, let keys = (NSApp?.delegate as? AppDelegate)?.hotKeyManager else { return }
         escapeID = keys.registerID(keyCode: 53, modifiers: []) { [weak self] in Task { @MainActor in self?.cancel() } }
     }
 
     func disarmEscape() {
         guard let id = escapeID else { return }
-        (NSApp.delegate as? AppDelegate)?.hotKeyManager.unregister(id: id)
+        (NSApp?.delegate as? AppDelegate)?.hotKeyManager.unregister(id: id)
         escapeID = nil
     }
 }

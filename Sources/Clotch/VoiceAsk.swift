@@ -6,8 +6,12 @@ import ClotchCore
 enum VoiceAsk {
     static let timeout: TimeInterval = 45
 
+    /// The sessions Clotch sees, one line each (set at launch): the answer starts from them, not from thousands of files (#174).
+    @MainActor static var sessions: () -> [String] = { [] }
+
     static func run(_ question: String) async -> Result<String, ClaudeLogin.Failure> {
-        await ClaudeRun.run(VoiceRoute.askArguments(), input: VoiceRoute.askInput(question), timeout: timeout,
+        let sessions = await MainActor.run { Self.sessions() }
+        return await ClaudeRun.run(VoiceRoute.askArguments(), input: VoiceRoute.askInput(question, sessions: sessions), timeout: timeout,
                             directory: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude"))
     }
 }
