@@ -159,6 +159,10 @@ enum FigmaToken {
         static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
         static let notchFontMedio: String = "Medium"  // notch/font/medio
         static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
+        static let durataLuceDissolvenza: TimeInterval = 0.6  // durata/luce/dissolvenza
+        static let durataLuceRossaCompare: TimeInterval = 0.5  // durata/luce-rossa/compare
+        static let durataLuceRossaAccesa: TimeInterval = 1  // durata/luce-rossa/accesa
+        static let durataLuceRossaSpegne: TimeInterval = 1  // durata/luce-rossa/spegne
     }
 }
 
