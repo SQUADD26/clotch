@@ -39,8 +39,8 @@ private final class GoalWatcher: @unchecked Sendable {
             let support = home.appendingPathComponent("Library/Application Support")
             self.support = support.resolvingSymlinksInPath().path
             // FSEvents reports resolved paths (/private/var…), so match both spellings.
-            prefixes = [paths.goals, paths.live, paths.requests].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
-            let roots = Array(Set([paths.goals, paths.live, paths.requests, support].map { Self.existingAncestor($0).path }))
+            prefixes = [paths.goals, paths.live, paths.requests, paths.states].flatMap { [$0.path, $0.resolvingSymlinksInPath().path] }
+            let roots = Array(Set([paths.goals, paths.live, paths.requests, paths.states, support].map { Self.existingAncestor($0).path }))
 
             var context = FSEventStreamContext(version: 0, info: Unmanaged.passUnretained(self).toOpaque(),
                                                retain: nil, release: nil, copyDescription: nil)
@@ -143,7 +143,7 @@ private final class GoalWatcher: @unchecked Sendable {
         return t > 0 ? Date(timeIntervalSince1970: t) : Date()
     }()
     private nonisolated static let answersSeenKey = "clotch.answersSeenAt"
-    var hasNewAnswer: Bool { requests.contains { $0.isNewAnswer(since: answersSeenAt) } }
+    var newAnswerCount: Int { requests.filter { $0.isNewAnswer(since: answersSeenAt) }.count }
 
     func markAnswersSeen() {
         answersSeenAt = Date()
@@ -163,7 +163,7 @@ private final class GoalWatcher: @unchecked Sendable {
     private nonisolated static let rejectedKey = "clotch.rejectedProposals"
 
     private var goalPRs: [String: [SessionPR]] = [:]  // handed to `PullRequestFeed`, which publishes the open ones
-    private var snapshot: GoalDiskData = ([], [], [], [])
+    private var snapshot: GoalDiskData = ([], [], [], [], [])
     private var watcher: GoalWatcher?
     /// One-shot, at `GoalBoard.nextChange`: the only time the board is rebuilt without a change on disk.
     private var deadline: Timer?
@@ -262,7 +262,7 @@ private final class GoalWatcher: @unchecked Sendable {
 
     private func refresh() {
         let t = Date()
-        let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t)
+        let next = GoalBoard.rows(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, motor: snapshot.motor, now: t)
         deadline?.invalidate()
         deadline = nil
         if watcher != nil, let at = GoalBoard.nextChange(goals: snapshot.goals, sessions: snapshot.sessions, live: snapshot.live, now: t) {

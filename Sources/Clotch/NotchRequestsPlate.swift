@@ -88,14 +88,12 @@ private struct RequestLine: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 12) {
-                RequestMark(look: request.look)
                 Text(request.text)
                     .font(NotchType.line)
                     .strikethrough(request.look.struck, color: GoalInk.quiet)
                     .foregroundStyle(GoalInk.row)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                if isNew { Circle().fill(GoalTone.wait.color).frame(width: 6, height: 6) }
                 Text(request.statusLabel)
                     .font(NotchType.small)
                     .foregroundStyle(request.look.color)
@@ -106,7 +104,6 @@ private struct RequestLine: View {
                     .font(NotchType.small)
                     .foregroundStyle(GoalInk.secondary)
                     .lineLimit(2)
-                    .padding(.leading, 28)  // under the text, past the 16 pt mark and the 12 pt gap
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -128,28 +125,26 @@ extension UserRequest.Look {
     }
 }
 
-/// A request's mark (#39): a thin white circle while it waits, a slowly pulsing yellow dot while a session works on it,
-/// a green circle with a dark check only once done.
+/// A request's mark in a notification (#39, #114): an hourglass while it waits, a pulsing arrow while a session works
+/// on it, a green check once done. Never a dot or a circle.
 struct RequestMark: View {
     let look: UserRequest.Look
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Group {
-            if look == .working {
-                Image(systemName: "circle.circle")
-                    .font(.system(size: 15))
+            switch look {
+            case .working:
+                Image(systemName: "arrow.triangle.2.circlepath")
                     .foregroundStyle(look.color)
                     .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
-            } else if look == .done {
-                Image(systemName: "checkmark.circle.fill")
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(GoalInk.check, look.color)
-                    .font(.system(size: 16))
-            } else {
-                Circle().stroke(Color.white.opacity(0.42), lineWidth: 1.5).frame(width: 15, height: 15)
+            case .done:
+                Image(systemName: "checkmark").fontWeight(.semibold).foregroundStyle(look.color)
+            default:
+                Image(systemName: "hourglass").foregroundStyle(GoalInk.quiet)
             }
         }
+        .font(.system(size: 14))
         .frame(width: 16, height: 16)
     }
 }
