@@ -9,6 +9,7 @@ final class AppStateQuestionFlowTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        optIntoAutoExpand()
         savedSmartSuppress = UserDefaults.standard.object(forKey: SettingsKey.smartSuppress)
     }
 

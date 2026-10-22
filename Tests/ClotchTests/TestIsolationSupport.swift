@@ -23,6 +23,18 @@ extension XCTestCase {
         AppleScriptRunner.current = runner
         addTeardownBlock { AppleScriptRunner.current = saved }
     }
+
+    /// Turns on the notch opening by itself for questions and permissions until this test ends: since #207 it is off by
+    /// default, and the card-flow tests check what happens once a card is up (#219).
+    func optIntoAutoExpand() {
+        for key in [SettingsKey.autoExpandOnQuestion, SettingsKey.autoExpandOnPermission] {
+            let saved = UserDefaults.standard.object(forKey: key) as? Bool
+            UserDefaults.standard.set(true, forKey: key)
+            addTeardownBlock {
+                if let saved { UserDefaults.standard.set(saved, forKey: key) } else { UserDefaults.standard.removeObject(forKey: key) }
+            }
+        }
+    }
 }
 
 extension TerminalVisibilityDetector.Probe {

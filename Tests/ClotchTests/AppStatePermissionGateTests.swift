@@ -8,6 +8,11 @@ import ClotchCore
 /// resurrect a session the user dismissed.
 @MainActor
 final class AppStatePermissionGateTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        optIntoAutoExpand()
+    }
+
 
     /// A card can be left pointing at a session whose own request was drained
     /// (a question arriving for that session does this) while other sessions are
