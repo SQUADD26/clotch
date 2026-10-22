@@ -250,14 +250,14 @@ final class NotchFeedsTests: XCTestCase {
         XCTAssertFalse(req("").answered, "an old file has no answer")
     }
 
-    func testListedKeepsWaitingAndFreshAnswers() {
+    func testListedKeepsWaitingAndAnswersUntilEsceT() {
         let now = Date(timeIntervalSince1970: 1_792_580_000 + 3600)
-        let fresh = req(#", "risposta": "ok", "t_risposta": 1792580000"#)
-        let old = GoalSources.parseRequest(data(#"{"id": "Q-2", "testo": "x", "stato": "fatta", "risposta": "ok", "t_risposta": 1792000000}"#))!
-        let doneNoAnswer = req(#", "tipo": "domanda""#)
+        let fresh = req(#", "risposta": "ok", "t_risposta": 1792580000, "esce_t": 1792590000"#)
+        let past = GoalSources.parseRequest(data(#"{"id": "Q-2", "testo": "x", "stato": "fatta", "risposta": "ok", "esce_t": 1792000000}"#))!
+        let noExit = req(#", "risposta": "ok", "t_risposta": 1792580000"#)
         let waiting = req("", state: "nuova")
-        XCTAssertEqual(UserRequest.listed([fresh, old, doneNoAnswer, waiting], now: now).map(\.id), ["Q-1", "Q-1"])
-        XCTAssertEqual(UserRequest.listed([old], now: now), [])
+        XCTAssertEqual(UserRequest.listed([fresh, past, noExit, waiting], now: now).map(\.id), ["Q-1", "Q-1"])
+        XCTAssertEqual(UserRequest.listed([past], now: now), [])
         XCTAssertEqual(UserRequest.waiting([fresh, req(#", "tipo": "domanda""#, state: "nuova")]), [], "a question is no task")
     }
 

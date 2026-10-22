@@ -30,6 +30,30 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(UserRequest.listed([r], now: Date(timeIntervalSince1970: 1792000100)).map(\.id), [r.id])
     }
 
+    /// #199: the Requests tab lists what the engine says is open, with the engine's own state, point and exit time.
+    func testRequestsTabListsWhatTheEngineLeavesOpen() throws {
+        func req(_ name: String, _ edit: (inout [String: Any]) -> Void = { _ in }) throws -> UserRequest {
+            var d = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture(name)) as? [String: Any])
+            edit(&d)
+            return try XCTUnwrap(GoalSources.parseRequest(JSONSerialization.data(withJSONObject: d)))
+        }
+        let stuck = try req("richiesta-ferma.json"), question = try req("richiesta-domanda.json")
+        let doneInTime = try req("richiesta-compito.json")                      // esce_t = t_fatta + 24 h
+        let doneNoExit = try req("richiesta-compito.json") { $0["esce_t"] = NSNull(); $0["id"] = "Q-1" }
+        let takenQuiet = try req("richiesta-compito.json") { $0["stato"] = "presa"; $0["esce_t"] = NSNull(); $0["id"] = "Q-2" }
+        let takenAsking = try req("richiesta-compito.json") {
+            $0["stato"] = "presa"; $0["esce_t"] = NSNull(); $0["id"] = "Q-3"
+            $0["aspetta_te"] = true; $0["punto"] = "Tengo il colore o lo cambio?"
+        }
+        let exit = try XCTUnwrap(doneInTime.leavesAt), all = [stuck, question, doneInTime, doneNoExit, takenQuiet, takenAsking]
+        XCTAssertEqual(UserRequest.listed(all, now: exit.addingTimeInterval(-60)).map(\.id), [stuck.id, question.id, "Q-3", doneInTime.id],
+                       "open ones first, then the done one until esce_t; a done one without esce_t and a taken one nobody waits on are out")
+        XCTAssertEqual(UserRequest.listed(all, now: exit.addingTimeInterval(60)).map(\.id), [stuck.id, question.id, "Q-3"],
+                       "no 48 h rule of ours: past esce_t the done one is gone")
+        XCTAssertEqual([stuck.statusLabel, takenAsking.statusLabel], ["Ferma", "In attesa di te"])
+        XCTAssertEqual([stuck.point, takenAsking.point, doneInTime.point], ["La sessione è chiusa.", "Tengo il colore o lo cambio?", "Fatto: il notch si vede."])
+    }
+
     func testAdhdListIsRead() throws {
         let list = GoalSources.parseAdhd(try fixture("adhd-elenco.json"))
         let r = try XCTUnwrap(list.first)

@@ -1,8 +1,8 @@
 import SwiftUI
 import ClotchCore
 
-/// The Requests tab: the requests no session has taken in charge yet, plus the ones with an answer, 5 per page.
-/// Under each text its answer (#90); a question waits as «In attesa di risposta». A taken task leaves the list.
+/// The Requests tab: what the engine leaves open (`UserRequest.listed`, #199), 5 per page, with the engine's state.
+/// Under each text its `punto` (#90, #199); a question waits as «In attesa di risposta». A taken task leaves the list.
 struct RequestsTab: View {
     let requests: [UserRequest]
     /// False until the requests register exists on this Mac.
@@ -99,8 +99,8 @@ struct RequestLine: View {
                     .foregroundStyle(request.look.color)
             }
             .frame(minHeight: 20, alignment: .top)  // wraps, never «…» (#156)
-            if request.answered {
-                Text(request.answer)
+            if !request.point.isEmpty {
+                Text(request.point)
                     .font(NotchType.small)
                     .foregroundStyle(GoalInk.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -110,7 +110,7 @@ struct RequestLine: View {
         .help(request.original)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(request.text + ". " + request.statusLabel + (isNew ? ", nuova risposta" : "")
-                            + (request.answered ? ". " + request.answer : ""))
+                            + (request.point.isEmpty ? "" : ". " + request.point))
     }
 }
 
@@ -120,6 +120,7 @@ extension UserRequest.Look {
         switch ink {
         case .quiet: GoalInk.quiet
         case .wait: GoalTone.wait.color
+        case .stop: GoalTone.stop.color
         case .go: GoalTone.go.color
         }
     }
