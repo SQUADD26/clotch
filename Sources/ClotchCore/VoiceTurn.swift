@@ -220,4 +220,12 @@ public enum VoiceTurn {
 
     /// The player's rate for the speed above what ElevenLabs gives.
     public static func playbackRate(_ config: Config) -> Float { Float(config.speed / min(config.speed, apiMaxSpeed)) }
+
+    /// The «voice said» log line (#271): the seconds that really played, and «interrotta» when `hush()` cut it short.
+    public static func saidLog(chars: Int, length: Double, played: Double) -> String {
+        let f = { String(format: "%.1f", $0) }
+        // 0.5 s: the player is polled every 100 ms, so a voice that ran to its end never falls short by more than that.
+        return played < length - 0.5 ? "voice said: \(chars) chars, \(f(played)) s played of \(f(length)) s, interrotta"
+                                     : "voice said: \(chars) chars, \(f(length)) s of audio"
+    }
 }

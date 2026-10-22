@@ -3,7 +3,7 @@ import ClotchCore
 import OSLog
 import SwiftUI
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "CompletionReply")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "CompletionReply")
 
 // MARK: - Entry point
 

@@ -10,7 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceSpeaker {
     static let shared = VoiceSpeaker()
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "Voice")
 
     private let files = VoiceFiles()
     private let home = FileManager.default.homeDirectoryForCurrentUser
@@ -98,7 +98,7 @@ final class VoiceSpeaker {
 
     /// One piece of news the engine let through. The rules of the moment it is said: switch, key, muted session, daily caps.
     func say(_ event: VoiceEvent) async {
-        guard !AfkFiles().isOn else { return }  // AFK (#106): Clotch is silent while Roberto is away
+        guard !AfkFiles().isOn, !DoNotDisturb().isOn else { return }  // AFK (#106) or non-disturbare (#266): silent, no Haiku call, no daily count
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
         // No canonical prompt from the config (#84): silent, never a copy of it.
@@ -155,6 +155,7 @@ final class VoiceSpeaker {
 
     /// ElevenLabs → light on → audio → light off. nil = said; otherwise why not, for the page.
     private func speak(_ text: String, config: VoiceTurn.Config, key: String) async -> String? {
+        guard !DoNotDisturb().isOn else { return "Non disturbare acceso. Spegnilo con non-disturbare off." }  // clotch#266: every voice goes through here
         let request = VoiceTurn.speechRequest(text: text, config: config, key: key, pronunciation: files.pronunciation)
         let language = (try? JSONSerialization.jsonObject(with: request.httpBody ?? Data()) as? [String: Any])?["language_code"] as? String ?? "none"
         Self.log.notice("voice request: voice \(config.voiceId, privacy: .public), model \(config.model, privacy: .public), language \(language, privacy: .public)")
@@ -182,11 +183,12 @@ final class VoiceSpeaker {
             player = p
             try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
             p.play()
+            let playStart = Date()
             let end = Date().addingTimeInterval(length + 1)
             while p.isPlaying, Date() < end { try? await Task.sleep(nanoseconds: 100_000_000) }  // stops early when `hush()` silences it
             player = nil
             writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
-            Self.log.notice("voice said: \(text.count) chars, \(String(format: "%.1f", length), privacy: .public) s of audio")
+            Self.log.notice("\(VoiceTurn.saidLog(chars: text.count, length: length, played: Date().timeIntervalSince(playStart)), privacy: .public)")
             return nil
         }
     }

@@ -57,6 +57,7 @@ class VoiceCapture: @unchecked Sendable {
     }
 
     func start() throws {
+        guard !DoNotDisturb().isOn else { throw CocoaError(.userCancelled) }  // clotch#266: the one place the microphone turns on
         prepare()
         // The device's own format, read now: after `prepare` the node's output format can follow the speakers (96 kHz against a
         // 48 kHz microphone), and a tap that does not match the hardware throws and leaves the bar stuck (#174).

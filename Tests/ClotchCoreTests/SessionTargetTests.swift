@@ -44,7 +44,7 @@ final class SessionTargetTests: GoalTestCase {
         try fm.createDirectory(at: sessions, withIntermediateDirectories: true)
         let paths = GoalSources.defaultPaths(home: home)  // after the folder exists: it lists the Claude* app folders
         try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
-        try sessionJSON("local_t", cli: "taker").write(to: sessions.appendingPathComponent("local_t.json"))
+        try sessionJSON("local_t", cli: "taker", title: "⌘ Clotch: richieste").write(to: sessions.appendingPathComponent("local_t.json"))
         func request(_ id: String, _ state: String, by: String, localId: String? = nil) throws {
             let local = localId.map { #", "local_id": "\#($0)""# } ?? ""
             try Data(#"{"id": "\#(id)", "t": 1792580000, "testo": "x", "stato": "\#(state)", "presa_da": "\#(by)"\#(local)}"#.utf8)
@@ -56,6 +56,7 @@ final class SessionTargetTests: GoalTestCase {
         try request("Q-d", "presa", by: "nobody", localId: "local_t")  // the register's local_id wins, no cli lookup needed
         try request("Q-e", "presa", by: "taker", localId: "local_other")  // its own id, even if the cli points elsewhere
         try request("Q-f", "presa", by: "taker", localId: "")  // empty: the fallback
+        try request("Q-g", "presa", by: "⌘ Clotch: richieste")  // clotch#261: the engine writes the session's title, never a cli id
         let byId = Dictionary(uniqueKeysWithValues: GoalSources.load(paths).requests.map { ($0.id, $0.target) })
         let found = try XCTUnwrap(byId["Q-a"] ?? nil)
         XCTAssertEqual(found.localId, "local_t")
@@ -66,5 +67,6 @@ final class SessionTargetTests: GoalTestCase {
         XCTAssertEqual((byId["Q-d"] ?? nil)?.profile, found.profile, "profile found by the local id")
         XCTAssertEqual(byId["Q-e"] ?? nil, SessionTarget(localId: "local_other", profile: ""), "id unknown here: default app, not the cli session folder")
         XCTAssertEqual((byId["Q-f"] ?? nil)?.localId, "local_t")
+        XCTAssertEqual((byId["Q-g"] ?? nil)?.localId, "local_t", "presa_da = title finds who is doing it")
     }
 }

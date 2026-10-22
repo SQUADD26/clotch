@@ -2,7 +2,7 @@ import Foundation
 import os.log
 import ClotchCore
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "PermissionDeny")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "PermissionDeny")
 
 /// Cached metadata for an in-flight tool_use_id, written on PreToolUse and consumed by
 /// downstream PermissionRequest / PostToolUse events.

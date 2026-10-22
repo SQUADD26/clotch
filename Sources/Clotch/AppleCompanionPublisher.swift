@@ -9,7 +9,7 @@ final class AppleCompanionPublisher: NSObject, ObservableObject {
     static let shared = AppleCompanionPublisher()
 
     private static let serviceType = "clotch"
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "apple-companion")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "apple-companion")
 
     @Published private(set) var enabled = false
     @Published private(set) var advertising = false

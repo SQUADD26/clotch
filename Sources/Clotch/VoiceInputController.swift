@@ -10,7 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "VoiceInput")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.
@@ -69,6 +69,8 @@ final class VoiceInputController: ObservableObject {
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
+    /// Asks `claude -p` (question, helper prompt or nil); the tests hand in a fake that records the call and launches nothing (#270).
+    var ask: (String, String?) async -> Result<String, ClaudeLogin.Failure> = { await VoiceAsk.run($0, helper: $1) }
     /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
     var finishLocal: (() async -> String)?
     var localWait = VoiceInput.commitWait
@@ -104,6 +106,7 @@ final class VoiceInputController: ObservableObject {
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
     /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }  // clotch#266: Roberto in a call, the microphone stays closed
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
@@ -140,6 +143,7 @@ final class VoiceInputController: ObservableObject {
     // MARK: - Listening
 
     func begin() async {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }
         reset()
         run += 1
         let me = run
@@ -229,11 +233,11 @@ final class VoiceInputController: ObservableObject {
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
-        let helper = VoiceAsk.helperPrompt()  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
+        let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
         Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
         if isQuestion {
             phase = .thinking
-            let reply = await VoiceAsk.run(said, helper: helper)
+            let reply = await ask(said, helper)
             guard me == run else { return }
             guard case .success(let answer) = reply else {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
@@ -248,10 +252,15 @@ final class VoiceInputController: ObservableObject {
         disarmEscape()
         if let helper {
             phase = .thinking
-            let reply = await VoiceAsk.run(said, helper: helper)
+            let started = Date()
+            let reply = await ask(said, helper)
             guard me == run else { return }
-            if case .success(let answer) = reply {
-                return answered(answer)
+            // #262: the helper's words are not the outcome of an order; the engine's `.esiti` is
+            if case .success = reply {
+                let outcome = await OverseerDelivery.afterHelper(said, since: started, files: files)
+                guard me == run else { return }
+                Self.log.notice("order: helper, \(String(describing: outcome), privacy: .public)")
+                return show(Self.sentence(outcome))
             }
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
@@ -259,7 +268,16 @@ final class VoiceInputController: ObservableObject {
         let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
-        show(outcome == .sent ? "Inviato all’Overseer" : outcome == .queued ? "In coda per l’Overseer" : "Testo copiato. Incolla con ⌘V")
+        show(Self.sentence(outcome))
+    }
+
+    private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
+        switch outcome {
+        case .sent: return "Inviato all’Overseer"
+        case .queued: return "In coda per l’Overseer"
+        case .copied: return "Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato all’Overseer. Testo copiato. Incolla con ⌘V"
+        }
     }
 
     func fail(_ why: VoiceInput.Failure, run me: Int) {

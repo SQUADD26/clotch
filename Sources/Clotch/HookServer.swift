@@ -3,7 +3,7 @@ import Network
 import os.log
 import ClotchCore
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "HookServer")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "HookServer")
 
 @MainActor
 class HookServer {
