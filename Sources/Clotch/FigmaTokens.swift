@@ -152,13 +152,20 @@ enum FigmaToken {
         static let notchMisura120: CGFloat = 120  // notch/misura/120
         static let notchMisura420: CGFloat = 420  // notch/misura/420
         static let notchMisura422: CGFloat = 422  // notch/misura/422
+        static let notchMisura434: CGFloat = 434  // notch/misura/434
+        static let notchMisura440: CGFloat = 440  // notch/misura/440
         static let notchMisura458: CGFloat = 458  // notch/misura/458
         static let notchMisura488: CGFloat = 488  // notch/misura/488
         static let notchMisura578: CGFloat = 578  // notch/misura/578
+        static let notchMisura106_5: CGFloat = 106.5  // notch/misura/106_5
         static let notchMisura103_5: CGFloat = 103.5  // notch/misura/103_5
         static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
         static let notchFontMedio: String = "Medium"  // notch/font/medio
         static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
+        static let durataLuceDissolvenza: TimeInterval = 0.6  // durata/luce/dissolvenza
+        static let durataLuceRossaCompare: TimeInterval = 0.5  // durata/luce-rossa/compare
+        static let durataLuceRossaAccesa: TimeInterval = 1  // durata/luce-rossa/accesa
+        static let durataLuceRossaSpegne: TimeInterval = 1  // durata/luce-rossa/spegne
     }
 }
 
