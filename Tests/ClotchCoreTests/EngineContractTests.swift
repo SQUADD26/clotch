@@ -54,6 +54,19 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual([stuck.point, takenAsking.point, doneInTime.point], ["La sessione è chiusa.", "Tengo il colore o lo cambio?", "Fatto: il notch si vede."])
     }
 
+    /// clotch#223: `richieste.py vista` (claude-config#2107) is a JSON array of the open requests, each one a register record
+    /// with `punto`, `aspetta_te`, `ferma_perche`; every row is read by the one request parser, none dropped.
+    /// `titolo_prove` (clotch#188, the engine's count of title tries) sits in `richiesta-compito.json` and is ignored on purpose.
+    func testEngineOpenRequestsViewIsRead() throws {
+        let rows = try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("vista-richieste.json")) as? [[String: Any]])
+        let list = try rows.map { try XCTUnwrap(GoalSources.parseRequest(JSONSerialization.data(withJSONObject: $0))) }
+        XCTAssertEqual(list.count, rows.count)
+        let r = try XCTUnwrap(list.first)
+        XCTAssertEqual([r.id, r.state, r.kind, r.takenBy, r.point], ["Q-5ef8766d", "ferma", "compito", "cli-3", "La sessione è chiusa."])
+        XCTAssertEqual(r.look, .stuck); XCTAssertFalse(r.waitsForYou)
+        XCTAssertEqual(try XCTUnwrap(JSONSerialization.jsonObject(with: fixture("richiesta-compito.json")) as? [String: Any])["titolo_prove"] as? Int, 1)
+    }
+
     func testAdhdListIsRead() throws {
         let list = GoalSources.parseAdhd(try fixture("adhd-elenco.json"))
         let r = try XCTUnwrap(list.first)
