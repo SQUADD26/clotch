@@ -183,11 +183,12 @@ final class VoiceSpeaker {
             player = p
             try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
             p.play()
+            let playStart = Date()
             let end = Date().addingTimeInterval(length + 1)
             while p.isPlaying, Date() < end { try? await Task.sleep(nanoseconds: 100_000_000) }  // stops early when `hush()` silences it
             player = nil
             writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
-            Self.log.notice("voice said: \(text.count) chars, \(String(format: "%.1f", length), privacy: .public) s of audio")
+            Self.log.notice("\(VoiceTurn.saidLog(chars: text.count, length: length, played: Date().timeIntervalSince(playStart)), privacy: .public)")
             return nil
         }
     }
