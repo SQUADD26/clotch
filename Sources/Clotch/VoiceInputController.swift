@@ -116,6 +116,7 @@ final class VoiceInputController: ObservableObject {
             // At once, not in the task: a second press before the task runs ends this one (finish → abort), never starts a second (#174).
             run += 1
             phase = .ready
+            VoiceSpeaker.shared.hush()
             let me = run
             Task { if me == run { await begin() } }
         case .ready, .listening: finish()
