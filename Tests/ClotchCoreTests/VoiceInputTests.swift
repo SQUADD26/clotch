@@ -81,7 +81,7 @@ final class VoiceInputTests: XCTestCase {
 
     /// Figma #110 note 5 and 6: a title, a cause and the move that fixes it; never a code.
     func testFailuresSpeakPlainlyAndOfferTheFix() {
-        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local, .off, .shortcut, .doNotDisturb]
+        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local, .off, .shortcut, .doNotDisturb, .nothingHeard]
         for f in all {
             XCTAssertNil((f.title + f.detail).range(of: #"\d{3}|HTTP|error|errore"#, options: .regularExpression), "\(f)")
             XCTAssertFalse(f.actions.isEmpty)
@@ -94,6 +94,27 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.network))
         // #147: no voice to hear is Roberto's choice, not a failure.
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .quiet)
+    }
+
+    /// #269: black team 22/10, «16.4 s of audio, 0 words» and the bar closed mute; a quick tap is still Roberto's choice (#147).
+    func testSixteenSecondsOfNothingIsNotHeard() {
+        XCTAssertTrue(VoiceInput.heardNothing(seconds: 16.4, words: 0, peak: 0.6), "no words after a long recording")
+        XCTAssertTrue(VoiceInput.heardNothing(seconds: 16.4, words: 0, peak: 0), "the stale microphone: no words, level at zero")
+        XCTAssertTrue(VoiceInput.heardNothing(seconds: 5, words: 3, peak: 0), "words but a level that never moved")
+        XCTAssertFalse(VoiceInput.heardNothing(seconds: 0.6, words: 0, peak: 0), "a tap is a choice (#147)")
+        XCTAssertFalse(VoiceInput.heardNothing(seconds: VoiceInput.heardAfter, words: 0, peak: 0), "after more than the threshold, not at it")
+        XCTAssertFalse(VoiceInput.heardNothing(seconds: 16, words: 12, peak: 0.4), "a normal dictation")
+        XCTAssertEqual(VoiceInput.Failure.nothingHeard.title, "Non ho sentito niente")
+    }
+
+    /// #269: the spare microphone made before an audio change is bound to the old setup and hears nothing.
+    func testASpareOlderThanTheAudioChangeIsMadeAgain() {
+        let now = Date(timeIntervalSince1970: 10_000)
+        let made = now.addingTimeInterval(-60)
+        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-10), now: now), "changed after it was made")
+        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: now.addingTimeInterval(-120), now: now), "changed before it was made")
+        XCTAssertFalse(VoiceInput.spareIsStale(madeAt: made, changedAt: .distantPast, now: now), "no change seen")
+        XCTAssertTrue(VoiceInput.spareIsStale(madeAt: now.addingTimeInterval(-VoiceInput.spareMaxAge - 1), changedAt: .distantPast, now: now), "too old")
     }
 
     func testDictationKeepsCommittedAndShowsThePartial() {
