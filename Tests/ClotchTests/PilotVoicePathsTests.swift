@@ -55,7 +55,7 @@ final class PilotVoicePathsTests: XCTestCase {
         d.add(idle ? "BARRA idle: \(d.since()) s dopo il secondo press" : "BARRA NON idle dopo 150 s, fase \(c.phase)")
         let late = await until(40) { spoken }
         if !spoken { d.add(late ? "" : "parlatore MAI chiamato (o ancora in corso) 40 s dopo la barra") }
-        try save(d, "P1: domanda «\(question)» (sessioni finte date a VoiceAsk: 3 righe; `claude -p` vero)")
+        try save(d, "P1: domanda «\(question)» (sessioni finte date a VoiceAsk: 3 righe; `claude -p` FINTO, #270)")
     }
 
     private func p2(listening: Bool) async throws {
@@ -151,6 +151,7 @@ final class PilotVoicePathsTests: XCTestCase {
         d.bag = [c.$phase.removeDuplicates().sink { d.add("fase \(Self.describe($0))") },
                           c.$sure.combineLatest(c.$maybe).removeDuplicates { $0 == $1 }.dropFirst().sink { d.add("testo barra: sicuro=«\($0.0)» forse=«\($0.1)»") },
                           c.$hint.compactMap { $0 }.sink { d.add("avviso barra: \($0)") }]
+        c.ask = { q, h in d.add("ASK FINTO (nessun claude lanciato, #270): «\(q)», helper \(h != nil)"); return .success("Risposta finta del pilota.") }
         d.voice = voice
         d.speechEnd = VoiceInputCaptureTests.speechEnd(try text.map { try VoiceInputCaptureTests.recorded($0) } ?? [])
         if engine == "locale" {

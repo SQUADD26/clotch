@@ -8,11 +8,15 @@ private typealias T = FigmaToken.MacOS27GoldenGate
 /// «Sollecita» asks again; with an answer, the answer and how often it was asked. Drawn from Figma frame 58-56113.
 struct AdhdTab: View {
     let items: [AdhdRequest]
+    var error: String? = nil
     var markRead: (String?) -> Void = { _ in }
     var nudge: (String) -> Void = { _ in }
 
     var body: some View {
         VStack(alignment: .leading, spacing: T.notchSpazio18) {
+            if let error {
+                Text(error).font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchGiallo)
+            }
             if items.contains(where: \.answered) {
                 HStack {
                     Spacer(minLength: 0)
