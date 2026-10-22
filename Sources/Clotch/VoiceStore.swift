@@ -32,7 +32,7 @@ final class VoiceStore: ObservableObject {
             let list = (unsafeBitCast(eventPaths, to: NSArray.self) as? [String]) ?? []
             let paths = list.prefix(count)
             // The same stream tells the alerts engine about new events (#57).
-            if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged() } }
+            if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged(); ScreenNoticeStore.shared.changed() } }
             // And AFK's files (#106).
             if paths.contains(where: { $0.hasSuffix("/voce/afk.json") || $0.contains("/clotch/afk-") }) { MainActor.assumeIsolated { AfkStore.shared.reload() } }
             // And the Overseer heartbeat's steps (#184).

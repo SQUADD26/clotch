@@ -99,7 +99,7 @@ public enum VoiceEvents {
         // The mark's line still there: what follows it. Gone (rewritten): what is newer than it.
         let new = !mark.id.isEmpty ? all.lastIndex(where: { $0.id == mark.id }).map { Array(all[($0 + 1)...]) } : nil
         let fresh = new ?? all.filter { $0.at > mark.at }
-        return (fresh.compactMap(\.event), last, fresh.filter { $0.event == nil }.map(\.type))
+        return (fresh.compactMap(\.event), last, fresh.filter { $0.event == nil && !ScreenNotice.types.contains($0.type) }.map(\.type))
     }
 
     /// Any well-formed line, known type or not: the mark moves past a type the voice does not say.
