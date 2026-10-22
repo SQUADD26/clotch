@@ -56,9 +56,11 @@ final class RequestTextWholeTests: XCTestCase {
         XCTAssertGreaterThan(try tab(words(160), "adhd-160").height, try tab(words(60), "adhd-60").height)
         func answered(_ text: String, _ name: String) throws -> CGImage {
             let items = GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"Come faccio?","risposta":"\#(text)","volte":1}]"#.utf8))
-            return try render(AdhdTab(items: items).frame(width: 460), name)
+            let store = AdhdStore()
+            store.show(question: "Come faccio?")  // an answer is one line at rest (#158); open (pointer, focus) it shows whole
+            return try render(AdhdTab(items: items, store: store).frame(width: 460), name)
         }
         XCTAssertGreaterThan(try answered(words(200), "adhd-risposta-200").height, try answered(words(40), "adhd-risposta-40").height,
-                             "the answer wraps too (it was cut «…su quel…»)")
+                             "the open row wraps the whole answer (it was cut «…su quel…»)")
     }
 }
