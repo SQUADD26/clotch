@@ -65,6 +65,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // notifications stay inside this login session): live tests open and close the dictation this way.
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.dettatura"), object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
+                // Not Roberto's key: with the dictation off it does nothing, it never paints his screen red (#245).
+                guard VoiceInput.Config((try? VoiceFiles().readConfig()) ?? [:]).enabled else {
+                    Self.log.notice("dettatura: local command ignored, dictation off")
+                    return
+                }
                 Self.log.notice("dettatura: local command")
                 self?.executeShortcut(.voiceInput)
             }

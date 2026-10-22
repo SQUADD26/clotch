@@ -104,6 +104,9 @@ final class VoiceTurnTests: XCTestCase {
         XCTAssertFalse(String(decoding: body, as: UTF8.self).contains(key))
         let o = try JSONSerialization.jsonObject(with: body) as! [String: Any]
         XCTAssertEqual(o["text"] as? String, "Ciao")
+        XCTAssertEqual(o["language_code"] as? String, "it", "Italian forced, no foreign accent")
+        let multi = VoiceTurn.speechRequest(text: "Ciao", config: VoiceTurn.Config(["model_id": "eleven_multilingual_v2"]), key: key, pronunciation: [:])
+        XCTAssertNil((try JSONSerialization.jsonObject(with: XCTUnwrap(multi.httpBody)) as! [String: Any])["language_code"], "that model rejects the field")
         XCTAssertEqual((o["voice_settings"] as? [String: Any])?["speed"] as? Double, 1.2, "ElevenLabs caps at 1.2")
         XCTAssertEqual(VoiceTurn.playbackRate(cfg), 1.5, accuracy: 0.001, "the player does the rest")
         XCTAssertEqual(VoiceTurn.Config([:]).voiceId, VoiceTurn.Config.defaultVoice, "only the key set: a premade voice")

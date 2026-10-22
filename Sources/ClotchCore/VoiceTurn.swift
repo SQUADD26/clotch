@@ -200,6 +200,9 @@ public enum VoiceTurn {
         return out + ns.substring(from: last)
     }
 
+    /// The language every spoken line is in.
+    public static let spokenLanguage = "it"
+
     /// The ElevenLabs request, the text said as the pronunciation list wants: the key only in the `xi-api-key` header, never in the URL or the body.
     public static func speechRequest(text: String, config: Config, key: String, pronunciation: [String: String]) -> URLRequest {
         var r = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/text-to-speech/\(config.voiceId)?output_format=mp3_44100_64")!)
@@ -208,7 +211,9 @@ public enum VoiceTurn {
         r.setValue(key, forHTTPHeaderField: "xi-api-key")
         r.setValue("application/json", forHTTPHeaderField: "Content-Type")
         r.setValue("audio/mpeg", forHTTPHeaderField: "Accept")
-        let body: [String: Any] = ["text": pronounced(text, pronunciation), "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
+        var body: [String: Any] = ["text": pronounced(text, pronunciation), "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
+        // Without it the model guesses the language and a voice made for another one speaks Italian with its accent (#245).
+        if ["turbo", "flash", "v3"].contains(where: config.model.contains) { body["language_code"] = spokenLanguage }
         r.httpBody = try? JSONSerialization.data(withJSONObject: body)
         return r
     }
