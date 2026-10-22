@@ -13,6 +13,11 @@ actor LocalTranscriber {
     /// False until the first use: the pill says the model is being downloaded.
     var isLoaded: Bool { models != nil }
 
+    /// At launch (#174): the model loads while nobody waits. Loaded at the first press instead, the first utterance took 12 to 44 s.
+    func preload() async throws {
+        if models == nil { models = try await AsrModels.downloadAndLoad(version: .v3) }
+    }
+
     /// `onText` gets the whole text so far (confirmed, then still changing) after every update.
     func start(onText: @escaping @Sendable (String) -> Void) async throws {
         let m = SlidingWindowAsrManager(config: .streaming)
