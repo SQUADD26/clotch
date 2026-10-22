@@ -10,7 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "VoiceInput")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.

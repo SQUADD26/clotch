@@ -63,7 +63,7 @@ public enum EngineCommand {
 
     public static func defaultLog(_ line: String) {
         #if canImport(os)
-        Logger(subsystem: "com.squadd.clotch", category: "EngineCommand").error("\(line, privacy: .public)")
+        Logger(subsystem: ClotchLog.subsystem, category: "EngineCommand").error("\(line, privacy: .public)")
         #else
         FileHandle.standardError.write(Data(("EngineCommand: " + line + "\n").utf8))
         #endif
