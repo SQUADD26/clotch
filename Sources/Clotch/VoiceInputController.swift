@@ -303,6 +303,7 @@ final class VoiceInputController: ObservableObject {
         teardown()
         timers.append(dismiss(after: seconds, whenStill: next))
         phase = next
+        Self.log.notice("pill: \(Self.label(next), privacy: .public) for \(seconds, privacy: .public) s")  // #228: how long the red light lasts
     }
 
     func dismiss(after seconds: Double, whenStill expected: Phase) -> Task<Void, Never> {
@@ -311,6 +312,7 @@ final class VoiceInputController: ObservableObject {
             try? await Task.sleep(nanoseconds: UInt64(seconds * 1e9))
             guard !Task.isCancelled, let self, me == run, phase == expected else { return }
             withAnimation(NotchAnimation.close) { phase = .idle }
+            Self.log.notice("pill: idle after \(Self.label(expected), privacy: .public)")
         }
     }
 }
