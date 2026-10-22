@@ -206,6 +206,7 @@ public enum VoiceTurn {
         "Friday": "fràidei", "handoff": "hènd off", "worktree": "uòrk trì", "branch": "brànc", "issue": "ìsciu",
         "pull request": "pul richièst", "pipeline": "pàiplain", "webhook": "uèb huk", "backend": "bèk end", "frontend": "frònt end",
         "staging": "stèigin", "rebase": "ribèis", "push": "pusc", "build": "bild", "token": "tòuken",
+        "Overseer": "ouver sìr", "Slack": "slèc", "Notion": "nòuscion", "dashboard": "dàscbord",
     ]
 
     /// The voice's name: ONE place (#299), Roberto will pick another.
