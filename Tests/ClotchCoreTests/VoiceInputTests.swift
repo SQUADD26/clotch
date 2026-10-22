@@ -201,4 +201,19 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(f.inboxListenerURL.path, "/h/.config/voce/ingresso/.ascolta")
         XCTAssertEqual(f.overseerURL.path, "/h/.claude/overseer/attuale.json")
     }
+
+    /// #242: the sentences the local engine heard in the live tests of 22/10, and words that must stay.
+    func testSystemNamesAreFixedAfterTheEngine() {
+        XCTAssertEqual(VoiceInput.fixNames("Di Allover Saird e la prova dal vivo della dettatura di Cloche è passata."),
+                       "Di all'Overseer e la prova dal vivo della dettatura di Clotch è passata.")
+        XCTAssertEqual(VoiceInput.fixNames("Di Allover Seyer che la prova della dettatura di Cloce è passata"),
+                       "Di all'Overseer che la prova della dettatura di Clotch è passata")
+        XCTAssertEqual(VoiceInput.fixNames("Oversayer, questa è una prova dettata da Cloch."), "Overseer, questa è una prova dettata da Clotch.")
+        XCTAssertEqual(VoiceInput.fixNames("Che cosa fanno le sessioni di cloch?"), "Che cosa fanno le sessioni di Clotch?")
+        XCTAssertEqual(VoiceInput.fixNames("Over sire, chiudi"), "Overseer, chiudi")
+        for same in ["game over", "un lover", "la sessione dell'Overseer", "Overseer", "clock e orologio"] {
+            XCTAssertEqual(VoiceInput.fixNames(same), same)
+        }
+    }
+
 }
