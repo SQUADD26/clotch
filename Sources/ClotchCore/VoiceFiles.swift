@@ -33,7 +33,13 @@ public struct VoiceFiles {
         judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
         jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
+        overseerURL = home.appendingPathComponent(".claude/overseer/attuale.json")
     }
+
+    /// Orders for the Overseer (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
+    public var inboxURL: URL { voiceDir.appendingPathComponent(VoiceRoute.inboxFolder) }
+    public var inboxListenerURL: URL { inboxURL.appendingPathComponent(".ascolta") }
+    public let overseerURL: URL
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }
 
