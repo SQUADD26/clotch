@@ -19,7 +19,7 @@ public enum GoalSources {
                           proof: d["prova"] as? String ?? "", at: date(d["t"]),
                           title: d["titolo"] as? String ?? "", proofs: proofs, successor: d["a"] as? String,
                           proposal: (d["proposta"] as? [String: Any])?["testo"] as? String, lastSeen: date(d["ultima_attivita"]),
-                          stalledSince: date(d["fermo_da"]), stalledReason: d["perche"] as? String ?? "")
+                          stalledSince: date(d["fermo_da"]), stalledReason: d["perche"] as? String ?? "", valid: d["valido"] as? Bool ?? true)
     }
 
     /// nil for scheduled-task sessions and sessions without a CLI id (same filter as overseer_fonti.leggi_sessioni).

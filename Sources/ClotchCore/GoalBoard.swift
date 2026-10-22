@@ -22,6 +22,7 @@ public struct GoalRecord: Equatable, Sendable {
     public var lastSeen: Date? = nil     // "ultima_attivita": the hook's sign of life at each prompt and Stop of the live session
     public var stalledSince: Date? = nil // "fermo_da" (#1916): when the engine saw the open goal stop with proofs undone
     public var stalledReason = ""        // "perche": the proof that fails, with its real output
+    public var valid = true              // "valido" (#183): false = the engine treats the file as unsigned; no field = valid
 }
 
 /// One local_*.json of the Claude desktop app.
@@ -123,7 +124,7 @@ public enum GoalBoard {
         let liveByCli = Dictionary(live.map { ($0.cliId, $0) }, uniquingKeysWith: { a, _ in a })
 
         var out: [GoalRow] = []
-        for g in goals where shown.contains(g.state) {
+        for g in goals where shown.contains(g.state) && g.valid {  // an invalid one is hidden (#183)
             let master = masters[g.cli] ?? g.successor.flatMap { masters[$0] }
             if g.state == "raggiunto", master == nil || master!.isArchived { continue }
 
