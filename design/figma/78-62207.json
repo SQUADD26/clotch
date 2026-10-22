@@ -1,0 +1,324 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "78:62207",
+  "nome": "avvisi per te",
+  "w": 508,
+  "h": 106
+ },
+ "variabili": {
+  "notch/bianco-a7": "#ffffff12",
+  "notch/raggio/14": 14,
+  "notch/spazio/12": 12,
+  "notch/spazio/16": 16,
+  "notch/spazio/4": 4,
+  "notch/bianco-a92": "#ffffffeb",
+  "notch/testo/14": 14,
+  "notch/bianco-a60": "#ffffff99",
+  "notch/testo/12": 12,
+  "notch/spazio/8": 8,
+  "notch/bianco-a94": "#fffffff0",
+  "notch/raggio/11": 11,
+  "notch/spazio/10": 10,
+  "notch/misura/22": 22,
+  "notch/nero": "#000000",
+  "notch/testo/11": 11,
+  "notch/bianco-a12": "#ffffff1f"
+ },
+ "nodi": [
+  {
+   "id": "78:62207",
+   "nome": "avvisi per te",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 508,
+    "h": 106
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/14",
+    "itemSpacing": "notch/spazio/12",
+    "paddingLeft": "notch/spazio/16",
+    "paddingRight": "notch/spazio/16",
+    "paddingTop": "notch/spazio/12",
+    "paddingBottom": "notch/spazio/12"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62208",
+   "nome": "avviso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 16,
+    "y": 12,
+    "w": 476,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62209",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 16,
+    "y": 12,
+    "w": 322,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62210",
+   "nome": "chi e cosa",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 12,
+    "w": 322,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Setup aspetta il tuo ok",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62211",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 33,
+    "w": 322,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Scegliere come fare i test della pagina prezzi.",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62212",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 354,
+    "y": 18.5,
+    "w": 138,
+    "h": 22
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62213",
+   "nome": "bottone Dai l’ok",
+   "tipo": "FRAME",
+   "box": {
+    "x": 354,
+    "y": 18.5,
+    "w": 60,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a94",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62214",
+   "nome": "testo Dai l’ok",
+   "tipo": "TEXT",
+   "box": {
+    "x": 364,
+    "y": 23,
+    "w": 40,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Dai l’ok",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62215",
+   "nome": "bottone Apri chat",
+   "tipo": "FRAME",
+   "box": {
+    "x": 422,
+    "y": 18.5,
+    "w": 70,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a12",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62216",
+   "nome": "testo Apri chat",
+   "tipo": "TEXT",
+   "box": {
+    "x": 432,
+    "y": 23,
+    "w": 50,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Apri chat",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62217",
+   "nome": "avviso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 16,
+    "y": 59,
+    "w": 476,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62218",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 16,
+    "y": 59,
+    "w": 390,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62219",
+   "nome": "chi e cosa",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 59,
+    "w": 390,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "SEO aspetta te da 40 min",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62220",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 80,
+    "w": 390,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Il motore si è fermato: serve una persona.",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62221",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 422,
+    "y": 65.5,
+    "w": 70,
+    "h": 22
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62222",
+   "nome": "bottone Apri chat",
+   "tipo": "FRAME",
+   "box": {
+    "x": 422,
+    "y": 65.5,
+    "w": 70,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a12",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62223",
+   "nome": "testo Apri chat",
+   "tipo": "TEXT",
+   "box": {
+    "x": 432,
+    "y": 70,
+    "w": 50,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Apri chat",
+   "font": "SF Pro Semibold"
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "78:62682",
+  "nome": "prova da confermare",
+  "w": 508,
+  "h": 47
+ },
+ "variabili": {
+  "notch/bianco-a7": "#ffffff12",
+  "notch/raggio/10": 10,
+  "notch/spazio/16": 16,
+  "notch/spazio/8": 8,
+  "notch/spazio/2": 2,
+  "notch/bianco-a60": "#ffffff99",
+  "notch/testo/11": 11,
+  "notch/bianco-a92": "#ffffffeb",
+  "notch/testo/13": 13,
+  "notch/bianco-a94": "#fffffff0",
+  "notch/raggio/11": 11,
+  "notch/spazio/10": 10,
+  "notch/misura/22": 22,
+  "notch/nero": "#000000"
+ },
+ "nodi": [
+  {
+   "id": "78:62682",
+   "nome": "prova da confermare",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 508,
+    "h": 47
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/10",
+    "itemSpacing": "notch/spazio/16",
+    "paddingLeft": "notch/spazio/16",
+    "paddingRight": "notch/spazio/16",
+    "paddingTop": "notch/spazio/8",
+    "paddingBottom": "notch/spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62683",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 16,
+    "y": 8,
+    "w": 386,
+    "h": 31
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62684",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 8,
+    "w": 386,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Prova da confermare",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62685",
+   "nome": "testo prova",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 23,
+    "w": 386,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Prova dal vivo: il notch si apre e si legge intero",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62686",
+   "nome": "bottone Conferma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 418,
+    "y": 12.5,
+    "w": 74,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a94",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62687",
+   "nome": "testo Conferma",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 17,
+    "w": 54,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Conferma",
+   "font": "SF Pro Semibold"
+  }
+ ]
+}
