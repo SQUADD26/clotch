@@ -31,6 +31,27 @@ final class EngineCommandTests: XCTestCase {
         XCTAssertEqual(failure, .notStarted)
     }
 
+    func testPreciseSentenceSaysCommandStatusAndLastStderrLine() {
+        let failure = EngineCommand.Failure.exit(status: 1, stderr: "Traceback\nrichieste.py: file non trovato\n")
+        XCTAssertEqual(failure.precise(what: "delle richieste"),
+                       "Il comando delle richieste è uscito con errore 1: «richieste.py: file non trovato». Riprova tra poco.")
+    }
+
+    func testPreciseSentenceWithoutStderrHasNoQuotes() {
+        XCTAssertEqual(EngineCommand.Failure.exit(status: 3, stderr: "").precise(what: "delle richieste"),
+                       "Il comando delle richieste è uscito con errore 3. Riprova tra poco.")
+    }
+
+    func testPreciseSentenceCutsALongStderrLine() {
+        let sentence = EngineCommand.Failure.exit(status: 2, stderr: String(repeating: "x", count: 300)).precise(what: "delle richieste")
+        XCTAssertTrue(sentence.contains("«" + String(repeating: "x", count: 120) + "…»"), sentence)
+    }
+
+    func testPreciseSentenceWhenNotStarted() {
+        XCTAssertEqual(EngineCommand.Failure.notStarted.precise(what: "delle richieste"),
+                       "Il comando delle richieste non è partito. Riprova tra poco.")
+    }
+
     func testRobertoIsNotASession() throws {
         setenv("CLAUDE_CODE_SESSION_ID", "cli-1", 1)
         defer { unsetenv("CLAUDE_CODE_SESSION_ID") }

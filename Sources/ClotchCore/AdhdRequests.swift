@@ -67,3 +67,14 @@ extension GoalSources {
         }
     }
 }
+
+/// What the ADHD tab shows (claude-config#1967): an empty card that could not be read is not «Nessuna domanda».
+/// A failed read with a list already in hand keeps the list (it may be old; the yellow line says so).
+public enum AdhdScreen: Equatable, Sendable {
+    case list, empty, readFailed(String)
+
+    public static func of(items: [AdhdRequest], readError: String?) -> AdhdScreen {
+        if !items.isEmpty { return .list }
+        return readError.map(AdhdScreen.readFailed) ?? .empty
+    }
+}

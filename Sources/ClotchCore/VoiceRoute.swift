@@ -77,7 +77,7 @@ public enum VoiceRoute {
     public static func askArguments(model: String = askModel) -> [String] {
         let allowed = ["Read", "Glob", "Grep", "Bash(gh issue view:*)", "Bash(gh issue list:*)", "Bash(gh pr view:*)", "Bash(gh pr list:*)"]
         return ["-p", "--safe-mode", "--model", model, "--effort", "low", "--tools", "Read,Glob,Grep,Bash", "--allowed-tools", allowed.joined(separator: ","),
-                "--no-session-persistence", "--max-budget-usd", "0.10", "--system-prompt", askPrompt]
+                "--no-session-persistence", "--max-budget-usd", budget(model), "--system-prompt", askPrompt]
     }
 
     static let askPrompt = """
@@ -97,13 +97,21 @@ public enum VoiceRoute {
     /// The helper's instructions, claude-config's own file under the home, read and never copied: present = the helper answers, talks
     /// to the sessions itself and passes only new work to the Overseer; missing or empty = the read-only question and the inbox order.
     public static let helperPromptPath = ".claude/hooks/helper_voce_prompt.md"
-    /// The one command the helper may run, from `~/.claude`: `stato`, `sessione <local_…> "<testo>"`, `overseer "<testo>"`.
+    /// The one command the helper (the Overseer, clotch#286) may run, from `~/.claude`: `stato`, `sessione`, `casella`, `ferme`, `sblocca`, `archivia`, `promuovi`, `apri`, `overseer`…
     public static let helperCommand = "Bash(python3 hooks/helper_voce.py:*)"
 
     public static func helperArguments(prompt: String, model: String = askModel) -> [String] {
         ["-p", "--safe-mode", "--model", model, "--effort", "low", "--tools", "Read,Glob,Grep,Bash", "--allowed-tools", "Read,Glob,Grep,\(helperCommand)",
-         "--no-session-persistence", "--max-budget-usd", "0.10", "--system-prompt", prompt]
+         "--no-session-persistence", "--max-budget-usd", budget(model), "--system-prompt", prompt]
     }
+
+    /// The ceiling of one answer (clotch#286): a stronger Overseer reads more of the box and costs more per token.
+    public static func budget(_ model: String) -> String {
+        model.contains("opus") ? "0.60" : model.contains("sonnet") ? "0.30" : "0.10"
+    }
+
+    /// Seconds one answer may take: Haiku as before (`dai-ok` may wait to start a turn), the slower models longer.
+    public static func helperSeconds(_ model: String) -> TimeInterval { model == askModel ? 90 : 150 }
 
     public static func askInput(_ question: String, sessions: [String] = []) -> String {
         "<sessioni>\n\(sessions.joined(separator: "\n"))\n</sessioni>\n<domanda>\n\(question)\n</domanda>\n"
