@@ -105,6 +105,25 @@ final class VoiceAlertBar: ObservableObject {
         state = .shown
     }
 
+    /// The red light of the island while an ok failed (the voice pill's own light, #110).
+    static func light(_ s: State) -> VoiceInputController.Light { if case .failed = s { return .red } else { return .off } }
+
+    /// The Figma's states (78-61664), for `--snapshot --gallery`.
+    static var stills: [(String, VoiceEvent, State)] {
+        var ok = VoiceEvent(kind: .waitsForOk, at: Date(), subject: "Setup",
+                            text: "Setup aspetta un tuo ok per scegliere come fare i test della pagina prezzi: vuoi che glielo dia io?", proof: "local_x")
+        ok.id = "e-ok"
+        var adhd = VoiceEvent(kind: .adhdAnswer, at: Date(), subject: "Dove mi registro al programma startup di Google Cloud?",
+                              text: "Risposta a: Dove mi registro al programma startup di Google Cloud? Su cloud.google.com/startup, modulo «Apply now». Servono la partita IVA e il sito online.")
+        adhd.id = "e-adhd"
+        var stuck = VoiceEvent(kind: .stalledDependency, at: Date(), subject: "SEO", text: "Una sessione aspetta te da troppo: il motore si è fermato: serve una persona.")
+        stuck.localId = "local_y"
+        stuck.id = "e-dip"
+        return [("ok", ok, .shown), ("invio", ok, .sending), ("ok-dato", ok, .done),
+                ("ok-non-dato", ok, .failed("La chat di Setup non si è aperta: l’app Claude è chiusa.")),
+                ("risposta-adhd", adhd, .shown), ("sessione-ferma", stuck, .shown)]
+    }
+
     /// nil = done; else the last line dai-ok printed, without its «dai-ok:» prefix.
     nonisolated static func reason(code: Int32, stdout: String) -> String? {
         guard code != 0 else { return nil }

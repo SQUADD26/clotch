@@ -162,7 +162,6 @@ struct NotchPanelView: View {
     }
     /// Shown even when the bar is hidden, like the pill: the voice is saying it.
     private var showsAlert: Bool { !shouldShowExpanded && !showsVoiceInput && alertBar.current != nil }
-    private var alertFailed: Bool { if case .failed = alertBar.state { return true } else { return false } }
     /// Shown even when the bar is hidden: he is speaking and must see it.
     private var showsVoiceInput: Bool { !shouldShowExpanded && voiceInput.phase != .idle }
     /// The goal element of the closed notch already says it (#39): no second line under the notch.
@@ -494,7 +493,7 @@ struct NotchPanelView: View {
             // The Overseer's voice: a light on the island's outline, outside the clip so it spills past the edge (#10).
             .overlay { VoiceEdgeLightLive(voice: voice, shape: panelShape) }
             .overlay { VoiceInputLightLive(light: voiceInput.light, shape: panelShape) }
-            .overlay { VoiceInputLightLive(light: showsAlert && alertFailed ? .red : .off, shape: panelShape) }
+            .overlay { VoiceInputLightLive(light: showsAlert ? VoiceAlertBar.light(alertBar.state) : .off, shape: panelShape) }
             .simultaneousGesture(TapGesture().onEnded { openOnClick() })
             .offset(y: curtainOffset)
             .opacity(curtainOpacity)
