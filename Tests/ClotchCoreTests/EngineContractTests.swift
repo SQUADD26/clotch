@@ -46,6 +46,7 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(one(#""responsabile":"Clotch","origine":"x","da_smistare":false"#).waitingLabel, "In attesa di Clotch")
         XCTAssertEqual(one(#""responsabile":"","origine":"Notch","da_smistare":false"#).waitingLabel, "In attesa di Notch")
         XCTAssertEqual(one(#""da_smistare":true"#).waitingLabel, "Da smistare · Overseer")
+        XCTAssertEqual(one(#""stato":"sollecitata","da_smistare":false"#).waitingLabel, "Sollecitata · aspetto la risposta")
         XCTAssertEqual(AdhdRequest.unansweredCount([one(#""da_smistare":true"#)]), 1)
     }
 

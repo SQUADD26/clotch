@@ -27,7 +27,7 @@ final class NotchHeightTests: XCTestCase {
     func testGoalsTabIsShorterWithOneGoalThanWithAList() {
         let one = height(GoalsTab(rows: [row("a")], now: now).hugging(maxHeight: 700))
         let many = height(GoalsTab(rows: [row("a"), row("b"), row("c")], now: now).hugging(maxHeight: 700))
-        XCTAssertLessThan(one, many)  // the list adds the page dots
+        XCTAssertLessThanOrEqual(one, many)  // no page dots any more (#140): a list is never shorter
         XCTAssertLessThan(one, 700)   // and nothing fills the cap
     }
 

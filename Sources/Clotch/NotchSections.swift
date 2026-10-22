@@ -147,76 +147,14 @@ enum TabBarPointer {
     static var inside = false
 }
 
-/// Three 142 × 30 segments in a 38 pt well; the chosen one lifts. One spring moves the highlight.
-struct TabBar: View {
-    @Binding var tab: NotchTab
-    var tabs = NotchTab.allCases
-    /// The tab with a yellow number, no box (new answers, #90, #114); never the open one.
-    var badge: (tab: NotchTab, count: Int)? = nil
-    /// The yellow number in the ADHD tab: the questions still without an answer (#123); nothing at 0.
-    var adhdCount = 0
-    /// The AFK moon's state for `--snapshot`; nil = live.
-    var afkOn: Bool? = nil
-    @Namespace private var highlight
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(tabs) { item in
-                // withAnimation, so the notch's height follows the new tab with the same spring as the tab.
-                Button { withAnimation(NotchMotion.animation(reduce: reduceMotion)) { tab = item } } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: item.symbol)
-                        Text(item.title)
-                        if let badge, badge.tab == item, item != tab {
-                            Text("\(badge.count)")
-                                .font(.system(size: FigmaToken.MacOS27GoldenGate.notchTesto11, weight: .semibold))
-                                .foregroundStyle(FigmaToken.MacOS27GoldenGate.notchGiallo)
-                                .accessibilityLabel(badge.count == 1 ? "1 nuova risposta" : "\(badge.count) nuove risposte")
-                        }
-                        if item == .adhd && adhdCount > 0 {
-                            Text("\(adhdCount)").font(.system(size: FigmaToken.MacOS27GoldenGate.notchTesto11, weight: .semibold))
-                                .foregroundStyle(GoalTone.wait.color).accessibilityLabel("\(adhdCount) senza risposta")
-                        }
-                    }
-                    .font(item == tab ? NotchType.tab : NotchType.tabOff)
-                    .foregroundStyle(item == tab ? GoalInk.primary : GoalInk.off)
-                    .frame(maxWidth: .infinity, minHeight: 30)
-                    .background {
-                        if item == tab {
-                            Capsule().fill(GoalInk.selected).matchedGeometryEffect(id: "tab", in: highlight)
-                        }
-                    }
-                    .contentShape(Capsule())
-                }
-                .buttonStyle(.notch)
-                .accessibilityAddTraits(item == tab ? .isSelected : [])
-            }
-        }
-        .padding(4)
-        .background(Capsule().fill(GoalInk.well))
-        .frame(maxWidth: 434)
-        .onHover { TabBarPointer.inside = $0 }
-        .onDisappear { TabBarPointer.inside = false }  // closing the notch sends no hover-out
-        // The gear and the AFK moon (#106) on the right of the bar, so they are there on every tab.
-        .padding(.trailing, 86)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .trailing) {
-            HStack(spacing: 12) {
-                NotchSettingsButton()
-                AfkButton(on: afkOn)
-            }
-        }
-    }
-}
-
 /// The gear of the open notch: the app's settings window, the same as the menu bar's «Impostazioni…»
 /// (where «Personalizza il notch» lives too).
 struct NotchSettingsButton: View {
     var open: @MainActor () -> Void = { NotchExit.close(); SettingsWindowController.shared.show() }
 
     var body: some View {
-        NotchIconButton(icon: "gearshape", tooltip: "Apri impostazioni") { open() }
+        NotchIconButton(icon: "gearshape", tooltip: "Apri impostazioni", circle: FigmaToken.MacOS27GoldenGate.notchMisura36,
+                        glyph: FigmaToken.MacOS27GoldenGate.notchTesto13) { open() }
     }
 }
 
