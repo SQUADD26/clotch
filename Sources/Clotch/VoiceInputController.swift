@@ -30,6 +30,9 @@ final class VoiceInputController: ObservableObject {
     /// One line while the local model is not ready yet.
     @Published private(set) var hint: String?
 
+    /// The microphone is on or about to be: nothing else may speak.
+    var micOpen: Bool { phase == .ready || phase == .listening || phase == .finishing }
+
     var text: String { [sure, maybe].filter { !$0.isEmpty }.joined(separator: " ") }
     var light: Light {
         switch phase {
