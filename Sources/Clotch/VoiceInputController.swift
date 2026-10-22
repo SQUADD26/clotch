@@ -84,9 +84,10 @@ final class VoiceInputController: ObservableObject {
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
-    /// At launch and after each utterance: the slow part of the microphone's start, done while nobody waits.
+    /// At launch and after each utterance: the slow part of the microphone's start and the local model, done while nobody waits.
     func prewarm() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        if current.enabled, current.engine == .local { Task { [local] in try? await local.preload() } }
         guard current.enabled, spare?.microphone != current.microphone else { return }
         spare = makeCapture(current.microphone)
         spare?.prepare()
@@ -278,9 +279,6 @@ final class VoiceInputController: ObservableObject {
         hint = nil
         levels = [Double](repeating: 0, count: levels.count)
     }
-
-    /// A line on the pill for a while, then the pill folds away.
-    func show(_ message: String, seconds: Double = 3) { end(.result(message), seconds: seconds) }
 
     /// Closes the engines and puts `next` on the pill for `seconds`.
     func end(_ next: Phase, seconds: Double) {

@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let dir = GoalSnapshot.requestedDirectory() {
             GoalSnapshot.run(into: dir)
         }
+        Self.log.notice("launch: build \(Bundle.main.object(forInfoDictionaryKey: "ClotchCommit") as? String ?? "unknown", privacy: .public) at \(Bundle.main.bundlePath, privacy: .public)")
         SingleInstance.replaceOthers()
         ProcessInfo.processInfo.disableAutomaticTermination("Clotch must stay running")
         ProcessInfo.processInfo.disableSuddenTermination()
