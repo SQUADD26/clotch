@@ -163,6 +163,8 @@ public enum VoiceInput {
         case doNotDisturb
         /// A dictation of more than `heardAfter` s with no words or no level at all (#269): never a bar that closes mute.
         case nothingHeard
+        /// #314: ElevenLabs answered with an error of its own (rate_limited, transcriber_error, …), or refused the audio (input_error).
+        case service, audio
 
         public var title: String {
             switch self {
@@ -175,6 +177,8 @@ public enum VoiceInput {
             case .shortcut: return "Scorciatoia non disponibile"
             case .doNotDisturb: return "Non disturbare acceso"
             case .nothingHeard: return "Non ho sentito niente"
+            case .service: return "ElevenLabs non trascrive"
+            case .audio: return "ElevenLabs rifiuta l'audio"
             }
         }
 
@@ -189,6 +193,8 @@ public enum VoiceInput {
             case .shortcut: return "Un altro programma usa questo tasto. Scegline un altro nelle impostazioni."
             case .doNotDisturb: return "Spegnilo con non-disturbare off, poi riprova."
             case .nothingHeard: return "Il microfono non mi ha dato voce. Riprova, o scegli un altro microfono."
+            case .service: return "Riprova tra poco, o usa il modello locale."
+            case .audio: return "Riprova, o scegli un altro microfono."
             }
         }
 
@@ -198,10 +204,10 @@ public enum VoiceInput {
             case .mic: return [.openPrivacy]
             case .key: return [.checkKey, .useLocal]
             case .credits: return [.useLocal]
-            case .network: return [.retry, .useLocal]
+            case .network, .service: return [.retry, .useLocal]
             case .local, .doNotDisturb: return [.retry]
             case .off, .shortcut: return [.openDictation]
-            case .nothingHeard: return [.retry, .openDictation]
+            case .nothingHeard, .audio: return [.retry, .openDictation]
             }
         }
     }
@@ -225,7 +231,20 @@ public enum VoiceInput {
         switch type {
         case "auth_error", "unaccepted_terms": return .key
         case "quota_exceeded": return .credits
-        default: return .network  // rate_limited, resource_exhausted, transcriber_error, …
+        // #314: under 0.3 s of audio at the commit: the microphone gave nothing, the connection is fine
+        case "commit_throttled": return .nothingHeard
+        case "input_error": return .audio
+        default: return .service  // rate_limited, resource_exhausted, transcriber_error, …
+        }
+    }
+
+    /// The socket closed without a message: refused at the handshake (HTTP status), else the connection itself.
+    public static func failure(httpStatus: Int) -> Failure {
+        switch httpStatus {
+        case 401, 403: return .key
+        case 402: return .credits
+        case 400...599: return .service
+        default: return .network
         }
     }
 
