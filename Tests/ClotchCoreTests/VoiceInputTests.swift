@@ -73,7 +73,13 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"committed_transcript_with_timestamps","text":"x","words":[]}"#), .committed("x"))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"auth_error","error":"bad key"}"#), .failure(.key))
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"quota_exceeded","error":"x"}"#), .failure(.credits))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure(.network))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"transcriber_error","error":"x"}"#), .failure(.service))
+        // #314: what the Mac got when the microphone sent nothing, word for word
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"commit_throttled","error":"Commit request ignored: only 0.10s of uncommitted audio. You need at least 0.3s of uncommitted audio before committing."}"#), .failure(.nothingHeard))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"input_error","error":"x"}"#), .failure(.audio))
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 401), .key)
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 429), .service)
+        XCTAssertEqual(VoiceInput.failure(httpStatus: 0), .network)
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"warning","warning":"w"}"#), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent("not json"), .ignored)
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"something_new"}"#), .ignored)
@@ -91,7 +97,7 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.Failure.credits.actions, [.useLocal])
         XCTAssertEqual(VoiceInput.Failure.network.actions, [.retry, .useLocal])
         XCTAssertEqual(VoiceInput.Failure.mic.actions.map(\.label), ["Apri Privacy › Microfono"])
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.network))
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.service))
         // #147: no voice to hear is Roberto's choice, not a failure.
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .quiet)
     }

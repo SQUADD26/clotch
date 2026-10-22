@@ -10,7 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
-    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
+    static let log = Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.
@@ -69,6 +69,8 @@ final class VoiceInputController: ObservableObject {
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
     /// Asks `claude -p` (question, helper prompt or nil); the tests hand in a fake that records the call and launches nothing (#270).
     var ask: (String, String?) async -> Result<String, ClaudeLogin.Failure> = { await VoiceAsk.run($0, helper: $1) }
+    /// The error pill's buttons: the click test (#314) records the action instead of opening Privacy or Settings.
+    var act: ((VoiceInput.Action) -> Void)?
     /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
     var finishLocal: (() async -> String)?
     var localWait = VoiceInput.commitWait
