@@ -38,8 +38,12 @@ final class AdhdStore: ObservableObject {
 
     /// One answered question, or all of them with nil: gone from the list.
     func markRead(_ id: String?) {
+        let commands = AdhdRequest.markReadArguments(id, in: items, home: home)
         items.removeAll { $0.answered && (id == nil || $0.id == id) }
-        act("letta", id ?? "--tutte")
+        Task.detached {
+            for args in commands { _ = Self.run(args) }
+            await MainActor.run { self.refresh() }
+        }
     }
 
     func nudge(_ id: String) {

@@ -15,7 +15,7 @@ struct GoalsTab: View {
     @State private var pageOrder: [String] = []
 
     var body: some View {
-        let tab = GoalBoard.tab(rows, rejected: store.rejected)
+        let tab = GoalBoard.tab(rows)
         let freshAsks = tab.toConfirm.map(\.id), freshPages = rows.pages.map(\.id)
         let toConfirm = GoalBoard.keepOrder(askOrder, freshAsks).compactMap { id in tab.toConfirm.first { $0.id == id } }
         let pages = GoalBoard.keepOrder(pageOrder, freshPages).compactMap { id in tab.goals.first { $0.id == id } }

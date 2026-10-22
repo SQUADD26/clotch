@@ -49,6 +49,14 @@ final class EngineContractTests: XCTestCase {
         XCTAssertNil(GoalSources.parseAdhd(Data(#"[{"id":"Q-3","domanda_chiara":"D?","risposta_da":"sessione"}]"#.utf8))[0].answerNote, "the session's own answer says nothing")
     }
 
+    func testMarkAllReadSendsOnlyTheIdsShown() {
+        let list = GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"A?","risposta":"x"},{"id":"Q-2","domanda_chiara":"B?"},{"id":"Q-3","domanda_chiara":"C?","risposta":"y"}]"#.utf8))
+        XCTAssertEqual(AdhdRequest.markReadArguments(nil, in: list, home: "/h"),
+                       [["/h/.claude/hooks/richieste.py", "letta", "Q-1"], ["/h/.claude/hooks/richieste.py", "letta", "Q-3"]],
+                       "never `--tutte`: an answer that landed after the list was drawn stays unread (#171)")
+        XCTAssertEqual(AdhdRequest.markReadArguments("Q-3", in: list, home: "/h"), [["/h/.claude/hooks/richieste.py", "letta", "Q-3"]])
+    }
+
     func testAdhdWaitingLabelAndBadge() {
         func one(_ extra: String) -> AdhdRequest {
             GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"Domanda?","risposta":"",\#(extra)}]"#.utf8))[0]

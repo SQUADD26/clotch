@@ -36,6 +36,12 @@ public struct AdhdRequest: Identifiable, Equatable, Sendable {
     /// The number in the tab: the questions still without an answer.
     public static func unansweredCount(_ all: [AdhdRequest]) -> Int { all.filter { !$0.answered }.count }
 
+    /// One `letta <id>` per answered question shown (or just `id`): never `--tutte`, which would also mark an answer that landed
+    /// after the list was drawn (#171).
+    public static func markReadArguments(_ id: String?, in shown: [AdhdRequest], home: String) -> [[String]] {
+        shown.filter { $0.answered && (id == nil || $0.id == id) }.map { arguments("letta", $0.id, home: home) }
+    }
+
     /// Arguments for `python3`: `richieste.py letta <id>|--tutte`, `richieste.py sollecita <id>`.
     public static func arguments(_ verb: String, _ id: String?, home: String) -> [String] {
         [home + "/.claude/hooks/richieste.py", verb] + (id.map { [$0] } ?? [])

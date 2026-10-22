@@ -20,10 +20,18 @@ final class GoalProposalsTests: GoalTestCase {
         XCTAssertNil(tab.goals.first { $0.id == "aperto" }?.proposal)
     }
 
-    func testRejectedProposalHiddenUntilNewText() {
-        let r = rows([g("p", stato: "proposto")], [s("l1", cli: "p")])
-        XCTAssertEqual(GoalBoard.tab(r, rejected: [GoalDecision.key(cli: "p", text: "Fare il dato vivo")]).toConfirm, [])
-        XCTAssertEqual(GoalBoard.tab(r, rejected: [GoalDecision.key(cli: "p", text: "un altro testo")]).toConfirm.map(\.id), ["p"])
+    /// #171 (A-F-10): what is hidden comes from the register alone. The engine drops a rejected proposal («rifiutato» is never
+    /// shown), so a proposal still in the file shows, even if the same text was refused before.
+    func testProposalShowsWhileTheRegisterHoldsIt_RejectedStateNeverShows() {
+        let held = rows([g("p", stato: "proposto")], [s("l1", cli: "p")])
+        XCTAssertEqual(GoalBoard.tab(held).toConfirm.map(\.id), ["p"], "the same text again after a refusal shows again")
+        let refused = rows([g("p", stato: "rifiutato")], [s("l1", cli: "p")])
+        XCTAssertEqual(GoalBoard.tab(refused).toConfirm, [])
+    }
+
+    func testProofOnlyRobertoCanTickIsMarked() {
+        let json = #"{"cli":"c","obiettivo":"g","stato":"aperto","prove":[{"testo":"a","fatta":false,"cmd":"x => 1"},{"testo":"la pagina sembra giusta","fatta":false,"cmd":""},{"testo":"b","fatta":true}]}"#
+        XCTAssertEqual(GoalSources.parseGoal(Data(json.utf8))?.proofs?.map(\.waitsForRoberto), [false, true, false], "no command and not done = Roberto's")
     }
 
     func testAcceptAndRejectRunTheGuardWithTheRowCli() {
