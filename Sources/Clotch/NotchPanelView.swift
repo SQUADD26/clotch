@@ -492,7 +492,7 @@ struct NotchPanelView: View {
             }
             .onAppear { displayedToolStatus = showToolStatus }
             .scaleEffect(shouldShowPrehover ? NotchHoverInteraction.prehoverScale : 1, anchor: .top)
-            .contentShape(IslandColumn(width: panelWidth))
+            .contentShape(IslandHoverArea(width: panelWidth, notchHeight: notchHeight, expanded: shouldShowExpanded))
             .onHover { handleHover($0) }
             .onContinuousHover { phase in
                 if case .active = phase, hoverGate.move(to: NSEvent.mouseLocation) { handleHover(true) }
@@ -4133,6 +4133,22 @@ private struct IslandColumn: Shape {
     }
 
     func path(in rect: CGRect) -> Path { Path(NotchIslandGeometry.column(in: rect, width: width)) }
+}
+
+/// Where the pointer opens the island (#264): the rule is `NotchHoverArea`; closed, only the bar, not the note line or buttons under it.
+private struct IslandHoverArea: Shape {
+    var width: CGFloat
+    var notchHeight: CGFloat
+    var expanded: Bool
+    var animatableData: CGFloat {
+        get { width }
+        set { width = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        let column = NotchIslandGeometry.column(in: rect, width: width)
+        return Path(NotchHoverArea.region(column: column, notchHeight: notchHeight, expanded: expanded))
+    }
 }
 
 private struct NotchPanelShape: Shape {

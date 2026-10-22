@@ -4,7 +4,7 @@ import Combine
 import SwiftUI
 import os.log
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "Panel")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "Panel")
 
 private class KeyablePanel: NSPanel {
     override var canBecomeKey: Bool { true }

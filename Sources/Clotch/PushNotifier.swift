@@ -3,7 +3,7 @@ import CoreGraphics
 import os.log
 import ClotchCore
 
-private let log = Logger(subsystem: "com.squadd.clotch", category: "Push")
+private let log = Logger(subsystem: ClotchLog.subsystem, category: "Push")
 
 /// What `PushNotifier.notify` did with one moment.
 enum PushDecision: Equatable {

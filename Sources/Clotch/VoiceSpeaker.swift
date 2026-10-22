@@ -10,7 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceSpeaker {
     static let shared = VoiceSpeaker()
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "Voice")
 
     private let files = VoiceFiles()
     private let home = FileManager.default.homeDirectoryForCurrentUser

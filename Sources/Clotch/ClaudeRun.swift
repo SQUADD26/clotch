@@ -5,7 +5,7 @@ import ClotchCore
 /// Every `claude -p` Clotch starts (#159): with the CLAUDE_CONFIG_DIR of an account that has a login (`ClaudeLogin`),
 /// stderr and exit status in the log, and a failure that says why instead of a silent nil.
 enum ClaudeRun {
-    private static let log = Logger(subsystem: "com.squadd.clotch", category: "ClaudeRun")
+    private static let log = Logger(subsystem: ClotchLog.subsystem, category: "ClaudeRun")
     private static let lock = NSLock()
     nonisolated(unsafe) private static var chosen: (folder: String, at: Date)?
     /// A pick is kept this long; a login failure drops it at once.
