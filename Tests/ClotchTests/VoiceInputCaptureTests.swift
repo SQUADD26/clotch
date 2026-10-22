@@ -242,3 +242,14 @@ final class RecordedVoice: VoiceCapture, @unchecked Sendable {
         queue.asyncAfter(deadline: .now() + 0.1) { self.tick() }
     }
 }
+
+/// Prove dal vivo 22/10: un avviso detto a microfono aperto finiva nella trascrizione di Roberto.
+@MainActor
+final class VoiceMicOpenTests: XCTestCase {
+    func testOnlyTheOpenMicrophonePhasesBlockTheAlerts() {
+        let open: [VoiceInputController.Phase] = [.ready, .listening, .finishing]
+        let closed: [VoiceInputController.Phase] = [.idle, .thinking, .sending, .result("x")]
+        for p in open { XCTAssertTrue(VoiceInputController.still(p).micOpen, "\(p)") }
+        for p in closed { XCTAssertFalse(VoiceInputController.still(p).micOpen, "\(p)") }
+    }
+}
