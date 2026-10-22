@@ -216,14 +216,11 @@ final class VoiceInputTests: XCTestCase {
         }
     }
 
-    /// #271: the forms of the black team of 22/10 that passed mangled, and the keyterms Scribe gets from the same table.
-    func testMoreMangledNamesAndTheKeytermsOfScribe() {
+    /// #271: the forms of the black team of 22/10 that passed mangled.
+    func testMoreMangledNames() {
         XCTAssertEqual(VoiceInput.fixNames("Clutch, che cosa fanno le sessioni?"), "Clotch, che cosa fanno le sessioni?")
         XCTAssertEqual(VoiceInput.fixNames("API Master, dammi lo stato"), "apri-master, dammi lo stato")
         XCTAssertEqual(VoiceInput.fixNames("Dì a apri master di fermarsi"), "Dì a apri-master di fermarsi")
         XCTAssertEqual(VoiceInput.fixNames("apri-master"), "apri-master")
-        let url = VoiceInput.scribeURL(language: "it").absoluteString
-        for name in ["Clotch", "Overseer", "apri-master"] { XCTAssertTrue(url.contains("keyterms=\(name)"), name) }
     }
-
 }

@@ -91,7 +91,6 @@ public enum VoiceInput {
                      URLQueryItem(name: "commit_strategy", value: "manual")]
         if language != "auto" { items.append(URLQueryItem(name: "language_code", value: language)) }
         var c = URLComponents(string: "wss://api.elevenlabs.io/v1/speech-to-text/realtime")!
-        items += names.map { URLQueryItem(name: "keyterms", value: $0.name) }  // Scribe leans toward the system's names (#271)
         c.queryItems = items
         return c.url!
     }
