@@ -93,19 +93,19 @@ final class VoiceFilesTests: XCTestCase {
         let f = VoiceFiles(home: home)
         XCTAssertEqual(f.promptURL.path, home.appendingPathComponent(".claude/hooks/voce-parlatore.md").path)
         XCTAssertEqual(f.prompt, "Dal motore.")
-        XCTAssertEqual(f.pronunciation, ["PR": "pi erre"])
+        XCTAssertEqual(f.pronunciation.withoutBuiltIn, ["PR": "pi erre"])
     }
 
     func testPronunciationIsBaseListThenOwnFile() throws {
-        XCTAssertEqual(files.pronunciation, [:])
+        XCTAssertEqual(files.pronunciation.withoutBuiltIn, [:])
         try put(#"{"Clotch": "Clocc", "PR": "pi erre"}"#, files.basePronunciationURL)
         try put(#"{"PR": "richiesta", "notch": "nocc"}"#, files.pronunciationURL)
-        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "richiesta", "notch": "nocc"])
+        XCTAssertEqual(files.pronunciation.withoutBuiltIn, ["Clotch": "Clocc", "PR": "richiesta", "notch": "nocc"])
         XCTAssertEqual(files.pronunciationURL.path, home.appendingPathComponent(".config/voce/pronuncia.json").path)
         try put("non json", files.pronunciationURL)
-        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "pi erre"])
+        XCTAssertEqual(files.pronunciation.withoutBuiltIn, ["Clotch": "Clocc", "PR": "pi erre"])
         try put(#"{"API": "èi pi ài", "n": 3}"#, files.pronunciationURL)
-        XCTAssertEqual(files.pronunciation, ["Clotch": "Clocc", "PR": "pi erre", "API": "èi pi ài"], "an entry that is not text is skipped")
+        XCTAssertEqual(files.pronunciation.withoutBuiltIn, ["Clotch": "Clocc", "PR": "pi erre", "API": "èi pi ài"], "an entry that is not text is skipped")
     }
 
     func testJudgeQuestionIsTheConfigFile() throws {
@@ -114,4 +114,9 @@ final class VoiceFilesTests: XCTestCase {
         try put("E' necessario avvisare l'utente adesso?\n", files.judgeQuestionURL)
         XCTAssertEqual(files.judgeQuestion, "E' necessario avvisare l'utente adesso?")
     }
+}
+
+private extension Dictionary where Key == String, Value == String {
+    /// #299: the built-in English words sit in every list; these tests are about the files.
+    var withoutBuiltIn: [String: String] { filter { VoiceTurn.builtInPronunciation[$0.key] == nil } }
 }
