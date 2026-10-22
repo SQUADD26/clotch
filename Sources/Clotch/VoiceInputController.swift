@@ -69,6 +69,8 @@ final class VoiceInputController: ObservableObject {
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
+    /// Asks `claude -p` (question, helper prompt or nil); the tests hand in a fake that records the call and launches nothing (#270).
+    var ask: (String, String?) async -> Result<String, ClaudeLogin.Failure> = { await VoiceAsk.run($0, helper: $1) }
     /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
     var finishLocal: (() async -> String)?
     var localWait = VoiceInput.commitWait
@@ -229,11 +231,11 @@ final class VoiceInputController: ObservableObject {
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
-        let helper = VoiceAsk.helperPrompt()  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
+        let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
         Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
         if isQuestion {
             phase = .thinking
-            let reply = await VoiceAsk.run(said, helper: helper)
+            let reply = await ask(said, helper)
             guard me == run else { return }
             guard case .success(let answer) = reply else {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
@@ -248,7 +250,7 @@ final class VoiceInputController: ObservableObject {
         disarmEscape()
         if let helper {
             phase = .thinking
-            let reply = await VoiceAsk.run(said, helper: helper)
+            let reply = await ask(said, helper)
             guard me == run else { return }
             if case .success(let answer) = reply {
                 return answered(answer)
