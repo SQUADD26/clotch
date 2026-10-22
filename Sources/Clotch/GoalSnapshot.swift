@@ -203,7 +203,7 @@ enum GoalSnapshot {
         .background(UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous).fill(.black))
         .overlay {
             if light != .off {
-                VoiceInputLightLive(light: light, shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous))
+                VoiceInputLightLive(light: light, shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous), still: true)
             }
             if let voice {
                 VoiceGlow(shape: UnevenRoundedRectangle(bottomLeadingRadius: radius, bottomTrailingRadius: radius, style: .continuous),
