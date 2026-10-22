@@ -182,4 +182,21 @@ final class GoalLoaderTests: GoalTestCase {
         XCTAssertEqual(byId["Q-2"]?.target?.localId, "local_b", "presa_da as fallback")
         XCTAssertNil(byId["Q-3"]?.target, "not taken: no session to open")
     }
+
+    /// `testo_da` "ripiego" = the title is not ready, `testo` is Roberto's own words (claude-config#2045): never loaded,
+    /// so never listed nor announced; it shows once the engine writes the real title.
+    func testRequestWithoutRealTitleIsNotLoaded() throws {
+        let fm = FileManager.default
+        let home = fm.temporaryDirectory.appendingPathComponent("goals-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: home) }
+        let paths = GoalSources.defaultPaths(home: home)
+        try fm.createDirectory(at: paths.requests, withIntermediateDirectories: true)
+        let write = { (id: String, from: String) in
+            try Data(#"{"id": "\#(id)", "testo": "x", "stato": "presa", "testo_da": "\#(from)"}"#.utf8).write(to: paths.requests.appendingPathComponent("\(id).json"))
+        }
+        try write("Q-1", "ripiego"); try write("Q-2", "haiku"); try write("Q-3", "sessione")
+        XCTAssertEqual(Set(GoalSources.load(paths).requests.map(\.id)), ["Q-2", "Q-3"])
+        try write("Q-1", "haiku")
+        XCTAssertTrue(GoalSources.load(paths).requests.contains { $0.id == "Q-1" }, "shows once the title is real")
+    }
 }

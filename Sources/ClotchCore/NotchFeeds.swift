@@ -22,6 +22,9 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     public let answer: String         // `risposta`: the direct answer, one sentence; "" while there is none (#90)
     public let answeredAt: Date?      // `t_risposta`
     public let localId: String        // app id (`local_…`) of the session that took it; "" while the register does not know it
+    /// `testo_da` "ripiego" (claude-config#2045): `text` is still Roberto's own words, not a title. Never listed nor announced:
+    /// `GoalLoader` drops it until the engine writes the real title.
+    public var titleReady = true
     /// The session that took it in charge, set by `GoalLoader` from `localId`, else from `takenBy` (its cli id); nil when not taken or unknown.
     public var target: SessionTarget? = nil
 
@@ -85,7 +88,7 @@ extension GoalSources {
         guard let d = object(data), let id = d["id"] as? String, !id.isEmpty,
               let text = d["testo"] as? String,
               d["tipo"] as? String != "nota" else { return nil }
-        return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
+        var r = UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
                            text: firstSentence(of: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
                                                whenRaw: d["originale"] as? String == text),
@@ -96,6 +99,8 @@ extension GoalSources {
                            folder: d["cartella"] as? String ?? "", kind: d["tipo"] as? String ?? "compito",
                            answer: (d["risposta"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
                            answeredAt: date(d["t_risposta"]), localId: d["local_id"] as? String ?? "")
+        r.titleReady = d["testo_da"] as? String != "ripiego"
+        return r
     }
 
     /// A file the engine never shortened (`testo` == `originale`) and that is long: its first sentence, whole, never
