@@ -80,7 +80,7 @@ final class PilotVoicePathsTests: XCTestCase {
                 }
             }
         }
-        OverseerDelivery.onFallback = { d.add("RIPIEGO (finto, non eseguito): appunti ← «\($0)»; poi si aprirebbe la chat dell'Overseer") }
+        OverseerDelivery.onFallback = { d.add("RIPIEGO (finto, non eseguito): appunti ← «\($0)»") }
         defer { mod?.cancel() }
         guard try await utter(c, d, say: order) else { return try save(d, "P2: ordine") }
         let idle = await until(60) { c.phase == .idle }

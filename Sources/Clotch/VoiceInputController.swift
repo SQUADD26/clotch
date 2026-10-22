@@ -241,7 +241,8 @@ final class VoiceInputController: ObservableObject {
         disarmEscape()
         let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
-        show(outcome == .sent ? "Inviato all’Overseer" : "Testo copiato. Incolla con ⌘V")
+        Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
+        show(outcome == .sent ? "Inviato all’Overseer" : outcome == .queued ? "In coda per l’Overseer" : "Testo copiato. Incolla con ⌘V")
     }
 
     func fail(_ why: VoiceInput.Failure, run me: Int) {
