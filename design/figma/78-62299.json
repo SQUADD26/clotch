@@ -1,0 +1,1005 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "78:62299",
+  "nome": "ADHD · mouse sopra – Chiaro",
+  "w": 578,
+  "h": 457
+ },
+ "variabili": {
+  "notch/nero": "#000000",
+  "notch/raggio/40": 40,
+  "notch/spazio/18": 18,
+  "notch/spazio/35": 35,
+  "notch/spazio/42": 42,
+  "notch/spazio/26": 26,
+  "notch/misura/578": 578,
+  "notch/bianco-a7": "#ffffff12",
+  "notch/raggio/19": 19,
+  "notch/spazio/4": 4,
+  "notch/misura/422": 422,
+  "notch/raggio/15": 15,
+  "notch/spazio/6": 6,
+  "notch/misura/103_5": 103.5,
+  "notch/misura/30": 30,
+  "notch/bianco-a60": "#ffffff99",
+  "notch/spessore/1_1667": 1.1666666269302368,
+  "notch/testo/13": 13,
+  "notch/bianco-a16": "#ffffff29",
+  "notch/bianco": "#ffffff",
+  "notch/giallo": "#ffd60a",
+  "notch/testo/11": 11,
+  "notch/spazio/12": 12,
+  "notch/misura/86": 86,
+  "notch/raggio/18": 18,
+  "notch/misura/36": 36,
+  "notch/bianco-a92": "#ffffffeb",
+  "notch/spessore/1_3333": 1.3333333730697632,
+  "notch/misura/38": 38,
+  "notch/spazio/16": 16,
+  "notch/testo/14": 14,
+  "notch/testo/12": 12,
+  "notch/raggio/14": 14,
+  "notch/bianco-a12": "#ffffff1f",
+  "notch/raggio/11": 11,
+  "notch/spazio/10": 10,
+  "notch/misura/22": 22
+ },
+ "nodi": [
+  {
+   "id": "78:62299",
+   "nome": "ADHD · mouse sopra – Chiaro",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 578,
+    "h": 457
+   },
+   "variabili": {
+    "fills[0]": "notch/nero",
+    "bottomLeftRadius": "notch/raggio/40",
+    "bottomRightRadius": "notch/raggio/40",
+    "itemSpacing": "notch/spazio/18",
+    "paddingLeft": "notch/spazio/35",
+    "paddingRight": "notch/spazio/35",
+    "paddingTop": "notch/spazio/42",
+    "paddingBottom": "notch/spazio/26",
+    "width": "notch/misura/578"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62300",
+   "nome": "barra schede",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 42,
+    "w": 508,
+    "h": 38
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62301",
+   "nome": "schede",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 42,
+    "w": 422,
+    "h": 38
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/19",
+    "paddingLeft": "notch/spazio/4",
+    "paddingRight": "notch/spazio/4",
+    "paddingTop": "notch/spazio/4",
+    "paddingBottom": "notch/spazio/4",
+    "width": "notch/misura/422"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62302",
+   "nome": "scheda Obiettivi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 39,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62303",
+   "nome": "icona target",
+   "tipo": "FRAME",
+   "box": {
+    "x": 54.916015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62304",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 54.916015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 11.666666030883789
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62305",
+   "nome": "Obiettivi",
+   "tipo": "TEXT",
+   "box": {
+    "x": 72.583984375,
+    "y": 53,
+    "w": 54,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Obiettivi",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62306",
+   "nome": "scheda Richieste",
+   "tipo": "FRAME",
+   "box": {
+    "x": 142.5,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62307",
+   "nome": "icona inbox",
+   "tipo": "FRAME",
+   "box": {
+    "x": 156.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62308",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 156.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 9.333333015441895
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62309",
+   "nome": "Richieste",
+   "tipo": "TEXT",
+   "box": {
+    "x": 174.083984375,
+    "y": 53,
+    "w": 58,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Richieste",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62310",
+   "nome": "scheda ADHD",
+   "tipo": "FRAME",
+   "box": {
+    "x": 246,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a16",
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62311",
+   "nome": "icona brain",
+   "tipo": "FRAME",
+   "box": {
+    "x": 262.916015625,
+    "y": 54,
+    "w": 11.667608261108398,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62312",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 262.916015625,
+    "y": 54,
+    "w": 11.667608261108398,
+    "h": 11.669331550598145
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62313",
+   "nome": "ADHD",
+   "tipo": "TEXT",
+   "box": {
+    "x": 280.583984375,
+    "y": 53,
+    "w": 39,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "ADHD",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62314",
+   "nome": "numero senza risposta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 325.583984375,
+    "y": 54.5,
+    "w": 7,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/giallo",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62315",
+   "nome": "scheda Account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 349.5,
+    "y": 46,
+    "w": 103.5,
+    "h": 30
+   },
+   "variabili": {
+    "cornerRadius": "notch/raggio/15",
+    "itemSpacing": "notch/spazio/6",
+    "width": "notch/misura/103_5",
+    "height": "notch/misura/30"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62316",
+   "nome": "icona users",
+   "tipo": "FRAME",
+   "box": {
+    "x": 366.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 14
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62317",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 366.416015625,
+    "y": 54,
+    "w": 11.666666030883789,
+    "h": 10.5
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a60",
+    "strokeWeight": "notch/spessore/1_1667"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62318",
+   "nome": "Account",
+   "tipo": "TEXT",
+   "box": {
+    "x": 384.083984375,
+    "y": 53,
+    "w": 52,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/13"
+   },
+   "senza": [],
+   "testo": "Account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62319",
+   "nome": "bottoni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 457,
+    "y": 42,
+    "w": 86,
+    "h": 38
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/12",
+    "width": "notch/misura/86"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62320",
+   "nome": "bottone impostazioni (ingranaggio)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 457,
+    "y": 43,
+    "w": 36,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/18",
+    "width": "notch/misura/36",
+    "height": "notch/misura/36"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62321",
+   "nome": "icona impostazioni (ingranaggio)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 468.98828125,
+    "y": 53,
+    "w": 12.02344036102295,
+    "h": 16
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62322",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 468.98828125,
+    "y": 53,
+    "w": 12.02344036102295,
+    "h": 13.333333969116211
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1_3333"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62323",
+   "nome": "bottone AFK (luna)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 505,
+    "y": 42,
+    "w": 38,
+    "h": 38
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/19",
+    "width": "notch/misura/38",
+    "height": "notch/misura/38"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62324",
+   "nome": "icona AFK (luna)",
+   "tipo": "FRAME",
+   "box": {
+    "x": 518,
+    "y": 53,
+    "w": 12.00000286102295,
+    "h": 16
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62325",
+   "nome": "tratto",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 518,
+    "y": 53,
+    "w": 12.00000286102295,
+    "h": 12.000003814697266
+   },
+   "variabili": {
+    "strokes[0]": "notch/bianco-a92",
+    "strokeWeight": "notch/spessore/1_3333"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62326",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 98,
+    "w": 508,
+    "h": 333
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/18"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62327",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 98,
+    "w": 508,
+    "h": 13
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "78:62328",
+   "nome": "Rimuovi risposte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 453,
+    "y": 98,
+    "w": 90,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Rimuovi risposte",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62329",
+   "nome": "richiesta senza risposta",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 129,
+    "w": 508,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62330",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 129,
+    "w": 441,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62331",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 129,
+    "w": 441,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Come riavvio il notch se si blocca?",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62332",
+   "nome": "in attesa",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 150,
+    "w": 441,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/giallo",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "In attesa di Clotch",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62333",
+   "nome": "Sollecita",
+   "tipo": "TEXT",
+   "box": {
+    "x": 492,
+    "y": 129,
+    "w": 51,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Sollecita",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62334",
+   "nome": "richiesta senza risposta",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 182,
+    "w": 508,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62335",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 182,
+    "w": 441,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62336",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 182,
+    "w": 441,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Quale account Claude uso per il CRM?",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62337",
+   "nome": "in attesa",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 203,
+    "w": 441,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/giallo",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Da smistare · Overseer",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62338",
+   "nome": "Sollecita",
+   "tipo": "TEXT",
+   "box": {
+    "x": 492,
+    "y": 182,
+    "w": 51,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Sollecita",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62339",
+   "nome": "richiesta",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 235,
+    "w": 508,
+    "h": 90
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a7",
+    "cornerRadius": "notch/raggio/14",
+    "itemSpacing": "notch/spazio/16",
+    "paddingLeft": "notch/spazio/16",
+    "paddingRight": "notch/spazio/16",
+    "paddingTop": "notch/spazio/12",
+    "paddingBottom": "notch/spazio/12"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62340",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 51,
+    "y": 247,
+    "w": 397,
+    "h": 66
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62341",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 51,
+    "y": 247,
+    "w": 397,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Dove vedo i miei commenti su Figma?",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62342",
+   "nome": "risposta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 51,
+    "y": 268,
+    "w": 397,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Nel file Clotch, pannello Commenti in alto a destra. Li leggo io a ogni giro: qu",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62354",
+   "nome": "volte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 51,
+    "y": 300,
+    "w": 397,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Chiesta 20 volte",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62355",
+   "nome": "bottone Rimuovi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 247,
+    "w": 63,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a12",
+    "cornerRadius": "notch/raggio/11",
+    "paddingLeft": "notch/spazio/10",
+    "paddingRight": "notch/spazio/10",
+    "height": "notch/misura/22"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62356",
+   "nome": "testo Rimuovi",
+   "tipo": "TEXT",
+   "box": {
+    "x": 474,
+    "y": 251.5,
+    "w": 43,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "Rimuovi",
+   "font": "SF Pro Semibold"
+  },
+  {
+   "id": "78:62344",
+   "nome": "richiesta",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 343,
+    "w": 508,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62345",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 343,
+    "w": 477,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62346",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 343,
+    "w": 477,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Come porto una modifica in produzione?",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62347",
+   "nome": "risposta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 364,
+    "w": 477,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Si lavora su dev. Main lo promuove la sessione madre.",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62348",
+   "nome": "volte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 528,
+    "y": 343,
+    "w": 15,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "×4",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62349",
+   "nome": "richiesta",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 396,
+    "w": 508,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62350",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 35,
+    "y": 396,
+    "w": 478,
+    "h": 35
+   },
+   "variabili": {
+    "itemSpacing": "notch/spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "78:62351",
+   "nome": "domanda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 396,
+    "w": 478,
+    "h": 17
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a92",
+    "fontSize": "notch/testo/14"
+   },
+   "senza": [],
+   "testo": "Cosa è rimasto aperto su Clotch?",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62352",
+   "nome": "risposta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 35,
+    "y": 417,
+    "w": 478,
+    "h": 14
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/12"
+   },
+   "senza": [],
+   "testo": "Tre pull request aspettano il verde: dettatura, scheda Richieste e scheda ADHD. ",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "78:62353",
+   "nome": "volte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 529,
+    "y": 396,
+    "w": 14,
+    "h": 13
+   },
+   "variabili": {
+    "fills[0]": "notch/bianco-a60",
+    "fontSize": "notch/testo/11"
+   },
+   "senza": [],
+   "testo": "×2",
+   "font": "SF Pro Medium"
+  }
+ ]
+}
