@@ -200,14 +200,9 @@ public enum VoiceTurn {
         return out + ns.substring(from: last)
     }
 
-    /// English words of the engine, said the Italian way (#299). Above the config's base list (its «òuversir» came out French),
-    /// below Roberto's own `pronuncia.json`.
-    public static let builtInPronunciation: [String: String] = [
-        "Friday": "fràidei", "handoff": "hènd off", "worktree": "uòrk trì", "branch": "brànc", "issue": "ìsciu",
-        "pull request": "pul richièst", "pipeline": "pàiplain", "webhook": "uèb huk", "backend": "bèk end", "frontend": "frònt end",
-        "staging": "stèigin", "rebase": "ribèis", "push": "pusc", "build": "bild", "token": "tòuken",
-        "Overseer": "ouver sìr", "Slack": "slèc", "Notion": "nòuscion", "dashboard": "dàscbord",
-    ]
+    /// No word is forced to English (Roberto, #312: «ho chiesto che NON venga pronunciato in francese»): the voice reads Italian
+    /// and names as an Italian would. Only the old name becomes the new one, in titles and subjects too.
+    public static let builtInPronunciation: [String: String] = ["Overseer": "Friday"]
 
     /// The voice's name: ONE place (#299), Roberto will pick another.
     public static let voiceName = "Friday"
