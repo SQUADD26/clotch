@@ -32,7 +32,7 @@ struct AdhdTab: View {
     }
 }
 
-/// Line heights of the frame's text boxes (58:56150, 58:56153, 58:56154): one line each, so every row is 35 tall.
+/// Line heights of the frame's text boxes (58:56150, 58:56153, 58:56154): one line each at least (a longer text wraps, #156), so a row is 35 tall.
 private enum Line {
     static let header: CGFloat = 13, question: CGFloat = 17, detail: CGFloat = 14
 }
@@ -47,7 +47,7 @@ private struct AdhdRow: View {
         HStack(alignment: .top, spacing: T.notchSpazio16) {
             VStack(alignment: .leading, spacing: T.notchSpazio4) {
                 Text(item.question).font(.system(size: T.notchTesto14, weight: .medium)).foregroundStyle(T.notchBiancoA92)
-                    .frame(height: Line.question)
+                    .fixedSize(horizontal: false, vertical: true).frame(minHeight: Line.question, alignment: .top)
                 Group {
                     if item.answered {
                         Text(item.answer).font(.system(size: T.notchTesto12, weight: .medium)).foregroundStyle(T.notchBiancoA60)
@@ -55,9 +55,8 @@ private struct AdhdRow: View {
                         Text(item.waitingLabel).font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchGiallo)
                     }
                 }
-                .frame(height: Line.detail)
+                .fixedSize(horizontal: false, vertical: true).frame(minHeight: Line.detail, alignment: .top)
             }
-            .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
             trailing
         }
