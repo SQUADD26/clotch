@@ -81,7 +81,7 @@ final class VoiceInputTests: XCTestCase {
 
     /// Figma #110 note 5 and 6: a title, a cause and the move that fixes it; never a code.
     func testFailuresSpeakPlainlyAndOfferTheFix() {
-        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local, .silence]
+        let all: [VoiceInput.Failure] = [.mic, .key, .credits, .network, .local]
         for f in all {
             XCTAssertNil((f.title + f.detail).range(of: #"\d{3}|HTTP|error|errore"#, options: .regularExpression), "\(f)")
             XCTAssertFalse(f.actions.isEmpty)
@@ -92,7 +92,8 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceInput.Failure.network.actions, [.retry, .useLocal])
         XCTAssertEqual(VoiceInput.Failure.mic.actions.map(\.label), ["Apri Privacy › Microfono"])
         XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"rate_limited","error":"x"}"#), .failure(.network))
-        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .failure(.silence))
+        // #147: no voice to hear is Roberto's choice, not a failure.
+        XCTAssertEqual(VoiceInput.scribeEvent(#"{"message_type":"insufficient_audio_activity","error":"x"}"#), .quiet)
     }
 
     func testDictationKeepsCommittedAndShowsThePartial() {

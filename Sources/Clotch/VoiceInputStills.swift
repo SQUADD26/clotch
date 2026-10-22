@@ -22,7 +22,6 @@ extension VoiceInputController {
             ("6b-errore-crediti", fail(.credits)),
             ("6c-errore-rete", fail(.network)),
             ("6d-errore-locale", fail(.local)),
-            ("6e-silenzio", fail(.silence)),
         ]
     }
 }

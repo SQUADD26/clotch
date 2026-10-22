@@ -11,7 +11,7 @@ final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
-    /// The light on the island's outline: white and steady while he speaks, red and fast on an error, none otherwise.
+    /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.
     enum Light { case off, white, red }
 
     /// Seconds an order can still be taken back, before it leaves.
@@ -160,6 +160,7 @@ final class VoiceInputController: ObservableObject {
     private func scribeEvent(_ event: VoiceInput.ScribeEvent, run me: Int) {
         guard me == run else { return }
         if case .failure(let why) = event { return fail(why, run: me) }
+        if case .quiet = event { return abort() }
         if case .committed = event { scribeCommitted = true }
         dictation.take(event)
         publishText()
@@ -208,9 +209,9 @@ final class VoiceInputController: ObservableObject {
         }
     }
 
-    private func route(_ said: String, run me: Int) async {
+    func route(_ said: String, run me: Int) async {
         let said = said.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !said.isEmpty else { return show(failure: .silence) }
+        guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         if VoiceRoute.classify(said) == .question {
