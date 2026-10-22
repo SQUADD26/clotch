@@ -146,6 +146,8 @@ public enum VoiceInput {
         case mic, key, credits, network, local
         /// The key is pressed with «Dettatura accesa» off / the shortcut could not be registered: never a silent key (#198).
         case off, shortcut
+        /// `~/.config/voce/non-disturbare` exists (clotch#266): no microphone, nothing to dictate.
+        case doNotDisturb
 
         public var title: String {
             switch self {
@@ -156,6 +158,7 @@ public enum VoiceInput {
             case .local: return "Il modello locale non parte"
             case .off: return "Dettatura spenta"
             case .shortcut: return "Scorciatoia non disponibile"
+            case .doNotDisturb: return "Non disturbare acceso"
             }
         }
 
@@ -168,6 +171,7 @@ public enum VoiceInput {
             case .local: return "Riprova. Se non basta, passa a ElevenLabs nelle impostazioni."
             case .off: return "Accendila nelle impostazioni per dettare."
             case .shortcut: return "Un altro programma usa questo tasto. Scegline un altro nelle impostazioni."
+            case .doNotDisturb: return "Spegnilo con non-disturbare off, poi riprova."
             }
         }
 
@@ -178,7 +182,7 @@ public enum VoiceInput {
             case .key: return [.checkKey, .useLocal]
             case .credits: return [.useLocal]
             case .network: return [.retry, .useLocal]
-            case .local: return [.retry]
+            case .local, .doNotDisturb: return [.retry]
             case .off, .shortcut: return [.openDictation]
             }
         }
