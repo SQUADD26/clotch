@@ -52,6 +52,13 @@ final class NotchEventsTests: XCTestCase {
         XCTAssertEqual(NotchEvents.goals(old: [proposed], new: [row("p", .moving)]).map(\.id), ["confirmed-p-0"])
     }
 
+    func testProposalClosedAsReachedAnnouncesReached() {
+        // #171 (A-F-18): since claude-config#1969 a proposal with green proofs closes straight to «raggiunto».
+        var proposed = row("p", .moving)
+        proposed.proposed = true
+        XCTAssertEqual(NotchEvents.goals(old: [proposed], new: [row("p", .reached)]).map(\.id), ["reached-p-0"])
+    }
+
     func testNoticeSaysWhatAndWho() {
         XCTAssertEqual(NotchEvents.notice(.requestTaken, title: "Correggere notch tra schermi", by: "Clotch"),
                        "Presa in carico: Correggere notch tra schermi · Clotch")

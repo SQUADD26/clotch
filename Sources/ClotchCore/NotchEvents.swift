@@ -67,7 +67,8 @@ public enum NotchEvents {
             // A goal that appears is not news: only a change of a known goal is.
             // A proposed goal is not chased yet, a closed session's goal is over: they announce nothing.
             guard let prev = before[row.id], !row.proposed, !row.closed else { return nil }
-            if prev.proposed { return event(.confirmed) }
+            // Read the new status first: a proposal whose proofs turned green closes straight to «raggiunto» (#171).
+            if prev.proposed, row.status != .reached { return event(.confirmed) }
             switch (prev.status, row.status) {
             case (.reached, .reached), (.blocked, .blocked), (.still, .still): break
             case (_, .reached): return event(.reached)
