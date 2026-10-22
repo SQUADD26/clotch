@@ -67,6 +67,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.prova-voce"), object: nil, queue: .main) { _ in
             Task { _ = await VoiceSpeaker.shared.test() }
         }
+        for (name, run) in [("voci-italiane", VoiceDiagnostics.listItalianVoices), ("verifica-voce", VoiceDiagnostics.verifyLanguage)] {
+            DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.\(name)"), object: nil, queue: .main) { _ in
+                Task { await run() }
+            }
+        }
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.dettatura"), object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
                 // Not Roberto's key: with the dictation off it does nothing, it never paints his screen red (#245).

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The files of the voice, shared with Clean View (claude-config `global/bin/voce`, `clean-view/hooks/voce*.ts`): the «Voce»
+/// The files of the voice, shared with the engine and Clean View (claude-config `global/bin/voce`, `clean-view/hooks/voce*.ts`): the «Voce»
 /// settings page (#38) and Clotch's own speaker (#50) read and write them. The page never reads the key back, only whether it is there.
 public struct VoiceFiles {
     public static let defaultModel = "eleven_v4_turbo"
@@ -16,11 +16,17 @@ public struct VoiceFiles {
         keyURL = home.appendingPathComponent(".config/elevenlabs/api-key")
         configURL = voce.appendingPathComponent("config.json")
         offURL = voce.appendingPathComponent("spento")
-        // The config's own files, installed by claude-config `global/bin/installa` with the mod (#84): read, never copied or written.
+        // The engine's own files (#84, #251): read, never copied or written. They live in ~/.claude/hooks since claude-config#1998;
+        // an engine installed before that still has them in Clean View's mod folder.
+        let motore = home.appendingPathComponent(".claude/hooks")
         let mod = home.appendingPathComponent(".claude/mods/clean-view/hooks")
-        promptURL = mod.appendingPathComponent("voce-parlatore.md")
+        func engineFile(_ name: String) -> URL {
+            let url = motore.appendingPathComponent(name)
+            return FileManager.default.fileExists(atPath: url.path) ? url : mod.appendingPathComponent(name)
+        }
+        promptURL = engineFile("voce-parlatore.md")
         ownPromptURL = voce.appendingPathComponent("istruzioni.md")  // Roberto's own, from the page (#95); wins over the config's
-        basePronunciationURL = mod.appendingPathComponent("voce-pronuncia.json")
+        basePronunciationURL = engineFile("voce-pronuncia.json")
         pronunciationURL = voce.appendingPathComponent("pronuncia.json")
         judgeQuestionURL = home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt")  // the same question as `voce_giudice.py`
         dayURL = voce.appendingPathComponent("giorno.json")
