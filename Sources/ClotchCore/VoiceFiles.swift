@@ -129,12 +129,12 @@ public struct VoiceFiles {
         return t.isEmpty ? nil : t
     }
 
-    /// How words are said (`{"parola": "come si dice"}`): the config's base list, then Roberto's `pronuncia.json` on top.
+    /// How words are said (`{"parola": "come si dice"}`): the config's base list, then the built-in English words (#299), then Roberto's `pronuncia.json` on top.
     /// A missing or broken file counts as empty; an entry that is not text is skipped.
     public var pronunciation: [String: String] {
         let read = { (u: URL) in ((try? Data(contentsOf: u)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:])
             .compactMapValues { $0 as? String } }
-        return read(basePronunciationURL).merging(read(pronunciationURL)) { _, own in own }
+        return read(basePronunciationURL).merging(VoiceTurn.builtInPronunciation) { _, mine in mine }.merging(read(pronunciationURL)) { _, own in own }
     }
 
     /// The key, for the speaker only: trimmed, nil when missing or not shaped like a key.
