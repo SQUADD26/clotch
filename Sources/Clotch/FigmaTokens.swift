@@ -159,6 +159,42 @@ enum FigmaToken {
         static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
         static let notchFontMedio: String = "Medium"  // notch/font/medio
         static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
+        static let impostazioniRaggio4: CGFloat = 4  // impostazioni/raggio/4
+        static let impostazioniRaggio8: CGFloat = 8  // impostazioni/raggio/8
+        static let impostazioniSpazio5: CGFloat = 5  // impostazioni/spazio/5
+        static let impostazioniSpazio7: CGFloat = 7  // impostazioni/spazio/7
+        static let impostazioniSpazio22: CGFloat = 22  // impostazioni/spazio/22
+        static let impostazioniSpazio28: CGFloat = 28  // impostazioni/spazio/28
+        static let impostazioniSpazio32: CGFloat = 32  // impostazioni/spazio/32
+        static let impostazioniSpazio58: CGFloat = 58  // impostazioni/spazio/58
+        static let impostazioniIconaGrigio = coppia(chiaro: rgb(0x8e8e93), scuro: rgb(0x98989d))  // impostazioni/icona/grigio
+        static let impostazioniIconaBlu = coppia(chiaro: rgb(0x007aff), scuro: rgb(0x0a84ff))  // impostazioni/icona/blu
+        static let impostazioniIconaRosso = coppia(chiaro: rgb(0xff3b30), scuro: rgb(0xff453a))  // impostazioni/icona/rosso
+        static let impostazioniIconaViola = coppia(chiaro: rgb(0xaf52de), scuro: rgb(0xbf5af2))  // impostazioni/icona/viola
+        static let impostazioniIconaArancio = coppia(chiaro: rgb(0xff9500), scuro: rgb(0xff9f0a))  // impostazioni/icona/arancio
+        static let impostazioniIconaVerde = coppia(chiaro: rgb(0x34c759), scuro: rgb(0x30d158))  // impostazioni/icona/verde
+        static let impostazioniMisura4: CGFloat = 4  // impostazioni/misura/4
+        static let impostazioniMisura8: CGFloat = 8  // impostazioni/misura/8
+        static let impostazioniMisura16: CGFloat = 16  // impostazioni/misura/16
+        static let impostazioniMisura18: CGFloat = 18  // impostazioni/misura/18
+        static let impostazioniMisura26: CGFloat = 26  // impostazioni/misura/26
+        static let impostazioniMisura56: CGFloat = 56  // impostazioni/misura/56
+        static let impostazioniMisura60: CGFloat = 60  // impostazioni/misura/60
+        static let impostazioniMisura70: CGFloat = 70  // impostazioni/misura/70
+        static let impostazioniMisura80: CGFloat = 80  // impostazioni/misura/80
+        static let impostazioniMisura90: CGFloat = 90  // impostazioni/misura/90
+        static let impostazioniMisura180: CGFloat = 180  // impostazioni/misura/180
+        static let impostazioniMisura186: CGFloat = 186  // impostazioni/misura/186
+        static let impostazioniMisura192: CGFloat = 192  // impostazioni/misura/192
+        static let impostazioniMisura200: CGFloat = 200  // impostazioni/misura/200
+        static let impostazioniMisura230: CGFloat = 230  // impostazioni/misura/230
+        static let impostazioniMisura260: CGFloat = 260  // impostazioni/misura/260
+        static let impostazioniMisura678: CGFloat = 678  // impostazioni/misura/678
+        static let impostazioniTesto22: CGFloat = 22  // impostazioni/testo/22
+        static let impostazioniFontMonospazio: String = "Andale Mono"  // impostazioni/font/monospazio
+        static let impostazioniInterlinea15: CGFloat = 15  // impostazioni/interlinea/15
+        static let impostazioniOpacita40: Double = 40  // impostazioni/opacita/40
+        static let accentoTesto: Color = Color(nsColor: rgb(0xffffff))  // accento-testo
     }
 }
 
