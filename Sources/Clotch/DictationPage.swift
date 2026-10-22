@@ -1,3 +1,4 @@
+// figma: 91-64148
 import SwiftUI
 import AppKit
 import AVFoundation
@@ -16,6 +17,7 @@ struct DictationPage: View {
     @State private var note: String?
     @State private var access = AVCaptureDevice.authorizationStatus(for: .audio)
     @State private var hasKey = false
+    @State private var configBroken = false
     @State private var inputs: [(id: String, name: String)] = []
 
     var body: some View {
@@ -75,9 +77,15 @@ struct DictationPage: View {
                 .labelsHidden().frame(width: 200)
             }
             Divider()
-            SettingsRow("Invia a") {
-                Text("Overseer")
-                SettingsNote("Un ordine arriva all’Overseer. Una domanda riceve risposta.")
+            SettingsRow("Modello Overseer") {
+                Picker("Modello Overseer", selection: Binding(get: { config.overseerModel }, set: { config.overseerModel = $0; save() })) {
+                    Text("Haiku 5.5").tag("claude-haiku-5-5")
+                    Text("Sonnet 5.5").tag("claude-sonnet-5-5")
+                    Text("Opus 5.5").tag("claude-opus-5-5")
+                }
+                .labelsHidden().frame(width: 200).disabled(configBroken)
+                SettingsNote(configBroken ? "Impostazioni illeggibili. Correggi a mano il file config.json della voce."
+                             : "Risponde sullo stato del lavoro, scrive alle sessioni, sblocca le chat ferme e apre lavoro nuovo.\nPiù forte: capisce meglio, ma risponde più lento e costa di più.")
             }
             SettingsRow("Microfono") {
                 Picker("Microfono", selection: Binding(get: { config.microphone }, set: { config.microphone = $0; save() })) {
@@ -115,7 +123,9 @@ struct DictationPage: View {
     }
 
     private func refresh() {
-        config = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        let read = try? files.readConfig()
+        configBroken = read == nil
+        config = VoiceInput.Config(read ?? [:])
         access = AVCaptureDevice.authorizationStatus(for: .audio)
         hasKey = files.hasKey
         inputs = VoiceCapture.inputs()
@@ -127,10 +137,16 @@ struct DictationPage: View {
 
     private func save() {
         do {
-            try files.updateConfig(["ingresso_motore": config.engine.rawValue, "ingresso_lingua": config.language, "ingresso_a_voce": config.spoken,
-                                    "ingresso_modo": config.mode.rawValue, "ingresso_acceso": config.enabled, "ingresso_microfono": config.microphone])
+            try files.updateConfig(Self.changes(config))
             note = nil
         } catch { note = "Impostazioni non salvate. Riprova." }
+    }
+
+    /// What one change writes to config.json: every `ingresso_*` key plus the Overseer's model (`overseer_modello`, clotch#286).
+    static func changes(_ config: VoiceInput.Config) -> [String: Any] {
+        ["ingresso_motore": config.engine.rawValue, "ingresso_lingua": config.language, "ingresso_a_voce": config.spoken,
+         "ingresso_modo": config.mode.rawValue, "ingresso_acceso": config.enabled, "ingresso_microfono": config.microphone,
+         "overseer_modello": config.overseerModel]
     }
 
     /// The next key press with ⌘, ⌃ or ⌥ becomes the shortcut; Esc cancels.

@@ -1,3 +1,4 @@
+// figma: 91-64778
 import SwiftUI
 import AppKit
 import ClotchCore
@@ -87,13 +88,14 @@ struct VoiceSettingsPage: View {
             Divider()
             reading
             Divider()
-            SettingsRow("Scrive la frase") {
-                Picker("Scrive la frase", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
+            SettingsRow("Modello novità") {
+                Picker("Modello novità", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() })) {
                     Text("Haiku 5.5").tag("claude-haiku-5-5")
                     Text("Sonnet 5.5").tag("claude-sonnet-5-5")
                     Text("Opus 5.5").tag("claude-opus-5-5")
                 }
                 .labelsHidden().frame(width: 200)
+                SettingsNote("Legge a voce le novità delle sessioni. Il modello dell’Overseer si sceglie in Dettatura.")
             }
             .disabled(configBroken)
             SettingsRow("Ragionamento") {
