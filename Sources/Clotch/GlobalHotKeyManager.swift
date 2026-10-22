@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import os.log
+import ClotchCore
 
 /// Registers global hotkeys via Carbon's `RegisterEventHotKey`. Unlike an
 /// `NSEvent.addGlobalMonitorForEvents` keyboard monitor, Carbon hotkeys do NOT
@@ -9,7 +10,7 @@ import os.log
 /// app, so an NSEvent local monitor only fires while our own window is focused).
 /// See #217.
 final class GlobalHotKeyManager {
-    nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "GlobalHotKey")
+    nonisolated private static let log = Logger(subsystem: ClotchLog.subsystem, category: "GlobalHotKey")
 
     /// One installed Carbon hotkey plus the callback to run when it fires.
     private struct Entry {

@@ -5,7 +5,7 @@ import ClotchCore
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-    nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "AppDelegate")
+    nonisolated private static let log = Logger(subsystem: ClotchLog.subsystem, category: "AppDelegate")
 
     var panelController: PanelWindowController?
     let hotKeyManager = GlobalHotKeyManager()

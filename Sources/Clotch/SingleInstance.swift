@@ -1,11 +1,12 @@
 import AppKit
 import os.log
+import ClotchCore
 
 /// One Clotch per Mac (#144). Carbon `RegisterEventHotKey` returns noErr even when another process
 /// already owns the combination, so two copies fight for the shortcut silently. The newer copy
 /// closes the others and takes their place: a new build replaces the old one, whatever folder it runs from.
 enum SingleInstance {
-    nonisolated private static let log = Logger(subsystem: "com.squadd.clotch", category: "SingleInstance")
+    nonisolated private static let log = Logger(subsystem: ClotchLog.subsystem, category: "SingleInstance")
 
     struct Proc: Equatable {
         let pid: pid_t
