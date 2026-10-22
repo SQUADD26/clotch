@@ -18,8 +18,8 @@ final class CompletionStyleTests: XCTestCase {
         super.tearDown()
     }
 
-    func testDefaultIsExpand() {
-        XCTAssertEqual(AppState.completionStyle(defaults: defaults), .expand)
+    func testDefaultIsOff() {
+        XCTAssertEqual(AppState.completionStyle(defaults: defaults), .off)
     }
 
     func testLegacyDisabledBoolMigratesToOff() {
@@ -40,7 +40,7 @@ final class CompletionStyleTests: XCTestCase {
 
     func testUnknownRawValueFallsBackToMigration() {
         defaults.set("bogus", forKey: SettingsKey.completionNotificationStyle)
-        XCTAssertEqual(AppState.completionStyle(defaults: defaults), .expand)
+        XCTAssertEqual(AppState.completionStyle(defaults: defaults), .off)
     }
 
     func testCompletionStyleL10nKeysExistInAllLanguages() {
