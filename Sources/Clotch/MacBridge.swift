@@ -25,7 +25,7 @@ final class MacBridge {
 
     nonisolated static var allowed: Set<String> {
         let home = FileManager.default.homeDirectoryForCurrentUser.path
-        return ["/usr/bin/osascript", "/usr/sbin/screencapture", home + "/.cache/apri-master/ax-premi"]
+        return ["/usr/bin/osascript", "/usr/sbin/screencapture", home + "/.cache/apri-master/ax-premi", home + "/.cache/chat-ferme/ax-chat-ferme"]
     }
 
     private var listener: NWListener?

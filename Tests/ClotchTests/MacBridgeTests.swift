@@ -32,8 +32,8 @@ final class MacBridgeTests: XCTestCase {
         XCTAssertLessThan(Date().timeIntervalSince(started), 5)
     }
 
-    func testDefaultAllowListIsTheThreeEnginePrograms() {
-        XCTAssertEqual(MacBridge.allowed.count, 3)
+    func testDefaultAllowListIsTheEnginePrograms() {
+        XCTAssertEqual(MacBridge.allowed.count, 4)
         XCTAssertTrue(MacBridge.allowed.contains("/usr/bin/osascript"))
         XCTAssertTrue(MacBridge.allowed.contains { $0.hasSuffix("/.cache/apri-master/ax-premi") })
     }
