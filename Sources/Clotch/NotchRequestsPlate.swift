@@ -81,7 +81,7 @@ struct RequestsTab: View {
     }
 }
 
-private struct RequestLine: View {
+struct RequestLine: View {
     let request: UserRequest
     let isNew: Bool
 
