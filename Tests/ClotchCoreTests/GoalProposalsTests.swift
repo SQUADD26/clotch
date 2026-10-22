@@ -34,6 +34,17 @@ final class GoalProposalsTests: GoalTestCase {
         XCTAssertEqual(GoalSources.parseGoal(Data(json.utf8))?.proofs?.map(\.waitsForRoberto), [false, true, false], "no command and not done = Roberto's")
     }
 
+    /// #237: «Conferma» ticks proof `n` = its place in the file's `prove` array, done ones counting, with the row's cli id.
+    func testConfirmProofTicksByPlaceInTheFile() throws {
+        let prove = #"[{"testo":"a","fatta":true,"cmd":""},{"testo":"b","fatta":false,"cmd":"x => 1"},{"testo":"la pagina sembra giusta","fatta":false,"cmd":""},{"testo":"c","fatta":false}]"#
+        let row = rows([g("cli-9", prove: prove)], [s("local_x", cli: "cli-9")])[0]
+        XCTAssertEqual(row.proofsToConfirm.map(\.text), ["la pagina sembra giusta", "c"], "no command and not done, in file order")
+        XCTAssertEqual(GoalDecision.proofArguments(row, proof: row.proofsToConfirm[0], home: "/Users/r"),
+                       ["/Users/r/.claude/hooks/obiettivo-guard.py", "prove", "--sessione", "cli-9", "fatta", "3"])
+        XCTAssertEqual(GoalDecision.proofArguments(row, proof: row.proofsToConfirm[1], home: "/Users/r")?.last, "4")
+        XCTAssertNil(GoalDecision.proofArguments(row, proof: GoalProof(text: "b", done: false, at: nil), home: "/Users/r"), "not Roberto's to tick")
+    }
+
     func testAcceptAndRejectRunTheGuardWithTheRowCli() {
         let row = rows([g("cli-123", stato: "proposto")], [s("local_x", cli: "cli-123")])[0]
         XCTAssertEqual(GoalDecision.acceptArguments(row, home: "/Users/r"),

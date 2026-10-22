@@ -4,8 +4,10 @@ import Foundation
 
 public struct GoalProof: Equatable, Sendable {
     public let text: String; public let done: Bool; public let at: Date?
-    /// A proof with no command (`cmd` empty): only Roberto or the Overseer can tick it (#171). No view yet: the button goes through Figma.
+    /// A proof with no command (`cmd` empty): only Roberto or the Overseer can tick it (#171, #237: «Conferma» in the goal page).
     public var waitsForRoberto = false
+    /// 1-based place in the file's `prove` array (done ones count): the `n` of `obiettivo-guard.py prove fatta n`. 0 = not from a file.
+    public var index = 0
 }
 
 /// One ~/.claude/obiettivi/<cli>.json
@@ -82,6 +84,7 @@ public struct GoalRow: Identifiable, Equatable, Sendable {
     public var closed = false  // its master session is archived or gone: kept out of the list, only counted
     public var master: SessionTarget? = nil  // the session that carries the goal: the title opens it
     public var motor: SessionMotor? = nil  // the engine's true state of the master session (clotch#114); nil = not written yet
+    public var proofsToConfirm: [GoalProof] = []  // proofs only Roberto can tick (#237), in file order
 }
 
 extension GoalRow {
@@ -178,7 +181,8 @@ public enum GoalBoard {
                 status: status, lastActivity: last, pulses: pulses, proposed: g.state == "proposto", since: g.at,
                 proposal: g.state == "proposto" ? goal : g.proposal, closed: master?.isArchived ?? true,
                 master: master.map { SessionTarget(localId: $0.localId, profile: $0.profile) },
-                motor: engineState(of: g.cli, master: master, in: motor).map { busy ? $0 : $0.aged(at: now) }))
+                motor: engineState(of: g.cli, master: master, in: motor).map { busy ? $0 : $0.aged(at: now) },
+                proofsToConfirm: g.proofs?.filter(\.waitsForRoberto) ?? []))
         }
         return out.sorted {
             let (a, b) = (rank($0), rank($1))
