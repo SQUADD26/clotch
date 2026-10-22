@@ -31,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
         VoiceSpeaker.shared.start()
+        VoiceInputController.shared.prewarm()
         AfkStore.shared.start()
 
         #if DEBUG

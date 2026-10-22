@@ -1,5 +1,6 @@
 import AVFoundation
 import SwiftUI
+import os.log
 import ClotchCore
 
 /// Voice in (#110): one shortcut, press to speak, press again to finish. Microphone → Scribe v2 Realtime or Parakeet on the Mac
@@ -9,6 +10,7 @@ import ClotchCore
 @MainActor
 final class VoiceInputController: ObservableObject {
     static let shared = VoiceInputController()
+    private static let log = Logger(subsystem: "com.squadd.clotch", category: "VoiceInput")
 
     enum Phase: Equatable { case idle, ready, listening, finishing, thinking, sending, failure(VoiceInput.Failure), result(String) }
     /// The light on the island's outline: white and steady while he speaks, red and slow on an error (a soft rise, then a gentle breath, #145), none otherwise.
@@ -43,8 +45,8 @@ final class VoiceInputController: ObservableObject {
     }
 
     /// `--snapshot --gallery` only: a controller held at one state of the pill, for the Figma comparison.
-    static func still(_ phase: Phase, sure: String = "", maybe: String = "", levels: [Double] = [], elapsed: TimeInterval = 0) -> VoiceInputController {
-        let c = VoiceInputController()
+    static func still(_ phase: Phase, files: VoiceFiles = VoiceFiles(), sure: String = "", maybe: String = "", levels: [Double] = [], elapsed: TimeInterval = 0) -> VoiceInputController {
+        let c = VoiceInputController(files: files)
         c.phase = phase
         c.sure = sure
         c.maybe = maybe
@@ -54,15 +56,20 @@ final class VoiceInputController: ObservableObject {
         return c
     }
 
-    let files = VoiceFiles()
+    let files: VoiceFiles
     var config = VoiceInput.Config([:])
-    private let local = LocalTranscriber()
+    let local = LocalTranscriber()
     private var capture: VoiceCapture?
-    private var scribe: ScribeSession?
+    /// The next utterance's microphone, already prepared: the first syllable is not lost to the start (#174).
+    private var spare: VoiceCapture?
+    /// The tests hand in a recorded voice instead of the microphone.
+    var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
+    private var audioSeconds = 0.0
+    var scribe: ScribeSession?
     private var feed: AsyncStream<AVAudioPCMBuffer>.Continuation?
-    private var feeding: Task<Void, Never>?
-    private var dictation = VoiceInput.Dictation()
-    private var scribeCommitted = false
+    var feeding: Task<Void, Never>?
+    var dictation = VoiceInput.Dictation()
+    var scribeCommitted = false
     /// Hold mode: the key is still down. `begin` looks at it once the microphone runs, in case it went up while macOS asked.
     private var holds = false
     private var pressedAt = Date.distantPast
@@ -75,19 +82,35 @@ final class VoiceInputController: ObservableObject {
     /// Every utterance has its number: a late event of a finished one changes nothing.
     var run = 0
 
-    /// The key went down. Idle: starts. Open: ends it (press mode, or a quick tap in hold mode). Thinking or waiting to send: nothing
-    /// (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
+    init(files: VoiceFiles = VoiceFiles()) { self.files = files }
+
+    /// At launch and after each utterance: the slow part of the microphone's start, done while nobody waits.
+    func prewarm() {
+        let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
+        guard current.enabled, spare?.microphone != current.microphone else { return }
+        spare = makeCapture(current.microphone)
+        spare?.prepare()
+    }
+
+    /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
+    /// send: nothing (Esc and «Annulla» take it back). «Dettatura accesa» off: nothing at all.
     func press() {
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return }
+        Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
         switch phase {
-        case .idle, .result, .failure:
+        // Thinking: a new utterance is worth more than the answer still coming (it would only block the key).
+        case .idle, .result, .failure, .thinking:
             holds = current.mode == .hold
             pressedAt = Date()
             releasedAt = nil
-            Task { await begin() }
+            // At once, not in the task: a second press before the task runs ends this one (finish → abort), never starts a second (#174).
+            run += 1
+            phase = .ready
+            let me = run
+            Task { if me == run { await begin() } }
         case .ready, .listening: finish()
-        case .finishing, .thinking, .sending: break
+        case .finishing, .sending: break
         }
     }
 
@@ -116,21 +139,27 @@ final class VoiceInputController: ObservableObject {
         if config.engine == .scribe, key == nil { return show(failure: .key) }
         phase = .ready
         armEscape()
-        guard await VoiceCapture.authorized() else { return show(failure: .mic) }
+        let capture = spare?.microphone == config.microphone ? spare! : makeCapture(config.microphone)
+        spare = nil
+        guard await capture.authorized() else { return show(failure: .mic) }
         guard me == run, phase == .ready else { return }  // pressed again while macOS asked: finished or aborted already
-        let capture = VoiceCapture(microphone: config.microphone)
+        audioSeconds = 0
         let meter: @Sendable (Double) -> Void = { l in Task { @MainActor [weak self] in self?.push(l) } }
+        let counted: @Sendable (AVAudioPCMBuffer) -> Void = { b in
+            let s = Double(b.frameLength) / b.format.sampleRate
+            Task { @MainActor [weak self] in if me == self?.run { self?.audioSeconds += s } }
+        }
         switch config.engine {
         case .scribe:
             let s = ScribeSession()
             s.onEvent = { event in Task { @MainActor [weak self] in self?.scribeEvent(event, run: me) } }
             s.open(key: key ?? "", language: config.language)
             scribe = s
-            capture.onAudio = { _, pcm in s.send(pcm); meter(VoiceInput.level(pcm16: pcm)) }
+            capture.onAudio = { buffer, pcm in s.send(pcm); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
         case .local:
             let (stream, continuation) = AsyncStream<AVAudioPCMBuffer>.makeStream()
             feed = continuation
-            capture.onAudio = { buffer, pcm in continuation.yield(buffer); meter(VoiceInput.level(pcm16: pcm)) }
+            capture.onAudio = { buffer, pcm in continuation.yield(buffer); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
             feeding = Task { [local] in
                 // The model loads while the microphone already runs: its first buffers wait in the stream.
                 if !(await local.isLoaded) { hint = "Scarico il modello. Succede solo la prima volta." }
@@ -143,6 +172,7 @@ final class VoiceInputController: ObservableObject {
         }
         do { try capture.start() } catch { return fail(.mic, run: me) }
         self.capture = capture
+        Self.log.notice("listening: microphone on \(Int(Date().timeIntervalSince(self.pressedAt) * 1000)) ms after the press, engine \(self.config.engine.rawValue, privacy: .public)")
         startedAt = Date()
         phase = .listening
         if heldLong { finish() }  // the key went up during the start
@@ -157,55 +187,30 @@ final class VoiceInputController: ObservableObject {
         levels = Array(levels.dropFirst()) + [level]
     }
 
-    private func scribeEvent(_ event: VoiceInput.ScribeEvent, run me: Int) {
-        guard me == run else { return }
-        if case .failure(let why) = event { return fail(why, run: me) }
-        if case .quiet = event { return abort() }
-        if case .committed = event { scribeCommitted = true }
-        dictation.take(event)
-        publishText()
-    }
-
-    private func localText(_ whole: String, run me: Int) {
-        guard me == run else { return }
-        dictation.replace(with: whole)
-        publishText()
-    }
-
-    private func publishText() { (sure, maybe) = (dictation.sure, dictation.maybe) }
+    func publishText() { (sure, maybe) = (dictation.sure, dictation.maybe) }
 
     // MARK: - Finishing
 
+    /// The second press: the microphone keeps going `VoiceInput.tailSeconds` (the word being said, the audio still on its way),
+    /// then everything heard until then is transcribed. Nothing captured is dropped (#174).
     private func finish() {
         guard phase == .ready || phase == .listening else { return }
         guard capture != nil else { return abort() }
         let me = run
-        capture?.stop()
-        capture = nil
         timers.forEach { $0.cancel() }
         levels = [Double](repeating: 0, count: levels.count)
         phase = .finishing
-        feed?.finish()
+        let stopped = Date()
         Task {
+            try? await Task.sleep(nanoseconds: UInt64(VoiceInput.tailSeconds * 1e9))
+            guard me == run else { return }
+            capture?.stop()
+            capture = nil
+            feed?.finish()
             let said = await transcript()
             guard me == run else { return }
+            Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds)) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
             await route(said, run: me)
-        }
-    }
-
-    /// Scribe: the closing silence asks for the committed text, at most 3 s. Local: the model finishes what it holds.
-    private func transcript() async -> String {
-        switch config.engine {
-        case .scribe:
-            scribe?.commit()
-            for _ in 0..<60 where !scribeCommitted && scribe != nil { try? await Task.sleep(nanoseconds: 50_000_000) }
-            scribe?.close()
-            scribe = nil
-            return dictation.text
-        case .local:
-            await feeding?.value
-            let final = await local.finish()
-            return final.isEmpty ? dictation.text : final
         }
     }
 
@@ -214,6 +219,7 @@ final class VoiceInputController: ObservableObject {
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
+        Self.log.notice("route: \(VoiceRoute.classify(said) == .question ? "question" : "order", privacy: .public)")
         if VoiceRoute.classify(said) == .question {
             phase = .thinking
             let reply = await VoiceAsk.run(said)
@@ -235,9 +241,7 @@ final class VoiceInputController: ObservableObject {
         show(outcome == .sent ? "Inviato all’Overseer" : "Testo copiato. Incolla con ⌘V")
     }
 
-    // MARK: - End
-
-    private func fail(_ why: VoiceInput.Failure, run me: Int) {
+    func fail(_ why: VoiceInput.Failure, run me: Int) {
         guard me == run else { return }
         abort()
         show(failure: why)
@@ -263,6 +267,7 @@ final class VoiceInputController: ObservableObject {
         feeding?.cancel()
         feeding = nil
         disarmEscape()
+        prewarm()
     }
 
     private func reset() {
