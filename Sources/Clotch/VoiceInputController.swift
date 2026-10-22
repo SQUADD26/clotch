@@ -64,6 +64,8 @@ final class VoiceInputController: ObservableObject {
     private var spare: VoiceCapture?
     /// The tests hand in a recorded voice instead of the microphone.
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
+    /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
+    var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
     private var audioSeconds = 0.0
     var scribe: ScribeSession?
     private var feed: AsyncStream<AVAudioPCMBuffer>.Continuation?
@@ -229,7 +231,7 @@ final class VoiceInputController: ObservableObject {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
                 return
             }
-            if config.spoken { Task { _ = await VoiceSpeaker.shared.speakAnswer(answer) } }
+            if config.spoken { Task { [speak] in await speak(answer) } }
             return show(answer, seconds: max(6, Double(answer.count) * 0.07))
         }
         sendingSince = Date()
@@ -237,7 +239,7 @@ final class VoiceInputController: ObservableObject {
         try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
-        let outcome = await OverseerDelivery.send(said)
+        let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
         show(outcome == .sent ? "Inviato all’Overseer" : "Testo copiato. Incolla con ⌘V")
     }

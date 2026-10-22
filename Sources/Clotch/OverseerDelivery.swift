@@ -24,7 +24,11 @@ enum OverseerDelivery {
         return (try? FileManager.default.removeItem(at: url)) == nil ? .sent : await fallback(text, files: files)
     }
 
+    /// The pilot's test records the fallback instead of touching the clipboard and the chat.
+    static var onFallback: ((String) -> Void)?
+
     private static func fallback(_ text: String, files: VoiceFiles) async -> Outcome {
+        if let onFallback { onFallback(text); return .copied }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
         if let id = (try? Data(contentsOf: files.overseerURL)).flatMap(VoiceRoute.overseerLocalId) {
