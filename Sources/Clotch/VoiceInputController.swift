@@ -209,7 +209,7 @@ final class VoiceInputController: ObservableObject {
             feed?.finish()
             let said = await transcript()
             guard me == run else { return }
-            Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds)) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
+            Self.log.notice("transcript: \(String(format: "%.1f", self.audioSeconds), privacy: .public) s of audio, \(said.split(separator: " ").count) words in \(Int(Date().timeIntervalSince(stopped) * 1000)) ms: \(said, privacy: .public)")
             await route(said, run: me)
         }
     }

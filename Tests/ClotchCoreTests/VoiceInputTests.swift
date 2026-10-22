@@ -162,7 +162,15 @@ final class VoiceInputTests: XCTestCase {
         for write in ["Write", "Edit", "NotebookEdit"] { XCTAssertFalse(a.joined().contains(write), write) }
         XCTAssertTrue(a.contains("--no-session-persistence"))
         XCTAssertEqual(a.last, VoiceRoute.askPrompt)
-        XCTAssertEqual(VoiceRoute.askInput("che ore sono"), "<domanda>\nche ore sono\n</domanda>\n")
+        XCTAssertEqual(VoiceRoute.askInput("che ore sono"), "<sessioni>\n\n</sessioni>\n<domanda>\nche ore sono\n</domanda>\n")
+    }
+
+    func testAskGetsTheSessionsClotchSees() {
+        let now = Date()
+        let line = VoiceRoute.sessionLine(title: "Clotch: voce", status: .running, lastActivity: now.addingTimeInterval(-180), now: now)
+        XCTAssertEqual(line, "- Clotch: voce: lavora, ultima attività 3 min fa")
+        XCTAssertTrue(VoiceRoute.askInput("quante sessioni?", sessions: [line]).hasPrefix("<sessioni>\n\(line)\n</sessioni>\n"))
+        XCTAssertFalse(VoiceRoute.askPrompt.contains("local_*.json"))
     }
 
     func testListenerFreshnessAndOverseerId() {
