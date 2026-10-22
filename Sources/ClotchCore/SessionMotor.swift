@@ -61,6 +61,13 @@ public struct SessionMotor: Equatable, Sendable {
         (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover) = (cli, localId, phase, why, since, what, seen, mover)
     }
 
+    /// The engine's own rule (`stato_sessione.py`, MORTO_S): a «lavora» with no sign of life for 30 min is dead, so it reads
+    /// «ferma» (only Roberto can move it) even before the engine's heartbeat rewrites the file.
+    public func aged(at now: Date) -> SessionMotor {
+        guard phase == .lavora, let seen, now.timeIntervalSince(seen) > GoalBoard.stillAfter else { return self }
+        return SessionMotor(cli: cli, localId: localId, phase: .ferma, why: why, since: since, what: what, seen: seen, mover: "roberto")
+    }
+
     /// The phase's tone, except a still session that only Roberto can move: it waits for him, so yellow.
     public var tone: SessionTone { phase == .ferma && mover == "roberto" ? .attention : phase.tone }
 }

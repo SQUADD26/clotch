@@ -15,6 +15,24 @@ final class SessionMotorTests: GoalTestCase {
         GoalBoard.rows(goals: [g("m", stato: stato)], sessions: [s("local_m", cli: "m", ago: ago)], live: [], motor: m.map { [$0] } ?? [], now: now)[0]
     }
 
+    // MARK: stale «visto» (S-0157)
+
+    func testWorkingStateWithOldSeenReadsStill() {
+        let fresh = row(motor("lavora", seen: 29)), old = row(motor("lavora", seen: 31))
+        XCTAssertEqual(fresh.phase, .lavora)
+        XCTAssertEqual(old.phase, .ferma)
+        XCTAssertEqual(old.tone, .attention, "dead turn: only Roberto can move it")
+    }
+
+    func testOnlyWorkingStateAgesLikeTheEngine() {
+        for p in ["aspetta_roberto", "aspetta_altro", "problema", "ferma"] { XCTAssertEqual(row(motor(p, seen: 300)).phase, SessionPhase(contract: p), p) }
+    }
+
+    func testNextChangeWakesWhenAWorkingStateGoesStale() {
+        let m = motor("lavora", seen: 10)
+        XCTAssertEqual(GoalBoard.nextChange(goals: [], sessions: [], live: [], motor: [m], now: now), m.seen!.addingTimeInterval(GoalBoard.stillAfter))
+    }
+
     // MARK: parsing
 
     func testParsesEveryPhaseOfTheContract() {
