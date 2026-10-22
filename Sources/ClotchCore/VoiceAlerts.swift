@@ -55,7 +55,8 @@ public struct VoiceAlertEngine {
 
     /// Same subject in other words (case, spaces, a trailing dot) is the same subject.
     static func key(_ e: VoiceEvent) -> String {
-        let s = e.subject.isEmpty ? e.kind.rawValue + " " + e.text : e.subject
+        // An ok Roberto must give is never covered by another event of its session (engine MAI_UNITI, #1982): its own key.
+        let s = e.subject.isEmpty || e.kind == .waitsForOk ? e.kind.rawValue + " " + e.text : e.subject
         return s.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ").trimmingCharacters(in: CharacterSet(charactersIn: ".!?"))
     }
 }
