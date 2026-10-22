@@ -56,9 +56,28 @@ public struct SessionMotor: Equatable, Sendable {
     public let seen: Date?
     /// «muove»: for `ferma`, who has to move it (`roberto` | `overseer`).
     public let mover: String
+    /// «domande»: every question a session waiting for Roberto asks (the engine keeps up to 4); `why` names only the first (#165).
+    public let questions: [String]
+    /// «errori»: service errors in a row for a `problema`; `why` already says «(N volte di fila)».
+    public let errors: Int
 
-    public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil, mover: String = "") {
-        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover) = (cli, localId, phase, why, since, what, seen, mover)
+    public init(cli: String, localId: String = "", phase: SessionPhase, why: String = "", since: Date? = nil, what: String = "", seen: Date? = nil, mover: String = "",
+                questions: [String] = [], errors: Int = 0) {
+        (self.cli, self.localId, self.phase, self.why, self.since, self.what, self.seen, self.mover, self.questions, self.errors) =
+            (cli, localId, phase, why, since, what, seen, mover, questions, errors)
+    }
+
+    /// What a session waiting for Roberto asks, every question whole: «Ti chiede: X», or a list of them. nil = no questions to show.
+    public var askLine: String? {
+        guard phase == .aspettaRoberto, !questions.isEmpty else { return nil }
+        return questions.count == 1 ? "Ti chiede: \(questions[0])" : "Ti chiede:\n" + questions.map { "• " + $0 }.joined(separator: "\n")
+    }
+
+    /// The engine's own rule (`stato_sessione.py`, MORTO_S): a «lavora» with no sign of life for 30 min is dead, so it reads
+    /// «ferma» (only Roberto can move it) even before the engine's heartbeat rewrites the file.
+    public func aged(at now: Date) -> SessionMotor {
+        guard phase == .lavora, let seen, now.timeIntervalSince(seen) > GoalBoard.stillAfter else { return self }
+        return SessionMotor(cli: cli, localId: localId, phase: .ferma, why: why, since: since, what: what, seen: seen, mover: "roberto", questions: questions, errors: errors)
     }
 
     /// The phase's tone, except a still session that only Roberto can move: it waits for him, so yellow.
@@ -72,6 +91,8 @@ extension GoalSources {
         func line(_ key: String) -> String { (d[key] as? String ?? "").split(whereSeparator: \.isWhitespace).joined(separator: " ") }
         let file = (d["cli"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? cli
         return SessionMotor(cli: file, localId: line("local_id"), phase: phase, why: line("perche"), since: date(d["da"]),
-                            what: line("cosa"), seen: date(d["visto"]), mover: line("muove"))
+                            what: line("cosa"), seen: date(d["visto"]), mover: line("muove"),
+                            questions: (d["domande"] as? [String] ?? []).map { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }.filter { !$0.isEmpty },
+                            errors: d["errori"] as? Int ?? 0)
     }
 }

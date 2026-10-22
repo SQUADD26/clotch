@@ -39,6 +39,16 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(GoalSources.parseAdhd(Data("[]".utf8)), []); XCTAssertEqual(GoalSources.parseAdhd(Data("no".utf8)), [])
     }
 
+    func testAdhdWhoAnsweredAndWhichSessionOwesIt() throws {
+        let r = try XCTUnwrap(GoalSources.parseAdhd(try fixture("adhd-elenco.json")).first)
+        XCTAssertEqual([r.answeredBy, r.state, r.session, r.localId, r.sessionTitle], ["ereditata", "con_risposta", "cli-1", "", ""])
+        XCTAssertEqual(r.ids, ["Q-bfeb734d", "Q-b532a544"]); XCTAssertEqual(r.nudgedAt, Date(timeIntervalSince1970: 1792613319.8736444))
+        XCTAssertEqual(r.answerNote, "Già risposta prima")
+        let h = try XCTUnwrap(GoalSources.parseAdhd(Data(#"[{"id":"Q-2","domanda_chiara":"D?","risposta":"x","risposta_da":"haiku","local_id":"local_a","titolo_sessione":"⌘ Clotch: x"}]"#.utf8)).first)
+        XCTAssertEqual([h.answerNote, h.localId], ["Risposta provvisoria", "local_a"])
+        XCTAssertNil(GoalSources.parseAdhd(Data(#"[{"id":"Q-3","domanda_chiara":"D?","risposta_da":"sessione"}]"#.utf8))[0].answerNote, "the session's own answer says nothing")
+    }
+
     func testAdhdWaitingLabelAndBadge() {
         func one(_ extra: String) -> AdhdRequest {
             GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"Domanda?","risposta":"",\#(extra)}]"#.utf8))[0]
@@ -85,9 +95,53 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(e.at.timeIntervalSince1970, 1792610025.501, accuracy: 0.001)
     }
 
+    /// A line the engine's own `eventi_voce.py scrivi` wrote (claude-config main 478b6df), parsed by Clotch.
+    private func engineLine(_ json: String) throws -> VoiceEvent { try XCTUnwrap(VoiceEvents.parse(line: Substring(json))) }
+
+    func testAdhdAnswerIsSaidUrgent() throws {
+        // eventi_voce.py scrivi risposta_adhd "Risposta a: …" --soggetto … --prova Q-b532a544 (richieste_adhd.py#L111, #163)
+        let e = try engineLine(#"{"v": 1, "id": "e-9d76d56c", "t": 1792653719.373, "tipo": "risposta_adhd", "livello": "alto", "soggetto": "Perche' il notch e' nero?", "testo": "Risposta a: Perche' il notch e' nero? Perche' manca il tema scuro.", "prova": "Q-b532a544"}"#)
+        XCTAssertEqual(e.kind, .adhdAnswer)
+        XCTAssertEqual([e.level, e.subject, e.proof], ["alto", "Perche' il notch e' nero?", "Q-b532a544"])
+        XCTAssertTrue(e.report.contains("manca il tema scuro"))
+        XCTAssertFalse(e.report.contains("Q-b532a544"), "the proof is never said")
+        XCTAssertEqual(VoiceEvent(kind: .adhdAnswer, at: e.at).level, "alto", "derived like the engine: alto")
+        XCTAssertFalse(VoiceJudge.judges(e), "Roberto asked for it: never judged as noise")
+    }
+
+    func testStalledDependencyIsSaidUrgent() throws {
+        // eventi_voce.py scrivi dipendenza_ferma "Una sessione aspetta te da troppo: …" --soggetto … --prova D-… --cli cli-8 (dipendenze.py#L210, #164)
+        let e = try engineLine(#"{"v": 1, "id": "e-b04289c4", "t": 1792653719.404, "tipo": "dipendenza_ferma", "livello": "alto", "sessione": {"cli": "cli-8", "local_id": "", "titolo": "", "ruolo": ""}, "soggetto": "Clotch, voce", "testo": "Una sessione aspetta te da troppo: la chiave di ElevenLabs.", "prova": "D-1a2b3c4d"}"#)
+        XCTAssertEqual(e.kind, .stalledDependency)
+        XCTAssertEqual([e.level, e.session, e.subject, e.proof], ["alto", "cli-8", "Clotch, voce", "D-1a2b3c4d"])
+        XCTAssertTrue(e.report.contains("la chiave di ElevenLabs"))
+        XCTAssertFalse(e.report.contains("D-1a2b3c4d"), "the proof is never said")
+        XCTAssertEqual(VoiceEvent(kind: .stalledDependency, at: e.at).level, "alto")
+        XCTAssertFalse(VoiceJudge.judges(e), "it waits on Roberto: never judged as noise")
+    }
+
+    func testWaitsForOkIsSaidAsAQuestion() throws {
+        // eventi_voce.py scrivi aspetta_ok "<sessione> aspetta un tuo ok per …" --soggetto … --prova <local_id> --cli cli-7 (dipendenze.py#L84-L89, #162)
+        let e = try engineLine(#"{"v": 1, "id": "e-78ce5792", "t": 1792653719.331, "tipo": "aspetta_ok", "livello": "alto", "sessione": {"cli": "cli-7", "local_id": "", "titolo": "", "ruolo": ""}, "soggetto": "Clotch, correzioni", "testo": "Clotch, correzioni aspetta un tuo ok per fondere la PR: vuoi che glielo dia io?", "prova": "local_abc123"}"#)
+        XCTAssertEqual(e.kind, .waitsForOk)
+        XCTAssertEqual([e.level, e.session, e.subject, e.proof], ["alto", "cli-7", "Clotch, correzioni", "local_abc123"])
+        XCTAssertTrue(e.report.contains("vuoi che glielo dia io?"))
+        XCTAssertFalse(e.report.contains("local_abc123"), "the proof is never said")
+        XCTAssertEqual(e.kind.rank, VoiceEvent.Kind.question.rank, "said like a question")
+        XCTAssertFalse(VoiceJudge.judges(e))
+        // MAI_UNITI: another urgent event of the same session never covers it (#1982).
+        var engine = VoiceAlertEngine()
+        let now = e.at.addingTimeInterval(1), all = VoiceTurn.Config(["parla_per": "tutte"])
+        let blocked = VoiceEvent(kind: .goalBlocked, at: e.at, session: "cli-7", subject: "Clotch, correzioni", text: "bloccato")
+        XCTAssertNil(engine.offer(blocked, config: all, sessions: [], now: now))
+        XCTAssertNil(engine.offer(e, config: all, sessions: [], now: now), "not a duplicate of the other event")
+        XCTAssertEqual(engine.offer(e, config: all, sessions: [], now: now), "doppione", "the same ok twice is said once")
+    }
+
     func testEveryKindTheEngineWritesIsKnown() {
         // claude-config eventi_voce.LIVELLO
-        let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom"]
+        let engine: Set<String> = ["richiesta_fatta", "obiettivo_raggiunto", "obiettivo_bloccato", "fine_turno", "domanda", "rischio", "avviso_custom",
+                                   "risposta_adhd", "dipendenza_ferma", "aspetta_ok"]
         XCTAssertEqual(Set(VoiceEvent.Kind.allCases.map(\.rawValue)), engine)
     }
 

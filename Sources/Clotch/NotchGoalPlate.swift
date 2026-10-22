@@ -88,7 +88,7 @@ struct GoalPage: View {
                     GoalTitle(row: row)
                     EditableGoalText(row: row, text: row.hasSubtitle ? row.goal : nil).frame(maxWidth: 412, alignment: .leading)
                     if let reason = row.reason(now: now) {
-                        Text(reason).font(NotchType.caption).foregroundStyle(row.ink).lineLimit(1)
+                        Text(reason).font(NotchType.caption).foregroundStyle(row.ink).fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

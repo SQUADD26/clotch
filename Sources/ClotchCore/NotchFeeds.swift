@@ -63,12 +63,18 @@ public struct UserRequest: Identifiable, Equatable, Sendable {
     /// An answer written after Roberto last opened the tab (#90).
     public func isNewAnswer(since seen: Date) -> Bool { answered && (answeredAt ?? .distantPast) > seen }
 
+    /// A fact older than this is not news (#173): a record rewritten later (migration, new fields, a read caught
+    /// mid-write, a restart) never announces it again. No time on the record = cannot tell, so it counts as new.
+    public static let newsWindow: TimeInterval = 300
+    public static func isNews(_ fact: Date?, now: Date) -> Bool { fact.map { now.timeIntervalSince($0) <= newsWindow } ?? true }
+
     /// Ids to play the «presa in carico» animation for: taken now, seen as nuova (or not seen at all) on the
-    /// previous load, not shown yet. The first load (`before` nil) is the baseline: nothing animates at launch.
-    public static func newlyTaken(before: [UserRequest]?, after: [UserRequest], shown: Set<String>) -> [String] {
+    /// previous load, not shown yet, taken within `newsWindow`. The first load (`before` nil) is the baseline.
+    public static func newlyTaken(before: [UserRequest]?, after: [UserRequest], shown: Set<String>, now: Date) -> [String] {
         guard let before else { return [] }
         let was = Dictionary(before.map { ($0.id, $0.taken) }, uniquingKeysWith: { a, _ in a })
-        return after.filter { !$0.isQuestion && $0.taken && was[$0.id] != true && !shown.contains($0.id) }.map(\.id)
+        return after.filter { !$0.isQuestion && $0.taken && was[$0.id] != true && !shown.contains($0.id)
+            && isNews($0.takenAt ?? $0.doneAt, now: now) }.map(\.id)
     }
 }
 
@@ -81,7 +87,8 @@ extension GoalSources {
               d["tipo"] as? String != "nota" else { return nil }
         return UserRequest(id: id, at: date(d["t"]), session: d["sessione"] as? String ?? "",
                            sessionTitle: GoalBoard.clean(d["titolo_sessione"] as? String ?? ""),
-                           text: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
+                           text: firstSentence(of: headline(text) ?? headline(d["originale"] as? String ?? "", firstLine: true) ?? "una richiesta",
+                                               whenRaw: d["originale"] as? String == text),
                            original: d["originale"] as? String ?? text,
                            state: d["stato"] as? String ?? "nuova", takenAt: date(d["t_presa"]),
                            takenBy: d["presa_da"] as? String ?? "", doneAt: date(d["t_fatta"]),
@@ -89,6 +96,13 @@ extension GoalSources {
                            folder: d["cartella"] as? String ?? "", kind: d["tipo"] as? String ?? "compito",
                            answer: (d["risposta"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
                            answeredAt: date(d["t_risposta"]), localId: d["local_id"] as? String ?? "")
+    }
+
+    /// A file the engine never shortened (`testo` == `originale`) and that is long: its first sentence, whole, never
+    /// cut with «…» (#156). shortcut: no sentence end found = the whole text, the engine always writes `testo` short.
+    static func firstSentence(of s: String, whenRaw raw: Bool) -> String {
+        guard raw, s.count > 140, let end = s.range(of: #"[.?!](\s|$)"#, options: .regularExpression) else { return s }
+        return String(s[..<end.upperBound]).trimmingCharacters(in: .whitespaces)
     }
 
     /// Real text only (#39): blocks like <system-reminder>…</system-reminder> or <pasted_content …>…, an unclosed one up to

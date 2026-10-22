@@ -6,9 +6,12 @@ public struct VoiceEvent: Equatable, Sendable {
     public enum Kind: String, Sendable, CaseIterable {
         case requestDone = "richiesta_fatta", goalReached = "obiettivo_raggiunto", goalBlocked = "obiettivo_bloccato"
         case question = "domanda", risk = "rischio", custom = "avviso_custom", endOfTurn = "fine_turno"
+        case adhdAnswer = "risposta_adhd"  // the answer to a question Roberto chased in the ADHD tab (claude-config#1945)
+        case stalledDependency = "dipendenza_ferma"  // a session has waited on Roberto past the threshold (dipendenze.py)
+        case waitsForOk = "aspetta_ok"  // a session waits for Roberto's written ok (dipendenze.py, #1982): said like a question
 
         /// Lower = said first when several wait.
-        var rank: Int { [.risk: 0, .question: 1, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5, .endOfTurn: 6][self]! }
+        var rank: Int { [.risk: 0, .question: 1, .waitsForOk: 1, .adhdAnswer: 1, .stalledDependency: 2, .goalBlocked: 2, .custom: 3, .requestDone: 4, .goalReached: 5, .endOfTurn: 6][self]! }
 
         /// How the report for Haiku names it.
         var label: String {
@@ -20,6 +23,9 @@ public struct VoiceEvent: Equatable, Sendable {
             case .risk: return "Rischio"
             case .custom: return "Avviso che hai chiesto"
             case .endOfTurn: return "Novità"
+            case .adhdAnswer: return "Risposta alla tua domanda"
+            case .stalledDependency: return "Una sessione aspetta te"
+            case .waitsForOk: return "Aspetta il tuo ok"
             }
         }
     }
@@ -51,7 +57,7 @@ public struct VoiceEvent: Equatable, Sendable {
 
 extension VoiceEvent.Kind {
     /// The `livello` claude-config gives each type (#1854).
-    var level: String { [.goalBlocked, .question, .risk].contains(self) ? "alto" : "normale" }
+    var level: String { [.goalBlocked, .question, .risk, .adhdAnswer, .stalledDependency, .waitsForOk].contains(self) ? "alto" : "normale" }
 }
 
 public enum VoiceEvents {
@@ -75,17 +81,25 @@ public enum VoiceEvents {
     /// with its last 200 lines past 512 KB).
     public struct Mark: Equatable, Sendable { public var at: Date; public var id: String }
 
-    /// The events after `mark`, and the new mark. A last line without its newline waits for the next read.
+    /// The events after `mark`, the new mark, and the `tipo` of each new line the voice does not know (for the log: never
+    /// dropped in silence, #163). A last line without its newline waits for the next read.
     /// `mark` nil = the launch: nothing is old news to say, only the mark is taken.
-    public static func newer(_ data: Data, after mark: Mark?) -> (events: [VoiceEvent], mark: Mark?) {
+    public static func newer(_ data: Data, after mark: Mark?) -> (events: [VoiceEvent], mark: Mark?, unknown: [String]) {
         var text = String(decoding: data, as: UTF8.self)
         if !text.hasSuffix("\n") { text = String(text[..<(text.lastIndex(of: "\n").map { text.index(after: $0) } ?? text.startIndex)]) }
-        let all = text.split(separator: "\n").compactMap(parse(line:))
+        let all = text.split(separator: "\n").compactMap(entry(line:))
         let last = all.last.map { Mark(at: $0.at, id: $0.id) } ?? mark
-        guard let mark else { return ([], last) }
+        guard let mark else { return ([], last, []) }
         // The mark's line still there: what follows it. Gone (rewritten): what is newer than it.
-        if !mark.id.isEmpty, let i = all.lastIndex(where: { $0.id == mark.id }) { return (Array(all[(i + 1)...]), last) }
-        return (all.filter { $0.at > mark.at }, last)
+        let new = !mark.id.isEmpty ? all.lastIndex(where: { $0.id == mark.id }).map { Array(all[($0 + 1)...]) } : nil
+        let fresh = new ?? all.filter { $0.at > mark.at }
+        return (fresh.compactMap(\.event), last, fresh.filter { $0.event == nil }.map(\.type))
+    }
+
+    /// Any well-formed line, known type or not: the mark moves past a type the voice does not say.
+    private static func entry(line: Substring) -> (at: Date, id: String, type: String, event: VoiceEvent?)? {
+        guard let o = (try? JSONSerialization.jsonObject(with: Data(line.utf8))) as? [String: Any], let at = GoalSources.date(o["t"]) else { return nil }
+        return (at, o["id"] as? String ?? "", o["tipo"] as? String ?? "", parse(line: line))
     }
 
     // MARK: Derived from what Clotch reads (no eventi.jsonl)
@@ -112,7 +126,8 @@ public enum VoiceEvents {
     public static func requests(before: [UserRequest]?, after: [UserRequest], now: Date) -> [VoiceEvent] {
         guard let before else { return [] }
         let was = Dictionary(before.map { ($0.id, $0.state) }, uniquingKeysWith: { a, _ in a })
-        return after.filter { !$0.isQuestion && $0.state == "fatta" && was[$0.id] != "fatta" && !$0.notOurs }.map {
+        return after.filter { !$0.isQuestion && $0.state == "fatta" && was[$0.id] != "fatta" && !$0.notOurs
+            && UserRequest.isNews($0.doneAt, now: now) }.map {
             VoiceEvent(kind: .requestDone, at: $0.doneAt ?? now, session: $0.session, subject: $0.text, text: $0.text, proof: $0.proof)
         }
     }

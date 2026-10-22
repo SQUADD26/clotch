@@ -62,6 +62,7 @@ extension GoalRow {
             return nil
         case .moving, .still:
             // The engine's reason (what it waits for, what went wrong) beats a guess from silence.
+            if let ask = motor?.askLine { return ask }  // every question, whole (#165)
             if let motor, !motor.why.isEmpty, phase != .lavora { return motor.why }
             if motor == nil, case .still(let since) = status { return "Fermo da " + Self.elapsed(from: since, to: now) }
             return nil

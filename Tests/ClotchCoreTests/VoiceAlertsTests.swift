@@ -75,6 +75,7 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertEqual(VoiceEvents.newer(data, after: nil).events, [], "the launch only takes the mark")
         let first = VoiceEvents.newer(data, after: VoiceEvents.Mark(at: .distantPast, id: ""))
         XCTAssertEqual(first.events.count, 1, "a type the voice does not say, and a broken line, stay out")
+        XCTAssertEqual(first.unknown, ["merge"], "an unknown type is reported, for the log (#163)")
         let e = first.events[0]
         XCTAssertEqual([e.id, e.session, e.localId, e.role, e.subject, e.proof, e.level], ["e-00000001", "m", "local_m", "figlia", "Timer", "PR #51", "normale"])
         XCTAssertTrue(e.judged, "giudizio present, even si null: never judged again")
@@ -82,6 +83,7 @@ final class VoiceAlertsTests: XCTestCase {
         let rest = VoiceEvents.newer(data + Data(#""}"#.utf8) + Data("\n".utf8), after: first.mark)
         XCTAssertEqual(rest.events.map(\.kind), [.risk], "the half line waited for its end")
         XCTAssertEqual(rest.mark?.id, "e-00000003")
+        XCTAssertEqual(rest.unknown, [], "reported once: the mark moved past it")
         let rewritten = Data((c + "\"}\n").utf8)
         XCTAssertEqual(VoiceEvents.newer(rewritten, after: first.mark).events.map(\.id), ["e-00000003"], "mark's line gone: what is newer than it")
         XCTAssertEqual(VoiceEvents.newer(rewritten, after: rest.mark).events, [], "nothing after the mark")
@@ -113,6 +115,8 @@ final class VoiceAlertsTests: XCTestCase {
         XCTAssertEqual(e.first?.proof, "PR #51")
         XCTAssertEqual(VoiceEvents.requests(before: nil, after: [request("fatta")], now: now), [])
         XCTAssertEqual(VoiceEvents.requests(before: [request("presa")], after: [request("fatta", notOurs: true)], now: now), [])
+        let doneLongAgo = GoalSources.parseRequest(Data(#"{"id": "Q-1", "testo": "x", "stato": "fatta", "t_fatta": 1791990000}"#.utf8))!
+        XCTAssertEqual(VoiceEvents.requests(before: [], after: [doneLongAgo], now: now), [], "#173: an old fact coming back is not news")
     }
 
     func quota(_ five: Double, _ seven: Double) -> AccountQuota {
