@@ -34,6 +34,9 @@ final class VoiceSpeaker {
         ducker?.end()  // the others' audio back at once, never left lowered by a quit
     }
 
+    /// The microphone opens: the voice that is speaking stops at once, or Roberto's dictation would carry its words.
+    func hush() { player?.stop() }
+
     /// The hooks follow the switch and the key: on with a key = installed (once) in every Claude Code folder and the
     /// live sign written; otherwise both removed. Called at launch and by the «Voce» page on every change.
     func refresh() {
@@ -179,7 +182,8 @@ final class VoiceSpeaker {
             player = p
             try? await Task.sleep(nanoseconds: UInt64(VoiceStatus.lead * 1e9))
             p.play()
-            try? await Task.sleep(nanoseconds: UInt64(length * 1e9))
+            let end = Date().addingTimeInterval(length + 1)
+            while p.isPlaying, Date() < end { try? await Task.sleep(nanoseconds: 100_000_000) }  // stops early when `hush()` silences it
             player = nil
             writeStatus(id: id, speaking: false, start: Date(), end: Date(), levels: [])
             Self.log.notice("voice said: \(text.count) chars, \(String(format: "%.1f", length), privacy: .public) s of audio")
