@@ -7,6 +7,11 @@ import ClotchCore
 /// request happens to sit at the head of the queue. (#308)
 @MainActor
 final class AppStateAnswerRoutingTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        optIntoAutoExpand()
+    }
+
 
     // MARK: - Questions
 

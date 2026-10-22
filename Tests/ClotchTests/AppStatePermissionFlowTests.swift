@@ -10,6 +10,7 @@ final class AppStatePermissionFlowTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        optIntoAutoExpand()
         savedCodexHome = ProcessInfo.processInfo.environment["CODEX_HOME"]
         savedSmartSuppress = UserDefaults.standard.object(forKey: SettingsKey.smartSuppress)
         savedAutoExpandOnPermission = UserDefaults.standard.object(forKey: SettingsKey.autoExpandOnPermission)
