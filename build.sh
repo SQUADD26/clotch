@@ -67,6 +67,8 @@ build_mac() {
     cp "$ARM_DIR/$PRODUCT" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
     cp "$ARM_DIR/clotch-bridge" "$APP_BUNDLE/Contents/Helpers/clotch-bridge"
     cp Info.plist "$APP_BUNDLE/Contents/Info.plist"
+    # The commit in the bundle: every launch writes it in the log, so it is always known which build runs (#174).
+    /usr/libexec/PlistBuddy -c "Add :ClotchCommit string $(git rev-parse --short HEAD)$(git diff --quiet HEAD -- Sources || echo +)" "$APP_BUNDLE/Contents/Info.plist"
 
     echo "Embedding frameworks..."
     # Sparkle.xcframework macos-arm64_x86_64 slice is already universal; copy as-is to preserve symlinks.

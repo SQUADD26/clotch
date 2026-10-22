@@ -40,6 +40,27 @@ final class VoiceInputCaptureTests: XCTestCase {
         XCTAssertTrue(said.contains("stasera"), said)
     }
 
+    /// The first utterance after launch: the model is already loaded, the text comes in under 1 s (it took 12 to 44 s on Roberto's Mac).
+    func testFirstUtteranceAfterLaunchIsQuick() async throws {
+        // An order, not a question: a question goes to «sto pensando» and runs `claude -p`, an order stops at «sending».
+        let (c, voice) = controller(try Self.recorded("Chiudi le sessioni vecchie di stasera"))
+        c.prewarm()
+        let deadline = Date().addingTimeInterval(90)
+        while !(await c.local.isLoaded), Date() < deadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        let loaded = await c.local.isLoaded
+        XCTAssertTrue(loaded, "prewarm loads the model")
+        c.press()
+        try await waitFor { c.phase == .listening }
+        try await waitFor(seconds: 30) { voice.playedSeconds >= 2.8 }
+        let stopped = Date()
+        c.press()
+        try await waitFor(seconds: 60) { c.phase == .sending }
+        let wait = Date().timeIntervalSince(stopped)
+        XCTAssertLessThan(wait, 1, "text after the second press in \(wait) s")
+        XCTAssertTrue(c.sure.lowercased().contains("sessioni"), c.sure)
+        c.cancel()
+    }
+
     // MARK: - Presses
 
     func testDoublePressBeforeTheMicrophoneEndsQuietly() async throws {

@@ -4,6 +4,9 @@ import ClotchCore
 
 /// The error pills of #110 (Figma note 5 and 6), their buttons, and Esc for the length of a dictation.
 extension VoiceInputController {
+    /// A line on the pill for a while, then the pill folds away.
+    func show(_ message: String, seconds: Double = 3) { end(.result(message), seconds: seconds) }
+
     /// The microphone error waits for the permission; the others fold after a while.
     func show(failure why: VoiceInput.Failure) {
         end(.failure(why), seconds: why == .mic ? 300 : 20)
