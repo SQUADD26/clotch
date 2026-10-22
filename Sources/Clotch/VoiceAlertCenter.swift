@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 import ClotchCore
 
 /// Where the voice's news comes in (#57). With `~/.config/voce/eventi.jsonl` (claude-config#1854) only its new lines
@@ -8,6 +9,7 @@ import ClotchCore
 @MainActor
 final class VoiceAlertCenter {
     static let shared = VoiceAlertCenter()
+    private static let log = Logger(subsystem: "com.squadd.clotch", category: "Voice")
 
     private let files = VoiceFiles()
     private var engine = VoiceAlertEngine()
@@ -37,6 +39,7 @@ final class VoiceAlertCenter {
         guard let data = try? Data(contentsOf: files.eventsURL) else { eventsMark = nil; return }
         let read = VoiceEvents.newer(data, after: eventsMark)
         eventsMark = read.mark
+        for type in read.unknown { Self.log.error("voice event not said: unknown type «\(type, privacy: .public)» in eventi.jsonl") }
         offer(read.events)
     }
 
