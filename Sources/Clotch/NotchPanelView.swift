@@ -423,7 +423,7 @@ struct NotchPanelView: View {
                 if showBar {
                     // The elements chosen in «Personalizza il notch» for this screen, left, centre and right.
                     NotchLiveZones(layout: notchLayout, hasNotch: hasNotch, notchWidth: notchW,
-                                   workingSince: goals.rows.hero?.since, barHeight: notchHeight, expanded: shouldShowExpanded)
+                                   workingSince: goals.rows.hero?.clockStart, barHeight: notchHeight, expanded: shouldShowExpanded)
                         .frame(width: panelWidth)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(

@@ -6,7 +6,7 @@ import Foundation
 /// every goal family costs one parse when it changes, and no new board.
 /// Not thread-safe: the watcher calls it from one serial queue.
 public final class GoalLoader: @unchecked Sendable {
-    public typealias Snapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest])
+    public typealias Snapshot = (goals: [GoalRecord], sessions: [DesktopSession], live: [LiveState], requests: [UserRequest], motor: [SessionMotor])
     /// Session stats and values kept across launches, so a restart parses only the files changed since.
     /// Bump the name when `DesktopSession` or `GoalSources.sessionKeys` change: the old file is then ignored.
     public static let indexName = "sessions-v3.json"
@@ -16,11 +16,12 @@ public final class GoalLoader: @unchecked Sendable {
     let goals = GoalFileCache<GoalRecord>()
     let sessions = GoalFileCache<DesktopSession>(key: { $0.lastPathComponent })
     let requests = GoalFileCache<UserRequest>()
+    let motor = GoalFileCache<SessionMotor>(key: { $0.lastPathComponent })
     private var live: [String: LiveState] = [:]
     private var liveIds: Set<String> = []
     private var reached: [String] = []   // cache keys of the sessions a shown goal reaches, in cache order
     private var seenGoals: Int?
-    private var shipped: (goals: Int, requests: Int)?
+    private var shipped: (goals: Int, requests: Int, motor: Int)?
     private let index: URL?
     private var savedParses = 0
     private var savedAt: Date?
@@ -55,6 +56,11 @@ public final class GoalLoader: @unchecked Sendable {
         }
         if touched(paths.requests) {
             requests.replace(with: GoalSources.files(in: paths.requests, fm).filter { $0.pathExtension == "json" }) { d, _ in GoalSources.parseRequest(d) }
+        }
+        if touched(paths.states) {
+            motor.replace(with: GoalSources.files(in: paths.states, fm).filter { $0.pathExtension == "json" }) { d, u in
+                GoalSources.parseMotor(d, cli: u.deletingPathExtension().lastPathComponent)
+            }
         }
         let isSession = { (u: URL) in u.lastPathComponent.hasPrefix("local_") && u.pathExtension == "json" }
         let parseSession = { (d: Data, u: URL) -> DesktopSession? in
@@ -101,7 +107,7 @@ public final class GoalLoader: @unchecked Sendable {
         saveIndex(force: rescan)
 
         // Unchanged values (a rewrite with the same content, a live file of another session): no new board.
-        let versions = (goals.version, requests.version)
+        let versions = (goals.version, requests.version, motor.version)
         if !rescan, !liveMoved, !touchedReached, !touchedTaker, let shipped, shipped == versions { return nil }
         shipped = versions
         let byCli = takers.isEmpty ? [:] : GoalBoard.index(sessions.all)
@@ -116,7 +122,8 @@ public final class GoalLoader: @unchecked Sendable {
             return r
         }
         return (goals.all, reached.compactMap { sessions[$0] }, live.keys.sorted().compactMap { live[$0] },
-                linked.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) })
+                linked.sorted { ($0.at ?? .distantPast, $0.id) > ($1.at ?? .distantPast, $1.id) },
+                motor.all)
     }
 
     /// Every Claude app session parsed so far, not only those a goal reaches (the voice's «Parla per», #50).

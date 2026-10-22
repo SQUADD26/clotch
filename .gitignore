@@ -68,7 +68,6 @@ android-watch/**/build/
 .zencoder/
 skills/
 skills-lock.json
-CLAUDE.md
 build-dir/
 
 # Python bytecode from local syntax checks

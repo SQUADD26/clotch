@@ -76,14 +76,6 @@ final class NotchPagingTests: XCTestCase {
         XCTAssertEqual(PageDrag.settle(index: 1, offset: -300, velocity: -800, width: 440, count: 2), 1)
         XCTAssertEqual(PageDrag.settle(index: 1, offset: -300, velocity: -800, width: 440, count: 5), 2)
     }
-
-    func testDotWindowSlidesAndStaysInRange() {
-        XCTAssertEqual(PageDots.window(count: 3, index: 2), 0..<3)
-        XCTAssertEqual(PageDots.window(count: 13, index: 0), 0..<4)
-        XCTAssertEqual(PageDots.window(count: 13, index: 6), 4..<8)
-        XCTAssertEqual(PageDots.window(count: 13, index: 12), 9..<13)
-        for i in 0..<13 { XCTAssertTrue(PageDots.window(count: 13, index: i).contains(i)) }
-    }
 }
 
 final class PageDragTests: XCTestCase {

@@ -57,6 +57,8 @@ public enum GoalSources {
 
     public struct Paths: Sendable {
         public var goals: URL; public var live: URL; public var sessionRoots: [URL]; public var requests: URL
+        /// One `<cli>.json` per session, written by the config's engine: the session's true state (clotch#114).
+        public var states: URL
     }
 
     public static func defaultPaths(home: URL) -> Paths {
@@ -67,7 +69,8 @@ public enum GoalSources {
         }
         return Paths(goals: home.appendingPathComponent(".claude/obiettivi"),
                      live: home.appendingPathComponent(".claude/handoff/live"), sessionRoots: roots,
-                     requests: home.appendingPathComponent(".claude/richieste"))
+                     requests: home.appendingPathComponent(".claude/richieste"),
+                     states: home.appendingPathComponent(".claude/sessioni-stato"))
     }
 
     /// One full read (launch of `--snapshot`, tests). The app's watcher keeps one `GoalLoader` instead.

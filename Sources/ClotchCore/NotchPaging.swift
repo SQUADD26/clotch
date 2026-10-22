@@ -137,12 +137,3 @@ public struct PageSpring: Equatable, Sendable {
         }
     }
 }
-
-/// Which page dots to draw: at most `limit`, sliding with the page so the current one stays in view.
-public enum PageDots {
-    public static func window(count: Int, index: Int, limit: Int = 4) -> Range<Int> {
-        let size = min(count, limit)
-        let start = min(max(0, index - size / 2), count - size)
-        return start..<(start + size)
-    }
-}

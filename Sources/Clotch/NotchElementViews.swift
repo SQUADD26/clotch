@@ -64,7 +64,7 @@ private struct ActiveGoalElement: View {
     @ViewBuilder private var goal: some View {
         if let hero = data.rows.hero {
             HStack(spacing: 10) {
-                if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(GoalInk.primary).lineLimit(1).truncationMode(.tail) }
+                if !data.iconsOnly { Text(hero.title).font(NotchType.name).foregroundStyle(hero.tone == .quiet ? GoalInk.primary : hero.tone.ink).lineLimit(1).truncationMode(.tail) }
                 if let since = data.workingSince {
                     HStack(spacing: 5) {
                         Image(systemName: "stopwatch").font(.system(size: 15))

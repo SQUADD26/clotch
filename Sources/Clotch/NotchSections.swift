@@ -3,13 +3,14 @@ import SwiftUI
 import ClotchCore
 
 enum NotchTab: String, CaseIterable, Identifiable {
-    case goals, requests, accounts
+    case goals, requests, adhd, accounts
     var id: String { rawValue }
 
     var title: String {
         switch self {
         case .goals: return "Obiettivi"
         case .requests: return "Richieste"
+        case .adhd: return "ADHD"
         case .accounts: return "Account"
         }
     }
@@ -18,6 +19,7 @@ enum NotchTab: String, CaseIterable, Identifiable {
         switch self {
         case .goals: return "target"
         case .requests: return "tray"
+        case .adhd: return "brain"
         case .accounts: return "person.2"
         }
     }
@@ -54,8 +56,9 @@ struct NotchSections: View {
         .onAppear {  // opening the notch is when fresh numbers matter
             quota.refresh()
             PullRequestFeed.shared.refresh()
+            AdhdStore.shared.start()
         }
-        .onDisappear { afk.dismiss(closing: false) }  // closed by the pointer: the next opening shows the tabs
+        .onDisappear { afk.dismiss(closing: false); AdhdStore.shared.stop() }  // closed by the pointer: the next opening shows the tabs
     }
 }
 
@@ -74,6 +77,7 @@ struct NotchSectionsContent: View {
     @ObservedObject var quota: AccountQuotaFeed
     let now: Date
     @Binding var tab: NotchTab
+    @ObservedObject private var adhd = AdhdStore.shared
     @AppStorage(ClotchPrefs.hiddenTabs) private var hiddenTabs = ClotchPrefs.hiddenTabsDefault
     @State private var forward = true
     @State private var swipe = PageSwipe()
@@ -86,12 +90,14 @@ struct NotchSectionsContent: View {
 
     var body: some View {
         VStack(spacing: NotchSpace.section) {
-            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, dotted: store.hasNewAnswer ? .requests : nil)
+            TabBar(tab: Binding(get: { shown }, set: go), tabs: tabs, badge: store.newAnswerCount > 0 ? (.requests, store.newAnswerCount) : nil,
+                   adhdCount: adhd.unanswered)
             ZStack(alignment: .top) {
                 Group {
                     switch shown {
                     case .goals: GoalsTab(rows: store.rows, now: now)
                     case .requests: RequestsTab(requests: store.requests, active: store.requestsFolderExists, now: now, seenAt: store.answersSeenAt)
+                    case .adhd: AdhdTab(items: adhd.items, markRead: adhd.markRead, nudge: adhd.nudge)
                     case .accounts: AccountsTab(feed: quota, inUse: AccountsInUseFeed.shared, now: now)
                     }
                 }
@@ -145,8 +151,10 @@ enum TabBarPointer {
 struct TabBar: View {
     @Binding var tab: NotchTab
     var tabs = NotchTab.allCases
-    /// The tab with a small yellow dot (a new answer, #90); never the open one.
-    var dotted: NotchTab? = nil
+    /// The tab with a yellow number, no box (new answers, #90, #114); never the open one.
+    var badge: (tab: NotchTab, count: Int)? = nil
+    /// The yellow number in the ADHD tab: the questions still without an answer (#123); nothing at 0.
+    var adhdCount = 0
     /// The AFK moon's state for `--snapshot`; nil = live.
     var afkOn: Bool? = nil
     @Namespace private var highlight
@@ -160,8 +168,15 @@ struct TabBar: View {
                     HStack(spacing: 6) {
                         Image(systemName: item.symbol)
                         Text(item.title)
-                        if item == dotted && item != tab {
-                            Circle().fill(GoalTone.wait.color).frame(width: 6, height: 6).accessibilityLabel("Nuova risposta")
+                        if let badge, badge.tab == item, item != tab {
+                            Text("\(badge.count)")
+                                .font(.system(size: FigmaToken.MacOS27GoldenGate.notchTesto11, weight: .semibold))
+                                .foregroundStyle(FigmaToken.MacOS27GoldenGate.notchGiallo)
+                                .accessibilityLabel(badge.count == 1 ? "1 nuova risposta" : "\(badge.count) nuove risposte")
+                        }
+                        if item == .adhd && adhdCount > 0 {
+                            Text("\(adhdCount)").font(.system(size: FigmaToken.MacOS27GoldenGate.notchTesto11, weight: .semibold))
+                                .foregroundStyle(GoalTone.wait.color).accessibilityLabel("\(adhdCount) senza risposta")
                         }
                     }
                     .font(item == tab ? NotchType.tab : NotchType.tabOff)

@@ -6,16 +6,13 @@ import ClotchCore
 // Copy is plain Italian literals (L10n has no Italian table); app-copy rules.
 
 extension GoalRow {
-    var tone: GoalTone {
-        switch status {
-        case .moving, .reached: return .go
-        case .still: return .wait
-        case .blocked: return .stop
-        }
+    /// A proposed goal is drawn quiet: grey. A reached one is green; any other takes its session's tone: grey, yellow or red (#114).
+    var ink: Color {
+        if proposed { return GoalInk.secondary }
+        if case .reached = status { return GoalTone.go.color }
+        return tone.ink
     }
 
-    /// A proposed goal is drawn quiet: grey, never a traffic light.
-    var ink: Color { proposed ? GoalInk.secondary : tone.color }
     /// The ring and the proofs count: coloured by the share of proofs done (Figma thresholds), never by state.
     var ringInk: Color {
         guard !proposed, let p = progress else { return GoalInk.secondary }
@@ -26,11 +23,17 @@ extension GoalRow {
     /// The state as a label (app-copy: adjective or participle).
     var statusLabel: String {
         if proposed { return "Proposto" }
-        switch status {
-        case .moving: return "In corso"
-        case .still: return "Fermo"
-        case .blocked: return "Bloccato"
-        case .reached: return "Raggiunto"
+        if case .reached = status { return "Raggiunto" }
+        return phase.label
+    }
+
+    /// What the mouse-over line says: «Setup aspetta te: scegliere come fare i test.» A quiet session has no line.
+    func hoverLine(now: Date) -> String? {
+        let why = reason(now: now)
+        switch tone {
+        case .attention: return "\(title) aspetta te" + (why.map { ": \($0)" } ?? ".")
+        case .problem: return "\(title) ha un problema" + (why.map { ": \($0)" } ?? ".")
+        case .quiet: return nil
         }
     }
 
@@ -46,13 +49,22 @@ extension GoalRow {
     var proofsText: String? { proofsTotal > 0 ? "\(proofsDone)/\(proofsTotal)" : nil }
     var proofsSentence: String { proofsTotal > 0 ? "\(proofsDone) prove su \(proofsTotal)" : "Nessuna prova dichiarata" }
 
+    /// The mouse-over text: the reason, and for a session waiting on something else what it waits for.
+    func detail(now: Date) -> String {
+        let parts = [reason(now: now), phase == .aspettaAltro ? motor?.what : nil].compactMap { $0 }.filter { !$0.isEmpty }
+        return parts.isEmpty ? statusLabel : parts.joined(separator: ": ")
+    }
+
     /// Why the goal is not green, when it is not: shown under its text.
     func reason(now: Date) -> String? {
         switch status {
-        case .moving, .reached:
+        case .reached:
             return nil
-        case .still(let since):
-            return "Fermo da " + Self.elapsed(from: since, to: now)
+        case .moving, .still:
+            // The engine's reason (what it waits for, what went wrong) beats a guess from silence.
+            if let motor, !motor.why.isEmpty, phase != .lavora { return motor.why }
+            if motor == nil, case .still(let since) = status { return "Fermo da " + Self.elapsed(from: since, to: now) }
+            return nil
         case .blocked(let reason):
             var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
             // The register stores the reason as "BLOCCATO: …".
