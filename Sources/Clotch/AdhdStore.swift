@@ -8,7 +8,7 @@ final class AdhdStore: ObservableObject {
     static let shared = AdhdStore()
     @Published private(set) var items: [AdhdRequest] = []
     /// The engine's command that failed, as one sentence (#263): the card may be old. A read that works clears its own; an action's stays until the next action.
-    @Published private var readError: String?
+    @Published private(set) var readError: String?
     @Published private var actionError: String?
     var error: String? { actionError ?? readError }
     private var timer: Timer?
@@ -40,7 +40,7 @@ final class AdhdStore: ObservableObject {
                     self.readError = nil
                     let list = GoalSources.parseAdhd(data)
                     if list != self.items { self.items = list }
-                case .failure(let failure): self.readError = failure.message
+                case .failure(let failure): self.readError = failure.precise(what: "delle richieste")
                 }
             }
         }
@@ -71,7 +71,7 @@ final class AdhdStore: ObservableObject {
 
     /// The sentence if the command failed (the log has the stderr), nil if it worked.
     private nonisolated static func failure(_ args: [String]) -> String? {
-        if case .failure(let failure) = EngineCommand.python(args) { return failure.message }
+        if case .failure(let failure) = EngineCommand.python(args) { return failure.precise(what: "delle richieste") }
         return nil
     }
 }
