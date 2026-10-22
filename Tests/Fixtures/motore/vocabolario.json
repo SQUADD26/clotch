@@ -35,6 +35,11 @@
   "raggiunto": "letto",
   "rifiutato": "ignorato: Roberto l'ha rifiutato"
  },
+ "esito-ingresso.stato": {
+  "consegnato": "clotch#262",
+  "in_consegna": "clotch#262",
+  "non_consegnato": "clotch#262"
+ },
  "adhd.stato": {
   "aperta": "clotch#166",
   "con_risposta": "clotch#166",

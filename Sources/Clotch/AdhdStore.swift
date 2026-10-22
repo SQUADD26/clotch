@@ -7,6 +7,10 @@ import ClotchCore
 final class AdhdStore: ObservableObject {
     static let shared = AdhdStore()
     @Published private(set) var items: [AdhdRequest] = []
+    /// The engine's command that failed, as one sentence (#263): the card may be old. A read that works clears its own; an action's stays until the next action.
+    @Published private var readError: String?
+    @Published private var actionError: String?
+    var error: String? { actionError ?? readError }
     private var timer: Timer?
     private var reading = false
     private let home = FileManager.default.homeDirectoryForCurrentUser.path
@@ -28,10 +32,16 @@ final class AdhdStore: ObservableObject {
         reading = true
         let args = [home + "/.claude/hooks/richieste.py", "adhd"]
         Task.detached {
-            let list = Self.run(args).map(GoalSources.parseAdhd)
+            let result = EngineCommand.python(args)
             await MainActor.run {
                 self.reading = false
-                if let list, list != self.items { self.items = list }
+                switch result {
+                case .success(let data):
+                    self.readError = nil
+                    let list = GoalSources.parseAdhd(data)
+                    if list != self.items { self.items = list }
+                case .failure(let failure): self.readError = failure.message
+                }
             }
         }
     }
@@ -41,8 +51,8 @@ final class AdhdStore: ObservableObject {
         let commands = AdhdRequest.markReadArguments(id, in: items, home: home)
         items.removeAll { $0.answered && (id == nil || $0.id == id) }
         Task.detached {
-            for args in commands { _ = Self.run(args) }
-            await MainActor.run { self.refresh() }
+            let failed = commands.compactMap(Self.failure).first
+            await MainActor.run { self.actionError = failed; self.refresh() }
         }
     }
 
@@ -54,27 +64,14 @@ final class AdhdStore: ObservableObject {
     private func act(_ verb: String, _ arg: String) {
         let args = [home + "/.claude/hooks/richieste.py", verb, arg]
         Task.detached {
-            _ = Self.run(args)
-            await MainActor.run { self.refresh() }
+            let failed = Self.failure(args)
+            await MainActor.run { self.actionError = failed; self.refresh() }
         }
     }
 
-    /// stdout of the script, nil if it did not run or failed.
-    private nonisolated static func run(_ args: [String]) -> Data? {
-        guard let py = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
-            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return nil }
-        let process = Process(), out = Pipe()
-        process.executableURL = URL(fileURLWithPath: py)
-        process.arguments = args
-        var env = ProcessInfo.processInfo.environment
-        env["CLAUDE_CODE_SESSION_ID"] = nil  // Roberto, not a session: with it the command may refuse
-        process.environment = env
-        process.standardInput = FileHandle.nullDevice
-        process.standardOutput = out
-        process.standardError = FileHandle.nullDevice
-        guard (try? process.run()) != nil else { return nil }
-        let data = out.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        return process.terminationStatus == 0 ? data : nil
+    /// The sentence if the command failed (the log has the stderr), nil if it worked.
+    private nonisolated static func failure(_ args: [String]) -> String? {
+        if case .failure(let failure) = EngineCommand.python(args) { return failure.message }
+        return nil
     }
 }

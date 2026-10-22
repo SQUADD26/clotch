@@ -106,6 +106,7 @@ final class VoiceInputController: ObservableObject {
     /// The key went down. Idle or thinking: starts. Open: ends it (press mode, or a quick tap in hold mode). Finishing or waiting to
     /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }  // clotch#266: Roberto in a call, the microphone stays closed
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
@@ -142,6 +143,7 @@ final class VoiceInputController: ObservableObject {
     // MARK: - Listening
 
     func begin() async {
+        guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }
         reset()
         run += 1
         let me = run
@@ -250,10 +252,15 @@ final class VoiceInputController: ObservableObject {
         disarmEscape()
         if let helper {
             phase = .thinking
+            let started = Date()
             let reply = await ask(said, helper)
             guard me == run else { return }
-            if case .success(let answer) = reply {
-                return answered(answer)
+            // #262: the helper's words are not the outcome of an order; the engine's `.esiti` is
+            if case .success = reply {
+                let outcome = await OverseerDelivery.afterHelper(said, since: started, files: files)
+                guard me == run else { return }
+                Self.log.notice("order: helper, \(String(describing: outcome), privacy: .public)")
+                return show(Self.sentence(outcome))
             }
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
@@ -261,7 +268,16 @@ final class VoiceInputController: ObservableObject {
         let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
-        show(outcome == .sent ? "Inviato all’Overseer" : outcome == .queued ? "In coda per l’Overseer" : "Testo copiato. Incolla con ⌘V")
+        show(Self.sentence(outcome))
+    }
+
+    private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
+        switch outcome {
+        case .sent: return "Inviato all’Overseer"
+        case .queued: return "In coda per l’Overseer"
+        case .copied: return "Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato all’Overseer. Testo copiato. Incolla con ⌘V"
+        }
     }
 
     func fail(_ why: VoiceInput.Failure, run me: Int) {
