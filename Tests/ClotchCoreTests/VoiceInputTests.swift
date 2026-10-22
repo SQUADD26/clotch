@@ -165,6 +165,18 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(VoiceRoute.askInput("che ore sono"), "<sessioni>\n\n</sessioni>\n<domanda>\nche ore sono\n</domanda>\n")
     }
 
+    func testHelperRunsOnlyItsOwnCommand() {
+        let a = VoiceRoute.helperArguments(prompt: "istruzioni")
+        let allowed = a[a.firstIndex(of: "--allowed-tools")! + 1].split(separator: ",").map(String.init)
+        XCTAssertEqual(allowed, ["Read", "Glob", "Grep", "Bash(python3 hooks/helper_voce.py:*)"])
+        for write in ["Write", "Edit", "NotebookEdit", "gh "] { XCTAssertFalse(a.joined().contains(write), write) }
+        XCTAssertEqual(a[a.firstIndex(of: "--model")! + 1], VoiceRoute.askModel)
+        XCTAssertEqual(a[a.firstIndex(of: "--max-budget-usd")! + 1], "0.10")
+        XCTAssertTrue(a.contains("--no-session-persistence"))
+        XCTAssertEqual(a.suffix(2), ["--system-prompt", "istruzioni"])
+        XCTAssertEqual(VoiceRoute.helperPromptPath, ".claude/hooks/helper_voce_prompt.md")
+    }
+
     func testAskGetsTheSessionsClotchSees() {
         let now = Date()
         let line = VoiceRoute.sessionLine(title: "Clotch: voce", status: .running, lastActivity: now.addingTimeInterval(-180), now: now)

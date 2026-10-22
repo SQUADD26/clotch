@@ -225,10 +225,11 @@ final class VoiceInputController: ObservableObject {
         (sure, maybe) = (said, "")
         // A short confirmation («va bene», «sì vai») may answer the Overseer: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
-        Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public)")
+        let helper = VoiceAsk.helperPrompt()  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
+        Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
         if isQuestion {
             phase = .thinking
-            let reply = await VoiceAsk.run(said)
+            let reply = await VoiceAsk.run(said, helper: helper)
             guard me == run else { return }
             guard case .success(let answer) = reply else {
                 if case .failure(let why) = reply { show(why.message, seconds: 5) }
@@ -242,6 +243,17 @@ final class VoiceInputController: ObservableObject {
         try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
+        if let helper {
+            phase = .thinking
+            let reply = await VoiceAsk.run(said, helper: helper)
+            guard me == run else { return }
+            if case .success(let answer) = reply {
+                if config.spoken { Task { [speak] in await speak(answer) } }
+                return show(answer, seconds: max(6, Double(answer.count) * 0.07))
+            }
+            // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
+            Self.log.notice("order: helper failed, inbox as before")
+        }
         let outcome = await OverseerDelivery.send(said, files: files)
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
