@@ -61,6 +61,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // #117: no boot expand; the notch opens only for Roberto.
         setupGlobalShortcut()
+        // #239: the same press as ⌥V from a local command, with no Accessibility asked of the sender (distributed
+        // notifications stay inside this login session): live tests open and close the dictation this way.
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.dettatura"), object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                Self.log.notice("dettatura: local command")
+                self?.executeShortcut(.voiceInput)
+            }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
