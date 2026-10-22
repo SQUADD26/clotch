@@ -17,7 +17,7 @@ public struct AdhdRequest: Identifiable, Equatable, Sendable {
 
     /// The yellow line under an unanswered question.
     public var waitingLabel: String {
-        toSort ? "Da smistare · Overseer" : "In attesa di \([responsible, origin].first { !$0.isEmpty } ?? "una sessione")"
+        nudged ? "Sollecitata · aspetto la risposta" : toSort ? "Da smistare · Overseer" : "In attesa di \([responsible, origin].first { !$0.isEmpty } ?? "una sessione")"
     }
 
     /// The number in the tab: the questions still without an answer.

@@ -74,7 +74,7 @@ private struct AdhdRow: View {
                 Text("×\(item.times)").font(.system(size: T.notchTesto11, weight: .medium)).foregroundStyle(T.notchBiancoA60)
             }
         } else if item.nudged {
-            Text("Sollecitata").font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchBiancoA60)
+            Text("Sollecitata").font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchGiallo)
         } else {
             Button("Sollecita") { nudge(item.id) }
                 .font(.system(size: T.notchTesto12, weight: .semibold)).foregroundStyle(T.notchBiancoA92).buttonStyle(.notch)

@@ -45,6 +45,7 @@ enum FigmaToken {
         static let notchRaggio14: CGFloat = 14  // notch/raggio/14
         static let notchRaggio15: CGFloat = 15  // notch/raggio/15
         static let notchRaggio16: CGFloat = 16  // notch/raggio/16
+        static let notchRaggio18: CGFloat = 18  // notch/raggio/18
         static let notchRaggio19: CGFloat = 19  // notch/raggio/19
         static let notchRaggio20: CGFloat = 20  // notch/raggio/20
         static let notchRaggio28: CGFloat = 28  // notch/raggio/28
@@ -69,6 +70,7 @@ enum FigmaToken {
         static let notchSpessore1_2: CGFloat = 1.2000000476837158  // notch/spessore/1_2
         static let notchSpessore1_5167: CGFloat = 1.5166665315628052  // notch/spessore/1_5167
         static let notchSpessore1_7333: CGFloat = 1.7333333492279053  // notch/spessore/1_7333
+        static let notchSpessore1_3333: CGFloat = 1.3333333730697632  // notch/spessore/1_3333
         static let notchInterlinea17: CGFloat = 17  // notch/interlinea/17
         static let notchInterlinea18: CGFloat = 18  // notch/interlinea/18
         static let notchInterlinea19: CGFloat = 19  // notch/interlinea/19
@@ -142,13 +144,18 @@ enum FigmaToken {
         static let notchMisura24: CGFloat = 24  // notch/misura/24
         static let notchMisura28: CGFloat = 28  // notch/misura/28
         static let notchMisura30: CGFloat = 30  // notch/misura/30
+        static let notchMisura36: CGFloat = 36  // notch/misura/36
+        static let notchMisura38: CGFloat = 38  // notch/misura/38
         static let notchMisura40: CGFloat = 40  // notch/misura/40
         static let notchMisura54: CGFloat = 54  // notch/misura/54
+        static let notchMisura86: CGFloat = 86  // notch/misura/86
         static let notchMisura120: CGFloat = 120  // notch/misura/120
         static let notchMisura420: CGFloat = 420  // notch/misura/420
+        static let notchMisura422: CGFloat = 422  // notch/misura/422
         static let notchMisura458: CGFloat = 458  // notch/misura/458
         static let notchMisura488: CGFloat = 488  // notch/misura/488
         static let notchMisura578: CGFloat = 578  // notch/misura/578
+        static let notchMisura103_5: CGFloat = 103.5  // notch/misura/103_5
         static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
         static let notchFontMedio: String = "Medium"  // notch/font/medio
         static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
