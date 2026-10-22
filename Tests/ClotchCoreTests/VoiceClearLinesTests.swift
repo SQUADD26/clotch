@@ -25,9 +25,9 @@ final class VoiceClearLinesTests: XCTestCase {
         XCTAssertFalse(VoiceTurn.vague("Mi serve il tuo sì per il merge.", subject: question.subject))
     }
 
-    func testFridayIsSaidTheEnglishWay() {
+    func testFridayIsLeftToTheItalianVoice() {
         let said = VoiceTurn.pronounced("Friday apre un worktree dopo l'handoff", VoiceTurn.builtInPronunciation)
-        XCTAssertEqual(said, "fràidei apre un uòrk trì dopo l'hènd off")
+        XCTAssertEqual(said, "Friday apre un worktree dopo l'handoff")
     }
 
     func testVoiceKnowsItIsTheRightHand() {
@@ -47,10 +47,23 @@ final class VoiceClearLinesTests: XCTestCase {
         XCTAssertTrue(VoiceTurn.role.contains("niente numeri di PR"))
     }
 
-    /// #299: every spoken line goes through `speechRequest`, so the English names are respelled in all of them.
-    func testFridayGoesToElevenLabsRespelled() throws {
+    /// #299: every spoken line goes through `speechRequest`, so the English names stay as written in all of them.
+    func testFridayGoesToElevenLabsAsWritten() throws {
         let r = VoiceTurn.speechRequest(text: "Ho aperto Friday sul nodo giusto", config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation)
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
-        XCTAssertEqual(body["text"] as? String, "Ho aperto fràidei sul nodo giusto")
+        XCTAssertEqual(body["text"] as? String, "Ho aperto Friday sul nodo giusto")
+    }
+
+    /// #312: real lines of `eventi.jsonl` (subjects and texts): «Overseer» never reaches ElevenLabs, whatever the place in the line.
+    func testOverseerNeverReachesTheSynthesis() throws {
+        let real = ["Overseer, obiettivi motore Clotch", "8 cose aspettano te e l'Overseer non gira: riaprilo.", "Causa provata e mandata all'Overseer Correzione scritta",
+                    "Config, Overseer insegue obiettivo", "Clotch, disegno Impostazioni Overseer", "Dall'Overseer, stessa classe di #2192, da includere: S-0228."]
+        for line in real {
+            let r = VoiceTurn.speechRequest(text: line, config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation)
+            let body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
+            let text = try XCTUnwrap(body["text"] as? String)
+            XCTAssertFalse(text.lowercased().contains("overseer"), text)
+            XCTAssertTrue(text.contains("Friday"), text)
+        }
     }
 }
