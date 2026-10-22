@@ -127,14 +127,14 @@ public enum VoiceTurn {
     /// The input Clean View's parlatore gives Haiku (voce-parlatore.ts:100). `dire_argomento` = the line must say what it is
     /// about: there is no recent topic to follow (#204).
     public static func haikuInput(report: String, context: String = "", previousTopic: String) -> String {
-        "<rapporto>\n\(report)\n</rapporto>\n" + (context.isEmpty ? "" : "<contesto>\(context)</contesto>\n")
+        "<ruolo>\(role)</ruolo>\n<rapporto>\n\(report)\n</rapporto>\n" + (context.isEmpty ? "" : "<contesto>\(context)</contesto>\n")
             + "<dire_argomento>\(previousTopic.isEmpty ? "sì" : "no")</dire_argomento>\n"
             + (previousTopic.isEmpty ? "" : "<argomento_precedente>\(previousTopic)</argomento_precedente>\n")
     }
 
     /// The line to say (#73): Haiku up to `haikuTries` times, each cut at `timeout`. When both fail: nil, silence (#84,
     /// claude-config#1837: never the raw or cleaned report, never a fixed sentence).
-    public static func line(timeout: TimeInterval = haikuSeconds,
+    public static func line(timeout: TimeInterval = haikuSeconds, subject: String = "",
                             haiku: @escaping @Sendable () async -> String?) async -> (text: String, topic: String)? {
         for _ in 0..<haikuTries {
             let out: String? = await withTaskGroup(of: String?.self) { g in
@@ -144,7 +144,7 @@ public enum VoiceTurn {
                 g.cancelAll()
                 return first
             }
-            if let out, let said = spoken(fromHaiku: out) { return said }
+            if let out, let said = spoken(fromHaiku: out), !vague(said.text, subject: subject), !selfAnswered(said.text) { return said }
         }
         return nil
     }
@@ -198,6 +198,36 @@ public enum VoiceTurn {
             last = m.range.location + m.range.length
         }
         return out + ns.substring(from: last)
+    }
+
+    /// English words of the engine, said the Italian way (#299). Above the config's base list (its «òuversir» came out French),
+    /// below Roberto's own `pronuncia.json`.
+    public static let builtInPronunciation: [String: String] = [
+        "Overseer": "ouver sìr", "handoff": "hènd off", "worktree": "uòrk trì", "branch": "brànc", "issue": "ìsciu",
+        "pull request": "pul richièst", "pipeline": "pàiplain", "webhook": "uèb huk", "backend": "bèk end", "frontend": "frònt end",
+        "staging": "stèigin", "rebase": "ribèis", "push": "pusc", "build": "bild", "token": "tòuken",
+    ]
+
+    /// The voice's name: ONE place (#299), Roberto will pick another.
+    public static let voiceName = "Overseer"
+
+    /// Who speaks (#299): Roberto's right hand, not a loudspeaker for the sessions' sentences.
+    static let role = "Sei \(voiceName), il braccio destro di Roberto: tieni in mano tutti i lavori e parli a lui in prima persona («ho sbloccato…», «mi serve un tuo sì su…»). Non leggi le frasi delle sessioni: le riassumi, decidi da solo ciò che puoi e gli porti solo le scelte sue, sempre col nome del lavoro. Dici solo ciò che serve a Roberto, in parole semplici: niente numeri di PR o di issue, sha, percorsi. Le parole tecniche vanno bene, se servono. Se non cambia niente per lui, taci. Una frase è una frase: mai una domanda a cui rispondi tu."
+
+    /// Lines that say nothing about which job or what to do (#299): refused unless the line names the job.
+    static let vaguePhrases = ["se funziona", "riprova tra poco", "riprova più tardi", "riprova dopo", "adesso non si può", "adesso non si puo"]
+
+    /// A question the line answers itself («Ti serve dirmi qualcosa adesso? No, era solo un avviso»): never said (#299).
+    public static func selfAnswered(_ line: String) -> Bool {
+        line.range(of: #"\?\s*[«"]?(sì|si|no)\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+            || line.lowercased().contains("ti serve dirmi qualcosa")
+    }
+
+    /// A line with one of `vaguePhrases` and no word (4+ letters) of the job's name.
+    public static func vague(_ line: String, subject: String) -> Bool {
+        let l = line.lowercased()
+        guard vaguePhrases.contains(where: l.contains) else { return false }
+        return !subject.lowercased().split { !$0.isLetter }.contains { $0.count >= 4 && l.contains($0) }
     }
 
     /// The language every spoken line is in.
