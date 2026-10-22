@@ -1,0 +1,22 @@
+[
+ {
+  "da_smistare": false,
+  "domanda_chiara": "Perche' il notch e' nero?",
+  "id": "Q-b532a544",
+  "ids": [
+   "Q-bfeb734d",
+   "Q-b532a544"
+  ],
+  "local_id": "",
+  "origine": "cli-1",
+  "responsabile": "",
+  "risposta": "Perche' manca il tema scuro.",
+  "risposta_da": "ereditata",
+  "sessione": "cli-1",
+  "stato": "con_risposta",
+  "t": 1792000002.5,
+  "t_sollecito": 1792613319.8736444,
+  "titolo_sessione": "",
+  "volte": 2
+ }
+]

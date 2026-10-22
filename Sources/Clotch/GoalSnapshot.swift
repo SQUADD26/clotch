@@ -104,6 +104,7 @@ enum GoalSnapshot {
                 } else {
                     print("snapshot: \(store.requests.count) requests, no second page")
                 }
+                try save(open(.adhd, adhdCount: AdhdRequest.unansweredCount(AdhdRequest.samples)) { AdhdTab(items: AdhdRequest.samples) }, "21-adhd")
                 try save(open(.accounts), "08-account")
                 // «Larghezza» at its widest (#99): the open notch is as wide as the closed one, never narrower.
                 let widest = closed(1)
@@ -223,10 +224,10 @@ enum GoalSnapshot {
     }
 
     /// The open notch's tab bar with `body` as the tab's content (a second page, a still of a slide).
-    private static func open<Body: View>(_ tab: NotchTab, afkOn: Bool? = nil, afk: Int? = nil, @ViewBuilder body: () -> Body) -> some View {
+    private static func open<Body: View>(_ tab: NotchTab, afkOn: Bool? = nil, afk: Int? = nil, adhdCount: Int = 0, @ViewBuilder body: () -> Body) -> some View {
         island(width: openWidth, radius: NotchSpace.radius, afk: afk, expanded: true) {
             VStack(spacing: NotchSpace.section) {
-                TabBar(tab: .constant(tab), afkOn: afkOn)
+                TabBar(tab: .constant(tab), adhdCount: adhdCount, afkOn: afkOn)
                 body().frame(maxWidth: .infinity, alignment: .topLeading)
             }
             .padding(.horizontal, NotchSpace.side)

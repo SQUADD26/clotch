@@ -30,6 +30,25 @@ final class EngineContractTests: XCTestCase {
         XCTAssertEqual(UserRequest.listed([r], now: Date(timeIntervalSince1970: 1792000100)).map(\.id), [r.id])
     }
 
+    func testAdhdListIsRead() throws {
+        let list = GoalSources.parseAdhd(try fixture("adhd-elenco.json"))
+        let r = try XCTUnwrap(list.first)
+        XCTAssertEqual([r.id, r.question, r.answer], ["Q-b532a544", "Perche' il notch e' nero?", "Perche' manca il tema scuro."])
+        XCTAssertEqual(r.times, 2); XCTAssertNotNil(r.at)
+        XCTAssertTrue(r.answered); XCTAssertEqual(AdhdRequest.unansweredCount(list), 0)
+        XCTAssertEqual(GoalSources.parseAdhd(Data("[]".utf8)), []); XCTAssertEqual(GoalSources.parseAdhd(Data("no".utf8)), [])
+    }
+
+    func testAdhdWaitingLabelAndBadge() {
+        func one(_ extra: String) -> AdhdRequest {
+            GoalSources.parseAdhd(Data(#"[{"id":"Q-1","domanda_chiara":"Domanda?","risposta":"",\#(extra)}]"#.utf8))[0]
+        }
+        XCTAssertEqual(one(#""responsabile":"Clotch","origine":"x","da_smistare":false"#).waitingLabel, "In attesa di Clotch")
+        XCTAssertEqual(one(#""responsabile":"","origine":"Notch","da_smistare":false"#).waitingLabel, "In attesa di Notch")
+        XCTAssertEqual(one(#""da_smistare":true"#).waitingLabel, "Da smistare · Overseer")
+        XCTAssertEqual(AdhdRequest.unansweredCount([one(#""da_smistare":true"#)]), 1)
+    }
+
     func testGoalWithProofsActivityAndProposal() throws {
         let g = try XCTUnwrap(GoalSources.parseGoal(fixture("obiettivo.json")))
         XCTAssertEqual([g.cli, g.state, g.title], ["cli-9", "aperto", "★ Clotch: prove"])
