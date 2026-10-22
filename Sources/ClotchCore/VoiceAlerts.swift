@@ -20,11 +20,25 @@ public struct VoiceAlertEngine {
         if now.timeIntervalSince(e.at) > Self.maxAge { return "vecchio" }
         seen = seen.filter { now.timeIntervalSince($0.value.at) < Self.sameSubject }
         let key = Self.key(e)
+        // #205: a session's question is said once while it stays the same: its memory never expires (`distantFuture`);
+        // another question text or the session closing something (done, reached, blocked) forgets it.
+        if !e.session.isEmpty {
+            if [.requestDone, .goalReached, .goalBlocked].contains(e.kind) || (e.kind == .question && seen[key] == nil) {
+                seen = seen.filter { !$0.key.hasPrefix("\u{2}\(e.session) ") }
+            }
+            if e.kind == .question, seen[key] != nil { return "doppione" }
+        }
         // #1854: same subject = one, unless the new one weighs more; a request done and a goal reached of one session = the first.
         if let old = seen[key], !(e.urgent && !old.urgent) { return "doppione" }
         if let pair = Self.closing(e, other: true), seen[pair] != nil { return "doppione" }
-        seen[key] = (now, e.urgent)
+        seen[key] = (e.kind == .question && !e.session.isEmpty ? .distantFuture : now, e.urgent)
         if let mine = Self.closing(e, other: false) { seen[mine] = (now, e.urgent) }
+        // #205: alike news arriving together is one phrase (five limit risks, not four phrases and a «coda piena»).
+        if let j = waiting.firstIndex(where: { $0.kind == e.kind }) {
+            waiting[j].text = [waiting[j], e].map { $0.text.isEmpty ? $0.subject : $0.text }.joined(separator: "; ")
+            if e.urgent { waiting[j].level = "alto" }
+            return nil
+        }
         let i = waiting.firstIndex { Self.order(e, before: $0) } ?? waiting.endIndex
         waiting.insert(e, at: i)
         guard waiting.count > Self.maxWaiting else { return nil }
@@ -37,6 +51,7 @@ public struct VoiceAlertEngine {
 
     /// The next event to say; drops the ones that got old while the voice spoke.
     public mutating func next(now: Date) -> VoiceEvent? {
+        for e in waiting where e.kind == .question && now.timeIntervalSince(e.at) > Self.maxAge { seen[Self.key(e)] = nil }  // never said: not remembered (a question's memory has no end)
         waiting.removeAll { now.timeIntervalSince($0.at) > Self.maxAge }
         return waiting.isEmpty ? nil : waiting.removeFirst()
     }
@@ -56,7 +71,9 @@ public struct VoiceAlertEngine {
     /// Same subject in other words (case, spaces, a trailing dot) is the same subject.
     static func key(_ e: VoiceEvent) -> String {
         // An ok Roberto must give is never covered by another event of its session (engine MAI_UNITI, #1982): its own key.
-        let s = e.subject.isEmpty || e.kind == .waitsForOk ? e.kind.rawValue + " " + e.text : e.subject
+        var s = e.subject.isEmpty || e.kind == .waitsForOk ? e.kind.rawValue + " " + e.text : e.subject
+        // #205: a question's subject is its session's; what makes it «the same» is the text asked (prefix: see `offer`).
+        if e.kind == .question, !e.session.isEmpty { s = "\u{2}\(e.session) " + (e.text.isEmpty ? e.subject : e.text) }
         return s.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ").trimmingCharacters(in: CharacterSet(charactersIn: ".!?"))
     }
 }
