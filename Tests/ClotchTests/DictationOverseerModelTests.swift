@@ -2,7 +2,7 @@ import XCTest
 import ClotchCore
 @testable import Clotch
 
-/// clotch#286: the «Modello Overseer» picker saves its choice under `overseer_modello`, and `VoiceInput.Config` reads it back.
+/// clotch#286: the «Modello Friday» picker saves its choice under `overseer_modello`, and `VoiceInput.Config` reads it back.
 final class DictationOverseerModelTests: XCTestCase {
     func testChoiceIsWrittenUnderOverseerModello() throws {
         var config = VoiceInput.Config([:])

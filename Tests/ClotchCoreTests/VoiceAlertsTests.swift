@@ -216,7 +216,7 @@ final class VoiceAlertsTests: XCTestCase {
         r.repo = "SQUADD26/claude-config"
         f.mergedPRs = [PRRef(repo: "SQUADD26/claude-config", number: 1854)]
         XCTAssertEqual(r.fires(f)?.proof, "pr-fusa 1854", "repo from its own field")
-        XCTAssertNil(VoiceAlertRule(id: "A-1", text: "t", when: nil, value: "", created: now).fires(f), "no `quando`: the Overseer's")
+        XCTAssertNil(VoiceAlertRule(id: "A-1", text: "t", when: nil, value: "", created: now).fires(f), "no `quando`: Friday's")
     }
 
     func testRulesFileKeepsUnknownFieldsAndRefusesABrokenOne() throws {

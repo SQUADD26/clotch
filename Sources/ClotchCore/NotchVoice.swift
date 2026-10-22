@@ -1,6 +1,6 @@
 import Foundation
 
-// The voice light's data contract (issue #10). The Overseer's player (claude-config, Clean View `voce-io.ts`) writes
+// The voice light's data contract (issue #10). The Friday's player (claude-config, Clean View `voce-io.ts`) writes
 // ~/.config/voce/stato.json atomically, once before the audio starts and once when it ends:
 //   { "v":1, "id":"…", "parla":true, "t_inizio":<epoch ms, first word>, "t_fine":<epoch ms>, "passo_ms":50, "livello":[0…1, …] }
 // `livello` is the voice volume every `passo_ms` from `t_inizio`, computed from the mp3 BEFORE it plays, so the notch needs

@@ -114,7 +114,7 @@ public struct VoiceAlertRule: Equatable, Sendable, Identifiable {
 
     public let id: String
     public var text: String     // `condizione`
-    public var when: When?      // nil = no `quando` (or one Clotch does not know): the Overseer judges it, Clotch never fires it
+    public var when: When?      // nil = no `quando` (or one Clotch does not know): the Friday judges it, Clotch never fires it
     public var value: String
     public var repo = ""
     public var created: Date

@@ -44,7 +44,7 @@ public struct VoiceFiles {
         overseerURL = home.appendingPathComponent(".claude/overseer/attuale.json")
     }
 
-    /// Orders for the Overseer (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
+    /// Orders for the Friday (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
     public var inboxURL: URL { voiceDir.appendingPathComponent(VoiceRoute.inboxFolder) }
     public var inboxListenerURL: URL { inboxURL.appendingPathComponent(".ascolta") }
     /// The engine's outcome of each order, `<same file name>` inside (#262, see `VoiceRoute.delivery`).
