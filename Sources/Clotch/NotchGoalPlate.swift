@@ -115,10 +115,27 @@ struct GoalPage: View {
                     .font(NotchType.caption)
                     .foregroundStyle(row.proofsTotal > 0 ? row.ringInk : GoalInk.secondary)
             }
+            GoalProofSlot(row: row)
             GoalPRSlot(row: row)
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(row.accessibilityText(now: now))
+    }
+}
+
+/// The first proof only Roberto can tick (#237), with «Conferma»; the next one shows once the register has it done.
+private struct GoalProofSlot: View {
+    let row: GoalRow
+    @ObservedObject private var store = GoalStore.shared
+
+    var body: some View {
+        if let proof = row.proofsToConfirm.first {
+            let busy = store.confirming.contains(row.id)
+            GoalProofBox(text: proof.text, position: (1, row.proofsToConfirm.count),
+                         failure: store.confirmFailed.contains(row.id) ? store.failureLine[row.id] ?? "Non riesco a scrivere il file dell’obiettivo." : nil,
+                         confirm: { store.confirmProof(row, proof) })
+                .disabled(busy).opacity(busy ? 0.5 : 1)
+        }
     }
 }
 

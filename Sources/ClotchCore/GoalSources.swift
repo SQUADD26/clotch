@@ -9,10 +9,10 @@ public enum GoalSources {
         guard let d = object(data), let cli = d["cli"] as? String, !cli.isEmpty,
               let goal = d["obiettivo"] as? String else { return nil }
         let proofs = (d["prove"] as? [Any]).map { list in
-            list.compactMap { item -> GoalProof? in
+            list.enumerated().compactMap { n, item -> GoalProof? in
                 guard let p = item as? [String: Any], let text = p["testo"] as? String else { return nil }
                 let done = p["fatta"] as? Bool ?? false
-                return GoalProof(text: text, done: done, at: date(p["t"]), waitsForRoberto: !done && (p["cmd"] as? String ?? "").isEmpty)
+                return GoalProof(text: text, done: done, at: date(p["t"]), waitsForRoberto: !done && (p["cmd"] as? String ?? "").isEmpty, index: n + 1)
             }
         }
         return GoalRecord(cli: cli, goal: goal, state: d["stato"] as? String ?? "aperto",

@@ -17,6 +17,12 @@ public enum GoalDecision {
         return t.isEmpty || (t == row.goal && !row.proposed) ? nil : [home + "/.claude/hooks/obiettivo-guard.py", "conferma", "--sessione", row.id, t]
     }
 
+    /// Roberto ticks a proof that has no command (#237): `prove --sessione ID fatta N`. From a terminal with no session the engine
+    /// lets him tick his own. nil for a proof that is not his to tick or not read from a file.
+    public static func proofArguments(_ row: GoalRow, proof: GoalProof, home: String) -> [String]? {
+        proof.waitsForRoberto && proof.index > 0 ? [home + "/.claude/hooks/obiettivo-guard.py", "prove", "--sessione", row.id, "fatta", String(proof.index)] : nil
+    }
+
     private static func arguments(_ command: String, _ row: GoalRow, _ home: String) -> [String]? {
         row.proposal.map { _ in [home + "/.claude/hooks/obiettivo-guard.py", command, "--sessione", row.id] }
     }
