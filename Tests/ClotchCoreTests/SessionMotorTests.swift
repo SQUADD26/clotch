@@ -55,6 +55,20 @@ final class SessionMotorTests: GoalTestCase {
         XCTAssertEqual(m.cli, "m")
     }
 
+    func testEveryQuestionOfAWaitingSessionIsRead() {
+        func parse(_ stato: String, _ domande: String, errori: Int = 0) -> SessionMotor {
+            GoalSources.parseMotor(Data(#"{"stato": "\#(stato)", "perche": "Ti chiede: Una? (e altre 2)", "domande": \#(domande), "errori": \#(errori)}"#.utf8), cli: "m")!
+        }
+        let three = parse("aspetta_roberto", #"["Quale account?", "  Quale   ramo? ", "", "Procedo?"]"#)
+        XCTAssertEqual(three.questions, ["Quale account?", "Quale ramo?", "Procedo?"], "all of them, spaces collapsed, empty ones dropped")
+        XCTAssertEqual(three.askLine, "Ti chiede:\n• Quale account?\n• Quale ramo?\n• Procedo?")
+        XCTAssertEqual(parse("aspetta_roberto", #"["Solo una?"]"#).askLine, "Ti chiede: Solo una?")
+        XCTAssertNil(parse("aspetta_roberto", "[]").askLine, "no questions: the engine's sentence stays")
+        XCTAssertNil(parse("ferma", #"["Vecchia?"]"#).askLine, "only a session that waits for Roberto asks")
+        XCTAssertEqual(parse("problema", "[]", errori: 3).errors, 3)
+        XCTAssertEqual(GoalSources.parseMotor(Data(#"{"stato": "ferma"}"#.utf8), cli: "m")?.questions, [], "a file with no `domande`")
+    }
+
     func testParseReadsTheRestOfTheContract() {
         let m = motor("aspetta_altro", why: "Aspetta 2 cose in background", cli: "c1", localId: "local_x", seen: 3, what: "la CI; il deploy")
         XCTAssertEqual(m.what, "la CI; il deploy")
