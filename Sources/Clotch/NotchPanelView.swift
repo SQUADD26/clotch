@@ -795,6 +795,9 @@ struct NotchIconButton: View {
     let icon: String
     var tint: Color = .white
     var tooltip: String? = nil
+    /// The drawn circle and its symbol; the tab bar's gear is bigger (Figma 58-56113).
+    var circle: CGFloat = Self.circleSize
+    var glyph: CGFloat = 11
     let action: () -> Void
 
     /// The drawn circle, and the hit target around it.
@@ -804,11 +807,11 @@ struct NotchIconButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: glyph, weight: .medium))
                 .foregroundStyle(tint.opacity(0.85))
-                .frame(width: Self.circleSize, height: Self.circleSize)
+                .frame(width: circle, height: circle)
                 .background(Circle().fill(tint.opacity(0.08)))
-                .frame(width: Self.hitSize, height: Self.hitSize)
+                .frame(width: circle + Self.hitSize - Self.circleSize, height: circle + Self.hitSize - Self.circleSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.notchSmall)
