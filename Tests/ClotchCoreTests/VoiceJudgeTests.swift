@@ -15,9 +15,11 @@ final class VoiceJudgeTests: XCTestCase {
 
     func testYesAndNo() async {
         let yes = await VoiceJudge.judge(state: state, key: "k", question: "q?", ask: answer(0.82))
-        XCTAssertEqual(yes, VoiceJudge.Verdict(say: true, reason: "Jev: P=0.82, soglia 0.5", p: 0.82))
+        XCTAssertEqual(yes, VoiceJudge.Verdict(say: true, reason: "Jev: P=0.82, soglia 0.55", p: 0.82))
         let no = await VoiceJudge.judge(state: state, key: "k", question: "q?", ask: answer(0.1))
         XCTAssertEqual(no.say, false)
+        let between = await VoiceJudge.judge(state: state, key: "k", question: "q?", ask: answer(0.52))
+        XCTAssertEqual(between.say, false, "claude-config voce_giudice.py SOGLIA is 0.55 (#171): 0.52 is a no on both sides")
         let odd = await VoiceJudge.judge(state: state, key: "k", question: "q?") { _ in Data("{}".utf8) }
         XCTAssertNil(odd.say, "an unclear answer: not reached")
     }
