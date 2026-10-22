@@ -5,7 +5,7 @@ import ClotchCore
 /// Pages side by side, moved as on Apple's pagers (#52). On the trackpad the pages follow the fingers 1:1,
 /// with a rubber band past the first and last page; on release they settle on the page distance and speed
 /// point to (`PageDrag`) with a spring that keeps the gesture's speed. The mouse wheel (one step per spin,
-/// `PageSwipe`), the ‹ › buttons and the dots move with the same spring: the next page comes in while the
+/// `PageSwipe`), the ‹ › buttons move with the same spring: the next page comes in while the
 /// other leaves. The spring is `PageSpring`, run here tick by tick, so `offset` is always where the pages
 /// really are: any new gesture, of any kind, takes them from there, with their speed (#119).
 /// Reduce Motion: a short fade.
@@ -64,7 +64,6 @@ struct Pager<Page: View, Footer: View>: View {
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
             .clipped()
             footer(go)
-                .environment(\.pageProgress, Double(index) - (pitch > 0 ? Double(offset / pitch) : 0))
         }
         .onAppear { startSwipes() }
         .onDisappear { stopSwipes() }
@@ -205,40 +204,15 @@ extension PageSwipe {
     }
 }
 
-private struct PageProgressKey: EnvironmentKey {
-    static let defaultValue: Double? = nil
-}
-
-extension EnvironmentValues {
-    /// Where the pager is, continuously: 1.4 is 40% of the way from page 1 to page 2. Nil outside a pager.
-    var pageProgress: Double? {
-        get { self[PageProgressKey.self] }
-        set { self[PageProgressKey.self] = newValue }
-    }
-}
-
-/// The page dots (at most 4, sliding with the page) with ‹ › on each side; a button is off on the first or last page.
-/// The current dot is long and bright; during a move it shrinks while the next one grows (`pageProgress`).
+/// The ‹ › buttons under the pages; a button is off on the first or last page. No dots (clotch#114: the pager has none).
 struct PageControl: View {
     let count: Int
     let index: Int
     let go: (Int) -> Void
-    @Environment(\.pageProgress) private var progress
 
     var body: some View {
-        HStack(spacing: 11) {  // button centre 22 pt past the dots
+        HStack(spacing: 8) {
             arrow("chevron.left", to: index - 1, help: "Pagina precedente")
-            HStack(spacing: 6) {
-                ForEach(PageDots.window(count: count, index: index), id: \.self) { i in
-                    let near = max(0, 1 - abs(Double(i) - (progress ?? Double(index))))
-                    Capsule()
-                        .fill(Color.white.opacity(0.25 + 0.65 * near))
-                        .frame(width: 10 + 10 * near, height: 4)
-                        .contentShape(Rectangle().inset(by: -4))
-                        .onTapGesture { go(i) }
-                        .notchHover(small: true)
-                }
-            }
             arrow("chevron.right", to: index + 1, help: "Pagina successiva")
         }
         .accessibilityElement(children: .contain)
