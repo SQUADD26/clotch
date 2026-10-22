@@ -92,18 +92,18 @@ private struct RequestLine: View {
                     .font(NotchType.line)
                     .strikethrough(request.look.struck, color: GoalInk.quiet)
                     .foregroundStyle(GoalInk.row)
-                    .lineLimit(1)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(request.statusLabel)
                     .font(NotchType.small)
                     .foregroundStyle(request.look.color)
             }
-            .frame(height: 20)
+            .frame(minHeight: 20, alignment: .top)  // wraps, never «…» (#156)
             if request.answered {
                 Text(request.answer)
                     .font(NotchType.small)
                     .foregroundStyle(GoalInk.secondary)
-                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
