@@ -12,8 +12,8 @@ public enum VoiceClean {
     private static let file = #"\b[\w-]+\.(?:tsx?|jsx?|py|md|json|sh|ya?ml|log|txt|plist|toml|html|css|mp3|swift)\b"#
     private static let operative = #"(?i)\b(?:terminale|terminal|shell|bash|zsh|sudo|comando|comandi|prompt|console|incolla\w*|copia\w*|apri\w*|lancia\w*|esegui\w*|digita\w*|premi\w*|clicca\w*|scrivi|inserisci\w*|installa\w*|avvia\w*)\b|(?:^|[.!?]\s*)prova\s*:"#
 
-    /// The advice said as a formula («io dico sì», «io consiglio di no»): never said (claude-config#1837), the sentence goes.
-    private static let advice = #"(?i)^\W*(?:capo,?\s*)?(?:e\s+)?io\s+(?:dico|direi|consiglio|consiglierei)\s+(?:di\s+)?(?:sì|si|no)\b|^\W*per me è uguale\W*$"#
+    /// An opinion, in any point of the sentence (the mod's `PARERI`, voce-parlatore.ts, #204): the sentence goes, the proposal stays.
+    private static let advice = #"(?i)(?<![\p{L}\p{N}])(?:io\s+(?:non\s+)?(?:(?:lo|la|li|le|ci)\s+)?\p{L}*rei|per me|secondo me|a mio parere|ti consiglio|ti suggerisco|consiglio|direi|dico\s+(?:di\s+)?(?:sì|si|no)|meglio se)(?![\p{L}\p{N}])"#
 
     public static func hasSecret(_ t: String) -> Bool { secrets.contains { t.range(of: $0, options: .regularExpression) != nil } }
 
@@ -26,6 +26,7 @@ public enum VoiceClean {
 
     public static func clean(_ raw: String) -> String {
         var t = secrets.reduce(raw) { re($0, $1, "una chiave") }
+        t = re(t, #"(?i)\s*\(\s*(?:sì|si|no|scegli tu)\s*\)"#, "")  // the screen's advice mark: never read, never said (#204)
         t = re(t, "```[\\s\\S]*?```", " ")
         t = re(t, #"\[([^\]]*)\]\([^)]*\)"#, "$1")
         t = re(t, #"(?i)https?://\S+|www\.\S+"#, " ")
