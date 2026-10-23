@@ -1,0 +1,4 @@
+/* figma: 119-55555 — la nota a destra di una voce («dettaglio») è più piccola della scorciatoia del menu */
+.pezzo-impostazioni .scelta .menu .voce > .secondario { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+/* la voce scelta è evidenziata nei frame (il focus da tastiera non si vede dopo un clic) */
+.pezzo-impostazioni .scelta .menu .voce.scelta { background: var(--colore-fondo-riga-passaggio); }

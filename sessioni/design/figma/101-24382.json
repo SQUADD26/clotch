@@ -1,0 +1,65 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:24382",
+  "nome": "tooltip",
+  "w": 326,
+  "h": 26,
+  "dentro": "101:24127"
+ },
+ "variabili": {
+  "raggio/md": 10,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "colore/bordo/leggero": "#ffffff0b",
+  "colore/fondo/elevato": "#2d2d2d"
+ },
+ "nodi": [
+  {
+   "id": "101:24382",
+   "nome": "tooltip",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 326,
+    "h": 26
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "strokes[0]": "colore/bordo/leggero",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": [
+    "strokeWeight 1"
+   ]
+  },
+  {
+   "id": "101:24383",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 9,
+    "y": 5,
+    "w": 308,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Clotch: sessioni in Electron con lettura dal disco e filtri",
+   "font": "SF Pro Regular"
+  }
+ ]
+}

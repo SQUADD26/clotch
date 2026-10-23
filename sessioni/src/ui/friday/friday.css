@@ -1,0 +1,61 @@
+/* figma: 101-35494 — viste di Friday: intestazione, Casella (101-35494), Decisioni (101-39266), Regole (101-40473), comandi del titolo (101-37879) */
+.pezzo-friday .intestazione-friday { height: var(--misura-intestazione); flex: none; padding: 0 var(--spazio-4); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-friday .intestazione-friday .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-friday .intestazione-friday .riga-titolo, .pezzo-friday .intestazione-friday .stato { display: flex; align-items: center; }
+.pezzo-friday .intestazione-friday .riga-titolo { gap: var(--spazio-2); }
+.pezzo-friday .intestazione-friday .stato { gap: var(--spazio-1); }
+.pezzo-friday .azioni-f { display: flex; gap: var(--spazio-0-5); }
+
+/* «vista Casella» / «vista Decisioni» / «vista Regole»: colonna larga `colonna`, scorre da sola */
+.pezzo-friday .vista-friday {
+  flex: 1; min-height: 0; overflow-y: auto; padding: var(--spazio-6) 0;
+  display: flex; flex-direction: column; gap: var(--spazio-4);
+}
+
+/* scheda di progetto e «obiettivo proposto» */
+.pezzo-friday .scheda { background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl); padding: var(--spazio-4); display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-friday .scheda.proposta { background: none; border: var(--misura-tratto) solid var(--colore-bordo-fuoco); gap: var(--spazio-2); }
+.pezzo-friday .riga-f { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
+.pezzo-friday .riga-f .riempi { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-friday .colonna-f { display: flex; flex-direction: column; }
+.pezzo-friday .gap-1 { gap: var(--spazio-1); }
+.pezzo-friday .gap-2 { gap: var(--spazio-2); }
+.pezzo-friday .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
+.pezzo-friday .barra-uso > div { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
+.pezzo-friday .attesa { background: var(--colore-fondo-riga-passaggio); border-radius: var(--raggio-md); padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-friday .nota-clotch { padding: 0 var(--spazio-2); }
+.pezzo-friday .sagoma-f { height: var(--misura-icona); border-radius: var(--raggio-md); background: var(--colore-fondo-sagoma); }
+
+/* gruppi di Decisioni e Regole */
+.pezzo-friday .gruppo-f { background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl); padding: var(--spazio-2); display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-friday .gruppo-f .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-friday .voce-f { border-radius: var(--raggio-md); padding: var(--spazio-2); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-friday .voce-f .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+
+/* «vuoto» e «Avviso» rosso (registro non leggibile, Friday spenta) */
+.pezzo-friday .vuoto-f { padding: var(--spazio-16) var(--spazio-4) var(--spazio-4); display: flex; flex-direction: column; align-items: center; gap: var(--spazio-2); text-align: center; }
+.pezzo-friday .avviso-f { background: var(--colore-fondo-errore); border-radius: var(--raggio-lg); padding: var(--spazio-3); display: flex; gap: var(--spazio-3); }
+.pezzo-friday .avviso-f .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
+
+/* «comandi globali» della barra del titolo: luna di Non disturbare e «Ferma tutto» */
+.pezzo-friday .comandi-titolo { position: relative; display: flex; align-items: center; gap: var(--spazio-2); -webkit-app-region: no-drag; }
+.pezzo-friday .comandi-titolo .bottone-icona.aperto { background: var(--colore-fondo-riga-passaggio); }
+/* 101-38626: il menu ha il bordo destro sulla luna, 6 px sotto */
+.pezzo-friday .comandi-titolo .ancora-menu { position: relative; display: flex; }
+.pezzo-friday .comandi-titolo .menu { top: calc(var(--misura-bottone) + var(--spazio-1-5)); right: 0; }
+.pezzo-friday .menu .titolo-menu { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-friday .menu .nota-menu { min-height: var(--misura-riga); padding: 0 var(--spazio-2); display: flex; align-items: center; }
+
+/* testo dentro le righe */
+.pezzo-friday .t-primario { color: var(--colore-testo-primario); }
+.pezzo-friday .t-errore { color: var(--colore-testo-errore); }
+
+/* «testo regola» nel dialogo Modifica regola (101-40699) */
+.pezzo-friday .testo-regola {
+  min-height: calc(var(--misura-riga) * 3); padding: var(--spazio-2) var(--spazio-3); resize: none;
+  background: var(--colore-fondo-casella); color: var(--colore-testo-primario); font: inherit;
+  border: var(--misura-tratto) solid var(--colore-bordo-fuoco); border-radius: var(--raggio-lg); outline: none;
+}
+
+/* 101-42000: lo stato di Friday sta in fondo al filo, subito sopra la casella (lo spazio lo dà il gap di `colonna`) */
+.pezzo-friday .vista-friday.chat-friday { flex: none; padding: 0; overflow: visible; }

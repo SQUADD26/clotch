@@ -1,0 +1,150 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:39071",
+  "nome": "non disturbare attivo",
+  "w": 250,
+  "h": 72,
+  "dentro": "101:38897"
+ },
+ "variabili": {
+  "raggio/md": 10,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/icona": 16,
+  "colore/testo/primario": "#ffffff",
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/fondo/attesa": "#ee7c3729",
+  "colore/icona/accento": "#ee7c37",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16
+ },
+ "nodi": [
+  {
+   "id": "101:39071",
+   "nome": "non disturbare attivo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 250,
+    "h": 72
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/attesa",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/1",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:39072",
+   "nome": "riga",
+   "tipo": "FRAME",
+   "box": {
+    "x": 8,
+    "y": 8,
+    "w": 234,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:39074",
+   "nome": "icona luna",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 18,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:39074;101:7089",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 9.333740234375,
+    "y": 19.33203125,
+    "w": 13.333259582519531,
+    "h": 13.333259582519531
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/accento"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:39073",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 32,
+    "y": 8,
+    "w": 172,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Non disturbare fino alle 18:00",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "101:39076",
+   "nome": "azione",
+   "tipo": "TEXT",
+   "box": {
+    "x": 212,
+    "y": 17,
+    "w": 30,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Togli",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "101:39077",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 8,
+    "y": 48,
+    "w": 133,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "3 avvisi tenuti per dopo",
+   "font": "SF Pro Regular"
+  }
+ ]
+}

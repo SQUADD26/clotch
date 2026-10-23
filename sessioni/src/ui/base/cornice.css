@@ -1,0 +1,39 @@
+/* figma: 101-8036 — cornice della finestra a 1440 (e 101-8610 a 1024) */
+.cornice { position: relative; height: 100%; display: flex; flex-direction: column; background: var(--colore-fondo-cornice); overflow: hidden; }
+
+.barra-titolo {
+  height: var(--misura-barra-titolo); flex: none; padding: 0 var(--spazio-5); gap: var(--spazio-6);
+  display: flex; align-items: center; -webkit-app-region: drag;
+}
+.semaforo { display: flex; gap: var(--spazio-2); }
+.luce { width: var(--misura-semaforo); height: var(--misura-semaforo); border-radius: var(--raggio-pieno); visibility: hidden; }
+.parita .luce { visibility: visible; }
+.luce.rosso { background: var(--colore-semaforo-rosso); }
+.luce.giallo { background: var(--colore-semaforo-giallo); }
+.luce.verde { background: var(--colore-semaforo-verde); }
+.navigazione { display: flex; gap: var(--spazio-1); }
+/* 101-37696: a destra della barra, gap spazio/2 */
+.comandi-globali { margin-left: auto; display: flex; align-items: center; gap: var(--spazio-2); -webkit-app-region: no-drag; }
+
+.corpo { flex: 1; min-height: 0; display: flex; }
+.barra-laterale {
+  width: var(--misura-barra-laterale); flex: none; padding: 0 var(--spazio-2) var(--spazio-2);
+  display: flex; flex-direction: column; gap: var(--spazio-0-5); min-height: 0;
+}
+.area-principale { flex: 1; min-width: 0; display: flex; padding: 0 var(--spazio-2) var(--spazio-2) 0; }
+.superficie {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--colore-fondo-superficie);
+  border: var(--misura-tratto) solid var(--colore-bordo-leggero); border-radius: var(--raggio-lg);
+}
+.contenuto { flex: 1; min-height: 0; display: flex; gap: var(--spazio-4); padding: 0 var(--spazio-4); }
+.colonna {
+  flex: 1; min-width: 0; position: relative; padding-bottom: var(--spazio-4);
+  display: flex; flex-direction: column; align-items: center; gap: var(--spazio-4);
+}
+/* il filo e la casella della chat sono larghi al massimo una colonna, al centro */
+.colonna > :not(.area-avvisi, .pezzo), .colonna > .pezzo > * { width: 100%; max-width: var(--misura-colonna); }
+/* contenitore di un pezzo (base/Pezzo.tsx): non è una scatola, i suoi figli stanno nel layout del genitore */
+.pezzo { display: contents; }
+.pannello { width: var(--misura-pannello); flex: none; display: flex; flex-direction: column; }
+.pannello:empty { display: none; }

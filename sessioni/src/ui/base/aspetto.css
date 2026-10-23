@@ -1,0 +1,16 @@
+/* Impostazioni «Aspetto» (aspetto.ts): ridefiniscono solo variabili di Figma;
+   Media, Normale, Arancione e Sistema sono i valori di token.css. */
+:root[data-dimensione="piccola"] { --testo-dimensione-base: var(--testo-dimensione-sm); --testo-riga-base: var(--testo-riga-sm); --testo-riga-messaggio: var(--testo-riga-sm); }
+:root[data-dimensione="grande"] { --testo-dimensione-base: var(--testo-dimensione-lg); --testo-riga-base: var(--testo-riga-lg); --testo-riga-messaggio: var(--testo-riga-lg); }
+:root[data-densita="compatta"] { --misura-riga: var(--misura-riga-compatta); }
+:root[data-densita="ariosa"] { --misura-riga: var(--spazio-10); }
+:root[data-colore="blu"] { --colore-fondo-accento: var(--colore-fondo-accento-blu); --colore-fondo-bolla: var(--colore-fondo-bolla-blu); --colore-testo-bolla: var(--colore-testo-bolla-blu);
+  --colore-icona-accento: var(--colore-icona-accento-blu); --colore-bordo-fuoco: var(--colore-bordo-fuoco-blu); --colore-fondo-attesa: var(--colore-fondo-attesa-blu); }
+:root[data-colore="verde"] { --colore-fondo-accento: var(--colore-fondo-accento-verde); --colore-fondo-bolla: var(--colore-fondo-bolla-verde); --colore-testo-bolla: var(--colore-testo-bolla-verde);
+  --colore-icona-accento: var(--colore-icona-accento-verde); --colore-bordo-fuoco: var(--colore-bordo-fuoco-verde); --colore-fondo-attesa: var(--colore-fondo-attesa-verde); }
+:root[data-colore="viola"] { --colore-fondo-accento: var(--colore-fondo-accento-viola); --colore-fondo-bolla: var(--colore-fondo-bolla-viola); --colore-testo-bolla: var(--colore-testo-bolla-viola);
+  --colore-icona-accento: var(--colore-icona-accento-viola); --colore-bordo-fuoco: var(--colore-bordo-fuoco-viola); --colore-fondo-attesa: var(--colore-fondo-attesa-viola); }
+:root[data-colore="argento"] { --colore-fondo-accento: var(--colore-fondo-accento-argento); --colore-fondo-bolla: var(--colore-fondo-bolla-argento); --colore-testo-bolla: var(--colore-testo-bolla-argento);
+  --colore-icona-accento: var(--colore-icona-accento-argento); --colore-bordo-fuoco: var(--colore-bordo-fuoco-argento); --colore-fondo-attesa: var(--colore-fondo-attesa-argento); }
+:root[data-carattere="arrotondato"] { --testo-famiglia-ui: var(--testo-famiglia-arrotondato); }
+:root[data-carattere="monospaziato"] { --testo-famiglia-ui: var(--testo-famiglia-monospaziato); }

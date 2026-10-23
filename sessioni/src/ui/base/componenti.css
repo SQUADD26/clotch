@@ -1,0 +1,50 @@
+/* figma: 101-12461 — componenti comuni dal frame «Varianti»: icona, bottoni, pillola, campo, segno stato */
+.icona { width: var(--misura-icona); height: var(--misura-icona); flex: none; display: block; }
+/* rotazione dello spinner: «spin» lineare del vault (ui-ux-animazioni.md § Catalogo @keyframes), 1.2s tra le durate osservate */
+.gira { animation: gira 1.2s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+/* Bottone: Tipo=Primario | Secondario */
+.bottone {
+  height: var(--misura-bottone-invio); padding: 0 var(--spazio-4); gap: var(--spazio-2);
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  border-radius: var(--raggio-pieno); white-space: nowrap;
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500;
+}
+.bottone.primario { background: var(--colore-fondo-bottone-primario); color: var(--colore-testo-su-primario); }
+.bottone.secondario { background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-primario); }
+.bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); font-weight: 400; }
+.bottone.piccolo { height: var(--misura-bottone); -webkit-app-region: no-drag; }
+
+/* Bottone icona: Stato=Riposo | Passaggio */
+.bottone-icona {
+  width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-md);
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  -webkit-app-region: no-drag;
+}
+.bottone-icona:hover:not(:disabled), .bottone-icona[aria-expanded="true"] { background: var(--colore-fondo-riga-passaggio); }
+
+/* Pillola (Filtro): Attivo=Sì | No */
+.pillola {
+  height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-pieno);
+  display: inline-flex; align-items: center; flex: none; white-space: nowrap;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm);
+  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-primario);
+}
+.pillola.attiva { background: var(--colore-fondo-bottone-primario); color: var(--colore-testo-su-primario); }
+
+/* Campo: grande = «Campo ricerca», piccolo = «campo cerca» del menu filtro */
+.campo { display: flex; align-items: center; }
+.campo input { flex: 1; min-width: 0; color: var(--colore-testo-primario); }
+.campo input::placeholder { color: var(--colore-testo-secondario); }
+.campo.grande {
+  height: var(--misura-intestazione); padding: 0 var(--spazio-4); gap: var(--spazio-3);
+  border-bottom: var(--misura-tratto) solid var(--colore-bordo-leggero);
+}
+.campo.grande input { font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); }
+.campo.grande .tasto { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.campo.piccolo {
+  height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);
+  border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
+}
+.campo.piccolo input { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }

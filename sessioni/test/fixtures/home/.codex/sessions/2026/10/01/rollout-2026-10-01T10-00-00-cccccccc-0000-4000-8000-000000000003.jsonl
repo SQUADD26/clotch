@@ -1,0 +1,7 @@
+{"timestamp": "2026-10-01T10:00:00.000Z", "type": "session_meta", "payload": {"id": "cccccccc-0000-4000-8000-000000000003", "cwd": "/Users/x/codexproj", "originator": "codex_cli_rs", "source": "cli", "git": {"branch": "dev"}}}
+{"timestamp": "2026-10-01T10:00:01.000Z", "type": "turn_context", "payload": {"cwd": "/Users/x/codexproj", "model": "gpt-5-codex"}}
+{"timestamp": "2026-10-01T10:00:02.000Z", "type": "event_msg", "payload": {"type": "user_message", "message": "Ripara il test"}}
+{"timestamp": "2026-10-01T10:00:02.100Z", "type": "response_item", "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Ripara il test"}]}}
+{"timestamp": "2026-10-01T10:00:03.000Z", "type": "response_item", "payload": {"type": "function_call", "name": "shell", "arguments": "{\"cmd\":\"ls\"}", "call_id": "c1"}}
+{"timestamp": "2026-10-01T10:00:04.000Z", "type": "response_item", "payload": {"type": "function_call_output", "call_id": "c1", "output": "a.txt"}}
+{"timestamp": "2026-10-01T10:00:05.000Z", "type": "response_item", "payload": {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "Fatto."}]}}

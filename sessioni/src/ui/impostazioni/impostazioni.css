@@ -1,0 +1,98 @@
+/* figma: 101-17193 — pagina Impostazioni: navigazione a sinistra, superficie con la colonna delle sezioni */
+.pezzo-impostazioni .impostazioni { flex: 1; min-width: 0; display: flex; }
+.pezzo-impostazioni .impostazioni .superficie { position: relative; --avvisi-basso: var(--spazio-10); }
+
+.pezzo-impostazioni .nav-impostazioni {
+  width: var(--misura-impostazioni-nav); flex: none; padding: 0 var(--spazio-2) var(--spazio-2);
+  display: flex; flex-direction: column; gap: var(--spazio-0-5); overflow-y: auto;
+}
+.pezzo-impostazioni .nav-impostazioni .titolo { padding: var(--spazio-1) var(--spazio-2) var(--spazio-3); }
+.pezzo-impostazioni .nav-impostazioni .voce {
+  height: var(--misura-riga); flex: none; padding: 0 var(--spazio-2); gap: var(--spazio-2);
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.pezzo-impostazioni .nav-impostazioni .voce:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .nav-impostazioni .voce.scelta { background: var(--colore-fondo-riga-scelta); }
+
+.pezzo-impostazioni .scorre-impostazioni { flex: 1; min-height: 0; overflow-y: auto; }
+.pezzo-impostazioni .contenuto-impostazioni {
+  max-width: calc(var(--misura-impostazioni-colonna) + 2 * var(--spazio-4)); margin: 0 auto;
+  padding: var(--spazio-12) var(--spazio-4) var(--spazio-4);
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--spazio-6);
+}
+.pezzo-impostazioni .contenuto-impostazioni > * { align-self: stretch; }
+.pezzo-impostazioni .contenuto-impostazioni > .bottone { align-self: flex-start; }
+.pezzo-impostazioni .titolo-pagina { margin: 0; font-weight: 400; }
+.pezzo-impostazioni .contenuto-impostazioni .errore { color: var(--colore-testo-errore); }
+
+.pezzo-impostazioni .gruppo { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl); }
+.pezzo-impostazioni .riga {
+  padding: var(--spazio-3) var(--spazio-4); gap: var(--spazio-4);
+  display: flex; align-items: center;
+}
+.pezzo-impostazioni .riga.azione { gap: var(--spazio-3); }
+.pezzo-impostazioni .riga + .riga { border-top: var(--misura-tratto) solid var(--colore-bordo-leggero); }
+.pezzo-impostazioni .riga .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+
+/* Interruttore: Acceso=Sì | No */
+.pezzo-impostazioni .interruttore {
+  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none;
+  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
+  display: flex;
+}
+.pezzo-impostazioni .interruttore.acceso { background: var(--colore-fondo-accento); justify-content: flex-end; }
+.pezzo-impostazioni .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
+
+/* Riga scelta: valore e freccia, con la tendina sotto a destra */
+.pezzo-impostazioni .scelta { position: relative; flex: none; }
+.pezzo-impostazioni .scelta .valore { display: flex; align-items: center; gap: var(--spazio-1); }
+
+.pezzo-impostazioni .tasto {
+  flex: none; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
+  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
+}
+.pezzo-impostazioni .tasto.errore { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+
+.pezzo-impostazioni .campo-testo {
+  max-width: var(--misura-pannello); min-width: 0; flex: 0 1 auto; height: var(--misura-bottone-invio); padding: 0 var(--spazio-3);
+  display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
+}
+
+.pezzo-impostazioni .vuoto-lista {
+  padding: var(--spazio-8) var(--spazio-4); gap: var(--spazio-1);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.pezzo-impostazioni .vuoto-lista.con-bottone { gap: var(--spazio-2); }
+
+.pezzo-impostazioni .bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+
+/* Scorciatoie: tasti in ascolto e tasti già usati (101-33015) */
+.pezzo-impostazioni .tasto.in-ascolto { border: var(--misura-tratto-forte) solid var(--colore-bordo-fuoco); }
+.pezzo-impostazioni .conflitto { display: flex; align-items: center; gap: var(--spazio-2); }
+
+/* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */
+.pezzo-impostazioni .schede { display: flex; gap: var(--spazio-1); }
+.pezzo-impostazioni .contenuto-impostazioni > .schede { align-self: flex-start; }
+.pezzo-impostazioni .riga.uso { flex-direction: column; align-items: stretch; gap: var(--spazio-2); }
+.pezzo-impostazioni .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; }
+.pezzo-impostazioni .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
+.pezzo-impostazioni .barra-uso .pieno { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
+.pezzo-impostazioni .barra-uso .pieno.errore { background: var(--colore-testo-errore); }
+
+/* Archiviazione: spazio usato, barra a segmenti, legenda, calcolo in corso (101-32155) */
+.pezzo-impostazioni .spazio-usato { display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-impostazioni .barra-segmentata { height: var(--misura-riga); display: flex; gap: var(--spazio-0-5); }
+.pezzo-impostazioni .barra-segmentata > * { border-radius: var(--raggio-xs); }
+.pezzo-impostazioni .legenda { display: flex; gap: var(--spazio-4); }
+.pezzo-impostazioni .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); }
+.pezzo-impostazioni .campione { width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
+.pezzo-impostazioni .riga.calcolo { gap: var(--spazio-2); }
+
+/* Dati, Info, Clotch (101:17893, 101:33235, 101:18054, 101:45956) */
+.pezzo-impostazioni .valore-scelta { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
+.pezzo-impostazioni .indietro { display: flex; align-items: center; gap: var(--spazio-1); align-self: flex-start !important; }
+.pezzo-impostazioni .bottone.pericolo { font-weight: 400; }
+.pezzo-impostazioni .riga.stato-clotch { gap: var(--spazio-3); }
+/* nelle impostazioni il dialogo sta al centro esatto della finestra (119:57106, 119:57552), non spazio-10 più su */
+.pezzo-impostazioni .impostazioni .velo { padding-bottom: 0; }

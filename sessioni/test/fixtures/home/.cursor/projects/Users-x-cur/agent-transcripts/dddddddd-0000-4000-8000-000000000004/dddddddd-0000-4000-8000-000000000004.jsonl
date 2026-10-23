@@ -1,0 +1,2 @@
+{"role": "user", "message": {"content": [{"type": "text", "text": "<user_query>\nCambia il colore\n</user_query>"}]}}
+{"role": "assistant", "message": {"content": [{"type": "text", "text": "Ok."}, {"type": "tool_use", "name": "Edit", "input": {"path": "a.css"}}]}}

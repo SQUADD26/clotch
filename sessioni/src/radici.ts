@@ -1,0 +1,70 @@
+// Radici degli account Claude: ~/.claude e ~/.claude-*. Identità = realpath (ConfigPathIdentity.swift).
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import { percorsiAccount } from "./account-percorsi";
+
+export interface Radice {
+  path: string;
+  /** Nome della cartella: `.claude`, `.claude-roberto`. È l'identità dell'account. */
+  account: string;
+  email: string | null;
+}
+
+const identita = (p: string) => {
+  try {
+    return fs.realpathSync(p).normalize("NFC");
+  } catch {
+    return p.normalize("NFC");
+  }
+};
+
+const emailDi = (radice: string): string | null => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(radice, ".claude.json"), "utf8"))?.oauthAccount?.emailAddress ?? null;
+  } catch {
+    return null;
+  }
+};
+
+/** Solo cartelle vere (con `projects/` o `settings.json`); due nomi che portano allo stesso posto contano una volta. */
+export function trovaRadici(home: string): Radice[] {
+  let nomi: string[] = [];
+  try {
+    nomi = fs.readdirSync(home);
+  } catch {
+    return [];
+  }
+  const candidati = nomi.filter((n) => n === ".claude" || n.startsWith(".claude-")).sort((a, b) => (a === ".claude" ? -1 : b === ".claude" ? 1 : a.localeCompare(b)));
+  const viste = new Set<string>();
+  const out: Radice[] = [];
+  for (const n of candidati) {
+    const p = path.join(home, n);
+    try {
+      if (!fs.statSync(p).isDirectory()) continue;
+    } catch {
+      continue;
+    }
+    if (!fs.existsSync(path.join(p, "projects")) && !fs.existsSync(path.join(p, "settings.json"))) continue;
+    const id = identita(p);
+    if (viste.has(id)) continue;
+    viste.add(id);
+    out.push({ path: p, account: n, email: emailDi(p) });
+  }
+  return out;
+}
+
+/** `~/…` -> percorso assoluto, per aprire una cartella scritta come nel disegno. */
+export const espandi = (p: string, home = os.homedir()) => (p === "~" || p.startsWith("~/") ? path.join(home, p.slice(1)) : p);
+
+/** `/Users/x/.claude-y` -> `~/.claude-y`, come lo scrive il disegno. */
+export const accorcia = (p: string, home = os.homedir()) => (p === home ? "~" : p.startsWith(home + path.sep) ? "~" + p.slice(home.length) : p);
+
+/** Le radici da leggere davvero: `trovaRadici` più `accountAggiunti` meno `accountTolti` (percorsi scritti con `~`). */
+export function radiciScelte(home: string, aggiunte: string[] = [], tolte: string[] = []): Radice[] {
+  const trovate = trovaRadici(home);
+  return percorsiAccount(trovate.map((r) => accorcia(r.path, home)), aggiunte, tolte).map((p) => {
+    const assoluto = espandi(p, home);
+    return trovate.find((r) => r.path === assoluto) ?? { path: assoluto, account: path.basename(assoluto), email: emailDi(assoluto) };
+  });
+}

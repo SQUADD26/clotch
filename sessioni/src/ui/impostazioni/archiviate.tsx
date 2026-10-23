@@ -1,0 +1,39 @@
+// figma: 101-32359 — Impostazioni · Sessioni archiviate; vuota: 101-32550.
+// shortcut: il motore non ha «ripristina» (claude-config#2513), accendere quando c'è: con questo a false il bottone resta spento.
+const MOTORE_RIPRISTINA = false;
+import { useEffect, useState } from "react";
+import type { Archiviata } from "../../tipi";
+import { avvisa } from "../base/Avvisi";
+import { Bottone } from "../base/Bottone";
+import { Campo } from "../base/Campo";
+import { testoEsito } from "./friday";
+import { Gruppo, Pagina, Riga, VuotoLista } from "./controlli";
+
+export default function Archiviate() {
+  const [tutte, setTutte] = useState<Archiviata[]>([]);
+  useEffect(() => { window.impostazioni.archiviate().then(setTutte, () => {}); }, []);
+  const [cerca, setCerca] = useState("");
+  const ripristina = async (id: string) => {
+    const e = await window.friday.comando("ripristina", { chat: id }).catch(() => null);
+    if (e?.esito === "ok") return setTutte((t) => t.filter((s) => s.id !== id));
+    avvisa({ tipo: "errore", messaggio: e ? testoEsito(e) : "Comando non riuscito" });
+  };
+  const viste = tutte.filter((s) => `${s.titolo} ${s.dove}`.toLowerCase().includes(cerca.trim().toLowerCase()));
+  return (
+    <Pagina titolo="Sessioni archiviate">
+      {tutte.length > 0 && (
+        <Campo grande tasto="esc" placeholder="Cerca sessioni archiviate" value={cerca}
+          onChange={(e) => setCerca(e.target.value)} onKeyDown={(e) => e.key === "Escape" && setCerca("")} />
+      )}
+      <Gruppo>
+        {tutte.length === 0
+          ? <VuotoLista titolo="Nessuna sessione archiviata" corpo="Archivia una sessione dal suo menu «…»: la ritrovi qui." />
+          : viste.map((s) => (
+            <Riga key={s.id} etichetta={s.titolo} descrizione={s.dove} azione>
+              <Bottone tipo="secondario" disabled={!MOTORE_RIPRISTINA} onClick={() => ripristina(s.id)}>Ripristina</Bottone>
+            </Riga>
+          ))}
+      </Gruppo>
+    </Pagina>
+  );
+}

@@ -1,0 +1,21 @@
+/* figma: 101-30172 — «Bottone attività» 121:58595 e «Popover attività» 121:58601 */
+.bottone-attivita { position: relative; display: flex; -webkit-app-region: no-drag; }
+.bottone-attivita .aperto { background: var(--colore-fondo-riga-passaggio); }
+/* contatore: sporge di spazio/1 a destra e in alto del bottone */
+.bottone-attivita .contatore {
+  position: absolute; top: calc(-1 * var(--spazio-1)); right: calc(-1 * var(--spazio-1));
+  padding: 0 var(--spazio-1); border-radius: var(--raggio-pieno); pointer-events: none;
+  background: var(--colore-fondo-bottone-primario); color: var(--colore-testo-su-primario);
+}
+/* sotto l'intestazione della sessione, a destra della barra laterale: non copre il titolo */
+.popover-attivita {
+  position: absolute; z-index: 10; -webkit-app-region: no-drag;
+  left: calc(var(--misura-barra-laterale) + var(--spazio-2));
+  top: calc(var(--misura-barra-titolo) + var(--misura-intestazione) + var(--spazio-2));
+  width: var(--misura-menu); padding: var(--spazio-3); gap: var(--spazio-2);
+  display: flex; flex-direction: column;
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+}
+.popover-attivita .testata { display: flex; align-items: center; justify-content: space-between; color: var(--colore-testo-primario); }
+.popover-attivita .testata button { display: flex; }

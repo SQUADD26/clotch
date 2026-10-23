@@ -1,0 +1,29 @@
+/* figma: 101-10247 — ricerca ⌘K (101:10247, 101:23035, 101:23280) sopra il velo della finestra */
+.pezzo-barra .finestra-ricerca {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  /* 101:10297: la finestra di ricerca sta 120 px sotto il bordo della finestra = barra del titolo + 64 + 12 */
+  top: calc(var(--misura-barra-titolo) + var(--spazio-16) + var(--spazio-3));
+  width: var(--misura-dialogo-ricerca); max-height: calc(100% - 2 * (var(--misura-barra-titolo) + var(--spazio-16) + var(--spazio-3)));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-2xl);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+}
+.pezzo-barra .finestra-ricerca .risultati { padding: var(--spazio-2); gap: var(--spazio-0-5); display: flex; flex-direction: column; overflow-y: auto; }
+.pezzo-barra .finestra-ricerca .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-barra .voce-azione {
+  height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2); flex: none;
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.pezzo-barra .voce-azione .etichetta { flex: 1; }
+.pezzo-barra .voce-azione.scelta { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .risultato {
+  padding: var(--spazio-2) var(--spazio-3); gap: var(--spazio-3); flex: none;
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.pezzo-barra .risultato.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .risultato .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-barra .risultato .testo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pezzo-barra .nessun-risultato {
+  padding: var(--spazio-8) var(--spazio-4); gap: var(--spazio-1);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
