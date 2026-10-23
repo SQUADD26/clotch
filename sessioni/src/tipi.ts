@@ -155,8 +155,8 @@ export interface ImpostazioniApp {
 }
 
 export interface CartellaAccount { percorso: string; dettaglio: string; errore: boolean }
-/** `giorni`: uso al giorno dell'account (scheda Andamento), dal più vecchio a oggi; `giorno` = data ISO. */
-export interface QuotaUso { account: string; usato: number; ripartenza: string; giorni?: { giorno: string; v: number }[] }
+/** `giorni`: uso al giorno dell'account (scheda Andamento), dal più vecchio a oggi; `giorno` = data ISO. `letto`: quando il feed ha letto i numeri (ms). */
+export interface QuotaUso { account: string; usato: number; ripartenza: string; letto?: number; giorni?: { giorno: string; v: number }[] }
 export interface Archiviata { titolo: string; dove: string }
 
 /** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
@@ -170,7 +170,7 @@ export interface ImpostazioniApi {
   versione(): Promise<string>;
   /** «Apri all'avvio del Mac»: voce degli elementi di login. */
   avvio(acceso: boolean): Promise<void>;
-  /** Quote d'uso per account; null finché non c'è una fonte (#374). */
+  /** Quote d'uso per account, dal feed di Clotch (cache 60 s nel main); lancia se il feed non risponde. */
   uso(): Promise<QuotaUso[] | null>;
   /** Sessioni archiviate (#375). */
   archiviate(): Promise<Archiviata[]>;

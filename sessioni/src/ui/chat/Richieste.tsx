@@ -7,6 +7,7 @@ import { registraAzione } from "../base/scorciatoie";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
 import { comanda } from "./friday";
+import { useRiserva } from "./riserva";
 import { testoCampo } from "./strumenti";
 import { quanti } from "./testi";
 import "./richieste.css";
@@ -28,11 +29,12 @@ function Carta({ icona, titolo, dettaglio, children }: { icona: NomeIcona; titol
 export function Esito({ icona, colore, esito, dettaglio, codice = false }: {
   icona: NomeIcona; colore: "successo" | "errore" | "secondaria"; esito: string; dettaglio?: string; codice?: boolean;
 }) {
+  const ris = useRiserva();
   return (
     <div className="esito-richiesta">
       <Icona nome={icona} colore={colore} />
       <span className="esito">{esito}</span>
-      {dettaglio && <span className={codice ? "dettaglio codice" : "dettaglio"}>{dettaglio}</span>}
+      {dettaglio && <span className={codice ? "dettaglio codice" : "dettaglio"}>{ris.testo(dettaglio)}</span>}
     </div>
   );
 }
@@ -43,7 +45,8 @@ type Scelta = "consenti" | "consenti_sempre" | "nega";
 
 export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: string | null }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
-  const cmd = testoCampo(r.ingresso, "command");
+  const ris = useRiserva();
+  const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
   const mostra = cmd ? `$ ${cmd}` : r.strumento;
   const rispondi = async (s: Scelta) => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); };
   // finché aspetta la risposta, le scorciatoie salvate «Consenti» e «Nega» rispondono a questo permesso
@@ -61,7 +64,7 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
     <Carta icona="mano" titolo="Permesso richiesto" dettaglio={da}>
       {cmd && <div className="domanda">Eseguire questo comando?</div>}
       {mostra && <BloccoCodice comando={mostra} />}
-      {testoCampo(r.ingresso, "description") && <div className="motivo">{testoCampo(r.ingresso, "description")}</div>}
+      {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}
       <div className="bottoni">
         <Bottone onClick={() => rispondi("consenti")}>Consenti</Bottone>
         <Bottone tipo="secondario" onClick={() => rispondi("consenti_sempre")}>Consenti sempre</Bottone>
@@ -79,6 +82,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
   const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));
   const [altro, setAltro] = useState("");
   const [fatta, setFatta] = useState<string | null>(null);
+  const ris = useRiserva();
   if (fatta !== null) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={fatta} />;
   const risposte = domande.map((d, i) => {
     const o = scelte[i];
@@ -95,13 +99,13 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
       <Carta icona="persona" titolo="Domanda per te" dettaglio={da}>
         {domande.map((d, i) => (
           <div key={i} className="domanda-blocco">
-            <div className="testo-domanda">{d.domanda}</div>
+            <div className="testo-domanda">{ris.testo(d.domanda)}</div>
             <div className="opzioni" role="radiogroup">
               {d.opzioni.map((o, j) => (
                 <button key={j} type="button" role="radio" aria-checked={scelte[i] === j} className={scelte[i] === j ? "opzione scelta" : "opzione"}
                   onClick={() => setScelte(scelte.map((x, k) => (k === i ? j : x)))}>
                   <span className="numero">{j + 1}</span>
-                  <span className="testo">{o.replace(CONSIGLIATA, "")}</span>
+                  <span className="testo">{ris.testo(o.replace(CONSIGLIATA, ""))}</span>
                   {CONSIGLIATA.test(o) && <span className="nota">Consigliata</span>}
                 </button>
               ))}
@@ -138,15 +142,16 @@ export function passiPiano(testo: string) {
 
 export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; testo: string }) {
   const [esito, setEsito] = useState<"approva" | "modifica" | null>(null);
+  const ris = useRiserva();
   const { intro, passi } = passiPiano(testo);
   const nPassi = quanti(passi.length, "passo", "passi");
   if (esito === "approva") return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={nPassi} />;
   const decidi = async (e: "approva" | "modifica") => { if (rid && await comanda("piano", { chat, rid, esito: e })) setEsito(e); };
   return (
     <Carta icona="libro" titolo="Piano da approvare" dettaglio={nPassi}>
-      {intro && <div className="motivo">{intro}</div>}
+      {intro && <div className="motivo">{ris.testo(intro)}</div>}
       <div className="passi">
-        {passi.map((p, i) => <div key={i} className="passo"><span className="numero">{i + 1}</span><span className="testo">{p}</span></div>)}
+        {passi.map((p, i) => <div key={i} className="passo"><span className="numero">{i + 1}</span><span className="testo">{ris.testo(p)}</span></div>)}
       </div>
       {esito !== "modifica" && (
         <div className="bottoni">
