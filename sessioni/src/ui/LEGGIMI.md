@@ -16,7 +16,7 @@ Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostaz
 
 Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `friday`, `casella`, `decisioni`, `regole` (le quattro di Friday montano `friday/`), `impostazioni`.
 
-Barra del titolo: a destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
+Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
 
 Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvato.
 

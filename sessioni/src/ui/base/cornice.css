@@ -1,5 +1,5 @@
 /* figma: 101-8036 — cornice della finestra a 1440 (e 101-8610 a 1024) */
-.cornice { height: 100%; display: flex; flex-direction: column; background: var(--colore-fondo-cornice); overflow: hidden; }
+.cornice { position: relative; height: 100%; display: flex; flex-direction: column; background: var(--colore-fondo-cornice); overflow: hidden; }
 
 .barra-titolo {
   height: var(--misura-barra-titolo); flex: none; padding: 0 var(--spazio-5); gap: var(--spazio-6);
