@@ -3,10 +3,10 @@ import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
 import { CampoTesto, Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
-import { imposta, useImpostazioni } from "./stato";
+import { imposta, IN_NUOVA_FINESTRA, useImpostazioni } from "./stato";
 
 const MODELLI = { "Opus 5.5": "Il più capace", "Sonnet 5.5": "Veloce", "Haiku 5.5": "Il più rapido", "Fable 5.1": "Casi difficili" }; // 119:55555
-const APERTURE = ["Nella stessa finestra", "In una nuova finestra"]; // 119:55726
+const APERTURE = ["Nella stessa finestra", IN_NUOVA_FINESTRA]; // 119:55726
 const LINGUE = ["Rilevamento automatico", "Italiano", "English"]; // voci della «tendina lingua» 101:32999
 
 async function cambiaCartella() {

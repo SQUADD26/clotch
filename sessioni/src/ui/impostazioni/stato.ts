@@ -26,6 +26,8 @@ export const PARTENZA: ImpostazioniApp = {
     barra: "⌘\\", impostazioni: "⌘,", inviaInterrompi: "↵", coda: "⌘↵",
   },
 };
+/** Valore di `apriSessione` che apre le sessioni in una finestra a parte. */
+export const IN_NUOVA_FINESTRA = "In una nuova finestra";
 export type Impostazioni = ImpostazioniApp;
 export type Chiave = keyof Impostazioni;
 
