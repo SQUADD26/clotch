@@ -12,12 +12,8 @@ export function statoFriday(r: Registro, ora: number): { stato: StatoFriday; da:
   const viva = r.friday?.evento !== "stop" && !!f?.visto && ora - f.visto <= FRIDAY_MUTA_MS;
   if (!viva) return { stato: "spenta", da: f?.visto ?? r.friday?.t ?? null };
   const nd = r.nonDisturbare;
-  return nd && nd.fino > ora ? { stato: "pausa", da: nd.fino } : { stato: "attiva", da: null };
+  return nd && (nd.fino === null || nd.fino > ora) ? { stato: "pausa", da: nd.fino } : { stato: "attiva", da: null };
 }
-
-/** Avvisi arrivati mentre Non disturbare è acceso: Friday li tiene per dopo. */
-export const avvisiTenuti = (r: Registro, ora: number) =>
-  r.nonDisturbare && r.nonDisturbare.fino > ora ? r.avvisi.filter((a) => a.t !== null && a.t >= r.nonDisturbare!.da).length : 0;
 
 const stessoGiorno = (a: number, b: number) => new Date(a).toDateString() === new Date(b).toDateString();
 const viva = (c: ChatFriday) => !c.fine && c.chat !== "friday" && c.chat !== "terminale";

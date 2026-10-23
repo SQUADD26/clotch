@@ -11,7 +11,7 @@ export const STATI_FRIDAY = ["lavora", "aspetta", "finito", "serve_roberto", "se
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia",
+  "riprendi_altrove", "archivia", "obiettivo",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 180 s». Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 180_000;
@@ -65,13 +65,13 @@ export interface Registro {
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
   friday: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
-  comandi: { id: string; cmd: string; da: string }[];
+  comandi: { id: string; t: number | null; cmd: string; da: string; args: Record<string, any> }[];
   /** Decisioni di Friday ancora annullabili (inverso non nullo e nessun `annulla` fatto). */
-  decisioni: { id: string; t: number | null; cosa: string; perche: string; annullabile: boolean }[];
+  decisioni: { id: string; t: number | null; cosa: string; perche: string; chat: string | null; genere: string; nonAnnullabile: string | null; annullabile: boolean }[];
   /** Regole imparate vive: ogni `regola` aggiunge, con `togli` toglie (stesso testo e dove). */
   regole: { testo: string; perche: string; dove: string; t: number | null }[];
-  /** Ultimo `non_disturbare` andato a buon fine: Senza `minuti` il motore usa 60. */
-  nonDisturbare: { da: number; fino: number } | null;
+  /** Ultimo evento `non_disturbare` acceso: `fino` null = finché non si toglie; `tenuti` = avvisi tenuti per dopo. */
+  nonDisturbare: { fino: number | null; tenuti: number } | null;
   esiti: Map<string, { esito: string; testo: string }>;
   errori: ErroreLettura[];
 }
@@ -177,21 +177,17 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         }
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), annullabile: Array.isArray(d.inverso) }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), annullabile: Array.isArray(d.inverso) }); break;
         case "comando":
           comandi.set(String(d.id), d);
-          r.comandi.push({ id: String(d.id), cmd: String(d.cmd ?? ""), da: String(d.da ?? "") });
+          r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
           break;
+        case "non_disturbare": r.nonDisturbare = d.acceso === true ? { fino: aMillisecondi(d.fino), tenuti: Number(d.tenuti) || 0 } : null; break;
         case "friday": if (t !== null) r.friday = { evento: String(d.evento ?? ""), t }; break;
         case "comando_fatto": {
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
           const cmd = comandi.get(String(d.comando));
           if (d.esito === "ok" && cmd?.cmd === "annulla" && s(cmd.args?.decisione)) annullate.add(cmd.args.decisione);
-          const da = aMillisecondi(cmd?.t);
-          if (d.esito === "ok" && cmd?.cmd === "non_disturbare" && da !== null) {
-            // shortcut: il motore non scrive un evento di Non disturbare; si ricava dal comando riuscito, finché il contratto non ne ha uno
-            r.nonDisturbare = cmd.args?.acceso === true ? { da, fino: da + (Number.isFinite(cmd.args?.minuti) ? cmd.args.minuti : 60) * 60_000 } : null; // 60 = default del motore
-          }
           break;
         }
       }

@@ -4,7 +4,9 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { leggiRegistro } from "../src/friday";
-import { avvisiTenuti, casella, decisioniPerGiorno, regolePerDove, sessioniAlLavoro, statoFriday } from "../src/ui/friday/vista";
+import { piano } from "../src/friday-ipc";
+import { daPiano } from "../src/ui/friday/registro";
+import { casella, decisioniPerGiorno, regolePerDove, sessioniAlLavoro, statoFriday } from "../src/ui/friday/vista";
 
 const ORA = Date.parse("2026-10-23T14:00:00.000Z");
 const min = (m: number) => new Date(ORA - m * 60_000).toISOString();
@@ -52,21 +54,22 @@ test("vista: Friday attiva, spenta, in pausa con Non disturbare e avvisi tenuti"
   assert.deepEqual(statoFriday(registro([[10, "friday", "friday", { evento: "stop" }]]), ORA), { stato: "spenta", da: ORA - 600_000 });
   assert.equal(statoFriday(registro([]), ORA).stato, "spenta");
   const r = registro([
-    [30, "friday", "comando", { v: 1, id: "c-1", t: min(30), da: "app", cmd: "non_disturbare", args: { acceso: true, minuti: 60 } }],
-    [30, "friday", "comando_fatto", { comando: "c-1", esito: "ok", testo: "" }],
-    [20, "friday", "avviso", { testo: "a", livello: "normale", motivo: "goal", detto_da: "app" }],
-    [10, "friday", "avviso", { testo: "b", livello: "normale", motivo: "domanda", detto_da: "app" }],
+    [30, "friday", "non_disturbare", { acceso: true, fino: min(-30), tenuti: 2 }],
     [1, "friday", "battito", { stato: "lavora" }],
   ]);
   assert.deepEqual(statoFriday(r, ORA), { stato: "pausa", da: ORA + 30 * 60_000 });
-  assert.equal(avvisiTenuti(r, ORA), 2);
-  assert.equal(avvisiTenuti(r, ORA + 31 * 60_000), 0);
+  assert.equal(r.nonDisturbare?.tenuti, 2);
+  assert.equal(statoFriday(r, ORA + 31 * 60_000).stato, "spenta"); // nessun battito da 31 minuti
+  const sempre = registro([[5, "friday", "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [1, "friday", "battito", { stato: "lavora" }]]);
+  assert.deepEqual(statoFriday(sempre, ORA), { stato: "pausa", da: null });
+  const tolto = registro([[5, "friday", "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [2, "friday", "non_disturbare", { acceso: false, fino: null, tenuti: 0 }], [1, "friday", "battito", { stato: "lavora" }]]);
+  assert.equal(statoFriday(tolto, ORA).stato, "attiva");
 });
 
 test("vista: decisioni per giorno, annullate e non annullabili; regole per dove con togli", () => {
   const r = registro([
     [26 * 60, "friday", "decisione", { cosa: "Archiviate 4 sessioni", perche: "", inverso: ["friday", "x"] }],
-    [60, "friday", "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null }],
+    [60, "friday", "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null, chat: "m1", genere: "promozione", non_annullabile: "Già su main" }],
     [30, "friday", "decisione", { cosa: "Consentita la migrazione", perche: "", inverso: ["a"] }],
     [10, "friday", "decisione", { cosa: "annullata r-000000000002", perche: "", inverso: null }],
     [50, "friday", "regola", { testo: "Parla chiaro", perche: "", dove: "claude-config", togli: false }],
@@ -75,9 +78,21 @@ test("vista: decisioni per giorno, annullate e non annullabili; regole per dove 
     [20, "friday", "regola", { testo: "Via", perche: "", dove: "claude-config", togli: true }],
   ]);
   const g = decisioniPerGiorno(r, ORA);
+  assert.deepEqual(g[0].voci[1].chat, "m1");
+  assert.deepEqual([g[0].voci[1].genere, g[0].voci[1].nonAnnullabile, g[1].voci[0].genere], ["promozione", "Già su main", "altro"]);
   assert.deepEqual(g.map((x) => [x.titolo, x.voci.map((v) => [v.cosa, v.annullabile])]), [
     ["Oggi", [["Consentita la migrazione", false], ["Promosso dev a main", false]]],
     ["Ieri", [["Archiviate 4 sessioni", true]]],
   ]);
   assert.deepEqual(regolePerDove(r).map((x) => [x.dove, x.regole.map((y) => y.testo)]), [["claude-config", ["Parla chiaro"]], ["/r/clotch", ["Figma prima"]]]);
+});
+
+test("vista: il registro passa il ponte del preload senza Map e torna uguale", () => {
+  const r = registro([
+    [5, "m1", "inizio", { titolo: "T", madre: "", progetto: "clotch" }],
+    [4, "m1", "aiutante", { agente: "a1", fase: "inizio", tipo: "worker", modello: "x", testo: "t", esito: "" }],
+    [3, "friday", "comando_fatto", { comando: "c-1", esito: "ok", testo: "" }],
+  ]);
+  const passato = structuredClone(piano(r)); // come il ponte: niente Map, niente classi
+  assert.deepEqual(daPiano(passato), r);
 });
