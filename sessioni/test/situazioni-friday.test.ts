@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { MOTIVI_AVVISO, clotchAcceso, leggeLApp, leggiRegistro, mandaComando, nonRisponde } from "../src/friday";
+import { COMANDI, MOTIVI_AVVISO, NON_RISPONDE_MS, clotchAcceso, leggeLApp, leggiRegistro, mandaComando, nonRisponde } from "../src/friday";
 
 const DIR = path.join(__dirname, "..", "..", "test", "fixtures", "situazioni", "friday", "registro");
 const reg = leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: DIR });
@@ -67,9 +67,36 @@ test("casella: un file per comando, nessun .tmp lasciato, nome sconosciuto rifiu
 
 const ORA = Date.parse("2026-10-23T10:10:00Z");
 
-test("non risponde: lavora e nessun battito da 180 s", () => {
-  assert.equal(nonRisponde(chat("14141414"), ORA), true);
+test("non risponde: lavora e nessun battito da 20 minuti", () => {
+  const ultimo = Date.parse("2026-10-23T10:00:00Z"); // battito di 14141414
+  assert.equal(nonRisponde(chat("14141414"), ultimo + 20 * 60_000 + 1000), true);
+  assert.equal(nonRisponde(chat("14141414"), ultimo + 20 * 60_000), false); // la soglia non è inclusa
+  assert.equal(nonRisponde(chat("14141414"), ORA), false); // 10 min: un comando lungo non manda battiti
   assert.equal(nonRisponde(chat("15151515"), ORA), false);
+});
+
+// Valori del motore (SQUADD26/claude-config main 089cf3b), copiati a mano: se il motore cambia, cambia questo test.
+const MOTORE_FERMO_S = 20 * 60; // global/hooks/friday_triage.py:15 FERMO_S; CONTRATTO.md:41 «da 20 minuti (stessa soglia per app e Friday)»
+const MOTORE_COMANDI = [ // global/hooks/friday_comandi.py:25-36, chiavi di FORMA
+  "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena", "obiettivo",
+  "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi", "riprendi_altrove",
+  "archivia", "spegni", "imposta", "rinomina",
+];
+
+test("contratto col motore: stessa soglia «Non risponde» in src e in src/ui, uguale a friday_triage.FERMO_S", () => {
+  const ui = fs.readFileSync(path.join(__dirname, "..", "..", "src", "ui", "chat", "friday.ts"), "utf8");
+  const nellUi = Number(/const NON_RISPONDE_MS = ([\d_]+);/.exec(ui)?.[1].replaceAll("_", ""));
+  assert.deepEqual([NON_RISPONDE_MS, nellUi], [MOTORE_FERMO_S * 1000, MOTORE_FERMO_S * 1000]);
+});
+
+test("contratto col motore: i comandi dell'app sono quelli del motore, salvo due scarti dichiarati", () => {
+  const app = new Set<string>(COMANDI);
+  // «ripristina»: il motore lo rifiuta (claude-config#2513); resta nell'elenco solo perché il bottone di archiviate.tsx è spento.
+  const soloApp = COMANDI.filter((c) => !MOTORE_COMANDI.includes(c));
+  assert.deepEqual(soloApp, ["ripristina"]);
+  assert.match(fs.readFileSync(path.join(__dirname, "..", "..", "src", "ui", "impostazioni", "archiviate.tsx"), "utf8"), /const MOTORE_RIPRISTINA = false;/);
+  // «rinomina»: nessuna schermata la usa (manca il disegno), quindi l'app non la manda.
+  assert.deepEqual(MOTORE_COMANDI.filter((c) => !app.has(c)), ["rinomina"]);
 });
 
 test("permesso, domanda e piano aperti; la domanda chiusa da Clotch sparisce", () => {
