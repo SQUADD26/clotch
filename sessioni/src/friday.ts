@@ -17,6 +17,8 @@ export const COMANDI = [
 export const NON_RISPONDE_MS = 180_000;
 export const CLOTCH_SPENTO_MS = 600_000;
 export type Comando = (typeof COMANDI)[number];
+/** `domanda`: una sessione chiede qualcosa a Roberto. `risposta`: Friday risponde a una domanda di Roberto (Clotch la dice come risposta_adhd). */
+export const MOTIVI_AVVISO = ["blocco", "chiesto", "goal", "domanda", "fermo", "risposta"] as const;
 
 export interface ChatFriday {
   chat: string;

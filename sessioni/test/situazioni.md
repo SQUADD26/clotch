@@ -72,7 +72,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 27 | Decisione di Friday annullabile | Friday | `decisione {inverso}`; annullata da `comando annulla` + `comando_fatto ok` | elenco decisioni con «Annulla» | `decisione`; comando `annulla` | contratto |
 | 28 | Esito di un comando dell'app | Friday | `comando_fatto {comando, esito: ok / rifiutato / errore}` | conferma o errore col perché | `comando_fatto` | contratto |
 | 29 | Obiettivo cambiato | Friday | `obiettivo {stato, testo}` (la fonte resta `~/.claude/obiettivi/`) | pannello «Obiettivo» | `obiettivo` | contratto |
-| 30 | Chat Friday | Friday | `chat: friday`; Roberto scrive con il comando `parla` | «Friday / Sempre attiva» (101:16432) | `parla`, `avviso` | contratto (comando) |
+| 30 | Chat Friday | Friday | `chat: friday`; Roberto scrive con il comando `parla`, Friday risponde con `avviso {motivo: risposta}` (diverso da `domanda`, che è una sessione che chiede a Roberto) | «Friday / Sempre attiva» (101:16432) | `parla`, `avviso` | contratto (comando) |
 | 31 | Non disturbare | Friday | comando `non_disturbare {acceso, minuti}` | «Non disturbare» acceso | comando | contratto |
 | 32 | Cursor: tutte | Cursor | nessuna trascrizione Cursor sul Mac | — | fuori v1 | attende dati veri |
 | 33 | App desktop «in corso» | App | il file vero **non ha `isRunning`** (chiavi viste: `completedTurns`, `latestUserFrameAt`, `interruptedAwaitingPerson`…): `desktop.ts` non lo vede mai | «In corso» | `battito` (Friday lo copre) | attende (difetto di #334: issue #340) |
