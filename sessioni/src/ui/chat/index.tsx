@@ -32,7 +32,7 @@ export function Intestazione() {
   const c = useChatFriday(s?.id ?? null);
   const adesso = useOra();
   if (!s) return null;
-  return <TestaSessione s={s} nonRisponde={!!c && nonRisponde(c, adesso)} icona={p[s.id]?.icona} colore={p[s.id]?.colore} />;
+  return <TestaSessione s={s} nonRisponde={!!c && nonRisponde(c, adesso)} pref={p[s.id]} />;
 }
 
 export default function Chat() {

@@ -22,7 +22,7 @@
   display: inline-flex; align-items: center; justify-content: center; flex: none;
   -webkit-app-region: no-drag;
 }
-.bottone-icona:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
+.bottone-icona:hover:not(:disabled), .bottone-icona[aria-expanded="true"] { background: var(--colore-fondo-riga-passaggio); }
 
 /* Pillola (Filtro): Attivo=Sì | No */
 .pillola {

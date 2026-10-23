@@ -10,3 +10,4 @@
 .pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .ramo { gap: var(--spazio-1); }
 .pezzo-chat .intestazione .codice { font-family: var(--testo-famiglia-codice); }
 .pezzo-chat .intestazione .azioni { display: flex; gap: var(--spazio-0-5); flex: none; }
+.pezzo-chat .intestazione .con-menu { position: relative; display: flex; }
