@@ -4341,7 +4341,7 @@
     "x": 504,
     "y": 192,
     "w": 560,
-    "h": 564
+    "h": 600
    },
    "variabili": {
     "fills[0]": "colore/fondo/elevato",
@@ -4514,7 +4514,7 @@
     "x": 524,
     "y": 324,
     "w": 520,
-    "h": 412
+    "h": 448
    },
    "variabili": {
     "itemSpacing": "spazio/6"
@@ -5278,7 +5278,7 @@
     "x": 796,
     "y": 324,
     "w": 248,
-    "h": 412
+    "h": 448
    },
    "variabili": {
     "itemSpacing": "spazio/5"
@@ -5342,7 +5342,7 @@
    "box": {
     "x": 796,
     "y": 351,
-    "w": 202,
+    "w": 203,
     "h": 18
    },
    "variabili": {
@@ -5359,9 +5359,9 @@
    "nome": "tasto",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1006,
+    "x": 1007,
     "y": 349,
-    "w": 38,
+    "w": 37,
     "h": 22
    },
    "variabili": {
@@ -5379,9 +5379,9 @@
    "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 1014,
+    "x": 1015,
     "y": 351,
-    "w": 22,
+    "w": 21,
     "h": 18
    },
    "variabili": {
@@ -5390,7 +5390,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "⌘↵",
+   "testo": "⌘Y",
    "font": "SF Pro Regular"
   },
   {
@@ -5697,7 +5697,7 @@
     "x": 796,
     "y": 540,
     "w": 248,
-    "h": 196
+    "h": 232
    },
    "variabili": {
     "itemSpacing": "spazio/1"
@@ -5755,7 +5755,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Invia",
+   "testo": "Invia (interrompe la sessione)",
    "font": "SF Pro Regular"
   },
   {
@@ -5798,7 +5798,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:22302",
+   "id": "101:44302",
    "nome": "riga",
    "tipo": "FRAME",
    "box": {
@@ -5814,12 +5814,86 @@
    "senza": []
   },
   {
-   "id": "101:22303",
+   "id": "101:44303",
    "nome": "azione",
    "tipo": "TEXT",
    "box": {
     "x": 796,
     "y": 603,
+    "w": 202,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Metti in coda",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:44304",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1006,
+    "y": 601,
+    "w": 38,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44304;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1014,
+    "y": 603,
+    "w": 22,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘↵",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:22302",
+   "nome": "riga",
+   "tipo": "FRAME",
+   "box": {
+    "x": 796,
+    "y": 632,
+    "w": 248,
+    "h": 32
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:22303",
+   "nome": "azione",
+   "tipo": "TEXT",
+   "box": {
+    "x": 796,
+    "y": 639,
     "w": 201,
     "h": 18
    },
@@ -5838,7 +5912,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1005,
-    "y": 601,
+    "y": 637,
     "w": 39,
     "h": 22
    },
@@ -5858,7 +5932,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 1013,
-    "y": 603,
+    "y": 639,
     "w": 23,
     "h": 18
    },
@@ -5877,7 +5951,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 796,
-    "y": 632,
+    "y": 668,
     "w": 248,
     "h": 32
    },
@@ -5893,7 +5967,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 796,
-    "y": 639,
+    "y": 675,
     "w": 202,
     "h": 18
    },
@@ -5912,7 +5986,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1006,
-    "y": 637,
+    "y": 673,
     "w": 38,
     "h": 22
    },
@@ -5932,7 +6006,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 1014,
-    "y": 639,
+    "y": 675,
     "w": 22,
     "h": 18
    },
@@ -5951,7 +6025,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 796,
-    "y": 668,
+    "y": 704,
     "w": 248,
     "h": 32
    },
@@ -5967,7 +6041,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 796,
-    "y": 675,
+    "y": 711,
     "w": 220,
     "h": 18
    },
@@ -5986,7 +6060,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1024,
-    "y": 673,
+    "y": 709,
     "w": 20,
     "h": 22
    },
@@ -6006,7 +6080,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 1032,
-    "y": 675,
+    "y": 711,
     "w": 4,
     "h": 18
    },
@@ -6025,7 +6099,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 796,
-    "y": 704,
+    "y": 740,
     "w": 248,
     "h": 32
    },
@@ -6041,7 +6115,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 796,
-    "y": 711,
+    "y": 747,
     "w": 212,
     "h": 18
    },
@@ -6060,7 +6134,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1016,
-    "y": 709,
+    "y": 745,
     "w": 28,
     "h": 22
    },
@@ -6080,7 +6154,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 1024,
-    "y": 711,
+    "y": 747,
     "w": 12,
     "h": 18
    },

@@ -60,6 +60,7 @@
   "colore/fondo/accento": "#d25e28",
   "misura/bottone-invio": 32,
   "colore/icona/su-accento": "#ffffff",
+  "raggio/xs": 5,
   "raggio/xl": 15,
   "misura/pannello": 320,
   "colore/testo/errore": "#ff6764"
@@ -2306,7 +2307,7 @@
     "x": 365,
     "y": 165,
     "w": 760,
-    "h": 586
+    "h": 576
    },
    "variabili": {
     "itemSpacing": "spazio/6",
@@ -2321,7 +2322,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 610,
+    "y": 600,
     "w": 760,
     "h": 41
    },
@@ -2334,7 +2335,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 862,
-    "y": 610,
+    "y": 600,
     "w": 263,
     "h": 41
    },
@@ -2354,7 +2355,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 878,
-    "y": 620,
+    "y": 610,
     "w": 231,
     "h": 21
    },
@@ -2373,7 +2374,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 675,
+    "y": 665,
     "w": 760,
     "h": 18
    },
@@ -2388,7 +2389,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 365,
-    "y": 675,
+    "y": 665,
     "w": 760,
     "h": 18
    },
@@ -2403,7 +2404,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 676,
+    "y": 666,
     "w": 16,
     "h": 16
    },
@@ -2419,7 +2420,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 366.99951171875,
-    "y": 676.666015625,
+    "y": 666.666015625,
     "w": 12.000650405883789,
     "h": 14.6669921875
    },
@@ -2434,7 +2435,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 389,
-    "y": 675,
+    "y": 665,
     "w": 33,
     "h": 18
    },
@@ -2453,7 +2454,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 430,
-    "y": 675,
+    "y": 665,
     "w": 647,
     "h": 18
    },
@@ -2472,7 +2473,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 1085,
-    "y": 676,
+    "y": 666,
     "w": 16,
     "h": 16
    },
@@ -2491,7 +2492,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1109,
-    "y": 676,
+    "y": 666,
     "w": 16,
     "h": 16
    },
@@ -2507,7 +2508,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1114.3330078125,
-    "y": 679.333984375,
+    "y": 669.333984375,
     "w": 5.333883762359619,
     "h": 9.333883285522461
    },
@@ -2522,7 +2523,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 717,
+    "y": 707,
     "w": 760,
     "h": 18
    },
@@ -2537,7 +2538,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 365,
-    "y": 717,
+    "y": 707,
     "w": 760,
     "h": 18
    },
@@ -2552,7 +2553,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 718,
+    "y": 708,
     "w": 16,
     "h": 16
    },
@@ -2568,7 +2569,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 365.66650390625,
-    "y": 718.666015625,
+    "y": 708.666015625,
     "w": 14.666666984558105,
     "h": 14.666666984558105
    },
@@ -2583,7 +2584,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 389,
-    "y": 717,
+    "y": 707,
     "w": 70,
     "h": 18
    },
@@ -2602,7 +2603,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 467,
-    "y": 717,
+    "y": 707,
     "w": 658,
     "h": 18
    },
@@ -2621,9 +2622,9 @@
    "tipo": "FRAME",
    "box": {
     "x": 347,
-    "y": 767,
+    "y": 757,
     "w": 796,
-    "h": 72
+    "h": 44
    },
    "variabili": {
     "itemSpacing": "spazio/1"
@@ -2636,9 +2637,9 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 347,
-    "y": 767,
+    "y": 757,
     "w": 796,
-    "h": 34
+    "h": 44
    },
    "variabili": {
     "fills[0]": "colore/fondo/elevato",
@@ -2652,63 +2653,13 @@
    "senza": []
   },
   {
-   "id": "I101:14835;101:13483",
-   "nome": "icona orologio",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 359,
-    "y": 776,
-    "w": 16,
-    "h": 16
-   },
-   "variabili": {
-    "width": "misura/icona",
-    "height": "misura/icona"
-   },
-   "senza": []
-  },
-  {
-   "id": "I101:14835;101:13483;101:7110",
-   "nome": "forma",
-   "tipo": "VECTOR",
-   "box": {
-    "x": 359.66650390625,
-    "y": 776.666015625,
-    "w": 14.6669921875,
-    "h": 14.6669921875
-   },
-   "variabili": {
-    "fills[0]": "colore/icona/terziaria"
-   },
-   "senza": []
-  },
-  {
-   "id": "I101:14835;101:13485",
+   "id": "I101:14835;101:43286",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 383,
-    "y": 776,
-    "w": 43,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "In coda",
-   "font": "SF Pro Medium"
-  },
-  {
-   "id": "I101:14835;101:13482",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 434,
-    "y": 775,
-    "w": 673,
+    "x": 359,
+    "y": 770,
+    "w": 127,
     "h": 18
    },
    "variabili": {
@@ -2717,68 +2668,67 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Poi aggiungi anche lo stato con zero sessioni",
+   "testo": "1 messaggio in coda",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I101:14835;101:43287",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 494,
+    "y": 770,
+    "w": 541,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ascolta, ho bisogno anche di un’altra cosa: sul mio Mac c’è un collegamento che ",
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:14835;101:13486",
-   "nome": "icona chiudi",
-   "tipo": "INSTANCE",
+   "id": "I101:14835;101:43288",
+   "nome": "azioni",
+   "tipo": "FRAME",
    "box": {
-    "x": 1115,
-    "y": 776,
-    "w": 16,
-    "h": 16
+    "x": 1043,
+    "y": 765,
+    "w": 88,
+    "h": 28
    },
    "variabili": {
-    "width": "misura/icona",
-    "height": "misura/icona"
+    "itemSpacing": "spazio/0-5"
    },
    "senza": []
   },
   {
-   "id": "I101:14835;101:13486;101:6935",
-   "nome": "forma",
-   "tipo": "VECTOR",
-   "box": {
-    "x": 1118.3330078125,
-    "y": 779.333984375,
-    "w": 9.333883285522461,
-    "h": 9.333883285522461
-   },
-   "variabili": {
-    "fills[0]": "colore/icona/terziaria"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:14842",
-   "nome": "Messaggio in coda",
+   "id": "I101:14835;101:43289",
+   "nome": "bottone invia ora",
    "tipo": "INSTANCE",
    "box": {
-    "x": 347,
-    "y": 805,
-    "w": 796,
-    "h": 34
+    "x": 1043,
+    "y": 765,
+    "w": 28,
+    "h": 28
    },
    "variabili": {
-    "fills[0]": "colore/fondo/elevato",
     "cornerRadius": "raggio/md",
-    "itemSpacing": "spazio/2",
-    "paddingLeft": "spazio/3",
-    "paddingRight": "spazio/3",
-    "paddingTop": "spazio/2",
-    "paddingBottom": "spazio/2"
+    "width": "misura/bottone",
+    "height": "misura/bottone"
    },
    "senza": []
   },
   {
-   "id": "I101:14842;101:13483",
-   "nome": "icona orologio",
+   "id": "I101:14835;101:43289;101:7139",
+   "nome": "icona altro",
    "tipo": "INSTANCE",
    "box": {
-    "x": 359,
-    "y": 814,
+    "x": 1049,
+    "y": 771,
     "w": 16,
     "h": 16
    },
@@ -2789,65 +2739,44 @@
    "senza": []
   },
   {
-   "id": "I101:14842;101:13483;101:7110",
+   "id": "I101:14835;101:43289;101:7139;101:43278",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 359.66650390625,
-    "y": 814.666015625,
-    "w": 14.6669921875,
-    "h": 14.6669921875
+    "x": 1050.99951171875,
+    "y": 773,
+    "w": 12,
+    "h": 11.99994945526123
    },
    "variabili": {
-    "fills[0]": "colore/icona/terziaria"
+    "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
   },
   {
-   "id": "I101:14842;101:13485",
-   "nome": "etichetta",
-   "tipo": "TEXT",
-   "box": {
-    "x": 383,
-    "y": 814,
-    "w": 43,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "In coda",
-   "font": "SF Pro Medium"
-  },
-  {
-   "id": "I101:14842;101:13482",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 434,
-    "y": 813,
-    "w": 673,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "E controlla i titoli lunghissimi",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "I101:14842;101:13486",
-   "nome": "icona chiudi",
+   "id": "I101:14835;101:43293",
+   "nome": "bottone modifica",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1115,
-    "y": 814,
+    "x": 1073,
+    "y": 765,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:14835;101:43293;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1079,
+    "y": 771,
     "w": 16,
     "h": 16
    },
@@ -2858,17 +2787,65 @@
    "senza": []
   },
   {
-   "id": "I101:14842;101:13486;101:6935",
+   "id": "I101:14835;101:43293;101:7139;101:7061",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1118.3330078125,
-    "y": 817.333984375,
+    "x": 1079.6669921875,
+    "y": 771.666015625,
+    "w": 14.666559219360352,
+    "h": 14.666609764099121
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:14835;101:43297",
+   "nome": "bottone togli",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1103,
+    "y": 765,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:14835;101:43297;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1109,
+    "y": 771,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:14835;101:43297;101:7139;101:6935",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1112.3330078125,
+    "y": 774.333984375,
     "w": 9.333883285522461,
     "h": 9.333883285522461
    },
    "variabili": {
-    "fills[0]": "colore/icona/terziaria"
+    "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
   },
@@ -2878,7 +2855,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 855,
+    "y": 817,
     "w": 760,
     "h": 84
    },
@@ -2902,7 +2879,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 378,
-    "y": 868,
+    "y": 830,
     "w": 734,
     "h": 20
    },
@@ -2917,7 +2894,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 382,
-    "y": 868,
+    "y": 830,
     "w": 730,
     "h": 20
    },
@@ -2936,7 +2913,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 378,
-    "y": 896,
+    "y": 858,
     "w": 734,
     "h": 32
    },
@@ -2951,7 +2928,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 378,
-    "y": 898,
+    "y": 860,
     "w": 28,
     "h": 28
    },
@@ -2968,7 +2945,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 384,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -2984,7 +2961,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 386.66650390625,
-    "y": 906.666015625,
+    "y": 868.666015625,
     "w": 10.6669921875,
     "h": 10.6669921875
    },
@@ -2999,7 +2976,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 414,
-    "y": 898,
+    "y": 860,
     "w": 181,
     "h": 28
    },
@@ -3018,7 +2995,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 422,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3034,7 +3011,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 422.59619140625,
-    "y": 904.666015625,
+    "y": 866.666015625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
    },
@@ -3049,7 +3026,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 442,
-    "y": 903,
+    "y": 865,
     "w": 125,
     "h": 18
    },
@@ -3068,7 +3045,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 571,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3084,7 +3061,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 574.3330078125,
-    "y": 909.333984375,
+    "y": 871.333984375,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -3099,7 +3076,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 603,
-    "y": 911.5,
+    "y": 873.5,
     "w": 221,
     "h": 1
    },
@@ -3112,7 +3089,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 832,
-    "y": 898,
+    "y": 860,
     "w": 62,
     "h": 28
    },
@@ -3131,7 +3108,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 840,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3147,7 +3124,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 840.66650390625,
-    "y": 906,
+    "y": 868,
     "w": 14.6669921875,
     "h": 11.333754539489746
    },
@@ -3162,7 +3139,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 860,
-    "y": 904,
+    "y": 866,
     "w": 26,
     "h": 16
    },
@@ -3181,7 +3158,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 902,
-    "y": 898,
+    "y": 860,
     "w": 134,
     "h": 28
    },
@@ -3200,7 +3177,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 910,
-    "y": 903,
+    "y": 865,
     "w": 56,
     "h": 18
    },
@@ -3219,7 +3196,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 970,
-    "y": 903,
+    "y": 865,
     "w": 38,
     "h": 18
    },
@@ -3238,7 +3215,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1012,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3254,7 +3231,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1015.3330078125,
-    "y": 909.333984375,
+    "y": 871.333984375,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -3269,7 +3246,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1044,
-    "y": 898,
+    "y": 860,
     "w": 28,
     "h": 28
    },
@@ -3286,7 +3263,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1050,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3302,7 +3279,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1052.66650390625,
-    "y": 904.666015625,
+    "y": 866.666015625,
     "w": 10.6669921875,
     "h": 14.667318344116211
    },
@@ -3317,7 +3294,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 1080,
-    "y": 896,
+    "y": 858,
     "w": 32,
     "h": 32
    },
@@ -3335,7 +3312,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 1088,
-    "y": 904,
+    "y": 866,
     "w": 16,
     "h": 16
    },
@@ -3351,7 +3328,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1092,
-    "y": 908,
+    "y": 870,
     "w": 8,
     "h": 8
    },
@@ -3359,6 +3336,139 @@
     "fills[0]": "colore/icona/su-accento"
    },
    "senza": []
+  },
+  {
+   "id": "101:43325",
+   "nome": "tasti della casella",
+   "tipo": "FRAME",
+   "box": {
+    "x": 578,
+    "y": 917,
+    "w": 334,
+    "h": 22
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:43326",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 586,
+    "y": 917,
+    "w": 26,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:43326;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 594,
+    "y": 919,
+    "w": 10,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "↵",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:43328",
+   "nome": "invio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 620,
+    "y": 920,
+    "w": 152,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "interrompe e manda subito",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:43329",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 780,
+    "y": 917,
+    "w": 38,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:43329;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 788,
+    "y": 919,
+    "w": 22,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘↵",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:43331",
+   "nome": "coda",
+   "tipo": "TEXT",
+   "box": {
+    "x": 826,
+    "y": 920,
+    "w": 78,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "mette in coda",
+   "font": "SF Pro Regular"
   },
   {
    "id": "101:14883",

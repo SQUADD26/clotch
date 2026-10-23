@@ -2,7 +2,7 @@
 
 Fonte: vault squadd-v2 `Research/App/ChatGPT` (estrazione REA). Pagina Figma «Sessioni» (node 101:6839), solo tema scuro.
 
-Totale righe: 199 · già in Figma prima: 50 · disegnate ora: 82 · escluse con motivo: 67
+Totale righe: 200 · già in Figma prima: 50 · disegnate ora: 83 · escluse con motivo: 67
 
 | # | Elemento ChatGPT | In Sessioni | Stato | Schermata o motivo |
 |---|---|---|---|---|
@@ -198,6 +198,7 @@ Totale righe: 199 · già in Figma prima: 50 · disegnate ora: 82 · escluse con
 | R1 | Richiesta di Roberto: info sulla sessione | Pannello Info sessione | disegnato ora | Info sessione (`101-33775.png`) |
 | R2 | Richiesta di Roberto: sessioni figlie e PR | Righe madre e figlia con indicatore PR | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
 | R3 | Richiesta di Roberto: shimmer giallo | Nome giallo con banda chiara | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
+| R4 | Richiesta di Roberto: coda dei messaggi | Invio interrompe e manda subito; ⌘ Invio mette in coda; barra «1 messaggio in coda» con manda ora, modifica, togli | disegnato ora | Messaggi in coda (`101-14849.png`), Casella mentre lavora: Invio o ⌘ Invio (`101-43332.png`), Invio diretto: interrompe e manda subito (`101-43535.png`), Coda: modifica del messaggio (`101-43708.png`), Coda: invia ora (`101-43945.png`) |
 
 ## Friday nell’app (lavagna Sistema Friday, sezioni 14 e 15)
 

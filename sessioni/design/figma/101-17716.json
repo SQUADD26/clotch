@@ -1324,7 +1324,7 @@
     "x": 356,
     "y": 109,
     "w": 672,
-    "h": 501
+    "h": 595
    },
    "variabili": {
     "itemSpacing": "spazio/6",
@@ -1362,7 +1362,7 @@
     "x": 372,
     "y": 217,
     "w": 640,
-    "h": 377
+    "h": 471
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
@@ -1719,7 +1719,7 @@
    "box": {
     "x": 389,
     "y": 372,
-    "w": 552,
+    "w": 553,
     "h": 20
    },
    "variabili": {
@@ -1751,9 +1751,9 @@
    "nome": "tasto",
    "tipo": "INSTANCE",
    "box": {
-    "x": 957,
+    "x": 958,
     "y": 371,
-    "w": 38,
+    "w": 37,
     "h": 22
    },
    "variabili": {
@@ -1771,9 +1771,9 @@
    "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 965,
+    "x": 966,
     "y": 373,
-    "w": 22,
+    "w": 21,
     "h": 18
    },
    "variabili": {
@@ -1782,7 +1782,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "⌘↵",
+   "testo": "⌘Y",
    "font": "SF Pro Regular"
   },
   {
@@ -2211,6 +2211,220 @@
    },
    "senza": [],
    "testo": "⌘,",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:44306",
+   "nome": "divisore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 373,
+    "y": 593,
+    "w": 638,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:44307",
+   "nome": "riga Invia e interrompi la sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 373,
+    "y": 594,
+    "w": 638,
+    "h": 46
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "paddingTop": "spazio/3",
+    "paddingBottom": "spazio/3"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44307;101:17090",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 389,
+    "y": 607,
+    "w": 564,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44307;101:17091",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 389,
+    "y": 607,
+    "w": 191,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Invia e interrompi la sessione",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:44307;101:17095",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 969,
+    "y": 606,
+    "w": 26,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44307;101:17095;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 977,
+    "y": 608,
+    "w": 10,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "↵",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:44312",
+   "nome": "divisore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 373,
+    "y": 640,
+    "w": 638,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:44313",
+   "nome": "riga Metti in coda",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 373,
+    "y": 641,
+    "w": 638,
+    "h": 46
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "paddingTop": "spazio/3",
+    "paddingBottom": "spazio/3"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44313;101:17090",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 389,
+    "y": 654,
+    "w": 552,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44313;101:17091",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 389,
+    "y": 654,
+    "w": 86,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Metti in coda",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:44313;101:17095",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 957,
+    "y": 653,
+    "w": 38,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44313;101:17095;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 965,
+    "y": 655,
+    "w": 22,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘↵",
    "font": "SF Pro Regular"
   }
  ]
