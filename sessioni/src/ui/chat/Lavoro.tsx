@@ -27,12 +27,13 @@ function Riquadro({ icona, titolo, dettaglio, children }: { icona: NomeIcona; ti
 
 export function Attivita({ passi }: { passi: Passo[] }) {
   const fatti = passi.filter((p) => p.stato === "fatto").length;
+  const ris = useRiserva();
   return (
     <Riquadro icona="spunta" titolo="Attività" dettaglio={`${fatti} su ${passi.length}`}>
       {passi.map((p, i) => (
         <div key={i} className={p.stato === "in-corso" ? "voce-lavoro attiva" : "voce-lavoro"}>
           <Icona nome={SEGNO_PASSO[p.stato][0]} colore={SEGNO_PASSO[p.stato][1]} />
-          <span className="testo">{p.testo}</span>
+          <span className="testo">{ris.testo(p.testo)}</span>
         </div>
       ))}
     </Riquadro>
@@ -42,6 +43,7 @@ export function Attivita({ passi }: { passi: Passo[] }) {
 /** `modello`: dal registro di Friday («aiutante» con modello), se c'è. */
 export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello: string | null }) {
   const finiti = aiutanti.every((a) => a.finito);
+  const ris = useRiserva();
   const n = aiutanti.length;
   const titolo = finiti ? `${quanti(n, "aiutante", "aiutanti")} ${n === 1 ? "finito" : "finiti"}` : `${quanti(n, "aiutante", "aiutanti")} al lavoro`;
   return (
@@ -49,8 +51,8 @@ export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello:
       {aiutanti.map((a) => (
         <div key={a.id} className="voce-lavoro">
           <Icona nome={a.finito ? "spunta" : "in-corso"} colore={a.finito ? "successo" : "accento"} />
-          <span className="nome">{a.nome}</span>
-          <span className="testo">{a.azione}</span>
+          <span className="nome">{ris.testo(a.nome)}</span>
+          <span className="testo">{ris.testo(a.azione)}</span>
           {a.durata != null && <span className="durata">{durata(a.durata)}</span>}
         </div>
       ))}
