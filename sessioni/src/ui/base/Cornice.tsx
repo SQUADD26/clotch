@@ -6,10 +6,12 @@ import Friday, { Intestazione as IntestazioneFriday } from "../friday";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
+import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { ConNavigazione, useNavigazione, VISTE_FRIDAY } from "./navigazione";
 import { numero } from "./token";
 import "./cornice.css";
+import "./aspetto.css";
 
 // Il pannello sta accanto alla colonna solo se c'è posto per entrambi (a 1440 sì, a 1024 no, come nei due frame).
 const LARGHEZZA_PANNELLO = numero("misura-colonna") + numero("misura-pannello") + 3 * numero("spazio-4");
@@ -50,6 +52,7 @@ function Corpo() {
 }
 
 export function Cornice() {
+  useAspetto();
   return (
     <ConNavigazione>
       <div className="cornice">
