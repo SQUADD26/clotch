@@ -8,16 +8,13 @@
   "dentro": "101:30172"
  },
  "variabili": {
-  "raggio/md": 10,
-  "spazio/6": 24,
+  "spazio/0-5": 2,
   "spazio/2": 8,
-  "raggio/pieno": 9999,
-  "misura/bottone": 28,
+  "misura/barra-laterale": 266,
+  "raggio/md": 10,
+  "misura/riga": 32,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
-  "spazio/0-5": 2,
-  "misura/barra-laterale": 266,
-  "misura/riga": 32,
   "colore/testo/primario": "#ffffff",
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
@@ -29,11 +26,14 @@
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
   "spazio/3": 12,
+  "spazio/6": 24,
   "colore/fondo/riga-scelta": "#ffffff14",
   "colore/sessione/grigio": "#c4c8ce",
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
-  "colore/fondo/bottone-secondario": "#ffffff0d"
+  "colore/fondo/bottone-secondario": "#ffffff0d",
+  "raggio/pieno": 9999,
+  "misura/bottone": 28
  },
  "nodi": [
   {
@@ -56,7 +56,22 @@
    "senza": []
   },
   {
-   "id": "101:30177",
+   "id": "117:53479",
+   "nome": "comandi barra laterale",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 0,
+    "w": 250,
+    "h": 202
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51476",
    "nome": "comando cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -75,7 +90,7 @@
    "senza": []
   },
   {
-   "id": "I101:30177;101:7172",
+   "id": "I117:53479;117:51476;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -91,7 +106,7 @@
    "senza": []
   },
   {
-   "id": "I101:30177;101:7172;101:6869",
+   "id": "I117:53479;117:51476;101:7172;101:6869",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -106,7 +121,7 @@
    "senza": []
   },
   {
-   "id": "I101:30177;101:7174",
+   "id": "I117:53479;117:51476;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -125,7 +140,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:30177;101:7175",
+   "id": "I117:53479;117:51476;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -144,7 +159,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:30178",
+   "id": "I117:53479;117:51481",
    "nome": "comando filtra",
    "tipo": "INSTANCE",
    "box": {
@@ -163,7 +178,7 @@
    "senza": []
   },
   {
-   "id": "I101:30178;101:7172",
+   "id": "I117:53479;117:51481;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -179,7 +194,7 @@
    "senza": []
   },
   {
-   "id": "I101:30178;101:7172;101:6874",
+   "id": "I117:53479;117:51481;101:7172;101:6874",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -194,13 +209,13 @@
    "senza": []
   },
   {
-   "id": "I101:30178;101:7174",
+   "id": "I117:53479;117:51481;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 40,
     "y": 40,
-    "w": 210,
+    "w": 202,
     "h": 20
    },
    "variabili": {
@@ -213,7 +228,26 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:30179",
+   "id": "I117:53479;117:51481;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 41,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51486",
    "nome": "riga Friday",
    "tipo": "INSTANCE",
    "box": {
@@ -232,7 +266,7 @@
    "senza": []
   },
   {
-   "id": "I101:30179;101:13544",
+   "id": "I117:53479;117:51486;101:13544",
    "nome": "icona scintille",
    "tipo": "INSTANCE",
    "box": {
@@ -248,7 +282,7 @@
    "senza": []
   },
   {
-   "id": "I101:30179;101:13544;101:11153",
+   "id": "I117:53479;117:51486;101:13544;101:11153",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -263,7 +297,7 @@
    "senza": []
   },
   {
-   "id": "I101:30179;101:13543",
+   "id": "I117:53479;117:51486;101:13543",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
@@ -278,11 +312,11 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
-   "id": "I101:30179;101:13546",
+   "id": "I117:53479;117:51486;101:13546",
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
@@ -301,14 +335,278 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "I117:53479;117:51495",
+   "nome": "voce Casella",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 102,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51495;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 110,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51495;101:7172;101:11094",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 16.66650390625,
+    "y": 112,
+    "w": 14.667144775390625,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51495;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 108,
+    "w": 193,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Casella",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51495;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 241,
+    "y": 109,
+    "w": 9,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "3",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51500",
+   "nome": "voce Decisioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 136,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51500;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 144,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51500;101:7172;101:11183",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 16.66650390625,
+    "y": 145.33203125,
+    "w": 14.6669921875,
+    "h": 13.333658218383789
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51500;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 142,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Decisioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51500;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 143,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51505",
+   "nome": "voce Regole",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 170,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51505;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 178,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51505;101:7172;101:11137",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 17.99951171875,
+    "y": 178.66796875,
+    "w": 12,
+    "h": 14.668789863586426
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:53479;117:51505;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 176,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Regole",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:53479;117:51505;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 177,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
    "id": "101:30180",
    "nome": "Elenco",
    "tipo": "FRAME",
    "box": {
     "x": 8,
-    "y": 102,
+    "y": 204,
     "w": 250,
-    "h": 692
+    "h": 590
    },
    "variabili": {
     "itemSpacing": "spazio/0-5",
@@ -322,7 +620,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 114,
+    "y": 216,
     "w": 250,
     "h": 32
    },
@@ -339,7 +637,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 16,
-    "y": 121,
+    "y": 223,
     "w": 234,
     "h": 18
    },
@@ -358,7 +656,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 148,
+    "y": 250,
     "w": 250,
     "h": 32
    },
@@ -377,7 +675,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 156,
+    "y": 258,
     "w": 16,
     "h": 16
    },
@@ -393,7 +691,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 16.66650390625,
-    "y": 157.33203125,
+    "y": 259.33203125,
     "w": 14.668932914733887,
     "h": 12.667033195495605
    },
@@ -408,7 +706,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 40,
-    "y": 154,
+    "y": 256,
     "w": 193,
     "h": 20
    },
@@ -427,7 +725,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 241,
-    "y": 155,
+    "y": 257,
     "w": 9,
     "h": 18
    },
@@ -446,7 +744,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 8,
-    "y": 182,
+    "y": 284,
     "w": 250,
     "h": 134
    },
@@ -462,7 +760,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 182,
+    "y": 284,
     "w": 226,
     "h": 32
    },
@@ -482,7 +780,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 190,
+    "y": 292,
     "w": 16,
     "h": 16
    },
@@ -498,7 +796,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 190,
+    "y": 292,
     "w": 16,
     "h": 16
    },
@@ -514,7 +812,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 40.6650390625,
-    "y": 190.66796875,
+    "y": 292.66796875,
     "w": 14.668047904968262,
     "h": 14.048399925231934
    },
@@ -529,7 +827,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 188,
+    "y": 290,
     "w": 162,
     "h": 20
    },
@@ -547,7 +845,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 190,
+    "y": 292,
     "w": 16,
     "h": 16
    },
@@ -560,7 +858,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 190,
+    "y": 292,
     "w": 16,
     "h": 16
    },
@@ -576,7 +874,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.66650390625,
-    "y": 190.66796875,
+    "y": 292.66796875,
     "w": 14.666666984558105,
     "h": 14.666666984558105
    },
@@ -591,7 +889,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 216,
+    "y": 318,
     "w": 226,
     "h": 32
    },
@@ -610,7 +908,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 224,
+    "y": 326,
     "w": 16,
     "h": 16
    },
@@ -626,7 +924,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 224,
+    "y": 326,
     "w": 16,
     "h": 16
    },
@@ -642,7 +940,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 40.66650390625,
-    "y": 224.66796875,
+    "y": 326.66796875,
     "w": 14.678117752075195,
     "h": 14.661109924316406
    },
@@ -657,7 +955,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 222,
+    "y": 324,
     "w": 162,
     "h": 20
    },
@@ -675,7 +973,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 224,
+    "y": 326,
     "w": 16,
     "h": 16
    },
@@ -688,7 +986,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 224,
+    "y": 326,
     "w": 16,
     "h": 16
    },
@@ -704,7 +1002,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.66650390625,
-    "y": 224.66796875,
+    "y": 326.66796875,
     "w": 14.666666984558105,
     "h": 14.666666984558105
    },
@@ -719,7 +1017,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 250,
+    "y": 352,
     "w": 226,
     "h": 32
    },
@@ -738,7 +1036,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 258,
+    "y": 360,
     "w": 16,
     "h": 16
    },
@@ -754,7 +1052,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 258,
+    "y": 360,
     "w": 16,
     "h": 16
    },
@@ -770,7 +1068,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 40.66650390625,
-    "y": 259.33203125,
+    "y": 361.33203125,
     "w": 14.6669921875,
     "h": 13.333984375
    },
@@ -785,7 +1083,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 256,
+    "y": 358,
     "w": 162,
     "h": 20
    },
@@ -804,7 +1102,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 258,
+    "y": 360,
     "w": 16,
     "h": 16
    },
@@ -817,7 +1115,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 258,
+    "y": 360,
     "w": 16,
     "h": 16
    },
@@ -833,7 +1131,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.66650390625,
-    "y": 258.66796875,
+    "y": 360.66796875,
     "w": 14.6669921875,
     "h": 14.6669921875
    },
@@ -848,7 +1146,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 284,
+    "y": 386,
     "w": 226,
     "h": 32
    },
@@ -867,7 +1165,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 292,
+    "y": 394,
     "w": 16,
     "h": 16
    },
@@ -883,7 +1181,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 292,
+    "y": 394,
     "w": 16,
     "h": 16
    },
@@ -899,7 +1197,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 42.66650390625,
-    "y": 292.66796875,
+    "y": 394.66796875,
     "w": 10.6669921875,
     "h": 14.667318344116211
    },
@@ -914,7 +1212,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 290,
+    "y": 392,
     "w": 162,
     "h": 20
    },
@@ -933,7 +1231,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 292,
+    "y": 394,
     "w": 16,
     "h": 16
    },
@@ -946,7 +1244,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 292,
+    "y": 394,
     "w": 16,
     "h": 16
    },
@@ -962,7 +1260,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.66650390625,
-    "y": 292.66796875,
+    "y": 394.66796875,
     "w": 14.6669921875,
     "h": 14.6669921875
    },
@@ -977,7 +1275,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 318,
+    "y": 420,
     "w": 250,
     "h": 32
    },
@@ -996,7 +1294,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 326,
+    "y": 428,
     "w": 16,
     "h": 16
    },
@@ -1012,7 +1310,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 16.66650390625,
-    "y": 327.33203125,
+    "y": 429.33203125,
     "w": 14.6669921875,
     "h": 12.6669921875
    },
@@ -1027,7 +1325,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 40,
-    "y": 324,
+    "y": 426,
     "w": 186,
     "h": 20
    },
@@ -1046,7 +1344,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 234,
-    "y": 325,
+    "y": 427,
     "w": 16,
     "h": 18
    },
@@ -1065,7 +1363,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 352,
+    "y": 454,
     "w": 250,
     "h": 32
    },
@@ -1084,7 +1382,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 360,
+    "y": 462,
     "w": 16,
     "h": 16
    },
@@ -1100,7 +1398,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 16.66650390625,
-    "y": 361.33203125,
+    "y": 463.33203125,
     "w": 14.6669921875,
     "h": 12.6669921875
    },
@@ -1115,7 +1413,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 40,
-    "y": 358,
+    "y": 460,
     "w": 193,
     "h": 20
    },
@@ -1134,7 +1432,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 241,
-    "y": 359,
+    "y": 461,
     "w": 9,
     "h": 18
    },
@@ -1153,7 +1451,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 386,
+    "y": 488,
     "w": 250,
     "h": 32
    },
@@ -1172,7 +1470,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 394,
+    "y": 496,
     "w": 16,
     "h": 16
    },
@@ -1188,7 +1486,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 16.66650390625,
-    "y": 395.33203125,
+    "y": 497.33203125,
     "w": 14.6669921875,
     "h": 12.6669921875
    },
@@ -1203,7 +1501,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 40,
-    "y": 392,
+    "y": 494,
     "w": 187,
     "h": 20
    },
@@ -1213,7 +1511,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "friday-mac-v2",
+   "testo": "clotch-ai-mac-v2",
    "font": "SF Pro Regular"
   },
   {
@@ -1222,7 +1520,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 235,
-    "y": 393,
+    "y": 495,
     "w": 15,
     "h": 18
    },

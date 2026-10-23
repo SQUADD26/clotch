@@ -24,6 +24,9 @@
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
   "misura/bottone": 28,
+  "colore/testo/su-primario": "#2d2d2d",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
   "spazio/0-5": 2,
   "misura/impostazioni-nav": 240,
   "spazio/3": 12,
@@ -56,8 +59,7 @@
   "misura/dialogo": 420,
   "colore/icona/successo": "#40c977",
   "colore/fondo/bottone-primario": "#ffffff",
-  "misura/bottone-invio": 32,
-  "colore/testo/su-primario": "#2d2d2d"
+  "misura/bottone-invio": 32
  },
  "nodi": [
   {
@@ -323,6 +325,73 @@
     "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
+  },
+  {
+   "id": "I119:57554;121:58602;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 276,
+    "y": 72,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57554;121:58602;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 78,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57554;121:58602;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 283.333984375,
+    "y": 78.666015625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57554;121:58602;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 296,
+    "y": 68,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
   },
   {
    "id": "119:57555",
@@ -735,7 +804,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Regular"
   },
   {
@@ -2021,7 +2090,7 @@
     "x": 366,
     "y": 309,
     "w": 420,
-    "h": 278
+    "h": 296
    },
    "variabili": {
     "fills[0]": "colore/fondo/elevato",
@@ -2081,7 +2150,7 @@
     "x": 386,
     "y": 405,
     "w": 380,
-    "h": 114
+    "h": 132
    },
    "variabili": {
     "itemSpacing": "spazio/2"
@@ -2161,7 +2230,7 @@
     "x": 386,
     "y": 449,
     "w": 380,
-    "h": 18
+    "h": 36
    },
    "variabili": {
     "itemSpacing": "spazio/2"
@@ -2207,7 +2276,7 @@
     "x": 410,
     "y": 449,
     "w": 356,
-    "h": 18
+    "h": 36
    },
    "variabili": {
     "fills[0]": "colore/testo/primario",
@@ -2215,7 +2284,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Friday sempre in alto: casella, decisioni e regole imparate.",
+   "testo": "clotch AI sempre in alto: casella, decisioni e regole imparate.",
    "font": "SF Pro Regular"
   },
   {
@@ -2224,7 +2293,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 386,
-    "y": 475,
+    "y": 493,
     "w": 380,
     "h": 18
    },
@@ -2239,7 +2308,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 386,
-    "y": 475,
+    "y": 493,
     "w": 16,
     "h": 16
    },
@@ -2255,7 +2324,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 388,
-    "y": 478.3330078125,
+    "y": 496.3330078125,
     "w": 11.999899864196777,
     "h": 8.666566848754883
    },
@@ -2270,7 +2339,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 410,
-    "y": 475,
+    "y": 493,
     "w": 356,
     "h": 18
    },
@@ -2289,7 +2358,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 386,
-    "y": 501,
+    "y": 519,
     "w": 380,
     "h": 18
    },
@@ -2304,7 +2373,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 386,
-    "y": 501,
+    "y": 519,
     "w": 16,
     "h": 16
    },
@@ -2320,7 +2389,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 388,
-    "y": 504.3330078125,
+    "y": 522.3330078125,
     "w": 11.999899864196777,
     "h": 8.666566848754883
    },
@@ -2335,7 +2404,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 410,
-    "y": 501,
+    "y": 519,
     "w": 356,
     "h": 18
    },
@@ -2354,7 +2423,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 386,
-    "y": 535,
+    "y": 553,
     "w": 380,
     "h": 32
    },
@@ -2369,7 +2438,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 690,
-    "y": 535,
+    "y": 553,
     "w": 76,
     "h": 32
    },
@@ -2389,7 +2458,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 706,
-    "y": 541,
+    "y": 559,
     "w": 44,
     "h": 20
    },

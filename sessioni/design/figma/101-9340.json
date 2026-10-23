@@ -24,6 +24,9 @@
   "misura/bottone": 28,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
+  "colore/testo/su-primario": "#2d2d2d",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
   "spazio/0-5": 2,
   "misura/barra-laterale": 266,
   "misura/riga": 32,
@@ -35,8 +38,6 @@
   "testo/riga/sm": 18,
   "colore/icona/accento": "#ee7c37",
   "colore/testo/successo": "#40c977",
-  "testo/dimensione/xs": 12,
-  "testo/riga/xs": 16,
   "spazio/3": 12,
   "colore/sessione/grigio": "#c4c8ce",
   "colore/icona/successo": "#40c977",
@@ -47,6 +48,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
   "colore/fondo/bolla": "#87401d",
@@ -61,8 +63,7 @@
   "misura/bottone-invio": 32,
   "raggio/xl": 15,
   "misura/pannello": 320,
-  "colore/testo/errore": "#ff6764",
-  "misura/tratto": 1
+  "colore/testo/errore": "#ff6764"
  },
  "nodi": [
   {
@@ -345,6 +346,73 @@
     "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
+  },
+  {
+   "id": "I101:9093;121:58602;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 276,
+    "y": 72,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:9093;121:58602;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 78,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:9093;121:58602;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 283.33349609375,
+    "y": 78.6663818359375,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:9093;121:58602;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 296,
+    "y": 68,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
   },
   {
    "id": "101:9108",
@@ -635,7 +703,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -1030,7 +1098,7 @@
    "box": {
     "x": 104,
     "y": 364,
-    "w": 185,
+    "w": 188,
     "h": 20
    },
    "variabili": {
@@ -1047,9 +1115,9 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 297,
+    "x": 300,
     "y": 365,
-    "w": 17,
+    "w": 14,
     "h": 18
    },
    "variabili": {
@@ -1058,7 +1126,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "64",
+   "testo": "12",
    "font": "SF Pro Regular"
   },
   {
@@ -2866,7 +2934,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "friday-mac-v2",
+   "testo": "clotch-ai-mac-v2",
    "font": "SF Pro Regular"
   },
   {
@@ -2993,7 +3061,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "200 sessioni · 6 account",
+   "testo": "6 account · 4 sorgenti",
    "font": "SF Pro Regular"
   },
   {
