@@ -42,9 +42,9 @@
   "spazio/4": 16,
   "colore/fondo/riga-scelta": "#ffffff14",
   "colore/sessione/grigio": "#c4c8ce",
+  "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/icona/viola": "#ad7bf9",
-  "colore/icona/successo": "#40c977",
   "colore/testo/lavoro": "#f2c14e",
   "colore/icona/errore": "#ff6764",
   "colore/fondo/bottone-secondario": "#ffffff0d",
@@ -1279,8 +1279,8 @@
    "senza": []
   },
   {
-   "id": "I101:34704;101:33578;101:33545",
-   "nome": "icona pr-bozza",
+   "id": "I101:34704;101:33578;101:33541",
+   "nome": "icona pr-aperta",
    "tipo": "INSTANCE",
    "box": {
     "x": 247,
@@ -1295,7 +1295,7 @@
    "senza": []
   },
   {
-   "id": "I101:34704;101:33578;101:33545;101:33483",
+   "id": "I101:34704;101:33578;101:33541;101:33470",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -1305,12 +1305,12 @@
     "h": 13.333984375
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/successo"
    },
    "senza": []
   },
   {
-   "id": "I101:34704;101:33578;101:33547",
+   "id": "I101:34704;101:33578;101:33543",
    "nome": "numero",
    "tipo": "TEXT",
    "box": {
@@ -1503,8 +1503,8 @@
    "senza": []
   },
   {
-   "id": "I101:34718;101:33592;101:33545",
-   "nome": "icona pr-bozza",
+   "id": "I101:34718;101:33592;101:33541",
+   "nome": "icona pr-aperta",
    "tipo": "INSTANCE",
    "box": {
     "x": 247,
@@ -1519,7 +1519,7 @@
    "senza": []
   },
   {
-   "id": "I101:34718;101:33592;101:33545;101:33483",
+   "id": "I101:34718;101:33592;101:33541;101:33470",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -1529,12 +1529,12 @@
     "h": 13.333984375
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/successo"
    },
    "senza": []
   },
   {
-   "id": "I101:34718;101:33592;101:33547",
+   "id": "I101:34718;101:33592;101:33543",
    "nome": "numero",
    "tipo": "TEXT",
    "box": {

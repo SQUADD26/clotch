@@ -41,7 +41,7 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
         </div>
       </div>
       <div className="azioni">
-        <BottoneIcona icona="pannello" etichetta="Pannello" onClick={n.alternaPannello} />
+        <BottoneIcona icona="pannello" etichetta="Pannello" aria-expanded={n.pannelloAperto && n.pannelloInfo} onClick={n.alternaPannello} />
         {/* «menu sessione» sotto il «…» (101:20859): le stesse voci della riga nella barra */}
         <div className="con-menu">
           <BottoneIcona icona="altro" etichetta="Altro" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((x) => !x)} />

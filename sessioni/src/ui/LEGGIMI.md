@@ -14,6 +14,8 @@ Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostaz
 | `friday` | `Intestazione`, `default` | al posto della chat quando la vista è `friday`, senza pannello |
 | `impostazioni` | `default` | tutto il corpo sotto la barra del titolo; usa `Superficie` da `base/Cornice` |
 
+Il bottone «Pannello» della chat gira: pannello dell'obiettivo -> «Info sessione» (schede Ambiente, Contesto, Connettori, Modifiche; bottone premuto, `pannelloInfo`) -> chiuso. Contesto usato e file toccati vengono dal main (`api().info(id)`, `src/info-sessione.ts`); madre, PR, connettori e versione dal file `local_*.json` dell'app (`Sessione.app`, `src/desktop.ts`). Le figlie stanno sotto la madre nella barra (`barra/figlie.ts`). Finché l'elenco non arriva la cornice mostra «Avvio» (`base/Avvio.tsx`); una sessione aperta da una vista di clotch AI porta «Torna a clotch AI» nella barra del titolo (`daFriday`).
+
 Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `friday`, `casella`, `decisioni`, `regole` (le quattro di Friday montano `friday/`), `impostazioni`.
 
 Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.

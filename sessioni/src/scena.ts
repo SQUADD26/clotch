@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./friday";
 import { piano } from "./friday-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, InfoSessione, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -13,9 +13,13 @@ export interface Scena {
   /** Vista di partenza, come `useNavigazione()`: vista, sessione scelta, sezione. */
   navigazione?: { vista: string; sessione?: string; sezione?: string };
   elenco?: Elenco;
+  /** «Avvio» (101:30345): l'elenco non arriva mai, la finestra resta sul logo. */
+  avvio?: boolean;
   /** Messaggi per id di sessione, in ordine di tempo. */
   messaggi?: Record<string, Messaggio[]>;
   preferenze?: Record<string, PreferenzeSessione>;
+  /** Contesto e file toccati per id di sessione (pannello «Info sessione»). */
+  info?: Record<string, InfoSessione>;
   impostazioni?: Record<string, unknown>;
   /** Impostazioni (#351): cartelle degli account come le dà il main, quote d'uso, archiviate, spazio, versione. */
   cartelle?: CartellaAccount[];
@@ -44,7 +48,7 @@ const cronologie = new WeakMap<Scena, ReturnType<typeof creaCronologiaScena>>();
 /** Risposta di un canale IPC dalla scena; i canali che scrivono non fanno niente. */
 export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknown {
   switch (canale) {
-    case "sessioni:elenco": return s.elenco ?? { sessioni: [], errori: [] };
+    case "sessioni:elenco": return s.avvio ? new Promise(() => {}) : s.elenco ?? { sessioni: [], errori: [] };
     case "sessioni:messaggi": {
       let cronologia = cronologie.get(s);
       if (!cronologia) {
@@ -54,6 +58,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
       return cronologia.pagina(String(args[0]), args[1] as number, args[2] as OpzioniCronologia | undefined);
     }
     case "sessioni:preferenze": return s.preferenze ?? {};
+    case "sessioni:info": return s.info?.[String(args[0])]; // senza `info` la scena non mostra file né contesto
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
     case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
@@ -71,7 +76,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
-  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
+  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
   "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",

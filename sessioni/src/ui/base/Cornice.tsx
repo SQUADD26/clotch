@@ -6,6 +6,7 @@ import Friday, { Intestazione as IntestazioneFriday } from "../friday";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
+import { Avvio, useAvvio } from "./Avvio";
 import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { Pezzo } from "./Pezzo";
@@ -57,11 +58,13 @@ function Corpo() {
 
 export function Cornice() {
   useAspetto();
+  const avvio = useAvvio();
   return (
     <ConNavigazione>
-      <div className="cornice">
+      <div className={`cornice ${avvio ? "in-avvio" : ""}`}>
         <BarraTitolo />
         <Corpo />
+        {avvio && <Avvio />}
       </div>
     </ConNavigazione>
   );

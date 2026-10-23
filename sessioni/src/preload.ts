@@ -26,6 +26,7 @@ const api: SessioniApi = {
   },
   cerca: (testo) => ipcRenderer.invoke("sessioni:cerca", testo),
   spazio: () => ipcRenderer.invoke("sessioni:spazio"),
+  info: (id) => ipcRenderer.invoke("sessioni:info", id),
   ricostruisci: () => ipcRenderer.invoke("sessioni:ricostruisci"),
   svuota: () => ipcRenderer.invoke("sessioni:svuota"),
 };

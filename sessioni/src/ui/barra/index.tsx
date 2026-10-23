@@ -10,6 +10,7 @@ import { registraAzione } from "../base/scorciatoie";
 import { useNavigazione } from "../base/navigazione";
 import { numero } from "../base/token";
 import { useApriSessione } from "./apri";
+import { conFiglie } from "./figlie";
 import { componi, dettaglioProfilo, opzioni, type Proprieta, type Vista } from "./elenco";
 import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
 import { RigheFriday, useRegistro } from "./Friday";
@@ -83,9 +84,12 @@ export default function Barra() {
   };
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
-  const righe = (lista: typeof sessioni, fissate = false) => lista.map((s) => (
+  const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
+  const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
+  const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
+      figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
       onApri={() => apriSessione(s.id)}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
       onFissa={() => void api().impostaPreferenze(s.id, { fissa: pref[s.id]?.fissa ? null : true })}

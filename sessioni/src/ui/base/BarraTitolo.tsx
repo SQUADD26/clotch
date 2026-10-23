@@ -6,6 +6,7 @@ import * as pannello from "../pannello";
 import { Attivita } from "./Attivita";
 import { BottoneIcona } from "./Bottone";
 import { Pezzo } from "./Pezzo";
+import { TornaAFriday } from "./TornaAFriday";
 import { useNavigazione } from "./navigazione";
 
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
@@ -26,6 +27,7 @@ export function BarraTitolo() {
         <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
         <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
       </div>
+      <TornaAFriday />
       {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
       {n.vista !== "impostazioni" && (
         <>
