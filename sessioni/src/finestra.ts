@@ -43,7 +43,10 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
   });
   if (silenziosa) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w);
-  if (anteprima) w.once("ready-to-show", () => w.showInactive());
+  if (anteprima) w.once("ready-to-show", () => {
+    w.showInactive();
+    console.log(`PREVIEW_READY internal=${screen.getDisplayMatching(w.getBounds()).internal} visible=${w.isVisible()} focused=${w.isFocused()} audioMuted=${w.webContents.isAudioMuted()}`);
+  });
   w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
   return w;
 }

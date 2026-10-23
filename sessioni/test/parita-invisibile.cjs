@@ -10,8 +10,8 @@ const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKi
 const external = { internal: false, workArea: { x: 0, y: 25, width: 2560, height: 1415 } };
 const internal = { internal: true, workArea: { x: -1512, y: 38, width: 1512, height: 907 } };
 function normalWindow(silent, displays = [external, internal], primary = external, options = {}) {
-  const calls = [], screenCalls = [];
-  let createdOptions, ready;
+  const calls = [], screenCalls = [], logs = [];
+  let createdOptions, ready, visible = false, muted = false;
   const output = {};
   const windowCode = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/finestra.ts'), 'utf8'),
     { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
@@ -19,15 +19,26 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     electron: { screen: {
       getAllDisplays() { screenCalls.push('all'); return displays; },
       getPrimaryDisplay() { screenCalls.push('primary'); return primary; },
+      getDisplayMatching(bounds) {
+        assert.equal(bounds.x, createdOptions.x);
+        assert.equal(bounds.y, createdOptions.y);
+        return displays.find(d => bounds.x >= d.workArea.x && bounds.x < d.workArea.x + d.workArea.width) ?? primary;
+      },
     }, BrowserWindow: class {
       constructor(options) {
         createdOptions = options;
         calls.push({ name: 'construct', show: options.show });
-        this.webContents = { setAudioMuted: value => calls.push({ name: 'mute', value }) };
+        this.webContents = {
+          setAudioMuted: value => { muted = value; calls.push({ name: 'mute', value }); },
+          isAudioMuted: () => muted,
+        };
       }
       loadFile() { calls.push({ name: 'load' }); }
       once(event, callback) { assert.equal(event, 'ready-to-show'); ready = callback; }
-      showInactive() { calls.push({ name: 'showInactive' }); }
+      showInactive() { visible = true; calls.push({ name: 'showInactive' }); }
+      getBounds() { return createdOptions; }
+      isVisible() { return visible; }
+      isFocused() { return false; }
       show() { assert.fail('show attivante non consentito'); }
       focus() { assert.fail('focus non consentito'); }
       hide() { assert.fail('hide tardivo non consentito'); }
@@ -38,7 +49,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     './modalita-prova': { provaSilenziosa: () => silent },
   };
   vm.runInNewContext(windowCode, {
-    exports: output, __dirname: path.join(__dirname, '../dist/src'),
+    exports: output, __dirname: path.join(__dirname, '../dist/src'), console: { log: line => logs.push(line) },
     require: name => {
       if (name === 'node:fs') return { ...fs, existsSync: () => true };
       if (name.startsWith('node:')) return require(name);
@@ -47,7 +58,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     },
   });
   output.apriFinestra(undefined, options);
-  return { calls, screenCalls, options: createdOptions, emitReady: () => ready?.() };
+  return { calls, screenCalls, logs, options: createdOptions, emitReady: () => ready?.() };
 }
 
 async function run(args, scene, initialEnv = {}) {
@@ -148,11 +159,13 @@ function notificationCalls(silent) {
   assert.equal(production.options.x, undefined);
   production.emitReady();
   assert.equal(production.calls.length, 2);
+  assert.deepEqual(production.logs, []);
   const hidden = normalWindow(true, [], external, { show: false });
   assert.deepEqual(hidden.calls, [{ name: 'construct', show: false }, { name: 'mute', value: true }, { name: 'load' }]);
   assert.deepEqual(hidden.screenCalls, []);
   hidden.emitReady();
   assert.equal(hidden.calls.length, 3, 'test show:false non viene mai mostrato');
+  assert.deepEqual(hidden.logs, []);
   const hiddenNormal = normalWindow(false, [], external, { show: false });
   hiddenNormal.emitReady();
   assert.deepEqual(hiddenNormal.calls, [{ name: 'construct', show: false }, { name: 'load' }]);
@@ -166,7 +179,7 @@ function notificationCalls(silent) {
   for (const [displays, primary, area] of [
     [[external, internal], external, internal.workArea],
     [[external], external, external.workArea],
-    [[], { workArea: { x: 80, y: -600, width: 640, height: 480 } }, { x: 80, y: -600, width: 640, height: 480 }],
+    [[], { internal: false, workArea: { x: 80, y: -600, width: 640, height: 480 } }, { x: 80, y: -600, width: 640, height: 480 }],
   ]) {
     const window = normalWindow(true, displays, primary);
     assert.deepEqual(window.calls, [{ name: 'construct', show: false }, { name: 'mute', value: true }, { name: 'load' }]);
@@ -175,8 +188,11 @@ function notificationCalls(silent) {
     window.emitReady();
     assert.deepEqual(window.calls.at(-1), { name: 'showInactive' });
     assert.equal(window.calls.length, 4, 'mute e caricamento precedono showInactive');
+    assert.equal(window.logs.length, 1, 'una sola riga di osservazione');
+    assert.equal(window.logs[0], `PREVIEW_READY internal=${displays.some(d => d.internal) ? true : primary.internal} visible=true focused=false audioMuted=true`);
   }
   console.log('PREVIEW_INTERNAL_ORDER_OK: interno, fallback e limiti prima del paint; mute/load/ready/showInactive; test nascosti preservati');
+  console.log('PREVIEW_READY_MARKER_OK: riga unica dopo showInactive; interno/fallback e stato finestra/audio misurati dai confini');
   console.log('WINDOW_AUDIO_ORDER_OK: mute prima loadFile solo in prova silenziosa; audio normale invariato');
   console.log('PARITA_MAIN_ISOLATION_OK: scena assente/rotta e argomento mancante falliscono senza servizi live; app normale invariata');
   assert.deepEqual(notificationCalls(false), ['supported', 'construct', 'show'], 'controllo positivo notifiche normali');
