@@ -1,0 +1,6 @@
+/* Impostazioni «Aspetto» (aspetto.ts): ridefiniscono solo variabili di Figma; Media e Normale sono i valori di token.css.
+   Mancano in Figma: colore Blu/Verde/Viola/Argento e carattere Arrotondato/Monospaziato (vedi rapporto #405). */
+:root[data-dimensione="piccola"] { --testo-dimensione-base: var(--testo-dimensione-sm); --testo-riga-base: var(--testo-riga-sm); --testo-riga-messaggio: var(--testo-riga-sm); }
+:root[data-dimensione="grande"] { --testo-dimensione-base: var(--testo-dimensione-lg); --testo-riga-base: var(--testo-riga-lg); --testo-riga-messaggio: var(--testo-riga-lg); }
+:root[data-densita="compatta"] { --misura-riga: var(--misura-bottone); }
+:root[data-densita="ariosa"] { --misura-riga: var(--spazio-10); }
