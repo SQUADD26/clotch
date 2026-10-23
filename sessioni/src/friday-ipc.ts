@@ -5,6 +5,7 @@ import { execFile } from "node:child_process";
 import type { IpcMain } from "electron";
 import { cartellaRegistro, Comando, leggiRegistro, Registro } from "./friday";
 import { inviaComando } from "./comandi";
+import { daLeggere, leggi } from "./voce-app";
 
 /** Il registro senza Map, per passare il ponte del preload. Nel renderer `daPiano` (ui/friday/registro.ts) rimette le Map. */
 export const piano = (r: Registro) => JSON.parse(JSON.stringify(r, (_k, v) => (v instanceof Map ? Object.fromEntries(v) : v)));
@@ -19,7 +20,16 @@ export function collegaFriday(ipc: IpcMain, invia: (canale: string, dati: unknow
   // shortcut: rilegge tutto il registro a ogni cambio (al massimo ogni 300 ms); se il mese diventa grande, leggere solo la coda nuova.
   const dir = cartellaRegistro(home, env);
   let attesa: NodeJS.Timeout | null = null;
-  const cambiato = () => { attesa ??= setTimeout(() => { attesa = null; invia("friday:registro", piano(leggiRegistro(home, env))); }, 300); };
+  let visti: Set<string> | null = null;
+  const aggiorna = () => {
+    const r = leggiRegistro(home, env);
+    const v = daLeggere(r, visti);
+    visti = v.visti;
+    v.testi.forEach(leggi);
+    invia("friday:registro", piano(r));
+  };
+  const cambiato = () => { attesa ??= setTimeout(() => { attesa = null; aggiorna(); }, 300); };
   const guarda = () => { try { fs.watch(dir, cambiato); } catch { setTimeout(guarda, 5000); } }; // cartella non ancora creata: riprova
   guarda();
+  aggiorna(); // segna gli avvisi già scritti come visti
 }
