@@ -12,7 +12,7 @@ import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
 import { RigheFriday, useRegistro } from "./Friday";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
-import { Ricerca } from "./Ricerca";
+import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { Piede, RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { accanto, type Punto } from "./Sovrapposti";
@@ -57,6 +57,7 @@ export default function Barra() {
     const tasto = (e: KeyboardEvent) => {
       if (e.metaKey && e.key.toLowerCase() === "k") { e.preventDefault(); setRicerca((x) => !x); }
       if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.friday.comando("archivia", { chat: n.sessione }); }
+      if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
     };
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
@@ -153,7 +154,7 @@ export default function Barra() {
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
       {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
       {ricerca && (
-        <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca}
+        <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
           onApri={(id) => n.apri("sessione", id)} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />
       )}
     </>
