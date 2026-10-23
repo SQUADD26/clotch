@@ -47,4 +47,8 @@ scrivi("49194", con(casella, {}));
 // 49592: uno script usa lo schermo da 42 s (pillola in barra); 49632: senza Clotch, la nota nel filo
 scrivi("49592", con(sessione, { clotch: CLOTCH, schermo: { da: -42_000 } }));
 scrivi("49632", con(sessione, {}));
-console.log("scene Clotch: 9 in design/scene");
+// 47850 e 47883: la domanda per te di 13896, con Clotch installato e senza
+const domanda = adesso(leggi("13896"));
+scrivi("47850", con(domanda, { clotch: CLOTCH }));
+scrivi("47883", con(domanda, {}));
+console.log("scene Clotch: 11 in design/scene");
