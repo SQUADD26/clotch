@@ -7,7 +7,7 @@ export const GRUPPI: Gruppo[] = [
   { titolo: "Navigazione", colonna: 0, righe: [
     { etichetta: "Cerca sessioni", azione: "cerca" }, { etichetta: "Prossima sessione in attesa", azione: "prossima" },
     { etichetta: "Sessione precedente", fisso: "⌃↑" }, { etichetta: "Sessione successiva", fisso: "⌃↓" },
-    { etichetta: "Mostra barra laterale", azione: "barra" }, { etichetta: "Trova nella sessione", fisso: "⌘F" },
+    { etichetta: "Mostra barra laterale", azione: "barra" }, { etichetta: "Trova nella sessione", azione: "trova" },
   ] },
   { titolo: "Generale", colonna: 0, righe: [
     { etichetta: "Apri impostazioni", azione: "impostazioni" }, { etichetta: "Mostra scorciatoie", fisso: "⌘/" },

@@ -71,8 +71,27 @@ app.whenReady().then(async () => {
 
     win.setSize(600, 1000); // 101:29770: sotto la bolla piena la casella è compatta
     await wait(() => !!document.querySelector('.corpo[data-compatta]'));
+    const mostrati = () => run(() => Object.fromEntries(['.chip .etichetta', '.chip .livello', '.contesto'].map((s) => { const e = document.querySelector('.casella ' + s); return [s, e ? getComputedStyle(e).display !== 'none' : null]; })));
+    const stretti = await mostrati();
+    assert.equal(stretti['.chip .etichetta'], false, '«Chiedi approvazione» nascosto nella casella compatta');
+    assert.equal(stretti['.chip .livello'], false, '«Medio» nascosto nella casella compatta');
+    assert.notEqual(stretti['.contesto'], true, 'il contesto non si vede nella casella compatta');
+    // 101:29770 e 101:29971: il testo dei dati si taglia dove finisce il suo posto, mai sotto i bottoni
+    const dati = () => run(() => { const d = document.querySelector('.intestazione .dati'), a = document.querySelector('.intestazione .azioni');
+      return { fine: d.getBoundingClientRect().right, bottoni: a.getBoundingClientRect().left, tagliato: d.scrollWidth > d.clientWidth, sotto: [...d.children].every((c) => c.getBoundingClientRect().left < d.getBoundingClientRect().right) }; });
+    for (const larghezza of [600, 480]) {
+      win.setSize(larghezza, 1000);
+      await wait(`() => Math.abs(window.innerWidth - ${larghezza}) < 2 && !!document.querySelector('.intestazione .dati')`);
+      const m = await dati();
+      assert.ok(m.fine <= m.bottoni, `${larghezza}: i dati finiscono prima dei bottoni (${m.fine} > ${m.bottoni})`);
+      assert.ok(m.tagliato, `${larghezza}: il testo dei dati è più lungo del suo posto e si taglia`);
+    }
+    win.setSize(600, 1000);
     win.setSize(768, 1000);
     await wait(() => !document.querySelector('.corpo[data-compatta]'));
+    const larghi = await mostrati();
+    assert.equal(larghi['.chip .etichetta'], true, 'larga: il testo dei chip c\'è');
+    assert.equal(larghi['.chip .livello'], true, 'larga: lo sforzo c\'è');
     win.setSize(1800, 1000); // tornati larghi: ognuno ha il suo stato, la barra è dov'era e il pannello pure
     await wait(() => !!document.querySelector('.barra-laterale') && !!document.querySelector('.pannello') && !document.querySelector('.pannello.sopra'));
     console.log('LAYOUT_COMPATTA_E_RITORNO_OK');

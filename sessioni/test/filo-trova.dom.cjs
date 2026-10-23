@@ -25,8 +25,12 @@ app.whenReady().then(async () => {
     { tipo: 'strumento', id: 'b2', nome: 'Bash', ingresso: { command: 'npm test' }, esito: { testo: righe, errore: false }, t: inizioOggi + 2 * MIN + 1000 },
     { tipo: 'assistente', testo: 'Altro controllo, poi basta', modello: null, t: inizioOggi + 3 * MIN },
   ];
+  scene.impostazioni = { scorciatoie: { cerca: '⌘K' } }; // file salvato prima di «trova»: ⌘F resta quello di partenza
   scene.registro = { chat: {}, fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] };
   collegaScena(ipcMain, scene);
+  const comandi = [];
+  ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push([cmd, args]); });
   const history = creaCronologiaScena((sid) => scene.messaggi[sid] ?? []);
   ipcMain.removeHandler('sessioni:messaggi');
   ipcMain.handle('sessioni:messaggi', (_e, sid, pagina, opzioni) => history.pagina(sid, pagina, opzioni));
@@ -77,11 +81,44 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => !document.querySelector('.trova') && !CSS.highlights.has('trova')), true);
     console.log('FILO_TROVA_OK');
 
+    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no
+    const tasto = (code, key) => run(`() => { dispatchEvent(new KeyboardEvent('keydown', { code: '${code}', key: '${key}', metaKey: true, bubbles: true, cancelable: true })); }`);
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘G' } });
+    await pausa(200);
+    await tasto('KeyF', 'f'); await pausa(150);
+    assert.equal(await run(() => !document.querySelector('.trova')), true, 'il vecchio tasto non apre più la barra');
+    await tasto('KeyG', 'g');
+    await ready('.trova input');
+    await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: null } });
+    await pausa(200);
+    await tasto('KeyG', 'g'); await pausa(150);
+    assert.equal(await run(() => !document.querySelector('.trova')), true, 'tolta: nessun tasto apre la barra');
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K' } });
+    await pausa(200);
+    await tasto('KeyF', 'f');
+    await ready('.trova input');
+    await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    console.log('FILO_TROVA_TASTO_OK');
+
     // testo scelto + clic destro: Copia, Seleziona tutto, Chiedi a clotch AI; senza testo scelto solo Seleziona tutto
+    // la pagina si comporta come se avesse il fuoco (:focus vale) senza prenderlo davvero: la finestra resta non attiva
+    win.webContents.debugger.attach('1.3');
+    await win.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: true });
+    win.webContents.sendInputEvent({ type: 'mouseDown', x: 700, y: 20, button: 'left', clickCount: 1 }); win.webContents.sendInputEvent({ type: 'mouseUp', x: 700, y: 20, button: 'left', clickCount: 1 });
+    await pausa(200);
     await run(() => { const t = document.querySelector('.filo .testo-risposta'); getSelection().selectAllChildren(t);
       t.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 300, clientY: 300 })); });
     await ready('.menu');
     assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce .etichetta')].map((e) => e.textContent)), ['Copia', 'Seleziona tutto', 'Chiedi a clotch AI']);
+    // la prima voce è evidenziata all'apertura (101:28635), anche dopo un clic vero del mouse: fondo di passaggio come quando si apre da tastiera
+    const colori = await run(() => { const [prima, seconda] = document.querySelectorAll('.menu .voce'); return { attiva: document.activeElement === prima,      prima: getComputedStyle(prima).backgroundColor, seconda: getComputedStyle(seconda).backgroundColor }; });
+    assert.equal(colori.attiva, true, 'il fuoco è sulla prima voce');
+    assert.notEqual(colori.prima, colori.seconda, 'la prima voce ha il fondo di passaggio, la seconda no');
+    await run(() => document.querySelectorAll('.menu .voce')[1].dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))); // il passaggio sposta l'evidenza
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce')].map((v) => getComputedStyle(v).backgroundColor !== 'rgba(0, 0, 0, 0)')), [false, true, false]);
+    await win.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: false });
+    win.webContents.debugger.detach();
     await run(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await pausa(100);
@@ -109,6 +146,19 @@ app.whenReady().then(async () => {
     await pausa(1200);
     assert.equal(await run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); }), true);
     console.log('FILO_NUOVI_MESSAGGI_OK');
+
+    // «Chiedi a clotch AI»: la citazione arriva nella casella di clotch AI e la vista si apre, senza inviare
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: id } });
+    await ready('.filo .testo-risposta');
+    const citato = await run(() => { const t = document.querySelector('.filo .testo-risposta'); getSelection().selectAllChildren(t);
+      t.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 300, clientY: 300 })); return getSelection().toString().trim(); });
+    await ready('.menu');
+    await run(() => [...document.querySelectorAll('.menu .voce')].find((v) => v.textContent.includes('Chiedi a clotch AI')).click());
+    await ready('textarea[aria-label="Chiedi a clotch AI"]');
+    assert.equal(await run(() => document.querySelector('textarea[aria-label="Chiedi a clotch AI"]').value), `«${citato}»\n`);
+    await pausa(150);
+    assert.deepEqual(comandi, [], 'la citazione non parte da sola');
+    console.log('FILO_CHIEDI_A_CLOTCH_AI_OK');
 
     assert.equal(win.isVisible(), false);
     assert.equal(win.isFocused(), false);

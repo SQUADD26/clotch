@@ -17,7 +17,7 @@ export const nuovaVersione = (avvio: string | null, adesso: string | null) => av
 
 interface Mondo { dir: string; riapri(): void; silenzioso: boolean }
 
-/** Il canale `impostazioni:aggiornamenti`. `false`: nessun controllo offerto (Info non mostra «Controlla aggiornamenti» finché non lo usa);
+/** Il canale `impostazioni:aggiornamenti`. `false`: niente da fare (nessun chiamante lo usa più);
  *  `true`: controlla e dice se c'è una versione nuova; `"installa"`: riapre l'app, `false` se non l'ha riaperta. */
 export function creaAggiornamenti({ dir, riapri, silenzioso }: Mondo) {
   const avvio = firmaApp(dir);

@@ -126,6 +126,19 @@ app.whenReady().then(async () => {
     finto.errore = null;
   });
 
+  await check('INFO: «Controlla aggiornamenti» usa lo stesso controllo del menu (avviso o dialogo)', async () => {
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'impostazioni', sezione: 'info' } });
+    const voce = async () => { await wait(() => !!document.querySelector('button[aria-label^="Versione"]')); await run(() => document.querySelector('button[aria-label^="Versione"]').click()); await clicca('[role=menu] .voce', 'Controlla aggiornamenti'); };
+    finto.nuova = false; finto.chiamate.length = 0;
+    await voce();
+    await wait(() => document.body.innerText.includes('Già aggiornato · versione 0.1.0'));
+    assert.deepEqual(finto.chiamate, [true]);
+    finto.nuova = true;
+    await voce();
+    await wait(() => !!document.querySelector('[role=dialog]'));
+    assert.equal(await dialogo(), 'Aggiornare clotch ora?');
+  });
+
   assert.equal(mostrate, 0, 'nessun evento show'); assert.equal(fuochi, 0, 'nessun evento focus');
   assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false); assert.equal(win.webContents.isAudioMuted(), true);
   console.log(`HIDDEN_WINDOW_OK shows=${mostrate} focus=${fuochi}`);

@@ -86,7 +86,7 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled }: Dati 
   if (!nome) return null;
   return (
     <ChipMenu aperto={aperto} onAperto={onAperto} lato="destra" etichetta="Modello e sforzo" disabled={disabled}
-      chip={<><span className="modello">{nome}</span><span>{sforzo.etichetta}</span><Icona nome="giu" /></>}>
+      chip={<><span className="modello">{nome}</span><span className="livello">{sforzo.etichetta}</span><Icona nome="giu" /></>}>
       <ListaScelta titolo="Modello" voci={MODELLI_MENU} scelto={modello} onScegli={(id) => { onAperto(false); imposta({ modello: id }); }} />
       <div className="separatore"><div className="linea" /></div>
       <div className="titolo-gruppo">Sforzo</div>
