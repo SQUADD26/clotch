@@ -20,11 +20,8 @@ app.whenReady().then(async () => {
   const scena = { navigazione: { vista: 'clotch-ai' }, elenco: { sessioni: [], errori: [] }, messaggi: {}, preferenze: {}, registro: registro() };
   collegaScena(ipcMain, scena);
   const comandi = [];
-  let interrotta = 0;
   ipcMain.removeHandler('clotch-ai:comando');
   ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
-  ipcMain.removeHandler('clotch-ai:interrompi-voce');
-  ipcMain.handle('clotch-ai:interrompi-voce', () => { interrotta++; });
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
   let mostrate = 0, focalizzate = 0;
@@ -58,25 +55,29 @@ app.whenReady().then(async () => {
     });
     await check('TI_ASCOLTA', async () => {
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA } }));
-      await wait(() => !!document.querySelector('.barra-voce.ascolta'));
+      await wait(() => !!document.querySelector('.casella-voce.ascolta'));
       assert.equal(await stato(), 'Ti ascolta');
-      assert.equal(await run(() => !!document.querySelector('.area-casella textarea')), false, 'la barra prende il posto della casella');
-      assert.equal(await run(() => !!document.querySelector('.barra-voce button')), false, 'Clotch non ha un comando per finire: nessun bottone finto');
-      assert.equal(await run(() => document.querySelectorAll('.barra-voce .barra').length), 8);
+      assert.equal(await run(() => !!document.querySelector('.area-casella textarea')), false, 'la casella voce prende il posto della casella');
+      assert.equal(await run(() => document.querySelectorAll('.casella-voce .barra').length), 8);
+      await run(() => document.querySelector('.casella-voce button').click()); // «Fine»: con Clotch è la stessa pressione di ⌥Spazio
+      await new Promise((ok) => setTimeout(ok, 200));
+      assert.equal(comandi.at(-1).cmd, 'clotch_dettatura');
     });
     await check('STA_PARLANDO_CLOTCH', async () => {
       await carica(registro({ clotch: { voce: 'accesa', parla: true, ascolta: false, t: ORA } }));
-      await wait(() => !!document.querySelector('.barra-voce.parla'));
+      await wait(() => !!document.querySelector('.casella-voce.parla'));
       assert.equal(await stato(), 'Sta parlando');
-      assert.equal(await run(() => !!document.querySelector('.barra-voce button')), false, 'la voce di Clotch non si ferma da qui');
+      await run(() => document.querySelector('.casella-voce button').click()); // «Interrompi»
+      await new Promise((ok) => setTimeout(ok, 200));
+      assert.equal(comandi.at(-1).cmd, 'clotch_interrompi_voce');
     });
     await check('STA_PARLANDO_APP_INTERROMPI', async () => {
-      await carica(registro(), { voce: true });
-      await wait(() => !!document.querySelector('.barra-voce.parla button'));
-      assert.equal(await testo('.barra-voce .testo'), 'clotch AI sta parlando');
-      await run(() => document.querySelector('.barra-voce.parla button').click());
+      await carica(registro({ voceApp: true }), { voce: true });
+      await wait(() => !!document.querySelector('.casella-voce.parla button'));
+      assert.equal(await testo('.casella-voce .testo'), 'clotch AI sta parlando');
+      await run(() => document.querySelector('.casella-voce.parla button').click());
       await new Promise((ok) => setTimeout(ok, 200));
-      assert.equal(interrotta, 1, 'Interrompi chiama il main');
+      assert.equal(comandi.at(-1).cmd, 'voce_ferma', 'Interrompi ferma il `say` dell\'app dal main');
     });
     await check('MICROFONO_NON_DISPONIBILE', async () => {
       await carica(registro({ impostazioni: { attiva: true, microfono: '', microfoni_disponibili: [], voci_disponibili: ['Italiana'] } }));

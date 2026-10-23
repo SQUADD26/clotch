@@ -14,9 +14,9 @@ export function PillolaClotch() {
 
 export function Clotch() {
   return (
-    <span className="pillola-clotch" title="Clotch collegato">
+    <span className="pillola-clotch" title="clotch AI collegato">
       <Icona nome="schermo" colore="successo" />
-      Clotch
+      clotch AI
     </span>
   );
 }

@@ -99,6 +99,7 @@ async function run(args, scene, initialEnv = {}) {
     './finestra': { apriFinestra: record('finestra-live'), parita: record('parita') },
     './clotch-ai-ipc': { collegaClotchAi: record('clotch-ai-live') },
     './impostazioni': { collegaImpostazioni: record('impostazioni-live') },
+    './info-sessione': { infoSessione() {} },
     './indice-ipc': { collegaIndice: () => { calls.push('indice-live'); return {}; } },
     './preferenze': { leggiImpostazioni: () => ({}) },
     './casella-ipc': { collegaCasella: record('casella-live') },

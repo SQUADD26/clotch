@@ -64,6 +64,7 @@ app.whenReady().then(async () => {
 
     await click('button[aria-label="Pannello"]'); // il bottone non resta muto: il pannello si apre sopra la colonna
     await wait(() => !!document.querySelector('.pannello.sopra'));
+    await click('button[aria-label="Pannello"]'); // il bottone gira (#437): obiettivo -> Info sessione -> chiuso
     await click('button[aria-label="Pannello"]');
     await wait(() => !document.querySelector('.pannello'));
     console.log('LAYOUT_PANNELLO_SOPRA_OK');

@@ -24,7 +24,7 @@ export function useVoce(): Voce {
 
 const errore = (messaggio: string) => avvisa({ tipo: "errore", messaggio });
 const segnala = (cmd: Parameters<ClotchAiApi["comando"]>[0]) =>
-  clotchAi().comando(cmd).then((e) => { if (e.esito !== "ok") errore(e.testo || "Clotch non raggiunto"); }, () => errore("Clotch non raggiunto"));
+  clotchAi().comando(cmd).then((e) => { if (e.esito !== "ok") errore(e.testo || "clotch AI non raggiunto"); }, () => errore("clotch AI non raggiunto"));
 
 type Riconoscitore = { lang: string; continuous: boolean; interimResults: boolean; start(): void; stop(): void; abort(): void;
   onresult: ((e: any) => void) | null; onerror: ((e: any) => void) | null; onend: (() => void) | null };

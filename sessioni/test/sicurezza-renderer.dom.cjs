@@ -109,7 +109,7 @@ app.whenReady().then(async () => {
       fn: (() => { try { return window.sessioni.elencoSessioni.constructor('return typeof process')(); } catch (e) { return 'bloccato'; } })() }));
     assert.deepEqual(r.nodo, ['undefined', 'undefined', 'undefined', 'undefined', 'undefined']);
     assert.notEqual(r.fn, 'object', 'il costruttore di Function non raggiunge Node');
-    assert.deepEqual(r.k, ['azione', 'cerca', 'comandi', 'elencoSessioni', 'file', 'impostaImpostazioni', 'impostaPreferenze', 'impostazioni', 'messaggi', 'onAggiornamento', 'onImpostazioni', 'onPreferenze', 'preferenze', 'ricostruisci', 'spazio', 'svuota']);
+    assert.deepEqual(r.k, ['azione', 'cerca', 'comandi', 'elencoSessioni', 'file', 'impostaImpostazioni', 'impostaPreferenze', 'impostazioni', 'info', 'messaggi', 'onAggiornamento', 'onImpostazioni', 'onPreferenze', 'preferenze', 'ricostruisci', 'spazio', 'svuota']);
     assert.deepEqual(r.f, ['avvia', 'comando', 'interrompiVoce', 'onRegistro', 'onVoce', 'registro', 'voce']);
     assert.deepEqual(r.i, ['apri', 'archiviate', 'aggiornamenti', 'avvio', 'cartelle', 'eliminaDati', 'novita', 'radici', 'scegliCartella', 'uso', 'versione'].sort());
   }, { consenti: /unsafe-eval|script-src/ });

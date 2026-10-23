@@ -87,6 +87,6 @@ test("filo: segnaposto e percorsi escono dal testo; il visore parte dall'immagin
     { tipo: "strumento", id: "t1", nome: "Screenshot", ingresso: { name: "pagina.png" }, esito: { testo: "", errore: false, immagini: [rif("riga-0002-b")] }, t: 2 },
   ];
   const v = voci(m, false);
-  assert.deepEqual(v[0], { tipo: "roberto", chiave: "0-1", testo: "Guarda", immagini: m[0].tipo === "utente" ? m[0].immagini : undefined, percorsi: ["/tmp/uno.png", "/tmp/due.ts"] });
+  assert.deepEqual(v[0], { tipo: "roberto", chiave: "0-1", testo: "Guarda", t: 1, immagini: m[0].tipo === "utente" ? m[0].immagini : undefined, percorsi: ["/tmp/uno.png", "/tmp/due.ts"] });
   assert.deepEqual(galleria(v, "s1").map((g) => g.nome), ["pagina.png", "uno.png", "Immagine 1"]);
 });
