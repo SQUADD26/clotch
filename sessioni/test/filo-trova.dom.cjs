@@ -27,6 +27,9 @@ app.whenReady().then(async () => {
   ];
   scene.registro = { chat: {}, fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] };
   collegaScena(ipcMain, scene);
+  const comandi = [];
+  ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push([cmd, args]); });
   const history = creaCronologiaScena((sid) => scene.messaggi[sid] ?? []);
   ipcMain.removeHandler('sessioni:messaggi');
   ipcMain.handle('sessioni:messaggi', (_e, sid, pagina, opzioni) => history.pagina(sid, pagina, opzioni));
@@ -109,6 +112,19 @@ app.whenReady().then(async () => {
     await pausa(1200);
     assert.equal(await run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); }), true);
     console.log('FILO_NUOVI_MESSAGGI_OK');
+
+    // «Chiedi a clotch AI»: la citazione arriva nella casella di clotch AI e la vista si apre, senza inviare
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: id } });
+    await ready('.filo .testo-risposta');
+    const citato = await run(() => { const t = document.querySelector('.filo .testo-risposta'); getSelection().selectAllChildren(t);
+      t.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 300, clientY: 300 })); return getSelection().toString().trim(); });
+    await ready('.menu');
+    await run(() => [...document.querySelectorAll('.menu .voce')].find((v) => v.textContent.includes('Chiedi a clotch AI')).click());
+    await ready('textarea[aria-label="Chiedi a clotch AI"]');
+    assert.equal(await run(() => document.querySelector('textarea[aria-label="Chiedi a clotch AI"]').value), `«${citato}»\n`);
+    await pausa(150);
+    assert.deepEqual(comandi, [], 'la citazione non parte da sola');
+    console.log('FILO_CHIEDI_A_CLOTCH_AI_OK');
 
     assert.equal(win.isVisible(), false);
     assert.equal(win.isFocused(), false);
