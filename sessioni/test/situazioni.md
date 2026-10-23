@@ -75,7 +75,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 30 | Chat Friday | Friday | `chat: friday`; Roberto scrive con il comando `parla`, Friday risponde con `avviso {motivo: risposta}` (diverso da `domanda`, che è una sessione che chiede a Roberto) | «Friday / Sempre attiva» (101:16432) | `parla`, `avviso` | contratto (comando) |
 | 31 | Non disturbare | Friday | comando `non_disturbare {acceso, minuti}` | «Non disturbare» acceso | comando | contratto |
 | 32 | Cursor: tutte | Cursor | nessuna trascrizione Cursor sul Mac | — | fuori v1 | attende dati veri |
-| 33 | App desktop «in corso» | App | il file vero **non ha `isRunning`** (chiavi viste: `completedTurns`, `latestUserFrameAt`, `interruptedAwaitingPerson`…): `desktop.ts` non lo vede mai | «In corso» | `battito` (Friday lo copre) | attende (difetto di #334: issue #340) |
+| 33 | App desktop «in corso» | App | il file vero **non ha `isRunning`**: turno aperto = `lastAssistantUuid` presente e `postTurnSummaryFor` diverso (l'app lo scrive solo a turno chiuso); archiviata = non in corso | «In corso» | `battito` (Friday lo copre) | letto (fixture `app/`, #340) |
 
 ## Clotch installato o assente
 
@@ -104,7 +104,7 @@ Roberto: «ci sono delle robe che devono passare per Clutch se uno installa anch
 
 ## Difetti trovati nella lettura dati di #334
 
-- `desktop.ts` legge `isRunning`, che i file veri non hanno: «in corso» dall'app non scatta mai (riga 33, issue #340).
+- (risolto, #340) `desktop.ts` leggeva `isRunning`, che i file veri non hanno; ora usa `lastAssistantUuid` / `postTurnSummaryFor` (riga 33).
 - I rollout Codex scrivono quasi tutto in `event_msg item_completed` (CommandExecution, FileChange, McpToolCall…): `ConvertitoreCodex` legge solo `response_item`, quindi nei messaggi mancano modifiche e ricerche (issue #341). La situazione le vede (`situazioneCodex`).
 
 ## Prove di collegamento dal vivo

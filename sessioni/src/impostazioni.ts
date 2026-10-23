@@ -7,14 +7,9 @@ import { app, dialog, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
-import { trovaRadici } from "./radici";
+import { quoteUso } from "./quote-uso";
+import { accorcia, espandi, trovaRadici } from "./radici";
 import type { CartellaAccount, Elenco } from "./tipi";
-
-/** `~/…` -> percorso assoluto, per aprire una cartella scritta come nel disegno. */
-export const espandi = (p: string, home = os.homedir()) => (p === "~" || p.startsWith("~/") ? path.join(home, p.slice(1)) : p);
-
-/** `/Users/x/.claude-y` -> `~/.claude-y`, come lo scrive il disegno. */
-export const accorcia = (p: string, home = os.homedir()) => (p === home ? "~" : p.startsWith(home + path.sep) ? "~" + p.slice(home.length) : p);
 
 /** Una riga per cartella: sessioni lette di quell'account, o il perché non si legge (testi del frame 101:10369). */
 export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAccount[] {
@@ -48,10 +43,11 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   ipc.handle("impostazioni:elimina-dati", () => {
     eliminaDati(indice, path.join(app.getPath("userData"), "preferenze.json"));
     invia("sessioni:impostazioni", {});
+    sessioni.impostazioni({});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  // nessuna fonte ancora: quote d'uso #374, archiviate #375
-  ipc.handle("impostazioni:uso", () => null);
+  ipc.handle("impostazioni:uso", () => quoteUso());
+  // nessuna fonte ancora: archiviate #375
   ipc.handle("impostazioni:archiviate", () => []);
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);

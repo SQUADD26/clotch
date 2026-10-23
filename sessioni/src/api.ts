@@ -7,10 +7,18 @@ import { Aggiornamento, Elenco, PaginaMessaggi } from "./tipi";
 
 export class Sessioni {
   private oss: Osservatore | null = null;
+  /** Impostazioni salvate che filtrano l'elenco (#404); finché non arrivano, niente filtro. */
+  private imp: Record<string, unknown> | undefined;
   constructor(private home = os.homedir()) {}
 
   elencoSessioni(): Elenco {
-    return this.oss ? this.oss.elenco : leggiElenco({ home: this.home });
+    return this.oss ? this.oss.elenco : leggiElenco({ home: this.home, impostazioni: this.imp });
+  }
+
+  /** Nuove impostazioni salvate: l'elenco si rifà subito e chi ascolta riceve le sessioni apparse o sparite. */
+  impostazioni(i: Record<string, unknown>) {
+    this.imp = i;
+    this.oss?.giro();
   }
 
   messaggi(id: string, pagina: number): PaginaMessaggi {
@@ -19,7 +27,7 @@ export class Sessioni {
   }
 
   osserva(cb: (a: Aggiornamento) => void) {
-    this.oss ??= new Osservatore(this.home, cb);
+    this.oss ??= new Osservatore(this.home, cb, process.env, 250, () => this.imp);
     this.oss.avvia();
   }
 }

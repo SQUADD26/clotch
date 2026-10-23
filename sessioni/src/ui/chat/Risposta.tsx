@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
 import { Menu } from "../base/Menu";
+import { useRiserva } from "./riserva";
 import "./filo.css";
 
 /** Il testo senza i segni del Markdown: titoli, grassetto, codice, link. */
@@ -11,7 +12,8 @@ export const senzaMarkdown = (t: string) => t
   .replace(/^#{1,6}\s+/gm, "").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 
 /** `sessione`: per «Mostra nel file della sessione»; `prova`: stato del frame 101:23727 (copiato e menu aperto). */
-export function Risposta({ testo, inScrittura, sessione, prova = false }: { testo: string; inScrittura: boolean; sessione?: string; prova?: boolean }) {
+export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }: { testo: string; inScrittura: boolean; sessione?: string; prova?: boolean }) {
+  const testo = useRiserva().testo(grezzo); // vale anche per «Copia»: dalla risposta non esce una chiave coperta
   const [copiato, setCopiato] = useState(prova);
   const [menu, setMenu] = useState(prova);
   const copia = (t: string) => navigator.clipboard.writeText(t).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); });

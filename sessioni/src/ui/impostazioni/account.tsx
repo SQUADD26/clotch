@@ -1,5 +1,6 @@
 // figma: 101-10369 — Impostazioni · Account; dopo «Rimuovi», con l'avviso «Cartella rimossa» e «Annulla»: 101-10461.
 import { useEffect, useState } from "react";
+import { percorsiAccount } from "../../account-percorsi";
 import type { CartellaAccount } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -17,7 +18,7 @@ function useCartelle(): CartellaAccount[] | null {
   const [giro, setGiro] = useState(0);
   useAggiornamenti(() => setGiro((g) => g + 1));
   useEffect(() => { window.impostazioni.radici().then(setRadici, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })); }, []);
-  const percorsi = radici && [...radici, ...v.accountAggiunti.filter((p) => !radici.includes(p))].filter((p) => !v.accountTolti.includes(p));
+  const percorsi = radici && percorsiAccount(radici, v.accountAggiunti, v.accountTolti);
   const chiave = percorsi?.join("\n");
   useEffect(() => {
     if (percorsi) window.impostazioni.cartelle(percorsi).then(setCartelle, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));

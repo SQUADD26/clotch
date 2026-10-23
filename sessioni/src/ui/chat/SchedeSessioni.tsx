@@ -10,6 +10,7 @@ import { IconaSessione } from "../base/IconaSessione";
 import { useNavigazione } from "../base/navigazione";
 import { SegnoStato } from "../base/SegnoStato";
 import { comanda, useOra } from "./friday";
+import { useRiserva } from "./riserva";
 import { SORGENTE, daQuanto, durata, provaDi } from "./testi";
 import "./schede.css";
 
@@ -29,6 +30,7 @@ export function SchedaSessione({ x, sospesa = false }: { x: Citata; sospesa?: bo
   const n = useNavigazione();
   const pref = usePreferenze().dati[x.s.id];
   const ora = useOra();
+  const ris = useRiserva();
   const { s, c } = x;
   const r = c?.richieste[0];
   const ultimo = c?.domanda ?? c?.dettaglio;
@@ -42,7 +44,7 @@ export function SchedaSessione({ x, sospesa = false }: { x: Citata; sospesa?: bo
       </div>
       <div className="stato"><Icona nome="mano" colore="accento" /><span>{stato(x, ora)}</span></div>
       <div className="dettagli">{[s.progetto, s.ramo, SORGENTE[s.sorgente]].filter(Boolean).join(" · ")}</div>
-      {ultimo && <div className="ultimo">Ultimo: «{ultimo}»</div>}
+      {ultimo && <div className="ultimo">Ultimo: «{ris.testo(ultimo)}»</div>}
       <div className="bottoni">
         <Bottone onClick={apri}>Apri sessione</Bottone>
         {r?.genere === "permesso"
