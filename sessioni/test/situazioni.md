@@ -24,7 +24,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 3d | Domanda dichiarata a fine turno | Friday | `stato {stato: serve_roberto, domanda}` | «In attesa di te» con la domanda | `stato serve_roberto` | contratto |
 | 4 | Piano da approvare | CLI, App | `tool_use ExitPlanMode` senza esito (`adesso: piano`) | «Piano, 4 passi», Approva / Modifica (101:14132) | `richiesta {genere: piano}`; comando `piano {esito: approva / modifica}` | fatto · `claude/piano-aperto` · contratto |
 | 4b | Piano approvato | CLI, App | `tool_result` di ExitPlanMode senza errore («User has approved your plan») | «Piano approvato» | `richiesta_chiusa {esito: approva}` | fatto · `claude/piano-approvato` |
-| 4c | Piano rifiutato | CLI, App | nessun esempio vero sul Mac (40 giorni, 9 radici) | «Modifica» | `richiesta_chiusa {esito: modifica}` | attende dati veri |
+| 4c | Piano rifiutato | CLI, App | `tool_result` di ExitPlanMode con `is_error`, `toolDenialKind: user-rejected`, poi «[Request interrupted by user for tool use]» (`adesso: interrotta`) | «Modifica» | `richiesta_chiusa {esito: modifica}` | fatto · `claude/piano-rifiutato` |
 | 5 | Aiutanti al lavoro | CLI, App | `tool_use Agent` aperto (`adesso: aiutanti`); file `subagents/agent-*.jsonl` | «3 aiutanti al lavoro» con nome, cosa fa, tempo (101:14396) | `aiutante {fase: inizio}` | fatto · `claude/aiutante-al-lavoro` · contratto |
 | 5b | Aiutante in background | CLI, App | esito «Async agent launched successfully» (segno `aiutanti`) | come sopra | `aiutante` | fatto · `claude/aiutante-in-background` |
 | 5c | Aiutanti finiti | Friday | `aiutante {fase: fine, esito}` | «3 aiutanti finiti» con esito (101:15335) | `aiutante` | contratto |
@@ -76,6 +76,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 31 | Non disturbare | Friday | comando `non_disturbare {acceso, minuti}` | «Non disturbare» acceso | comando | contratto |
 | 32 | Cursor: tutte | Cursor | nessuna trascrizione Cursor sul Mac | — | fuori v1 | attende dati veri |
 | 33 | App desktop «in corso» | App | il file vero **non ha `isRunning`**: turno aperto = `lastAssistantUuid` presente e `postTurnSummaryFor` diverso (l'app lo scrive solo a turno chiuso); archiviata = non in corso | «In corso» | `battito` (Friday lo copre) | letto (fixture `app/`, #340) |
+| 34 | Comando locale (/clear, /model) | CLI, App | riga user `<command-name>/…` e poi `<local-command-stdout>` (CLI) o `system local_command` (app): il comando risponde da sé, la sessione torna com'era (`/clear`: nessun turno, `sconosciuta`) | come prima del comando | — | fatto · `claude/comando-clear`, `claude/comando-modello`, `claude/modello-cambiato` |
 
 ## Clotch installato o assente
 

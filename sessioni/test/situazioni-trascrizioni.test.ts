@@ -32,6 +32,7 @@ const CLAUDE: [string, Atteso][] = [
   ["domanda-scaduta", { segni: ["domanda_scaduta"] }],
   ["piano-aperto", { adesso: "piano", strumento: "ExitPlanMode" }],
   ["piano-approvato", { adesso: "lavora", segni: ["piano_approvato"] }],
+  ["piano-rifiutato", { adesso: "interrotta", segni: ["rifiutata_da_te", "interrotta"] }],
   ["aiutante-al-lavoro", { adesso: "aiutanti", strumento: "Agent", segni: ["aiutanti"] }],
   ["aiutante-in-background", { adesso: "lavora", segni: ["aiutanti"] }],
   ["modifica-con-differenze", { segni: ["modifica"] }],
@@ -50,6 +51,9 @@ const CLAUDE: [string, Atteso][] = [
   ["interrotta-senza-strumento", { adesso: "interrotta", segni: ["interrotta"] }],
   ["errore-rete-riprova", { adesso: "riprova" }],
   ["compattazione", { segni: ["compattazione"] }],
+  ["comando-clear", { adesso: "sconosciuta" }], // /clear apre una sessione nuova: nessun turno, il comando non è lavoro
+  ["comando-modello", { adesso: "turno_finito" }], // /model a turno finito non lo riapre
+  ["modello-cambiato", { adesso: "lavora", strumento: "mcp__clean-view__plan_steps" }], // il prompt dopo /model, risposto dal modello nuovo
   ["sessione-figlia", { segni: ["figlia"] }],
   ["messaggio-da-altra-sessione", { segni: ["messaggio_sessione"] }],
 ];
@@ -113,9 +117,5 @@ test("sessione cancellata mentre la guardi: sparisce dall'elenco, nessun errore"
   assert.deepEqual(leggiElenco({ home, env: {}, ora: ORA }), { sessioni: [], errori: [] });
 });
 
-// Situazioni senza un esempio vero sul Mac (cercate su 40 giorni, 9 radici): restano in attesa, non finte.
-for (const s of [
-  "Claude: piano rifiutato (nessun esempio vero)",
-  "Claude: /clear e cambio di modello (nessun esempio vero)",
-  "Cursor: tutte le situazioni (nessuna trascrizione Cursor sul Mac)",
-]) test(`attende dati veri: ${s}`, { todo: true }, () => {});
+// Cursor: nessuna trascrizione vera sul Mac (~/.cursor/projects/*/agent-transcripts è vuota, niente app Cursor): resta in attesa, non finta.
+test("attende dati veri: Cursor, tutte le situazioni (nessuna trascrizione Cursor sul Mac)", { todo: true }, () => {});
