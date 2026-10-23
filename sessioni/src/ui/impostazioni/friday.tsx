@@ -6,7 +6,6 @@ import type { FridayApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { daPiano } from "../friday/registro";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
-import { FRIDAY_PROVA, inParita } from "./prova";
 
 declare global {
   interface Window { friday: FridayApi }
@@ -16,9 +15,8 @@ type Valori = Record<string, unknown>;
 
 /** Ultimo evento `impostazioni` di Friday, aggiornato dal vivo; null finché Friday non l'ha mai scritto. */
 function useImpostazioniFriday(): Valori | null {
-  const [v, setV] = useState<Valori | null>(inParita ? FRIDAY_PROVA : null);
+  const [v, setV] = useState<Valori | null>(null);
   useEffect(() => {
-    if (inParita) return;
     const prendi = (p: unknown) => setV(daPiano(p).impostazioni);
     window.friday.registro().then(prendi, () => {});
     return window.friday.onRegistro(prendi);
@@ -36,8 +34,7 @@ export default function Friday() {
   // cambi mandati e non ancora tornati nel registro: si vedono subito, se Friday rifiuta tornano com'erano
   const [inViaggio, setInViaggio] = useState<Valori>({});
   useEffect(() => {
-    if (inParita) return;
-    window.impostazioni.radici().then((r) => setAccount(r.map((x) => x.account.replace(/^\.claude-?/, "") || "claude")), () => {});
+    window.impostazioni.radici().then((r) => setAccount(r.map((p) => p.split("/").pop()!.replace(/^\.claude-?/, "") || "claude")), () => {});
   }, []);
   // un cambio arrivato nel registro non è più in viaggio
   useEffect(() => setInViaggio((x) => Object.fromEntries(Object.entries(x).filter(([k, val]) => letti?.[k] !== val))), [letti]);

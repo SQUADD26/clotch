@@ -17,6 +17,17 @@ const api: SessioniApi = {
     return () => ipcRenderer.removeListener("sessioni:preferenze", f);
   },
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
+  impostazioni: () => ipcRenderer.invoke("sessioni:impostazioni"),
+  impostaImpostazioni: (parte) => ipcRenderer.invoke("sessioni:imposta-impostazioni", parte),
+  onImpostazioni: (cb) => {
+    const f = (_e: unknown, i: Record<string, unknown>) => cb(i);
+    ipcRenderer.on("sessioni:impostazioni", f);
+    return () => ipcRenderer.removeListener("sessioni:impostazioni", f);
+  },
+  cerca: (testo) => ipcRenderer.invoke("sessioni:cerca", testo),
+  spazio: () => ipcRenderer.invoke("sessioni:spazio"),
+  ricostruisci: () => ipcRenderer.invoke("sessioni:ricostruisci"),
+  svuota: () => ipcRenderer.invoke("sessioni:svuota"),
 };
 contextBridge.exposeInMainWorld("sessioni", api);
 
@@ -33,11 +44,13 @@ const friday: FridayApi = {
 contextBridge.exposeInMainWorld("friday", friday);
 
 const impostazioni: ImpostazioniApi = {
-  leggi: () => ipcRenderer.invoke("impostazioni:leggi"),
-  scrivi: (parte) => ipcRenderer.invoke("impostazioni:scrivi", parte),
   radici: () => ipcRenderer.invoke("impostazioni:radici"),
+  cartelle: (percorsi) => ipcRenderer.invoke("impostazioni:cartelle", percorsi),
   scegliCartella: () => ipcRenderer.invoke("impostazioni:scegli-cartella"),
   apri: (percorso) => ipcRenderer.invoke("impostazioni:apri", percorso),
   versione: () => ipcRenderer.invoke("impostazioni:versione"),
+  avvio: (acceso) => ipcRenderer.invoke("impostazioni:avvio", acceso),
+  uso: () => ipcRenderer.invoke("impostazioni:uso"),
+  archiviate: () => ipcRenderer.invoke("impostazioni:archiviate"),
 };
 contextBridge.exposeInMainWorld("impostazioni", impostazioni);

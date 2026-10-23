@@ -1,10 +1,9 @@
-// «Clotch acceso?» si legge da un solo posto, pannello/clotch.ts (#350); nella prova vale lo stato del frame.
+// «Clotch acceso?» si legge da un solo posto, pannello/clotch.ts (#350); nella prova lo dà il registro della scena.
 import { useEffect, useState } from "react";
 import { clotchAcceso, suClotch } from "../pannello/clotch";
-import { prova } from "./prova";
 
 export function useClotchAcceso(): boolean {
-  const [acceso, setAcceso] = useState(() => prova?.clotch ?? clotchAcceso());
-  useEffect(() => (prova?.clotch === undefined ? suClotch(setAcceso) : undefined), []);
+  const [acceso, setAcceso] = useState(clotchAcceso);
+  useEffect(() => suClotch(setAcceso), []);
   return acceso;
 }

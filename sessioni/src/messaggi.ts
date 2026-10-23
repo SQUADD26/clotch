@@ -19,7 +19,7 @@ function converti(righe: string[], s: Pick<Sessione, "sorgente">): Messaggio[] {
 }
 
 export function leggiPagina(s: Pick<Sessione, "file" | "sorgente">, pagina: number, dim = DIM_PAGINA): PaginaMessaggi {
-  const vuota = (errore: string | null): PaginaMessaggi => ({ messaggi: [], pagina, haAltre: false, errore });
+  const vuota = (errore: string | null): PaginaMessaggi => ({ messaggi: [], pagina, haAltre: false, errore, totale: null });
   if (!s.file.endsWith(".jsonl")) return vuota("trascrizione non trovata sul disco");
   let size: number;
   try {
@@ -42,7 +42,7 @@ export function leggiPagina(s: Pick<Sessione, "file" | "sorgente">, pagina: numb
     }
     const fineSlice = messaggi.length - pagina * dim;
     const inizio = Math.max(0, fineSlice - dim);
-    return { messaggi: fineSlice > 0 ? messaggi.slice(inizio, fineSlice) : [], pagina, haAltre: inizio > 0 || da > 0, errore: null };
+    return { messaggi: fineSlice > 0 ? messaggi.slice(inizio, fineSlice) : [], pagina, haAltre: inizio > 0 || da > 0, errore: null, totale: null };
   } catch (e: any) {
     return vuota(msgErrore(e));
   }

@@ -1,14 +1,14 @@
 // figma: 101-32359 — Impostazioni · Sessioni archiviate; vuota: 101-32550.
-// shortcut: non c'è ancora un elenco delle archiviate né un comando per ripristinarle (BLOCCATO in #351): fuori dalla prova
-// la sezione mostra il vuoto disegnato.
-import { useState } from "react";
+// shortcut: il main non ha ancora l'elenco delle archiviate né il comando «ripristina» (#375): «Ripristina» resta spento.
+import { useEffect, useState } from "react";
+import type { Archiviata } from "../../tipi";
 import { Bottone } from "../base/Bottone";
 import { Campo } from "../base/Campo";
 import { Gruppo, Pagina, Riga, VuotoLista } from "./controlli";
-import { ARCHIVIATE_PROVA, inParita, prova } from "./prova";
 
 export default function Archiviate() {
-  const tutte = inParita && !prova?.archiviateVuote ? ARCHIVIATE_PROVA : [];
+  const [tutte, setTutte] = useState<Archiviata[]>([]);
+  useEffect(() => { window.impostazioni.archiviate().then(setTutte, () => {}); }, []);
   const [cerca, setCerca] = useState("");
   const viste = tutte.filter((s) => `${s.titolo} ${s.dove}`.toLowerCase().includes(cerca.trim().toLowerCase()));
   return (

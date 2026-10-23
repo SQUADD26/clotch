@@ -1,34 +1,28 @@
 // figma: 101-10369 — Impostazioni · Account; dopo «Rimuovi», con l'avviso «Cartella rimossa» e «Annulla»: 101-10461.
 import { useEffect, useState } from "react";
+import type { CartellaAccount } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
-import { messaggioErrore, useElenco } from "../base/dati";
+import { messaggioErrore, useAggiornamenti } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { Gruppo, Pagina } from "./controlli";
-import { ACCOUNT_PROVA, inParita, prova } from "./prova";
+import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
 
-interface Cartella { percorso: string; dettaglio: string; errore: boolean }
-
-/** Cartelle da leggere: quelle trovate dal main, più le aggiunte, meno le tolte; numeri ed errori dall'elenco. */
-function useCartelle(): Cartella[] | null {
+/** Cartelle da leggere: quelle trovate dal main, più le aggiunte, meno le tolte; numeri ed errori dal main. */
+function useCartelle(): CartellaAccount[] | null {
   const v = useImpostazioni();
-  const elenco = useElenco();
-  const [radici, setRadici] = useState<{ percorso: string; account: string }[] | null>(null);
+  const [radici, setRadici] = useState<string[] | null>(null);
+  const [cartelle, setCartelle] = useState<CartellaAccount[] | null>(null);
+  const [giro, setGiro] = useState(0);
+  useAggiornamenti(() => setGiro((g) => g + 1));
+  useEffect(() => { window.impostazioni.radici().then(setRadici, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })); }, []);
+  const percorsi = radici && [...radici, ...v.accountAggiunti.filter((p) => !radici.includes(p))].filter((p) => !v.accountTolti.includes(p));
+  const chiave = percorsi?.join("\n");
   useEffect(() => {
-    if (!inParita) window.impostazioni.radici().then(setRadici, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
-  }, []);
-  if (inParita) return ACCOUNT_PROVA.filter((c) => !(prova?.dopoRimuovi && c.percorso === "~/.claude-friday"));
-  if (!radici || elenco.stato === "carica") return null;
-  const percorsi = [...radici.map((r) => r.percorso), ...v.accountAggiunti.filter((p) => !radici.some((r) => r.percorso === p))]
-    .filter((p) => !v.accountTolti.includes(p));
-  return percorsi.map((percorso) => {
-    const account = percorso.split("/").pop()!;
-    const err = elenco.dati?.errori.find((e) => e.percorso.split("/").includes(account));
-    if (err) return { percorso, dettaglio: `Non leggibile: ${err.messaggio}`, errore: true };
-    const n = elenco.dati?.sessioni.filter((s) => s.sorgente === "claude-code" && s.account === account).length ?? 0;
-    return { percorso, dettaglio: `${n} sessioni · letta ora`, errore: false };
-  });
+    if (percorsi) window.impostazioni.cartelle(percorsi).then(setCartelle, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
+  }, [chiave, giro]);
+  return cartelle;
 }
 
 function rimuovi(percorso: string, tolti: string[]) {

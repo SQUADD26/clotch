@@ -74,6 +74,8 @@ export interface PaginaMessaggi {
   pagina: number;
   haAltre: boolean;
   errore: string | null;
+  /** Messaggi di tutta la sessione, dall'indice di ricerca quando la conosce già; altrimenti null. */
+  totale: number | null;
 }
 
 export interface Aggiornamento {
@@ -92,6 +94,28 @@ export interface SessioniApi {
   impostaPreferenze(id: string, parte: { [K in keyof PreferenzeSessione]?: PreferenzeSessione[K] | null }): Promise<void>;
   onPreferenze(cb: (p: Record<string, PreferenzeSessione>) => void): () => void;
   azione(id: string, azione: AzioneSessione): Promise<void>;
+  /** Impostazioni dell'app (#368), nello stesso file delle preferenze: `imposta` unisce (null toglie), `on` riceve il nuovo insieme. */
+  impostazioni(): Promise<Record<string, unknown>>;
+  impostaImpostazioni(parte: Record<string, unknown>): Promise<void>;
+  onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
+  /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
+  cerca(testo: string): Promise<RisultatoRicerca[]>;
+  /** Byte su disco dell'indice e delle cache dell'app. */
+  spazio(): Promise<{ indice: number; messaggi: number; immagini: number }>;
+  /** Rifà l'indice da capo; si risolve quando ha finito. */
+  ricostruisci(): Promise<void>;
+  /** Toglie l'indice e le cache dal disco. */
+  svuota(): Promise<void>;
+}
+
+/** Una sessione trovata: l'ultimo messaggio che contiene il testo (`frammento` intorno al punto), o il titolo se nessuno. */
+export interface RisultatoRicerca {
+  id: string;
+  titolo: string;
+  frammento: string;
+  /** Tempo del messaggio trovato; null se trovata solo nel titolo o se la sorgente non lo dà. */
+  t: number | null;
+  nelTitolo: boolean;
 }
 
 export interface PreferenzeSessione {
@@ -103,7 +127,7 @@ export interface PreferenzeSessione {
   nonLetta?: boolean;
 }
 
-export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder";
+export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale";
 
 /** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
 export interface FridayApi {
@@ -115,12 +139,38 @@ export interface FridayApi {
   avvia(): Promise<{ ok: boolean; testo: string }>;
 }
 
-/** `window.impostazioni` (#351): impostazioni dell'app in userData (src/impostazioni.ts). Quelle di Friday passano da `window.friday`. */
+/** Impostazioni dell'app (#351) nel file delle preferenze (`SessioniApi.impostazioni`); i valori di partenza sono quelli del disegno. */
+export interface ImpostazioniApp {
+  apriAllAvvio: boolean; barraDeiMenu: boolean; lingua: string; modello: string; apriSessione: string; cartellaRegistro: string;
+  colore: string; carattere: string; dimensione: string; densita: string; pannelloAperto: boolean; iconeSessioni: boolean;
+  avvisoAttesa: boolean; avvisoFinita: boolean; avvisoErrori: boolean; avvisoLimite: boolean; suono: string; silenzio: string;
+  sorgenteClaudeCode: boolean; sorgenteClaude: boolean; sorgenteCodex: boolean; sorgenteCursor: boolean;
+  /** Cartelle ~/.claude-* tolte o aggiunte a mano, oltre a quelle trovate dal main. */
+  accountTolti: string[]; accountAggiunti: string[];
+  comandiInteri: boolean; nascondiChiavi: boolean; cartelleEscluse: string[]; cronologia: string;
+  aggiornamentiAutomatici: boolean;
+  clotchVoce: boolean; clotchDettatura: boolean; clotchAvvisi: boolean; clotchObiettivi: boolean;
+  /** Tasti per azione; null = scorciatoia tolta. */
+  scorciatoie: Record<string, string | null>;
+}
+
+export interface CartellaAccount { percorso: string; dettaglio: string; errore: boolean }
+export interface QuotaUso { account: string; usato: number; ripartenza: string }
+export interface Archiviata { titolo: string; dove: string }
+
+/** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
 export interface ImpostazioniApi {
-  leggi(): Promise<Record<string, unknown>>;
-  scrivi(parte: Record<string, unknown>): Promise<Record<string, unknown>>;
-  radici(): Promise<{ percorso: string; account: string }[]>;
+  /** Cartelle ~/.claude* trovate nella home. */
+  radici(): Promise<string[]>;
+  /** Una riga per cartella, con le sessioni lette o l'errore. */
+  cartelle(percorsi: string[]): Promise<CartellaAccount[]>;
   scegliCartella(): Promise<string | null>;
   apri(percorso: string): Promise<void>;
   versione(): Promise<string>;
+  /** «Apri all'avvio del Mac»: voce degli elementi di login. */
+  avvio(acceso: boolean): Promise<void>;
+  /** Quote d'uso per account; null finché non c'è una fonte (#374). */
+  uso(): Promise<QuotaUso[] | null>;
+  /** Sessioni archiviate (#375). */
+  archiviate(): Promise<Archiviata[]>;
 }

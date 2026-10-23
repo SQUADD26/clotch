@@ -15,7 +15,7 @@ export class Sessioni {
 
   messaggi(id: string, pagina: number): PaginaMessaggi {
     const s = this.elencoSessioni().sessioni.find((x) => x.id === id);
-    return s ? leggiPagina(s, pagina) : { messaggi: [], pagina, haAltre: false, errore: "sessione non trovata" };
+    return s ? leggiPagina(s, pagina) : { messaggi: [], pagina, haAltre: false, errore: "sessione non trovata", totale: null };
   }
 
   osserva(cb: (a: Aggiornamento) => void) {

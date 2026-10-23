@@ -1,9 +1,10 @@
 // figma: 101-48825 — Impostazioni · Uso con Clotch (dati dal notch); senza Clotch: 101-48888.
-// shortcut: nessuna fonte delle quote d'uso nel main né nel registro (BLOCCATO in #351): fuori dalla prova il gruppo non c'è.
+// shortcut: il main non ha ancora una fonte delle quote d'uso (#374): finché `uso()` torna null il gruppo non c'è.
+import { useEffect, useState } from "react";
+import type { QuotaUso } from "../../tipi";
 import { Icona } from "../base/Icona";
 import { useClotchAcceso } from "./clotch-acceso";
 import { Gruppo, Pagina } from "./controlli";
-import { inParita, USO_PROVA } from "./prova";
 
 const NOTA = {
   con: "Dati dal notch, aggiornati 1 min fa. Clotch avvisa a voce all’80% e al 90%.",
@@ -12,7 +13,8 @@ const NOTA = {
 
 export default function Uso() {
   const clotch = useClotchAcceso();
-  const quote = inParita ? USO_PROVA : null;
+  const [quote, setQuote] = useState<QuotaUso[] | null>(null);
+  useEffect(() => { window.impostazioni.uso().then(setQuote, () => {}); }, []);
   return (
     <Pagina titolo="Uso">
       <div className="schede" role="tablist">
