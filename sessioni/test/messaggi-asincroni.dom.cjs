@@ -1,5 +1,6 @@
 // Hook reale montato con React/Electron; IPC differito, nessun dato del Mac.
 const { app, BrowserWindow, ipcMain } = require('electron');
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -32,7 +33,18 @@ app.whenReady().then(async () => {
     await build({ root, configFile: false, logLevel: 'error', define: { 'process.env.NODE_ENV': '"production"' }, build: { outDir: path.join(temp, 'out'),
       lib: { entry, name: 'Probe', formats: ['iife'], fileName: () => 'probe.js' } } });
     fs.writeFileSync(path.join(temp, 'index.html'), '<div id="root"></div><script src="out/probe.js"></script>');
-    win = new BrowserWindow({ show: false, webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+    win = new BrowserWindow({ show: false, focusable: false, webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+    let showEvents = 0, focusEvents = 0;
+    win.on('show', () => showEvents++);
+    win.on('focus', () => focusEvents++);
+    win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+    const hidden = () => {
+      assert.equal(win.isVisible(), false, 'finestra mai visibile');
+      assert.equal(win.isFocused(), false, 'finestra mai attiva');
+      assert.equal(showEvents, 0, 'nessun evento show');
+      assert.equal(focusEvents, 0, 'nessun evento focus');
+    };
+    hidden();
     win.webContents.on('console-message', (details) => { if (details.level === 'error') console.error(details.message); });
     const run = (code) => win.webContents.executeJavaScript(code);
     const requests = (n) => wait(() => pending.length >= n, n + ' richieste IPC');
@@ -89,6 +101,7 @@ app.whenReady().then(async () => {
     assert.equal(await text(), 'D ripresa');
     console.log('ASYNC_ERROR_RETRY_OK');
     console.log('ASYNC_CHAT_ISOLATION_OK');
+    hidden(); console.log('HIDDEN_WINDOW_OK shows=0 focus=0');
     win.destroy(); fs.rmSync(temp, { recursive: true, force: true }); app.exit(0);
   } catch (error) {
     console.error(error); if (win) win.destroy(); fs.rmSync(temp, { recursive: true, force: true }); app.exit(1);

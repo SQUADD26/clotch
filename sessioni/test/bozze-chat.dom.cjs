@@ -1,5 +1,6 @@
 // Renderer reale con IPC intercettato: nessun dato o comando reale.
 const { app, BrowserWindow, ipcMain } = require('electron');
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
@@ -22,8 +23,19 @@ app.whenReady().then(async () => {
     commands.push({ cmd, args });
     return new Promise((resolve) => { pending = (esito = 'ok') => { pending = null; resolve({ esito }); }; });
   });
-  const win = new BrowserWindow({ show: false, width: 1440, height: 1000,
+  const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+  let showEvents = 0, focusEvents = 0;
+  win.on('show', () => showEvents++);
+  win.on('focus', () => focusEvents++);
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  const hidden = () => {
+    assert.equal(win.isVisible(), false, 'finestra mai visibile');
+    assert.equal(win.isFocused(), false, 'finestra mai attiva');
+    assert.equal(showEvents, 0, 'nessun evento show');
+    assert.equal(focusEvents, 0, 'nessun evento focus');
+  };
+  hidden();
   const run = (fn, ...args) => win.webContents.executeJavaScript(`(${fn})(...${JSON.stringify(args)})`);
   const wait = (fn) => win.webContents.executeJavaScript(`new Promise((resolve, reject) => {
     const end = Date.now() + 5000;
@@ -105,6 +117,7 @@ app.whenReady().then(async () => {
       await select('Bozza B'); assert.equal(await value(), 'Altro testo B uno');
     });
     assert.deepEqual(failures, []);
+    hidden(); console.log('HIDDEN_WINDOW_OK shows=0 focus=0');
     console.log('DRAFT_ISOLATION_OK'); app.exit(0);
   } catch (error) { console.error(error); app.exit(1); }
 });
