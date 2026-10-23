@@ -46,6 +46,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
   "colore/icona/errore": "#ff6764",
@@ -377,7 +378,22 @@
    "senza": []
   },
   {
-   "id": "101:42005",
+   "id": "117:54645",
+   "nome": "comandi barra laterale",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 108,
+    "w": 250,
+    "h": 202
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:54645;117:51476",
    "nome": "comando cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -396,7 +412,7 @@
    "senza": []
   },
   {
-   "id": "I101:42005;101:7172",
+   "id": "I117:54645;117:51476;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -412,7 +428,7 @@
    "senza": []
   },
   {
-   "id": "I101:42005;101:7172;101:6869",
+   "id": "I117:54645;117:51476;101:7172;101:6869",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -427,7 +443,7 @@
    "senza": []
   },
   {
-   "id": "I101:42005;101:7174",
+   "id": "I117:54645;117:51476;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -446,7 +462,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:42005;101:7175",
+   "id": "I117:54645;117:51476;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -465,7 +481,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:42006",
+   "id": "I117:54645;117:51481",
    "nome": "comando filtra",
    "tipo": "INSTANCE",
    "box": {
@@ -484,7 +500,7 @@
    "senza": []
   },
   {
-   "id": "I101:42006;101:7172",
+   "id": "I117:54645;117:51481;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -500,7 +516,7 @@
    "senza": []
   },
   {
-   "id": "I101:42006;101:7172;101:6874",
+   "id": "I117:54645;117:51481;101:7172;101:6874",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -515,13 +531,13 @@
    "senza": []
   },
   {
-   "id": "I101:42006;101:7174",
+   "id": "I117:54645;117:51481;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 104,
     "y": 148,
-    "w": 210,
+    "w": 202,
     "h": 20
    },
    "variabili": {
@@ -534,7 +550,26 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:42007",
+   "id": "I117:54645;117:51481;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 149,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:54645;117:51486",
    "nome": "riga Friday",
    "tipo": "INSTANCE",
    "box": {
@@ -554,7 +589,7 @@
    "senza": []
   },
   {
-   "id": "I101:42007;101:13549",
+   "id": "I117:54645;117:51486;101:13549",
    "nome": "icona scintille",
    "tipo": "INSTANCE",
    "box": {
@@ -570,7 +605,7 @@
    "senza": []
   },
   {
-   "id": "I101:42007;101:13549;101:11153",
+   "id": "I117:54645;117:51486;101:13549;101:11153",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -585,7 +620,7 @@
    "senza": []
   },
   {
-   "id": "I101:42007;101:13548",
+   "id": "I117:54645;117:51486;101:13548",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
@@ -604,7 +639,7 @@
    "font": "SF Pro Medium"
   },
   {
-   "id": "I101:42007;101:13551",
+   "id": "I117:54645;117:51486;101:13551",
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
@@ -623,7 +658,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:42067",
+   "id": "I117:54645;117:51495",
    "nome": "voce Casella",
    "tipo": "INSTANCE",
    "box": {
@@ -642,7 +677,7 @@
    "senza": []
   },
   {
-   "id": "I101:42067;101:7172",
+   "id": "I117:54645;117:51495;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -658,7 +693,7 @@
    "senza": []
   },
   {
-   "id": "I101:42067;101:7172;101:11094",
+   "id": "I117:54645;117:51495;101:7172;101:11094",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -673,7 +708,7 @@
    "senza": []
   },
   {
-   "id": "I101:42067;101:7174",
+   "id": "I117:54645;117:51495;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -692,7 +727,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:42067;101:7175",
+   "id": "I117:54645;117:51495;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -711,7 +746,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:42072",
+   "id": "I117:54645;117:51500",
    "nome": "voce Decisioni",
    "tipo": "INSTANCE",
    "box": {
@@ -730,7 +765,7 @@
    "senza": []
   },
   {
-   "id": "I101:42072;101:7172",
+   "id": "I117:54645;117:51500;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -746,7 +781,7 @@
    "senza": []
   },
   {
-   "id": "I101:42072;101:7172;101:11183",
+   "id": "I117:54645;117:51500;101:7172;101:11183",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -761,7 +796,7 @@
    "senza": []
   },
   {
-   "id": "I101:42072;101:7174",
+   "id": "I117:54645;117:51500;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -780,7 +815,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:42072;101:7175",
+   "id": "I117:54645;117:51500;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -799,7 +834,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:42077",
+   "id": "I117:54645;117:51505",
    "nome": "voce Regole",
    "tipo": "INSTANCE",
    "box": {
@@ -818,7 +853,7 @@
    "senza": []
   },
   {
-   "id": "I101:42077;101:7172",
+   "id": "I117:54645;117:51505;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -834,7 +869,7 @@
    "senza": []
   },
   {
-   "id": "I101:42077;101:7172;101:11137",
+   "id": "I117:54645;117:51505;101:7172;101:11137",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -849,7 +884,7 @@
    "senza": []
   },
   {
-   "id": "I101:42077;101:7174",
+   "id": "I117:54645;117:51505;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -868,7 +903,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:42077;101:7175",
+   "id": "I117:54645;117:51505;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -1967,7 +2002,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 293.32177734375,
-    "y": 922.66796875,
+    "y": 922.6640625,
     "w": 13.356658935546875,
     "h": 14.6669921875
    },
@@ -2005,11 +2040,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:42022",
@@ -2705,7 +2739,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 539.66650390625,
-    "y": 671.66796875,
+    "y": 671.6640625,
     "w": 14.6669921875,
     "h": 14.6669921875
    },
@@ -2758,7 +2792,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 545.66650390625,
-    "y": 737.66796875,
+    "y": 737.6640625,
     "w": 14.6669921875,
     "h": 14.6669921875
    },
@@ -2893,11 +2927,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:42030;101:7391",
@@ -2987,7 +3020,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 554.66650390625,
-    "y": 906.66796875,
+    "y": 906.6640625,
     "w": 10.6669921875,
     "h": 10.6669921875
    },
@@ -3037,7 +3070,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 590.59619140625,
-    "y": 904.66796875,
+    "y": 904.6640625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
    },
@@ -3087,7 +3120,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 742.3330078125,
-    "y": 909.33203125,
+    "y": 909.3359375,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -3257,7 +3290,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1183.3330078125,
-    "y": 909.33203125,
+    "y": 909.3359375,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -3305,7 +3338,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1220.66650390625,
-    "y": 904.66796875,
+    "y": 904.6640625,
     "w": 10.6669921875,
     "h": 14.667318344116211
    },
@@ -3354,7 +3387,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 1258.66650390625,
-    "y": 906.66796875,
+    "y": 906.6640625,
     "w": 10.666565895080566,
     "h": 10.6669921875
    },
