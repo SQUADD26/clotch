@@ -41,6 +41,6 @@ node $P token design/figma/101-8036.json design/tokens.json $(grep -rl "figma:" 
 node $P immagine design/figma/101-8036.png design/app/101-8036.png --soglia 0.08
 ```
 
-Scena di prova: `design/scene/<node-id>.json` = `{ navigazione?: { vista, sessione?, sezione? }, elenco?, messaggi?: { <id sessione>: [...] }, preferenze?, registro? }` (tipo `Scena` in `src/scena.ts`). Se c'è, in parità il main risponde coi suoi dati al posto di quelli del Mac e la finestra parte da quella vista. Un file per frame; un canale nuovo del main aggiunge la sua chiave in `src/scena.ts`.
+Scena di prova: `design/scene/<node-id>.json` = `{ navigazione?: { vista, sessione?, sezione? }, elenco?, messaggi?: { <id sessione>: [...] }, preferenze?, registro? }` (tipo `Scena` in `src/scena.ts`). Se c'è, in parità il main risponde coi suoi dati al posto di quelli del Mac e la finestra parte da quella vista. Un file per frame; un canale nuovo del main aggiunge la sua chiave in `src/scena.ts`. Un frame che non è una finestra (foglio di stati di un pezzo): il pezzo esporta `scene: { "<node-id>": () => <... /> }` dal suo `index.tsx` e la parità disegna quella al posto della cornice, sul fondo del riquadro.
 
 `npm run parita -- <node-id>` disegna la pagina a scala 1 alla misura del frame `design/figma/<node-id>.json` e salva `design/app/<node-id>.png`. Il frame si legge prima con `leggi-frame.js` e il suo PNG si esporta da Figma a scala 1 (skill `figma-ui-design`). Per la sola cornice: `design/figma/101-8036-cornice.png` e `101-8610-cornice.png` (frame con i pezzi nascosti).
