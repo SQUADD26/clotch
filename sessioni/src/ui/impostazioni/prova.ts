@@ -13,6 +13,8 @@ export interface Prova {
   novita?: boolean;
   /** Uso: la scheda scelta (119:57613). */
   scheda?: "andamento";
+  /** Il testo già scritto nel campo «Cerca» (119:57161 «voce», 119:57301 «tema»). */
+  cerca?: string;
 }
 
 const PROVE: Record<string, Prova> = {
@@ -32,6 +34,8 @@ const PROVE: Record<string, Prova> = {
   "119-57404": { aperta: "Versione" },
   "119-57552": { novita: true },
   "119-57613": { scheda: "andamento" },
+  "119-57161": { cerca: "voce" },
+  "119-57301": { cerca: "tema" },
 };
 
 const id = new URLSearchParams(location.search).get("parita");
