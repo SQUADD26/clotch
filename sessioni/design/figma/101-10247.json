@@ -1,0 +1,931 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:10247",
+  "nome": "Finestra ricerca",
+  "w": 640,
+  "h": 428,
+  "dentro": "101:10297"
+ },
+ "variabili": {
+  "raggio/md": 10,
+  "spazio/2": 8,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "spazio/0-5": 2,
+  "misura/riga": 32,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/base": 14,
+  "testo/riga/base": 20,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "spazio/3": 12,
+  "colore/sessione/grigio": "#c4c8ce",
+  "colore/bordo/leggero": "#ffffff0b",
+  "spazio/4": 16,
+  "misura/intestazione": 56,
+  "raggio/2xl": 20,
+  "colore/fondo/elevato": "#2d2d2d",
+  "misura/dialogo-ricerca": 640,
+  "testo/dimensione/lg": 16,
+  "testo/riga/lg": 24,
+  "colore/fondo/riga-scelta": "#ffffff14"
+ },
+ "nodi": [
+  {
+   "id": "101:10247",
+   "nome": "Finestra ricerca",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 428
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/2xl",
+    "width": "misura/dialogo-ricerca"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:10248",
+   "nome": "campo ricerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 56
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/leggero",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "height": "misura/intestazione"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10248;101:7540",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 19.5,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10248;101:7540;101:6869",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 17.3330078125,
+    "y": 20.8330078125,
+    "w": 13.333462715148926,
+    "h": 13.333462715148926
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10248;101:7542",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 44,
+    "y": 15.5,
+    "w": 548,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "lettura",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10248;101:7543",
+   "nome": "tasto",
+   "tipo": "TEXT",
+   "box": {
+    "x": 604,
+    "y": 19.5,
+    "w": 20,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "esc",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10253",
+   "nome": "risultati",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 56,
+    "w": 640,
+    "h": 372
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:10254",
+   "nome": "titolo sezione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 64,
+    "w": 624,
+    "h": 32
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10254;101:7170",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 71,
+    "w": 608,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sessioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10256",
+   "nome": "risultato",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 98,
+    "w": 624,
+    "h": 56
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10256;101:11399",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 118,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10256;101:11399;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 118,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10256;101:11399;101:11203;101:11147",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 20.66650390625,
+    "y": 118.666015625,
+    "w": 14.678117752075195,
+    "h": 14.661109924316406
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10256;101:7553",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 48,
+    "y": 106,
+    "w": 533,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10256;101:7557",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 106,
+    "w": 533,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Sessioni: lettura dal disco",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10256;101:7558",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 128,
+    "w": 533,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "clotch · Claude Code · accountmanager",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10256;101:7559",
+   "nome": "data",
+   "tipo": "TEXT",
+   "box": {
+    "x": 593,
+    "y": 118,
+    "w": 27,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Oggi",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10264",
+   "nome": "risultato",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 156,
+    "w": 624,
+    "h": 56
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10264;101:11396",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 176,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10264;101:11396;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 176,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10264;101:11396;101:11203;101:11183",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 20.66650390625,
+    "y": 177.3330078125,
+    "w": 14.6669921875,
+    "h": 13.333658218383789
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10264;101:7545",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 48,
+    "y": 164,
+    "w": 528,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10264;101:7549",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 164,
+    "w": 528,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Lettura dei log di Codex",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10264;101:7550",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 186,
+    "w": 528,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "friday-mac-v2 · Codex",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10264;101:7551",
+   "nome": "data",
+   "tipo": "TEXT",
+   "box": {
+    "x": 588,
+    "y": 176,
+    "w": 32,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "12 ott",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10272",
+   "nome": "titolo sezione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 214,
+    "w": 624,
+    "h": 32
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10272;101:7170",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 16,
+    "y": 221,
+    "w": 608,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Messaggi",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10274",
+   "nome": "risultato",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 248,
+    "w": 624,
+    "h": 56
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10274;101:11402",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 256,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10274;101:11402;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 256,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10274;101:11402;101:11203;101:11040",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 21.3330078125,
+    "y": 256.666259765625,
+    "w": 13.333984375,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10274;101:7561",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 48,
+    "y": 256,
+    "w": 533,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10274;101:7564",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 256,
+    "w": 533,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Clotch: sessioni in Electron",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10274;101:7565",
+   "nome": "estratto",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 278,
+    "w": 533,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "… la lettura delle sessioni dal disco la fa un'altra sessione, nella cartella se",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10274;101:7566",
+   "nome": "data",
+   "tipo": "TEXT",
+   "box": {
+    "x": 593,
+    "y": 256,
+    "w": 27,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Oggi",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10281",
+   "nome": "risultato",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 306,
+    "w": 624,
+    "h": 56
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10281;101:11402",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 314,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10281;101:11402;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 314,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10281;101:11402;101:11203;101:11040",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 21.3330078125,
+    "y": 314.666259765625,
+    "w": 13.333984375,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10281;101:7561",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 48,
+    "y": 314,
+    "w": 542,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10281;101:7564",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 314,
+    "w": 542,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Backend: auth e RLS",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10281;101:7565",
+   "nome": "estratto",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 336,
+    "w": 542,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "… la policy blocca la lettura di «sessioni» se manca lo studio dell'utente …",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10281;101:7566",
+   "nome": "data",
+   "tipo": "TEXT",
+   "box": {
+    "x": 602,
+    "y": 314,
+    "w": 18,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Ieri",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:10288",
+   "nome": "risultato",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 364,
+    "w": 624,
+    "h": 56
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10288;101:11402",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 372,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10288;101:11402;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 20,
+    "y": 372,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10288;101:11402;101:11203;101:11153",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 20.66748046875,
+    "y": 372.666015625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10288;101:7561",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 48,
+    "y": 372,
+    "w": 527,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10288;101:7564",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 372,
+    "w": 527,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Overseer: voce in Clotch",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10288;101:7565",
+   "nome": "estratto",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 394,
+    "w": 527,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "… dopo la lettura ad alta voce la sessione torna in attesa …",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:10288;101:7566",
+   "nome": "data",
+   "tipo": "TEXT",
+   "box": {
+    "x": 587,
+    "y": 372,
+    "w": 33,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "19 ott",
+   "font": "SF Pro Regular"
+  }
+ ]
+}
