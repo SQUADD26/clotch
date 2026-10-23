@@ -1,5 +1,5 @@
 // figma: 101-30172 — «Bottone attività» 121:58595 (Senza numero, Con numero, Aperto) e «Popover attività» 121:58601
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Registro } from "../../friday";
 import { useRegistro } from "../friday/dati";
 import { casella } from "../friday/vista";
@@ -7,11 +7,17 @@ import { BottoneIcona } from "./Bottone";
 import { Icona } from "./Icona";
 import "./attivita.css";
 
-/** Campana nella barra del titolo: il numero è quello di «Casella» (sessioni che aspettano te); il clic apre e chiude il popover. */
+/** Campana nella barra del titolo: il numero è quello di «Casella» (sessioni che aspettano te); il clic apre e chiude il popover; la X ed Esc lo chiudono. */
 export function Attivita() {
   const r = useRegistro();
   // nella prova di parità del frame 101-30172 il popover parte aperto, come nel disegno
   const [aperto, setAperto] = useState(() => new URLSearchParams(location.search).get("parita") === "101-30172");
+  useEffect(() => {
+    if (!aperto) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAperto(false); };
+    addEventListener("keydown", esc);
+    return () => removeEventListener("keydown", esc);
+  }, [aperto]);
   const n = r.dati ? casella(r.dati as Registro, Date.now()).aspettano : 0;
   return (
     <>
