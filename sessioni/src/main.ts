@@ -16,6 +16,7 @@ import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import type { PaginaMessaggi } from "./tipi";
+import { provaSilenziosa } from "./modalita-prova";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
@@ -24,6 +25,9 @@ if (iParita > 0) {
   process.env.CLOTCH_TEST_SILENT = "1";
   app.commandLine.appendSwitch("mute-audio");
   if (process.platform === "darwin") app.setActivationPolicy("prohibited");
+} else if (provaSilenziosa()) {
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("accessory");
 }
 const scena = (() => {
   try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }

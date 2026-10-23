@@ -1,5 +1,5 @@
 // La finestra dell'app e la prova di parità (`npm run parita -- <node-id>`): stessa pagina, stessa misura del frame Figma.
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import * as assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -24,18 +24,26 @@ function frame(id: string) {
 export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
+  const silenziosa = provaSilenziosa(), anteprima = silenziosa && opzioni.show !== false;
+  const area = anteprima ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
+  const larghezza = area ? Math.min(grande.w, area.width) : grande.w;
+  const altezza = area ? Math.min(grande.h, area.height) : grande.h;
   const w = new BrowserWindow({
-    show: opzioni.show ?? true,
+    show: anteprima ? false : opzioni.show ?? true,
     title: NOME_APP, icon: iconaApp(),
-    width: grande.w, height: grande.h, minWidth: piccola.w, minHeight: piccola.h,
+    width: larghezza, height: altezza,
+    minWidth: area ? Math.min(piccola.w, larghezza) : piccola.w,
+    minHeight: area ? Math.min(piccola.h, altezza) : piccola.h,
+    ...(area ? { x: area.x + Math.floor((area.width - larghezza) / 2), y: area.y + Math.floor((area.height - altezza) / 2) } : {}),
     backgroundColor: valori["colore-fondo-cornice"],
     titleBarStyle: "hiddenInset",
     // semaforo del Mac dove il disegno mette «semaforo»: padding della barra e centro verticale
     trafficLightPosition: { x: numero("spazio-5"), y: (numero("misura-barra-titolo") - numero("misura-semaforo")) / 2 },
     webPreferences: { preload, contextIsolation: true, webviewTag: false },
   });
-  if (provaSilenziosa()) w.webContents.setAudioMuted(true);
+  if (silenziosa) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w);
+  if (anteprima) w.once("ready-to-show", () => w.showInactive());
   w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
   return w;
 }
