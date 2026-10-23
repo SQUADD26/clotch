@@ -1,5 +1,6 @@
 node_modules/
 dist/
+renderer/
 # le fixture imitano la home del Mac: il .gitignore della radice le nasconderebbe
 !.claude/
 !.cursor/

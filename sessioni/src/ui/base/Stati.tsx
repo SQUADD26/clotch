@@ -1,0 +1,57 @@
+// figma: 101-8805 — stati vuoto (101-8805) ed errore (101-9090): «Messaggio al centro»; caricamento (101-8912): sagome.
+import type { CSSProperties, ReactNode } from "react";
+import caricamento from "../../../design/figma/101-8912.json";
+import { Bottone } from "./Bottone";
+import "./stati.css";
+
+/** Vuoto ed errore: titolo, testo e bottoni al centro della superficie. Testi dal frame Figma della situazione. */
+export function MessaggioAlCentro({ titolo, corpo, children }: { titolo: string; corpo: string; children?: ReactNode }) {
+  return (
+    <div className="messaggio-al-centro">
+      <div className="t-xl">{titolo}</div>
+      <div className="t-base secondario">{corpo}</div>
+      {children && <div className="bottoni">{children}</div>}
+    </div>
+  );
+}
+
+/** Errore con «Riprova» (testo di 101-9090): per una chiamata fallita di dati.ts. */
+export function StatoErrore({ titolo, corpo, riprova, children }: { titolo: string; corpo: string; riprova(): void; children?: ReactNode }) {
+  return (
+    <MessaggioAlCentro titolo={titolo} corpo={corpo}>
+      {children}
+      <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
+    </MessaggioAlCentro>
+  );
+}
+
+// Sagome lette dal frame 101-8912: righe del filo e loro sagome, larghezze in proporzione alla colonna.
+interface Nodo { nome: string; box: { x: number; y: number; w: number; h: number }; variabili: Record<string, string | undefined> }
+const nodi = caricamento.nodi as unknown as Nodo[];
+const v = (nome?: string) => nome && `var(--${nome.replace(/\//g, "-")})`;
+const dentro = (a: Nodo["box"], b: Nodo["box"]) => a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h;
+const filo = nodi.find((n) => n.nome === "Filo")!;
+const righe = nodi.filter((n) => /sagoma$/.test(n.nome) && n.nome !== "sagoma").map((r) => ({
+  bolla: r.nome === "bolla sagoma",
+  gap: r.variabili.itemSpacing,
+  sagome: nodi.filter((s) => s.nome === "sagoma" && dentro(s.box, r.box)),
+}));
+
+/** Caricamento: sagome al posto dei messaggi, come nel frame «Caricamento». */
+export function Sagome() {
+  const stileFilo: CSSProperties = { gap: v(filo.variabili.itemSpacing), paddingTop: v(filo.variabili.paddingTop), paddingBottom: v(filo.variabili.paddingBottom) };
+  return (
+    <div className="sagome" style={stileFilo} aria-busy="true">
+      {righe.map((r, i) => (
+        <div key={i} className={r.bolla ? "riga bolla" : "riga"} style={{ gap: v(r.gap) }}>
+          {r.sagome.map((s, j) => (
+            <div key={j} style={{
+              width: `${(s.box.w / filo.box.w) * 100}%`, height: s.box.h,
+              background: v(s.variabili["fills[0]"]), borderRadius: v(s.variabili.cornerRadius),
+            }} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
