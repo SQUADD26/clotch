@@ -5,6 +5,7 @@ import * as friday from "../friday";
 import * as pannello from "../pannello";
 import { Attivita } from "./Attivita";
 import { BottoneIcona } from "./Bottone";
+import { Pezzo } from "./Pezzo";
 import { useNavigazione } from "./navigazione";
 
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
@@ -31,8 +32,8 @@ export function BarraTitolo() {
           {/* 101-30172: subito dopo la navigazione, distanza = gap della barra */}
           <Attivita />
           <div className="comandi-globali">
-            {ComandiPannello && <ComandiPannello />}
-            {ComandiFriday && <ComandiFriday />}
+            {ComandiPannello && <Pezzo nome="pannello"><ComandiPannello /></Pezzo>}
+            {ComandiFriday && <Pezzo nome="friday"><ComandiFriday /></Pezzo>}
           </div>
         </>
       )}

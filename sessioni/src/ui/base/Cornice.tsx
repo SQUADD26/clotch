@@ -8,6 +8,7 @@ import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
 import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
+import { Pezzo } from "./Pezzo";
 import { ConNavigazione, useNavigazione, VISTE_FRIDAY } from "./navigazione";
 import { useScorciatoie } from "./scorciatoie";
 import { numero } from "./token";
@@ -32,20 +33,20 @@ function Corpo() {
   useScorciatoie();
   const contenuto = useRef<HTMLDivElement>(null);
   const largo = useLargo(contenuto);
-  if (n.vista === "impostazioni") return <div className="corpo"><Impostazioni /></div>;
+  if (n.vista === "impostazioni") return <div className="corpo"><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
   const friday = VISTE_FRIDAY.includes(n.vista);
   return (
     <div className="corpo">
-      {n.barraAperta && <nav className="barra-laterale"><Barra /></nav>}
+      {n.barraAperta && <nav className="barra-laterale"><Pezzo nome="barra"><Barra /></Pezzo></nav>}
       <main className="area-principale">
         <div className="superficie">
-          {friday ? <IntestazioneFriday /> : <IntestazioneChat />}
+          {friday ? <Pezzo nome="friday"><IntestazioneFriday /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
           <div className="contenuto" ref={contenuto}>
             <div className="colonna">
-              {friday ? <Friday /> : <Chat />}
+              {friday ? <Pezzo nome="friday"><Friday /></Pezzo> : <Pezzo nome="chat"><Chat /></Pezzo>}
               <AreaAvvisi />
             </div>
-            {!friday && n.pannelloAperto && largo && <aside className="pannello"><Pannello /></aside>}
+            {!friday && n.pannelloAperto && largo && <aside className="pannello"><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
           </div>
         </div>
       </main>

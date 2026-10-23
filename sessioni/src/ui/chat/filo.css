@@ -1,34 +1,34 @@
 /* figma: 101-8036 — filo dei messaggi e blocchi (componenti 101:7210, 7213, 7216, 7238, 7278, 7315, 13464, 13525) */
-.filo {
+.pezzo-chat .filo {
   flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--spazio-6);
   padding: var(--spazio-4) 0; user-select: text;
 }
-.filo > :first-child { margin-top: auto; } /* i messaggi stanno in fondo, sopra la casella */
-.filo > * { flex: none; content-visibility: auto; contain-intrinsic-size: auto none; }
-.turno { display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-chat .filo > :first-child { margin-top: auto; } /* i messaggi stanno in fondo, sopra la casella */
+.pezzo-chat .filo > * { flex: none; content-visibility: auto; contain-intrinsic-size: auto none; }
+.pezzo-chat .turno { display: flex; flex-direction: column; gap: var(--spazio-3); }
 
-.messaggio-roberto { display: flex; justify-content: flex-end; }
-.messaggio-roberto .bolla {
+.pezzo-chat .messaggio-roberto { display: flex; justify-content: flex-end; }
+.pezzo-chat .messaggio-roberto .bolla {
   max-width: var(--misura-bolla-max); padding: var(--spazio-2-5) var(--spazio-4); border-radius: var(--raggio-2xl);
   background: var(--colore-fondo-bolla); color: var(--colore-testo-bolla);
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); white-space: pre-wrap; overflow-wrap: anywhere;
 }
 
-.risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }
-.testo-risposta {
+.pezzo-chat .risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-chat .testo-risposta {
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); color: var(--colore-testo-primario);
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
-.risposta .azioni { display: flex; gap: var(--spazio-0-5); }
-.cursore {
+.pezzo-chat .risposta .azioni { display: flex; gap: var(--spazio-0-5); }
+.pezzo-chat .cursore {
   display: inline-block; width: var(--misura-cursore); height: var(--misura-icona); margin-left: var(--spazio-0-5);
   vertical-align: text-bottom; background: var(--colore-testo-primario); animation: lampeggia 1s steps(1) infinite;
 }
 @keyframes lampeggia { 50% { opacity: 0; } }
 
 /* suggerimento sotto un bottone (frame 101:23727, «tooltip») */
-.con-suggerimento { position: relative; display: inline-flex; }
-.suggerimento {
+.pezzo-chat .con-suggerimento { position: relative; display: inline-flex; }
+.pezzo-chat .suggerimento {
   position: absolute; top: calc(100% + var(--spazio-1-5)); left: 50%; transform: translateX(-50%); z-index: 2;
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); white-space: nowrap;
   background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
@@ -36,78 +36,78 @@
 }
 
 /* testata comune di Pensiero, Chiamata strumento, Modifica file, Ricerca sul web */
-.strumento, .pensiero { display: flex; flex-direction: column; gap: var(--spazio-2); min-width: 0; }
-.filo .testata {
+.pezzo-chat .strumento, .pezzo-chat .pensiero { display: flex; flex-direction: column; gap: var(--spazio-2); min-width: 0; }
+.pezzo-chat .filo .testata {
   display: flex; align-items: center; gap: var(--spazio-2); width: 100%; min-width: 0; text-align: left;
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
-.pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
-.testata .tipo { font-weight: 500; flex: none; }
-.testata .tipo.errore { color: var(--colore-testo-errore); }
-.testata .dettaglio {
+.pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
+.pezzo-chat .testata .tipo { font-weight: 500; flex: none; }
+.pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
+.pezzo-chat .testata .dettaglio {
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs);
 }
-.testata .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
-.testo-pensiero {
+.pezzo-chat .testata .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.pezzo-chat .testo-pensiero {
   padding-left: var(--spazio-3); border-left: var(--misura-tratto) solid var(--colore-bordo-normale);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); white-space: pre-wrap;
 }
 
-.blocco-codice {
+.pezzo-chat .blocco-codice {
   display: flex; flex-direction: column; gap: var(--spazio-1); padding: var(--spazio-3);
   border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
-.blocco-codice .comando { color: var(--colore-testo-primario); }
-.blocco-codice .uscita { color: var(--colore-testo-secondario); }
-.blocco-codice .uscita.errore { color: var(--colore-testo-errore); }
+.pezzo-chat .blocco-codice .comando { color: var(--colore-testo-primario); }
+.pezzo-chat .blocco-codice .uscita { color: var(--colore-testo-secondario); }
+.pezzo-chat .blocco-codice .uscita.errore { color: var(--colore-testo-errore); }
 
-.aggiunte, .tolte { flex: none; font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
-.strumento .aggiunte, .strumento .tolte { font-family: var(--testo-famiglia-ui); line-height: var(--testo-riga-xs); }
-.aggiunte { color: var(--colore-testo-successo); }
-.tolte { color: var(--colore-testo-errore); }
+.pezzo-chat .aggiunte, .pezzo-chat .tolte { flex: none; font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
+.pezzo-chat .strumento .aggiunte, .pezzo-chat .strumento .tolte { font-family: var(--testo-famiglia-ui); line-height: var(--testo-riga-xs); }
+.pezzo-chat .aggiunte { color: var(--colore-testo-successo); }
+.pezzo-chat .tolte { color: var(--colore-testo-errore); }
 
-.differenze {
+.pezzo-chat .differenze {
   display: flex; flex-direction: column; padding: var(--spazio-2) 0; border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
-.differenze .riga { display: flex; gap: var(--spazio-3); padding: 0 var(--spazio-3); }
-.differenze .segno { flex: none; white-space: pre; }
-.differenze .codice { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.differenze .riga.tolta { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
-.differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
+.pezzo-chat .differenze .riga { display: flex; gap: var(--spazio-3); padding: 0 var(--spazio-3); }
+.pezzo-chat .differenze .segno { flex: none; white-space: pre; }
+.pezzo-chat .differenze .codice { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pezzo-chat .differenze .riga.tolta { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+.pezzo-chat .differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
 
-.file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
-.file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); }
-.file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
-.file-toccati .file {
+.pezzo-chat .file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
+.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); }
+.pezzo-chat .file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .file-toccati .file {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);
   border-top: var(--misura-tratto) solid var(--colore-bordo-leggero);
 }
-.file-toccati .percorso {
+.pezzo-chat .file-toccati .percorso {
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-secondario);
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
 }
 
-.fonti {
+.pezzo-chat .fonti {
   display: flex; flex-direction: column; padding: var(--spazio-1);
   border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
 }
-.fonte { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); border-radius: var(--raggio-md); }
-.fonte .titolo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
-.fonte .sito { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .fonte { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); border-radius: var(--raggio-md); }
+.pezzo-chat .fonte .titolo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+.pezzo-chat .fonte .sito { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 
 /* «4.812 messaggi prima di questi» e «Carica precedenti» (101:9628) */
-.precedenti {
+.pezzo-chat .precedenti {
   display: flex; align-items: center; justify-content: center; gap: var(--spazio-3);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
-.risposta .con-menu { position: relative; display: inline-flex; }
-.risposta .aperto { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .risposta .con-menu { position: relative; display: inline-flex; }
+.pezzo-chat .risposta .aperto { background: var(--colore-fondo-riga-passaggio); }
 /* microfono e «…» compaiono al passaggio sulla risposta («risposta al passaggio», 101:23727) */
-.risposta:not(:hover) .azioni:not(.fisse) .al-passaggio { display: none; }
-.turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
+.pezzo-chat .risposta:not(:hover) .azioni:not(.fisse) .al-passaggio { display: none; }
+.pezzo-chat .turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
 /* avvisi e modifiche aperte stanno a spazio/6 dai vicini del turno (101:15790, 101:14631) */
-.turno > .avviso-filo, .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }
+.pezzo-chat .turno > .avviso-filo, .pezzo-chat .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }
