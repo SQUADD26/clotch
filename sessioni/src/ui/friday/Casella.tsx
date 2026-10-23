@@ -77,7 +77,7 @@ function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["propo
   // fatto: la scheda sparisce col registro nuovo; non riuscito: il perché di Friday (testo del disegno se non ne dà)
   const decidi = async (esito: "accetta" | "rifiuta") => {
     const e = await friday().comando("obiettivo", { chat: o.chat, esito });
-    if (e.esito !== "ok") avvisa({ tipo: "errore", messaggio: e.testo || "Friday non risponde" });
+    if (e.esito !== "ok") avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde" });
   };
   return (
     <section className="scheda proposta">
@@ -126,7 +126,7 @@ export function Casella() {
   if (rotto || !s.dati) {
     return (
       <div className="vista-friday">
-        <AvvisoRosso titolo="Registro non leggibile" corpo="Friday non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s." />
+        <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s." />
         <div className="riga-f">
           <Bottone tipo="secondario" onClick={s.riprova}>Riprova ora</Bottone>
           {/* shortcut: aprire il registro nel Finder serve un canale del main; il bottone arriva con quello */}
@@ -139,8 +139,8 @@ export function Casella() {
   if (!c.progetti.length && !c.proposti.length) {
     return (
       <div className="vista-friday">
-        <Vuoto icona="posta" titolo="Niente aspetta te" corpo="Friday ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
-          <Bottone tipo="secondario" onClick={() => n.apri("friday")}>Scrivi a Friday</Bottone>
+        <Vuoto icona="posta" titolo="Niente aspetta te" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
+          <Bottone tipo="secondario" onClick={() => n.apri("friday")}>Scrivi a clotch AI</Bottone>
         </Vuoto>
       </div>
     );

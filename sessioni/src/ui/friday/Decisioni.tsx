@@ -30,7 +30,7 @@ function dettaglio(r: Registro, d: Decisione) {
 /** Esito dell'annullo: i testi li scrive Friday in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
 export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () => void) {
   if (e.esito === "ok") avvisa({ tipo: "info", messaggio: e.testo || "Decisione annullata. La sessione aspetta te." });
-  else avvisa({ tipo: "errore", messaggio: e.testo || "Friday non risponde", azione: { etichetta: "Riprova", fai: riprova } });
+  else avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde", azione: { etichetta: "Riprova", fai: riprova } });
 }
 
 async function annulla(d: Decisione) {
@@ -45,7 +45,7 @@ export function Decisioni() {
   const gruppi = r ? decisioniPerGiorno(r, Date.now()) : [];
   const conferma = typeof scelta === "string" ? gruppi.flatMap((g) => g.voci).find((d) => d.id === scelta) ?? null : scelta;
   if (r && !gruppi.length) {
-    return <div className="vista-friday"><Vuoto icona="libro" titolo="Friday non ha ancora deciso niente" corpo="Qui trovi ogni scelta che Friday fa da sola, e la puoi annullare." /></div>;
+    return <div className="vista-friday"><Vuoto icona="libro" titolo="clotch AI non ha ancora deciso niente" corpo="Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare." /></div>;
   }
   return (
     <div className="vista-friday">

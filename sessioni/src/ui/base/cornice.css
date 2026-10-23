@@ -31,8 +31,8 @@
   flex: 1; min-width: 0; position: relative; padding-bottom: var(--spazio-4);
   display: flex; flex-direction: column; align-items: center; gap: var(--spazio-4);
 }
-/* il filo e la casella della chat sono larghi al massimo una colonna, al centro */
-.colonna > :not(.area-avvisi, .pezzo), .colonna > .pezzo > * { width: 100%; max-width: var(--misura-colonna); }
+/* I contenuti restano larghi una colonna anche attraverso più scope senza scatola (.pezzo). */
+.colonna > :not(.area-avvisi, .pezzo), .colonna .pezzo > :not(.area-avvisi, .pezzo) { width: 100%; max-width: var(--misura-colonna); }
 /* contenitore di un pezzo (base/Pezzo.tsx): non è una scatola, i suoi figli stanno nel layout del genitore */
 .pezzo { display: contents; }
 .pannello { width: var(--misura-pannello); flex: none; display: flex; flex-direction: column; }

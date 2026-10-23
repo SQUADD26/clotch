@@ -50,7 +50,7 @@ export function RigheFriday({ r, adesso, pagina }: { r: Registro | null; adesso:
     <>
       <button type="button" className={`riga riga-friday ${pagina === "friday" ? "scelta" : ""}`} onClick={() => n.apri("friday")}>
         <Icona nome="scintille" colore="accento" />
-        <span className="testo medio">Friday</span>
+        <span className="testo medio">clotch AI</span>
         {stato && <span className={`lato t-xs stato-${stato.classe}`}>{stato.testo}</span>}
       </button>
       <RigaComando icona="posta" etichetta="Casella" lato={aspettano ? String(aspettano) : undefined} scelta={pagina === "casella"} onClick={() => n.apri("casella")} />

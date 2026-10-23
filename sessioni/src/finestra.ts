@@ -3,6 +3,7 @@ import { app, BrowserWindow } from "electron";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { numero, valori } from "./ui/base/token";
+import { iconaApp, NOME_APP } from "./branding";
 
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
@@ -21,6 +22,7 @@ export function apriFinestra(sessione?: string): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
   const w = new BrowserWindow({
+    title: NOME_APP, icon: iconaApp(),
     width: grande.w, height: grande.h, minWidth: piccola.w, minHeight: piccola.h,
     backgroundColor: valori["colore-fondo-cornice"],
     titleBarStyle: "hiddenInset",

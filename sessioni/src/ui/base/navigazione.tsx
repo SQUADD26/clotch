@@ -36,6 +36,9 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
   const apri = useCallback((vista: Vista, sessione?: string | null, sezione?: string | null) => setStoria(({ passi, i }) => {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null };
     if (passo.vista === passi[i].vista && passo.sessione === passi[i].sessione && passo.sezione === passi[i].sezione) return { passi, i };
+    // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine.
+    if (vista === "impostazioni" && passi[i].vista === "impostazioni")
+      return { passi: [...passi.slice(0, i), passo], i };
     return { passi: [...passi.slice(0, i + 1), passo], i: i + 1 };
   }), []);
   const nav = useMemo<Navigazione>(() => ({

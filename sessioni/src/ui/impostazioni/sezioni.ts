@@ -5,7 +5,7 @@ export const SEZIONI = [
   ["generale", "Generale", "impostazioni"],
   ["aspetto", "Aspetto", "tavolozza"],
   ["notifiche", "Notifiche", "campana"],
-  ["friday", "Friday", "scintille"],
+  ["friday", "clotch AI", "scintille"],
   ["scorciatoie", "Scorciatoie", "tastiera"],
   ["sorgenti", "Sorgenti", "computer"],
   ["account", "Account", "persona"],
@@ -14,7 +14,7 @@ export const SEZIONI = [
   ["archiviazione", "Archiviazione", "disco"],
   ["dati", "Dati", "scudo"],
   ["info", "Info", "info"],
-  ["clotch", "Clotch", "schermo"],
+  ["clotch", "clotch", "schermo"],
 ] as const satisfies readonly (readonly [string, string, NomeIcona])[];
 
 export type Sezione = (typeof SEZIONI)[number][0];
