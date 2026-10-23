@@ -52,18 +52,18 @@ export function useElenco() {
 
 /** Messaggi di una sessione: pagina 0 (i più recenti), `altri()` per le pagine vecchie, i nuovi arrivano dal vivo. */
 export function useMessaggi(id: string | null) {
-  const [pagine, setPagine] = useState({ messaggi: [] as Messaggio[], pagina: 0, haAltre: false });
+  const [pagine, setPagine] = useState({ messaggi: [] as Messaggio[], pagina: 0, haAltre: false, totale: null as number | null });
   const c = useChiamata(async () => {
     if (!id) return null;
     const p = await api().messaggi(id, 0);
     if (p.errore) throw new Error(p.errore);
-    setPagine({ messaggi: p.messaggi, pagina: 0, haAltre: p.haAltre });
+    setPagine({ messaggi: p.messaggi, pagina: 0, haAltre: p.haAltre, totale: p.totale });
     return p;
   }, [id]);
   const [altriCarica, setAltriCarica] = useState(false);
   useAggiornamenti((a) => {
     const nuovi = a.nuoviMessaggi.filter((n) => n.id === id).flatMap((n) => n.messaggi);
-    if (nuovi.length) setPagine((p) => ({ ...p, messaggi: [...p.messaggi, ...nuovi] }));
+    if (nuovi.length) setPagine((p) => ({ ...p, messaggi: [...p.messaggi, ...nuovi], totale: p.totale === null ? null : p.totale + nuovi.length }));
   });
   const altri = async () => {
     if (!id || altriCarica || !pagine.haAltre) return;
@@ -71,7 +71,7 @@ export function useMessaggi(id: string | null) {
     try {
       const p = await api().messaggi(id, pagine.pagina + 1);
       if (p.errore) throw new Error(p.errore);
-      setPagine((x) => ({ messaggi: [...p.messaggi, ...x.messaggi], pagina: p.pagina, haAltre: p.haAltre }));
+      setPagine((x) => ({ messaggi: [...p.messaggi, ...x.messaggi], pagina: p.pagina, haAltre: p.haAltre, totale: p.totale ?? x.totale }));
     } finally { setAltriCarica(false); }
   };
   return { stato: c.stato, errore: c.errore, riprova: c.riprova, ...pagine, altri, altriCarica };
