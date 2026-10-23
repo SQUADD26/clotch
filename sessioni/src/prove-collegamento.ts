@@ -38,7 +38,7 @@ function claude(): Prova[] {
 /** Sessioni vere di prova (`claude -p`): mai sul Mac (#1797), una alla volta. */
 function sessioniVere(): Prova[] {
   const c = "app <> Claude (sessione vera)";
-  if (process.platform === "darwin") return [p(c, "sessione di prova passa per le situazioni", "attesa", "sul Mac le sessioni `claude -p` di prova sono vietate (#1797): lanciare `npm run prove -- claude` su squaddv2")];
+  if (process.platform === "darwin" && !env.PROVE_CLAUDE) return [p(c, "sessione di prova passa per le situazioni", "attesa", "sul Mac le sessioni `claude -p` di prova sono vietate (#1797): lanciare `npm run prove -- claude` su squaddv2")];
   const cmd = env.PROVE_CLAUDE || "claude"; // su squaddv2: PROVE_CLAUDE=claude-prove (token dedicato, max 2 sessioni vive)
   const bin = spawnSync("sh", ["-c", 'command -v "$1"', "sh", cmd], { encoding: "utf8" }).stdout.trim();
   if (!bin) return [p(c, "sessione di prova", "attesa", `comando ${cmd} non trovato su questa macchina`)];
