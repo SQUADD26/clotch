@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import Barra from "../barra";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
+import { Dialoghi } from "../dialoghi";
 import Friday, { Intestazione as IntestazioneFriday } from "../friday";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
@@ -78,6 +79,7 @@ export function Cornice() {
         <BarraTitolo />
         <Corpo />
         {avvio && <Avvio />}
+        <Pezzo nome="dialoghi"><Dialoghi /></Pezzo>
       </div>
     </ConNavigazione>
   );

@@ -268,8 +268,9 @@ export interface ImpostazioniApi {
   eliminaDati(): Promise<void>;
   /** Note della versione in uso; null finché non c'è una fonte. */
   novita(): Promise<Novita | null>;
-  /** `false`: c'è un modo di controllare gli aggiornamenti? `true`: controlla. */
-  aggiornamenti(fai: boolean): Promise<boolean>;
+  /** `false`: c'è un modo di controllare gli aggiornamenti? `true`: controlla, vero se c'è una versione nuova sul disco.
+   *  `"installa"`: riapre l'app (vero se l'ha riaperta). */
+  aggiornamenti(fai: boolean | "installa"): Promise<boolean>;
 }
 
 export interface Novita { data: string; voci: string[] }
