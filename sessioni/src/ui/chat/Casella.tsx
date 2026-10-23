@@ -72,6 +72,13 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const cerca = chiuso || disabilitata ? null : cercaDi(testo, Math.min(caret ?? testo.length, testo.length));
   const voci = useVoci(chat, cerca);
 
+  // scelta fatta in un menu dei chip: il fuoco torna al testo, se è caduto sul fondo della pagina
+  const eraAperto = useRef(false);
+  useEffect(() => {
+    if (menu === null && eraAperto.current && document.activeElement === document.body) area.current?.focus();
+    eraAperto.current = menu !== null;
+  }, [menu]);
+
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
   // la casella cresce col testo (101:25542 «testo lungo»); dopo una scelta del menu il cursore va dopo la voce
