@@ -1,0 +1,16 @@
+/* figma: 101-21010 — «menu sessione» e «Menu filtro» 101-16689 */
+.menu {
+  position: absolute; z-index: 10; width: var(--misura-menu); padding: var(--spazio-1);
+  display: flex; flex-direction: column;
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+}
+.menu .voce {
+  height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2);
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.menu .voce:hover, .menu .voce:focus-visible { background: var(--colore-fondo-riga-passaggio); outline: none; }
+.menu .etichetta { flex: 1; min-width: 0; color: var(--colore-testo-primario); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu .etichetta.pericolo { color: var(--colore-testo-errore); }
+.menu .separatore { padding: var(--spazio-1) var(--spazio-2); }
+.menu .linea { height: var(--misura-tratto); background: var(--colore-bordo-normale); }

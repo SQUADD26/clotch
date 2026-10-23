@@ -1,0 +1,18 @@
+/* figma: 101-24007 — pila di avvisi a comparsa al centro della colonna, sopra la casella (101-10457 per l'avviso) */
+.area-avvisi {
+  position: absolute; z-index: 20; left: 50%; transform: translateX(-50%);
+  /* la chat alza la pila sopra la casella impostando --avvisi-basso sulla colonna */
+  bottom: var(--avvisi-basso, var(--spazio-4));
+  display: flex; flex-direction: column; gap: var(--spazio-2); pointer-events: none;
+}
+.avviso-comparsa {
+  width: var(--misura-toast); padding: var(--spazio-2) var(--spazio-3); gap: var(--spazio-2);
+  display: flex; align-items: center; pointer-events: auto;
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+  animation: avviso-entra var(--tempo-normale) ease;
+  transition: opacity var(--tempo-normale) ease, transform var(--tempo-normale) ease;
+}
+.avviso-comparsa.esce { opacity: 0; transform: scale(0.8); }
+.avviso-comparsa .messaggio { flex: 1; min-width: 0; }
+@keyframes avviso-entra { from { opacity: 0; transform: scale(0.8); } }

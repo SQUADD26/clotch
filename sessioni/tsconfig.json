@@ -7,7 +7,10 @@
     "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["src/ui/**"],
+  "files": ["src/ui/base/token.ts"]
 }
