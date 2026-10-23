@@ -18,13 +18,14 @@ import "./aspetto.css";
 // Il pannello sta accanto alla colonna solo se c'è posto per entrambi (a 1440 sì, a 1024 no, come nei due frame).
 const LARGHEZZA_PANNELLO = numero("misura-colonna") + numero("misura-pannello") + 3 * numero("spazio-4");
 
-function useLargo(ref: React.RefObject<HTMLElement | null>) {
+function useLargo(ref: React.RefObject<HTMLElement | null>, visibile: boolean) {
   const [largo, setLargo] = useState(true);
   useEffect(() => {
+    if (!visibile) return;
     const o = new ResizeObserver(([e]) => setLargo(e.contentRect.width + 2 * numero("spazio-4") >= LARGHEZZA_PANNELLO));
     if (ref.current) o.observe(ref.current);
     return () => o.disconnect();
-  }, [ref]);
+  }, [ref, visibile]);
   return largo;
 }
 
@@ -32,7 +33,7 @@ function Corpo() {
   const n = useNavigazione();
   useScorciatoie();
   const contenuto = useRef<HTMLDivElement>(null);
-  const largo = useLargo(contenuto);
+  const largo = useLargo(contenuto, n.vista !== "impostazioni");
   if (n.vista === "impostazioni") return <div className="corpo"><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
   const friday = VISTE_FRIDAY.includes(n.vista);
   return (
