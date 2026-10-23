@@ -11,7 +11,7 @@
     "elenco": "tsc && node dist/src/elenco-cli.js",
     "prove": "tsc && node dist/src/prove-collegamento.js",
     "start": "npm run build && electron .",
-    "parita": "npm run build && electron --force-device-scale-factor=1 . --parita"
+    "parita": "node scripts/scene-chat.mjs && npm run build && electron --force-device-scale-factor=1 --force-color-profile=srgb . --parita"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

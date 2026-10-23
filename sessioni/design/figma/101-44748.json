@@ -62,7 +62,8 @@
   "misura/riferimento": 24,
   "colore/fondo/casella": "#363636",
   "raggio/casella": 22,
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff6764",
+  "misura/tratto": 1
  },
  "nodi": [
   {
@@ -2041,11 +2042,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:44770",
@@ -2634,11 +2634,10 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/dialogo"
+    "width": "misura/dialogo",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:44782;101:44475",
@@ -2979,11 +2978,10 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/dialogo"
+    "width": "misura/dialogo",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:44802;101:44475",
@@ -3749,11 +3747,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:44778;101:7323",

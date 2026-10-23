@@ -11,7 +11,7 @@ export const STATI_FRIDAY = ["lavora", "aspetta", "finito", "serve_roberto", "se
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia", "obiettivo", "spegni", "imposta",
+  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 180 s». Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 180_000;
@@ -48,6 +48,8 @@ export interface ChatFriday {
   /** ms dell'ultima riga di questa chat (battito o altro). */
   visto: number | null;
   fine: string | null;
+  /** ms dell'evento `fine`. */
+  fineT: number | null;
   chatNuova: string | null;
   fermata: boolean;
   quarantena: string | null;
@@ -60,8 +62,9 @@ export interface ChatFriday {
 export interface Registro {
   chat: Map<string, ChatFriday>;
   fermoTutto: boolean;
-  avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null }[];
-  clotch: { voce: string; parla: boolean; ascolta: boolean; t: number } | null;
+  avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null; sessioni: string[] }[];
+  /** `versione`: CFBundleShortVersionString di Clotch, se l'evento la porta (#344). */
+  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
   friday: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
@@ -83,7 +86,7 @@ export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => e
 const nuova = (chat: string): ChatFriday => ({
   chat, titolo: null, madre: null, progetto: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
   domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
-  obiettivo: null, passi: [], visto: null, fine: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
+  obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
@@ -138,7 +141,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         case "rifiuto": c.rifiuto = s(d.testo) ?? s(d.regola); break;
         case "errore": c.errore = s(d.testo); break;
-        case "fine": c.fine = s(d.motivo) ?? "fine"; c.chatNuova = s(d.chat_nuova); break;
+        case "fine": c.fine = s(d.motivo) ?? "fine"; c.fineT = t; c.chatNuova = s(d.chat_nuova); break;
         case "richiesta":
           c.richieste = c.richieste.filter((x) => x.rid !== String(d.rid)).concat({
             rid: String(d.rid), genere: String(d.genere ?? ""), strumento: s(d.strumento), ingresso: d.ingresso,
@@ -162,7 +165,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         }
         case "obiettivo": c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") }; break;
-        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, t }; break;
+        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
           else if (d.ambito === "chat" && s(d.chi)) {
@@ -178,7 +181,9 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           q.quarantena = d.acceso === true ? s(d.perche) ?? "quarantena" : null;
           break;
         }
-        case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
+        case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
+          // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
+          sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
         case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso), annullata: false }); break;
         case "comando":
           comandi.set(String(d.id), d);

@@ -1,0 +1,27 @@
+/* figma: 101-14396 — «Attività» 101:13368, «Aiutanti» 101:13419, righe di stato e avvisi nel filo (101:13475, 13480, 13494, 13532, 13541, 7316) */
+.pezzo-chat .riquadro-lavoro {
+  display: flex; flex-direction: column; gap: var(--spazio-2); padding: var(--spazio-4);
+  border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.pezzo-chat .testata-lavoro, .pezzo-chat .voce-lavoro, .pezzo-chat .riga-stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
+.pezzo-chat .testata-lavoro .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .testata-lavoro .dettaglio, .pezzo-chat .voce-lavoro .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.pezzo-chat .voce-lavoro .testo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-chat .voce-lavoro.attiva .testo { font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .voce-lavoro .nome { flex: none; font-weight: 500; color: var(--colore-testo-primario); }
+
+.pezzo-chat .riga-stato { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .riga-stato .esito { flex: none; font-weight: 500; }
+.pezzo-chat .riga-stato .dettaglio { flex: 1; min-width: 0; }
+
+.pezzo-chat .riassunto { display: flex; align-items: center; gap: var(--spazio-3); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .riassunto .linea { flex: 1; height: var(--misura-tratto); background: var(--colore-bordo-normale); }
+
+.pezzo-chat .avviso-filo { display: flex; align-items: flex-start; gap: var(--spazio-3); padding: var(--spazio-3); border-radius: var(--raggio-lg); }
+.pezzo-chat .avviso-filo.attesa { background: var(--colore-fondo-attesa); }
+.pezzo-chat .avviso-filo.errore { background: var(--colore-fondo-errore); align-items: center; }
+.pezzo-chat .avviso-filo .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-chat .avviso-filo .titolo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .avviso-filo .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+

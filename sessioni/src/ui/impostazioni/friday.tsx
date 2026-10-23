@@ -25,7 +25,7 @@ function useImpostazioniFriday(): Valori | null {
 }
 
 /** Testi dei frame: «Friday non risponde» se non ha preso il comando, se no il perché di Friday o «Comando non riuscito». */
-const testoEsito = (e: EsitoComando) =>
+export const testoEsito = (e: EsitoComando) =>
   e.esito === "scaduto" && !e.preso ? "Friday non risponde" : e.testo || "Comando non riuscito";
 
 export default function Friday() {

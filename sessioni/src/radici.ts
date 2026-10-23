@@ -1,6 +1,8 @@
 // Radici degli account Claude: ~/.claude e ~/.claude-*. Identità = realpath (ConfigPathIdentity.swift).
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
+import { percorsiAccount } from "./account-percorsi";
 
 export interface Radice {
   path: string;
@@ -50,4 +52,19 @@ export function trovaRadici(home: string): Radice[] {
     out.push({ path: p, account: n, email: emailDi(p) });
   }
   return out;
+}
+
+/** `~/…` -> percorso assoluto, per aprire una cartella scritta come nel disegno. */
+export const espandi = (p: string, home = os.homedir()) => (p === "~" || p.startsWith("~/") ? path.join(home, p.slice(1)) : p);
+
+/** `/Users/x/.claude-y` -> `~/.claude-y`, come lo scrive il disegno. */
+export const accorcia = (p: string, home = os.homedir()) => (p === home ? "~" : p.startsWith(home + path.sep) ? "~" + p.slice(home.length) : p);
+
+/** Le radici da leggere davvero: `trovaRadici` più `accountAggiunti` meno `accountTolti` (percorsi scritti con `~`). */
+export function radiciScelte(home: string, aggiunte: string[] = [], tolte: string[] = []): Radice[] {
+  const trovate = trovaRadici(home);
+  return percorsiAccount(trovate.map((r) => accorcia(r.path, home)), aggiunte, tolte).map((p) => {
+    const assoluto = espandi(p, home);
+    return trovate.find((r) => r.path === assoluto) ?? { path: assoluto, account: path.basename(assoluto), email: emailDi(assoluto) };
+  });
 }

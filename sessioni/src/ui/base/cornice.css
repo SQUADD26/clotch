@@ -32,6 +32,8 @@
   display: flex; flex-direction: column; align-items: center; gap: var(--spazio-4);
 }
 /* il filo e la casella della chat sono larghi al massimo una colonna, al centro */
-.colonna > :not(.area-avvisi) { width: 100%; max-width: var(--misura-colonna); }
+.colonna > :not(.area-avvisi, .pezzo), .colonna > .pezzo > * { width: 100%; max-width: var(--misura-colonna); }
+/* contenitore di un pezzo (base/Pezzo.tsx): non è una scatola, i suoi figli stanno nel layout del genitore */
+.pezzo { display: contents; }
 .pannello { width: var(--misura-pannello); flex: none; display: flex; flex-direction: column; }
 .pannello:empty { display: none; }

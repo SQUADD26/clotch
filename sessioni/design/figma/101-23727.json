@@ -2044,11 +2044,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:23749",
@@ -3445,11 +3444,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:23762;101:7280",
@@ -3801,11 +3799,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:23764;101:7323",
@@ -4729,11 +4726,10 @@
     "paddingLeft": "spazio/2",
     "paddingRight": "spazio/2",
     "paddingTop": "spazio/1",
-    "paddingBottom": "spazio/1"
+    "paddingBottom": "spazio/1",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:23983",
