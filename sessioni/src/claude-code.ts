@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { testaECoda, msgErrore } from "./jsonl";
 import { aMillisecondi } from "./registri";
 import { Radice } from "./radici";
+import { situazioneClaude } from "./situazione";
 import { ErroreLettura, Sessione } from "./tipi";
 
 const cache = new Map<string, { chiave: string; s: Sessione | null }>();
@@ -40,6 +41,7 @@ function daFile(file: string, radice: Radice, size: number, mtime: number): Sess
     perche: null,
     ultimaAttivita: Math.max(t, 0),
     obiettivo: null,
+    situazione: situazioneClaude(coda),
     file,
   };
 }
