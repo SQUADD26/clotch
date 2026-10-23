@@ -1,0 +1,100 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-squadd",
+    "email": null,
+    "idApp": null,
+    "titolo": "Backend: auth e RLS",
+    "progetto": "squadd-v2",
+    "cartella": "",
+    "ramo": "feat/2412-rls-sessioni",
+    "modello": "claude-opus-5-5",
+    "stato": "aspetta",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "Policy RLS di «sessioni» per ogni studio, provate sul database di sviluppo e promosse su main.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test delle policy: 14 su 14",
+       "fatta": true
+      },
+      {
+       "testo": "Migrazione 0042 provata su dev",
+       "fatta": true
+      },
+      {
+       "testo": "Sì di Roberto alla promozione",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "database"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Applica le policy RLS di «sessioni» e promuovi su main.",
+    "t": 1792767989617
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "gh pr checks 2412"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792767990617,
+    "id": "t0"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?",
+    "modello": "claude-opus-5-5",
+    "t": 1792767996617
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "database"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

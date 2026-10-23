@@ -1,0 +1,129 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1",
+  "sezione": "aperti:strumento"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: lettura dal disco",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "Leggere dal disco le sessioni di tutte le cartelle ~/.claude-*, di Codex e di Cursor, senza interfaccia.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Leggi le sessioni dal disco: tutte le cartelle ~/.claude-*, Codex e Cursor.",
+    "t": 1792767982617
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Grep",
+    "ingresso": {
+     "pattern": "«claude-code-sessions»",
+     "path": "~/Library"
+    },
+    "esito": {
+     "testo": "",
+     "errore": false
+    },
+    "t": 1792767983617,
+    "id": "t0"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Trovo 6 cartelle di account e 312 sessioni. Scrivo il lettore e i test.",
+    "modello": "claude-opus-5-5",
+    "t": 1792767985617
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm test -- lettore"
+    },
+    "esito": {
+     "testo": "PASS sessioni/lettore.test.ts (11 test)\nTests: 11 passed, 11 total",
+     "errore": false
+    },
+    "t": 1792767986617,
+    "id": "t1"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm test -- cartelle"
+    },
+    "esito": null,
+    "t": 1792767995617,
+    "id": "t2"
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "…",
+    "t": 1792767996617
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

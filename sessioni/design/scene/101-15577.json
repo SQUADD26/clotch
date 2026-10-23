@@ -1,0 +1,99 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "turno_finito",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Come si fa la barra laterale trasparente su Mac?",
+    "t": 1792767994617
+   },
+   {
+    "tipo": "strumento",
+    "nome": "WebSearch",
+    "ingresso": {
+     "query": "electron vibrancy sidebar macOS"
+    },
+    "esito": {
+     "testo": "Links: [{\"title\":\"BrowserWindow: vibrancy e visualEffectState\",\"url\":\"https://electronjs.org/docs\"},{\"title\":\"Barra laterale trasparente su macOS\",\"url\":\"https://github.com/x\"},{\"title\":\"NSVisualEffectView\",\"url\":\"https://developer.apple.com/x\"},{\"title\":\"Barra del titolo nascosta con i semafori\",\"url\":\"https://stackoverflow.com/x\"}]",
+     "errore": false
+    },
+    "t": 1792767995617,
+    "id": "t0"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Con vibrancy «sidebar» sulla finestra e lo sfondo della barra trasparente. Lo provo adesso.",
+    "modello": "claude-opus-5-5",
+    "t": 1792767996617
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

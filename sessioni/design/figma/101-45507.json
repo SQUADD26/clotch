@@ -60,7 +60,8 @@
   "misura/pannello": 320,
   "colore/icona/successo": "#40c977",
   "colore/testo/errore": "#ff6764",
-  "misura/riferimento": 24
+  "misura/riferimento": 24,
+  "misura/tratto": 1
  },
  "nodi": [
   {
@@ -1113,11 +1114,10 @@
     "itemSpacing": "spazio/1",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
-    "height": "misura/bottone"
+    "height": "misura/bottone",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:45518;101:16684",
@@ -1769,11 +1769,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:45528",
@@ -2672,11 +2671,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:45536;101:7323",

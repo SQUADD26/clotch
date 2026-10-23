@@ -1,0 +1,230 @@
+{
+ "navigazione": {
+  "vista": "friday",
+  "sezione": "scritta:Ferma @back"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "b1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Backend: auth e RLS",
+    "progetto": "squadd-v2",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "aspetta",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "database"
+   },
+   {
+    "id": "b2",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Backup Hetzner sulle VPS",
+    "progetto": "squadd-v2",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "finita",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "pacco"
+   },
+   {
+    "id": "b3",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Backend: webhook pagamenti",
+    "progetto": "dentalspace",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "ferma",
+    "perche": null,
+    "ultimaAttivita": 1792767997617,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "database"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {},
+ "preferenze": {
+  "b1": {
+   "icona": "database"
+  },
+  "b2": {
+   "icona": "pacco"
+  },
+  "b3": {
+   "icona": "database"
+  }
+ },
+ "registro": {
+  "chat": {
+   "friday": {
+    "chat": "friday",
+    "titolo": null,
+    "madre": null,
+    "progetto": null,
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "lavora",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [],
+    "battito": 1792768107617,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792768107617,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [
+   {
+    "id": "a0",
+    "t": 1792767557617,
+    "testo": "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev.",
+    "livello": "info",
+    "motivo": "risposta",
+    "dettoDa": null
+   },
+   {
+    "id": "a1",
+    "t": 1792767597617,
+    "testo": "Fatto. La migrazione è partita; ti avviso quando finisce.",
+    "livello": "info",
+    "motivo": "risposta",
+    "dettoDa": null
+   }
+  ],
+  "clotch": null,
+  "friday": null,
+  "comandi": [
+   {
+    "id": "c0",
+    "t": 1792767537617,
+    "cmd": "parla",
+    "da": "app",
+    "args": {
+     "testo": "Com’è messa la sessione del backend?"
+    }
+   },
+   {
+    "id": "c1",
+    "t": 1792767577617,
+    "cmd": "parla",
+    "da": "app",
+    "args": {
+     "testo": "Consentila tu."
+    }
+   }
+  ],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}
