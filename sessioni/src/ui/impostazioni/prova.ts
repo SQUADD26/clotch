@@ -9,6 +9,8 @@ export interface Prova {
   dopoRimuovi?: boolean;
   /** Dati: il dialogo «Eliminare i dati di Sessioni?» aperto (119:57106). */
   conferma?: boolean;
+  /** Info: il dialogo «Novità della versione» già aperto (119:57552). */
+  novita?: boolean;
 }
 
 const PROVE: Record<string, Prova> = {
@@ -17,6 +19,8 @@ const PROVE: Record<string, Prova> = {
   "101-10461": { dopoRimuovi: true },
   "119-56891": { aperta: "Cronologia" },
   "119-57106": { conferma: true },
+  "119-57404": { aperta: "Versione" },
+  "119-57552": { novita: true },
 };
 
 const id = new URLSearchParams(location.search).get("parita");

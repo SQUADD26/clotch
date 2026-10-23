@@ -1,0 +1,3 @@
+/* figma: 119-57552 — «novità»: una «voce novità» per riga, spunta di successo e testo */
+.novita { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spazio-2); }
+.novita li { display: flex; align-items: flex-start; gap: var(--spazio-2); }

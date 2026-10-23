@@ -53,4 +53,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   // nessuna fonte ancora: quote d'uso #374, archiviate #375
   ipc.handle("impostazioni:uso", () => null);
   ipc.handle("impostazioni:archiviate", () => []);
+  // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
+  ipc.handle("impostazioni:novita", () => null);
+  ipc.handle("impostazioni:aggiornamenti", () => false);
 }

@@ -175,4 +175,10 @@ export interface ImpostazioniApi {
   archiviate(): Promise<Archiviata[]>;
   /** «Elimina dati…»: toglie indice, cache e impostazioni dell'app; le sessioni originali non si toccano. */
   eliminaDati(): Promise<void>;
+  /** Note della versione in uso; null finché non c'è una fonte. */
+  novita(): Promise<Novita | null>;
+  /** `false`: c'è un modo di controllare gli aggiornamenti? `true`: controlla. */
+  aggiornamenti(fai: boolean): Promise<boolean>;
 }
+
+export interface Novita { data: string; voci: string[] }
