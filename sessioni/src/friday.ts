@@ -89,6 +89,8 @@ const nuova = (chat: string): ChatFriday => ({
   domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
   obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
+/** friday_hook.py scrive i passi in italiano; l'app li legge con i nomi di TodoWrite. */
+const STATO_PASSO = new Map([["fatto", "completed"], ["in_corso", "in_progress"], ["da_fare", "pending"]]);
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
@@ -103,6 +105,8 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
   }
   const ultimoN = new Map<string, number>();
   const annullate = new Set<string>();
+  const nonRiprovabili = new Set<string>(); // annulla rifiutata dal motore per sempre: inutile riproporla
+  const versioniObiettivo = new Map<string, number>();
   const comandi = new Map<string, any>();
   for (const m of mesi) {
     let testo: string;
@@ -157,7 +161,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "interrotta": c.interrotta = s(d.da) ?? "roberto"; break;
         case "coda": c.coda = Array.isArray(d.voci) ? d.voci.map((v: any) => ({ voce: String(v?.voce ?? ""), testo: String(v?.testo ?? "") })) : []; break;
         case "passi":
-          if (!d.agente && Array.isArray(d.passi)) c.passi = d.passi.filter((p: any) => !p?.tolto).map((p: any) => ({ testo: String(p?.testo ?? ""), stato: String(p?.stato ?? "") }));
+          if (!d.agente && Array.isArray(d.passi)) c.passi = d.passi.filter((p: any) => !p?.tolto).map((p: any) => ({ testo: String(p?.testo ?? ""), stato: STATO_PASSO.get(p?.stato) ?? String(p?.stato ?? "") }));
           break;
         case "regola": {
           const dove = String(d.dove ?? "claude-config"); // default del motore (friday_comandi.py)
@@ -165,7 +169,14 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           if (d.togli !== true) r.regole.push({ testo: String(d.testo ?? ""), perche: String(d.perche ?? ""), dove, t });
           break;
         }
-        case "obiettivo": c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") }; break;
+        case "obiettivo": {
+          // la versione sale a ogni cambio: una riga in ritardo (remota, riemessa) con versione più bassa non riporta indietro lo stato
+          const v = Number.isInteger(d.versione) ? d.versione : null;
+          if (v !== null && v < (versioniObiettivo.get(o.chat) ?? 0)) break;
+          if (v !== null) versioniObiettivo.set(o.chat, v);
+          c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") };
+          break;
+        }
         case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
@@ -185,7 +196,10 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
           // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
           sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false });
+          // annullata dal terminale: nessun comando dell'app, solo la decisione «annullata <id>» che il motore firma con la sua ricevuta
+          if (String(d.cosa).startsWith("annullata ") && ricevutaLocale(o, home, env)) annullate.add(String(d.cosa).slice(10));
+          break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
@@ -196,13 +210,21 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "comando_fatto": {
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
           const cmd = comandi.get(String(d.comando));
-          if (d.esito === "ok" && cmd?.cmd === "annulla" && s(cmd.args?.decisione)) annullate.add(cmd.args.decisione);
+          if (cmd?.cmd === "annulla" && s(cmd.args?.decisione)) {
+            const testo = String(d.testo ?? "");
+            // shortcut: il motore non dà un codice, si legge la frase; un rifiuto nuovo non riconosciuto lascia l'annulla riprovabile (fino a un codice nel contratto)
+            if (d.esito === "ok" || (d.esito === "rifiutato" && /gi[aà]'? annullata/i.test(testo))) annullate.add(cmd.args.decisione);
+            else if (d.esito === "rifiutato" && /interrott|non annullabile|senza provenienza|fuori dai comandi|non e'? un argv|non è un argv/i.test(testo)) nonRiprovabili.add(cmd.args.decisione);
+          }
           break;
         }
       }
     }
   }
-  for (const d of r.decisioni) if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
+  for (const d of r.decisioni) {
+    if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
+    else if (nonRiprovabili.has(d.id)) d.annullabile = false;
+  }
   return r;
 }
 
