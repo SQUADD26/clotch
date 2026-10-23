@@ -6,7 +6,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { leggiElenco } from "../src/elenco";
 import { Adesso, Segno } from "../src/situazione";
-import { Sessione } from "../src/tipi";
+import { Sessione, Stato } from "../src/tipi";
 
 const FIX = path.join(__dirname, "..", "..", "test", "fixtures", "situazioni");
 const ORA = Date.parse("2026-10-24T00:00:00Z");
@@ -79,9 +79,25 @@ function controlla(s: Sessione, a: Atteso) {
 for (const [nome, a] of CLAUDE) test(`Claude: ${nome}`, () => controlla(leggi("claude", nome), a));
 for (const [nome, a] of CODEX) test(`Codex: ${nome}`, () => controlla(leggi("codex", nome), a));
 
+// App Claude desktop (#340): copie ridotte di local_*.json veri, senza trascrizione; ORA è molto dopo lastActivityAt, quindi «lavora» viene solo dal file.
+const APP: [string, Stato][] = [
+  ["in-corso", "lavora"],
+  ["turno-finito", "ferma"],
+  ["archiviata-a-meta-turno", "finita"],
+];
+for (const [nome, stato] of APP) test(`App Claude desktop: ${nome}`, () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "situazione-"));
+  const dir = path.join(home, "Library", "Application Support", "Claude", "claude-code-sessions", "u", "p");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.copyFileSync(path.join(FIX, "app", `${nome}.json`), path.join(dir, "local_aaaa0000-0000-4000-8000-000000000001.json"));
+  const e = leggiElenco({ home, env: {}, ora: ORA });
+  assert.deepEqual(e.errori, []);
+  assert.deepEqual(e.sessioni.map((s) => s.stato), [stato]);
+});
+
 test("le fixture non coprono altro: ogni file ha la sua riga nel catalogo dei test", () => {
-  for (const [sorg, righe] of [["claude", CLAUDE], ["codex", CODEX]] as const) {
-    const file = fs.readdirSync(path.join(FIX, sorg)).map((n) => n.replace(/\.jsonl$/, "")).sort();
+  for (const [sorg, righe] of [["claude", CLAUDE], ["codex", CODEX], ["app", APP]] as const) {
+    const file = fs.readdirSync(path.join(FIX, sorg)).map((n) => n.replace(/\.jsonl?$/, "")).sort();
     assert.deepEqual(file, righe.map(([n]) => n).sort());
   }
 });
@@ -102,5 +118,4 @@ for (const s of [
   "Claude: piano rifiutato (nessun esempio vero)",
   "Claude: /clear e cambio di modello (nessun esempio vero)",
   "Cursor: tutte le situazioni (nessuna trascrizione Cursor sul Mac)",
-  "App Claude desktop: «in corso» (il file vero non ha isRunning; manca il campo giusto)",
 ]) test(`attende dati veri: ${s}`, { todo: true }, () => {});
