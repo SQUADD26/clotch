@@ -1,0 +1,11 @@
+/* Uso, scheda Andamento: grafico a barre impilate (119-57613). Tutte le misure da token. */
+.andamento { display: flex; flex-direction: column; gap: var(--spazio-4); padding: var(--spazio-4); --altezza-pila: calc(var(--spazio-2) * 25); }
+.andamento .testata { display: flex; justify-content: space-between; align-items: center; }
+.andamento .grafico { display: flex; align-items: flex-end; gap: var(--spazio-2); align-self: flex-start; }
+.andamento .giorno { display: flex; flex-direction: column; align-items: center; gap: var(--spazio-1); width: var(--spazio-6); }
+.andamento .pila { display: flex; flex-direction: column-reverse; width: 100%; }
+.andamento .pila > div { flex-basis: 0; }
+
+/* schede: `.scheda` è già della scheda di progetto in friday.css, qui `.tab-uso` */
+.tab-uso { display: flex; align-items: center; height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-md); }
+.tab-uso.scelta { background: var(--colore-fondo-riga-scelta); }
