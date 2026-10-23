@@ -5,7 +5,8 @@ import "./componenti.css";
 
 type Base = ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Bottone({ tipo = "primario", className = "", ...p }: Base & { tipo?: "primario" | "secondario" }) {
+/** `pericolo`: «Bottone pericolo» di 101-37696 (Ferma tutto, Annulla la decisione). */
+export function Bottone({ tipo = "primario", className = "", ...p }: Base & { tipo?: "primario" | "secondario" | "pericolo" }) {
   return <button type="button" {...p} className={`bottone ${tipo} ${className}`} />;
 }
 

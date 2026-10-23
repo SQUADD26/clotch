@@ -42,7 +42,7 @@ test("vista: casella per progetto con obiettivo, passi, chi aspetta, al lavoro, 
   const c = casella(r, ORA);
   assert.deepEqual(c.progetti.map((p) => p.nome), ["clotch", "squadd-v2"]);
   const [cl] = c.progetti;
-  assert.deepEqual(cl.obiettivo, { testo: "App Sessioni pari al disegno", fatti: 1, passi: [{ testo: "Disegno", stato: "completed" }, { testo: "Barra", stato: "in_progress" }] });
+  assert.deepEqual(cl.obiettivo, { testo: "App Sessioni pari al disegno", fatti: 1, passi: [{ testo: "Disegno", stato: "completed" }, { testo: "Barra", stato: "in_progress" }], lavora: true });
   assert.deepEqual(cl.aspettano.map((a) => [a.titolo, a.genere]), [["Sessioni: disegno", "Permesso"], ["Figma: schermate", "Domanda"]]);
   assert.deepEqual([cl.alLavoro, cl.fattoOggi, c.aspettano, c.alLavoro], [1, 1, 2, 1]);
   assert.deepEqual(c.proposti, [{ chat: "s1", progetto: "squadd-v2", testo: "Policy RLS" }]);

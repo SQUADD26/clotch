@@ -13,6 +13,7 @@
 }
 .bottone.primario { background: var(--colore-fondo-bottone-primario); color: var(--colore-testo-su-primario); }
 .bottone.secondario { background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-primario); }
+.bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); font-weight: 400; }
 
 /* Bottone icona: Stato=Riposo | Passaggio */
 .bottone-icona {
