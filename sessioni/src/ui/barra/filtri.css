@@ -1,26 +1,26 @@
 /* figma: 101-9860 — pillole 101:9860, menu filtro 101:16778 / 101:17031, raggruppa e ordina 101:30304 */
-.pillole { padding: var(--spazio-2) var(--spazio-2) 0; gap: var(--spazio-1); display: flex; flex-wrap: wrap; flex: none; }
-.pillola-filtro {
+.pezzo-barra .pillole { padding: var(--spazio-2) var(--spazio-2) 0; gap: var(--spazio-1); display: flex; flex-wrap: wrap; flex: none; }
+.pezzo-barra .pillola-filtro {
   height: var(--misura-bottone); padding: 0 var(--spazio-3); gap: var(--spazio-1); border-radius: var(--raggio-pieno);
   display: inline-flex; align-items: center; max-width: 100%; white-space: nowrap; background: var(--colore-fondo-riga-scelta);
 }
-.pillola-filtro .valore { overflow: hidden; text-overflow: ellipsis; }
-.pillola-filtro.aggiungi { background: none; border: var(--misura-tratto) solid var(--colore-bordo-normale); }
+.pezzo-barra .pillola-filtro .valore { overflow: hidden; text-overflow: ellipsis; }
+.pezzo-barra .pillola-filtro.aggiungi { background: none; border: var(--misura-tratto) solid var(--colore-bordo-normale); }
 
 /* «Menu filtro»: padding e gap spazio-2/1, raggio lg (il «menu» della base ha spazio-1 e raggio xl) */
-.menu.menu-filtro { padding: var(--spazio-2); gap: var(--spazio-1); border-radius: var(--raggio-lg); }
-.menu-filtro .testata { height: var(--testo-riga-sm); box-sizing: content-box; padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-1); display: flex; align-items: center; }
-.campo-menu {
+.pezzo-barra .menu.menu-filtro { padding: var(--spazio-2); gap: var(--spazio-1); border-radius: var(--raggio-lg); }
+.pezzo-barra .menu-filtro .testata { height: var(--testo-riga-sm); box-sizing: content-box; padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-1); display: flex; align-items: center; }
+.pezzo-barra .campo-menu {
   height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);
   display: flex; align-items: center; border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
 }
-.campo-menu input { flex: 1; min-width: 0; color: var(--colore-testo-primario); }
-.campo-menu input::placeholder { color: var(--colore-testo-secondario); }
-.casella-spunta {
+.pezzo-barra .campo-menu input { flex: 1; min-width: 0; color: var(--colore-testo-primario); }
+.pezzo-barra .campo-menu input::placeholder { color: var(--colore-testo-secondario); }
+.pezzo-barra .casella-spunta {
   width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-xs); flex: none;
   border: var(--misura-tratto) solid var(--colore-bordo-forte); display: flex;
 }
-.casella-spunta.spuntata { border: 0; background: var(--colore-fondo-accento); }
-.menu-filtro .linea { flex: none; }
-.menu-raggruppa .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
-.menu-raggruppa .spunta.nascosta { visibility: hidden; }
+.pezzo-barra .casella-spunta.spuntata { border: 0; background: var(--colore-fondo-accento); }
+.pezzo-barra .menu-filtro .linea { flex: none; }
+.pezzo-barra .menu-raggruppa .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-barra .menu-raggruppa .spunta.nascosta { visibility: hidden; }
