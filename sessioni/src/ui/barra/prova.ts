@@ -140,6 +140,8 @@ function ricerca(testo: string): Prova {
 FRAME["101-10297"] = () => ricerca("lettura");
 FRAME["101-23003"] = () => ricerca("copia");
 FRAME["101-23248"] = () => ricerca("kubernetes");
+// allegati e immagini nel filo (#437): la barra di «Sessione aperta», come 101-8036
+for (const id of ["101-25845", "101-27294", "101-28041", "101-28232"]) FRAME[id] = () => base();
 
 let una: Prova | null | undefined;
 /** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */

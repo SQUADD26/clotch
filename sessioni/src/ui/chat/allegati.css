@@ -1,0 +1,37 @@
+/* figma: 101-28041 — «chip allegato», «allegati messaggio», «miniatura»; 101-27294 «zona rilascio»; 101-25542 chip nella casella */
+.pezzo-chat .allegati-messaggio { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--spazio-2); }
+.pezzo-chat .chip-allegato {
+  display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; max-width: 100%; padding: var(--spazio-1) var(--spazio-2);
+  background: var(--colore-fondo-bottone-secondario); border-radius: var(--raggio-lg);
+}
+.pezzo-chat .chip-allegato .apri { display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; text-align: left; }
+.pezzo-chat .chip-allegato .testi { display: flex; flex-direction: column; min-width: 0; }
+.pezzo-chat .chip-allegato .nome {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .chip-allegato .dettaglio { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .chip-allegato .rimuovi { display: inline-flex; flex: none; }
+
+/* le miniature stanno più staccate: 24 sopra e sotto, come nel disegno */
+.pezzo-chat .miniature { display: flex; flex-wrap: wrap; gap: var(--spazio-2); margin: var(--spazio-4) 0 var(--spazio-3); }
+.pezzo-chat .miniatura {
+  width: var(--misura-miniatura-larga); height: var(--misura-miniatura-alta); display: block; overflow: hidden;
+  background: var(--colore-fondo-bottone-secondario); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl);
+}
+.pezzo-chat .miniatura img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pezzo-chat .miniatura .non-letta {
+  height: 100%; display: flex; align-items: center; justify-content: center; gap: var(--spazio-2);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+
+/* chip dentro la casella (101:25542) e zona di rilascio (101:27294) */
+.pezzo-chat .casella .allegati-casella { display: flex; flex-wrap: wrap; gap: var(--spazio-2); }
+.pezzo-chat .casella { position: relative; }
+.pezzo-chat .zona-rilascio {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: var(--spazio-2);
+  background: var(--colore-fondo-attesa); border: var(--misura-tratto-forte) dashed var(--colore-bordo-fuoco); border-radius: var(--raggio-casella);
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); pointer-events: none;
+}
+.pezzo-chat .aggiungi { position: relative; display: inline-flex; }
+.pezzo-chat .aggiungi .menu { left: 0; bottom: calc(100% + var(--spazio-2)); max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }

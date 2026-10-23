@@ -7,6 +7,8 @@ import "./menu.css";
 export type VoceMenu =
   /** `scelta`: se una voce la ha, tutte tengono il posto della spunta; si vede solo su quella scelta. */
   | { icona?: NomeIcona; etichetta: string; scorciatoia?: string; pericolo?: boolean; scelta?: boolean; fai(): void }
+  /** Titolo di un gruppo di voci («Skill», 101-25845). */
+  | { gruppo: string }
   | "separatore";
 
 interface Props {
@@ -18,7 +20,7 @@ interface Props {
 }
 
 export function Menu({ voci, onChiudi, testata, style }: Props) {
-  const conScelta = voci.some((v) => v !== "separatore" && v.scelta !== undefined);
+  const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelector<HTMLButtonElement>("button"))?.focus();
@@ -48,6 +50,7 @@ export function Menu({ voci, onChiudi, testata, style }: Props) {
       )}
       {voci.map((v, i) => v === "separatore"
         ? <div key={i} className="separatore" role="separator"><div className="linea" /></div>
+        : "gruppo" in v ? <div key={i} className="titolo-gruppo t-xs secondario">{v.gruppo}</div>
         : (
           <button key={i} type="button" role={conScelta ? "menuitemradio" : "menuitem"} aria-checked={conScelta ? !!v.scelta : undefined}
             className={v.scelta ? "voce scelta" : "voce"} onClick={() => { onChiudi(); v.fai(); }}>

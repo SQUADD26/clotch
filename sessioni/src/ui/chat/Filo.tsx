@@ -1,15 +1,18 @@
 // figma: 101-8036 — «Filo» della sessione aperta: messaggi di Roberto, turni coi loro blocchi, «Carica precedenti» (101:9628),
 // fine turno (101:15335), richieste vive di Friday (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { ChatFriday } from "../../friday";
 import { Bottone } from "../base/Bottone";
 import { nomeModello } from "./Casella";
+import { AllegatiMessaggio, VisoreContesto } from "./Allegati";
 import { Attivita, Aiutanti, AvvisoFilo, FineTurno, Interrotta, Riassunto } from "./Lavoro";
 import { FileToccati, MessaggioRoberto, Modifica, Pensiero, RicercaWeb, Strumento } from "./Blocchi";
 import { Risposta } from "./Risposta";
 import { riepilogo, type Blocco, type Voce } from "./modello";
 import { Domanda, Esito, Permesso, Piano, passiPiano } from "./Richieste";
+import { chiaveImmagine, galleria as galleriaDi } from "./percorsi";
 import { provaDi, quanti } from "./testi";
+import { Visore } from "./Visore";
 
 type Richiesta = ChatFriday["richieste"][number];
 
@@ -47,6 +50,10 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   prova?: string | null;
 }) {
   const filo = useRef<HTMLDivElement>(null);
+  // il visore scorre le immagini del filo, dalla più recente (101:28232 «1 di 2»); «visore:<n>» in una scena lo apre sulla n-esima
+  const galleria = useMemo(() => galleriaDi(voci, chat), [voci, chat]);
+  const [aperta, setAperta] = useState<string | null>(() => { const n = provaDi(prova, "visore"); return n == null ? null : galleria[Number(n) || 0]?.chiave ?? null; });
+  const indice = galleria.findIndex((g) => g.chiave === aperta); // per chiave: un'immagine nuova in testa non sposta quella aperta
   const daFondo = useRef(0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo
   const richiesta = (g: string) => c?.richieste.find((r) => r.genere === g) ?? null;
   // permessi aperti: non stanno nella trascrizione, solo nel registro di Friday
@@ -68,6 +75,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   };
 
   return (
+    <VisoreContesto.Provider value={{ sessione: chat, apri: (da) => setAperta(chiaveImmagine(da)) }}>
     <div className="filo" ref={filo} onScroll={scorri}>
       {prima !== false && (
         <div className="precedenti">
@@ -76,7 +84,12 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
         </div>
       )}
       {voci.map((v, k) => {
-        if (v.tipo === "roberto") return <MessaggioRoberto key={v.chiave} testo={v.testo} />;
+        if (v.tipo === "roberto") return (
+          <Fragment key={v.chiave}>
+            {(v.immagini?.length || v.percorsi?.length) ? <AllegatiMessaggio immagini={v.immagini ?? []} percorsi={v.percorsi ?? []} /> : null}
+            {v.testo && <MessaggioRoberto testo={v.testo} />}
+          </Fragment>
+        );
         if (v.tipo === "riassunto") return <Riassunto key={v.chiave} />;
         const vivoQui = vivo && k === ultimo;
         const r = riepilogo(v);
@@ -93,5 +106,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
       {permessi.map((p) => <Permesso key={p.rid} chat={chat} r={p} da={da} />)}
       {inFondo}
     </div>
+    {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}
+    </VisoreContesto.Provider>
   );
 }

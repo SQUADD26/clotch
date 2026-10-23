@@ -1,7 +1,9 @@
 // figma: 101-8036 — blocchi del filo: «Messaggio Roberto» 101:7210, «Risposta» 101:7216, «Blocco codice» 101:7213,
 // «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525.
-import { useState, type ReactNode } from "react";
+import { useContext, useState, type ReactNode } from "react";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { Miniature, VisoreContesto } from "./Allegati";
+import { nomeFile } from "./percorsi";
 import type { Blocco } from "./modello";
 import { durata, quanti } from "./testi";
 import { useRiserva } from "./riserva";
@@ -53,16 +55,20 @@ export function Strumento({ b, aperta: iniziale = false }: { b: Extract<Blocco, 
   const [aperta, setAperta] = useState(iniziale || b.stato === "errore");
   const apribile = b.stato !== "in-corso" && !!(b.comando || b.uscita);
   const r = useRiserva();
+  const { sessione, apri } = useContext(VisoreContesto);
+  // uno strumento che ha dato immagini («Schermata»): la testata apre la prima nel visore (101:28041)
+  const primaImmagine = b.immagini?.[0];
   const dettaglio = b.comando ? r.comando(b.dettaglio) : r.testo(b.dettaglio);
   return (
     <div className="strumento">
       <Testata icona={b.stato === "in-corso" ? "in-corso" : b.stato === "errore" ? "avviso" : b.icona} colore={b.stato === "errore" ? "errore" : "secondaria"}
-        aperta={aperta} onClick={apribile ? () => setAperta(!aperta) : undefined}>
+        aperta={aperta} onClick={apribile ? () => setAperta(!aperta) : primaImmagine ? () => apri({ sessione, rif: primaImmagine }) : undefined}>
         <span className={b.stato === "errore" ? "tipo errore" : "tipo"}>{b.etichetta}</span>
         <span className="dettaglio">{dettaglio}</span>
         {b.durata != null && b.stato !== "in-corso" && <span className="durata">{durata(b.durata)}</span>}
       </Testata>
       {aperta && apribile && <BloccoCodice comando={b.comando && `$ ${dettaglio}`} uscita={b.uscita && r.testo(b.uscita)} errore={b.stato === "errore"} />}
+      {b.immagini && <Miniature immagini={b.immagini} nome={nomeFile(b.dettaglio) || b.etichetta} />}
     </div>
   );
 }

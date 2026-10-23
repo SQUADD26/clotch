@@ -54,8 +54,20 @@ export interface Elenco {
   errori: ErroreLettura[];
 }
 
+/** Un'immagine dentro una riga della trascrizione (messaggio incollato o esito di uno strumento): si rilegge a richiesta, mai portata nel messaggio. */
+export interface RifImmagine {
+  /** `uuid` della riga che la contiene. */
+  riga: string;
+  /** Posizione tra le immagini della riga, in ordine di lettura. */
+  n: number;
+  mime: string;
+  byte: number;
+  /** «Immagine 1» per quelle incollate; assente per gli esiti. */
+  nome?: string;
+}
+
 export type Messaggio =
-  | { tipo: "utente"; testo: string; t: number | null }
+  | { tipo: "utente"; testo: string; t: number | null; immagini?: RifImmagine[] }
   | { tipo: "assistente"; testo: string; modello: string | null; t: number | null }
   | { tipo: "pensiero"; testo: string; t: number | null }
   | {
@@ -64,7 +76,7 @@ export type Messaggio =
       nome: string;
       ingresso: unknown;
       /** null finché l'esito non è arrivato. */
-      esito: { testo: string; errore: boolean } | null;
+      esito: { testo: string; errore: boolean; immagini?: RifImmagine[] } | null;
       t: number | null;
     }
   | { tipo: "errore"; testo: string; t: number | null };
@@ -135,6 +147,29 @@ export interface PreferenzeSessione {
 }
 
 export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale";
+
+/** Un file scelto per la casella o scritto in fondo a un messaggio (`@percorso`). */
+export interface FileAllegato { percorso: string; nome: string; tipo: "immagine" | "file" | "cartella"; byte: number | null }
+/** Dove sta un'immagine: in una riga della trascrizione o su disco. */
+export type DaImmagine = { sessione: string; rif: RifImmagine } | { percorso: string };
+export interface SkillNome { nome: string }
+
+/** `window.casella` (#437): tutto quello che la casella e il filo chiedono al Mac per allegati, immagini e skill. */
+export interface CasellaApi {
+  /** Finestra di scelta dei file e delle cartelle; [] se annullata. */
+  scegli(): Promise<FileAllegato[]>;
+  /** Nome, tipo e peso dei percorsi dati; un percorso che non si legge non c'è nel risultato. */
+  descrivi(percorsi: string[]): Promise<FileAllegato[]>;
+  /** Il percorso di un file trascinato nella finestra; "" se non sta sul disco. */
+  percorso(file: File): string;
+  /** L'immagine come indirizzo `data:`; null se non si legge. Con `sessione` e `rif`: dalla trascrizione; con `percorso`: dal disco. */
+  immagine(da: DaImmagine): Promise<string | null>;
+  copiaImmagine(da: DaImmagine): Promise<boolean>;
+  /** Finestra «Salva con nome»; false se annullata. */
+  salvaImmagine(da: DaImmagine, nome: string): Promise<boolean>;
+  /** Le skill dell'account della sessione, in ordine alfabetico. */
+  skill(account: string): Promise<SkillNome[]>;
+}
 
 /** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
 export interface FridayApi {

@@ -1,5 +1,5 @@
-import { contextBridge, ipcRenderer } from "electron";
-import type { Aggiornamento, FridayApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
+import type { Aggiornamento, CasellaApi, FridayApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -57,3 +57,14 @@ const impostazioni: ImpostazioniApi = {
   aggiornamenti: (fai) => ipcRenderer.invoke("impostazioni:aggiornamenti", fai),
 };
 contextBridge.exposeInMainWorld("impostazioni", impostazioni);
+
+const casella: CasellaApi = {
+  scegli: () => ipcRenderer.invoke("casella:scegli"),
+  descrivi: (percorsi) => ipcRenderer.invoke("casella:descrivi", percorsi),
+  percorso: (file) => { try { return webUtils.getPathForFile(file); } catch { return ""; } },
+  immagine: (da) => ipcRenderer.invoke("casella:immagine", da),
+  copiaImmagine: (da) => ipcRenderer.invoke("casella:copia-immagine", da),
+  salvaImmagine: (da, nome) => ipcRenderer.invoke("casella:salva-immagine", da, nome),
+  skill: (account) => ipcRenderer.invoke("casella:skill", account),
+};
+contextBridge.exposeInMainWorld("casella", casella);
