@@ -12,7 +12,12 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
   ipc.handle("sessioni:preferenze", () => leggiPreferenze(file));
   ipc.handle("sessioni:imposta-preferenze", (_e, id: string, parte) => { invia("sessioni:preferenze", impostaPreferenze(file, String(id), parte ?? {})); });
   ipc.handle("sessioni:impostazioni", () => leggiImpostazioni(file));
-  ipc.handle("sessioni:imposta-impostazioni", (_e, parte) => { invia("sessioni:impostazioni", impostaImpostazioni(file, parte ?? {})); });
+  try { sessioni.impostazioni(leggiImpostazioni(file)); } catch { /* file rotto: elenco senza filtro, il file non si tocca */ }
+  ipc.handle("sessioni:imposta-impostazioni", (_e, parte) => {
+    const salvate = impostaImpostazioni(file, parte ?? {});
+    invia("sessioni:impostazioni", salvate);
+    sessioni.impostazioni(salvate); // l'elenco segue le impostazioni (#404)
+  });
   ipc.handle("sessioni:azione", (_e, id: string, azione: AzioneSessione) => {
     const s = sessioni.elencoSessioni().sessioni.find((x) => x.id === id);
     if (!s) throw new Error("sessione non trovata");
