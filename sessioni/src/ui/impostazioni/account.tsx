@@ -1,10 +1,11 @@
-// figma: 101-10369 — Impostazioni · Account; dopo «Rimuovi», con l'avviso «Cartella rimossa» e «Annulla»: 101-10461.
+// figma: 101-10369 — Impostazioni · Account; «Rimuovi» chiede conferma (101-22095), poi l'avviso «Cartella rimossa» con «Annulla»: 101-10461.
 import { useEffect, useState } from "react";
 import { percorsiAccount } from "../../account-percorsi";
 import type { CartellaAccount } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore, useAggiornamenti } from "../base/dati";
+import { Dialogo } from "../base/Dialogo";
 import { Icona } from "../base/Icona";
 import { Gruppo, Pagina } from "./controlli";
 import { prova } from "./prova";
@@ -43,6 +44,7 @@ async function aggiungi(tolti: string[], aggiunti: string[]) {
 export default function Account() {
   const v = useImpostazioni();
   const cartelle = useCartelle();
+  const [daRimuovere, setDaRimuovere] = useState<string | null>(prova?.rimuovi ?? null);
   useEffect(() => { if (prova?.dopoRimuovi) avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => {} } }); }, []);
   return (
     <Pagina titolo="Account">
@@ -56,12 +58,19 @@ export default function Account() {
                 <div className="t-sm">{c.percorso}</div>
                 <div className={`t-sm ${c.errore ? "errore" : "secondario"}`}>{c.dettaglio}</div>
               </div>
-              <Bottone tipo="secondario" onClick={() => rimuovi(c.percorso, v.accountTolti)}>Rimuovi</Bottone>
+              <Bottone tipo="secondario" onClick={() => setDaRimuovere(c.percorso)}>Rimuovi</Bottone>
             </div>
           ))}
         </Gruppo>
       )}
       <Bottone onClick={() => aggiungi(v.accountTolti, v.accountAggiunti)}>Aggiungi cartella</Bottone>
+      {daRimuovere && (
+        <Dialogo titolo="Rimuovere la cartella?" corpo={`Smetto di leggere le sessioni di ${daRimuovere}. I file restano dove sono.`} onChiudi={() => setDaRimuovere(null)}
+          bottoni={<>
+            <Bottone tipo="secondario" onClick={() => setDaRimuovere(null)}>Annulla</Bottone>
+            <Bottone tipo="pericolo" onClick={() => { rimuovi(daRimuovere, v.accountTolti); setDaRimuovere(null); }}>Rimuovi</Bottone>
+          </>} />
+      )}
     </Pagina>
   );
 }

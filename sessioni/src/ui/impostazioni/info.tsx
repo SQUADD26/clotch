@@ -1,17 +1,14 @@
 // figma: 101-18054 — Impostazioni · Info; tendina «Versione»: 119-57404; dialogo «Novità della versione»: 119-57552.
 import { useEffect, useState } from "react";
 import { avvisa } from "../base/Avvisi";
-import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
-import { verificaAggiornamenti } from "../base/dialoghi";
-import { Dialogo } from "../base/Dialogo";
+import { apriDialogo, apriNovita, verificaAggiornamenti } from "../base/dialoghi";
 import { Icona } from "../base/Icona";
 import { Menu, type VoceMenu } from "../base/Menu";
 import type { Novita } from "../../tipi";
 import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
-import "./info.css";
 
 /** «Versione»: un valore con la freccia che apre un menu di azioni (non una scelta: nessuna spunta). */
 function TendinaVersione({ versione, voci }: { versione: string; voci: VoceMenu[] }) {
@@ -32,16 +29,16 @@ export default function Info() {
   const v = useImpostazioni();
   const [versione, setVersione] = useState("");
   const [novita, setNovita] = useState<Novita | null>(null);
-  const [dialogo, setDialogo] = useState(!!prova?.novita);
   useEffect(() => {
     window.impostazioni.versione().then(setVersione, () => {});
     window.impostazioni.novita().then(setNovita, () => {});
   }, []);
+  useEffect(() => { if (prova?.novita && novita && versione) apriDialogo("novita", { versione, novita }); }, [novita, versione]);
   const errore = (e: unknown) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) });
   const apriRegistro = () => window.impostazioni.apri(v.cartellaRegistro).catch(errore);
   const voci: VoceMenu[] = [
     { etichetta: "Controlla aggiornamenti", fai: () => void verificaAggiornamenti() },
-    ...(novita ? [{ etichetta: `Novità della versione ${versione}`, fai: () => setDialogo(true) }] : []),
+    ...(novita ? [{ etichetta: `Novità della versione ${versione}`, fai: () => void apriNovita() }] : []),
     { etichetta: "Copia versione", fai: () => { navigator.clipboard.writeText(versione).catch(errore); } },
   ];
   return (
@@ -61,21 +58,13 @@ export default function Info() {
         </Riga>
         {novita && (
           <Riga etichetta="Note di rilascio" azione>
-            <button type="button" className="valore-scelta" onClick={() => setDialogo(true)}>
+            <button type="button" className="valore-scelta" onClick={() => void apriNovita()}>
               <span className="t-sm secondario">Novità della versione {versione}</span>
               <Icona nome="destra" />
             </button>
           </Riga>
         )}
       </Gruppo>
-      {dialogo && novita && (
-        <Dialogo titolo={`Novità della versione ${versione}`} corpo={novita.data} onChiudi={() => setDialogo(false)}
-          bottoni={<Bottone onClick={() => setDialogo(false)}>Chiudi</Bottone>}>
-          <ul className="novita">
-            {novita.voci.map((x) => <li key={x} className="t-sm"><Icona nome="spunta" colore="successo" />{x}</li>)}
-          </ul>
-        </Dialogo>
-      )}
     </Pagina>
   );
 }

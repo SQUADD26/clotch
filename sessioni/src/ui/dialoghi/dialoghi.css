@@ -13,3 +13,14 @@
   background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
 }
 .pezzo-dialoghi .nessuna { padding: var(--spazio-8) var(--spazio-4); gap: var(--spazio-1); display: flex; flex-direction: column; align-items: center; text-align: center; }
+/* figma: 101-22044 — «campo nome»: fondo casella, bordo di fuoco, 32 di altezza */
+.pezzo-dialoghi .campo-nome {
+  height: var(--misura-bottone-invio); padding: 0 var(--spazio-3); border-radius: var(--raggio-lg);
+  background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-fuoco); color: var(--colore-testo-primario);
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base);
+}
+/* figma: 119-57552 — «voce novità»: spunta di successo e testo */
+.pezzo-dialoghi .novita { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-dialoghi .novita li { display: flex; align-items: flex-start; gap: var(--spazio-2); }
+.pezzo-dialoghi .dialoghi-vista { display: contents; }
+.pezzo-dialoghi .dialoghi-vista.centrato .velo { padding-bottom: 0; }

@@ -184,6 +184,8 @@ export interface PreferenzeSessione {
   colore?: string;
   fissa?: boolean;
   nonLetta?: boolean;
+  /** Nome dato in clotch (#460): sostituisce il titolo solo nell'app; la sessione sul disco non cambia. */
+  nome?: string;
   /** Scelte della casella (#437): id del modello CLI (claude-opus-5-5, claude-fable-5-1, …) che #457 manda al motore; sforzo: low, medium, high, xhigh, max; modalità rapida; permessi: default, acceptEdits, plan, bypassPermissions. */
   modello?: string;
   sforzo?: string;
@@ -240,6 +242,8 @@ export interface ImpostazioniApp {
   /** Cartelle ~/.claude-* tolte o aggiunte a mano, oltre a quelle trovate dal main. */
   accountTolti: string[]; accountAggiunti: string[];
   comandiInteri: boolean; nascondiChiavi: boolean; cartelleEscluse: string[]; cronologia: string;
+  /** «Rinomina etichetta…» (#460): nome mostrato per una cartella della barra, per nome originale; la cartella sul disco non cambia. */
+  etichetteCartelle: Record<string, string>;
   aggiornamentiAutomatici: boolean;
   clotchVoce: boolean; clotchDettatura: boolean; clotchAvvisi: boolean; clotchObiettivi: boolean;
   /** Tasti per azione; null = scorciatoia tolta. */

@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { DaImmagine, FileAllegato, RifImmagine } from "../../tipi";
 import { Icona } from "../base/Icona";
-import { casella, chiaveImmagine, eImmagine, nomeFile, peso } from "./percorsi";
+import { casella, chiaveImmagine, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
 import "./allegati.css";
 
 /** Il visore: `apri` mostra l'immagine nella galleria del filo. Fuori dal filo non fa niente. */
@@ -36,13 +36,18 @@ export function useImmagine(da: DaImmagine | null) {
   return url;
 }
 
-type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string };
+/** Un file della casella: `carico` finché non se ne conosce il peso (101:25542 «Carico…»). */
+export type AllegatoCasella = FileAllegato & { carico?: boolean };
+type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string; carico?: boolean };
 
 export function ChipAllegato({ a, onApri, onRimuovi }: { a: Chip; onApri?(): void; onRimuovi?(): void }) {
+  const stato = statoAllegato(a);
   const corpo = (
     <>
-      <Icona nome={a.tipo === "cartella" ? "cartella" : a.tipo === "immagine" ? "immagine" : "file"} />
-      <span className="testi"><span className="nome">{a.nome}</span><span className="dettaglio">{a.dettaglio ?? (a.tipo === "cartella" ? "Cartella" : peso(a.byte))}</span></span>
+      {stato === "carico" ? <Icona nome="spinner" gira /> : stato === "grande" ? <Icona nome="avviso" colore="errore" />
+        : <Icona nome={a.tipo === "cartella" ? "cartella" : a.tipo === "immagine" ? "immagine" : "file"} />}
+      <span className="testi"><span className="nome">{a.nome}</span>
+        <span className="dettaglio">{stato === "carico" ? "Carico…" : stato === "grande" ? "Troppo grande" : a.dettaglio ?? (a.tipo === "cartella" ? "Cartella" : peso(a.byte))}</span></span>
     </>
   );
   return (
@@ -105,3 +110,11 @@ function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(
     </button>
   );
 }
+
+/** Stato di una scena di prova (101:25542): un file, un'immagine, uno che si sta leggendo e uno oltre il limite. */
+export const ALLEGATI_PROVA: AllegatoCasella[] = [
+  { percorso: "/Users/privato/Desktop/lettore.ts", nome: "lettore.ts", tipo: "file", byte: 4_000 },
+  { percorso: "/Users/privato/Desktop/schermata-notch.png", nome: "schermata-notch.png", tipo: "immagine", byte: 312_000 },
+  { percorso: "/Users/privato/Desktop/registro.log", nome: "registro.log", tipo: "file", byte: null, carico: true },
+  { percorso: "/Users/privato/Desktop/prova.mov", nome: "prova.mov", tipo: "file", byte: 480_000_000 },
+];

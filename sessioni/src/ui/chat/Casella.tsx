@@ -3,7 +3,6 @@
 // Scelte e menu (#437): comandi «/» 101:26745, file «@» 101:27018, permessi e contesto 101:26140, modello e sforzo 101:26427, non inviato 101:27528.
 // Mentre la sessione lavora: ↵ interrompe e manda subito (`manda` modo subito), ⌘↵ mette in coda (`manda` modo coda).
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import type { FileAllegato } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { BottoneIcona, Bottone } from "../base/Bottone";
 import { usePreferenze } from "../base/dati";
@@ -12,13 +11,13 @@ import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
-import { ChipAllegato } from "./Allegati";
+import { ALLEGATI_PROVA, ChipAllegato, type AllegatoCasella } from "./Allegati";
 import { ChipContesto, ChipModello, ChipPermessi, impostaDi } from "./Chip";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
-import { casella, conPercorsi } from "./percorsi";
+import { casella, conPercorsi, eImmagine, nomeFile, statoAllegato } from "./percorsi";
 import { etichettaModello, motivoNonInviato } from "./scelte";
 import { useBozza } from "./bozze";
 import { argsManda, provaDi, quanti } from "./testi";
@@ -72,10 +71,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const pref = usePreferenze().dati[chat], imposta = useMemo(() => impostaDi(chat), [chat]);
   const preferenza = etichettaModello(pref?.modello) ?? globale; // la scelta di questa chat vince su quella dell'app
   const dati = { s: { modello, permessi, contesto }, p: pref };
-  const [allegati, setAllegati] = useState<FileAllegato[]>([]);
+  const [allegati, setAllegati] = useState<AllegatoCasella[]>(() => (provaDi(prova, "allegati") !== null ? ALLEGATI_PROVA : []));
   const [menuAggiungi, setMenuAggiungi] = useState(() => provaDi(prova, "menu-aggiungi") !== null);
   const [trascina, setTrascina] = useState(() => provaDi(prova, "rilascio") !== null);
-  const unisci = (nuovi: FileAllegato[]) => setAllegati((x) => [...x, ...nuovi.filter((n, i) => !x.some((y) => y.percorso === n.percorso) && nuovi.findIndex((m) => m.percorso === n.percorso) === i)]);
+  const unisci = (nuovi: AllegatoCasella[]) => setAllegati((x) => [...x, ...nuovi.filter((n, i) => !x.some((y) => y.percorso === n.percorso) && nuovi.findIndex((m) => m.percorso === n.percorso) === i)]);
+  const caricando = allegati.some((a) => a.carico); // il messaggio parte quando tutti i file sono letti
   const allega = async () => unisci(await casella().scegli().catch(() => []));
   /** «/goal », «/plan », «/<skill> »: il comando va in testa al messaggio, al posto di un altro già scritto. */
   const comando = (c: string) => { bozza.scrivi(c + testo.replace(/^\/\S*\s*/, "")); area.current?.focus(); };
@@ -108,9 +108,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   // file trascinati sulla finestra: la zona di rilascio sulla casella; fuori dalla casella non si apre il file al posto dell'app
   const aggiungi = useRef((_: string[]) => {});
   aggiungi.current = async (percorsi) => {
+    unisci(percorsi.map((percorso) => ({ percorso, nome: nomeFile(percorso), tipo: eImmagine(percorso) ? "immagine" : "file", byte: null, carico: true })));
     const trovati = percorsi.length ? await casella().descrivi(percorsi).catch(() => []) : [];
     if (trovati.length < percorsi.length) avvisa({ tipo: "errore", messaggio: "File non letto" });
-    unisci(trovati);
+    // il chip «Carico…» diventa il file letto; se non si è letto sparisce
+    setAllegati((x) => x.flatMap((a) => (a.carico && percorsi.includes(a.percorso) ? trovati.filter((t) => t.percorso === a.percorso) : [a])));
   };
   useEffect(() => {
     if (disabilitata) return;
@@ -148,10 +150,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     return false;
   };
   const manda = async (modo: "subito" | "coda") => {
+    if (caricando) return;
     const richiesta = bozza.inizia();
     if (!richiesta) return;
     ultimo.current = modo; setErrore(null);
-    const t = conPercorsi(richiesta.testo.trim(), allegati.map((a) => a.percorso)), modifica = richiesta.modifica;
+    const t = conPercorsi(richiesta.testo.trim(), allegati.filter((a) => !statoAllegato(a)).map((a) => a.percorso)), modifica = richiesta.modifica;
     let ok = false;
     try {
       ok = modifica
@@ -209,7 +212,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
           <BottoneIcona icona="microfono" etichetta="Detta" disabled />
-          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && !testo.trim())}
+          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && (caricando || !testo.trim()))}
             aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
             <Icona nome={ferma ? "stop" : "invia"} colore={stato === "vuota" || stato === "disabilitata" ? "terziaria" : "su-accento"} />

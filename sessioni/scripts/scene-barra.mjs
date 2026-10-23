@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const scena = (id) => new URL(`../design/scene/101-${id}.json`, import.meta.url);
 const base = readFileSync(scena("8036"));
-for (const id of ["10017", "10297", "12118", "16818", "21061", "21257", "21376", "22044", "23003", "23248", "24007", "24127", "25542", "28289",
+for (const id of ["10017", "10297", "12118", "16818", "21061", "21257", "21376", "23003", "23248", "24007", "24127", "28289",
   "30238", "35109", "48405"]) writeFileSync(scena(id), base);
 
 // 30172: la campana «Attività» con due sessioni che aspettano te (la scena vecchia aveva solo il registro, senza elenco né filo)
