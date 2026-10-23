@@ -1,6 +1,6 @@
 // figma: 101-16432 — «Chat Friday»: domande di Roberto (`parla` nel registro) e risposte di Friday (avvisi «risposta»), casella
 // «Chiedi a Friday» con le sessioni da citare dopo @ (101:45260). Friday li monta nella sua vista (#352).
-import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { useElenco, usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
@@ -12,6 +12,7 @@ import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
 import { Risposta } from "./Risposta";
 import { SessioniCitate, type Citata } from "./SchedeSessioni";
+import { prendiChiesta } from "./chiedi";
 import { comanda } from "./friday";
 import { provaDi } from "./testi";
 import "./casella.css";
@@ -55,12 +56,15 @@ const MENZIONE = /@([^\s@]*)$/;
 
 /** `microfono`: il bottone della voce di Friday; `spenta`: Friday non risponde, la casella non manda. */
 export function CasellaFriday({ microfono, spenta = false }: { microfono?: ReactNode; spenta?: boolean }) {
-  const [testo, setTesto] = useState(provaDi(useNavigazione().sezione, "scritta") ?? ""); // scena di prova 101:45260
+  const [chiesta] = useState(prendiChiesta); // «Chiedi a clotch AI» sul testo scelto nel filo (101:28471)
+  const [testo, setTesto] = useState(provaDi(useNavigazione().sezione, "scritta") ?? chiesta ?? ""); // scena di prova 101:45260
   const [scelta, setScelta] = useState(0);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
   const elenco = useElenco().dati?.sessioni ?? [];
   const pref = usePreferenze().dati;
+
+  useEffect(() => { const a = area.current; if (a && chiesta) { a.focus(); a.setSelectionRange(a.value.length, a.value.length); } }, []);
 
   const cerca = testo.match(MENZIONE)?.[1].toLowerCase();
   const trovate = cerca == null ? [] : elenco.filter((s) => s.titolo.toLowerCase().includes(cerca)).slice(0, 5);

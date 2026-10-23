@@ -2,6 +2,7 @@
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
 import type { Messaggio, RifImmagine } from "../../tipi";
+import { ramoCreato } from "./eventi";
 import { senzaPercorsi, senzaSegnaposto } from "./percorsi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
 
@@ -28,8 +29,10 @@ export type Blocco = (
 
 export type Voce =
   /** `immagini`: incollate (101:28041); `percorsi`: file scritti in fondo al testo come `@percorso` (la casella li mette così). */
-  | { tipo: "roberto"; chiave: string; testo: string; immagini?: RifImmagine[]; percorsi?: string[] }
+  | { tipo: "roberto"; chiave: string; testo: string; immagini?: RifImmagine[]; percorsi?: string[]; t: number | null }
   | { tipo: "riassunto"; chiave: string }
+  /** Cosa è successo nella sessione (101:28725): `testo` è già la riga da scrivere. */
+  | { tipo: "evento"; chiave: string; testo: string; t: number | null }
   | { tipo: "turno"; chiave: string; blocchi: Blocco[]; origini?: string[]; inizio: number | null; fine: number | null };
 
 const MODIFICHE = new Set(["Edit", "MultiEdit", "Write", "NotebookEdit"]);
@@ -104,9 +107,12 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       turno = null;
       inizio = m.t;
       const { testo, percorsi } = senzaPercorsi(m.immagini ? senzaSegnaposto(m.testo) : m.testo);
-      out.push({ tipo: "roberto", chiave, testo, ...(m.immagini ? { immagini: m.immagini } : {}), ...(percorsi.length ? { percorsi } : {}) });
+      out.push({ tipo: "roberto", chiave, testo, ...(m.immagini ? { immagini: m.immagini } : {}), ...(percorsi.length ? { percorsi } : {}), t: m.t });
       return;
     }
+    // un ramo creato finisce il turno: la riga dell'evento sostituisce il comando e il filo riparte da lei
+    const ramo = m.tipo === "strumento" && m.esito && !m.esito.errore && m.nome === "Bash" ? ramoCreato(testoCampo(m.ingresso, "command")) : null;
+    if (ramo) { turno = null; out.push({ tipo: "evento", chiave, testo: `Ramo creato: ${ramo}`, t: m.t }); return; }
     const tu = turno ?? apri(m.t, chiave);
     if (m.t != null) tu.fine = m.t;
     const ultimo = i === messaggi.length - 1;

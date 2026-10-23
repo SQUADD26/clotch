@@ -1,0 +1,5 @@
+/* figma: 101-23475 — «Trova nella sessione»: ogni corrispondenza prende il colore d'accento (la corrente è sottolineata);
+   101-28471 — «Testo selezionato»: il testo scelto sta sul fondo «attesa». Pseudo-elementi di tutta la pagina: stanno nella base. */
+::highlight(trova) { color: var(--colore-icona-accento); }
+::highlight(trova-corrente) { color: var(--colore-icona-accento); text-decoration: underline; }
+::selection { background: var(--colore-fondo-attesa); }

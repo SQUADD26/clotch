@@ -9,11 +9,13 @@ import { Casella } from "./Casella";
 import { Filo } from "./Filo";
 import { nonRisponde, useChatFriday, useOra } from "./friday";
 import { TestaSessione } from "./Intestazione";
+import { Trova } from "./Trova";
 import { Limite, NonRisponde } from "./Lavoro";
 import { voci as daMessaggi, type Voce } from "./modello";
-import { daQuanto, nomeAccount, ora as orario } from "./testi";
+import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
 export { CasellaFriday, FiloFriday } from "./FiloFriday";
+export { scene } from "./varianti";
 
 /** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
 function dopoInterruzione(voci: Voce[]) {
@@ -84,6 +86,7 @@ export default function Chat() {
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione} />
       {casella}
+      <Trova iniziale={provaDi(sezione, "trova")} />
     </>
   );
 }
