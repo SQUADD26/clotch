@@ -11,6 +11,7 @@ import { useNavigazione } from "./navigazione";
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
 const comandi = (m: object) => (m as { ComandiTitolo?: ComponentType }).ComandiTitolo;
 const ComandiPannello = comandi(pannello), ComandiFriday = comandi(friday);
+const CentroPannello = (pannello as { CentroTitolo?: ComponentType }).CentroTitolo; // pillola «schermo occupato» (101-49592)
 
 export function BarraTitolo() {
   const n = useNavigazione();
@@ -31,6 +32,7 @@ export function BarraTitolo() {
         <>
           {/* 101-30172: subito dopo la navigazione, distanza = gap della barra */}
           <Attivita />
+          {CentroPannello && <Pezzo nome="pannello"><CentroPannello /></Pezzo>}
           <div className="comandi-globali">
             {ComandiPannello && <Pezzo nome="pannello"><ComandiPannello /></Pezzo>}
             {ComandiFriday && <Pezzo nome="friday"><ComandiFriday /></Pezzo>}

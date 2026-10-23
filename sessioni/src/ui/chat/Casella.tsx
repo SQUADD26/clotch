@@ -7,6 +7,7 @@ import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
+import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda } from "./friday";
 import { useBozza } from "./bozze";
 import { provaDi, quanti } from "./testi";
@@ -56,6 +57,8 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const inModifica = provaDi(prova, "modifica") !== null ? coda[0] ?? null : null;
   const { testo, modifica, invio, bozza } = useBozza(chat, provaDi(prova, "scritta") ?? inModifica?.testo ?? "", inModifica);
   const area = useRef<HTMLTextAreaElement>(null);
+  const areaCasella = useRef<HTMLDivElement>(null);
+  useAvvisiSopra(areaCasella);
   const { scorciatoie } = useImpostazioni();
 
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
@@ -90,7 +93,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
-    <div className="area-casella">
+    <div className="area-casella" ref={areaCasella}>
       {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>

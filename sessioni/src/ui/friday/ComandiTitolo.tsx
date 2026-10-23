@@ -7,6 +7,8 @@ import { Bottone } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import "../base/menu.css"; // stile di «menu» della base: qui il menu ha titolo e nota, che Menu non ha
+import { useAvvisoNotch } from "./avvisoNotch";
+import { useNavigazione } from "../base/navigazione";
 import { avviaFriday, friday, negozio, useRegistro } from "./dati";
 import { plurale } from "./Intestazione";
 import { sessioniAlLavoro, statoFriday } from "./vista";
@@ -72,6 +74,8 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
 
 export function ComandiTitolo() {
   const { dati: r } = useRegistro();
+  useAvvisoNotch(); // sempre montato, in ogni vista: il toast «Avviso mandato anche al notch» (101-48368)
+  const sessione = useNavigazione().vista === "sessione"; // i frame della sessione aperta (101-8036, 101-49632) non hanno i comandi globali di Friday
   const stato = fermo.usa();
   const menu = menuQuiete.usa();
   const chiudi = useCallback(() => menuQuiete.metti(false), []);
@@ -85,6 +89,7 @@ export function ComandiTitolo() {
     riaperta.current = r!.friday!.t;
     avviaFriday("riavvio");
   }, [chiusa]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (sessione) return null;
   return (
     <div className="comandi-titolo">
       <span className="ancora-menu">

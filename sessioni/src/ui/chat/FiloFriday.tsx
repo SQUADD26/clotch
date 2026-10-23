@@ -10,10 +10,13 @@ import { SegnoStato } from "../base/SegnoStato";
 import { Pezzo } from "../base/Pezzo";
 import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
+import { useAvvisiSopra } from "./avvisiSopra";
+import { Permesso } from "./Richieste";
 import { Risposta } from "./Risposta";
 import { SessioniCitate, type Citata } from "./SchedeSessioni";
 import { comanda } from "./friday";
-import { provaDi } from "./testi";
+import { useOra } from "./friday";
+import { daQuanto, provaDi } from "./testi";
 import "./casella.css";
 
 /** Le voci della chat con Friday, in ordine di tempo. */
@@ -22,7 +25,8 @@ export function useVociFriday() {
   return useMemo(() => {
     if (!r) return [];
     const da = r.comandi.filter((c) => c.cmd === "parla").map((c) => ({ chi: "roberto" as const, id: c.id, t: c.t ?? 0, testo: String(c.args.testo ?? "") }));
-    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
+    // tutti gli avvisi di Friday stanno nella sua chat, non solo le risposte (101:48368: «aspetta un tuo permesso»)
+    const di = r.avvisi.map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
     return [...da, ...di].sort((a, b) => a.t - b.t);
   }, [r]);
 }
@@ -37,8 +41,11 @@ export function FiloFriday() {
     const s = elenco.find((x) => x.id === id);
     return s ? [{ s, c: r?.chat.get(id) ?? null }] : [];
   });
+  // i permessi che le sessioni aspettano da Roberto si danno anche da qui (101:48368)
+  const adesso = useOra();
+  const permessi = [...(r?.chat.values() ?? [])].flatMap((c) => c.richieste.filter((x) => x.genere === "permesso").map((x) => ({ c, x })));
   const filo = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length]);
+  useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length, permessi.length]);
   return (
     <Pezzo nome="chat"><div className="filo" ref={filo}>
       {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : (
@@ -46,6 +53,10 @@ export function FiloFriday() {
           <Risposta testo={v.testo} inScrittura={false} />
           <SessioniCitate citate={citate(v.sessioni)} />
         </div>
+      ))}
+      {permessi.map(({ c, x }) => (
+        <Permesso key={`${c.chat}:${x.rid}`} chat={c.chat} r={x} da={daQuanto(x.t ?? c.visto ?? adesso, adesso)}
+          titolo={`${elenco.find((s) => s.id === c.chat)?.titolo ?? c.titolo ?? "Una sessione"} chiede un permesso`} />
       ))}
     </div></Pezzo>
   );
@@ -59,6 +70,8 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
   const [scelta, setScelta] = useState(0);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
+  const areaCasella = useRef<HTMLDivElement>(null);
+  useAvvisiSopra(areaCasella);
   const elenco = useElenco().dati?.sessioni ?? [];
   const pref = usePreferenze().dati;
 
@@ -88,7 +101,7 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
 
   const stato = spenta ? "disabilitata" : testo ? "scritta" : "vuota";
   return (
-    <Pezzo nome="chat"><div className="area-casella con-menu">
+    <Pezzo nome="chat"><div className="area-casella con-menu" ref={areaCasella}>
       {trovate.length > 0 && (
         <div className="menu-sessioni" role="listbox">
           <div className="titolo-gruppo">Sessioni</div>

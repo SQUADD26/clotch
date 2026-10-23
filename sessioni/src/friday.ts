@@ -36,7 +36,7 @@ export interface ChatFriday {
   /** Con `ferma_limite`. */
   limite: { account: string | null; ripartenza: number | null } | null;
   /** Permessi, domande e piani ancora aperti (chi risponde primo vince). */
-  richieste: { rid: string; genere: string; strumento: string | null; ingresso: unknown; domande: { domanda: string; opzioni: string[] }[] }[];
+  richieste: { rid: string; genere: string; strumento: string | null; ingresso: unknown; /** ms dell'evento `richiesta`: «da 2 min». */ t?: number | null; domande: { domanda: string; opzioni: string[] }[] }[];
   /** Ultimo `battito` (non risponde si misura da qui). */
   battito: number | null;
   aiutanti: Map<string, { tipo: string | null; modello: string | null; testo: string | null; esito: string | null; finito: boolean }>;
@@ -80,6 +80,11 @@ export interface Registro {
   impostazioni: Record<string, unknown> | null;
   esiti: Map<string, { esito: string; testo: string }>;
   errori: ErroreLettura[];
+  /** Solo nel registro che l'app manda alle viste (friday-ipc.ts), mai letti dal disco qui: schermo occupato da uno script,
+   *  AFK acceso con gli avvisi tenuti, e se l'app sta dicendo un avviso a voce (Clotch spento). */
+  schermo?: { da: number } | null;
+  afk?: { da: number; avvisi: number } | null;
+  voceApp?: boolean;
 }
 
 export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => env.FRIDAY_REGISTRO || path.join(home, ".claude", "registro");
@@ -149,7 +154,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "fine": c.fine = s(d.motivo) ?? "fine"; c.fineT = t; c.chatNuova = s(d.chat_nuova); break;
         case "richiesta":
           c.richieste = c.richieste.filter((x) => x.rid !== String(d.rid)).concat({
-            rid: String(d.rid), genere: String(d.genere ?? ""), strumento: s(d.strumento), ingresso: d.ingresso,
+            rid: String(d.rid), genere: String(d.genere ?? ""), strumento: s(d.strumento), ingresso: d.ingresso, t,
             domande: Array.isArray(d.domande) ? d.domande.map((q: any) => ({ domanda: String(q?.domanda ?? ""), opzioni: Array.isArray(q?.opzioni) ? q.opzioni.map(String) : [] })) : [],
           });
           break;

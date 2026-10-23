@@ -6,6 +6,7 @@ import { useNavigazione } from "../base/navigazione";
 import { useAvvio, useRegistro } from "./dati";
 import { orario } from "./formato";
 import { casella, decisioniPerGiorno, statoFriday } from "./vista";
+import { useVoce } from "./voce";
 
 type Colore = "secondaria" | "accento" | "successo" | "errore";
 interface Testa { icona: NomeIcona; accento?: boolean; titolo: string; segno?: [NomeIcona, Colore]; stato: string }
@@ -43,7 +44,10 @@ export function Intestazione() {
   const n = useNavigazione();
   const s = useRegistro();
   const avvio = useAvvio();
+  const voce = useVoce();
   const t = testa(n.vista, s, avvio);
+  // 101:46268 e 101:46701: mentre la voce parla o ascolta, la riga di stato lo dice al posto di «Sempre attiva»
+  if (voce && n.vista === "friday") Object.assign(t, voce.cosa === "parla" ? { segno: ["scintille", "secondaria"], stato: "Sta parlando" } : { segno: ["microfono", "accento"], stato: "Ti ascolta" });
   return (
     <div className="intestazione-friday">
       <div className="testi">

@@ -38,10 +38,10 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
   }
 }
 
-export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCarica, inFondo, prova = null }: {
+export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCarica, inFondo, inCima, prova = null }: {
   voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatFriday | null; da: string | null;
   /** Messaggi più vecchi non ancora caricati (null = non si sa, ma ci sono). */
-  prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode;
+  prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode; inCima?: ReactNode;
   /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727),
    *  «aperti:pensiero,strumento» parte coi blocchi di quei tipi aperti, come dopo un clic (101:8309, 8610, 9628). */
   prova?: string | null;
@@ -69,6 +69,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
 
   return (
     <div className="filo" ref={filo} onScroll={scorri}>
+      {inCima}
       {prima !== false && (
         <div className="precedenti">
           {prima != null && <span>{quanti(prima, "messaggio prima di questi", "messaggi prima di questi")}</span>}

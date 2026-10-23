@@ -5,7 +5,9 @@ import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
 import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
+import { useClotchAcceso } from "../pannello/Pillole";
 import { Casella } from "./Casella";
+import { NotaSchermo } from "./CasellaVoce";
 import { Filo } from "./Filo";
 import { nonRisponde, useChatFriday, useOra } from "./friday";
 import { TestaSessione } from "./Intestazione";
@@ -41,6 +43,7 @@ export default function Chat() {
   const m = useMessaggi(s?.id ?? null);
   const c = useChatFriday(s?.id ?? null);
   const adesso = useOra();
+  const clotch = useClotchAcceso();
   const vivo = s?.stato === "lavora" && s.situazione?.adesso !== "turno_finito";
   const precedenti = useRef<{ sessione: string | null; voci: Voce[] }>({ sessione: null, voci: [] });
   const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella, m.identita,
@@ -82,7 +85,8 @@ export default function Chat() {
       <Filo key={s.id} voci={voci} chat={s.id} vivo={vivo && !muta} finita={s.stato === "finita"} c={c}
         da={s.stato === "aspetta" ? daQuanto(s.ultimaAttivita, adesso) : null}
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
-        altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione} />
+        altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione}
+        inCima={!clotch && s.stato === "lavora" ? <NotaSchermo /> : undefined} />
       {casella}
     </>
   );

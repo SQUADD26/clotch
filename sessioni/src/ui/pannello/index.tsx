@@ -7,6 +7,8 @@ import { scene } from "./scene";
 
 export { PillolaClotch, PillolaSchermoOccupato, useClotchAcceso } from "./Pillole";
 export { clotchAcceso, suClotch } from "./clotch";
+export { PillolaClotch as ComandiTitolo } from "./Pillole";
+export { CentroTitolo } from "./Schermo";
 export { scene };
 
 /** Dalla sessione ai dati del pannello. Obiettivo non firmato (`valido: false`) = nessun obiettivo, come chiede il registro. */
