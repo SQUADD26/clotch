@@ -25,10 +25,10 @@ export function senzaMarkdown(testo: string): string {
   return leggi(parser.parse(testo));
 }
 
-/** Solo destinazioni web, posta e ancore del documento: mai percorsi locali o protocolli eseguibili. */
+/** Solo destinazioni web e ancore del documento: mai percorsi locali o protocolli eseguibili. */
 const destinazione = (url: string): string | undefined => {
   if (/[\u0000-\u0020\u007f]/.test(url)) return undefined;
-  return /^(https?:\/\/|mailto:|#)/i.test(url) ? url : undefined;
+  return /^(https?:\/\/|#)/i.test(url) ? url : undefined;
 };
 
 function Codice({ children }: { children?: ReactNode }) {
@@ -50,7 +50,7 @@ function Codice({ children }: { children?: ReactNode }) {
 export function Markdown({ testo }: { testo: string }) {
   return <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml urlTransform={destinazione} components={{
     pre: ({ children }) => <Codice>{children}</Codice>,
-    a: ({ href, children }) => href ? <a href={href} target="_blank" rel="noreferrer noopener">{children}</a> : <span>{children}</span>,
+    a: ({ href, children }) => href ? <a href={href} target={href.startsWith("#") ? undefined : "_blank"} rel={href.startsWith("#") ? undefined : "noreferrer noopener"}>{children}</a> : <span>{children}</span>,
     img: ({ alt }) => <span>{alt}</span>,
     table: ({ children }) => <div className="tabella-markdown"><table>{children}</table></div>,
   }}>{testo}</ReactMarkdown>;

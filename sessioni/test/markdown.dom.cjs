@@ -4,15 +4,18 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
-const positivo = '# Verifica delle sessioni\n\nHo controllato **tre percorsi** e il ritorno alle impostazioni.\n\nRiga uno  \nRiga due.\n\n- Chat della sessione\n- Risposta di clotch AI\n\n1. Apri impostazioni\n2. Torna alla chat\n\n[Apri la prova](https://example.com/prova) e `npm test`.\n\n| Percorso | Esito |\n| --- | --- |\n| Chat | Verificato |\n\n```sh\nnpm test\nprintf "ok"\n```\n\n> Le prove usano dati fittizi.\n\n- [x] Controllo terminato\n\n~~Vecchia nota~~';
+const positivo = '# Verifica delle sessioni\n\nHo controllato **tre percorsi** e il ritorno alle impostazioni.\n\nRiga uno  \nRiga due.\n\n- Chat della sessione\n- Risposta di clotch AI\n\n1. Apri impostazioni\n2. Torna alla chat\n\n[Apri la prova](https://example.com/prova) e `npm test`.\n\n[Torna alla risposta](#radice).\n\n| Percorso | Esito |\n| --- | --- |\n| Chat | Verificato |\n\n```sh\nnpm test\nprintf "ok"\n```\n\n> Le prove usano dati fittizi.\n\n- [x] Controllo terminato\n\n~~Vecchia nota~~';
 const segreto = 'sk-test_abcdefghijklmnopqrstuvwxyz';
-const avverso = `[male](javascript:alert%281%29) [data](data:text/html;base64,AAAA) [file](file:///etc/passwd) [relativo](../privato)\n\n<script>window.MARKDOWN_PWNED=1</script>\n\n<img src="x" onerror="window.MARKDOWN_PWNED=1">\n\n![immagine](https://example.com/track.png)\n\n[segreto](https://example.com/${segreto})\n\n\`\`\`txt\n${segreto}\n\`\`\``;
+const avverso = `[male](javascript:alert%281%29) [data](data:text/html;base64,AAAA) [file](file:///etc/passwd) [relativo](../privato) [posta](mailto:nome@example.com)\n\n<script>window.MARKDOWN_PWNED=1</script>\n\n<img src="x" onerror="window.MARKDOWN_PWNED=1">\n\n![immagine](https://example.com/track.png)\n\n[segreto](https://example.com/${segreto})\n\n\`\`\`txt\n${segreto}\n\`\`\``;
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 app.whenReady().then(async () => {
   collegaScena(ipcMain, { impostazioni: { nascondiChiavi: true }, registro: {
     avvisi: [positivo, avverso, '## Risposta parziale\n\n**Sto scrivendo\n\n```js\nconst x ='].map((testo, i) => ({ motivo: 'risposta', id: `markdown-${i}`, t: i + 1, testo, sessioni: [] })),
   } });
   const win = new BrowserWindow({ show: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+  const finestre = [];
+  win.webContents.setWindowOpenHandler(({ url }) => { finestre.push(url); return { action: 'deny' }; });
   const run = (fn) => win.webContents.executeJavaScript(`(${fn})()`);
   try {
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'friday' } });
@@ -29,6 +32,15 @@ app.whenReady().then(async () => {
         images: bad.querySelectorAll('img').length, script: bad.querySelectorAll('script').length,
         pwned: window.MARKDOWN_PWNED, html: bad.innerHTML, partial: partial.querySelector('pre code')?.textContent };
     });
+    await run(() => document.querySelector('a[href="#radice"]').click());
+    const anchor = await win.webContents.executeJavaScript(`new Promise(resolve => { const end = Date.now() + 500; const tick = () => location.hash === '#radice' ? resolve(true) : Date.now() > end ? resolve(false) : setTimeout(tick, 20); tick(); })`);
+    assert.equal(anchor, true, 'Ancora naviga nel documento corrente');
+    assert.deepEqual(finestre, [], 'Ancora non apre finestre esterne');
+    assert.equal(await run(() => document.querySelector('a[href="#radice"]').hasAttribute('target')), false);
+    assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false);
+    assert.equal(BrowserWindow.getAllWindows().length, 1);
+    console.log('MARKDOWN_HIDDEN_WINDOW visible=false focused=false count=1');
+    console.log('MARKDOWN_ANCHOR_CLICK current-document/no-window/mailto-blocked: OK');
     assert.equal(state.heading, 'Verifica delle sessioni');
     assert.equal(state.list, 3); assert.equal(state.ordered, 2);
     assert.equal(state.table, 'Chat'); assert.equal(state.strong, 'tre percorsi');
