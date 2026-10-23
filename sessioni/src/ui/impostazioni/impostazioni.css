@@ -74,15 +74,11 @@
 /* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */
 .schede { display: flex; gap: var(--spazio-1); }
 .contenuto-impostazioni > .schede { align-self: flex-start; }
-.scheda { height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-md); }
-.scheda.scelta { background: var(--colore-fondo-riga-scelta); }
 .riga.uso { flex-direction: column; align-items: stretch; gap: var(--spazio-2); }
 .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; }
 .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
 .barra-uso .pieno { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
 .barra-uso .pieno.errore { background: var(--colore-testo-errore); }
-.nota-clotch { display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-2); }
-.contenuto-impostazioni > .nota-clotch { align-self: flex-start; }
 
 /* Archiviazione: spazio usato, barra a segmenti, legenda, calcolo in corso (101-32155) */
 .spazio-usato { display: flex; flex-direction: column; gap: var(--spazio-3); }
@@ -98,3 +94,5 @@
 .indietro { display: flex; align-items: center; gap: var(--spazio-1); align-self: flex-start !important; }
 .bottone.pericolo { font-weight: 400; }
 .riga.stato-clotch { gap: var(--spazio-3); }
+/* nelle impostazioni il dialogo sta al centro esatto della finestra (119:57106, 119:57552), non spazio-10 più su */
+.impostazioni .velo { padding-bottom: 0; }
