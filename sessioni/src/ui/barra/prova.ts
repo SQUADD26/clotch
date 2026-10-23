@@ -1,0 +1,136 @@
+// figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
+// Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
+import type { Registro } from "../../friday";
+import type { Elenco, PreferenzeSessione, Sessione, Sorgente, Stato } from "../../tipi";
+import type { Stato as StatoChiamata } from "../base/dati";
+import type { Vista } from "./elenco";
+import type { Aperto } from "./index";
+
+const ORA = new Date(2026, 9, 22, 15, 0).getTime();
+const MIN = 60_000;
+
+let n = 0;
+function s(titolo: string, progetto: string, stato: Stato, eta: number, sorgente: Sorgente = "claude-code", account = "accountmanager"): Sessione {
+  return {
+    id: `s${++n}`, sorgente, account, email: null, idApp: null, titolo, progetto, cartella: `/Users/privato/Documents/Repos/${progetto}`,
+    ramo: null, modello: null, stato, perche: null, ultimaAttivita: ORA - eta * MIN, obiettivo: null, situazione: null, file: "",
+  };
+}
+/** Sessioni vecchie per i conteggi delle cartelle chiuse; sei account su quattro sorgenti, come «6 account · 4 sorgenti». */
+const ACCOUNT: [Sorgente, string][] = [["claude-code", "accountmanager"], ["claude-code", "squadd"], ["claude-desktop", "roberto"], ["claude-desktop", "squadd"], ["codex", "codex"], ["cursor", "cursor"]];
+const riempi = (progetto: string, quante: number, eta: number) =>
+  Array.from({ length: quante }, (_, i) => s(`${progetto} ${i + 1}`, progetto, "finita", eta + i, ...ACCOUNT[i % ACCOUNT.length]));
+
+function clotch(icone: [string, string?][]) {
+  const lista = [
+    s("Clotch: sessioni in Electron", "clotch", "lavora", 1), s("Sessioni: lettura dal disco", "clotch", "lavora", 2),
+    s("Notch: avviso schermo", "clotch", "finita", 3), s("Voce: parole inglesi", "clotch", "ferma", 4),
+  ];
+  const pref: Record<string, PreferenzeSessione> = {};
+  lista.forEach((x, i) => { pref[x.id] = { icona: icone[i][0], ...(icone[i][1] ? { colore: icone[i][1] } : {}) }; });
+  return { lista, pref };
+}
+
+function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number } = {}): Registro {
+  const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]);
+  for (let i = 0; i < (f.aspettano ?? 0); i++)
+    chat.set(`c${i}`, { chat: `c${i}`, progetto: "clotch", visto: ORA, richieste: [{ genere: "permesso" }], stato: "serve_roberto", passi: [], aiutanti: new Map() });
+  return { chat, friday: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null } as unknown as Registro;
+}
+
+interface Prova {
+  ora: number;
+  elenco: StatoChiamata<Elenco> & { riprova(): void };
+  pref: Record<string, PreferenzeSessione>;
+  registro: Registro | null;
+  vista?: Vista;
+  aperto?: Aperto;
+  aperte?: string[];
+  scelta?: string;
+  passaggio?: string;
+  ricerca?: string;
+  suggerimento?: { testo: string; a: { x: number; y: number } };
+}
+
+const pronto = (sessioni: Sessione[], errori: Elenco["errori"] = []) => ({ stato: "pronto" as const, dati: { sessioni, errori }, riprova() {} });
+const ICONE: [string, string?][] = [["stella"], ["strati"], ["schermo"], ["microfono"]];
+
+function base(icone = ICONE, extra: Partial<Prova> = {}): Prova {
+  const c = clotch(icone);
+  const sessioni = [...c.lista, ...riempi("squadd-v2", 23, 60), ...riempi("dentalspace", 9, 200), ...riempi("friday-mac-v2", 14, 400)];
+  return { ora: ORA, elenco: pronto(sessioni), pref: c.pref, registro: registro(), scelta: c.lista[0].id, ...extra };
+}
+
+const FRAME: Record<string, () => Prova> = {
+  "101-8036": () => base(),
+  "101-8309": () => base(),
+  "101-9628": () => base(),
+  "101-35109": () => base(),
+  "101-8805": () => ({ ora: ORA, elenco: pronto([]), pref: {}, registro: registro() }),
+  "101-8912": () => ({ ora: ORA, elenco: { stato: "carica", riprova() {} }, pref: {}, registro: registro() }),
+  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-friday", messaggio: "permesso negato" }]) }; },
+  "101-12118": () => { const b = base([["stella", "arancione"], ...ICONE.slice(1)]); return { ...b, aperto: { tipo: "icona", id: b.scelta!, a: { x: 335, y: 169 } } }; },
+  "101-21061": () => {
+    const b = base();
+    const ids = b.elenco.dati!.sessioni.map((x) => x.id);
+    b.pref[ids[3]].fissa = true;
+    return { ...b, passaggio: ids[1], aperto: { tipo: "riga", id: ids[1], a: { x: 282, y: 408 } } };
+  },
+  "101-21257": () => { const b = base(); return { ...b, aperto: { tipo: "cartella", chiave: "squadd-v2", a: { x: 286, y: 460 } } }; },
+  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 672 } } }),
+  "101-24127": () => {
+    const b = base();
+    b.elenco.dati!.sessioni[0].titolo = "Clotch: sessioni in Electron con lettura dal disco e filtri";
+    return { ...b, passaggio: b.scelta, suggerimento: { testo: b.elenco.dati!.sessioni[0].titolo, a: { x: 120, y: 326 } } };
+  },
+  "101-30238": () => ({ ...base(), aperto: { tipo: "raggruppa", a: { x: 326, y: 142 } } }),
+  "101-38897": () => ({ ...base(), registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
+  "101-42000": () => ({ ...base(), registro: registro({ stato: "spenta", aspettano: 3 }) }),
+};
+
+function filtrata(aperto?: Aperto): Prova {
+  const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];
+  const altre = base().elenco.dati!.sessioni.filter((x) => x.stato !== "aspetta");
+  return {
+    ora: ORA, elenco: pronto([...lista, ...altre]), pref: { [lista[0].id]: { icona: "database" } }, registro: registro(), scelta: lista[0].id,
+    vista: { filtri: [{ proprieta: "sorgente", valori: ["Claude Code"] }, { proprieta: "stato", valori: ["aspetta"] }], raggruppa: "cartella", ordina: "attivita" },
+    aperto,
+  };
+}
+FRAME["101-10017"] = () => filtrata({ tipo: "opzioni", i: 1, a: { x: 334, y: 250 } });
+FRAME["101-16818"] = () => filtrata({ tipo: "proprieta", a: { x: 334, y: 250 } });
+
+// 200 sessioni (101:9340): le dodici visibili di clotch con le loro icone, le altre cartelle chiuse
+const TANTE: [string, string, Stato][] = [
+  ["Notch: luce bianca ed errore", "lampadina", "finita"], ["Voce: Scribe e microfono", "microfono", "finita"],
+  ["Clotch: impostazioni in stile Apple", "stella", "lavora"], ["AFK: foto dello schermo", "schermo", "ferma"],
+  ["ADHD: domande aperte", "lampadina", "finita"], ["Hook: posizione di Codex", "codice", "finita"],
+  ["Notch: bottoni sotto la barra", "strati", "finita"], ["Voce: pronuncia di Overseer", "microfono", "finita"],
+  ["Release 2.4: note", "libro", "lavora"], ["Quote: uso degli account", "grafico", "ferma"],
+  ["Cowork: lavagna 71", "tavolozza", "finita"], ["ESP32: stato via Bluetooth", "globo", "finita"],
+];
+FRAME["101-9340"] = () => {
+  const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
+  const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
+  const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("friday-mac-v2", 27, 400)];
+  return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro(), scelta: lista[3].id };
+};
+
+function ricerca(testo: string): Prova {
+  const b = base();
+  const extra = [s("Lettura dei log di Codex", "friday-mac-v2", "finita", 10 * 24 * 60, "codex", "codex")];
+  return { ...b, elenco: pronto([...b.elenco.dati!.sessioni, ...extra]), pref: { ...b.pref, [extra[0].id]: { icona: "libro" } }, ricerca: testo };
+}
+FRAME["101-10297"] = () => ricerca("lettura");
+FRAME["101-23003"] = () => ricerca("copia");
+FRAME["101-23248"] = () => ricerca("kubernetes");
+
+let una: Prova | null | undefined;
+/** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */
+export function prova(): Prova | null {
+  if (una === undefined) {
+    const id = new URLSearchParams(location.search).get("parita");
+    una = id && FRAME[id] ? FRAME[id]() : null;
+  }
+  return una;
+}
