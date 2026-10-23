@@ -101,7 +101,7 @@ export interface SessioniApi {
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
   cerca(testo: string): Promise<RisultatoRicerca[]>;
   /** Byte su disco dell'indice e delle cache dell'app. */
-  spazio(): Promise<{ indice: number; messaggi: number; immagini: number }>;
+  spazio(): Promise<{ indice: number; messaggi: number; immagini: number; altro: number }>;
   /** Rifà l'indice da capo; si risolve quando ha finito. */
   ricostruisci(): Promise<void>;
   /** Toglie l'indice e le cache dal disco. */
