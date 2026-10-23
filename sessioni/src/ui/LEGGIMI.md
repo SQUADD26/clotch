@@ -4,19 +4,19 @@ React + TypeScript, costruito da Vite in `renderer/`. Disegno: file Figma «Clot
 
 ## Montare un pezzo
 
-Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostazioni/`, `friday/`. La cornice (`base/Cornice.tsx`) monta già il loro `index.tsx`:
+Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostazioni/`, `clotch-ai/`. La cornice (`base/Cornice.tsx`) monta già il loro `index.tsx`:
 
 | Pezzo | Export | Dove sta |
 |---|---|---|
 | `barra` | `default` | colonna «Barra laterale» (larga `misura-barra-laterale`, gap `spazio-0-5`) |
 | `chat` | `Intestazione`, `default` | in cima alla «Superficie»; nella «Colonna» centrale (i figli sono larghi al massimo `misura-colonna`) |
 | `pannello` | `default` | colonna destra (`misura-pannello`); se torna `null` la colonna centrale si allarga. Sparisce da sola quando non c'è posto (frame 1024) |
-| `friday` | `Intestazione`, `default` | al posto della chat quando la vista è `friday`, senza pannello |
+| `clotch-ai` | `Intestazione`, `default` | al posto della chat quando la vista è `clotch-ai`, senza pannello |
 | `impostazioni` | `default` | tutto il corpo sotto la barra del titolo; usa `Superficie` da `base/Cornice` |
 
-Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `friday`, `casella`, `decisioni`, `regole` (le quattro di Friday montano `friday/`), `impostazioni`.
+Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `clotch-ai`, `casella`, `decisioni`, `regole` (le quattro di clotch AI montano `clotch-ai/`), `impostazioni`.
 
-Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
+Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `clotch-ai/` lo esportano con nome.
 
 Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvato.
 

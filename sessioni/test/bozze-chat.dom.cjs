@@ -29,10 +29,10 @@ app.whenReady().then(async () => {
     const p = history.pagina(id, pagina, opzioni);
     assert.equal(p.cronologia?.sessione, id); historyReads++; return p;
   });
-  ipcMain.removeHandler('friday:comando');
+  ipcMain.removeHandler('clotch-ai:comando');
   let pending = null;
   const commands = [];
-  ipcMain.handle('friday:comando', (_e, cmd, args) => {
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => {
     commands.push({ cmd, args });
     return new Promise((resolve) => { pending = (esito = 'ok') => { pending = null; resolve({ esito }); }; });
   });

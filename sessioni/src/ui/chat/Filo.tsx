@@ -1,7 +1,7 @@
 // figma: 101-8036 — «Filo» della sessione aperta: messaggi di Roberto, turni coi loro blocchi, «Carica precedenti» (101:9628),
-// fine turno (101:15335), richieste vive di Friday (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
+// fine turno (101:15335), richieste vive di clotch AI (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
 import { useLayoutEffect, useRef, type ReactNode } from "react";
-import type { ChatFriday } from "../../friday";
+import type { ChatClotchAi } from "../../clotch-ai";
 import { Bottone } from "../base/Bottone";
 import { nomeModello } from "./Casella";
 import { Attivita, Aiutanti, AvvisoFilo, FineTurno, Interrotta, Riassunto } from "./Lavoro";
@@ -11,7 +11,7 @@ import { riepilogo, type Blocco, type Voce } from "./modello";
 import { Domanda, Esito, Permesso, Piano, passiPiano } from "./Richieste";
 import { provaDi, quanti } from "./testi";
 
-type Richiesta = ChatFriday["richieste"][number];
+type Richiesta = ChatClotchAi["richieste"][number];
 
 /** Un blocco del turno. `vivo`: l'ultimo turno di una sessione che lavora (le modifiche si vedono aperte, 101:14631). */
 function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
@@ -39,7 +39,7 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
 }
 
 export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCarica, inFondo, prova = null }: {
-  voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatFriday | null; da: string | null;
+  voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatClotchAi | null; da: string | null;
   /** Messaggi più vecchi non ancora caricati (null = non si sa, ma ci sono). */
   prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode;
   /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727),
@@ -49,7 +49,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const filo = useRef<HTMLDivElement>(null);
   const daFondo = useRef(0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo
   const richiesta = (g: string) => c?.richieste.find((r) => r.genere === g) ?? null;
-  // permessi aperti: non stanno nella trascrizione, solo nel registro di Friday
+  // permessi aperti: non stanno nella trascrizione, solo nel registro di clotch AI
   const permessi = c?.richieste.filter((r) => r.genere === "permesso") ?? [];
   const ultimo = voci.length - 1;
   const aperti = provaDi(prova, "aperti")?.split(",") ?? [];

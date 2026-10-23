@@ -1,29 +1,29 @@
-// figma: 101-38901 — righe di Friday nella barra: «Riga Friday» (Attiva 101:7728,
-// In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di Friday (src/ui/friday).
+// figma: 101-38901 — righe di clotch AI nella barra: «Riga clotch AI» (Attiva 101:7728,
+// In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di clotch AI (src/ui/clotch-ai).
 import { useEffect, useState } from "react";
-import type { Registro } from "../../friday";
+import type { Registro } from "../../clotch-ai";
 import { useChiamata } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
-import { daPiano } from "../friday/registro";
-import { casella, statoFriday, type StatoFriday } from "../friday/vista";
+import { daPiano } from "../clotch-ai/registro";
+import { casella, statoClotchAi, type StatoClotchAi } from "../clotch-ai/vista";
 import { RigaComando } from "./Righe";
 
 declare global {
-  interface Window { friday: import("../../tipi").FridayApi }
+  interface Window { clotchAi: import("../../tipi").ClotchAiApi }
 }
 
-const STATO: Record<StatoFriday, { testo: string; classe: string }> = {
+const STATO: Record<StatoClotchAi, { testo: string; classe: string }> = {
   attiva: { testo: "Attiva", classe: "successo" },
   pausa: { testo: "In pausa", classe: "secondario" },
   spenta: { testo: "Spenta", classe: "errore" },
 };
 
-/** Registro di Friday, aggiornato dal vivo; null finché non arriva o se non si legge. */
+/** Registro di clotch AI, aggiornato dal vivo; null finché non arriva o se non si legge. */
 export function useRegistro(): Registro | null {
-  const c = useChiamata(async () => daPiano(await window.friday.registro()), []);
+  const c = useChiamata(async () => daPiano(await window.clotchAi.registro()), []);
   const [vivo, setVivo] = useState<Registro | null>(null);
-  useEffect(() => window.friday.onRegistro((r) => setVivo(daPiano(r))), []);
+  useEffect(() => window.clotchAi.onRegistro((r) => setVivo(daPiano(r))), []);
   return vivo ?? c.dati ?? null;
 }
 
@@ -35,20 +35,20 @@ export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
         <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${ora(nd.fino)}`}</span>
-        <button type="button" className="t-sm medio" onClick={() => window.friday.comando("non_disturbare", { acceso: false })}>Togli</button>
+        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Togli</button>
       </div>
       <span className="dettaglio t-xs secondario">{nd.tenuti} avvisi tenuti per dopo</span>
     </div>
   );
 }
 
-export function RigheFriday({ r, adesso, pagina }: { r: Registro | null; adesso: number; pagina: string }) {
+export function RigheClotchAi({ r, adesso, pagina }: { r: Registro | null; adesso: number; pagina: string }) {
   const n = useNavigazione();
-  const stato = r ? STATO[statoFriday(r, adesso).stato] : null;
+  const stato = r ? STATO[statoClotchAi(r, adesso).stato] : null;
   const aspettano = r ? casella(r, adesso).aspettano : 0;
   return (
     <>
-      <button type="button" className={`riga riga-friday ${pagina === "friday" ? "scelta" : ""}`} onClick={() => n.apri("friday")}>
+      <button type="button" className={`riga riga-clotch-ai ${pagina === "clotch-ai" ? "scelta" : ""}`} onClick={() => n.apri("clotch-ai")}>
         <Icona nome="scintille" colore="accento" />
         <span className="testo medio">clotch AI</span>
         {stato && <span className={`lato t-xs stato-${stato.classe}`}>{stato.testo}</span>}

@@ -1,7 +1,7 @@
-// figma: 101-44748 — «Friday cita le sessioni»: «scheda sessione» per chi aspetta te, «riferimento sessione» per chi lavora,
+// figma: 101-44748 — «clotch AI cita le sessioni»: «scheda sessione» per chi aspetta te, «riferimento sessione» per chi lavora,
 // scheda al passaggio sul riferimento (101:44989). Le sessioni citate vengono dal campo `sessioni` della risposta (claude-config#2512).
 import { useState } from "react";
-import type { ChatFriday } from "../../friday";
+import type { ChatClotchAi } from "../../clotch-ai";
 import type { Sessione } from "../../tipi";
 import { Bottone } from "../base/Bottone";
 import { usePreferenze } from "../base/dati";
@@ -9,12 +9,12 @@ import { Icona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { useNavigazione } from "../base/navigazione";
 import { SegnoStato } from "../base/SegnoStato";
-import { comanda, useOra } from "./friday";
+import { comanda, useOra } from "./clotch-ai";
 import { useRiserva } from "./riserva";
 import { SORGENTE, daQuanto, durata, provaDi } from "./testi";
 import "./schede.css";
 
-export interface Citata { s: Sessione; c: ChatFriday | null }
+export interface Citata { s: Sessione; c: ChatClotchAi | null }
 
 /** Riga di stato della scheda, nelle forme dei frame: permesso, domanda, al lavoro coi passi. */
 function stato({ s, c }: Citata, ora: number) {
@@ -73,7 +73,7 @@ function Riferimento({ x }: { x: Citata }) {
   );
 }
 
-/** Sotto la risposta di Friday: schede per chi aspetta te, riferimenti per le altre. */
+/** Sotto la risposta di clotch AI: schede per chi aspetta te, riferimenti per le altre. */
 export function SessioniCitate({ citate }: { citate: Citata[] }) {
   const aspettano = citate.filter((x) => x.s.stato === "aspetta" || !!x.c?.richieste.length);
   const altre = citate.filter((x) => !aspettano.includes(x));

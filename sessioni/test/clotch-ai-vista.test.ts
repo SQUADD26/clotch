@@ -3,11 +3,12 @@ import assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { leggiRegistro } from "../src/friday";
-import { piano } from "../src/friday-ipc";
-import { daPiano } from "../src/ui/friday/registro";
-import { casella, decisioniPerGiorno, regolePerDove, sessioniAlLavoro, statoFriday } from "../src/ui/friday/vista";
+import { leggiRegistro } from "../src/clotch-ai";
+import { piano } from "../src/clotch-ai-ipc";
+import { daPiano } from "../src/ui/clotch-ai/registro";
+import { casella, decisioniPerGiorno, regolePerDove, sessioniAlLavoro, statoClotchAi } from "../src/ui/clotch-ai/vista";
 
+const MOTORE = "friday"; // nome del protocollo del motore
 const ORA = Date.parse("2026-10-23T14:00:00.000Z");
 const min = (m: number) => new Date(ORA - m * 60_000).toISOString();
 
@@ -49,34 +50,34 @@ test("vista: casella per progetto con obiettivo, passi, chi aspetta, al lavoro, 
   assert.equal(sessioniAlLavoro(r), 1);
 });
 
-test("vista: Friday attiva, spenta, in pausa con Non disturbare e avvisi tenuti", () => {
-  assert.equal(statoFriday(registro([[1, "friday", "battito", { stato: "lavora" }]]), ORA).stato, "attiva");
-  assert.deepEqual(statoFriday(registro([[10, "friday", "friday", { evento: "stop" }]]), ORA), { stato: "spenta", da: ORA - 600_000 });
-  assert.equal(statoFriday(registro([]), ORA).stato, "spenta");
+test("vista: clotch AI attiva, spenta, in pausa con Non disturbare e avvisi tenuti", () => {
+  assert.equal(statoClotchAi(registro([[1, MOTORE, "battito", { stato: "lavora" }]]), ORA).stato, "attiva");
+  assert.deepEqual(statoClotchAi(registro([[10, MOTORE, MOTORE, { evento: "stop" }]]), ORA), { stato: "spenta", da: ORA - 600_000 });
+  assert.equal(statoClotchAi(registro([]), ORA).stato, "spenta");
   const r = registro([
-    [30, "friday", "non_disturbare", { acceso: true, fino: min(-30), tenuti: 2 }],
-    [1, "friday", "battito", { stato: "lavora" }],
+    [30, MOTORE, "non_disturbare", { acceso: true, fino: min(-30), tenuti: 2 }],
+    [1, MOTORE, "battito", { stato: "lavora" }],
   ]);
-  assert.deepEqual(statoFriday(r, ORA), { stato: "pausa", da: ORA + 30 * 60_000 });
+  assert.deepEqual(statoClotchAi(r, ORA), { stato: "pausa", da: ORA + 30 * 60_000 });
   assert.equal(r.nonDisturbare?.tenuti, 2);
-  assert.equal(statoFriday(r, ORA + 31 * 60_000).stato, "spenta"); // nessun battito da 31 minuti
-  const sempre = registro([[5, "friday", "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [1, "friday", "battito", { stato: "lavora" }]]);
-  assert.deepEqual(statoFriday(sempre, ORA), { stato: "pausa", da: null });
-  const tolto = registro([[5, "friday", "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [2, "friday", "non_disturbare", { acceso: false, fino: null, tenuti: 0 }], [1, "friday", "battito", { stato: "lavora" }]]);
-  assert.equal(statoFriday(tolto, ORA).stato, "attiva");
+  assert.equal(statoClotchAi(r, ORA + 31 * 60_000).stato, "spenta"); // nessun battito da 31 minuti
+  const sempre = registro([[5, MOTORE, "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [1, MOTORE, "battito", { stato: "lavora" }]]);
+  assert.deepEqual(statoClotchAi(sempre, ORA), { stato: "pausa", da: null });
+  const tolto = registro([[5, MOTORE, "non_disturbare", { acceso: true, fino: null, tenuti: 0 }], [2, MOTORE, "non_disturbare", { acceso: false, fino: null, tenuti: 0 }], [1, MOTORE, "battito", { stato: "lavora" }]]);
+  assert.equal(statoClotchAi(tolto, ORA).stato, "attiva");
 });
 
 test("vista: decisioni per giorno, annullate e non annullabili; regole per dove con togli", () => {
   const r = registro([
-    [26 * 60, "friday", "decisione", { cosa: "Archiviate 4 sessioni", perche: "", inverso: ["friday", "x"] }],
-    [60, "friday", "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null, chat: "m1", genere: "promozione", non_annullabile: "Già su main" }],
-    [30, "friday", "decisione", { cosa: "Consentita la migrazione", perche: "", inverso: ["a"] }],
-    [10, "friday", "decisione", { cosa: "annullata r-000000000002", perche: "", inverso: null }],
-    [50, "friday", "regola", { testo: "Parla chiaro", perche: "", dove: "claude-config", togli: false }],
-    [40, "friday", "regola", { testo: "Via", perche: "", dove: "claude-config", togli: false }],
-    [35, "friday", "regola", { testo: "Figma prima", perche: "", dove: "/r/clotch", togli: false }],
-    [30, "friday", "regola", { testo: "Più nuova", perche: "", dove: "claude-config", togli: false }],
-    [20, "friday", "regola", { testo: "Via", perche: "", dove: "claude-config", togli: true }],
+    [26 * 60, MOTORE, "decisione", { cosa: "Archiviate 4 sessioni", perche: "", inverso: ["friday", "x"] }], // nome del protocollo del motore
+    [60, MOTORE, "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null, chat: "m1", genere: "promozione", non_annullabile: "Già su main" }],
+    [30, MOTORE, "decisione", { cosa: "Consentita la migrazione", perche: "", inverso: ["a"] }],
+    [10, MOTORE, "decisione", { cosa: "annullata r-000000000002", perche: "", inverso: null }],
+    [50, MOTORE, "regola", { testo: "Parla chiaro", perche: "", dove: "claude-config", togli: false }],
+    [40, MOTORE, "regola", { testo: "Via", perche: "", dove: "claude-config", togli: false }],
+    [35, MOTORE, "regola", { testo: "Figma prima", perche: "", dove: "/r/clotch", togli: false }],
+    [30, MOTORE, "regola", { testo: "Più nuova", perche: "", dove: "claude-config", togli: false }],
+    [20, MOTORE, "regola", { testo: "Via", perche: "", dove: "claude-config", togli: true }],
   ]);
   const g = decisioniPerGiorno(r, ORA);
   assert.deepEqual(g[0].voci[1].chat, "m1");
@@ -92,7 +93,7 @@ test("vista: il registro passa il ponte del preload senza Map e torna uguale", (
   const r = registro([
     [5, "m1", "inizio", { titolo: "T", madre: "", progetto: "clotch" }],
     [4, "m1", "aiutante", { agente: "a1", fase: "inizio", tipo: "worker", modello: "x", testo: "t", esito: "" }],
-    [3, "friday", "comando_fatto", { comando: "c-1", esito: "ok", testo: "" }],
+    [3, MOTORE, "comando_fatto", { comando: "c-1", esito: "ok", testo: "" }],
   ]);
   const passato = structuredClone(piano(r)); // come il ponte: niente Map, niente classi
   assert.deepEqual(daPiano(passato), r);
@@ -100,8 +101,8 @@ test("vista: il registro passa il ponte del preload senza Map e torna uguale", (
 
 test("registro: l'ultimo evento impostazioni resta in Registro.impostazioni", () => {
   const r = registro([
-    [5, "friday", "impostazioni", { attiva: true, voce: "Alice", microfoni_disponibili: ["AirPods"] }],
-    [2, "friday", "impostazioni", { attiva: true, voce: "Luca", microfoni_disponibili: ["AirPods", "Mac"] }],
+    [5, MOTORE, "impostazioni", { attiva: true, voce: "Alice", microfoni_disponibili: ["AirPods"] }],
+    [2, MOTORE, "impostazioni", { attiva: true, voce: "Luca", microfoni_disponibili: ["AirPods", "Mac"] }],
   ]);
   assert.deepEqual(r.impostazioni, { attiva: true, voce: "Luca", microfoni_disponibili: ["AirPods", "Mac"] });
   assert.deepEqual(daPiano(structuredClone(piano(r))).impostazioni, r.impostazioni);

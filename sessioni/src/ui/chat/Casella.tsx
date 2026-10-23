@@ -7,7 +7,7 @@ import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
-import { comanda } from "./friday";
+import { comanda } from "./clotch-ai";
 import { useBozza } from "./bozze";
 import { provaDi, quanti } from "./testi";
 import "./casella.css";

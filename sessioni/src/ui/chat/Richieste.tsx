@@ -1,12 +1,12 @@
 // figma: 101-13650 — richieste a Roberto: «Richiesta permesso» 101:13247, «Domanda» 101:13280 (101:13896), «Piano» 101:13314 (101:14132).
-// Ogni risposta è un comando nella casella di Friday (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
+// Ogni risposta è un comando nella casella di clotch AI (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
 import { useEffect, useState, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
-import { comanda } from "./friday";
+import { comanda } from "./clotch-ai";
 import { useRiserva } from "./riserva";
 import { testoCampo } from "./strumenti";
 import { quanti } from "./testi";
@@ -76,7 +76,7 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
 
 const CONSIGLIATA = /\s*\((Recommended|Consigliata)\)\s*$/i;
 
-/** `rid` null: la domanda è aperta nella trascrizione ma Friday non la conosce, e non si può rispondere da qui. */
+/** `rid` null: la domanda è aperta nella trascrizione ma clotch AI non la conosce, e non si può rispondere da qui. */
 export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: { domanda: string; opzioni: string[] }[]; da: string | null }) {
   // l'opzione consigliata parte scelta, come nel disegno
   const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));

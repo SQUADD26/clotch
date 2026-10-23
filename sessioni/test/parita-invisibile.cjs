@@ -96,7 +96,7 @@ async function run(args, scene, initialEnv = {}) {
     './barra-menu': { collegaBarraMenu: () => record('tray-live') },
     './branding': { impostaNome: record('nome'), impostaIdentita: record('identita') },
     './finestra': { apriFinestra: record('finestra-live'), parita: record('parita') },
-    './friday-ipc': { collegaFriday: record('friday-live') },
+    './clotch-ai-ipc': { collegaClotchAi: record('clotch-ai-live') },
     './impostazioni': { collegaImpostazioni: record('impostazioni-live') },
     './indice-ipc': { collegaIndice: () => { calls.push('indice-live'); return {}; } },
     './preferenze': { leggiImpostazioni: () => ({}) },
@@ -163,7 +163,7 @@ function notificationCalls(silent) {
   assert.ok(!normal.calls.includes('policy:prohibited'), 'app normale conserva attivazione');
   assert.ok(!normal.calls.includes('switch:mute-audio'));
   assert.equal(normal.env.CLOTCH_TEST_SILENT, undefined);
-  assert.ok(normal.calls.includes('friday-live') && normal.calls.includes('finestra-live'));
+  assert.ok(normal.calls.includes('clotch-ai-live') && normal.calls.includes('finestra-live'));
   assert.ok(!normal.calls.some(c => c.startsWith('exit:')));
   const preview = await run([], null, { CLOTCH_TEST_SILENT: '1' });
   assert.ok(preview.calls.indexOf('policy:accessory') < preview.calls.indexOf('ready'));

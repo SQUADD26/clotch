@@ -1,13 +1,13 @@
-// Situazioni che arrivano dal registro di Friday (contratto v1). Righe del catalogo: test/situazioni.md, colonna «Friday».
+// Situazioni che arrivano dal registro di clotch AI (contratto v1). Righe del catalogo: test/situazioni.md, colonna «clotch AI».
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { MOTIVI_AVVISO, clotchAcceso, leggeLApp, leggiRegistro, mandaComando, nonRisponde } from "../src/friday";
+import { MOTIVI_AVVISO, clotchAcceso, leggeLApp, leggiRegistro, mandaComando, nonRisponde } from "../src/clotch-ai";
 
-const DIR = path.join(__dirname, "..", "..", "test", "fixtures", "situazioni", "friday", "registro");
-const reg = leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: DIR });
+const DIR = path.join(__dirname, "..", "..", "test", "fixtures", "situazioni", "clotch-ai", "registro");
+const reg = leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: DIR }); // nome del protocollo del motore
 const chat = (prefisso: string) => [...reg.chat.values()].find((c) => c.chat.startsWith(prefisso))!;
 
 test("registro: righe rotte e di un'altra versione saltate, nessun errore", () => {
@@ -35,9 +35,9 @@ test("chat in quarantena", () => assert.equal(chat("cccccccc").quarantena, "Due 
 test("bloccata da una regola di stato", () => assert.equal(chat("dddddddd").rifiuto, "Manca la riga STATO"));
 test("eventi persi: buco nella numerazione", () => assert.equal(chat("eeeeeeee").persi, 2));
 test("ferma tutto acceso", () => assert.equal(reg.fermoTutto, true));
-test("avviso di Friday", () => assert.deepEqual(reg.avvisi.map((a) => [a.livello, a.motivo]), [["alto", "blocco"], ["normale", "domanda"], ["normale", "risposta"]]));
+test("avviso di clotch AI", () => assert.deepEqual(reg.avvisi.map((a) => [a.livello, a.motivo]), [["alto", "blocco"], ["normale", "domanda"], ["normale", "risposta"]]));
 
-test("avviso: risposta di Friday a Roberto distinta dalla domanda di una sessione", () => {
+test("avviso: risposta di clotch AI a Roberto distinta dalla domanda di una sessione", () => {
   const [domanda, risposta] = ["domanda", "risposta"].map((m) => reg.avvisi.filter((a) => a.motivo === m));
   assert.deepEqual([domanda.length, risposta.length], [1, 1]);
   assert.notEqual(domanda[0].id, risposta[0].id);
@@ -106,7 +106,7 @@ test("Clotch acceso: avviso detto da Clotch, l'app lo mostra e non lo legge", ()
 
 test("Clotch assente o fermo da più di 10 min: l'app legge gli avvisi", () => {
   assert.equal(clotchAcceso(reg, Date.parse("2026-10-23T10:16:00Z")), false);
-  assert.equal(clotchAcceso(leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: "/non/esiste" }), ORA), false);
+  assert.equal(clotchAcceso(leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: "/non/esiste" }), ORA), false); // nome del protocollo del motore
   assert.equal(leggeLApp(reg.avvisi.find((x) => x.motivo === "blocco")!), true);
 });
 
@@ -121,4 +121,4 @@ test("casella: i comandi dell'app per permesso, domanda, piano, coda, interrompi
 });
 
 // Fuori dalla v1 del contratto (sezione 5): Codex e Cursor non scrivono nel registro.
-test("attende formato Friday: Codex e Cursor nel registro (v2)", { todo: true }, () => {});
+test("attende formato clotch AI: Codex e Cursor nel registro (v2)", { todo: true }, () => {});

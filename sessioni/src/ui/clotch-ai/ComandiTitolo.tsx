@@ -7,9 +7,9 @@ import { Bottone } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import "../base/menu.css"; // stile di «menu» della base: qui il menu ha titolo e nota, che Menu non ha
-import { avviaFriday, friday, negozio, useRegistro } from "./dati";
+import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
 import { plurale } from "./Intestazione";
-import { sessioniAlLavoro, statoFriday } from "./vista";
+import { sessioniAlLavoro, statoClotchAi } from "./vista";
 
 // Ore fisse del disegno: «Fino alle 18:00»; «Fino a domani mattina» = domani alle 8:00 (decisione della master, #352).
 const ORA_SERA = 18, ORA_MATTINA = 8;
@@ -27,10 +27,10 @@ export const menuQuiete = negozio(false);
 
 export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", messaggio: `Fermo ${plurale(quante, "sessione", "sessioni")}…` });
 
-/** Esito di Ferma tutto: `non` = sessioni non ferme (null = Friday non ha risposto, col suo testo). */
+/** Esito di Ferma tutto: `non` = sessioni non ferme (null = clotch AI non ha risposto, col suo testo). */
 export function esitoFermo(id: number, quante: number, non: string[] | null, testo = "") {
   if (non && !non.length) {
-    aggiornaAvviso(id, { tipo: "info", messaggio: `${plurale(quante, "sessione ferma", "sessioni ferme")}`, azione: { etichetta: "Riprendi tutte", fai: () => friday().comando("riprendi_tutto") } });
+    aggiornaAvviso(id, { tipo: "info", messaggio: `${plurale(quante, "sessione ferma", "sessioni ferme")}`, azione: { etichetta: "Riprendi tutte", fai: () => clotchAi().comando("riprendi_tutto") } });
   } else {
     const messaggio = non ? (non.length === 1 ? "1 sessione non si è fermata" : `${non.length} sessioni non si sono fermate`) : testo || "clotch AI non risponde";
     aggiornaAvviso(id, { tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: () => fermaTutto(quante) } });
@@ -40,13 +40,13 @@ export function esitoFermo(id: number, quante: number, non: string[] | null, tes
 export async function fermaTutto(quante: number) {
   fermo.metti("in-corso");
   const id = avvisoInCorso(quante);
-  const e = await friday().comando("ferma_tutto");
+  const e = await clotchAi().comando("ferma_tutto");
   fermo.metti("chiuso");
   esitoFermo(id, quante, e.esito === "ok" ? e.nonFermate ?? [] : null, e.testo);
 }
 
 function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): void }) {
-  const metti = (args: Record<string, unknown>) => { onChiudi(); friday().comando("non_disturbare", { acceso: true, ...args }); };
+  const metti = (args: Record<string, unknown>) => { onChiudi(); clotchAi().comando("non_disturbare", { acceso: true, ...args }); };
   const voci: [NomeIcona, string, Record<string, unknown>][] = [
     ["orologio", "Per 1 ora", { minuti: 60 }],
     ["orologio", `Fino alle ${ORA_SERA}:00`, { fino: prossima(Date.now(), ORA_SERA) }],
@@ -75,15 +75,15 @@ export function ComandiTitolo() {
   const stato = fermo.usa();
   const menu = menuQuiete.usa();
   const chiudi = useCallback(() => menuQuiete.metti(false), []);
-  const quiete = !!r && statoFriday(r, Date.now()).stato === "pausa";
+  const quiete = !!r && statoClotchAi(r, Date.now()).stato === "pausa";
   const quante = r ? sessioniAlLavoro(r) : 0;
-  // «L’app prova a riaprirla» (101-42000): una volta per chiusura, mai dopo `spegni` (evento friday «stop»)
+  // «L’app prova a riaprirla» (101-42000): una volta per chiusura, mai dopo `spegni` (evento friday «stop») // nome del protocollo del motore
   const riaperta = useRef<number | null>(null);
-  const chiusa = !!r && statoFriday(r, Date.now()).stato === "spenta" && !!r.friday && r.friday.evento !== "stop";
+  const chiusa = !!r && statoClotchAi(r, Date.now()).stato === "spenta" && !!r.clotchAi && r.clotchAi.evento !== "stop";
   useEffect(() => {
-    if (!chiusa || riaperta.current === r!.friday!.t || new URLSearchParams(location.search).has("parita")) return;
-    riaperta.current = r!.friday!.t;
-    avviaFriday("riavvio");
+    if (!chiusa || riaperta.current === r!.clotchAi!.t || new URLSearchParams(location.search).has("parita")) return;
+    riaperta.current = r!.clotchAi!.t;
+    avviaClotchAi("riavvio");
   }, [chiusa]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="comandi-titolo">

@@ -1,4 +1,4 @@
-// figma: 101-17363 — Impostazioni · Notifiche. «Silenzio» ferma solo le notifiche dell'app (non è il Non disturbare di Friday).
+// figma: 101-17363 — Impostazioni · Notifiche. «Silenzio» ferma solo le notifiche dell'app (non è il Non disturbare di clotch AI).
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
 

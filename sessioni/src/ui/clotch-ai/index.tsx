@@ -1,15 +1,15 @@
-// figma: 101-35494 — montaggio di Friday (#352): `Intestazione`, la vista (chat Friday, Casella, Decisioni, Regole) e
+// figma: 101-35494 — montaggio di clotch AI (#352): `Intestazione`, la vista (chat clotch AI, Casella, Decisioni, Regole) e
 // `ComandiTitolo` nella barra del titolo. Nelle scene di prova `sezione` porta lo stato da disegnare (avvisi, dialoghi, avvio).
 import { useEffect } from "react";
 import { useNavigazione } from "../base/navigazione";
 import { Casella } from "./Casella";
-import { ChatFriday } from "./ChatFriday";
+import { ChatClotchAi } from "./ChatClotchAi";
 import { avvisoInCorso, esitoFermo, fermo, menuQuiete } from "./ComandiTitolo";
 import { avviaScena, fineAvvio, useRegistro } from "./dati";
 import { Decisioni, esitoAnnulla } from "./Decisioni";
 import { avvisoSalvataggio, esitoSalvataggio, Regole } from "./Regole";
-import { sessioniAlLavoro, statoFriday } from "./vista";
-import "./friday.css";
+import { sessioniAlLavoro, statoClotchAi } from "./vista";
+import "./clotch-ai.css";
 
 export { ComandiTitolo } from "./ComandiTitolo";
 export { Intestazione } from "./Intestazione";
@@ -39,15 +39,15 @@ function useScena(sezione: string | null, quante: number | null) {
   }, [sezione, quante === null]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-export default function Friday() {
+export default function ClotchAi() {
   const n = useNavigazione();
   const { dati: r } = useRegistro();
   useScena(n.sezione, r ? sessioniAlLavoro(r) : null);
-  // «Avvio…» e «Riavvio…» finiscono quando il registro mostra Friday viva
-  useEffect(() => { if (r && statoFriday(r, Date.now()).stato !== "spenta") fineAvvio(); }, [r]);
+  // «Avvio…» e «Riavvio…» finiscono quando il registro mostra clotch AI viva
+  useEffect(() => { if (r && statoClotchAi(r, Date.now()).stato !== "spenta") fineAvvio(); }, [r]);
   if (n.vista === "casella") return <Casella />;
   if (n.vista === "decisioni") return <Decisioni />;
   if (n.vista === "regole") return <Regole />;
-  return <ChatFriday />;
+  return <ChatClotchAi />;
 }
 

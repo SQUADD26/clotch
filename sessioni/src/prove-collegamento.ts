@@ -1,6 +1,6 @@
-// Prove di collegamento dal vivo (#338): app <> sessioni Claude, Friday, Clotch, Codex, su questa macchina.
+// Prove di collegamento dal vivo (#338): app <> sessioni Claude, clotch AI, Clotch, Codex, su questa macchina.
 // Ogni prova stampa verde, fallita o in attesa (col perché). Uscita: 0 tutte verdi, 1 almeno una fallita, 3 qualcuna in attesa.
-// Uso: npm run prove [-- claude|friday|clotch|codex]   (PROVE_CLAUDE=<comando> per le sessioni vere; default claude)
+// Uso: npm run prove [-- claude|clotch-ai|clotch|codex]   (PROVE_CLAUDE=<comando> per le sessioni vere; default claude)
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -8,7 +8,7 @@ import * as crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { leggiElenco } from "./elenco";
 import { leggiObiettivi } from "./registri";
-import { cartellaRegistro, clotchAcceso, leggiRegistro } from "./friday";
+import { cartellaRegistro, clotchAcceso, leggiRegistro } from "./clotch-ai";
 import { trovaFile } from "./jsonl";
 import { Situazione } from "./situazione";
 
@@ -63,18 +63,18 @@ function sessioniVere(): Prova[] {
   });
 }
 
-async function friday(): Promise<Prova[]> {
-  const c = "app <> Friday";
+async function clotchAi(): Promise<Prova[]> {
+  const c = "app <> clotch AI";
   const dir = cartellaRegistro(home, env);
-  if (!fs.existsSync(dir)) return [p(c, "legge il registro", "attesa", `manca ${dir}: Friday non installata`)];
+  if (!fs.existsSync(dir)) return [p(c, "legge il registro", "attesa", `manca ${dir}: clotch AI non installata`)];
   const reg = leggiRegistro(home, env);
   const out = [p(c, "legge il registro vero", reg.errori.length ? "fallita" : "verde",
     `${reg.chat.size} chat, ${reg.avvisi.length} avvisi, ${reg.comandi.length} comandi, errori ${JSON.stringify(reg.errori)}`)];
-  if (reg.friday?.evento !== "avvio") {
-    out.push(p(c, "comando nella casella -> comando_fatto", "attesa", `motore Friday spento: ultimo evento friday ${reg.friday ? `«${reg.friday.evento}» ${eta(reg.friday.t)}` : "mai"}`));
+  if (reg.clotchAi?.evento !== "avvio") {
+    out.push(p(c, "comando nella casella -> comando_fatto", "attesa", `motore clotch AI spento: ultimo evento del motore ${reg.clotchAi ? `«${reg.clotchAi.evento}» ${eta(reg.clotchAi.t)}` : "mai"}`));
     return out;
   }
-  // un comando con un nome fuori elenco: nessun effetto, Friday deve rispondere `rifiutato`
+  // un comando con un nome fuori elenco: nessun effetto, clotch AI deve rispondere `rifiutato`
   const id = `c-${crypto.randomBytes(6).toString("hex")}`;
   const cmdDir = path.join(home, ".claude", "casella", "comandi");
   fs.mkdirSync(cmdDir, { recursive: true });
@@ -110,7 +110,7 @@ function clotch(): Prova[] {
   const letti = leggiObiettivi(path.join(home, ".claude"), []);
   out.push(p(c, "obiettivi: stessa fonte di Clotch", nomi.length && letti.size === nomi.length ? "verde" : nomi.length ? "fallita" : "attesa",
     `${nomi.length} file in ~/.claude/obiettivi, ${letti.size} letti; eventi obiettivo nel registro: ${[...reg.chat.values()].filter((x) => x.obiettivo).length} chat`));
-  out.push(p(c, "con Clotch spento", "attesa", "serve chiudere Clotch sul Mac di Roberto; il ramo «spento» è provato coi dati in situazioni-friday.test.ts"));
+  out.push(p(c, "con Clotch spento", "attesa", "serve chiudere Clotch sul Mac di Roberto; il ramo «spento» è provato coi dati in situazioni-clotch-ai.test.ts"));
   return out;
 }
 
@@ -129,7 +129,7 @@ function codex(): Prova[] {
 
 async function main() {
   const scelta = process.argv[2];
-  const tutte: Record<string, () => Prova[] | Promise<Prova[]>> = { claude, friday, clotch, codex };
+  const tutte: Record<string, () => Prova[] | Promise<Prova[]>> = { claude, "clotch-ai": clotchAi, clotch, codex };
   const prove: Prova[] = [];
   for (const [k, f] of Object.entries(tutte)) if (!scelta || scelta === k) prove.push(...(await f()));
   const w = Math.max(...prove.map((x) => `${x.coppia} · ${x.nome}`.length));

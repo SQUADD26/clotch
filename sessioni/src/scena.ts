@@ -3,8 +3,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { IpcMain } from "electron";
-import { leggiRegistro } from "./friday";
-import { piano } from "./friday-ipc";
+import { leggiRegistro } from "./clotch-ai";
+import { piano } from "./clotch-ai-ipc";
 import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
@@ -26,7 +26,7 @@ export interface Scena {
   /** Info (#351): le note della versione e se c'è «Controlla aggiornamenti». */
   novita?: Novita;
   aggiornamenti?: boolean;
-  /** Registro di Friday come lo dà `friday:registro`. */
+  /** Registro di clotch AI come lo dà `clotch-ai:registro`. */
   registro?: unknown;
 }
 
@@ -65,14 +65,14 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "impostazioni:novita": return s.novita ?? null;
     case "impostazioni:aggiornamenti": return args[0] === true ? undefined : s.aggiornamenti ?? false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
-    case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
+    case "clotch-ai:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
     default: return undefined;
   }
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
-  "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
+  "clotch-ai:registro", "clotch-ai:comando", "clotch-ai:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti"];

@@ -1,4 +1,4 @@
-// Giro vero produttore -> lettore (#456): il motore Python di Friday scrive registro e casella in una HOME temporanea,
+// Giro vero produttore -> lettore (#456): il motore Python di clotch AI scrive registro e casella in una HOME temporanea,
 // l'app li legge e gli manda comandi. Niente rete, voce o processi veri: dentro Python `subprocess.run` è sostituito da un finto che registra e basta.
 // Il motore è quello installato (CLOTCH_MOTORE_HOOKS o ~/.claude/hooks): se manca, i test si saltano.
 import test from "node:test";
@@ -7,30 +7,30 @@ import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { leggiRegistro, mandaComando } from "../src/friday";
+import { leggiRegistro, mandaComando } from "../src/clotch-ai";
 import { inviaComando } from "../src/comandi";
 
 const HOOKS = process.env.CLOTCH_MOTORE_HOOKS || path.join(os.homedir(), ".claude", "hooks");
-const motore = fs.existsSync(path.join(HOOKS, "friday_registro.py")) && spawnSync("python3", ["--version"]).status === 0;
+const motore = fs.existsSync(path.join(HOOKS, "friday_registro.py")) && spawnSync("python3", ["--version"]).status === 0; // nome del protocollo del motore
 const PY = String.raw`
 import json, os, sys, types
 from unittest.mock import patch
 hooks, home, modo = sys.argv[1:4]
 rc = sys.argv[4] if len(sys.argv) > 4 else "0"
-os.environ.update(HOME=home, REGISTRI_PROVA='1', REGISTRI_PROVA_DIR=home, FRIDAY_REGISTRO=home+'/.claude/registro', FRIDAY_DIR=home+'/.claude/friday',
+os.environ.update(HOME=home, REGISTRI_PROVA='1', REGISTRI_PROVA_DIR=home, FRIDAY_REGISTRO=home+'/.claude/registro', FRIDAY_DIR=home+'/.claude/friday',  # nome del protocollo del motore
                   CASELLA_DIR=home+'/.claude/casella', OBIETTIVI_DIR=home+'/.claude/obiettivi', PYTHONDONTWRITEBYTECODE='1')
 sys.dont_write_bytecode = True
 sys.path.insert(0, hooks)
 sys.modules['eventi_voce'] = types.SimpleNamespace(scrivi=lambda *a, **k: None)  # nessuna voce
-import friday_registro as R, friday_annulla as A, obiettivo_registro as O, friday_hook as H, friday
+import friday_registro as R, friday_annulla as A, obiettivo_registro as O, friday_hook as H, friday  # nome del protocollo del motore
 def finto(cmd, **kw):  # l'unico "processo": registra l'argv; l'obiettivo si accetta solo per s-1; mai altro
     open(home + '/processi.log', 'a').write(json.dumps(cmd) + '\n')
     if 'obiettivo-guard.py' in cmd[1]: return types.SimpleNamespace(returncode=0 if cmd[-1] == 's-1' else 1, stdout='', stderr='')
     if cmd[0] == 'system_profiler': return types.SimpleNamespace(returncode=1, stdout='', stderr='')  # nessun microfono
-    assert cmd[1].endswith('friday_fermo.py') or cmd[0] == 'echo', cmd
+    assert cmd[1].endswith('friday_fermo.py') or cmd[0] == 'echo', cmd  # nome del protocollo del motore
     return types.SimpleNamespace(returncode=int(rc), stdout='', stderr='boom')
 if modo == 'produci':
-    inv = [sys.executable, os.path.join(os.path.realpath(hooks), 'friday_fermo.py'), 'riprendi', 'tutto']
+    inv = [sys.executable, os.path.join(os.path.realpath(hooks), 'friday_fermo.py'), 'riprendi', 'tutto']  # nome del protocollo del motore
     R.scrivi('inizio', 's-1', {'titolo': 'Prova', 'madre': '', 'progetto': 'clotch'})
     O.imposta('s-1', 'Il pannello mostra il comando annullato entro un secondo', 'roberto')
     O.imposta('s-1', 'Il pannello mostra il comando annullato subito dopo il clic', 'roberto')
@@ -42,10 +42,10 @@ if modo == 'produci':
     H.passi('s-1', todo(('Leggere il registro', 'completed'), ('Scrivere il test', 'in_progress')))
     ids = {n: A.decidi(f'Decisione {n}', 'prova', i, 's-1', 'fermo', effetto_annullo='riparte') for n, i in
            [('buona', inv), ('fallisce', inv), ('terminale', inv), ('fuori', ['echo', 'x']), ('senzaInverso', None)]}
-    ids['importata'] = R.scrivi('decisione', 'friday', {'cosa': 'storica', 'perche': 'x', 'inverso': inv, 'chat': '', 'genere': 'altro', 'non_annullabile': '', 'effetto_annullo': ''})['id']
+    ids['importata'] = R.scrivi('decisione', 'friday', {'cosa': 'storica', 'perche': 'x', 'inverso': inv, 'chat': '', 'genere': 'altro', 'non_annullabile': '', 'effetto_annullo': ''})['id']  # nome del protocollo del motore
     print(json.dumps(ids))
 elif modo == 'daemon':
-    with patch('subprocess.run', finto): friday.comandi()
+    with patch('subprocess.run', finto): friday.comandi()  # nome del protocollo del motore
 elif modo == 'terminale':
     with patch('subprocess.run', finto): print(json.dumps(A._annulla(sys.argv[5])))
 `;
@@ -56,7 +56,7 @@ const py = (h: string, modo: string, ...a: string[]) => {
 };
 const casella = (h: string) => path.join(h, ".claude", "casella", "comandi");
 const processi = (h: string) => { try { return fs.readFileSync(path.join(h, "processi.log"), "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)); } catch { return []; } };
-/** Manda un comando e fa girare la Friday vera (un giro di casella) appena il file compare. */
+/** Manda un comando e fa girare la clotch AI vera (un giro di casella) appena il file compare. */
 async function manda(h: string, cmd: any, args: Record<string, unknown>, rc = "0") {
   const p = inviaComando(h, cmd, args, { ogniMs: 20, scadenzaMs: 20_000 });
   while (!fs.existsSync(casella(h)) || !fs.readdirSync(casella(h)).some((n) => n.endsWith(".json"))) await new Promise((ok) => setTimeout(ok, 10));
@@ -65,7 +65,7 @@ async function manda(h: string, cmd: any, args: Record<string, unknown>, rc = "0
 }
 const dec = (h: string, id: string) => leggiRegistro(h).decisioni.find((d) => d.id === id)!;
 
-test("giro vero: il motore scrive, l'app legge obiettivi, passi e decisioni", { skip: !motore && "motore Friday non installato" }, () => {
+test("giro vero: il motore scrive, l'app legge obiettivi, passi e decisioni", { skip: !motore && "motore clotch AI non installato" }, () => {
   const h = fs.mkdtempSync(path.join(os.tmpdir(), "integrato-"));
   const ids = JSON.parse(py(h, "produci"));
   const r = leggiRegistro(h);
@@ -79,7 +79,7 @@ test("giro vero: il motore scrive, l'app legge obiettivi, passi e decisioni", { 
   console.log(`INTEGRATO_LETTORE_OK decisioni=${r.decisioni.length} obiettivo=${s1.obiettivo!.stato} passi=${s1.passi.length}`);
 });
 
-test("giro vero: annulla, doppio clic, rifiuti e errori del motore, riavvio", { skip: !motore && "motore Friday non installato" }, async () => {
+test("giro vero: annulla, doppio clic, rifiuti e errori del motore, riavvio", { skip: !motore && "motore clotch AI non installato" }, async () => {
   const h = fs.mkdtempSync(path.join(os.tmpdir(), "integrato-"));
   const ids = JSON.parse(py(h, "produci"));
   const [a, b] = await Promise.all([manda(h, "annulla", { decisione: ids.buona }), inviaComando(h, "annulla", { decisione: ids.buona })]);
@@ -104,12 +104,12 @@ test("giro vero: annulla, doppio clic, rifiuti e errori del motore, riavvio", { 
   assert.equal((await manda(h, "obiettivo", { chat: "s-1", esito: "accetta" })).esito, "ok");
   assert.equal((await manda(h, "obiettivo", { chat: "s-9", esito: "accetta" })).esito, "rifiutato"); // nessuna proposta
   const prima = JSON.stringify([...leggiRegistro(h).esiti]);
-  py(h, "daemon"); // Friday riavviata: stessi file, niente rieseguito
-  assert.deepEqual([JSON.stringify([...leggiRegistro(h).esiti]), processi(h).filter((p) => p[0] !== "echo" && p[1].endsWith("friday_fermo.py")).length], [prima, 3]);
+  py(h, "daemon"); // clotch AI riavviata: stessi file, niente rieseguito
+  assert.deepEqual([JSON.stringify([...leggiRegistro(h).esiti]), processi(h).filter((p) => p[0] !== "echo" && p[1].endsWith("friday_fermo.py")).length], [prima, 3]); // nome del protocollo del motore
   assert.deepEqual(fs.readdirSync(casella(h)).filter((n) => n.endsWith(".json")), []);
 });
 
-test("giro vero: comando vecchio, impostazioni e account non disponibile", { skip: !motore && "motore Friday non installato" }, async () => {
+test("giro vero: comando vecchio, impostazioni e account non disponibile", { skip: !motore && "motore clotch AI non installato" }, async () => {
   const h = fs.mkdtempSync(path.join(os.tmpdir(), "integrato-"));
   const ids = JSON.parse(py(h, "produci"));
   mandaComando(h, "annulla", { decisione: ids.buona }, Date.now() - 2 * 3600_000); // scritto 2 ore fa: il motore lo rifiuta senza eseguirlo

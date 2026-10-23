@@ -1,7 +1,7 @@
 // figma: 101-7712 — «Barra titolo»: posto del semaforo del Mac, navigazione (barra laterale, indietro, avanti) e,
 // a destra, «comandi globali» (101-37696) montati dai pezzi che esportano `ComandiTitolo`.
 import type { ComponentType } from "react";
-import * as friday from "../friday";
+import * as clotchAi from "../clotch-ai";
 import * as pannello from "../pannello";
 import { Attivita } from "./Attivita";
 import { BottoneIcona } from "./Bottone";
@@ -10,7 +10,7 @@ import { useNavigazione } from "./navigazione";
 
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
 const comandi = (m: object) => (m as { ComandiTitolo?: ComponentType }).ComandiTitolo;
-const ComandiPannello = comandi(pannello), ComandiFriday = comandi(friday);
+const ComandiPannello = comandi(pannello), ComandiClotchAi = comandi(clotchAi);
 
 export function BarraTitolo() {
   const n = useNavigazione();
@@ -33,7 +33,7 @@ export function BarraTitolo() {
           <Attivita />
           <div className="comandi-globali">
             {ComandiPannello && <Pezzo nome="pannello"><ComandiPannello /></Pezzo>}
-            {ComandiFriday && <Pezzo nome="friday"><ComandiFriday /></Pezzo>}
+            {ComandiClotchAi && <Pezzo nome="clotch-ai"><ComandiClotchAi /></Pezzo>}
           </div>
         </>
       )}

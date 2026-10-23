@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Scene di prova dei frame Friday (#352): un registro nella forma del contratto v1 con i dati scritti nei frame Figma,
-// letto col lettore vero e salvato in design/scene/<id>.json. Le ore sono relative ad adesso (Friday «Attiva» = battito
-// recente): si rilancia subito prima di `npm run parita`. Uso: npm run build && node scripts/scene-friday.mjs
+// Scene di prova dei frame clotch AI (#352): un registro nella forma del contratto v1 con i dati scritti nei frame Figma,
+// letto col lettore vero e salvato in design/scene/<id>.json. Le ore sono relative ad adesso (clotch AI «Attiva» = battito
+// recente): si rilancia subito prima di `npm run parita`. Uso: npm run build && node scripts/scene-clotch-ai.mjs
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -9,8 +9,9 @@ import { createRequire } from "node:module";
 
 const radice = path.join(path.dirname(new URL(import.meta.url).pathname), "..");
 const require = createRequire(import.meta.url);
-const { leggiRegistro } = require(path.join(radice, "dist/src/friday.js"));
-const { piano } = require(path.join(radice, "dist/src/friday-ipc.js"));
+const { leggiRegistro } = require(path.join(radice, "dist/src/clotch-ai.js"));
+const { piano } = require(path.join(radice, "dist/src/clotch-ai-ipc.js"));
+const MOTORE = "friday"; // nome del protocollo del motore
 
 const ora = Date.now();
 const alle = (h, m, giorni = 0) => { const d = new Date(ora); d.setDate(d.getDate() - giorni); d.setHours(h, m, 0, 0); return d.toISOString(); };
@@ -19,7 +20,7 @@ const giorno = (g, m) => { const d = new Date(ora); d.setMonth(m - 1, g); d.setH
 
 const passi = (fatti, inCorso, attesa) => [...fatti.map((testo) => ({ testo, stato: "completed" })), ...inCorso.map((testo) => ({ testo, stato: "in_progress" })), ...attesa.map((testo) => ({ testo, stato: "pending" }))];
 const chat = (id, titolo, progetto, madre, stato, extra = []) => [
-  [fa(90), id, "inizio", { titolo, madre, progetto, cwd: "", modo: "app", figlia_friday: false, account: ".claude", sorgente: "app", da_handoff: "" }],
+  [fa(90), id, "inizio", { titolo, madre, progetto, cwd: "", modo: "app", figlia_friday: false, account: ".claude", sorgente: "app", da_handoff: "" }], // nome del protocollo del motore
   [fa(2), id, stato === "lavora" ? "battito" : "stato", { stato }],
   ...extra.map(([tipo, dati]) => [fa(3), id, tipo, dati]),
 ];
@@ -40,45 +41,45 @@ const casella = [
   ]),
   ...chat("c-backend", "Backend: auth e RLS", "squadd-v2", "m-squadd", "aspetta", [["richiesta", { genere: "piano", rid: "q2", strumento: "ExitPlanMode", ingresso: {}, domande: [] }]]),
   ...["Squadd: fatta 1", "Squadd: fatta 2"].flatMap((t, i) => chat(`s-fatta-${i}`, t, "squadd-v2", "m-squadd", "finito")),
-  ...chat("m-friday", "Friday: casella unica", "friday-mac-v2", "", "lavora", [
+  ...chat("m-clotch-ai", "clotch AI: casella unica", "clotch-ai-mac-v2", "", "lavora", [
     ["obiettivo", { stato: "aperto", testo: "Casella unica e sandbox", versione: 1 }],
     ["passi", { agente: "", passi: passi(["a", "b"], ["Registro unico delle sessioni"], ["Stati e piano", "e", "f", "g"]) }],
   ]),
-  ...chat("f-lavora-1", "Friday: lavoro 1", "friday-mac-v2", "m-friday", "lavora"),
-  ...chat("f-lavora-2", "Friday: lavoro 2", "friday-mac-v2", "m-friday", "lavora"),
-  ...chat("f-fatta", "Friday: fatta", "friday-mac-v2", "m-friday", "finito"),
+  ...chat("f-lavora-1", "clotch AI: lavoro 1", "clotch-ai-mac-v2", "m-clotch-ai", "lavora"),
+  ...chat("f-lavora-2", "clotch AI: lavoro 2", "clotch-ai-mac-v2", "m-clotch-ai", "lavora"),
+  ...chat("f-fatta", "clotch AI: fatta", "clotch-ai-mac-v2", "m-clotch-ai", "finito"),
 ];
 
 // Decisioni 101-39266 e Regole 101-40473
 const decisioni = [
-  [alle(18, 20, 1), "friday", "decisione", { cosa: "Archiviate 4 sessioni finite", perche: "", inverso: ["friday", "archivia"], chat: "m-squadd", genere: "archivio" }],
-  [alle(11, 30), "friday", "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null, chat: "m-clotch", genere: "promozione", non_annullabile: "Già su main: non si annulla" }],
-  [alle(12, 5), "friday", "decisione", { cosa: "Risposto alla domanda: «Nel repo, in sessioni/design/app»", perche: "", inverso: ["x"], chat: "c-figma", genere: "risposta" }],
-  [alle(13, 40), "friday", "decisione", { cosa: "Fermata la sessione «Notch: avviso schermo»", perche: "", inverso: ["x"], chat: "c-fatta-0", genere: "fermo" }],
-  [alle(14, 12), "friday", "decisione", { cosa: "Consentita la migrazione 0042 su dev", perche: "", effetto_annullo: "Friday ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.", inverso: ["x"], chat: "c-backend", genere: "permesso" }],
+  [alle(18, 20, 1), MOTORE, "decisione", { cosa: "Archiviate 4 sessioni finite", perche: "", inverso: ["friday", "archivia"], chat: "m-squadd", genere: "archivio" }], // nome del protocollo del motore
+  [alle(11, 30), MOTORE, "decisione", { cosa: "Promosso dev a main", perche: "", inverso: null, chat: "m-clotch", genere: "promozione", non_annullabile: "Già su main: non si annulla" }],
+  [alle(12, 5), MOTORE, "decisione", { cosa: "Risposto alla domanda: «Nel repo, in sessioni/design/app»", perche: "", inverso: ["x"], chat: "c-figma", genere: "risposta" }],
+  [alle(13, 40), MOTORE, "decisione", { cosa: "Fermata la sessione «Notch: avviso schermo»", perche: "", inverso: ["x"], chat: "c-fatta-0", genere: "fermo" }],
+  [alle(14, 12), MOTORE, "decisione", { cosa: "Consentita la migrazione 0042 su dev", perche: "", effetto_annullo: "clotch AI ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.", inverso: ["x"], chat: "c-backend", genere: "permesso" }],
 ];
 const regole = [
-  [giorno(23, 10), "friday", "regola", { testo: "Parla poco e chiaro: una cosa alla volta, parole semplici.", perche: "", dove: "claude-config", togli: false }],
-  [giorno(18, 10), "friday", "regola", { testo: "Main si cambia solo con la promozione da dev.", perche: "", dove: "claude-config", togli: false }],
-  [giorno(21, 10), "friday", "regola", { testo: "Ogni interfaccia passa prima da Figma.", perche: "", dove: "/Users/privato/Documents/Repos/clotch", togli: false }],
+  [giorno(23, 10), MOTORE, "regola", { testo: "Parla poco e chiaro: una cosa alla volta, parole semplici.", perche: "", dove: "claude-config", togli: false }],
+  [giorno(18, 10), MOTORE, "regola", { testo: "Main si cambia solo con la promozione da dev.", perche: "", dove: "claude-config", togli: false }],
+  [giorno(21, 10), MOTORE, "regola", { testo: "Ogni interfaccia passa prima da Figma.", perche: "", dove: "/Users/privato/Documents/Repos/clotch", togli: false }],
 ];
-const viva = [[fa(0.5), "friday", "battito", { stato: "lavora" }]];
-const spenta = [[alle(14, 2), "friday", "friday", { evento: "avvio" }], [alle(14, 2), "friday", "battito", { stato: "lavora" }]];
-// filo della chat Friday di 101-42000: due domande di Roberto (`parla`) e due risposte (avvisi «risposta»), prima della chiusura
-const parla = (h, m, testo) => [alle(h, m), "friday", "comando", { id: `parla-${h}${m}`, cmd: "parla", da: "app", args: { testo } }];
-const risponde = (h, m, testo) => [alle(h, m), "friday", "avviso", { testo, livello: "normale", motivo: "risposta" }];
+const viva = [[fa(0.5), MOTORE, "battito", { stato: "lavora" }]];
+const spenta = [[alle(14, 2), MOTORE, MOTORE, { evento: "avvio" }], [alle(14, 2), MOTORE, "battito", { stato: "lavora" }]];
+// filo della chat clotch AI di 101-42000: due domande di Roberto (`parla`) e due risposte (avvisi «risposta»), prima della chiusura
+const parla = (h, m, testo) => [alle(h, m), MOTORE, "comando", { id: `parla-${h}${m}`, cmd: "parla", da: "app", args: { testo } }];
+const risponde = (h, m, testo) => [alle(h, m), MOTORE, "avviso", { testo, livello: "normale", motivo: "risposta" }];
 const filo = [
   parla(13, 58, "Com’è messa la sessione del backend?"),
   risponde(13, 59, "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev."),
   parla(14, 0, "Consentila tu."),
   risponde(14, 1, "Fatto. La migrazione è partita; ti avviso quando finisce."),
 ];
-// Friday chiusa alle 14:02: niente di Friday dopo (le decisioni delle 14:12 la terrebbero «vista» più tardi)
-const primaDellaChiusura = (righe) => righe.filter(([t, c]) => c !== "friday" || t <= alle(14, 2));
-const quiete = (fino) => [[fa(30), "friday", "non_disturbare", { acceso: true, fino, tenuti: 3 }]];
+// clotch AI chiusa alle 14:02: niente di clotch AI dopo (le decisioni delle 14:12 la terrebbero «vista» più tardi)
+const primaDellaChiusura = (righe) => righe.filter(([t, c]) => c !== MOTORE || t <= alle(14, 2));
+const quiete = (fino) => [[fa(30), MOTORE, "non_disturbare", { acceso: true, fino, tenuti: 3 }]];
 const clotch = [[fa(1), "clotch", "clotch", { voce: "accesa", parla: false, ascolta: false }]];
 const proposto = chat("m-proposto", "Clotch: barra annidata", "clotch", "", "aspetta", [["obiettivo", { stato: "proposto", testo: "Le sessioni annidate e le PR nella barra laterale, pari al disegno.", versione: 1 }]]);
-const annullata = [[fa(1), "friday", "decisione", { cosa: "annullata DECISIONE", perche: "", inverso: null, chat: "", genere: "altro" }]];
+const annullata = [[fa(1), MOTORE, "decisione", { cosa: "annullata DECISIONE", perche: "", inverso: null, chat: "", genere: "altro" }]];
 
 const tutto = [...casella, ...decisioni, ...regole];
 // id del frame -> [vista, sezione, righe del registro]
@@ -87,14 +88,14 @@ const SCENE = {
   // 101-36010 (caricamento) non ha scena: la scena risponde subito, il caricamento non si vede
   "101-35803": ["casella", null, [...decisioni, ...regole, ...viva]],
   "101-36225": ["casella", null, null],
-  "101-37696": ["friday", "ferma-conferma", [...tutto, ...viva]],
-  "101-37879": ["friday", "ferma-in-corso", [...tutto, ...viva]],
-  "101-38124": ["friday", "ferma-fatto", [...tutto, ...viva]],
-  "101-38374": ["friday", "ferma-errore:c-lettura", [...tutto, ...viva]],
-  "101-38626": ["friday", "quiete-menu", [...tutto, ...viva]],
-  "101-50008": ["friday", "quiete-menu", [...tutto, ...viva, ...clotch]],
-  "101-50071": ["friday", "quiete-menu", [...tutto, ...viva]],
-  "101-38897": ["friday", null, [...tutto, ...viva, ...quiete(alle(18, 0))]],
+  "101-37696": ["clotch-ai", "ferma-conferma", [...tutto, ...viva]],
+  "101-37879": ["clotch-ai", "ferma-in-corso", [...tutto, ...viva]],
+  "101-38124": ["clotch-ai", "ferma-fatto", [...tutto, ...viva]],
+  "101-38374": ["clotch-ai", "ferma-errore:c-lettura", [...tutto, ...viva]],
+  "101-38626": ["clotch-ai", "quiete-menu", [...tutto, ...viva]],
+  "101-50008": ["clotch-ai", "quiete-menu", [...tutto, ...viva, ...clotch]],
+  "101-50071": ["clotch-ai", "quiete-menu", [...tutto, ...viva]],
+  "101-38897": ["clotch-ai", null, [...tutto, ...viva, ...quiete(alle(18, 0))]],
   "101-39266": ["decisioni", null, [...tutto, ...viva]],
   "101-39512": ["decisioni", "annulla:DECISIONE", [...tutto, ...viva]],
   "101-39767": ["decisioni", "annullata:Decisione annullata. La sessione aspetta te.", [...tutto, ...viva, ...annullata]],
@@ -106,9 +107,9 @@ const SCENE = {
   "101-41166": ["regole", "salvata:2402", [...tutto, ...viva]],
   "101-41397": ["regole", "salvataggio-errore:Regola non salvata: la PR non si apre.", [...tutto, ...viva]],
   "101-41628": ["regole", null, [...casella, ...decisioni, ...viva]],
-  "101-41834": ["friday", "avvio", [...tutto]],
-  "101-42000": ["friday", null, primaDellaChiusura([...tutto, ...spenta, ...filo])],
-  "101-42245": ["friday", "riavvio", primaDellaChiusura([...tutto, ...spenta, ...filo])],
+  "101-41834": ["clotch-ai", "avvio", [...tutto]],
+  "101-42000": ["clotch-ai", null, primaDellaChiusura([...tutto, ...spenta, ...filo])],
+  "101-42245": ["clotch-ai", "riavvio", primaDellaChiusura([...tutto, ...spenta, ...filo])],
   "101-47170": ["casella", null, [...tutto, ...viva, ...proposto, ...clotch]],
   "101-47297": ["casella", null, [...tutto, ...viva, ...proposto]],
 };
@@ -116,7 +117,7 @@ const SCENE = {
 const dir = path.join(radice, "design", "scene");
 fs.mkdirSync(dir, { recursive: true });
 for (const [id, [vista, sezione, righe]] of Object.entries(SCENE)) {
-  const casa = fs.mkdtempSync(path.join(os.tmpdir(), "scena-friday-"));
+  const casa = fs.mkdtempSync(path.join(os.tmpdir(), "scena-clotch-ai-"));
   const reg = path.join(casa, ".claude", "registro");
   fs.mkdirSync(reg, { recursive: true });
   if (righe) {
@@ -137,4 +138,4 @@ for (const [id, [vista, sezione, righe]] of Object.entries(SCENE)) {
   fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify(scena, null, 1) + "\n");
   fs.rmSync(casa, { recursive: true });
 }
-console.log(`scene Friday: ${Object.keys(SCENE).length} in ${dir}`);
+console.log(`scene clotch AI: ${Object.keys(SCENE).length} in ${dir}`);

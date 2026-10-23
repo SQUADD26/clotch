@@ -1,4 +1,4 @@
-// Contratto locale di claude-config/friday_fiducia.py: il client legge le ricevute, non le crea.
+// Contratto locale di claude-config/friday_fiducia.py: il client legge le ricevute, non le crea. // nome del protocollo del motore
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { createHash } from "node:crypto";
@@ -23,9 +23,9 @@ export function ricevutaLocale(o: Record<string, unknown>, home: string, env: No
   const remota = o.origine_remota;
   const vuota = remota === null || remota === undefined || remota === false || remota === 0 || remota === "" ||
     (Array.isArray(remota) ? remota.length === 0 : typeof remota === "object" && Object.keys(remota).length === 0);
-  if (o.tipo !== "decisione" || o.chat !== "friday" || !vuota || typeof o.id !== "string" || !/^r-[0-9a-f]{12}$/.test(o.id)) return false;
+  if (o.tipo !== "decisione" || o.chat !== "friday" || !vuota || typeof o.id !== "string" || !/^r-[0-9a-f]{12}$/.test(o.id)) return false; // nome del protocollo del motore
   try {
-    const file = path.join(env.FRIDAY_DIR || path.join(home, ".claude", "friday"), "eventi-locali", "decisione", o.id);
+    const file = path.join(env.FRIDAY_DIR || path.join(home, ".claude", "friday"), "eventi-locali", "decisione", o.id); // nome del protocollo del motore
     return fs.readFileSync(file, "utf8") === createHash("sha256").update(canonico(o), "utf8").digest("hex");
   } catch { return false; }
 }

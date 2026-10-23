@@ -1,37 +1,37 @@
-// figma: 101-17538 — Impostazioni · Friday. Sono impostazioni di Friday, non dell'app: si leggono dall'ultimo evento
-// `impostazioni` del registro e si cambiano coi comandi `imposta` e `spegni` (contratto v1); `friday avvia` la accende.
+// figma: 101-17538 — Impostazioni · clotch AI. Sono impostazioni di clotch AI, non dell'app: si leggono dall'ultimo evento
+// `impostazioni` del registro e si cambiano coi comandi `imposta` e `spegni` (contratto v1); `friday avvia` la accende. // nome del protocollo del motore
 import { useEffect, useState } from "react";
 import type { EsitoComando } from "../../comandi";
-import type { FridayApi } from "../../tipi";
+import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
-import { daPiano } from "../friday/registro";
+import { daPiano } from "../clotch-ai/registro";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 
 declare global {
-  interface Window { friday: FridayApi }
+  interface Window { clotchAi: ClotchAiApi }
 }
 
 type Valori = Record<string, unknown>;
 
-/** Ultimo evento `impostazioni` di Friday, aggiornato dal vivo; null finché Friday non l'ha mai scritto. */
-function useImpostazioniFriday(): Valori | null {
+/** Ultimo evento `impostazioni` di clotch AI, aggiornato dal vivo; null finché clotch AI non l'ha mai scritto. */
+function useImpostazioniClotchAi(): Valori | null {
   const [v, setV] = useState<Valori | null>(null);
   useEffect(() => {
     const prendi = (p: unknown) => setV(daPiano(p).impostazioni);
-    window.friday.registro().then(prendi, () => {});
-    return window.friday.onRegistro(prendi);
+    window.clotchAi.registro().then(prendi, () => {});
+    return window.clotchAi.onRegistro(prendi);
   }, []);
   return v;
 }
 
-/** Testi dei frame: «Friday non risponde» se non ha preso il comando, se no il perché di Friday o «Comando non riuscito». */
+/** Testi dei frame: «clotch AI non risponde» se non ha preso il comando, se no il perché di clotch AI o «Comando non riuscito». */
 export const testoEsito = (e: EsitoComando) =>
   e.esito === "scaduto" && !e.preso ? "clotch AI non risponde" : e.testo || "Comando non riuscito";
 
-export default function Friday() {
-  const letti = useImpostazioniFriday();
+export default function ClotchAi() {
+  const letti = useImpostazioniClotchAi();
   const [account, setAccount] = useState<string[]>([]);
-  // cambi mandati e non ancora tornati nel registro: si vedono subito, se Friday rifiuta tornano com'erano
+  // cambi mandati e non ancora tornati nel registro: si vedono subito, se clotch AI rifiuta tornano com'erano
   const [inViaggio, setInViaggio] = useState<Valori>({});
   useEffect(() => {
     window.impostazioni.radici().then((r) => setAccount(r.map((p) => p.split("/").pop()!.replace(/^\.claude-?/, "") || "claude")), () => {});
@@ -48,9 +48,9 @@ export default function Friday() {
     setInViaggio(({ [chiave]: _, ...resto }) => resto);
     avvisa({ tipo: "errore", messaggio: "esito" in e ? testoEsito(e) : e.testo || "Comando non riuscito" });
   };
-  const imposta = (chiave: string, valore: unknown) => manda(chiave, valore, () => window.friday.comando("imposta", { chiave, valore }));
+  const imposta = (chiave: string, valore: unknown) => manda(chiave, valore, () => window.clotchAi.comando("imposta", { chiave, valore }));
   const attiva = v.attiva === true;
-  // senza il suo evento, o spenta, Friday non può cambiare le sue impostazioni: i controlli restano spenti
+  // senza il suo evento, o spenta, clotch AI non può cambiare le sue impostazioni: i controlli restano spenti
   const spenti = !letti || !attiva;
   const lista = (x: unknown) => (Array.isArray(x) ? x.map(String) : undefined);
 
@@ -59,7 +59,7 @@ export default function Friday() {
       <Gruppo>
         <Riga etichetta="clotch AI attiva" descrizione="Sempre in ascolto, fissa in alto nella barra laterale">
           <Interruttore etichetta="clotch AI attiva" acceso={attiva}
-            onCambia={(x) => manda("attiva", x, () => (x ? window.friday.avvia() : window.friday.comando("spegni")))} />
+            onCambia={(x) => manda("attiva", x, () => (x ? window.clotchAi.avvia() : window.clotchAi.comando("spegni")))} />
         </Riga>
         <Riga etichetta="Microfono" descrizione="Quello che clotch AI ascolta">
           <Scelta etichetta="Microfono" valore={String(v.microfono ?? "")} voci={lista(v.microfoni_disponibili)}

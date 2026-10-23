@@ -95,7 +95,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [
    {
@@ -154,7 +154,7 @@
     "chat": "c-backend",
     "genere": "permesso",
     "nonAnnullabile": null,
-    "effettoAnnullo": "Friday ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.",
+    "effettoAnnullo": "clotch AI ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.",
     "annullabile": true,
     "annullata": false
    }

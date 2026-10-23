@@ -1,6 +1,6 @@
 // figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
 // Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
-import type { Registro } from "../../friday";
+import type { Registro } from "../../clotch-ai";
 import type { Elenco, PreferenzeSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
 import type { Stato as StatoChiamata } from "../base/dati";
 import type { Vista } from "./elenco";
@@ -32,10 +32,10 @@ function clotch(icone: [string, string?][]) {
 }
 
 function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number } = {}): Registro {
-  const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]);
+  const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]); // nome del protocollo del motore
   for (let i = 0; i < (f.aspettano ?? 0); i++)
     chat.set(`c${i}`, { chat: `c${i}`, progetto: "clotch", visto: ORA, richieste: [{ genere: "permesso" }], stato: "serve_roberto", passi: [], aiutanti: new Map() });
-  return { chat, friday: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null } as unknown as Registro;
+  return { chat, clotchAi: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null } as unknown as Registro;
 }
 
 interface Prova {
@@ -60,7 +60,7 @@ const ICONE: [string, string?][] = [["stella"], ["strati"], ["schermo"], ["micro
 
 function base(icone = ICONE, extra: Partial<Prova> = {}): Prova {
   const c = clotch(icone);
-  const sessioni = [...c.lista, ...riempi("squadd-v2", 23, 60), ...riempi("dentalspace", 9, 200), ...riempi("friday-mac-v2", 14, 400)];
+  const sessioni = [...c.lista, ...riempi("squadd-v2", 23, 60), ...riempi("dentalspace", 9, 200), ...riempi("clotch-ai-mac-v2", 14, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref: c.pref, registro: registro(), scelta: c.lista[0].id, ...extra };
 }
 
@@ -71,7 +71,7 @@ const FRAME: Record<string, () => Prova> = {
   "101-35109": () => base(),
   "101-8805": () => ({ ora: ORA, elenco: pronto([]), pref: {}, registro: registro() }),
   "101-8912": () => ({ ora: ORA, elenco: { stato: "carica", riprova() {} }, pref: {}, registro: registro() }),
-  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-friday", messaggio: "permesso negato" }]) }; },
+  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-clotch-ai", messaggio: "permesso negato" }]) }; },
   "101-12118": () => { const b = base([["stella", "arancione"], ...ICONE.slice(1)]); return { ...b, aperto: { tipo: "icona", id: b.scelta!, a: { x: 335, y: 169 } } }; },
   "101-21061": () => {
     const b = base();
@@ -87,8 +87,8 @@ const FRAME: Record<string, () => Prova> = {
     return { ...b, passaggio: b.scelta, suggerimento: { testo: b.elenco.dati!.sessioni[0].titolo, a: { x: 120, y: 326 } } };
   },
   "101-30238": () => ({ ...base(), aperto: { tipo: "raggruppa", a: { x: 326, y: 142 } } }),
-  "101-38897": () => ({ ...base(), pagina: "friday", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
-  "101-42000": () => ({ ...base(), pagina: "friday", registro: registro({ stato: "spenta", aspettano: 3 }) }),
+  "101-38897": () => ({ ...base(), pagina: "clotch-ai", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
+  "101-42000": () => ({ ...base(), pagina: "clotch-ai", registro: registro({ stato: "spenta", aspettano: 3 }) }),
 };
 
 function filtrata(aperto?: Aperto): Prova {
@@ -115,7 +115,7 @@ const TANTE: [string, string, Stato][] = [
 FRAME["101-9340"] = () => {
   const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
   const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
-  const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("friday-mac-v2", 27, 400)];
+  const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("clotch-ai-mac-v2", 27, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro({ aspettano: 3 }), scelta: lista[3].id };
 };
 
@@ -123,7 +123,7 @@ FRAME["101-9340"] = () => {
 function ricerca(testo: string): Prova {
   const b = base();
   const extra = [
-    s("Lettura dei log di Codex", "friday-mac-v2", "finita", 10 * 24 * 60, "codex", "codex"),
+    s("Lettura dei log di Codex", "clotch-ai-mac-v2", "finita", 10 * 24 * 60, "codex", "codex"),
     s("Backend: auth e RLS", "squadd-v2", "finita", 24 * 60), s("Overseer: voce in Clotch", "clotch", "finita", 3 * 24 * 60),
   ];
   const nel = (x: Sessione, frammento: string): RisultatoRicerca => ({ id: x.id, titolo: x.titolo, frammento, t: x.ultimaAttivita, nelTitolo: false });

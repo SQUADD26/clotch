@@ -136,13 +136,13 @@ export interface PreferenzeSessione {
 
 export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale";
 
-/** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
-export interface FridayApi {
-  comando(cmd: import("./friday").Comando, args?: Record<string, unknown>): Promise<import("./comandi").EsitoComando>;
-  /** Il registro senza Map: `daPiano` (ui/friday/registro.ts) lo riporta a `Registro`. */
+/** `window.clotchAi` (#352): l'unico modo dell'interfaccia per comandare clotch AI e leggere il suo registro. */
+export interface ClotchAiApi {
+  comando(cmd: import("./clotch-ai").Comando, args?: Record<string, unknown>): Promise<import("./comandi").EsitoComando>;
+  /** Il registro senza Map: `daPiano` (ui/clotch-ai/registro.ts) lo riporta a `Registro`. */
   registro(): Promise<unknown>;
   onRegistro(cb: (registro: unknown) => void): () => void;
-  /** `friday avvia`, quando Friday è spenta. */
+  /** `friday avvia`, quando clotch AI è spenta. */ // nome del protocollo del motore
   avvia(): Promise<{ ok: boolean; testo: string }>;
 }
 

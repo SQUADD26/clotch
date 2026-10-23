@@ -1,16 +1,16 @@
-// L'unico modulo dell'app che manda comandi a Friday (#352): scrive il file nella casella
+// L'unico modulo dell'app che manda comandi a clotch AI (#352): scrive il file nella casella
 // e aspetta la riga `comando_fatto` nel registro (contratto v1, sezione 3). Chat e impostazioni usano questo.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { msgErrore, parseRiga, righeNuove } from "./jsonl";
-import { cartellaRegistro, Comando, mandaComando } from "./friday";
+import { cartellaRegistro, Comando, mandaComando } from "./clotch-ai";
 
 export type EsitoComando =
-  /** Friday ha risposto con `comando_fatto`. */
+  /** clotch AI ha risposto con `comando_fatto`. */
   | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[] }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
-  /** Nessuna risposta in tempo. `preso: false` = Friday non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
+  /** Nessuna risposta in tempo. `preso: false` = clotch AI non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
   | { id: string; esito: "scaduto"; testo: string; preso: boolean };
 
 export interface OpzioniComando { env?: NodeJS.ProcessEnv; scadenzaMs?: number; ogniMs?: number }
@@ -39,7 +39,7 @@ function ritira(home: string, id: string): boolean {
     if (!f) return false;
     fs.unlinkSync(path.join(dir, f));
     return true;
-  } catch { return false; } // Friday l'ha preso proprio ora
+  } catch { return false; } // clotch AI l'ha preso proprio ora
 }
 
 const inVolo = new Map<string, Promise<EsitoComando>>();
@@ -64,7 +64,7 @@ async function invia(home: string, cmd: Comando, args: Record<string, unknown>, 
       if (r.v !== 1 || r.tipo !== "comando_fatto" || r.dati?.comando !== id) continue;
       const e = r.dati.esito;
       const fatto: EsitoComando = { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
-      if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da Friday
+      if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da clotch AI
       if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
       return fatto;
     }

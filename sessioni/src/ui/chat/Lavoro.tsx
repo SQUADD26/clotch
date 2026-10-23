@@ -40,7 +40,7 @@ export function Attivita({ passi }: { passi: Passo[] }) {
   );
 }
 
-/** `modello`: dal registro di Friday («aiutante» con modello), se c'è. */
+/** `modello`: dal registro di clotch AI («aiutante» con modello), se c'è. */
 export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello: string | null }) {
   const finiti = aiutanti.every((a) => a.finito);
   const ris = useRiserva();

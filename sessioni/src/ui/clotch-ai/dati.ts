@@ -1,14 +1,14 @@
-// Registro di Friday nel renderer: `window.friday` (preload.ts), con lo stesso stato carica/pronto/errore di base/dati.ts.
+// Registro di clotch AI nel renderer: `window.clotchAi` (preload.ts), con lo stesso stato carica/pronto/errore di base/dati.ts.
 import { useSyncExternalStore } from "react";
-import type { Registro } from "../../friday";
-import type { FridayApi } from "../../tipi";
+import type { Registro } from "../../clotch-ai";
+import type { ClotchAiApi } from "../../tipi";
 import { messaggioErrore } from "../base/dati";
 import { daPiano } from "./registro";
 
 declare global {
-  interface Window { friday: FridayApi }
+  interface Window { clotchAi: ClotchAiApi }
 }
-export const friday = (): FridayApi => window.friday;
+export const clotchAi = (): ClotchAiApi => window.clotchAi;
 
 /** Un negozio piccolo: valore, chi ascolta, `metti` per cambiarlo. */
 export function negozio<T>(iniziale: T) {
@@ -24,29 +24,29 @@ export function negozio<T>(iniziale: T) {
 type StatoRegistro = { stato: "carica" | "pronto" | "errore"; dati?: Registro; errore?: string };
 const registro = negozio<StatoRegistro>({ stato: "carica" });
 let collegato = false;
-const leggi = () => friday().registro().then(
+const leggi = () => clotchAi().registro().then(
   (p) => registro.metti({ stato: "pronto", dati: daPiano(p) }),
   (e) => registro.metti({ stato: "errore", dati: registro.get().dati, errore: messaggioErrore(e) }),
 );
 
-/** Il registro, uno solo per tutta l'app: letto una volta, poi aggiornato da ogni `friday:registro` del main. */
+/** Il registro, uno solo per tutta l'app: letto una volta, poi aggiornato da ogni `clotch-ai:registro` del main. */
 export function useRegistro() {
   if (!collegato) {
     collegato = true;
     leggi();
-    friday().onRegistro((p) => registro.metti({ stato: "pronto", dati: daPiano(p) }));
+    clotchAi().onRegistro((p) => registro.metti({ stato: "pronto", dati: daPiano(p) }));
   }
   return { ...registro.usa(), riprova: () => { registro.metti({ stato: "carica" }); leggi(); } };
 }
 
-/** Stato che il registro non ha: l'app sta avviando Friday («Avvio…», «Riavvio…»). */
+/** Stato che il registro non ha: l'app sta avviando clotch AI («Avvio…», «Riavvio…»). */
 const avvio = negozio<"avvio" | "riavvio" | null>(null);
 export const useAvvio = avvio.usa;
 
-/** `friday avvia`; «Avvio…» resta finché il registro non mostra Friday viva (lo toglie `fineAvvio`). */
-export async function avviaFriday(come: "avvio" | "riavvio") {
+/** `friday avvia`; «Avvio…» resta finché il registro non mostra clotch AI viva (lo toglie `fineAvvio`). */ // nome del protocollo del motore
+export async function avviaClotchAi(come: "avvio" | "riavvio") {
   avvio.metti(come);
-  const r = await friday().avvia().catch((e) => ({ ok: false, testo: messaggioErrore(e) }));
+  const r = await clotchAi().avvia().catch((e) => ({ ok: false, testo: messaggioErrore(e) }));
   if (!r.ok) avvio.metti(null);
   return r;
 }

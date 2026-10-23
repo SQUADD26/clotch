@@ -1,13 +1,13 @@
-// figma: 101-39266 — «vista Decisioni»: le scelte di Friday per giorno, con Annulla. Stati: conferma 101-39512, annullata
+// figma: 101-39266 — «vista Decisioni»: le scelte di clotch AI per giorno, con Annulla. Stati: conferma 101-39512, annullata
 // 101-39767, annullo non riuscito 101-40016, vuoto 101-40267.
 import { useState } from "react";
-import type { Registro } from "../../friday";
+import type { Registro } from "../../clotch-ai";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
-import { friday, useRegistro } from "./dati";
+import { clotchAi, useRegistro } from "./dati";
 import { orario } from "./formato";
 import { Vuoto } from "./Pezzi";
 import { decisioniPerGiorno } from "./vista";
@@ -27,14 +27,14 @@ function dettaglio(r: Registro, d: Decisione) {
   return [chi, d.t !== null ? orario(d.t) : ""].filter(Boolean).join(" · ");
 }
 
-/** Esito dell'annullo: i testi li scrive Friday in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
+/** Esito dell'annullo: i testi li scrive clotch AI in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
 export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () => void) {
   if (e.esito === "ok") avvisa({ tipo: "info", messaggio: e.testo || "Decisione annullata. La sessione aspetta te." });
   else avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde", azione: { etichetta: "Riprova", fai: riprova } });
 }
 
 async function annulla(d: Decisione) {
-  esitoAnnulla(await friday().comando("annulla", { decisione: d.id }), () => annulla(d));
+  esitoAnnulla(await clotchAi().comando("annulla", { decisione: d.id }), () => annulla(d));
 }
 
 export function Decisioni() {
@@ -45,10 +45,10 @@ export function Decisioni() {
   const gruppi = r ? decisioniPerGiorno(r, Date.now()) : [];
   const conferma = typeof scelta === "string" ? gruppi.flatMap((g) => g.voci).find((d) => d.id === scelta) ?? null : scelta;
   if (r && !gruppi.length) {
-    return <div className="vista-friday"><Vuoto icona="libro" titolo="clotch AI non ha ancora deciso niente" corpo="Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare." /></div>;
+    return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="clotch AI non ha ancora deciso niente" corpo="Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare." /></div>;
   }
   return (
-    <div className="vista-friday">
+    <div className="vista-clotch-ai">
       {gruppi.map((g) => (
         <section key={g.titolo} className="gruppo-f">
           <div className="titolo-gruppo t-xs medio secondario">{g.titolo}</div>

@@ -1,22 +1,22 @@
-// Dal registro di Friday ai dati delle schermate Friday (#352). Puro: nessun file, nessun DOM.
-import type { ChatFriday, Registro } from "../../friday";
+// Dal registro di clotch AI ai dati delle schermate clotch AI (#352). Puro: nessun file, nessun DOM.
+import type { ChatClotchAi, Registro } from "../../clotch-ai";
 
-/** Contratto: Friday manda un battito ogni 60 s; `friday stato` la dà spenta dopo 180 s senza battito. */
-const FRIDAY_MUTA_MS = 180_000;
+/** Contratto: clotch AI manda un battito ogni 60 s; `friday stato` la dà spenta dopo 180 s senza battito. */ // nome del protocollo del motore
+const CLOTCH_AI_MUTA_MS = 180_000;
 const GENERE: Record<string, string> = { permesso: "Permesso", domanda: "Domanda", piano: "Piano" };
 
-export type StatoFriday = "attiva" | "spenta" | "pausa";
+export type StatoClotchAi = "attiva" | "spenta" | "pausa";
 
-export function statoFriday(r: Registro, ora: number): { stato: StatoFriday; da: number | null } {
-  const f = r.chat.get("friday");
-  const viva = r.friday?.evento !== "stop" && !!f?.visto && ora - f.visto <= FRIDAY_MUTA_MS;
-  if (!viva) return { stato: "spenta", da: f?.visto ?? r.friday?.t ?? null };
+export function statoClotchAi(r: Registro, ora: number): { stato: StatoClotchAi; da: number | null } {
+  const f = r.chat.get("friday"); // nome del protocollo del motore
+  const viva = r.clotchAi?.evento !== "stop" && !!f?.visto && ora - f.visto <= CLOTCH_AI_MUTA_MS;
+  if (!viva) return { stato: "spenta", da: f?.visto ?? r.clotchAi?.t ?? null };
   const nd = r.nonDisturbare;
   return nd && (nd.fino === null || nd.fino > ora) ? { stato: "pausa", da: nd.fino } : { stato: "attiva", da: null };
 }
 
 const stessoGiorno = (a: number, b: number) => new Date(a).toDateString() === new Date(b).toDateString();
-const viva = (c: ChatFriday) => !c.fine && c.chat !== "friday" && c.chat !== "terminale";
+const viva = (c: ChatClotchAi) => !c.fine && c.chat !== "friday" && c.chat !== "terminale"; // nome del protocollo del motore
 
 export interface Attesa { chat: string; titolo: string; genere: string }
 export interface Progetto {
@@ -28,7 +28,7 @@ export interface Progetto {
 }
 
 export function casella(r: Registro, ora: number) {
-  const gruppi = new Map<string, ChatFriday[]>();
+  const gruppi = new Map<string, ChatClotchAi[]>();
   for (const c of r.chat.values()) if (c.progetto && (viva(c) || (c.visto && stessoGiorno(c.visto, ora)))) gruppi.set(c.progetto, [...(gruppi.get(c.progetto) ?? []), c]);
   const progetti: Progetto[] = [...gruppi].map(([nome, cc]) => {
     const vive = cc.filter(viva);
@@ -37,7 +37,7 @@ export function casella(r: Registro, ora: number) {
       const g = c.richieste[0]?.genere ?? (c.stato === "serve_roberto" ? "domanda" : null);
       return g ? [{ chat: c.chat, titolo: c.titolo ?? c.chat, genere: GENERE[g] ?? g }] : [];
     });
-    // stati dei passi: quelli di TodoWrite (pending, in_progress, completed), come li scrive friday_passi.py
+    // stati dei passi: quelli di TodoWrite (pending, in_progress, completed), come li scrive friday_passi.py // nome del protocollo del motore
     return {
       nome,
       obiettivo: madre ? { testo: madre.obiettivo!.testo, fatti: madre.passi.filter((p) => p.stato === "completed").length, passi: madre.passi, lavora: madre.stato === "lavora" } : null,
@@ -64,7 +64,7 @@ export function decisioniPerGiorno(r: Registro, ora: number) {
   const annullate = new Set(r.decisioni.filter((d) => d.cosa.startsWith("annullata ")).map((d) => d.cosa.slice(10)));
   const gruppi = new Map<string, Registro["decisioni"]>();
   for (const d of [...r.decisioni].reverse()) {
-    if (d.cosa.startsWith("annullata ")) continue; // la riga che il motore scrive quando annulla (friday_comandi.py)
+    if (d.cosa.startsWith("annullata ")) continue; // la riga che il motore scrive quando annulla (friday_comandi.py) // nome del protocollo del motore
     const g = giorno(d.t);
     const annullata = d.annullata || annullate.has(d.id);
     gruppi.set(g, [...(gruppi.get(g) ?? []), { ...d, annullata, annullabile: d.annullabile && !annullata }]);

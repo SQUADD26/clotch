@@ -1,6 +1,6 @@
 // Canali delle impostazioni (#351) che non sono valori salvati: i valori stanno nel file delle preferenze (#368,
 // `sessioni:impostazioni`). Qui: cartelle degli account, scelta e apertura di cartelle, versione, avvio col Mac.
-// Le impostazioni di Friday non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
+// Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
 import * as os from "node:os";
 import * as path from "node:path";
 import { app, dialog, shell, type IpcMain } from "electron";
@@ -8,7 +8,7 @@ import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
 import { leggiApp, type SessioneApp } from "./desktop";
-import { leggiRegistro, type Registro } from "./friday";
+import { leggiRegistro, type Registro } from "./clotch-ai";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { quoteUso } from "./quote-uso";
 import { accorcia, espandi, trovaRadici } from "./radici";
@@ -26,7 +26,7 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
 }
 
 /** Archiviate di tutte le sorgenti, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»).
- *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di Friday (`fine` motivo `archiviata`, comando `archivia` riuscito).
+ *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di clotch AI (`fine` motivo `archiviata`, comando `archivia` riuscito).
  *  La data è il momento dell'archiviazione se il registro lo dà, se no l'ultima attività. Se l'app dice che la sessione non è archiviata, vince l'app. */
 export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "comandi" | "esiti">, fuso?: string): Archiviata[] {
   const per = new Map<string, { titolo: string; progetto: string | null; quando: number | null }>();

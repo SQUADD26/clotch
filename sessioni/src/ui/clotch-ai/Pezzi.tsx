@@ -1,4 +1,4 @@
-// figma: 101-36225 — pezzi comuni delle viste Friday: «Avviso» rosso (101-36225, «avviso friday» 101-42000) e «vuoto» (101-35803, 40267, 41628).
+// figma: 101-36225 — pezzi comuni delle viste clotch AI: «Avviso» rosso (101-36225, «avviso clotch AI» 101-42000) e «vuoto» (101-35803, 40267, 41628).
 import type { ReactNode } from "react";
 import { Icona, type NomeIcona } from "../base/Icona";
 

@@ -8,10 +8,10 @@ import { inviaComando } from "../src/comandi";
 const casa = () => fs.mkdtempSync(path.join(os.tmpdir(), "comandi-"));
 const casella = (h: string) => path.join(h, ".claude", "casella", "comandi");
 const mese = (h: string) => path.join(h, ".claude", "registro", `${new Date().toISOString().slice(0, 7)}.jsonl`);
-const riga = (tipo: string, dati: object) => JSON.stringify({ v: 1, id: "r-000000000000", t: new Date().toISOString(), n: 1, chat: "friday", macchina: "mac", hook_v: "x", tipo, dati }) + "\n";
+const riga = (tipo: string, dati: object) => JSON.stringify({ v: 1, id: "r-000000000000", t: new Date().toISOString(), n: 1, chat: "friday", macchina: "mac", hook_v: "x", tipo, dati }) + "\n"; // nome del protocollo del motore
 
-/** Una Friday finta: prende il primo comando dalla casella, lo sposta in fatti/ e (se `esito`) scrive comando_fatto a pezzi. */
-function fridayFinta(h: string, esito: string | null, aPezzi = false) {
+/** Una clotch AI finta: prende il primo comando dalla casella, lo sposta in fatti/ e (se `esito`) scrive comando_fatto a pezzi. */
+function clotchAiFinta(h: string, esito: string | null, aPezzi = false) {
   const t = setInterval(() => {
     let nomi: string[] = [];
     try { nomi = fs.readdirSync(casella(h)).filter((n) => n.endsWith(".json")); } catch {}
@@ -34,7 +34,7 @@ test("comandi: scrive .tmp poi rename nella forma del contratto e legge il suo c
   const h = casa();
   fs.mkdirSync(path.dirname(mese(h)), { recursive: true });
   fs.writeFileSync(mese(h), riga("comando_fatto", { comando: "c-vecchio", esito: "ok", testo: "" })); // righe di prima: ignorate
-  fridayFinta(h, "ok", true);
+  clotchAiFinta(h, "ok", true);
   const e = await inviaComando(h, "non_disturbare", { acceso: true, minuti: 60 }, { ogniMs: 20, scadenzaMs: 3000 });
   assert.deepEqual(e, { id: e.id, esito: "ok", testo: "fatto così", pr: 2402, nonFermate: ["chat-1"] });
   const [nome] = fs.readdirSync(path.join(casella(h), "fatti"));
@@ -49,13 +49,13 @@ test("comandi: scrive .tmp poi rename nella forma del contratto e legge il suo c
 test("comandi: rifiutato ed esito sconosciuto arrivano come rifiutato ed errore", async () => {
   for (const [scritto, atteso] of [["rifiutato", "rifiutato"], ["strano", "errore"]]) {
     const h = casa();
-    fridayFinta(h, scritto);
+    clotchAiFinta(h, scritto);
     const e = await inviaComando(h, "ferma_tutto", {}, { ogniMs: 20, scadenzaMs: 3000 });
     assert.equal(e.esito, atteso);
   }
 });
 
-test("comandi: Friday spenta, alla scadenza il comando è ritirato dalla casella", async () => {
+test("comandi: clotch AI spenta, alla scadenza il comando è ritirato dalla casella", async () => {
   const h = casa();
   const e = await inviaComando(h, "ferma_tutto", {}, { ogniMs: 20, scadenzaMs: 100 });
   assert.deepEqual({ esito: e.esito, preso: e.esito === "scaduto" && e.preso }, { esito: "scaduto", preso: false });
@@ -64,7 +64,7 @@ test("comandi: Friday spenta, alla scadenza il comando è ritirato dalla casella
 
 test("comandi: preso ma senza risposta, alla scadenza dice preso", async () => {
   const h = casa();
-  fridayFinta(h, null);
+  clotchAiFinta(h, null);
   const e = await inviaComando(h, "ferma_tutto", {}, { ogniMs: 20, scadenzaMs: 300 });
   assert.equal(e.esito === "scaduto" && e.preso, true);
 });

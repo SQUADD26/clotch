@@ -1,6 +1,6 @@
 {
  "navigazione": {
-  "vista": "friday",
+  "vista": "clotch-ai",
   "sezione": "scritta:Ferma @back"
  },
  "elenco": {
@@ -201,7 +201,7 @@
    }
   ],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [
    {
     "id": "c0",

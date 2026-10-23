@@ -1,5 +1,5 @@
-// figma: 101-16432 — «Chat Friday»: domande di Roberto (`parla` nel registro) e risposte di Friday (avvisi «risposta»), casella
-// «Chiedi a Friday» con le sessioni da citare dopo @ (101:45260). Friday li monta nella sua vista (#352).
+// figma: 101-16432 — «Chat clotch AI»: domande di Roberto (`parla` nel registro) e risposte di clotch AI (avvisi «risposta»), casella
+// «Chiedi a clotch AI» con le sessioni da citare dopo @ (101:45260). clotch AI li monta nella sua vista (#352).
 import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { useElenco, usePreferenze } from "../base/dati";
@@ -8,28 +8,28 @@ import { IconaSessione } from "../base/IconaSessione";
 import { useNavigazione } from "../base/navigazione";
 import { SegnoStato } from "../base/SegnoStato";
 import { Pezzo } from "../base/Pezzo";
-import { useRegistro } from "../friday/dati";
+import { useRegistro } from "../clotch-ai/dati";
 import { MessaggioRoberto } from "./Blocchi";
 import { Risposta } from "./Risposta";
 import { SessioniCitate, type Citata } from "./SchedeSessioni";
-import { comanda } from "./friday";
+import { comanda } from "./clotch-ai";
 import { provaDi } from "./testi";
 import "./casella.css";
 
-/** Le voci della chat con Friday, in ordine di tempo. */
-export function useVociFriday() {
+/** Le voci della chat con clotch AI, in ordine di tempo. */
+export function useVociClotchAi() {
   const { dati: r } = useRegistro();
   return useMemo(() => {
     if (!r) return [];
     const da = r.comandi.filter((c) => c.cmd === "parla").map((c) => ({ chi: "roberto" as const, id: c.id, t: c.t ?? 0, testo: String(c.args.testo ?? "") }));
-    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
+    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "clotch-ai" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
     return [...da, ...di].sort((a, b) => a.t - b.t);
   }, [r]);
 }
 
 // I componenti esportati portano il proprio scope CSS anche dentro un altro pezzo.
-export function FiloFriday() {
-  const voci = useVociFriday();
+export function FiloClotchAi() {
+  const voci = useVociClotchAi();
   const elenco = useElenco().dati?.sessioni ?? [];
   const { dati: r } = useRegistro();
   // sessioni citate nella risposta: solo quelle che l'elenco conosce
@@ -42,7 +42,7 @@ export function FiloFriday() {
   return (
     <Pezzo nome="chat"><div className="filo" ref={filo}>
       {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : (
-        <div key={v.id} className="risposta-friday">
+        <div key={v.id} className="risposta-clotch-ai">
           <Risposta testo={v.testo} inScrittura={false} />
           <SessioniCitate citate={citate(v.sessioni)} />
         </div>
@@ -53,8 +53,8 @@ export function FiloFriday() {
 
 const MENZIONE = /@([^\s@]*)$/;
 
-/** `microfono`: il bottone della voce di Friday; `spenta`: Friday non risponde, la casella non manda. */
-export function CasellaFriday({ microfono, spenta = false }: { microfono?: ReactNode; spenta?: boolean }) {
+/** `microfono`: il bottone della voce di clotch AI; `spenta`: clotch AI non risponde, la casella non manda. */
+export function CasellaClotchAi({ microfono, spenta = false }: { microfono?: ReactNode; spenta?: boolean }) {
   const [testo, setTesto] = useState(provaDi(useNavigazione().sezione, "scritta") ?? ""); // scena di prova 101:45260
   const [scelta, setScelta] = useState(0);
   const [invio, setInvio] = useState(false);

@@ -3,9 +3,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "./dati";
 
-export type Vista = "sessione" | "friday" | "casella" | "decisioni" | "regole" | "impostazioni";
-/** Le viste di Friday: montano friday/, senza pannello. */
-export const VISTE_FRIDAY: readonly Vista[] = ["friday", "casella", "decisioni", "regole"];
+export type Vista = "sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
+/** Le viste di clotch AI: montano clotch-ai/, senza pannello. */
+export const VISTE_CLOTCH_AI: readonly Vista[] = ["clotch-ai", "casella", "decisioni", "regole"];
 /** `sezione`: sottopagina libera della vista (es. «generale» nelle impostazioni). */
 interface Passo { vista: Vista; sessione: string | null; sezione: string | null }
 

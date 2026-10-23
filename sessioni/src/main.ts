@@ -23,7 +23,7 @@ import { Sessioni } from "./api";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
 import { apriFinestra, parita } from "./finestra";
-import { collegaFriday } from "./friday-ipc";
+import { collegaClotchAi } from "./clotch-ai-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaIndice } from "./indice-ipc";
 import { leggiImpostazioni } from "./preferenze";
@@ -87,7 +87,7 @@ app.whenReady().then(() => {
     }
     return { ...risposta, totale: indice.totale(String(id)) };
   });
-  collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
+  collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
