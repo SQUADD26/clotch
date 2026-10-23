@@ -3131,7 +3131,8 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/1-5",
-    "paddingBottom": "spazio/1-5"
+    "paddingBottom": "spazio/1-5",
+    "strokeWeight": "misura/tratto"
    },
    "senza": []
   },
@@ -3239,7 +3240,8 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/1-5",
-    "paddingBottom": "spazio/1-5"
+    "paddingBottom": "spazio/1-5",
+    "strokeWeight": "misura/tratto"
    },
    "senza": []
   },
@@ -3347,7 +3349,8 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/1-5",
-    "paddingBottom": "spazio/1-5"
+    "paddingBottom": "spazio/1-5",
+    "strokeWeight": "misura/tratto"
    },
    "senza": []
   },

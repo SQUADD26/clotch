@@ -1140,11 +1140,10 @@
     "itemSpacing": "spazio/1",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
-    "height": "misura/bottone"
+    "height": "misura/bottone",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16774;101:16684",
@@ -1796,11 +1795,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:9925",
@@ -2699,11 +2697,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:9976;101:7323",
@@ -3826,11 +3823,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16701",
@@ -4038,11 +4034,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16713",
@@ -4129,11 +4124,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16718",
@@ -4220,11 +4214,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16723",
