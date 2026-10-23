@@ -3,6 +3,7 @@
 import type { ComponentType } from "react";
 import * as friday from "../friday";
 import * as pannello from "../pannello";
+import { Attivita } from "./Attivita";
 import { BottoneIcona } from "./Bottone";
 import { useNavigazione } from "./navigazione";
 
@@ -24,12 +25,16 @@ export function BarraTitolo() {
         <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
         <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
       </div>
-      {/* le impostazioni non hanno i comandi globali (101-17193) */}
+      {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
       {n.vista !== "impostazioni" && (
-        <div className="comandi-globali">
-          {ComandiPannello && <ComandiPannello />}
-          {ComandiFriday && <ComandiFriday />}
-        </div>
+        <>
+          {/* 101-30172: subito dopo la navigazione, distanza = gap della barra */}
+          <Attivita />
+          <div className="comandi-globali">
+            {ComandiPannello && <ComandiPannello />}
+            {ComandiFriday && <ComandiFriday />}
+          </div>
+        </>
       )}
     </div>
   );
