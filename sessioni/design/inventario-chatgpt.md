@@ -2,7 +2,7 @@
 
 Fonte: vault squadd-v2 `Research/App/ChatGPT` (estrazione REA). Pagina Figma «Sessioni» (node 101:6839), solo tema scuro.
 
-Totale righe: 202 · già in Figma prima: 50 · disegnate ora: 85 · escluse con motivo: 67
+Totale righe: 215 · già in Figma prima: 50 · disegnate ora: 95 · escluse con motivo: 70
 
 | # | Elemento ChatGPT | In Sessioni | Stato | Schermata o motivo |
 |---|---|---|---|---|
@@ -215,3 +215,23 @@ Roberto: «L’app electron E’ friday, è un estensione, così come clotch».
 | FR5 | Comanda: annulla le decisioni di Friday | Elenco Decisioni, conferma, annullata, errore, vuoto | disegnato ora | Decisioni di Friday (`101-39266.png`), Decisioni: conferma annulla (`101-39512.png`), Decisioni: annullata (`101-39767.png`), Decisioni: annullo non riuscito (`101-40016.png`), Decisioni: vuoto (`101-40267.png`) |
 | FR6 | Regole imparate da Friday | Elenco per repo, modifica, salvataggio, salvata, errore, vuoto | disegnato ora | Regole imparate (`101-40473.png`), Regole: modifica (`101-40699.png`), Regole: salvataggio (`101-40936.png`), Regole: salvata (`101-41166.png`), Regole: errore (`101-41397.png`), Regole: vuoto (`101-41628.png`) |
 | FR7 | Avvio: l’app avvia Friday e mostra se è accesa | Stato di Friday nella barra laterale: attiva, avvio, spenta, riavvio | disegnato ora | Friday: avvio (`101-41834.png`), Friday: spenta (`101-42000.png`), Friday: riavvio in corso (`101-42245.png`) |
+
+## Con e senza Clotch (#339)
+
+Roberto: «ci sono delle robe che devono passare per Clutch se uno installa anche Clutch».
+
+| # | Funzione | Comportamento | Stato | Schermate (installato / assente) |
+|---|---|---|---|---|
+| CL1 | Collegamento con Clotch | Pagina Impostazioni › Clotch: collegato con le funzioni che passano dal notch, oppure «Scarica Clotch» | disegnato ora | `101-45956.png` / `101-45993.png` |
+| CL2 | Voce che parla | Con Clotch parla il notch e l’app ne mostra l’indicatore; senza, parla l’app | disegnato ora | `101-46268.png` / `101-46308.png` |
+| CL3 | Dettatura dell’utente | ⌥Spazio usa il microfono di Clotch; senza, quello del Mac dall’app | disegnato ora | `101-46701.png` / `101-46741.png` |
+| CL4 | Obiettivi da decidere | Accetta e rifiuta anche dal notch; senza, solo nell’app | disegnato ora | `101-47170.png` / `101-47297.png` |
+| CL5 | Domande di una sessione | Risposta anche a voce dal notch; senza, nell’app o con ⌥Spazio | disegnato ora | `101-47850.png` / `101-47883.png` |
+| CL6 | Avvisi | Con Clotch l’avviso va anche al notch; senza, avviso a comparsa nell’app | disegnato ora | `101-48368.png` / `101-48405.png` |
+| CL7 | Quote d’uso | Dati e avviso a voce da Clotch; senza, li legge l’app | disegnato ora | `101-48825.png` / `101-48888.png` |
+| CL8 | Via dal Mac | Clotch sa quando sei via e tiene gli avvisi; senza, l’app suggerisce Non disturbare | disegnato ora | `101-49067.png` / `101-49194.png` |
+| CL9 | Schermo occupato da uno script | Pillola in alto come nel notch; senza Clotch l’app non lo sa | disegnato ora | `101-49592.png` / `101-49632.png` |
+| CL10 | Non disturbare | Con Clotch vale anche per il notch: niente voce né microfono | disegnato ora | `101-50008.png` / `101-50071.png` |
+| CL11 | Stato della sessione madre | — | escluso | Uguale con o senza Clotch: l’app calcola lo stato dal registro |
+| CL12 | Stato delle PR | — | escluso | Uguale: i dati arrivano dal file della sessione |
+| CL13 | Apri nell’app Claude giusta | — | escluso | Uguale: l’app apre la sessione da sola |
