@@ -22,11 +22,11 @@ export const nomeModello = (m: string | null) => {
 
 const Tasto = ({ t }: { t: string }) => <span className="tasto">{t}</span>;
 
-function Coda({ voci, modifica, onModifica, chat, suggerimento }: {
-  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean;
+function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale }: {
+  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean; attuale: string | null;
 }) {
   const { modello } = useImpostazioni();
-  const subito = async (v: VoceCoda) => { if (await comanda("manda", argsManda(chat, v.testo, "subito", modello))) await comanda("coda_togli", { chat, voce: v.voce }); };
+  const subito = async (v: VoceCoda) => { if (await comanda("manda", argsManda(chat, v.testo, "subito", modello, attuale))) await comanda("coda_togli", { chat, voce: v.voce }); };
   return (
     <div className="coda">
       {voci.map((v, i) => (
@@ -73,8 +73,8 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
       ok = modifica
         ? modo === "coda"
           ? await comanda("coda_modifica", { chat, voce: modifica.voce, testo: t })
-          : (await comanda("manda", argsManda(chat, t, "subito", preferenza))) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
-        : await comanda("manda", argsManda(chat, t, lavora ? modo : "subito", preferenza));
+          : (await comanda("manda", argsManda(chat, t, "subito", preferenza, modello))) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
+        : await comanda("manda", argsManda(chat, t, lavora ? modo : "subito", preferenza, modello));
     } finally { richiesta.finisci(ok); }
   };
 
@@ -92,7 +92,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
     <div className="area-casella">
-      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
+      {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello}suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}

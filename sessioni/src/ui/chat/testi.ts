@@ -40,9 +40,10 @@ export const MODELLI: Record<string, { id: string; dettaglio: string }> = {
 /** Id CLI di un'etichetta; undefined se non è un modello noto. */
 export const idModello = (etichetta: string) => MODELLI[etichetta]?.id;
 
-/** Argomenti di `manda`. `modello` sempre con `subito` (vale la preferenza attuale), mai in coda: il motore lo rifiuta. */
-export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string) => {
-  const modello = modo === "subito" ? idModello(preferenza) : undefined;
+/** Argomenti di `manda`. `modello` con `subito`, se la preferenza è diversa dal modello della sessione (`attuale`, dalla trascrizione: può avere un suffisso di data) o se questo non si conosce; mai in coda: il motore lo rifiuta. */
+export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string, attuale: string | null) => {
+  const id = idModello(preferenza);
+  const modello = modo === "subito" && id && !attuale?.startsWith(id) ? id : undefined;
   return { chat, testo, modo, ...(modello ? { modello } : {}) };
 };
 
