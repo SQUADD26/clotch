@@ -139,9 +139,10 @@ export class Indice {
 
   cerca(testo: string) { return cerca(this.dati, testo); }
 
-  /** Byte su disco: l'indice e le due cartelle di cache (0 se mancano). */
+  /** Byte su disco: l'indice, le due cartelle di cache (0 se mancano) e `altro`, il resto della cartella dell'app. */
   spazio() {
-    return { indice: dimensione(this.file), messaggi: dimensione(this.cache[0]), immagini: dimensione(this.cache[1]) };
+    const indice = dimensione(this.file), messaggi = dimensione(this.cache[0]), immagini = dimensione(this.cache[1]);
+    return { indice, messaggi, immagini, altro: Math.max(0, dimensione(this.dir) - indice - messaggi - immagini) };
   }
 
   /** Numero dei messaggi se l'indice conosce la trascrizione così com'è adesso; altrimenti null. */

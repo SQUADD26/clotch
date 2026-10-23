@@ -35,7 +35,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "sessioni:preferenze": return s.preferenze ?? {};
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
-    case "sessioni:spazio": return { indice: 0, messaggi: 0, immagini: 0 };
+    case "sessioni:spazio": return { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
     case "friday:registro": return s.registro ?? piano(leggiRegistro(path.join(path.sep, "nessuna-home")));
     default: return undefined;
   }
