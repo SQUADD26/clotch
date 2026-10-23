@@ -21,9 +21,7 @@
 .riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
 .riga-sessione:hover .azioni, .riga-sessione.passaggio .azioni { display: flex; }
 .riga-sessione:hover .segno, .riga-sessione.passaggio .segno { display: none; }
-.icona-sessione { display: flex; flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
-.icona-sessione .icona { color: inherit !important; }
 
 /* shimmer sul nome di una sessione al lavoro (101:35045): banda chiara che scorre, ciclo 1,8 s */
 .lavoro {

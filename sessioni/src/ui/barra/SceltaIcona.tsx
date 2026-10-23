@@ -3,11 +3,10 @@ import { useState } from "react";
 import type { PreferenzeSessione } from "../../tipi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
-import { IconaSessione } from "./Righe";
+import { COLORI_SESSIONE as COLORI, IconaSessione } from "../base/IconaSessione";
 import { Sovrapposto, type Punto } from "./Sovrapposti";
 import "./scelta-icona.css";
 
-const COLORI = ["grigio", "rosso", "arancione", "verde", "blu", "viola"] as const;
 const ICONE: NomeIcona[] = [
   "stella", "database", "tavolozza", "codice", "razzo", "insetto", "libro", "grafico", "calendario", "telefono", "posta", "globo",
   "lampadina", "fulmine", "cuore", "bandiera", "casa", "chiave", "scudo", "strati", "scintille", "pacco", "valigetta", "bussola",
@@ -39,7 +38,7 @@ export function SceltaIcona({ a, pref, onImposta, onChiudi }: { a: Punto; pref?:
         {ICONE.filter((n) => n.includes(q.trim().toLowerCase())).map((n) => (
           <button key={n} type="button" role="radio" aria-checked={n === pref?.icona} aria-label={n}
             className={`cella-icona ${n === pref?.icona ? "scelta" : ""}`} onClick={() => onImposta({ icona: n })}>
-            <IconaSessione pref={{ icona: n, colore }} />
+            <IconaSessione icona={n} colore={colore} />
           </button>
         ))}
       </div>
