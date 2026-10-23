@@ -55,7 +55,9 @@ app.whenReady().then(() => {
     barraMenu();
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
     const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
-    if (ids.size) indice.metti(sessioni.elencoSessioni().sessioni.filter((s) => ids.has(s.id)));
+    const el = sessioni.elencoSessioni().sessioni;
+    const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
+    if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
   });
 
   if (idParita) return parita(idParita);
