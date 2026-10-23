@@ -1,5 +1,5 @@
 // Dal registro di Friday ai dati delle schermate Friday (#352). Puro: nessun file, nessun DOM.
-import { ChatFriday, Registro } from "../../friday";
+import type { ChatFriday, Registro } from "../../friday";
 
 /** Contratto: Friday manda un battito ogni 60 s; `friday stato` la dà spenta dopo 180 s senza battito. */
 const FRIDAY_MUTA_MS = 180_000;
@@ -21,7 +21,7 @@ const viva = (c: ChatFriday) => !c.fine && c.chat !== "friday" && c.chat !== "te
 export interface Attesa { chat: string; titolo: string; genere: string }
 export interface Progetto {
   nome: string;
-  obiettivo: { testo: string; fatti: number; passi: { testo: string; stato: string }[] } | null;
+  obiettivo: { testo: string; fatti: number; passi: { testo: string; stato: string }[]; lavora: boolean } | null;
   aspettano: Attesa[];
   alLavoro: number;
   fattoOggi: number;
@@ -40,7 +40,7 @@ export function casella(r: Registro, ora: number) {
     // stati dei passi: quelli di TodoWrite (pending, in_progress, completed), come li scrive friday_passi.py
     return {
       nome,
-      obiettivo: madre ? { testo: madre.obiettivo!.testo, fatti: madre.passi.filter((p) => p.stato === "completed").length, passi: madre.passi } : null,
+      obiettivo: madre ? { testo: madre.obiettivo!.testo, fatti: madre.passi.filter((p) => p.stato === "completed").length, passi: madre.passi, lavora: madre.stato === "lavora" } : null,
       aspettano,
       alLavoro: vive.filter((c) => c.stato === "lavora").length,
       fattoOggi: cc.filter((c) => c.stato === "finito" && c.visto !== null && stessoGiorno(c.visto, ora)).length,
@@ -66,7 +66,8 @@ export function decisioniPerGiorno(r: Registro, ora: number) {
   for (const d of [...r.decisioni].reverse()) {
     if (d.cosa.startsWith("annullata ")) continue; // la riga che il motore scrive quando annulla (friday_comandi.py)
     const g = giorno(d.t);
-    gruppi.set(g, [...(gruppi.get(g) ?? []), { ...d, annullabile: d.annullabile && !annullate.has(d.id) }]);
+    const annullata = d.annullata || annullate.has(d.id);
+    gruppi.set(g, [...(gruppi.get(g) ?? []), { ...d, annullata, annullabile: d.annullabile && !annullata }]);
   }
   return [...gruppi].map(([titolo, voci]) => ({ titolo, voci }));
 }
@@ -74,7 +75,9 @@ export function decisioniPerGiorno(r: Registro, ora: number) {
 /** Regole a gruppi per `dove` (repo o cartella), in ordine di arrivo. */
 export function regolePerDove(r: Registro) {
   const gruppi = new Map<string, Registro["regole"]>();
-  for (const x of r.regole) gruppi.set(x.dove, [...(gruppi.get(x.dove) ?? []), x]);
+  // dalla più nuova (101-40473); senza data in fondo
+  const nuove = [...r.regole].sort((a, b) => (b.t ?? 0) - (a.t ?? 0));
+  for (const x of nuove) gruppi.set(x.dove, [...(gruppi.get(x.dove) ?? []), x]);
   return [...gruppi].map(([dove, regole]) => ({ dove, regole }));
 }
 

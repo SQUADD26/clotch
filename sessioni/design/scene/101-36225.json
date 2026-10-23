@@ -1,0 +1,24 @@
+{
+ "navigazione": {
+  "vista": "casella"
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": [
+   {
+    "percorso": "~/.claude/registro/2026-10.jsonl",
+    "messaggio": "permesso negato"
+   }
+  ]
+ }
+}

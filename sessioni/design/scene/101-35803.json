@@ -1,0 +1,130 @@
+{
+ "navigazione": {
+  "vista": "casella"
+ },
+ "registro": {
+  "chat": {
+   "friday": {
+    "chat": "friday",
+    "titolo": null,
+    "madre": null,
+    "progetto": null,
+    "account": null,
+    "sorgente": null,
+    "daHandoff": null,
+    "stato": "lavora",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [],
+    "battito": 1792765964571,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792765964571,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [
+   {
+    "id": "r-000000000002",
+    "t": 1792682400000,
+    "cosa": "Archiviate 4 sessioni finite",
+    "perche": "",
+    "chat": "m-squadd",
+    "genere": "archivio",
+    "nonAnnullabile": null,
+    "effettoAnnullo": null,
+    "annullabile": true,
+    "annullata": false
+   },
+   {
+    "id": "r-000000000004",
+    "t": 1792744200000,
+    "cosa": "Promosso dev a main",
+    "perche": "",
+    "chat": "m-clotch",
+    "genere": "promozione",
+    "nonAnnullabile": "Già su main: non si annulla",
+    "effettoAnnullo": null,
+    "annullabile": false,
+    "annullata": false
+   },
+   {
+    "id": "r-000000000005",
+    "t": 1792746300000,
+    "cosa": "Risposto alla domanda: «Nel repo, in sessioni/design/app»",
+    "perche": "",
+    "chat": "c-figma",
+    "genere": "risposta",
+    "nonAnnullabile": null,
+    "effettoAnnullo": null,
+    "annullabile": true,
+    "annullata": false
+   },
+   {
+    "id": "r-000000000006",
+    "t": 1792752000000,
+    "cosa": "Fermata la sessione «Notch: avviso schermo»",
+    "perche": "",
+    "chat": "c-fatta-0",
+    "genere": "fermo",
+    "nonAnnullabile": null,
+    "effettoAnnullo": null,
+    "annullabile": true,
+    "annullata": false
+   },
+   {
+    "id": "r-000000000007",
+    "t": 1792753920000,
+    "cosa": "Consentita la migrazione 0042 su dev",
+    "perche": "",
+    "chat": "c-backend",
+    "genere": "permesso",
+    "nonAnnullabile": null,
+    "effettoAnnullo": "Friday ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.",
+    "annullabile": true,
+    "annullata": false
+   }
+  ],
+  "regole": [
+   {
+    "testo": "Main si cambia solo con la promozione da dev.",
+    "perche": "",
+    "dove": "claude-config",
+    "t": 1792306800000
+   },
+   {
+    "testo": "Ogni interfaccia passa prima da Figma.",
+    "perche": "",
+    "dove": "/Users/privato/Documents/Repos/clotch",
+    "t": 1792566000000
+   },
+   {
+    "testo": "Parla poco e chiaro: una cosa alla volta, parole semplici.",
+    "perche": "",
+    "dove": "claude-config",
+    "t": 1792738800000
+   }
+  ],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

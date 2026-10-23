@@ -7,6 +7,7 @@ import { numero, valori } from "./ui/base/token";
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
 const preload = path.join(__dirname, "preload.js");
+const ATTESA_DATI_MS = 500; // scene di prova: le risposte IPC arrivano in pochi ms, 500 lascia margine agli effetti che ne seguono
 
 /** Misura di un frame esportato in design/figma/<id>.json; la finestra di 101:8036 è la misura di partenza. */
 function frame(id: string) {
@@ -36,7 +37,8 @@ export async function parita(id: string, navigazione?: Record<string, string | u
   const { w: larga, h: alta } = frame(id);
   const w = new BrowserWindow({ width: larga, height: alta, show: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true } });
   await w.loadFile(pagina, { query: { ...Object.fromEntries(Object.entries(navigazione ?? {}).filter(([, v]) => v)) as Record<string, string>, parita: id } });
-  await w.webContents.executeJavaScript("document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))");
+  // i dati arrivano dai canali IPC dopo il primo disegno: si aspetta che la rete dei canali si calmi, poi due fotogrammi
+  await w.webContents.executeJavaScript(`document.fonts.ready.then(() => new Promise(r => setTimeout(r, ${ATTESA_DATI_MS}))).then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`);
   const img = await w.webContents.capturePage();
   const out = path.join(radice, "design", "app", `${id}.png`);
   fs.mkdirSync(path.dirname(out), { recursive: true });
