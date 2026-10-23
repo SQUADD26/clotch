@@ -66,3 +66,29 @@
 .vuoto-lista.con-bottone { gap: var(--spazio-2); }
 
 .bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+
+/* Scorciatoie: tasti in ascolto e tasti già usati (101-33015) */
+.tasto.in-ascolto { border: var(--misura-tratto-forte) solid var(--colore-bordo-fuoco); }
+.conflitto { display: flex; align-items: center; gap: var(--spazio-2); }
+
+/* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */
+.schede { display: flex; gap: var(--spazio-1); }
+.contenuto-impostazioni > .schede { align-self: flex-start; }
+.scheda { height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-md); }
+.scheda.scelta { background: var(--colore-fondo-riga-scelta); }
+.riga.uso { flex-direction: column; align-items: stretch; gap: var(--spazio-2); }
+.riga.uso .testata { display: flex; justify-content: space-between; align-items: center; }
+.barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
+.barra-uso .pieno { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
+.barra-uso .pieno.errore { background: var(--colore-testo-errore); }
+.nota-clotch { display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-2); }
+.contenuto-impostazioni > .nota-clotch { align-self: flex-start; }
+
+/* Archiviazione: spazio usato, barra a segmenti, legenda, calcolo in corso (101-32155) */
+.spazio-usato { display: flex; flex-direction: column; gap: var(--spazio-3); }
+.barra-segmentata { height: var(--misura-riga); display: flex; gap: var(--spazio-0-5); }
+.barra-segmentata > * { border-radius: var(--raggio-xs); }
+.legenda { display: flex; gap: var(--spazio-4); }
+.voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); }
+.campione { width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
+.riga.calcolo { gap: var(--spazio-2); }

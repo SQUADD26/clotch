@@ -1,9 +1,10 @@
 // figma: 101-17193 — pagina Impostazioni (#351): «Navigazione impostazioni» a sinistra, la sezione scelta nella «Superficie».
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, type ComponentType } from "react";
 import { AreaAvvisi } from "../base/Avvisi";
 import { Superficie } from "../base/Cornice";
 import { Icona } from "../base/Icona";
-import { prova } from "./prova";
+import { useNavigazione } from "../base/navigazione";
+import { inParita } from "./prova";
 import { SEZIONI, type Sezione } from "./sezioni";
 import { caricaImpostazioni } from "./stato";
 import Account from "./account";
@@ -21,14 +22,17 @@ import Sorgenti from "./sorgenti";
 import Uso from "./uso";
 import "./impostazioni.css";
 
-const PAGINE: Record<Sezione, ComponentType> = {
+const PAGINE: Record<Sezione, ComponentType<{ sotto?: string }>> = {
   generale: Generale, aspetto: Aspetto, notifiche: Notifiche, friday: Friday, scorciatoie: Scorciatoie, sorgenti: Sorgenti,
   account: Account, uso: Uso, archiviate: Archiviate, archiviazione: Archiviazione, dati: Dati, info: Info, clotch: Clotch,
 };
 
 export default function Impostazioni() {
-  const [sezione, setSezione] = useState<Sezione>(prova?.sezione ?? "generale");
-  useEffect(() => caricaImpostazioni(!!prova), []);
+  const n = useNavigazione();
+  useEffect(() => caricaImpostazioni(inParita), []);
+  // la sezione sta nella navigazione (indietro e avanti la seguono); «dati/cartelle» è una sottopagina di Dati
+  const [prima, sotto] = (n.sezione ?? "generale").split("/");
+  const sezione: Sezione = prima in PAGINE ? (prima as Sezione) : "generale";
   const Pagina = PAGINE[sezione];
   return (
     <div className="impostazioni">
@@ -38,13 +42,13 @@ export default function Impostazioni() {
         <button type="button" className="voce" disabled><Icona nome="cerca" /><span>Cerca</span></button>
         {SEZIONI.map(([id, nome, icona]) => (
           <button key={id} type="button" className={`voce ${id === sezione ? "scelta" : ""}`}
-            aria-current={id === sezione ? "page" : undefined} onClick={() => setSezione(id)}>
+            aria-current={id === sezione ? "page" : undefined} onClick={() => n.apri("impostazioni", undefined, id)}>
             <Icona nome={icona} /><span>{nome}</span>
           </button>
         ))}
       </nav>
       <Superficie>
-        <div className="scorre-impostazioni"><Pagina key={sezione} /></div>
+        <div className="scorre-impostazioni"><Pagina key={n.sezione} sotto={sotto} /></div>
         <AreaAvvisi />
       </Superficie>
     </div>
