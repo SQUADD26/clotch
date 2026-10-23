@@ -53,7 +53,7 @@ export function Menu({ voci, onChiudi, testata, style }: Props) {
         : "gruppo" in v ? <div key={i} className="titolo-gruppo t-xs secondario">{v.gruppo}</div>
         : (
           <button key={i} type="button" role={conScelta ? "menuitemradio" : "menuitem"} aria-checked={conScelta ? !!v.scelta : undefined}
-            className={v.scelta ? "voce scelta" : "voce"} onClick={() => { onChiudi(); v.fai(); }}>
+            className={v.scelta ? "voce scelta" : "voce"} onMouseEnter={(e) => e.currentTarget.focus()} onClick={() => { onChiudi(); v.fai(); }}>
             {conScelta && <span className={v.scelta ? "spunta" : "spunta nascosta"}><Icona nome="spunta" colore="primaria" /></span>}
             {v.icona && <Icona nome={v.icona} colore={v.pericolo ? "errore" : "secondaria"} />}
             <span className={`etichetta t-sm ${v.pericolo ? "pericolo" : ""}`}>{v.etichetta}</span>
