@@ -106,3 +106,20 @@ Roberto: «ci sono delle robe che devono passare per Clutch se uno installa anch
 
 - `desktop.ts` legge `isRunning`, che i file veri non hanno: «in corso» dall'app non scatta mai (riga 33, issue #340).
 - I rollout Codex scrivono quasi tutto in `event_msg item_completed` (CommandExecution, FileChange, McpToolCall…): `ConvertitoreCodex` legge solo `response_item`, quindi nei messaggi mancano modifiche e ricerche (issue #341). La situazione le vede (`situazioneCodex`).
+
+## Prove di collegamento dal vivo
+
+Roberto: «Assicuratevi di condurre i dovuti test prima dell'integrazione app <> claude p <> clotch etc Così da gestire tutto e fare una bella integrazione».
+
+`cd sessioni && npm run prove [-- claude|friday|clotch|codex]` (`src/prove-collegamento.ts`): legge i dati veri della macchina e stampa per ogni prova `VERDE`, `FALLITA` o `ATTESA` col perché. Uscita 0 solo se tutte verdi, 1 se una è fallita, 3 se qualcuna è in attesa. Nessuna prova in attesa conta come verde.
+
+| Coppia | Prova | Dove gira |
+|---|---|---|
+| app <> Claude CLI | il lettore vede le sessioni vere, ognuna con la situazione | Mac |
+| app <> app Claude | il lettore vede le sessioni dell'app | Mac |
+| app <> Claude (sessione vera) | tre `claude -p` di prova, uno alla volta: turno finito, modifica con differenze, permesso negato; il lettore le riconosce | squaddv2 (sul Mac è vietato, #1797) |
+| app <> Friday | legge il registro vero; un comando con nome fuori elenco nella casella torna come `comando_fatto rifiutato` entro 30 s | Mac, solo con il motore acceso (`friday {evento: avvio}`) |
+| app <> Clotch | acceso o spento dal registro (confrontato col file della voce), `avviso.detto_da`, dettatura da Clotch, obiettivi dalla stessa fonte, Clotch spento | Mac |
+| app <> Codex | il lettore vede tutti i rollout veri; sessione vera di prova | Mac |
+
+Esito sul Mac, 23/10: `verdi 5 · fallite 1 · in attesa 6`. Fallita: l'ultimo avviso del registro non ha `detto_da` (contratto v1). In attesa: sessione Claude vera (va su squaddv2), motore Friday spento, Clotch non scrive l'evento `clotch` né usa la casella, prova con Clotch spento, `codex` non installato.

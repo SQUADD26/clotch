@@ -8,6 +8,7 @@
     "build": "tsc",
     "test": "tsc && node --test \"dist/test/*.test.js\"",
     "elenco": "tsc && node dist/src/elenco-cli.js",
+    "prove": "tsc && node dist/src/prove-collegamento.js",
     "start": "tsc && electron ."
   },
   "devDependencies": {

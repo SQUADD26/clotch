@@ -55,8 +55,12 @@ export interface ChatFriday {
 export interface Registro {
   chat: Map<string, ChatFriday>;
   fermoTutto: boolean;
-  avvisi: { id: string; testo: string; livello: string; motivo: string; dettoDa: string }[];
+  avvisi: { id: string; testo: string; livello: string; motivo: string; dettoDa: string | null }[];
   clotch: { voce: string; parla: boolean; ascolta: boolean; t: number } | null;
+  /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
+  friday: { evento: string; t: number } | null;
+  /** Comandi presi dalla casella, in ordine. */
+  comandi: { id: string; cmd: string; da: string }[];
   /** Decisioni di Friday ancora annullabili (inverso non nullo e nessun `annulla` fatto). */
   decisioni: { id: string; cosa: string; perche: string; annullabile: boolean }[];
   esiti: Map<string, { esito: string; testo: string }>;
@@ -73,7 +77,7 @@ const nuova = (chat: string): ChatFriday => ({
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
-  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, decisioni: [], esiti: new Map(), errori: [] };
+  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], esiti: new Map(), errori: [] };
   const dir = cartellaRegistro(home, env);
   let mesi: string[];
   try {
@@ -154,9 +158,13 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           q.quarantena = d.acceso === true ? s(d.perche) ?? "quarantena" : null;
           break;
         }
-        case "avviso": r.avvisi.push({ id: String(o.id), testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: String(d.detto_da ?? "app") }); break;
+        case "avviso": r.avvisi.push({ id: String(o.id), testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
         case "decisione": r.decisioni.push({ id: String(o.id), cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), annullabile: Array.isArray(d.inverso) }); break;
-        case "comando": comandi.set(String(d.id), d); break;
+        case "comando":
+          comandi.set(String(d.id), d);
+          r.comandi.push({ id: String(d.id), cmd: String(d.cmd ?? ""), da: String(d.da ?? "") });
+          break;
+        case "friday": if (t !== null) r.friday = { evento: String(d.evento ?? ""), t }; break;
         case "comando_fatto": {
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
           const cmd = comandi.get(String(d.comando));
