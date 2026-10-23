@@ -28,6 +28,22 @@ app.whenReady().then(async () => {
       console.log(`CHAT_STYLE ${selector}: ${display}`);
       if (display !== 'flex') failures.push(`${selector}: atteso flex, ricevuto ${display}`);
     }
+    for (const width of [1440, 1024]) {
+      win.setSize(width, 1000);
+      const sizes = await run(() => {
+        const column = document.querySelector('.colonna').getBoundingClientRect();
+        const expected = Math.min(column.width, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--misura-colonna')));
+        return Object.fromEntries(['.filo', '.area-casella', '.casella'].map((q) => {
+          const rect = document.querySelector(q).getBoundingClientRect();
+          return [q, { width: rect.width, expected, center: rect.x + rect.width / 2, columnCenter: column.x + column.width / 2 }];
+        }));
+      });
+      for (const [selector, size] of Object.entries(sizes)) {
+        console.log(`CHAT_WIDTH ${width} ${selector}: ${size.width}, expected ${size.expected}`);
+        if (Math.abs(size.width - size.expected) > 1 || Math.abs(size.center - size.columnCenter) > 1)
+          failures.push(`${width} ${selector}: larghezza o centro diversi dalla colonna`);
+      }
+    }
     await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
     await ready('.nav-impostazioni');
     await run(() => [...document.querySelectorAll('.nav-impostazioni button')].find((b) => b.textContent === 'Aspetto').click());
