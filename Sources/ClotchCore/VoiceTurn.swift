@@ -204,6 +204,15 @@ public enum VoiceTurn {
     /// and names as an Italian would. Only the old name becomes the new one, in titles and subjects too.
     public static let builtInPronunciation: [String: String] = ["Overseer": "Friday"]
 
+    /// English words that the Italian voice reads with a French accent (#323). Respelled in Italian letters, so an Italian reads them
+    /// as English and the line stays Italian: no phoneme tag (ElevenLabs allows it on English models only), no forced language.
+    /// Applied AFTER the pronunciation list, so Roberto's `pronuncia.json` has the last word and «Overseer» (already «Friday») is covered.
+    public static let foreignRespelling: [String: String] = [
+        "Friday": "Fraidèi", "deploy": "diplòi", "merge": "mèrgi", "branch": "brànci", "build": "bild", "push": "pusc",
+        "commit": "comìt", "issue": "ìsciu", "token": "tòuken", "bug": "bag", "worktree": "uòrktrì", "handoff": "hàndoff",
+        "hook": "huk", "review": "riviù", "rollback": "ròulbak", "staging": "stèigin", "pull request": "pul request", "file": "fail",
+    ]
+
     /// The voice's name: ONE place (#299), Roberto will pick another.
     public static let voiceName = "Friday"
 
@@ -230,14 +239,14 @@ public enum VoiceTurn {
     public static let spokenLanguage = "it"
 
     /// The ElevenLabs request, the text said as the pronunciation list wants: the key only in the `xi-api-key` header, never in the URL or the body.
-    public static func speechRequest(text: String, config: Config, key: String, pronunciation: [String: String]) -> URLRequest {
+    public static func speechRequest(text: String, config: Config, key: String, pronunciation: [String: String], foreign: [String: String] = [:]) -> URLRequest {
         var r = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/text-to-speech/\(config.voiceId)?output_format=mp3_44100_64")!)
         r.httpMethod = "POST"
         r.timeoutInterval = 20
         r.setValue(key, forHTTPHeaderField: "xi-api-key")
         r.setValue("application/json", forHTTPHeaderField: "Content-Type")
         r.setValue("audio/mpeg", forHTTPHeaderField: "Accept")
-        var body: [String: Any] = ["text": pronounced(text, pronunciation), "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
+        var body: [String: Any] = ["text": pronounced(pronounced(text, pronunciation), foreign), "model_id": config.model, "voice_settings": ["speed": min(config.speed, apiMaxSpeed)]]
         // Without it the model guesses the language and a voice made for another one speaks Italian with its accent (#245).
         if ["turbo", "flash", "v3"].contains(where: config.model.contains) { body["language_code"] = spokenLanguage }
         r.httpBody = try? JSONSerialization.data(withJSONObject: body)
