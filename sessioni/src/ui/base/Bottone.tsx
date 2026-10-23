@@ -5,8 +5,9 @@ import "./componenti.css";
 
 type Base = ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Bottone({ tipo = "primario", className = "", ...p }: Base & { tipo?: "primario" | "secondario" }) {
-  return <button type="button" {...p} className={`bottone ${tipo} ${className}`} />;
+/** `pericolo`: «Bottone pericolo» di 101-37696 (Ferma tutto, Annulla la decisione). `piccolo`: alto `bottone` (barra del titolo, 101-37879). */
+export function Bottone({ tipo = "primario", piccolo = false, className = "", ...p }: Base & { tipo?: "primario" | "secondario" | "pericolo"; piccolo?: boolean }) {
+  return <button type="button" {...p} className={`bottone ${tipo} ${piccolo ? "piccolo" : ""} ${className}`} />;
 }
 
 /** `etichetta` è il nome letto dai lettori di schermo e il suggerimento al passaggio. */
