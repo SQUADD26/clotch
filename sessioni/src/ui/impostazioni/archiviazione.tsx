@@ -17,24 +17,23 @@ const PARTI = [
 const mb = (byte: number) => `${Math.round(byte / 1e6)} MB`;
 
 export default function Archiviazione() {
-  const spazio = useChiamata(() => api().spazio() as Promise<Partial<Record<(typeof PARTI)[number]["chiave"], number>>>, []);
+  const spazio = useChiamata(() => api().spazio(), []);
   const [occupato, setOccupato] = useState(false);
   const fai = (azione: () => Promise<void>) => {
     setOccupato(true);
     azione().then(spazio.ricarica, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })).finally(() => setOccupato(false));
   };
-  const parti = PARTI.filter((p) => spazio.dati?.[p.chiave] !== undefined);
-  const totale = parti.reduce((t, p) => t + spazio.dati![p.chiave]!, 0);
+  const totale = PARTI.reduce((t, p) => t + (spazio.dati?.[p.chiave] ?? 0), 0);
   return (
     <Pagina titolo="Archiviazione">
       {spazio.dati && (
         <div className="spazio-usato">
           <div className="t-base">Usati da Sessioni: {mb(totale)}</div>
           <div className="barra-segmentata">
-            {parti.map((p) => <div key={p.chiave} style={{ flex: spazio.dati![p.chiave], background: `var(${p.colore})` }} />)}
+            {PARTI.map((p) => <div key={p.chiave} style={{ flex: spazio.dati![p.chiave], background: `var(${p.colore})` }} />)}
           </div>
           <div className="legenda">
-            {parti.map((p) => (
+            {PARTI.map((p) => (
               <span key={p.chiave} className="voce-legenda">
                 <span className="campione" style={{ background: `var(${p.colore})` }} />
                 <span className="t-sm secondario">{p.nome}</span>

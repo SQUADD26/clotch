@@ -1,0 +1,1351 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "120:58483",
+  "nome": "segni nel titolo",
+  "w": 107,
+  "h": 356
+ },
+ "variabili": {
+  "spazio/2": 8,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/base": 14,
+  "testo/riga/base": 20,
+  "misura/icona": 16,
+  "colore/sessione/arancione": "#ff8549",
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/sessione/grigio": "#c4c8ce"
+ },
+ "nodi": [
+  {
+   "id": "120:58483",
+   "nome": "segni nel titolo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 107,
+    "h": 356
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58484",
+   "nome": "segno stella",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 81,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58485",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "★︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58486",
+   "nome": "icona stella",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 2,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58486;101:11209",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 2,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58486;101:11209;101:11030",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.6651611328125,
+    "y": 2.66650390625,
+    "w": 14.668047904968262,
+    "h": 14.048399925231934
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/arancione"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58489",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 1,
+    "w": 33,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "stella",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58490",
+   "nome": "segno database",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 28,
+    "w": 105,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58491",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 28,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⛁︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58492",
+   "nome": "icona database",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 30,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58492;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 30,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58492;101:11203;101:11040",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 25.3330078125,
+    "y": 30.66650390625,
+    "w": 13.333984375,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58495",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 29,
+    "w": 57,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "database",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58497",
+   "nome": "segno tavolozza",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 56,
+    "w": 107,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58498",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 56,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "🎨",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58499",
+   "nome": "icona tavolozza",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 58,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58499;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 58,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58499;101:11203;101:11054",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 58.66650390625,
+    "w": 14.662109375,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58502",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 57,
+    "w": 59,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "tavolozza",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58504",
+   "nome": "segno insetto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 84,
+    "w": 91,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58505",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 84,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⚠︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58506",
+   "nome": "icona insetto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 86,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58506;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 86,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58506;101:11203;101:11079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 86.66650390625,
+    "w": 14.666666984558105,
+    "h": 13.99994945526123
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58509",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 85,
+    "w": 43,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "insetto",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58511",
+   "nome": "segno strati",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 112,
+    "w": 80,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58512",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 112,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "◰︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58513",
+   "nome": "icona strati",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 114,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58513;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 114,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58513;101:11203;101:11147",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666305541992188,
+    "y": 114.666015625,
+    "w": 14.678117752075195,
+    "h": 14.661109924316406
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58516",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 113,
+    "w": 32,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "strati",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58518",
+   "nome": "segno globo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 140,
+    "w": 83,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58519",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 140,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "☁︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58520",
+   "nome": "icona globo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 142,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58520;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 142,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58520;101:11203;101:11099",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 142.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58523",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 141,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "globo",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58525",
+   "nome": "segno chiave",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 168,
+    "w": 88,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58526",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 168,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⚙︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58527",
+   "nome": "icona chiave",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 170,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58527;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 170,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58527;101:11203;101:11131",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 170.6416015625,
+    "w": 14.692731857299805,
+    "h": 14.691822052001953
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58530",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 169,
+    "w": 40,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "chiave",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58532",
+   "nome": "segno casa",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 196,
+    "w": 77,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58533",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 196,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⌘︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58534",
+   "nome": "icona casa",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 198,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58534;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 198,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58534;101:11203;101:11125",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 25.3330078125,
+    "y": 198.66650390625,
+    "w": 13.333984375,
+    "h": 14.000304222106934
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58537",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 197,
+    "w": 29,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "casa",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58539",
+   "nome": "segno bussola",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 224,
+    "w": 96,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58540",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 224,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⌕︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58541",
+   "nome": "icona bussola",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 226,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58541;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 226,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58541;101:11203;101:11178",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 226.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58544",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 225,
+    "w": 48,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "bussola",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58546",
+   "nome": "segno scudo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 252,
+    "w": 86,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58547",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 252,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "☑︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58548",
+   "nome": "icona scudo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 254,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58548;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 254,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58548;101:11203;101:11137",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 25.999679565429688,
+    "y": 254.666015625,
+    "w": 12,
+    "h": 14.668789863586426
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58551",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 253,
+    "w": 38,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "scudo",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58553",
+   "nome": "segno libro",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 280,
+    "w": 75,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58554",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 280,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "✎︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58555",
+   "nome": "icona libro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 282,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58555;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 282,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58555;101:11203;101:11183",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.666336059570312,
+    "y": 283.3330078125,
+    "w": 14.6669921875,
+    "h": 13.333658218383789
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58558",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 281,
+    "w": 27,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "libro",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58560",
+   "nome": "segno fulmine",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 308,
+    "w": 94,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58561",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 308,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "⇋︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58562",
+   "nome": "icona fulmine",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58562;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58562;101:11203;101:11110",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 25.331283569335938,
+    "y": 310.66455078125,
+    "w": 13.337800979614258,
+    "h": 14.670222282409668
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58565",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 309,
+    "w": 46,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "fulmine",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58567",
+   "nome": "segno pacco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 336,
+    "w": 86,
+    "h": 20
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58568",
+   "nome": "segno",
+   "tipo": "TEXT",
+   "box": {
+    "x": 0,
+    "y": 336,
+    "w": 16,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base",
+    "width": "misura/icona"
+   },
+   "senza": [],
+   "testo": "♺︎",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58569",
+   "nome": "icona pacco",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 338,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58569;101:11203",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 338,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58569;101:11203;101:11165",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 25.3330078125,
+    "y": 338.66748046875,
+    "w": 13.333984375,
+    "h": 14.665299415588379
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/grigio"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58572",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 48,
+    "y": 337,
+    "w": 38,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "pacco",
+   "font": "SF Pro Regular"
+  }
+ ]
+}

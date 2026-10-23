@@ -20,7 +20,7 @@ export interface Scena {
   cartelle?: CartellaAccount[];
   uso?: QuotaUso[];
   archiviate?: Archiviata[];
-  spazio?: { indice: number; messaggi: number; immagini: number };
+  spazio?: { indice: number; messaggi: number; immagini: number; altro: number };
   versione?: string;
   /** Registro di Friday come lo dà `friday:registro`. */
   registro?: unknown;
@@ -47,7 +47,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "sessioni:preferenze": return s.preferenze ?? {};
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
-    case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0 };
+    case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
     case "impostazioni:radici": return (s.cartelle ?? []).map((c) => c.percorso);
     case "impostazioni:cartelle": return (s.cartelle ?? []).filter((c) => (args[0] as string[]).includes(c.percorso));
     case "impostazioni:versione": return s.versione ?? "";
