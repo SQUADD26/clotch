@@ -39,8 +39,10 @@ function normalWindow(silent) {
 
 async function run(args, scene) {
   const calls = [], errors = [];
+  const env = {};
   const record = name => () => { calls.push(name); };
   const app = {
+    commandLine: { appendSwitch: name => calls.push(`switch:${name}`) },
     setActivationPolicy: policy => calls.push(`policy:${policy}`),
     whenReady: () => { calls.push('ready'); return Promise.resolve(); },
     getPath: () => '/test-no-real-user', on() {}, exit: code => calls.push(`exit:${code}`),
@@ -66,7 +68,7 @@ async function run(args, scene) {
   };
   vm.runInNewContext(code, {
     exports: {}, __dirname: '/test/dist/src',
-    process: { platform: 'darwin', argv: ['electron', '.', ...args], on() {} },
+    process: { platform: 'darwin', argv: ['electron', '.', ...args], env, on() {} },
     console: { error: (...args) => errors.push(args.join(' ')) },
     require: name => {
       if (name === 'node:os' || name === 'node:path') return require(name);
@@ -75,13 +77,15 @@ async function run(args, scene) {
     },
   });
   await new Promise(setImmediate);
-  return { calls, errors };
+  return { calls, errors, env };
 }
 
 (async () => {
   for (const [args, scene] of [[['--parita', 'missing'], null], [['--parita'], null], [['--parita', 'broken'], new SyntaxError('fixture JSON')]]) {
-    const { calls, errors } = await run(args, scene);
+    const { calls, errors, env } = await run(args, scene);
     assert.ok(calls.indexOf('policy:prohibited') < calls.indexOf('ready'));
+    assert.ok(calls.indexOf('switch:mute-audio') < calls.indexOf('ready'));
+    assert.equal(env.CLOTCH_TEST_SILENT, '1');
     assert.ok(calls.includes('exit:1'));
     assert.match(errors[0], /scena non disponibile/);
     assert.deepEqual(calls.filter(c => c.endsWith('-live')), []);
@@ -89,10 +93,13 @@ async function run(args, scene) {
   }
   const fixture = await run(['--parita', '101-8036'], { navigazione: {} });
   assert.ok(fixture.calls.indexOf('policy:prohibited') < fixture.calls.indexOf('ready'));
+  assert.equal(fixture.env.CLOTCH_TEST_SILENT, '1');
   assert.deepEqual(fixture.calls.filter(c => ['scena', 'parita'].includes(c)), ['scena', 'parita']);
   assert.deepEqual(fixture.calls.filter(c => c.endsWith('-live')), []);
   const normal = await run([], null);
   assert.ok(!normal.calls.includes('policy:prohibited'), 'app normale conserva attivazione');
+  assert.ok(!normal.calls.includes('switch:mute-audio'));
+  assert.equal(normal.env.CLOTCH_TEST_SILENT, undefined);
   assert.ok(normal.calls.includes('friday-live') && normal.calls.includes('finestra-live'));
   assert.ok(!normal.calls.some(c => c.startsWith('exit:')));
   assert.deepEqual(normalWindow(true), [

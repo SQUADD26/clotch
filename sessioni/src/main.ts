@@ -20,7 +20,11 @@ import type { PaginaMessaggi } from "./tipi";
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
 const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
-if (iParita > 0 && process.platform === "darwin") app.setActivationPolicy("prohibited");
+if (iParita > 0) {
+  process.env.CLOTCH_TEST_SILENT = "1";
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("prohibited");
+}
 const scena = (() => {
   try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }
   catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron

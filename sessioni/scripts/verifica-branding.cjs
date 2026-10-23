@@ -6,6 +6,8 @@ const ts = require("typescript");
 const { app, BrowserWindow, Menu } = require("electron");
 const { impostaNome, impostaIdentita, iconaApp, NOME_APP } = require("../dist/src/branding");
 
+process.env.CLOTCH_TEST_SILENT = "1";
+app.commandLine.appendSwitch("mute-audio");
 if (process.platform === "darwin") app.setActivationPolicy("prohibited");
 let mostrate = 0, focalizzate = 0;
 app.on("browser-window-created", (_evento, finestra) => {
