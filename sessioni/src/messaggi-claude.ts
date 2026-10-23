@@ -8,6 +8,8 @@ const tempo = (o: any): number | null => {
   return Number.isNaN(t) ? null : t;
 };
 
+const stringa = (x: unknown) => (typeof x === "string" ? x : "");
+
 const testoDi = (c: unknown): string => {
   if (typeof c === "string") return c;
   if (!Array.isArray(c)) return "";
@@ -40,11 +42,11 @@ export class Convertitore {
           } else if (b?.type === "thinking" && typeof b.thinking === "string" && b.thinking.trim()) {
             nuovi.push({ tipo: "pensiero", testo: b.thinking, t });
           } else if (b?.type === "tool_use") {
-            const m: Strumento = { tipo: "strumento", id: String(b.id), nome: String(b.name), ingresso: b.input, esito: null, t };
-            this.attesa.set(m.id, m);
+            const m: Strumento = { tipo: "strumento", id: stringa(b.id), nome: stringa(b.name) || "strumento", ingresso: b.input, esito: null, t };
+            if (m.id) this.attesa.set(m.id, m); // senza id nessun esito può agganciarsi
             nuovi.push(m);
           } else if (b?.type === "tool_result") {
-            const m = this.attesa.get(String(b.tool_use_id));
+            const m = this.attesa.get(stringa(b.tool_use_id));
             if (m) {
               m.esito = { testo: testoDi(b.content), errore: b.is_error === true };
               this.attesa.delete(m.id);
