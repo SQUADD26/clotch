@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
+import { verificaAggiornamenti } from "../base/dialoghi";
 import { Dialogo } from "../base/Dialogo";
 import { Icona } from "../base/Icona";
 import { Menu, type VoceMenu } from "../base/Menu";
@@ -31,17 +32,15 @@ export default function Info() {
   const v = useImpostazioni();
   const [versione, setVersione] = useState("");
   const [novita, setNovita] = useState<Novita | null>(null);
-  const [controlla, setControlla] = useState(false);
   const [dialogo, setDialogo] = useState(!!prova?.novita);
   useEffect(() => {
     window.impostazioni.versione().then(setVersione, () => {});
     window.impostazioni.novita().then(setNovita, () => {});
-    window.impostazioni.aggiornamenti(false).then(setControlla, () => {});
   }, []);
   const errore = (e: unknown) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) });
   const apriRegistro = () => window.impostazioni.apri(v.cartellaRegistro).catch(errore);
   const voci: VoceMenu[] = [
-    ...(controlla ? [{ etichetta: "Controlla aggiornamenti", fai: () => { window.impostazioni.aggiornamenti(true).catch(errore); } }] : []),
+    { etichetta: "Controlla aggiornamenti", fai: () => void verificaAggiornamenti() },
     ...(novita ? [{ etichetta: `Novità della versione ${versione}`, fai: () => setDialogo(true) }] : []),
     { etichetta: "Copia versione", fai: () => { navigator.clipboard.writeText(versione).catch(errore); } },
   ];
