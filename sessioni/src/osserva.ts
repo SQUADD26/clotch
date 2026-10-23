@@ -2,21 +2,26 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { leggiElenco } from "./elenco";
-import { righeNuove, parseRiga } from "./jsonl";
-import { nuovoConvertitore } from "./messaggi";
-import { Aggiornamento, Elenco, Messaggio, Sessione } from "./tipi";
+import { fineCompleta, firmaFile } from "./messaggi";
+import { Cronologia } from "./cronologia";
+import { Aggiornamento, Elenco } from "./tipi";
 
 export class Osservatore {
   elenco: Elenco;
-  private offset = new Map<string, number>();
-  private conv = new Map<string, ReturnType<typeof nuovoConvertitore>>();
+  private iniziali = new Map<string, number>();
+  private firme = new Map<string, string>();
   private watchers: fs.FSWatcher[] = [];
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
 
-  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined) {
+  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia()) {
     this.elenco = leggiElenco({ home, env, impostazioni: imp?.() });
-    for (const s of this.elenco.sessioni) if (s.file.endsWith(".jsonl")) this.offset.set(s.file, safeSize(s.file));
+    for (const s of this.elenco.sessioni) if (s.file.endsWith(".jsonl")) {
+      this.firme.set(s.file, firma(s.file));
+      try { this.iniziali.set(s.file, fineCompleta(s.file)); } catch { /* l'evento successivo riporterà l'errore */ }
+    }
+    this.cronologia.collega((d) => this.cb({ sessioni: [d.sessione], cronologia: [d],
+      nuoviMessaggi: d.tipo === "upsert" ? [{ id: d.sessione, messaggi: d.righe.map((r) => r.messaggio) }] : [] }));
   }
 
   /** Cartelle da guardare: non esistono ancora = si salta (si rivedono al prossimo avvio). */
@@ -39,8 +44,8 @@ export class Osservatore {
   avvia() {
     for (const d of this.cartelle()) {
       try {
-        const w = fs.watch(d, { recursive: true }, (_ev, nome) => nome && this.tocca(path.join(d, String(nome))));
-        w.on("error", () => {}); // cartella sparita o senza permesso: l'app non cade
+        const w = fs.watch(d, { recursive: true }, (_ev, nome) => this.tocca(nome ? path.join(d, String(nome)) : d));
+        w.on("error", () => this.tocca(d)); // riconcilia i file noti senza creare polling
         this.watchers.push(w);
       } catch { /* watch non disponibile su questa cartella */ }
     }
@@ -69,33 +74,23 @@ export class Osservatore {
     const dopo = new Set(this.elenco.sessioni.map((s) => s.id));
     // anche quelle sparite (spenta una sorgente, cartella esclusa): il renderer deve rileggere l'elenco
     const cambiate = [...this.elenco.sessioni.filter((s) => prima.get(s.id) !== JSON.stringify(s)).map((s) => s.id), ...[...prima.keys()].filter((id) => !dopo.has(id))];
-    const nuovi: Aggiornamento["nuoviMessaggi"] = [];
     for (const s of this.elenco.sessioni) {
-      // non solo i file dell'evento: un evento perso non deve perdere messaggi, basta che il file sia cresciuto
-      if (!s.file.endsWith(".jsonl") || !(file.includes(s.file) || safeSize(s.file) > (this.offset.get(s.file) ?? 0))) continue;
-      const m = this.coda(s);
-      if (m.length) nuovi.push({ id: s.id, messaggi: m });
+      if (!s.file.endsWith(".jsonl")) continue;
+      const attuale = firma(s.file);
+      // La riconciliazione parte solo da avvio/evento; include rename, riscritture e crescita senza evento nominato.
+      if (attuale === this.firme.get(s.file) && !file.some((f) => s.file === f || s.file.startsWith(`${f}${path.sep}`))) continue;
+      this.cronologia.aggiorna(s, this.iniziali.get(s.file) ?? 0);
+      this.iniziali.delete(s.file);
+      this.firme.set(s.file, attuale);
     }
-    if (cambiate.length || nuovi.length) this.cb({ sessioni: cambiate, nuoviMessaggi: nuovi });
+    const presenti = new Set(this.elenco.sessioni.map((s) => s.file));
+    for (const f of this.firme.keys()) if (!presenti.has(f)) { this.firme.delete(f); this.iniziali.delete(f); }
+    if (cambiate.length) this.cb({ sessioni: cambiate, nuoviMessaggi: [] });
   }
 
-  private coda(s: Sessione): Messaggio[] {
-    try {
-      // file mai visto prima = sessione nata adesso: si parte dall'inizio
-      const { righe, offset } = righeNuove(s.file, this.offset.get(s.file) ?? 0);
-      this.offset.set(s.file, offset);
-      const c = this.conv.get(s.file) ?? nuovoConvertitore(s);
-      this.conv.set(s.file, c);
-      return righe.flatMap((r) => {
-        const o = parseRiga(r);
-        if (!o) return [];
-        const x = c.riga(o);
-        return [...x.nuovi, ...x.aggiornati.filter((a) => !x.nuovi.includes(a))];
-      });
-    } catch {
-      return []; // file sparito tra l'evento e la lettura
-    }
-  }
 }
 
-const safeSize = (f: string) => { try { return fs.statSync(f).size; } catch { return 0; } };
+const firma = (file: string) => {
+  try { return firmaFile(file); }
+  catch { return "assente"; }
+};
