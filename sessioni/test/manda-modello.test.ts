@@ -5,7 +5,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { inviaComando } from "../src/comandi";
-import { argsManda, erroreComando, ID_MODELLO } from "../src/ui/chat/testi";
+import { argsManda, erroreComando, idModello, MODELLI } from "../src/ui/chat/testi";
 
 const RIFIUTO = "Il modello non cambia nei messaggi in coda. Invia subito o attendi la fine del turno.";
 
@@ -27,12 +27,13 @@ test("manda: con un modello scelto il comando scritto ha l'id CLI, mai l'etichet
   assert.equal(erroreComando(e), RIFIUTO); // il testo del motore, non «Sessione non raggiunta»
 });
 
-test("manda: senza scelta o in coda il campo modello non c'è; ogni etichetta ha un id ammesso", () => {
-  assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5"), { chat: "c", testo: "t", modo: "subito" }); // modello di partenza: non scelto
+test("manda: modello sempre con subito, mai in coda o se sconosciuto; ogni etichetta ha un id ammesso", () => {
+  assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5"), { chat: "c", testo: "t", modo: "subito", modello: "claude-opus-5-5" }); // anche il modello di partenza
   assert.deepEqual(argsManda("c", "t", "coda", "Haiku 5.5"), { chat: "c", testo: "t", modo: "coda" }); // coda: il motore lo rifiuterebbe
   assert.deepEqual(argsManda("c", "t", "subito", "Sconosciuto"), { chat: "c", testo: "t", modo: "subito" });
   const ammessi = ["haiku", "sonnet", "opus", "fable", "claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5", "claude-fable-5-1"];
-  for (const id of Object.values(ID_MODELLO)) assert.ok(ammessi.includes(id), id);
+  for (const [et, m] of Object.entries(MODELLI)) { assert.ok(ammessi.includes(m.id), m.id); assert.equal(idModello(et), m.id); }
+  assert.equal(idModello("Sconosciuto"), undefined);
   assert.equal(erroreComando(null), "Sessione non raggiunta");
   assert.equal(erroreComando({ id: "c", esito: "errore", testo: "boh" }), "Sessione non raggiunta");
 });
