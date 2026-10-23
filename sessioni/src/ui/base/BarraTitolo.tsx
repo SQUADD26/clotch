@@ -19,7 +19,8 @@ export function BarraTitolo() {
         <span className="luce rosso" /><span className="luce giallo" /><span className="luce verde" />
       </div>
       <div className="navigazione">
-        <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} />
+        {/* nelle impostazioni la navigazione ha solo indietro e avanti (101-17193) */}
+        {n.vista !== "impostazioni" && <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} />}
         <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
         <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
       </div>
