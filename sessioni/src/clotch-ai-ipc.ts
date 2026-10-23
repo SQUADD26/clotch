@@ -5,7 +5,7 @@ import { execFile } from "node:child_process";
 import type { IpcMain } from "electron";
 import { cartellaRegistro, Comando, leggiRegistro, Registro } from "./clotch-ai";
 import { inviaComando } from "./comandi";
-import { daLeggere, interrompiVoce, leggi, staParlando, suVoce } from "./voce-app";
+import { daLeggere, leggi, staParlando, suVoce } from "./voce-app";
 import { cartelleStatoApp, leggiStatoApp } from "./stato-app";
 import { eComandoApp, eseguiComandoApp, type ComandoApp } from "./comandi-app";
 
@@ -21,7 +21,6 @@ export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unkn
   ipc.handle("clotch-ai:registro", () => completo(leggiRegistro(home, env), home, env));
   // Voce dell'app (Clotch assente): lo stato «sta parlando» e «Interrompi» del frame 101-37055.
   ipc.handle("clotch-ai:voce", () => staParlando());
-  ipc.handle("clotch-ai:interrompi-voce", () => { interrompiVoce(); });
   suVoce((parla) => invia("clotch-ai:voce", parla));
   // Contratto: a clotch AI spenta la casella non serve; si avvia con `friday avvia` (launchctl kickstart). // nome del protocollo del motore
   ipc.handle("clotch-ai:avvia", () => new Promise((ok) =>

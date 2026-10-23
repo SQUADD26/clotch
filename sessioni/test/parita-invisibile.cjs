@@ -88,7 +88,7 @@ async function run(args, scene, initialEnv = {}) {
   const ipcMain = { handle: (canale, fn) => handlers.set(canale, fn) };
   const modules = {
     electron: { app, ipcMain, BrowserWindow: { getAllWindows: () => [] } },
-    './allegati-ipc': { collegaCasella: record('casella-live') },
+    './allegati-ipc': { collegaAllegati: record('casella-live') },
     './api': { Sessioni: class {
       elencoSessioni() { return { sessioni: [], errori: [] }; }
       osserva() { calls.push('osserva'); }

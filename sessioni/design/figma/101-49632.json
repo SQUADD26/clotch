@@ -2735,7 +2735,7 @@
    "box": {
     "x": 397,
     "y": 229,
-    "w": 356,
+    "w": 354,
     "h": 16
    },
    "variabili": {
@@ -2744,7 +2744,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Senza Clotch l’app non vede quando uno script usa lo schermo",
+   "testo": "Senza clotch l’app non vede quando uno script usa lo schermo",
    "font": "SF Pro Regular"
   },
   {

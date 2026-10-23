@@ -227,7 +227,6 @@ export interface ClotchAiApi {
   /** L'app sta leggendo un avviso a voce (Clotch assente), e quando comincia o smette. */
   voce(): Promise<boolean>;
   onVoce(cb: (parla: boolean) => void): () => void;
-  interrompiVoce(): Promise<void>;
 }
 
 /** Impostazioni dell'app (#351) nel file delle preferenze (`SessioniApi.impostazioni`); i valori di partenza sono quelli del disegno. */

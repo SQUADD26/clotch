@@ -39,7 +39,6 @@ const clotchAi: ClotchAiApi = {
   registro: () => ipcRenderer.invoke("clotch-ai:registro"),
   avvia: () => ipcRenderer.invoke("clotch-ai:avvia"),
   voce: () => ipcRenderer.invoke("clotch-ai:voce"),
-  interrompiVoce: () => ipcRenderer.invoke("clotch-ai:interrompi-voce"),
   onVoce: (cb) => {
     const f = (_e: unknown, parla: boolean) => cb(parla);
     ipcRenderer.on("clotch-ai:voce", f);

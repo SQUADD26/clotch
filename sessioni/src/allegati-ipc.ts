@@ -5,7 +5,7 @@ import { comeIndirizzo, descrivi, leggiImmagine, leggiSkill } from "./allegati";
 import { provaSilenziosa } from "./modalita-prova";
 import type { DaImmagine } from "./tipi";
 
-export function collegaCasella(ipc: IpcMain, home: string, fileSessione: (id: string) => string | null) {
+export function collegaAllegati(ipc: IpcMain, home: string, fileSessione: (id: string) => string | null) {
   const finestra = (e: { sender: Electron.WebContents }) => BrowserWindow.fromWebContents(e.sender) ?? undefined;
   // la prova non apre finestre di scelta né tocca gli appunti del Mac
   const silenzio = provaSilenziosa();

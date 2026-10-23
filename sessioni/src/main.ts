@@ -20,7 +20,7 @@ if (iParita > 0) {
 impostaNome();
 
 import { Sessioni } from "./api";
-import { collegaCasella as collegaAllegati } from "./allegati-ipc";
+import { collegaAllegati } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
 import { apriFinestra, parita } from "./finestra";

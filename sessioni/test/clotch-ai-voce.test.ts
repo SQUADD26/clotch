@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { leggiRegistro, type ChatClotchAi, type Registro } from "../src/clotch-ai";
-import { interrompiVoce, leggi, staParlando, suVoce } from "../src/voce-app";
+import { fermaVoce, leggi, staParlando, suVoce } from "../src/voce-app";
 import { statoVoce } from "../src/ui/clotch-ai/statoVoce";
 import { suggerimenti } from "../src/ui/clotch-ai/vista";
 import childProcess = require("node:child_process");
@@ -69,7 +69,7 @@ test("voce dell'app: sta parlando finché say gira, Interrompi lo ferma e chi as
   leggi("Un secondo avviso");
   fine[0]();
   assert.equal(staParlando(), true, "la seconda frase gira ancora");
-  interrompiVoce();
+  fermaVoce();
   assert.deepEqual(killed, [1], "Interrompi ferma solo ciò che gira");
   assert.equal(staParlando(), false);
   assert.deepEqual(visti, [true, true, true, false]);

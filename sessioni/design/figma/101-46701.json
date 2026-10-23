@@ -2821,9 +2821,9 @@
    "nome": "nota clotch",
    "tipo": "FRAME",
    "box": {
-    "x": 773.5,
+    "x": 774.5,
     "y": 849,
-    "w": 279,
+    "w": 277,
     "h": 16
    },
    "variabili": {
@@ -2838,7 +2838,7 @@
    "nome": "icona microfono",
    "tipo": "INSTANCE",
    "box": {
-    "x": 781.5,
+    "x": 782.5,
     "y": 849,
     "w": 16,
     "h": 16
@@ -2854,7 +2854,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 784.16650390625,
+    "x": 785.16650390625,
     "y": 849.6640625,
     "w": 10.6669921875,
     "h": 14.667318344116211
@@ -2869,9 +2869,9 @@
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
-    "x": 805.5,
+    "x": 806.5,
     "y": 849,
-    "w": 239,
+    "w": 237,
     "h": 16
    },
    "variabili": {
@@ -2880,7 +2880,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Ti ascolta il microfono di Clotch · ⌥Spazio",
+   "testo": "Ti ascolta il microfono di clotch · ⌥Spazio",
    "font": "SF Pro Regular"
   },
   {
@@ -4138,7 +4138,7 @@
    "box": {
     "x": 1212,
     "y": 72,
-    "w": 76,
+    "w": 74,
     "h": 28
    },
    "variabili": {
@@ -4189,7 +4189,7 @@
    "box": {
     "x": 1240,
     "y": 77,
-    "w": 40,
+    "w": 38,
     "h": 18
    },
    "variabili": {
@@ -4198,7 +4198,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Clotch",
+   "testo": "clotch",
    "font": "SF Pro Regular"
   }
  ]
