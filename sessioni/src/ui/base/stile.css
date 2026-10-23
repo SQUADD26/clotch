@@ -1,0 +1,31 @@
+/* figma: 101-8036 — fondo, testo e font di base della finestra */
+html, body, #radice { height: 100%; margin: 0; }
+body {
+  background: var(--colore-fondo-cornice);
+  color: var(--colore-testo-primario);
+  font-family: var(--testo-famiglia-ui);
+  font-size: var(--testo-dimensione-base);
+  line-height: var(--testo-riga-base);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  overflow: hidden;
+}
+* { box-sizing: border-box; }
+button, input { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; outline: none; }
+button { cursor: default; }
+:focus-visible { outline: var(--misura-tratto) solid var(--colore-bordo-fuoco); }
+
+/* prova di parità: il riquadro del frame Figma intorno alla finestra */
+.parita body { background: var(--colore-fondo-riquadro); padding: var(--spazio-16); }
+.parita .cornice { border-radius: var(--raggio-md); }
+.parita.scena body { background: none; padding: 0; }
+
+.t-xs { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.t-sm { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+.t-base { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); }
+.t-lg { font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); }
+.t-xl { font-size: var(--testo-dimensione-xl); line-height: var(--testo-riga-xl); }
+.medio { font-weight: 500; }
+.codice { font-family: var(--testo-famiglia-codice); }
+.secondario { color: var(--colore-testo-secondario); }
+.terziario { color: var(--colore-testo-terziario); }

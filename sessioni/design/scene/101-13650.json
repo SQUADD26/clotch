@@ -1,0 +1,141 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "aspetta",
+    "perche": null,
+    "ultimaAttivita": 1792768244164,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Ricompila l’app dopo il cambio della barra laterale.",
+    "t": 1792768241164
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "sessioni/package.json"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792768242164,
+    "id": "t0"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "La cartella della build è vecchia: la svuoto e ricompilo.",
+    "modello": "claude-opus-5-5",
+    "t": 1792768243164
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "titolo": null,
+    "madre": null,
+    "progetto": "clotch",
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r1",
+      "genere": "permesso",
+      "strumento": "Bash",
+      "ingresso": {
+       "command": "rm -rf sessioni/dist && npm run build",
+       "description": "Svuota la cartella della build e ricompila l’app."
+      },
+      "domande": []
+     }
+    ],
+    "battito": 1792768344164,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792768364164,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

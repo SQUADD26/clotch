@@ -1,0 +1,7 @@
+{"type": "mode", "mode": "normal", "sessionId": "aaaaaaaa-0000-4000-8000-000000000001"}
+{"sessionId": "aaaaaaaa-0000-4000-8000-000000000001", "cwd": "/Users/x/app", "gitBranch": "feat/uno", "isSidechain": false, "type": "user", "timestamp": "2026-10-20T10:00:00.000Z", "message": {"role": "user", "content": "Fai la cosa"}}
+{questa riga è rotta
+{"sessionId": "aaaaaaaa-0000-4000-8000-000000000001", "cwd": "/Users/x/app", "gitBranch": "feat/uno", "isSidechain": false, "type": "assistant", "timestamp": "2026-10-20T10:00:05.000Z", "message": {"model": "claude-opus-5", "role": "assistant", "content": [{"type": "thinking", "thinking": "Devo leggere il file"}, {"type": "text", "text": "Leggo il file."}, {"type": "tool_use", "id": "t1", "name": "Read", "input": {"file_path": "/Users/x/app/a.txt"}}]}}
+{"sessionId": "aaaaaaaa-0000-4000-8000-000000000001", "cwd": "/Users/x/app", "gitBranch": "feat/uno", "isSidechain": false, "type": "user", "timestamp": "2026-10-20T10:00:06.000Z", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "nessun file", "is_error": true}]}}
+{"sessionId": "aaaaaaaa-0000-4000-8000-000000000001", "cwd": "/Users/x/app", "gitBranch": "feat/uno", "isSidechain": false, "type": "assistant", "timestamp": "2026-10-20T10:00:09.000Z", "message": {"model": "claude-opus-5", "role": "assistant", "content": [{"type": "text", "text": "Il file non c'è."}]}}
+{"type": "ai-title", "aiTitle": "Prova uno", "sessionId": "aaaaaaaa-0000-4000-8000-000000000001"}

@@ -1,0 +1,180 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "aspetta",
+    "perche": null,
+    "ultimaAttivita": 1792768064164,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Fai la prova di parità di tutte le schermate.",
+    "t": 1792768200164
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm run prova -- --scala 1"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792768201164,
+    "id": "t0"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Le 14 immagini sono pronte. Prima di salvarle ho un dubbio.",
+    "modello": "claude-opus-5-5",
+    "t": 1792768242164
+   },
+   {
+    "tipo": "strumento",
+    "nome": "AskUserQuestion",
+    "ingresso": {
+     "questions": [
+      {
+       "question": "Dove salvo le immagini della prova di parità?",
+       "options": [
+        {
+         "label": "Nel repo, in sessioni/design/app (Recommended)"
+        },
+        {
+         "label": "Nella cartella appunti della sessione"
+        },
+        {
+         "label": "Non salvarle: mostrale e basta"
+        }
+       ]
+      }
+     ]
+    },
+    "esito": null,
+    "t": 1792768243164,
+    "id": "t1"
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "titolo": null,
+    "madre": null,
+    "progetto": "clotch",
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r2",
+      "genere": "domanda",
+      "strumento": "AskUserQuestion",
+      "ingresso": {
+       "questions": [
+        {
+         "question": "Dove salvo le immagini della prova di parità?",
+         "options": [
+          {
+           "label": "Nel repo, in sessioni/design/app (Recommended)"
+          },
+          {
+           "label": "Nella cartella appunti della sessione"
+          },
+          {
+           "label": "Non salvarle: mostrale e basta"
+          }
+         ]
+        }
+       ]
+      },
+      "domande": []
+     }
+    ],
+    "battito": 1792768344164,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792768364164,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

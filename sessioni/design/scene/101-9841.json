@@ -1,0 +1,52 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Voce: parole inglesi",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "fix/323-parole-inglesi",
+    "modello": "claude-opus-5-5",
+    "stato": "ferma",
+    "perche": null,
+    "ultimaAttivita": 1792768244164,
+    "obiettivo": null,
+    "situazione": null,
+    "file": "",
+    "icona": "microfono"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": []
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "microfono"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

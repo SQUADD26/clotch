@@ -1,0 +1,93 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:49891",
+  "nome": "schermo occupato",
+  "w": 236,
+  "h": 28
+ },
+ "variabili": {
+  "colore/fondo/riga-scelta": "#ffffff14",
+  "raggio/pieno": 9999,
+  "spazio/1": 4,
+  "spazio/2": 8,
+  "misura/bottone": 28,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18
+ },
+ "nodi": [
+  {
+   "id": "101:49891",
+   "nome": "schermo occupato",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 236,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/pieno",
+    "itemSpacing": "spazio/1",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:49892",
+   "nome": "icona finestra",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 6,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:49892;101:19932",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 8.66650390625,
+    "y": 8,
+    "w": 14.6669921875,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:49894",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 28,
+    "y": 5,
+    "w": 200,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Uno script usa lo schermo · 0:42",
+   "font": "SF Pro Regular"
+  }
+ ]
+}
