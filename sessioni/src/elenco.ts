@@ -3,7 +3,8 @@ import * as path from "node:path";
 import { leggiRadice, nomeProgetto } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
 import { leggiCodex, leggiCursor } from "./altre-sorgenti";
-import { trovaRadici } from "./radici";
+import { conPartenza, filtraElenco } from "./filtro-elenco";
+import { radiciScelte } from "./radici";
 import { leggiObiettivi, leggiStati, StatoRegistro } from "./registri";
 import { Elenco, ErroreLettura, Obiettivo, Sessione, Stato } from "./tipi";
 
@@ -20,9 +21,11 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
 /** Quante sessioni aspettano te: stato «aspetta» (un permesso o una risposta). */
 export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
 
-export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number }): Elenco {
+/** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
+export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown> }): Elenco {
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
+  const imp = opz.impostazioni && conPartenza(opz.impostazioni);
   const app = leggiApp(opz.home, errori);
   const perCli = new Map(app.map((a) => [a.cliId, a]));
   const obiettivi = leggiObiettivi(path.join(opz.home, ".claude"), errori);
@@ -30,7 +33,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
-  for (const r of trovaRadici(opz.home)) tutte.push(...leggiRadice(r, errori));
+  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) tutte.push(...leggiRadice(r, errori));
   const viste = new Set(tutte.map((s) => s.id));
   for (const s of tutte) {
     const a = perCli.get(s.id);
@@ -54,7 +57,8 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
       ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file,
     });
   }
-  tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori), ...leggiCursor(opz.home, errori));
+  if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));
+  if (!imp || imp.sorgenteCursor) tutte.push(...leggiCursor(opz.home, errori));
 
   for (const s of tutte) {
     s.obiettivo = obiettivi.get(s.id) ?? null;
@@ -69,5 +73,6 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     const p = unici.get(k);
     if (!p || p.ultimaAttivita < s.ultimaAttivita) unici.set(k, s);
   }
-  return { sessioni: [...unici.values()].sort((a, b) => b.ultimaAttivita - a.ultimaAttivita), errori };
+  const elenco = { sessioni: [...unici.values()].sort((a, b) => b.ultimaAttivita - a.ultimaAttivita), errori };
+  return opz.impostazioni ? filtraElenco(elenco, opz.impostazioni, ora, opz.home) : elenco;
 }

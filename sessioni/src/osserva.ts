@@ -14,8 +14,8 @@ export class Osservatore {
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
 
-  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250) {
-    this.elenco = leggiElenco({ home, env });
+  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined) {
+    this.elenco = leggiElenco({ home, env, impostazioni: imp?.() });
     for (const s of this.elenco.sessioni) if (s.file.endsWith(".jsonl")) this.offset.set(s.file, safeSize(s.file));
   }
 
@@ -65,8 +65,10 @@ export class Osservatore {
     const file = [...this.dirty];
     this.dirty.clear();
     const prima = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
-    this.elenco = leggiElenco({ home: this.home, env: this.env });
-    const cambiate = this.elenco.sessioni.filter((s) => prima.get(s.id) !== JSON.stringify(s)).map((s) => s.id);
+    this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.() });
+    const dopo = new Set(this.elenco.sessioni.map((s) => s.id));
+    // anche quelle sparite (spenta una sorgente, cartella esclusa): il renderer deve rileggere l'elenco
+    const cambiate = [...this.elenco.sessioni.filter((s) => prima.get(s.id) !== JSON.stringify(s)).map((s) => s.id), ...[...prima.keys()].filter((id) => !dopo.has(id))];
     const nuovi: Aggiornamento["nuoviMessaggi"] = [];
     for (const s of this.elenco.sessioni) {
       // non solo i file dell'evento: un evento perso non deve perdere messaggi, basta che il file sia cresciuto
