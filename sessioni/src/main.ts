@@ -34,7 +34,7 @@ import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
 import type { OpzioniCronologia } from "./cronologia-tipi";
-import type { PaginaMessaggi } from "./tipi";
+import type { Aggiornamento, PaginaMessaggi } from "./tipi";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const scena = (() => {
@@ -71,10 +71,16 @@ app.whenReady().then(() => {
   }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
-  ipcMain.handle("sessioni:elenco", elenco);
-  ipcMain.handle("sessioni:info", (_e, id: string) => infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))));
-  const indice = collegaIndice(ipcMain, sessioni);
+  // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
+  // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
+  let apri!: () => void;
+  const dopo = new Promise<void>((ok) => { apri = ok; });
+  const pronte = dopo.then(() => caricaSessioni());
+  ipcMain.handle("sessioni:elenco", async () => { await pronte; return elenco(); });
+  ipcMain.handle("sessioni:info", async (_e, id: string) => { await pronte; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
+  const indice = collegaIndice(ipcMain, sessioni, pronte);
   ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
+    await pronte;
     if (opzioni !== undefined && (
       !opzioni || typeof opzioni !== "object" || Array.isArray(opzioni) || opzioni.v !== 1 ||
       (opzioni.cursore !== undefined && (typeof opzioni.cursore !== "string" || opzioni.cursore.length > 4096))
@@ -101,20 +107,25 @@ app.whenReady().then(() => {
   collegaCasella(ipcMain, sessioni);
   collegaImpostazioni(ipcMain, sessioni, indice, invia);
   collegaAllegati(ipcMain, os.homedir(), (id) => sessioni.elencoSessioni().sessioni.find((x) => x.id === id)?.file ?? null);
-  sessioni.osserva((a) => {
+  let avvisa = (_a: Aggiornamento) => {}; // diventa quello vero dopo la prima finestra
+  const finestra = apriFinestra();
+  // la finestra la mostra il suo ready-to-show (registrato prima di questo): solo dopo si legge. Il timer evita l'attesa infinita se non arriva.
+  if (finestra) finestra.once("ready-to-show", () => setImmediate(apri)); else apri();
+  setTimeout(apri, 10_000).unref();
+  const caricaSessioni = async () => {
+    await sessioni.osservaInWorker((a) => {
+      barraMenu();
+      BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
+      const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
+      const el = sessioni.elencoSessioni().sessioni;
+      const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
+      if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
+      avvisa(a);
+    });
+    // dopo l'osservatore: da qui l'elenco è il suo
+    avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();
-    BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
-    const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
-    const el = sessioni.elencoSessioni().sessioni;
-    const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
-    if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
-    avvisa(a);
-  });
-  // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
-  const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
-
-  barraMenu();
-  apriFinestra();
+  };
   app.on("activate", () => BrowserWindow.getAllWindows().length || apriFinestra());
 });
 

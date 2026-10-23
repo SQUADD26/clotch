@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-export const CARTELLA_REGISTRO = "~/Library/Logs/Sessioni"; // come PARTENZA.cartellaRegistro dell'interfaccia
+export const CARTELLA_REGISTRO = "~/Library/Logs/clotch"; // come PARTENZA.cartellaRegistro dell'interfaccia
 const due = (n: number) => String(n).padStart(2, "0");
 const giorno = (o: Date) => `${o.getFullYear()}-${due(o.getMonth() + 1)}-${due(o.getDate())}`;
 

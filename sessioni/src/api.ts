@@ -1,8 +1,12 @@
 // L'API vera, nel processo main: elenco, messaggi a pagine, evento di aggiornamento.
 import * as os from "node:os";
+import * as path from "node:path";
+import { Worker } from "node:worker_threads";
+import { caricaCache } from "./altre-sorgenti";
+import { cache as cacheClaude } from "./claude-code";
 import { leggiElenco } from "./elenco";
 import { leggiPagina } from "./messaggi";
-import { Osservatore } from "./osserva";
+import { Osservatore, type StatoIniziale } from "./osserva";
 import { Cronologia } from "./cronologia";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { Aggiornamento, Elenco, PaginaMessaggi } from "./tipi";
@@ -34,5 +38,22 @@ export class Sessioni {
   osserva(cb: (a: Aggiornamento) => void) {
     this.oss ??= new Osservatore(this.home, cb, process.env, 250, () => this.imp, this.cronologia);
     this.oss.avvia();
+  }
+
+  /** Come osserva(), ma la prima lettura (lenta) gira in un worker: il main resta libero. Se il worker fallisce si legge nel main, come prima. */
+  async osservaInWorker(cb: (a: Aggiornamento) => void) {
+    const imp = this.imp;
+    try {
+      const r = await new Promise<{ stato: StatoIniziale; claude: [string, any][]; altre: Parameters<typeof caricaCache>[0] }>((ok, no) => {
+        const w = new Worker(path.join(__dirname, "avvio-worker.js"), { workerData: { home: this.home, env: { ...process.env }, imp } });
+        w.once("message", ok); w.once("error", no);
+        w.once("exit", (c) => no(new Error(`worker d'avvio uscito (${c})`)));
+      });
+      for (const [k, v] of r.claude) cacheClaude.set(k, v);
+      caricaCache(r.altre);
+      this.oss ??= new Osservatore(this.home, cb, process.env, 250, () => this.imp, this.cronologia, r.stato);
+      this.oss.avvia();
+      if (this.imp !== imp) this.oss.giro(); // impostazioni cambiate mentre il worker leggeva
+    } catch { this.osserva(cb); }
   }
 }

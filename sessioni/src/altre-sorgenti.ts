@@ -17,6 +17,9 @@ const base = (): Sessione => ({
 // Ogni giro tiene solo i file che ha visto: quelli spariti escono dalla memoria.
 type Cache = Map<string, { chiave: string; s: Sessione }>;
 let cacheCodex: Cache = new Map(), cacheCursor: Cache = new Map();
+/** Passaggio delle cache dal worker d'avvio al main (#463): dopo, la prima lettura del main controlla solo i file, non li rilegge. */
+export const copiaCache = () => ({ codex: [...cacheCodex], cursor: [...cacheCursor] });
+export const caricaCache = (c: ReturnType<typeof copiaCache>) => { cacheCodex = new Map(c.codex); cacheCursor = new Map(c.cursor); };
 function dalCache(vecchia: Cache, nuova: Cache, file: string, st: fs.Stats, crea: () => Sessione): Sessione {
   const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`;
   const e = vecchia.get(file);
