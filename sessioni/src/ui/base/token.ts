@@ -162,6 +162,7 @@ export type Token =
   | "misura-logo-icona"
   | "misura-barra-uso"
   | "misura-legenda"
+  | "misura-riferimento"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -336,6 +337,7 @@ export const valori: Record<Token, string> = {
   "misura-logo-icona": "24px",
   "misura-barra-uso": "6px",
   "misura-legenda": "8px",
+  "misura-riferimento": "24px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
