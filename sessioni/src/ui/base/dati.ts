@@ -52,29 +52,63 @@ export function useElenco() {
 
 /** Messaggi di una sessione: pagina 0 (i più recenti), `altri()` per le pagine vecchie, i nuovi arrivano dal vivo. */
 export function useMessaggi(id: string | null) {
-  const [pagine, setPagine] = useState({ messaggi: [] as Messaggio[], pagina: 0, haAltre: false, totale: null as number | null });
-  const c = useChiamata(async () => {
-    if (!id) return null;
-    const p = await api().messaggi(id, 0);
-    if (p.errore) throw new Error(p.errore);
-    setPagine({ messaggi: p.messaggi, pagina: 0, haAltre: p.haAltre, totale: p.totale });
-    return p;
-  }, [id]);
+  const vuote = () => ({ id, messaggi: [] as Messaggio[], pagina: 0, haAltre: false, totale: null as number | null });
+  const [pagine, setPagine] = useState(vuote);
+  const [stato, setStato] = useState<Stato<null>>({ stato: "carica" });
   const [altriCarica, setAltriCarica] = useState(false);
+  const corrente = useRef(id);
+  const giro = useRef(0);
+  const precedente = useRef<object | null>(null);
+  // Il cambio identità invalida subito anche risposte in arrivo prima del prossimo effetto.
+  if (corrente.current !== id) {
+    corrente.current = id;
+    giro.current++;
+    precedente.current = null;
+  }
+  const riprova = useCallback(() => {
+    const mio = ++giro.current;
+    precedente.current = null;
+    setAltriCarica(false);
+    setPagine(vuote());
+    setStato({ stato: "carica" });
+    if (!id) { setStato({ stato: "pronto", dati: null }); return; }
+    api().messaggi(id, 0).then((p) => {
+      if (mio !== giro.current) return;
+      if (p.errore) throw new Error(p.errore);
+      setPagine({ id, messaggi: p.messaggi, pagina: 0, haAltre: p.haAltre, totale: p.totale });
+      setStato({ stato: "pronto", dati: null });
+    }).catch((e) => {
+      if (mio === giro.current) setStato({ stato: "errore", errore: messaggioErrore(e) });
+    });
+  }, [id]);
+  useEffect(() => { riprova(); return () => { giro.current++; precedente.current = null; }; }, [riprova]);
   useAggiornamenti((a) => {
     const nuovi = a.nuoviMessaggi.filter((n) => n.id === id).flatMap((n) => n.messaggi);
     if (nuovi.length) setPagine((p) => ({ ...p, messaggi: [...p.messaggi, ...nuovi], totale: p.totale === null ? null : p.totale + nuovi.length }));
   });
   const altri = async () => {
-    if (!id || altriCarica || !pagine.haAltre) return;
+    if (!id || pagine.id !== id || precedente.current || stato.stato !== "pronto" || !pagine.haAltre) return;
+    const mio = giro.current, richiesta = {};
+    precedente.current = richiesta; // Sincrono: due clic prima del render condividono la stessa richiesta.
     setAltriCarica(true);
     try {
       const p = await api().messaggi(id, pagine.pagina + 1);
+      if (mio !== giro.current || precedente.current !== richiesta) return;
       if (p.errore) throw new Error(p.errore);
-      setPagine((x) => ({ messaggi: [...p.messaggi, ...x.messaggi], pagina: p.pagina, haAltre: p.haAltre, totale: p.totale ?? x.totale }));
-    } finally { setAltriCarica(false); }
+      setPagine((x) => ({ id, messaggi: [...p.messaggi, ...x.messaggi], pagina: p.pagina, haAltre: p.haAltre, totale: p.totale ?? x.totale }));
+    } catch (e) {
+      if (mio === giro.current && precedente.current === richiesta)
+        setStato({ stato: "errore", errore: messaggioErrore(e) });
+    } finally {
+      if (mio === giro.current && precedente.current === richiesta) {
+        precedente.current = null;
+        setAltriCarica(false);
+      }
+    }
   };
-  return { stato: c.stato, errore: c.errore, riprova: c.riprova, ...pagine, altri, altriCarica };
+  const { id: _id, ...visibili } = pagine.id === id ? pagine : vuote();
+  return { stato: pagine.id === id ? stato.stato : "carica", errore: stato.errore, riprova,
+    ...visibili, altri, altriCarica };
 }
 
 /** Preferenze dell'app per sessione (#360): `dati[id]`, `imposta(id, parte)`; si aggiornano da sole quando cambiano. */
