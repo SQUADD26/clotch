@@ -1,0 +1,68 @@
+/* figma: 101-7728 — barra laterale: righe comando, Friday, titolo sezione, cartella, sessione, piede (101:7728, 101:21065) */
+.riga {
+  height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2); flex: none;
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left; width: 100%;
+}
+.riga:hover, .riga.passaggio { background: var(--colore-fondo-riga-passaggio); }
+.riga.scelta { background: var(--colore-fondo-riga-scelta); }
+.riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.riga .lato { flex: none; white-space: nowrap; }
+.riga.titolo-sezione, .riga.titolo-sezione:hover { background: none; }
+
+.elenco {
+  flex: 1; min-height: 0; overflow-y: auto; padding-top: var(--spazio-3);
+  display: flex; flex-direction: column; gap: var(--spazio-0-5);
+}
+.sessioni-gruppo { display: flex; flex-direction: column; gap: var(--spazio-0-5); padding-left: var(--spazio-6); }
+.riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
+.riga-sessione:hover .azioni, .riga-sessione.passaggio .azioni { display: flex; }
+.riga-sessione:hover .segno, .riga-sessione.passaggio .segno { display: none; }
+.icona-sessione { display: flex; flex: none; }
+/* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
+.icona-sessione .icona { color: inherit !important; }
+
+/* shimmer sul nome di una sessione al lavoro (101:35045): banda chiara che scorre, ciclo 1,8 s */
+.lavoro {
+  background: linear-gradient(90deg, var(--colore-testo-lavoro) 40%, var(--colore-testo-lavoro-luce) 50%, var(--colore-testo-lavoro) 60%);
+  background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: luccica 1.8s linear infinite;
+}
+@keyframes luccica { from { background-position: 100% 0; } to { background-position: 0 0; } }
+/* parità: il fotogramma a 0 ms del disegno, banda sulle lettere 4-10 */
+.parita .lavoro { animation: none; background-position: 72% 0; }
+
+.piede {
+  padding: var(--spazio-2); gap: var(--spazio-2); flex: none;
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.piede:hover { background: var(--colore-fondo-riga-passaggio); }
+.avatar {
+  width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-pieno); flex: none;
+  display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-bottone-secondario);
+}
+.piede .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.piede .testi > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* stati della barra: vuoto 101:8772, caricamento 101:8824, errore 101:8931 */
+.elenco.vuoto { padding-left: var(--spazio-2); }
+.sagoma { height: var(--spazio-3); border-radius: var(--raggio-xs); background: var(--colore-fondo-sagoma); }
+.avviso-cartella {
+  padding: var(--spazio-3); gap: var(--spazio-3); border-radius: var(--raggio-lg); flex: none;
+  display: flex; background: var(--colore-fondo-errore);
+}
+.avviso-cartella .testi { display: flex; flex-direction: column; gap: var(--spazio-1); min-width: 0; }
+
+/* bande sopra la riga Friday: «Non disturbare» 101:39071, «Via dal Mac» 101:49347 */
+.banda {
+  padding: var(--spazio-2); gap: var(--spazio-1); border-radius: var(--raggio-md); flex: none;
+  display: flex; flex-direction: column; background: var(--colore-fondo-attesa);
+}
+.banda .riga-banda { display: flex; align-items: center; gap: var(--spazio-2); }
+.banda .titolo { flex: 1; min-width: 0; }
+.banda .dettaglio { white-space: nowrap; overflow: hidden; }
+
+/* suggerimento su titolo troncato 101:24382 */
+.suggerimento {
+  position: fixed; z-index: 20; padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); pointer-events: none;
+  background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero); white-space: nowrap;
+}

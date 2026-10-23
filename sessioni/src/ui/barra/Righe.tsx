@@ -1,0 +1,95 @@
+// figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta), «Piede barra laterale».
+import type { MouseEvent, ReactNode } from "react";
+import type { PreferenzeSessione, Sessione } from "../../tipi";
+import { BottoneIcona } from "../base/Bottone";
+import { Icona, type NomeIcona } from "../base/Icona";
+import { SegnoStato } from "../base/SegnoStato";
+import "./barra.css";
+
+/** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
+export function RigaComando({ icona, etichetta, lato, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
+  return (
+    <button type="button" className={`riga ${scelta ? "scelta" : ""}`} onClick={onClick}>
+      <Icona nome={icona} />
+      <span className="testo">{etichetta}</span>
+      {lato && <span className="lato t-sm secondario">{lato}</span>}
+    </button>
+  );
+}
+
+export function TitoloSezione({ children }: { children: ReactNode }) {
+  return <div className="riga titolo-sezione"><span className="testo t-sm secondario">{children}</span></div>;
+}
+
+export function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nome: string; conteggio: number; aperta: boolean; onClick(): void; onMenu(e: MouseEvent): void }) {
+  return (
+    <button type="button" className="riga" aria-expanded={aperta} onClick={onClick} onContextMenu={onMenu}>
+      <Icona nome={aperta ? "cartella-aperta" : "cartella"} />
+      <span className="testo">{nome}</span>
+      <span className="lato t-sm secondario">{conteggio}</span>
+    </button>
+  );
+}
+
+/** Icona scelta per la sessione (101:12169) nel suo colore «colore/sessione/…»; senza scelta: stella grigia. */
+export function IconaSessione({ pref }: { pref?: PreferenzeSessione }) {
+  const nome = (pref?.icona ?? "stella") as NomeIcona;
+  return (
+    <span className="icona-sessione" style={{ color: `var(--colore-sessione-${pref?.colore ?? "grigio"})` }}>
+      <Icona nome={nome} />
+    </span>
+  );
+}
+
+interface PropsSessione {
+  s: Sessione;
+  pref?: PreferenzeSessione;
+  scelta: boolean;
+  /** Nella sezione «Fissate» (101:21065): a destra lo spillo al posto dello stato. */
+  fissata?: boolean;
+  /** Solo per la prova di parità: la riga disegnata come al passaggio del mouse. */
+  passaggio?: boolean;
+  onApri(): void;
+  onIcona(e: MouseEvent): void;
+  onFissa(): void;
+  onMenu(e: MouseEvent): void;
+  onTroncato(titolo: string | null, el?: HTMLElement): void;
+}
+
+export function RigaSessione({ s, pref, scelta, fissata, passaggio, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+  const entra = (e: MouseEvent<HTMLElement>) => {
+    const t = e.currentTarget.querySelector<HTMLElement>(".testo");
+    onTroncato(t && t.scrollWidth > t.clientWidth ? s.titolo : null, t ?? undefined);
+  };
+  return (
+    <div
+      role="button" tabIndex={0} aria-current={scelta || undefined}
+      className={`riga riga-sessione ${scelta ? "scelta" : ""} ${passaggio ? "passaggio" : ""}`}
+      onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
+      onKeyDown={(e) => { if (e.key === "Enter") onApri(); }}
+    >
+      <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
+        <IconaSessione pref={pref} />
+      </button>
+      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>{s.titolo}</span>
+      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.stato} />}</span>
+      <span className="azioni" onClick={(e) => e.stopPropagation()}>
+        <BottoneIcona icona="spillo" etichetta="Fissa in alto" onClick={onFissa} />
+        <BottoneIcona icona="altro" etichetta="Altre azioni" onClick={onMenu} />
+      </span>
+    </div>
+  );
+}
+
+export function Piede({ dettaglio, onMenu, onImpostazioni }: { dettaglio: string; onMenu(e: MouseEvent): void; onImpostazioni(): void }) {
+  return (
+    <div className="piede">
+      <button type="button" className="avatar" onClick={onMenu}><span className="t-xs medio">RB</span></button>
+      <button type="button" className="testi" onClick={onMenu}>
+        <span>Roberto Bondici</span>
+        <span className="t-xs secondario">{dettaglio}</span>
+      </button>
+      <BottoneIcona icona="impostazioni" etichetta="Impostazioni" onClick={onImpostazioni} />
+    </div>
+  );
+}
