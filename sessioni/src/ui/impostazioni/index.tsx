@@ -1,5 +1,5 @@
 // figma: 101-17193 — pagina Impostazioni (#351): «Navigazione impostazioni» a sinistra, la sezione scelta nella «Superficie».
-import { useEffect, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { AreaAvvisi } from "../base/Avvisi";
 import { Superficie } from "../base/Cornice";
 import { Icona } from "../base/Icona";
@@ -20,6 +20,7 @@ import Notifiche from "./notifiche";
 import Scorciatoie from "./scorciatoie";
 import Sorgenti from "./sorgenti";
 import Uso from "./uso";
+import { Ricerca } from "./Ricerca";
 import "./impostazioni.css";
 
 const PAGINE: Record<Sezione, ComponentType<{ sotto?: string }>> = {
@@ -29,6 +30,7 @@ const PAGINE: Record<Sezione, ComponentType<{ sotto?: string }>> = {
 
 export default function Impostazioni() {
   const n = useNavigazione();
+  const [cerca, setCerca] = useState(prova?.cerca ?? "");
   useEffect(caricaImpostazioni, []);
   // prova di parità di un frame con una tendina aperta: la si apre come farebbe un clic
   useEffect(() => { if (prova?.aperta) document.querySelector<HTMLButtonElement>(`.scelta .valore[aria-label^="${prova.aperta}:"]`)?.click(); }, []);
@@ -40,9 +42,8 @@ export default function Impostazioni() {
     <div className="impostazioni">
       <nav className="nav-impostazioni" aria-label="Impostazioni">
         <div className="titolo t-lg">Impostazioni</div>
-        {/* shortcut: i risultati della ricerca non sono disegnati (BLOCCATO in #351): la voce c'è ma non apre niente */}
-        <button type="button" className="voce" disabled><Icona nome="cerca" /><span>Cerca</span></button>
-        {SEZIONI.map(([id, nome, icona]) => (
+        <Ricerca testo={cerca} onTesto={setCerca} sezione={sezione} />
+        {!cerca.trim() && SEZIONI.map(([id, nome, icona]) => (
           <button key={id} type="button" className={`voce ${id === sezione ? "scelta" : ""}`}
             aria-current={id === sezione ? "page" : undefined} onClick={() => n.apri("impostazioni", undefined, id)}>
             <Icona nome={icona} /><span>{nome}</span>
