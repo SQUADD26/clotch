@@ -14,8 +14,8 @@ export const COMANDI = [
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
   "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta",
 ] as const;
-/** Contratto: «Non risponde = stato lavora e nessun battito da 180 s». Clotch: ultimo evento più vecchio di 10 min = spento. */
-export const NON_RISPONDE_MS = 180_000;
+/** Contratto: «Non risponde = stato lavora e nessun battito da 20 minuti», come friday_triage.FERMO_S (la copia della UI è in ui/chat/friday.ts). Clotch: ultimo evento più vecchio di 10 min = spento. */
+export const NON_RISPONDE_MS = 1_200_000;
 export const CLOTCH_SPENTO_MS = 600_000;
 export type Comando = (typeof COMANDI)[number];
 /** `domanda`: una sessione chiede qualcosa a Roberto. `risposta`: Friday risponde a una domanda di Roberto (Clotch la dice come risposta_adhd). */
@@ -228,7 +228,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
   return r;
 }
 
-/** Contratto: la chat dice «lavora» ma nessun battito da 180 s. */
+/** Contratto: la chat dice «lavora» ma nessun battito da 20 minuti. */
 export const nonRisponde = (c: ChatFriday, ora: number) => c.stato === "lavora" && !c.fine && ora - (c.battito ?? 0) > NON_RISPONDE_MS;
 /** Clotch acceso: ultimo evento `clotch` con voce accesa e più giovane di 10 min. */
 export const clotchAcceso = (r: Registro, ora: number) => !!r.clotch && r.clotch.voce === "accesa" && ora - r.clotch.t <= CLOTCH_SPENTO_MS;
