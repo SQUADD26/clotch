@@ -71,7 +71,7 @@ export function contaRighe(righe: RigaDiff[]) {
  * `vivo`: la sessione lavora ancora (situazione «lavora», «aiutanti»…): l'ultimo turno è aperto, gli strumenti senza esito girano.
  * `cartella`: per mostrare i percorsi relativi.
  */
-export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[] {
+export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identita?: readonly { chiave: string }[]): Voce[] {
   const out: Voce[] = [];
   let turno: Extract<Voce, { tipo: "turno" }> | null = null;
   let inizio: number | null = null; // il turno dura dal messaggio di Roberto che lo apre
@@ -79,7 +79,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
   const durata = (i: number) => { const a = messaggi[i].t, b = tempoDopo(i); return a != null && b != null && b >= a ? b - a : null; };
 
   messaggi.forEach((m, i) => {
-    const chiave = `${i}-${m.t ?? ""}`;
+    const chiave = identita?.[i]?.chiave ?? `${i}-${m.t ?? ""}`;
     if (m.tipo === "utente") {
       if (INTERRUZIONE.test(m.testo)) { (turno ?? apri(m.t, chiave)).blocchi.push({ tipo: "interrotta" }); return; }
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }

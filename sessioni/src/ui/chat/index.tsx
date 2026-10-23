@@ -1,6 +1,7 @@
 // figma: 101-7873 — punto di montaggio della chat (#349): `Intestazione` sopra, `Chat` nella colonna centrale (101:8036, 101:8610).
 // Vuota 101:9841; caricamento ed errore coi pezzi della base. Friday monta `FiloFriday` e `CasellaFriday`.
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
 import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
@@ -41,12 +42,17 @@ export default function Chat() {
   const c = useChatFriday(s?.id ?? null);
   const adesso = useOra();
   const vivo = s?.stato === "lavora" && s.situazione?.adesso !== "turno_finito";
-  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella), [m.messaggi, vivo, s?.cartella]);
+  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella, m.identita), [m.messaggi, vivo, s?.cartella, m.identita]);
 
-  if (elenco.stato === "carica" || (s && m.stato === "carica")) return <Sagome />;
+  useEffect(() => {
+    const messaggio = m.altriErrore ?? (m.messaggi.length ? m.errore : null);
+    if (messaggio) avvisa({ tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: m.altriErrore ? m.riprovaAltri : m.riprova } });
+  }, [m.errore, m.altriErrore]);
+
+  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={elenco.errore} riprova={elenco.riprova} />;
   if (!s) return null;
-  if (m.stato === "errore") return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
