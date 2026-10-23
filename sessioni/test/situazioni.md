@@ -36,7 +36,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 7c | Coda | Codex | **non esiste** nei dati veri | — | fuori v1 | attende (non c'è) |
 | 8 | Interrotta da te | CLI, App | testo «[Request interrupted by user for tool use]» (`adesso: interrotta`) | «Interrotta da te», stato «Ferma» (101:15055) | `interrotta {da: roberto}`; comando `interrompi` | fatto · `claude/rifiutata-da-te` · contratto |
 | 8b | Interrotta a metà strumento (sessione chiusa) | CLI, App | `toolDenialKind: interrupted`, «[Tool call interrupted…», poi «No response requested.» | «Interrotta» | `interrotta` | fatto · `claude/interrotta-a-meta-strumento` |
-| 8c | «[Request interrupted by user]» senza strumento | CLI, App | nessun esempio vero | «Interrotta da te» | `interrotta` | attende dati veri |
+| 8c | Interrotta senza strumento in corso | CLI, App | testo «[Request interrupted by user]» | «Interrotta da te» | `interrotta` | fatto · `claude/interrotta-senza-strumento` |
 | 8d | Interrotta | Codex | `turn_aborted {reason: interrupted}` | come 8 | fuori v1 | fatto · `codex/interrotta` |
 | 9 | Turno finito | CLI, App | ultima riga assistant di solo testo (`end_turn` o `stop_sequence`), poi `system stop_hook_summary` | «Finita in 4 min 12 s · 18 strumenti · 3 file · 2 aiutanti» (101:15335) | `stato {stato: finito, prova}` | fatto · `claude/turno-finito` · contratto |
 | 9b | Turno finito | Codex | `task_complete` senza `error` | come 9 | fuori v1 | fatto · `codex/turno-finito` |
@@ -49,7 +49,7 @@ Ogni riga: una situazione in cui può trovarsi una sessione di lavoro, da dove l
 | 12 | Non risponde | Friday | stato `lavora` e nessun `battito` da 180 s (stessa soglia per app e Friday) | «La sessione non risponde. Nessun segnale da 6 min», «Apri nel terminale» (101:15993) | `battito` | contratto |
 | 13 | Limite d'uso | Friday | `stato {stato: ferma_limite, account, riparte_alle}` | «Limite di uso raggiunto. L'account … riparte alle 18:00», casella «Riparte alle 18:00» (101:16211) | `ferma_limite`; comando `riprendi_altrove` | contratto |
 | 13b | Limite d'uso | Codex | `task_complete {error: {codex_error_info: usage_limit_exceeded}}`, `token_count rate_limits.primary.used_percent: 100` | come 13 | fuori v1 | fatto · `codex/limite-uso` |
-| 13c | Limite d'uso nella trascrizione | CLI, App | nessun esempio vero (solo `rateLimits: null` negli errori) | come 13 | `ferma_limite` | attende dati veri |
+| 13c | Limite d'uso nella trascrizione | CLI, App | assistant `isApiErrorMessage: true`, `error: rate_limit`, «You've hit your session limit · resets …» (`adesso: limite`) | come 13 | `ferma_limite` | fatto · `claude/limite-uso` |
 | 14 | Errore API | CLI, App | assistant `isApiErrorMessage: true` («API Error …», `error: invalid_request`) | riga di errore rossa | `errore` | fatto · `claude/errore-api` |
 | 14b | Errore di rete, riprova | CLI, App | `system api_error {retryAttempt, maxRetries, connection.code}` (`adesso: riprova`) | «Riprovo (1 di 10)» | — | fatto · `claude/errore-rete-riprova` |
 | 14c | Errore di un hook o di Friday | Friday | `errore {dove, testo}` | avviso di errore | `errore` | contratto |

@@ -49,7 +49,7 @@ export function situazioneClaude(righe: any[]): Situazione {
     if (o.turnOrigin === "peer" || testo.includes("<cross-session-message")) segni.add("messaggio_sessione");
     if (testo.includes(FIGLIA)) segni.add("figlia");
     if (o.type === "assistant") {
-      if (o.isApiErrorMessage) { adesso = o.error === "rate_limit" ? "limite" : "errore"; continue; } // shortcut: "rate_limit" non visto nei dati veri, il limite vero lo dà ferma_limite di Friday
+      if (o.isApiErrorMessage) { adesso = o.error === "rate_limit" ? "limite" : "errore"; continue; } // limite: «You've hit your session limit · resets …»
       for (const b of Array.isArray(c) ? c : []) {
         if (b?.type !== "tool_use") continue;
         attesa.set(String(b.id), String(b.name));

@@ -14,7 +14,7 @@ const ID = /^(uuid|parentUuid|logicalParentUuid|sessionId|id|tool_use_id|agentId
 // Testi scritti dal sistema, non da una persona: si tiene l'inizio, il resto diventa <testo>.
 const FISSI = [
   "[Request interrupted by user for tool use]", "[Request interrupted by user]", "The user doesn't want to proceed with this tool use.",
-  "User rejected tool use", "User has approved your plan.", "<tool_use_error>PreToolUse:", "PreToolUse:", "Error: Permission to use", "Permission to use", "No response after", "Async agent launched successfully", "API Error",
+  "User rejected tool use", "User has approved your plan.", "<tool_use_error>PreToolUse:", "PreToolUse:", "Error: Permission to use", "Permission to use", "No response after", "Async agent launched successfully", "You've hit your session limit", "API Error",
   "Conversation compacted", "No response requested.", "[Tool call interrupted", "<cross-session-message", "Claude AI usage limit reached",
   "Background (from the session that started this one)", "<side-sessions-event>", "Claude needs your permission",
 ];

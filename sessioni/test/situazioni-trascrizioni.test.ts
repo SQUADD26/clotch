@@ -46,6 +46,8 @@ const CLAUDE: [string, Atteso][] = [
   ["negata-da-regola", { segni: ["negata_da_regola"] }],
   ["permesso-dato-a-mano", { segni: ["permesso_dato"] }],
   ["errore-api", { adesso: "errore" }],
+  ["limite-uso", { adesso: "limite" }],
+  ["interrotta-senza-strumento", { adesso: "interrotta", segni: ["interrotta"] }],
   ["errore-rete-riprova", { adesso: "riprova" }],
   ["compattazione", { segni: ["compattazione"] }],
   ["sessione-figlia", { segni: ["figlia"] }],
@@ -98,8 +100,6 @@ test("sessione cancellata mentre la guardi: sparisce dall'elenco, nessun errore"
 // Situazioni senza un esempio vero sul Mac (cercate su 40 giorni, 9 radici): restano in attesa, non finte.
 for (const s of [
   "Claude: piano rifiutato (nessun esempio vero)",
-  "Claude: limite d'uso nella trascrizione (nessun esempio vero; lo dà ferma_limite del registro Friday)",
-  "Claude: «[Request interrupted by user]» senza strumento (nessun esempio vero)",
   "Claude: /clear e cambio di modello (nessun esempio vero)",
   "Cursor: tutte le situazioni (nessuna trascrizione Cursor sul Mac)",
   "App Claude desktop: «in corso» (il file vero non ha isRunning; manca il campo giusto)",
