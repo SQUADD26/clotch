@@ -24,6 +24,9 @@
   "misura/bottone": 28,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
+  "colore/testo/su-primario": "#2d2d2d",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
   "spazio/0-5": 2,
   "misura/barra-laterale": 266,
   "misura/riga": 32,
@@ -36,8 +39,6 @@
   "colore/fondo/riga-scelta": "#ffffff14",
   "colore/icona/accento": "#ee7c37",
   "colore/testo/successo": "#40c977",
-  "testo/dimensione/xs": 12,
-  "testo/riga/xs": 16,
   "spazio/3": 12,
   "colore/sessione/grigio": "#c4c8ce",
   "colore/icona/successo": "#40c977",
@@ -46,6 +47,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
   "testo/dimensione/xl": 28,
@@ -341,6 +343,73 @@
    "senza": []
   },
   {
+   "id": "I101:36644;121:58602;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 276,
+    "y": 72,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:36644;121:58602;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 78,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:36644;121:58602;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 283.333740234375,
+    "y": 78.66796875,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:36644;121:58602;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 296,
+    "y": 68,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
+  },
+  {
    "id": "101:36645",
    "nome": "Corpo",
    "tipo": "FRAME",
@@ -630,7 +699,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2035,11 +2104,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:36664",
@@ -2152,7 +2220,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2485,9 +2553,9 @@
    "nome": "corpo",
    "tipo": "TEXT",
    "box": {
-    "x": 743,
+    "x": 735,
     "y": 497,
-    "w": 340,
+    "w": 356,
     "h": 18
    },
    "variabili": {
@@ -2496,7 +2564,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Friday vede tutte le sessioni. Chiedi a voce o scrivendo.",
+   "testo": "clotch AI vede tutte le sessioni. Chiedi a voce o scrivendo.",
    "font": "SF Pro Regular"
   },
   {
@@ -2529,11 +2597,10 @@
     "cornerRadius": "raggio/pieno",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
+    "strokeWeight": "misura/tratto",
     "height": "misura/bottone"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:36827",
@@ -2569,11 +2636,10 @@
     "cornerRadius": "raggio/pieno",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
+    "strokeWeight": "misura/tratto",
     "height": "misura/bottone"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:36829",
@@ -2609,11 +2675,10 @@
     "cornerRadius": "raggio/pieno",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
+    "strokeWeight": "misura/tratto",
     "height": "misura/bottone"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:36831",
@@ -2652,11 +2717,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:36672;101:7323",
@@ -2689,7 +2753,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Chiedi a Friday",
+   "testo": "Chiedi a clotch AI",
    "font": "SF Pro Regular"
   },
   {

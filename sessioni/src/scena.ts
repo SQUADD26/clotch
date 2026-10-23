@@ -39,6 +39,8 @@ export interface Scena {
   allegati?: FileAllegato[];
   immagini?: Record<string, string>;
   skill?: string[];
+  /** L'app sta dicendo un avviso a voce (frame 101-37055): `friday:voce`. */
+  voce?: boolean;
 }
 
 export const fileScena = (radice: string, id: string) => path.join(radice, "design", "scene", `${id}.json`);
@@ -89,13 +91,14 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "casella:copia-immagine": case "casella:salva-immagine": return false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
     case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
+    case "friday:voce": return s.voce === true;
     default: return undefined;
   }
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
-  "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
+  "friday:registro", "friday:comando", "friday:avvia", "friday:voce", "friday:interrompi-voce", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",

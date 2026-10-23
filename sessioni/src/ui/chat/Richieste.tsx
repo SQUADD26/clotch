@@ -43,7 +43,8 @@ export interface Richiesta { rid: string; strumento: string | null; ingresso: un
 
 type Scelta = "consenti" | "consenti_sempre" | "nega";
 
-export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: string | null }) {
+/** `titolo`: nella chat di clotch AI la carta dice di quale sessione è (101-37492). */
+export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat: string; r: Richiesta; da: string | null; titolo?: string }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
   const ris = useRiserva();
   const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
@@ -61,7 +62,7 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
       : <Esito icona="spunta" colore="successo" esito="Consentito da te" dettaglio={cmd || r.strumento || ""} codice />;
   }
   return (
-    <Carta icona="mano" titolo="Permesso richiesto" dettaglio={da}>
+    <Carta icona="mano" titolo={titolo} dettaglio={da}>
       {cmd && <div className="domanda">Eseguire questo comando?</div>}
       {mostra && <BloccoCodice comando={mostra} />}
       {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}

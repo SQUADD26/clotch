@@ -207,6 +207,7 @@ export type Token =
   | "misura-riga-compatta"
   | "misura-menu-modello"
   | "misura-menu-permessi"
+  | "misura-onda-barra"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -426,6 +427,7 @@ export const valori: Record<Token, string> = {
   "misura-riga-compatta": "28px",
   "misura-menu-modello": "320px",
   "misura-menu-permessi": "336px",
+  "misura-onda-barra": "3px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",

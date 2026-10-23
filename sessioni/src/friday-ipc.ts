@@ -5,7 +5,7 @@ import { execFile } from "node:child_process";
 import type { IpcMain } from "electron";
 import { cartellaRegistro, Comando, leggiRegistro, Registro } from "./friday";
 import { inviaComando } from "./comandi";
-import { daLeggere, leggi } from "./voce-app";
+import { daLeggere, interrompiVoce, leggi, staParlando, suVoce } from "./voce-app";
 
 /** Il registro senza Map, per passare il ponte del preload. Nel renderer `daPiano` (ui/friday/registro.ts) rimette le Map. */
 export const piano = (r: Registro) => JSON.parse(JSON.stringify(r, (_k, v) => (v instanceof Map ? Object.fromEntries(v) : v)));
@@ -13,6 +13,10 @@ export const piano = (r: Registro) => JSON.parse(JSON.stringify(r, (_k, v) => (v
 export function collegaFriday(ipc: IpcMain, invia: (canale: string, dati: unknown) => void, home: string, env: NodeJS.ProcessEnv = process.env) {
   ipc.handle("friday:comando", (_e, cmd: Comando, args: Record<string, unknown>) => inviaComando(home, cmd, args ?? {}, { env }));
   ipc.handle("friday:registro", () => piano(leggiRegistro(home, env)));
+  // Voce dell'app (Clotch assente): lo stato «sta parlando» e «Interrompi» del frame 101-37055.
+  ipc.handle("friday:voce", () => staParlando());
+  ipc.handle("friday:interrompi-voce", () => { interrompiVoce(); });
+  suVoce((parla) => invia("friday:voce", parla));
   // Contratto: a Friday spenta la casella non serve; si avvia con `friday avvia` (launchctl kickstart).
   ipc.handle("friday:avvia", () => new Promise((ok) =>
     execFile(path.join(home, ".claude", "bin", "friday"), ["avvia"], (err, out, errOut) => ok({ ok: !err, testo: String(err ? errOut || err.message : out).trim() }))));

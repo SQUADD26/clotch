@@ -4,6 +4,8 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useAvvio, useRegistro } from "./dati";
+import { useVoce } from "./Voce";
+import type { StatoVoce } from "./statoVoce";
 import { orario } from "./formato";
 import { casella, decisioniPerGiorno, statoFriday } from "./vista";
 
@@ -14,7 +16,12 @@ export const plurale = (n: number, uno: string, tanti: string) => `${n} ${n === 
 
 const SEGNO_FRIDAY: Record<string, [NomeIcona, Colore]> = { attiva: ["microfono", "successo"], spenta: ["avviso", "errore"], pausa: ["luna", "secondaria"] };
 
-function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" | "riavvio" | null): Testa {
+// riga di stato mentre la voce fa qualcosa (101-36832, 37055, 37278): al posto di «Sempre attiva»
+const STATO_VOCE: Record<StatoVoce, [NomeIcona, Colore, string]> = {
+  ascolta: ["microfono", "accento", "Ti ascolta"], parla: ["scintille", "secondaria", "Sta parlando"], "mic-no": ["avviso", "errore", "Microfono non disponibile"],
+};
+
+function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" | "riavvio" | null, voce: StatoVoce | null): Testa {
   const r = s.dati;
   if (vista === "decisioni") {
     const g = r ? decisioniPerGiorno(r, Date.now()) : [];
@@ -34,6 +41,10 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
   }
   const st = r && statoFriday(r, Date.now());
   const segno: Testa["segno"] = avvio ? ["spinner", "secondaria"] : st ? SEGNO_FRIDAY[st.stato] : undefined;
+  if (voce && !avvio && st?.stato === "attiva") {
+    const [icona, colore, testo] = STATO_VOCE[voce];
+    return { icona: "scintille", accento: true, titolo: "clotch AI", segno: [icona, colore], stato: testo };
+  }
   const stato = avvio === "avvio" ? "Avvio…" : avvio === "riavvio" ? "Riavvio…" : !st ? "" : st.stato === "spenta" ? "Spenta"
     : st.stato === "pausa" ? (st.da ? `In pausa fino alle ${orario(st.da)}` : "In pausa") : "Sempre attiva";
   return { icona: "scintille", accento: true, titolo: "clotch AI", segno, stato };
@@ -43,7 +54,7 @@ export function Intestazione() {
   const n = useNavigazione();
   const s = useRegistro();
   const avvio = useAvvio();
-  const t = testa(n.vista, s, avvio);
+  const t = testa(n.vista, s, avvio, useVoce().stato);
   return (
     <div className="intestazione-friday">
       <div className="testi">
