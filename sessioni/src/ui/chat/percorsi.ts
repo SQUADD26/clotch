@@ -16,6 +16,14 @@ export function peso(byte: number | null): string {
   return `${(byte / 1_000_000).toLocaleString("it-IT", { maximumFractionDigits: 1 })} MB`;
 }
 
+/** Il peso massimo di un file allegato dalla casella: oltre, il chip dice «Troppo grande» e il file non parte (101:25542). */
+// shortcut: limite fisso, da prendere dal motore quando claude-config#2568 lo definisce
+export const LIMITE_ALLEGATO_BYTE = 30_000_000;
+
+/** Come sta un allegato nella casella: `carico` finché se ne legge il peso, `grande` se supera il limite; `null` = pronto a partire. */
+export const statoAllegato = (a: { byte: number | null; carico?: boolean }): "carico" | "grande" | null =>
+  a.carico ? "carico" : a.byte != null && a.byte > LIMITE_ALLEGATO_BYTE ? "grande" : null;
+
 const IMMAGINE = /\.(png|jpe?g|gif|webp|bmp|svg|heic|tiff?)$/i;
 export const eImmagine = (percorso: string) => IMMAGINE.test(percorso);
 export const nomeFile = (percorso: string) => percorso.replace(/\/+$/, "").split("/").pop() ?? percorso;

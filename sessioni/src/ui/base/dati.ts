@@ -2,7 +2,7 @@
 // Schema dal vault (Research/App/ChatGPT): rete-e-api.md § «Dal vivo»: il renderer non fa rete, chiede al main via IPC e
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Aggiornamento, Elenco, PreferenzeSessione, Sessione, SessioniApi } from "../../tipi";
 
 import { applicaDelta, applicaPagina, fallita, nuovaCronologia, righeOrdinate, type CronologiaStato } from "./cronologia-stato";
@@ -69,7 +69,10 @@ const normalizzaElenco = (e: Elenco): Elenco => {
 export function useElenco() {
   const c = useChiamata<Elenco>(() => api().elencoSessioni().then(normalizzaElenco), []);
   useAggiornamenti((a) => { if (a.sessioni.length) c.ricarica(); });
-  return c;
+  const pref = usePreferenze().dati;
+  // «Rinomina…» (#460): il nome dato in clotch prende il posto del titolo ovunque l'app lo mostra; il file della sessione non cambia
+  const dati = useMemo(() => c.dati && { ...c.dati, sessioni: c.dati.sessioni.map((s) => (pref[s.id]?.nome ? { ...s, titolo: pref[s.id].nome! } : s)) }, [c.dati, pref]);
+  return { ...c, dati } as typeof c;
 }
 
 /** Snapshot immutabile e delta fisici; il listener precede sempre la prima richiesta. */
@@ -142,12 +145,14 @@ export function useMessaggi(id: string | null) {
     altri, altriCarica, altriErrore, riprovaAltri: s.invalida ? riprova : altri };
 }
 
+const SENZA_PREFERENZE: Record<string, PreferenzeSessione> = {}; // stesso oggetto a ogni giro: chi lo ha nelle dipendenze non si rifà
+
 /** Preferenze dell'app per sessione (#360): `dati[id]`, `imposta(id, parte)`; si aggiornano da sole quando cambiano. */
 export function usePreferenze() {
   const c = useChiamata(() => api().preferenze(), []);
   const [dal, setDal] = useState<Record<string, PreferenzeSessione> | null>(null);
   useEffect(() => api().onPreferenze(setDal), []);
-  return { stato: c.stato, errore: c.errore, riprova: c.riprova, dati: dal ?? c.dati ?? {}, imposta: api().impostaPreferenze };
+  return { stato: c.stato, errore: c.errore, riprova: c.riprova, dati: dal ?? c.dati ?? SENZA_PREFERENZE, imposta: api().impostaPreferenze };
 }
 
 /** Impostazioni dell'app (#368), nello stesso file delle preferenze: `dati`, `imposta(parte)` (null toglie); si aggiornano da sole. */

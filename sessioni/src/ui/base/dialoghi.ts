@@ -1,19 +1,37 @@
-// figma: 101-22137 — dialoghi dell'app aperti da più punti (voci del menu del profilo, ⌘/, scena di prova): «aggiornamento» e «scorciatoie».
+// figma: 101-22137 — dialoghi dell'app aperti da più punti (voci del menu del profilo e della barra, ⌘/, scena di prova): «aggiornamento», «scorciatoie», «rinomina» (101-22044), «novita» (119-57552).
 // Un solo dialogo alla volta; li disegna `ui/dialoghi`, la cornice lo monta.
 import { useSyncExternalStore } from "react";
 import { avvisa } from "./Avvisi";
 import { messaggioErrore } from "./dati";
+import type { Novita } from "../../tipi";
 
-export type NomeDialogo = "aggiornamento" | "scorciatoie";
+/** Dati dei dialoghi che ne hanno: «rinomina» (sessione e etichetta di una cartella) e «novita». */
+export interface DatiDialoghi {
+  rinomina: { titolo: string; valore: string; nota: string; salva(nome: string): void };
+  novita: { versione: string; novita: Novita };
+}
+export type NomeDialogo = "aggiornamento" | "scorciatoie" | keyof DatiDialoghi;
+export interface Aperto { nome: NomeDialogo; dati?: unknown }
 
-let aperto: NomeDialogo | null = null;
+let aperto: Aperto | null = null;
 const ascolta = new Set<() => void>();
-const cambia = (n: NomeDialogo | null) => { aperto = n; ascolta.forEach((f) => f()); };
+const cambia = (a: Aperto | null) => { aperto = a; ascolta.forEach((f) => f()); };
 
-export const apriDialogo = (n: NomeDialogo) => cambia(n);
+export function apriDialogo(n: "aggiornamento" | "scorciatoie"): void;
+export function apriDialogo<N extends keyof DatiDialoghi>(n: N, dati: DatiDialoghi[N]): void;
+export function apriDialogo(n: NomeDialogo, dati?: unknown) { cambia({ nome: n, dati }); }
 export const chiudiDialogo = () => cambia(null);
-export const alternaDialogo = (n: NomeDialogo) => cambia(aperto === n ? null : n);
+export const alternaDialogo = (n: "aggiornamento" | "scorciatoie") => cambia(aperto?.nome === n ? null : { nome: n });
 export const useDialogo = () => useSyncExternalStore((f) => { ascolta.add(f); return () => { ascolta.delete(f); }; }, () => aperto);
+
+/** «Novità» (menu del profilo, Info): apre le note della versione; se il main non ne ha, lo dice. */
+export async function apriNovita() {
+  try {
+    const [novita, versione] = await Promise.all([window.impostazioni.novita(), window.impostazioni.versione()]);
+    if (novita) return apriDialogo("novita", { versione, novita });
+    avvisa({ tipo: "info", messaggio: `Nessuna novità per la versione ${versione}` });
+  } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
+}
 
 /** «Verifica aggiornamenti…»: se sul disco c'è una versione nuova apre «Aggiornare clotch ora?», se no lo dice. */
 export async function verificaAggiornamenti() {

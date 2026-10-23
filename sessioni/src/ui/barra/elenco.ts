@@ -100,3 +100,13 @@ export function dettaglioProfilo(sessioni: Sessione[]) {
   const sorgenti = new Set(sessioni.map((s) => s.sorgente)).size;
   return `${account} account · ${sorgenti} sorgenti`;
 }
+
+/** «Rinomina etichetta…»: l'etichetta della cartella `chiave`; vuota = torna il nome della cartella. */
+export function conEtichetta(etichette: Record<string, string>, chiave: string, nome: string): Record<string, string> {
+  const { [chiave]: _vecchia, ...altre } = etichette;
+  return nome ? { ...altre, [chiave]: nome } : altre;
+}
+
+/** «Nascondi cartella»: i percorsi delle sue sessioni che non sono ancora tra le cartelle escluse. */
+export const nuoveEscluse = (sessioni: Sessione[], escluse: string[]) =>
+  [...new Set(sessioni.map((s) => s.cartella).filter((c) => c && !escluse.includes(c)))];

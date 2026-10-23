@@ -9,7 +9,7 @@ export const PARTENZA: ImpostazioniApp = {
   avvisoAttesa: true, avvisoFinita: true, avvisoErrori: true, avvisoLimite: true, suono: "Vetro", silenzio: "22:00–8:00",
   sorgenteClaudeCode: true, sorgenteClaude: true, sorgenteCodex: true, sorgenteCursor: false,
   accountTolti: [], accountAggiunti: [],
-  comandiInteri: true, nascondiChiavi: true, cartelleEscluse: [], cronologia: "30 giorni",
+  comandiInteri: true, nascondiChiavi: true, cartelleEscluse: [], etichetteCartelle: {}, cronologia: "30 giorni",
   aggiornamentiAutomatici: true,
   clotchVoce: true, clotchDettatura: true, clotchAvvisi: true, clotchObiettivi: true,
   scorciatoie: {

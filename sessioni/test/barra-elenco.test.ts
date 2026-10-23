@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Sessione } from "../src/tipi";
-import { componi, dettaglioProfilo, giorno, opzioni, pillola, type Vista } from "../src/ui/barra/elenco";
+import { componi, conEtichetta, dettaglioProfilo, giorno, nuoveEscluse, opzioni, pillola, type Vista } from "../src/ui/barra/elenco";
 
 const ORA = new Date(2026, 9, 22, 15, 0).getTime();
 const s = (id: string, titolo: string, progetto: string, stato: Sessione["stato"], minuti: number, sorgente: Sessione["sorgente"] = "claude-code", account = "a"): Sessione => ({
@@ -45,4 +45,12 @@ test("testi: pillola, giorni, opzioni, piede", () => {
   assert.equal(opzioni(elenco, "stato", ORA).length, 5);
   assert.equal(dettaglioProfilo(elenco), "3 account · 3 sorgenti");
   assert.equal(dettaglioProfilo([]), "Nessuna sessione");
+});
+
+test("etichetta di una cartella e cartelle da nascondere (#460)", () => {
+  assert.deepEqual(conEtichetta({}, "clotch", "Notch"), { clotch: "Notch" });
+  assert.deepEqual(conEtichetta({ clotch: "Notch", altra: "X" }, "clotch", "  ".trim()), { altra: "X" }); // vuota = torna il nome della cartella
+  const con = (id: string, cartella: string) => ({ ...elenco[0], id, cartella });
+  assert.deepEqual(nuoveEscluse([con("1", "/a"), con("2", "/a"), con("3", "/b"), con("4", "")], ["/b"]), ["/a"]);
+  assert.deepEqual(nuoveEscluse([con("1", "")], []), []); // senza percorso non c'è niente da escludere
 });

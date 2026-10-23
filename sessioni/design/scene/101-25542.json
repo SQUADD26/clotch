@@ -1,7 +1,8 @@
 {
  "navigazione": {
   "vista": "sessione",
-  "sessione": "s1"
+  "sessione": "s1",
+  "sezione": "scritta:Guarda la schermata: il notch copre il titolo della sessione.\nNel file lettore.ts la cartella vuota manda in errore il lettore.\nSistema tutti e due, poi rifai la prova di parità a scala 1.|allegati"
  },
  "elenco": {
   "sessioni": [
@@ -18,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792768244164,
+    "ultimaAttivita": 1792791406699,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -45,7 +46,9 @@
      "segni": []
     },
     "file": "",
-    "icona": "stella"
+    "icona": "stella",
+    "permessi": "default",
+    "contesto": 124000
    }
   ],
   "errori": []
@@ -55,12 +58,12 @@
    {
     "tipo": "utente",
     "testo": "Fammi l'app Sessioni in Electron con l'aspetto di ChatGPT. Prima il disegno in Figma, poi il codice pari al disegno.",
-    "t": 1792768207164
+    "t": 1792791369699
    },
    {
     "tipo": "pensiero",
     "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
-    "t": 1792768208164
+    "t": 1792791370699
    },
    {
     "tipo": "strumento",
@@ -72,7 +75,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768222164,
+    "t": 1792791384699,
     "id": "t0"
    },
    {
@@ -85,19 +88,19 @@
      "testo": "Test Suite 'SessioniTests' passed",
      "errore": false
     },
-    "t": 1792768223164,
+    "t": 1792791385699,
     "id": "t1"
    },
    {
     "tipo": "assistente",
     "testo": "Ho letto il riferimento di ChatGPT: token, icone e 37 schermate. Creo le variabili con i colori scuri di ChatGPT, poi i componenti.",
     "modello": "claude-opus-5-5",
-    "t": 1792768235164
+    "t": 1792791397699
    },
    {
     "tipo": "utente",
     "testo": "Aggiungi anche lo stato con 200 sessioni.",
-    "t": 1792768236164
+    "t": 1792791398699
    },
    {
     "tipo": "strumento",
@@ -109,7 +112,7 @@
      "testo": "src/sessioni/lettore.ts(42,7): error TS2339: Property 'cwd' does not exist on type 'Sessione'.",
      "errore": true
     },
-    "t": 1792768237164,
+    "t": 1792791399699,
     "id": "t2"
    },
    {
@@ -124,7 +127,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768240164,
+    "t": 1792791402699,
     "id": "t3"
    },
    {
@@ -139,7 +142,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768241164,
+    "t": 1792791403699,
     "id": "t4"
    },
    {
@@ -154,14 +157,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768242164,
+    "t": 1792791404699,
     "id": "t5"
    },
    {
     "tipo": "assistente",
     "testo": "Errore corretto. Il controllo del file torna vuoto. Manca solo il tuo sì sul disegno.",
     "modello": "claude-opus-5-5",
-    "t": 1792768243164
+    "t": 1792791405699
    }
   ]
  },
@@ -174,7 +177,13 @@
   "chat": {},
   "fermoTutto": false,
   "avvisi": [],
-  "clotch": null,
+  "clotch": {
+   "voce": "accesa",
+   "parla": false,
+   "ascolta": false,
+   "versione": "2.4",
+   "t": -60000
+  },
   "clotchAi": null,
   "comandi": [],
   "decisioni": [],
@@ -183,5 +192,15 @@
   "impostazioni": null,
   "esiti": {},
   "errori": []
+ },
+ "info": {
+  "s1": {
+   "contesto": 124000,
+   "file": {
+    "quanti": 3,
+    "aggiunte": 214,
+    "tolte": 12
+   }
+  }
  }
 }

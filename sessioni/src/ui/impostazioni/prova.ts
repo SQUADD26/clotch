@@ -7,6 +7,8 @@ export interface Prova {
   registrazione?: boolean;
   /** Account: l'avviso «Cartella rimossa» dopo «Rimuovi» (101:10461). */
   dopoRimuovi?: boolean;
+  /** Account: il dialogo «Rimuovere la cartella?» già aperto su quel percorso (101:22095). */
+  rimuovi?: string;
   /** Dati: il dialogo «Eliminare i dati di Sessioni?» aperto (119:57106). */
   conferma?: boolean;
   /** Info: il dialogo «Novità della versione» già aperto (119:57552). */
@@ -29,6 +31,7 @@ const PROVE: Record<string, Prova> = {
   "119-56715": { aperta: "Silenzio" },
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
+  "101-22095": { rimuovi: "~/.claude-clotch-ai" },
   "119-56891": { aperta: "Cronologia" },
   "119-57106": { conferma: true },
   "119-57404": { aperta: "Versione" },

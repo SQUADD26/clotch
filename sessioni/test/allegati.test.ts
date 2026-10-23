@@ -8,7 +8,7 @@ import { descrivi, leggiImmagine, leggiSkill } from "../src/allegati";
 import { Convertitore } from "../src/messaggi-claude";
 import type { Messaggio } from "../src/tipi";
 import { voci } from "../src/ui/chat/modello";
-import { conPercorsi, galleria, peso, senzaPercorsi } from "../src/ui/chat/percorsi";
+import { conPercorsi, galleria, LIMITE_ALLEGATO_BYTE, peso, senzaPercorsi, statoAllegato } from "../src/ui/chat/percorsi";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==", "base64");
 const B64 = PNG.toString("base64");
@@ -89,4 +89,11 @@ test("filo: segnaposto e percorsi escono dal testo; il visore parte dall'immagin
   const v = voci(m, false);
   assert.deepEqual(v[0], { tipo: "roberto", chiave: "0-1", testo: "Guarda", t: 1, immagini: m[0].tipo === "utente" ? m[0].immagini : undefined, percorsi: ["/tmp/uno.png", "/tmp/due.ts"] });
   assert.deepEqual(galleria(v, "s1").map((g) => g.nome), ["pagina.png", "uno.png", "Immagine 1"]);
+});
+
+test("stato di un allegato nella casella: carico, troppo grande, pronto (#460)", () => {
+  assert.equal(statoAllegato({ byte: null, carico: true }), "carico");
+  assert.equal(statoAllegato({ byte: LIMITE_ALLEGATO_BYTE + 1 }), "grande");
+  assert.equal(statoAllegato({ byte: LIMITE_ALLEGATO_BYTE }), null); // il limite stesso passa
+  assert.equal(statoAllegato({ byte: null }), null); // una cartella non ha peso
 });

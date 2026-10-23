@@ -35,7 +35,8 @@ let vistaRicordata: Vista | null = null;
 export default function Barra() {
   const n = useNavigazione();
   const apriSessione = useApriSessione();
-  const tastoCerca = useImpostazioni().scorciatoie.cerca;
+  const { scorciatoie: { cerca: tastoCerca }, etichetteCartelle } = useImpostazioni();
+  const etichetta = (g: { chiave: string; titolo: string }) => etichetteCartelle[g.chiave] ?? g.titolo;
   const p = prova();
   const vivo = useElenco();
   const prefVive = usePreferenze();
@@ -142,7 +143,7 @@ export default function Barra() {
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
           {barra.gruppi.map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
-              <RigaCartella nome={g.titolo} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
+              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
                 onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
               {aperta(g.chiave) && <div className="sessioni-gruppo">{righe(g.sessioni)}</div>}
             </div>
@@ -167,9 +168,12 @@ export default function Barra() {
           onRimuovi={() => { setVista({ ...vista, filtri: filtri.filter((_, i) => i !== aperto.i) }); chiudi(); }} />
       )}
       {aperto?.tipo === "icona" && <SceltaIcona a={aperto.a} pref={pref[aperto.id]} onChiudi={chiudi} onImposta={(x) => void api().impostaPreferenze(aperto.id, x)} />}
-      {aperto?.tipo === "riga" && sessione(aperto.id) && <MenuRiga s={sessione(aperto.id)!} pref={pref[aperto.id]} a={aperto.a} onChiudi={chiudi} />}
-      {aperto?.tipo === "cartella" && <MenuCartella sessioni={barra.gruppi.find((g) => g.chiave === aperto.chiave)?.sessioni ?? []} a={aperto.a} onChiudi={chiudi} />}
-      {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
+      {aperto?.tipo === "riga" && sessione(aperto.id) && <MenuRiga s={sessione(aperto.id)!} pref={pref[aperto.id]} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />}
+      {aperto?.tipo === "cartella" && barra.gruppi.find((g) => g.chiave === aperto.chiave) && (
+        <MenuCartella sessioni={barra.gruppi.find((g) => g.chiave === aperto.chiave)!.sessioni} chiave={aperto.chiave} etichetta={etichetta(barra.gruppi.find((g) => g.chiave === aperto.chiave)!)}
+          a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />
+      )}
+      {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
       {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
       {ricerca && (
         <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}

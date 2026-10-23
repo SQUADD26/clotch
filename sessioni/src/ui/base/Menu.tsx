@@ -17,13 +17,15 @@ interface Props {
   /** «intestazione menu»: nome e dettaglio in cima, poi un separatore. */
   testata?: { titolo: string; dettaglio?: string };
   style?: CSSProperties;
+  /** Voce che ha il fuoco all'apertura, se nessuna è scelta (di serie la prima). Conta solo le voci, non i separatori. */
+  inizio?: number;
 }
 
-export function Menu({ voci, onChiudi, testata, style }: Props) {
+export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
   const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelector<HTMLButtonElement>("button"))?.focus();
+    (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
     const tasto = (e: KeyboardEvent) => {
       if (e.key === "Escape") onChiudi();
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
