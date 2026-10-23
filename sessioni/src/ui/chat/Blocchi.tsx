@@ -4,10 +4,12 @@ import { useState, type ReactNode } from "react";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Blocco } from "./modello";
 import { durata, quanti } from "./testi";
+import { useRiserva } from "./riserva";
 import "./filo.css";
 
 export function MessaggioRoberto({ testo }: { testo: string }) {
-  return <div className="messaggio-roberto"><div className="bolla">{testo}</div></div>;
+  const r = useRiserva();
+  return <div className="messaggio-roberto"><div className="bolla">{r.testo(testo)}</div></div>;
 }
 
 /** Testata apribile: freccia a destra da chiusa, in giù da aperta (varianti Chiusa/Aperta del disegno). */
@@ -25,6 +27,7 @@ function Testata({ icona, colore = "secondaria", aperta, onClick, children }: {
 
 export function Pensiero({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "pensiero" }>; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
+  const r = useRiserva();
   if (b.inCorso) return <div className="pensiero"><div className="testata"><span className="etichetta">Ragionando…</span></div></div>;
   return (
     <div className="pensiero">
@@ -32,7 +35,7 @@ export function Pensiero({ b, aperto: iniziale = false }: { b: Extract<Blocco, {
         <span className="etichetta">Ragionato per {durata(b.durata ?? 0)}</span>
         <Icona nome={aperto ? "giu" : "destra"} />
       </button>
-      {aperto && <div className="testo-pensiero">{b.testo}</div>}
+      {aperto && <div className="testo-pensiero">{r.testo(b.testo)}</div>}
     </div>
   );
 }
@@ -49,15 +52,17 @@ export function BloccoCodice({ comando, uscita, errore = false }: { comando?: st
 export function Strumento({ b, aperta: iniziale = false }: { b: Extract<Blocco, { tipo: "strumento" }>; aperta?: boolean }) {
   const [aperta, setAperta] = useState(iniziale || b.stato === "errore");
   const apribile = b.stato !== "in-corso" && !!(b.comando || b.uscita);
+  const r = useRiserva();
+  const dettaglio = b.comando ? r.comando(b.dettaglio) : r.testo(b.dettaglio);
   return (
     <div className="strumento">
       <Testata icona={b.stato === "in-corso" ? "in-corso" : b.stato === "errore" ? "avviso" : b.icona} colore={b.stato === "errore" ? "errore" : "secondaria"}
         aperta={aperta} onClick={apribile ? () => setAperta(!aperta) : undefined}>
         <span className={b.stato === "errore" ? "tipo errore" : "tipo"}>{b.etichetta}</span>
-        <span className="dettaglio">{b.dettaglio}</span>
+        <span className="dettaglio">{dettaglio}</span>
         {b.durata != null && b.stato !== "in-corso" && <span className="durata">{durata(b.durata)}</span>}
       </Testata>
-      {aperta && apribile && <BloccoCodice comando={b.comando} uscita={b.uscita} errore={b.stato === "errore"} />}
+      {aperta && apribile && <BloccoCodice comando={b.comando && `$ ${dettaglio}`} uscita={b.uscita && r.testo(b.uscita)} errore={b.stato === "errore"} />}
     </div>
   );
 }
@@ -68,6 +73,7 @@ const Conti = ({ aggiunte, tolte }: { aggiunte: number; tolte: number }) => (
 
 export function Modifica({ b, aperta: iniziale }: { b: Extract<Blocco, { tipo: "modifica" }>; aperta: boolean }) {
   const [aperta, setAperta] = useState(iniziale);
+  const ris = useRiserva();
   return (
     <div className="strumento modifica">
       <Testata icona="matita" aperta={aperta} onClick={() => setAperta(!aperta)}>
@@ -79,7 +85,7 @@ export function Modifica({ b, aperta: iniziale }: { b: Extract<Blocco, { tipo: "
         <div className="differenze">
           {b.righe.map((r, i) => (
             <div key={i} className={r.segno === "+" ? "riga aggiunta" : r.segno === "-" ? "riga tolta" : "riga"}>
-              <span className="segno">{r.segno}</span><span className="codice">{r.codice}</span>
+              <span className="segno">{r.segno}</span><span className="codice">{ris.testo(r.codice)}</span>
             </div>
           ))}
         </div>

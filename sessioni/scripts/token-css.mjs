@@ -11,7 +11,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const IN = join(root, 'design/tokens.json');
 const CSS = join(root, 'src/ui/base/token.css'), TS = join(root, 'src/ui/base/token.ts');
 // «SF Pro» in Figma è il font di sistema del Mac: Chromium lo trova solo come -apple-system.
-const FAMIGLIA = { 'SF Pro': '"SF Pro", -apple-system, system-ui', Menlo: 'Menlo, monospace' };
+const FAMIGLIA = { 'SF Pro': '"SF Pro", -apple-system, system-ui', Menlo: 'Menlo, monospace',
+  'SF Pro Rounded': 'ui-rounded, "SF Pro Rounded", -apple-system, system-ui', 'SF Mono': 'ui-monospace, "SF Mono", Menlo, monospace' };
 
 export function voci(tokens) {
   const out = new Map(); // nome CSS -> {tipo, valore}

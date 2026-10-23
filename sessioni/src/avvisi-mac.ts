@@ -3,14 +3,13 @@ import { Notification } from "electron";
 import { daAvvisare, type ImpostazioniAvvisi } from "./avvisi";
 import type { Aggiornamento, Sessione } from "./tipi";
 
-/** `elenco`: le sessioni di adesso; `impostazioni`: lette ogni volta dal file (un cambio vale subito). Il primo elenco è lo stato di partenza: niente avvisi per ciò che c'era già. */
+/** `elenco`: le sessioni di adesso; `impostazioni`: lette ogni volta dal file (un cambio vale subito; file rotto = {}). Il primo elenco è lo stato di partenza: niente avvisi per ciò che c'era già. */
 export function collegaAvvisi(elenco: () => Sessione[], impostazioni: () => ImpostazioniAvvisi, ora = () => new Date()) {
   let viste = new Map(elenco().map((s) => [s.id, s]));
   return (a: Aggiornamento) => {
     const adesso = elenco();
     const cambiate = new Set(a.sessioni);
-    let imp: ImpostazioniAvvisi;
-    try { imp = impostazioni(); } catch { imp = {}; } // file rotto: valori di partenza
+    const imp = impostazioni();
     for (const s of adesso) {
       if (!cambiate.has(s.id)) continue;
       const v = daAvvisare(viste.get(s.id), s, imp, ora());

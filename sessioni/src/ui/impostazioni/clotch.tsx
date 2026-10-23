@@ -1,5 +1,5 @@
 // figma: 101-45956 — Impostazioni · Clotch con Clotch collegato; senza Clotch: 101-45993.
-// shortcut: la versione di Clotch arriva nel registro di Friday con #344; finché manca, la descrizione la salta.
+// La versione arriva dall'evento clotch del registro (#339); finché Clotch non la scrive (#344) la descrizione la salta.
 import { useEffect, useState } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
@@ -18,7 +18,7 @@ const VOCI: [Chiave, string, string][] = [
 function useVersioneClotch(): string | null {
   const [v, setV] = useState<string | null>(null);
   useEffect(() => {
-    const prendi = (p: unknown) => setV((daPiano(p).clotch as { versione?: string } | null)?.versione ?? null);
+    const prendi = (p: unknown) => setV(daPiano(p).clotch?.versione ?? null);
     window.friday.registro().then(prendi, () => {});
     return window.friday.onRegistro(prendi);
   }, []);
