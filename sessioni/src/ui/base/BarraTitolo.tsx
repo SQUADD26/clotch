@@ -1,6 +1,14 @@
-// figma: 101-7712 — «Barra titolo»: posto del semaforo del Mac e navigazione (barra laterale, indietro, avanti).
+// figma: 101-7712 — «Barra titolo»: posto del semaforo del Mac, navigazione (barra laterale, indietro, avanti) e,
+// a destra, «comandi globali» (101-37696) montati dai pezzi che esportano `ComandiTitolo`.
+import type { ComponentType } from "react";
+import * as friday from "../friday";
+import * as pannello from "../pannello";
 import { BottoneIcona } from "./Bottone";
 import { useNavigazione } from "./navigazione";
+
+// export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
+const comandi = (m: object) => (m as { ComandiTitolo?: ComponentType }).ComandiTitolo;
+const ComandiPannello = comandi(pannello), ComandiFriday = comandi(friday);
 
 export function BarraTitolo() {
   const n = useNavigazione();
@@ -14,6 +22,10 @@ export function BarraTitolo() {
         <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} />
         <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
         <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
+      </div>
+      <div className="comandi-globali">
+        {ComandiPannello && <ComandiPannello />}
+        {ComandiFriday && <ComandiFriday />}
       </div>
     </div>
   );

@@ -12,6 +12,8 @@
 .luce.giallo { background: var(--colore-semaforo-giallo); }
 .luce.verde { background: var(--colore-semaforo-verde); }
 .navigazione { display: flex; gap: var(--spazio-1); }
+/* 101-37696: a destra della barra, gap spazio/2 */
+.comandi-globali { margin-left: auto; display: flex; align-items: center; gap: var(--spazio-2); -webkit-app-region: no-drag; }
 
 .corpo { flex: 1; min-height: 0; display: flex; }
 .barra-laterale {

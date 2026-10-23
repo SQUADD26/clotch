@@ -31,11 +31,11 @@ export function apriFinestra(sessione?: string): BrowserWindow | null {
   return w;
 }
 
-/** Disegna la pagina alla misura del frame, a scala 1, e salva design/app/<id>.png. */
-export async function parita(id: string) {
+/** Disegna la pagina alla misura del frame, a scala 1, e salva design/app/<id>.png. `navigazione`: vista di partenza (scena.ts). */
+export async function parita(id: string, navigazione?: Record<string, string | undefined>) {
   const { w: larga, h: alta } = frame(id);
   const w = new BrowserWindow({ width: larga, height: alta, show: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true } });
-  await w.loadFile(pagina, { query: { parita: id } });
+  await w.loadFile(pagina, { query: { ...Object.fromEntries(Object.entries(navigazione ?? {}).filter(([, v]) => v)) as Record<string, string>, parita: id } });
   await w.webContents.executeJavaScript("document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))");
   const img = await w.webContents.capturePage();
   const out = path.join(radice, "design", "app", `${id}.png`);
