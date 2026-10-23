@@ -11,6 +11,8 @@ export interface Prova {
   conferma?: boolean;
   /** Info: il dialogo «Novità della versione» già aperto (119:57552). */
   novita?: boolean;
+  /** Uso: la scheda scelta (119:57613). */
+  scheda?: "andamento";
 }
 
 const PROVE: Record<string, Prova> = {
@@ -21,6 +23,7 @@ const PROVE: Record<string, Prova> = {
   "119-57106": { conferma: true },
   "119-57404": { aperta: "Versione" },
   "119-57552": { novita: true },
+  "119-57613": { scheda: "andamento" },
 };
 
 const id = new URLSearchParams(location.search).get("parita");
