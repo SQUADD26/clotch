@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { Aggiornamento, FridayApi, SessioniApi } from "./tipi";
+import type { Aggiornamento, FridayApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -9,6 +9,14 @@ const api: SessioniApi = {
     ipcRenderer.on("sessioni:aggiornamento", f);
     return () => ipcRenderer.removeListener("sessioni:aggiornamento", f);
   },
+  preferenze: () => ipcRenderer.invoke("sessioni:preferenze"),
+  impostaPreferenze: (id, parte) => ipcRenderer.invoke("sessioni:imposta-preferenze", id, parte),
+  onPreferenze: (cb) => {
+    const f = (_e: unknown, p: Record<string, PreferenzeSessione>) => cb(p);
+    ipcRenderer.on("sessioni:preferenze", f);
+    return () => ipcRenderer.removeListener("sessioni:preferenze", f);
+  },
+  azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
 };
 contextBridge.exposeInMainWorld("sessioni", api);
 

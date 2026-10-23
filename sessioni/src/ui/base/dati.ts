@@ -3,7 +3,7 @@
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Aggiornamento, Elenco, Messaggio, SessioniApi } from "../../tipi";
+import type { Aggiornamento, Elenco, Messaggio, PreferenzeSessione, SessioniApi } from "../../tipi";
 
 declare global {
   interface Window { sessioni: SessioniApi }
@@ -75,4 +75,12 @@ export function useMessaggi(id: string | null) {
     } finally { setAltriCarica(false); }
   };
   return { stato: c.stato, errore: c.errore, riprova: c.riprova, ...pagine, altri, altriCarica };
+}
+
+/** Preferenze dell'app per sessione (#360): `dati[id]`, `imposta(id, parte)`; si aggiornano da sole quando cambiano. */
+export function usePreferenze() {
+  const c = useChiamata(() => api().preferenze(), []);
+  const [dal, setDal] = useState<Record<string, PreferenzeSessione> | null>(null);
+  useEffect(() => api().onPreferenze(setDal), []);
+  return { stato: c.stato, errore: c.errore, riprova: c.riprova, dati: dal ?? c.dati ?? {}, imposta: api().impostaPreferenze };
 }
