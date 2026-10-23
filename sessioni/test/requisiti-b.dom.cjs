@@ -55,7 +55,8 @@ H.avvia('requisiti-b', async () => {
     await riga('Filtra'); await voce('Aggiungi filtro'); await voce('Stato');
     assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In corso', 'In attesa di te', 'Ferma', 'Finita', 'Errore']);
     await scrivi('.menu-filtro input', 'att'); assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In attesa di te'], 'la ricerca nel menu restringe le opzioni');
-    await scrivi('.menu-filtro input', ''); await voce('Finita'); await voce('In attesa di te'); await esc(); await riga('clotch'); // la cartella con i risultati resta chiusa: vedi UI-FILTRO-CARTELLA-CHIUSA
+    await scrivi('.menu-filtro input', ''); await voce('Finita'); await voce('In attesa di te'); await esc(); // la cartella con i risultati si apre da sola (UI-FILTRO-CARTELLA-CHIUSA corretto): nessun clic su «clotch»
+    assert.equal(await run(() => [...document.querySelectorAll('.barra-laterale .riga')].find((r) => r.querySelector('.testo')?.textContent === 'clotch')?.getAttribute('aria-expanded')), 'true', 'la cartella con i risultati è aperta da sola');
     assert.deepEqual(await barra(), ['Beta due', 'Gamma tre']); assert.match(await run(() => document.querySelector('.pillola-filtro').innerText), /Stato:\s*Finita, In attesa/); assert.equal((await testo('.titolo-sezione .testo')).at(-1), '2 sessioni');
     await clicca('.pillola-filtro', 'Stato:Finita, In attesa'); await voce('Finita'); await esc(); assert.deepEqual(await barra(), ['Gamma tre']);
     await clicca('.pillola-filtro', 'Stato:In attesa'); await voce('Rimuovi filtro'); await wait(() => !document.querySelector('.pillola-filtro:not(.aggiungi)'));
