@@ -3,7 +3,8 @@
 // Ogni requisito stampa «REQ <id> ok» o «REQ <id> difetto: <cosa>» (+ DEFECT_OPEN, uscita 2): un difetto non si corregge qui.
 const H = require('./aiuti-requisiti.cjs');
 const { assert, run, wait, clicca, scrivi, tasto, testo, carica, caricaChat, attesa, fatte, rispondi, req, nuova, U, AS, PE, ora, aggiorna, esc, barra, riga, voce } = H;
-const copiaFinta = () => run(() => { window.__copiato = []; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__copiato.push(t); } }, configurable: true }); });
+const { NON_RISPONDE_MS } = require(H.root + '/dist/src/friday.js'); // la soglia del motore (20 min), non una copia a mano
+const copiaFinta =() => run(() => { window.__copiato = []; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__copiato.push(t); } }, configurable: true }); });
 
 H.avvia('requisiti-a', async () => {
   await req('A1', async () => {
@@ -185,7 +186,11 @@ H.avvia('requisiti-a', async () => {
   });
 
   await req('F4', async () => {
-    nuova((s) => { s.registro.chat.s1.battito = ora - 600000; }); await carica({ vista: 'sessione', sessione: 's1' });
+    nuova((s) => { s.registro.chat.s1.battito = ora - NON_RISPONDE_MS + 300000; }); await carica({ vista: 'sessione', sessione: 's1' }); // sotto soglia: ancora al lavoro
+    await wait(() => !!document.querySelector('.intestazione .stato'));
+    assert.doesNotMatch(await run(() => document.querySelector('.intestazione .stato').textContent), /Non risponde/);
+    assert.equal(await run(() => !!document.querySelector('.avviso-filo.errore')), false, 'sotto soglia nessun avviso «non risponde»');
+    nuova((s) => { s.registro.chat.s1.battito = ora - NON_RISPONDE_MS - 60000; }); await carica({ vista: 'sessione', sessione: 's1' }); // oltre la soglia del motore
     await wait(() => /non risponde/.test(document.querySelector('.avviso-filo.errore .titolo')?.textContent || ''));
     assert.match(await run(() => document.querySelector('.intestazione .stato').textContent), /Non risponde/);
     assert.equal(await run(() => document.querySelector('textarea').placeholder), 'In attesa della sessione');
