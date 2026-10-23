@@ -24,12 +24,12 @@ function frame(id: string) {
 export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
-  const silenziosa = provaSilenziosa(), anteprima = silenziosa && opzioni.show !== false;
+  const silenziosa = provaSilenziosa(), anteprima = silenziosa && process.env.CLOTCH_TEST_ANTEPRIMA === "1" && opzioni.show !== false; // SILENT da solo non mostra mai: la finestra visibile è un'altra scelta, esplicita
   const area = anteprima ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
   const larghezza = area ? Math.min(grande.w, area.width) : grande.w;
   const altezza = area ? Math.min(grande.h, area.height) : grande.h;
   const w = new BrowserWindow({
-    show: anteprima ? false : opzioni.show ?? true,
+    show: !silenziosa && (opzioni.show ?? true),
     title: NOME_APP, icon: iconaApp(),
     width: larghezza, height: altezza,
     minWidth: area ? Math.min(piccola.w, larghezza) : piccola.w,

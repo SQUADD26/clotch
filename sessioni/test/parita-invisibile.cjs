@@ -9,7 +9,7 @@ const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKi
 
 const external = { internal: false, workArea: { x: 0, y: 25, width: 2560, height: 1415 } };
 const internal = { internal: true, workArea: { x: -1512, y: 38, width: 1512, height: 907 } };
-function normalWindow(silent, displays = [external, internal], primary = external, options = {}) {
+function normalWindow(silent, displays = [external, internal], primary = external, options = {}, anteprima = silent) {
   const calls = [], screenCalls = [], logs = [];
   let createdOptions, ready, visible = false, muted = false;
   const output = {};
@@ -49,7 +49,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     './modalita-prova': { provaSilenziosa: () => silent },
   };
   vm.runInNewContext(windowCode, {
-    exports: output, __dirname: path.join(__dirname, '../dist/src'), console: { log: line => logs.push(line) },
+    exports: output, process: { env: anteprima ? { CLOTCH_TEST_ANTEPRIMA: '1' } : {} }, __dirname: path.join(__dirname, '../dist/src'), console: { log: line => logs.push(line) },
     require: name => {
       if (name === 'node:fs') return { ...fs, existsSync: () => true };
       if (name.startsWith('node:')) return require(name);
@@ -191,6 +191,12 @@ function notificationCalls(silent) {
     assert.equal(window.logs.length, 1, 'una sola riga di osservazione');
     assert.equal(window.logs[0], `PREVIEW_READY internal=${displays.some(d => d.internal) ? true : primary.internal} visible=true focused=false audioMuted=true`);
   }
+  const soloSilent = normalWindow(true, [external, internal], external, {}, false);
+  assert.deepEqual(soloSilent.calls, [{ name: 'construct', show: false }, { name: 'mute', value: true }, { name: 'load' }]);
+  assert.deepEqual(soloSilent.screenCalls, []);
+  soloSilent.emitReady();
+  assert.equal(soloSilent.calls.length, 3, 'SILENT da solo non mostra mai la finestra');
+  assert.deepEqual(soloSilent.logs, []);
   console.log('PREVIEW_INTERNAL_ORDER_OK: interno, fallback e limiti prima del paint; mute/load/ready/showInactive; test nascosti preservati');
   console.log('PREVIEW_READY_MARKER_OK: riga unica dopo showInactive; interno/fallback e stato finestra/audio misurati dai confini');
   console.log('WINDOW_AUDIO_ORDER_OK: mute prima loadFile solo in prova silenziosa; audio normale invariato');
