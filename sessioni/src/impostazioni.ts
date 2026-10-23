@@ -6,9 +6,11 @@ import * as path from "node:path";
 import { app, dialog, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
+import { nomeProgetto } from "./claude-code";
+import { leggiApp, type SessioneApp } from "./desktop";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { trovaRadici } from "./radici";
-import type { CartellaAccount, Elenco } from "./tipi";
+import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
 
 /** `~/…` -> percorso assoluto, per aprire una cartella scritta come nel disegno. */
 export const espandi = (p: string, home = os.homedir()) => (p === "~" || p.startsWith("~/") ? path.join(home, p.slice(1)) : p);
@@ -24,6 +26,15 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
     if (err) return { percorso, dettaglio: `Non leggibile: ${err.messaggio}`, errore: true };
     const n = elenco.sessioni.filter((s) => s.sorgente === "claude-code" && s.account === account).length;
     return { percorso, dettaglio: `${n} sessioni · letta ora`, errore: false };
+  });
+}
+
+/** Archiviate dell'app Claude, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»). */
+export function archiviate(app: SessioneApp[], fuso?: string): Archiviata[] {
+  return app.filter((a) => a.archiviata).sort((a, b) => (b.ultimaAttivita ?? 0) - (a.ultimaAttivita ?? 0)).map((a) => {
+    const quando = a.ultimaAttivita == null ? null
+      : new Date(a.ultimaAttivita).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short", timeZone: fuso });
+    return { id: a.cliId, titolo: a.titolo, dove: [a.cartella ? nomeProgetto(a.cartella) : null, quando].filter(Boolean).join(" · ") };
   });
 }
 
@@ -50,9 +61,9 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     invia("sessioni:impostazioni", {});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  // nessuna fonte ancora: quote d'uso #374, archiviate #375
+  // nessuna fonte ancora: quote d'uso #374
   ipc.handle("impostazioni:uso", () => null);
-  ipc.handle("impostazioni:archiviate", () => []);
+  ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, [])));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
   ipc.handle("impostazioni:aggiornamenti", () => false);
