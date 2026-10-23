@@ -1,7 +1,7 @@
 // figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
 // Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
 import type { Registro } from "../../friday";
-import type { Elenco, PreferenzeSessione, Sessione, Sorgente, Stato } from "../../tipi";
+import type { Elenco, PreferenzeSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
 import type { Stato as StatoChiamata } from "../base/dati";
 import type { Vista } from "./elenco";
 import type { Aperto } from "./index";
@@ -47,8 +47,11 @@ interface Prova {
   aperto?: Aperto;
   aperte?: string[];
   scelta?: string;
+  /** Vista aperta (useNavigazione().vista) del frame; di solito «sessione». */
+  pagina?: string;
   passaggio?: string;
   ricerca?: string;
+  cercati?: RisultatoRicerca[];
   suggerimento?: { testo: string; a: { x: number; y: number } };
 }
 
@@ -84,8 +87,8 @@ const FRAME: Record<string, () => Prova> = {
     return { ...b, passaggio: b.scelta, suggerimento: { testo: b.elenco.dati!.sessioni[0].titolo, a: { x: 120, y: 326 } } };
   },
   "101-30238": () => ({ ...base(), aperto: { tipo: "raggruppa", a: { x: 326, y: 142 } } }),
-  "101-38897": () => ({ ...base(), registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
-  "101-42000": () => ({ ...base(), registro: registro({ stato: "spenta", aspettano: 3 }) }),
+  "101-38897": () => ({ ...base(), pagina: "friday", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
+  "101-42000": () => ({ ...base(), pagina: "friday", registro: registro({ stato: "spenta", aspettano: 3 }) }),
 };
 
 function filtrata(aperto?: Aperto): Prova {
@@ -113,13 +116,26 @@ FRAME["101-9340"] = () => {
   const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
   const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
   const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("friday-mac-v2", 27, 400)];
-  return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro(), scelta: lista[3].id };
+  return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro({ aspettano: 3 }), scelta: lista[3].id };
 };
 
+/** Ricerca: «Lettura dei log di Codex» nel titolo; tre sessioni trovate solo nei messaggi, coi frammenti di 101:10247. */
 function ricerca(testo: string): Prova {
   const b = base();
-  const extra = [s("Lettura dei log di Codex", "friday-mac-v2", "finita", 10 * 24 * 60, "codex", "codex")];
-  return { ...b, elenco: pronto([...b.elenco.dati!.sessioni, ...extra]), pref: { ...b.pref, [extra[0].id]: { icona: "libro" } }, ricerca: testo };
+  const extra = [
+    s("Lettura dei log di Codex", "friday-mac-v2", "finita", 10 * 24 * 60, "codex", "codex"),
+    s("Backend: auth e RLS", "squadd-v2", "finita", 24 * 60), s("Overseer: voce in Clotch", "clotch", "finita", 3 * 24 * 60),
+  ];
+  const nel = (x: Sessione, frammento: string): RisultatoRicerca => ({ id: x.id, titolo: x.titolo, frammento, t: x.ultimaAttivita, nelTitolo: false });
+  return {
+    ...b, elenco: pronto([...b.elenco.dati!.sessioni, ...extra]), ricerca: testo,
+    pref: { ...b.pref, [extra[0].id]: { icona: "libro" }, [extra[1].id]: { icona: "database" }, [extra[2].id]: { icona: "scintille" } },
+    cercati: testo === "lettura" ? [
+      nel(b.elenco.dati!.sessioni[0], "…la lettura delle sessioni dal disco la fa un'altra sessione, nella cartella sessioni/…"),
+      nel(extra[1], "…la policy blocca la lettura di «sessioni» se manca lo studio dell'utente…"),
+      nel(extra[2], "…dopo la lettura ad alta voce la sessione torna in attesa…"),
+    ] : [],
+  };
 }
 FRAME["101-10297"] = () => ricerca("lettura");
 FRAME["101-23003"] = () => ricerca("copia");

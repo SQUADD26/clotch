@@ -12,7 +12,7 @@ import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
 import { RigheFriday, useRegistro } from "./Friday";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
-import { Ricerca } from "./Ricerca";
+import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { Piede, RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { accanto, type Punto } from "./Sovrapposti";
@@ -43,7 +43,8 @@ export default function Barra() {
   const [chiuse, setChiuse] = useState<Set<string>>(new Set());
   const [suggerimento, setSuggerimento] = useState<{ testo: string; a: Punto } | null>(p?.suggerimento ?? null);
   const barra = useMemo(() => componi(sessioni, vista, pref, adesso), [sessioni, vista, pref, adesso]);
-  const scelta = p?.scelta ?? n.sessione;
+  const pagina = p?.pagina ?? n.vista;
+  const scelta = pagina === "sessione" ? (p?.scelta ?? n.sessione) : null;
   // aperta: la cartella della sessione scelta e quelle aperte a mano; chiuse a mano restano chiuse
   const [aperteAMano, setAperteAMano] = useState<Set<string>>(new Set(p?.aperte ?? []));
   const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
@@ -57,6 +58,7 @@ export default function Barra() {
     const tasto = (e: KeyboardEvent) => {
       if (e.metaKey && e.key.toLowerCase() === "k") { e.preventDefault(); setRicerca((x) => !x); }
       if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.friday.comando("archivia", { chat: n.sessione }); }
+      if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
     };
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
@@ -92,7 +94,7 @@ export default function Barra() {
       <RigaComando icona="cerca" etichetta="Cerca sessioni" lato="⌘K" onClick={() => setRicerca(true)} />
       <RigaComando icona="filtra" etichetta="Filtra" lato={filtri.length ? `${filtri.length} attivi` : undefined}
         onClick={(e) => setAperto({ tipo: "raggruppa", a: accanto(e.currentTarget, -numero("spazio-1")) })} />
-      <RigheFriday r={registro} adesso={adesso} />
+      <RigheFriday r={registro} adesso={adesso} pagina={pagina} />
       <Pillole filtri={filtri} onApri={(i, e) => setAperto({ tipo: "opzioni", i, a: accanto(e.currentTarget, numero("spazio-1")) })}
         onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })} />
 
@@ -153,7 +155,7 @@ export default function Barra() {
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
       {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
       {ricerca && (
-        <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca}
+        <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
           onApri={(id) => n.apri("sessione", id)} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />
       )}
     </>

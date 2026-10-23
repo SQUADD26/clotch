@@ -17,6 +17,7 @@
   height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2); flex: none;
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
+.voce-azione .etichetta { flex: 1; }
 .voce-azione.scelta { background: var(--colore-fondo-riga-passaggio); }
 .risultato {
   padding: var(--spazio-2) var(--spazio-3); gap: var(--spazio-3); flex: none;
