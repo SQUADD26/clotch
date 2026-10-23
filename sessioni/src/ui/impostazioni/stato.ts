@@ -20,7 +20,8 @@ export type Chiave = keyof Impostazioni;
 let valori: Impostazioni = PARTENZA;
 const ascolta = new Set<() => void>();
 const cambia = (v: Impostazioni) => { valori = v; ascolta.forEach((f) => f()); };
-const daFile = (salvate: Record<string, unknown>) => cambia({ ...PARTENZA, ...(salvate as Partial<Impostazioni>) });
+// le scorciatoie si uniscono una per una: un file salvato prima di una scorciatoia nuova (trova) non la perde
+const daFile = (salvate: Record<string, unknown>) => cambia({ ...PARTENZA, ...(salvate as Partial<Impostazioni>), scorciatoie: { ...PARTENZA.scorciatoie, ...(salvate.scorciatoie as Impostazioni["scorciatoie"] | undefined) } });
 let avviato = false;
 
 /** Legge il file una volta e lo segue dal vivo (anche nella prova: lì risponde la scena). */

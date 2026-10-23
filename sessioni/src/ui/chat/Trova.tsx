@@ -2,6 +2,7 @@
 // Cerca nel testo della colonna e del pannello (`.contenuto`). Le corrispondenze si colorano con le evidenziazioni del browser: il DOM non cambia.
 import { useEffect, useRef, useState } from "react";
 import { Icona } from "../base/Icona";
+import { registraAzione } from "../base/scorciatoie";
 import "../base/evidenza.css";
 import "./trova.css";
 
@@ -56,17 +57,12 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
   // dopo il disegno, quando il DOM ha già il testo nuovo
   useEffect(() => { setR(aperta ? trovate(testo) : []); }, [aperta, testo, versione]);
 
-  useEffect(() => {
-    const tasto = (e: KeyboardEvent) => {
-      if (!e.metaKey || e.shiftKey || e.altKey || e.ctrlKey || e.code !== "KeyF") return;
-      e.preventDefault();
-      setAperta(true);
-      campo.current?.focus();
-      campo.current?.select();
-    };
-    addEventListener("keydown", tasto);
-    return () => removeEventListener("keydown", tasto);
-  }, []);
+  // il tasto lo sceglie l'utente (Impostazioni · Scorciatoie, azione «trova»); lo ascolta il gestore dei tasti dell'app
+  useEffect(() => registraAzione("trova", () => {
+    setAperta(true);
+    campo.current?.focus();
+    campo.current?.select();
+  }), []);
 
   useEffect(() => {
     if (!r.length) return;

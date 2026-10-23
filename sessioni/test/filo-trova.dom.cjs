@@ -25,6 +25,7 @@ app.whenReady().then(async () => {
     { tipo: 'strumento', id: 'b2', nome: 'Bash', ingresso: { command: 'npm test' }, esito: { testo: righe, errore: false }, t: inizioOggi + 2 * MIN + 1000 },
     { tipo: 'assistente', testo: 'Altro controllo, poi basta', modello: null, t: inizioOggi + 3 * MIN },
   ];
+  scene.impostazioni = { scorciatoie: { cerca: '⌘K' } }; // file salvato prima di «trova»: ⌘F resta quello di partenza
   scene.registro = { chat: {}, fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] };
   collegaScena(ipcMain, scene);
   const comandi = [];
@@ -79,6 +80,26 @@ app.whenReady().then(async () => {
     await pausa(100);
     assert.equal(await run(() => !document.querySelector('.trova') && !CSS.highlights.has('trova')), true);
     console.log('FILO_TROVA_OK');
+
+    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no
+    const tasto = (code, key) => run(`() => { dispatchEvent(new KeyboardEvent('keydown', { code: '${code}', key: '${key}', metaKey: true, bubbles: true, cancelable: true })); }`);
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘G' } });
+    await pausa(200);
+    await tasto('KeyF', 'f'); await pausa(150);
+    assert.equal(await run(() => !document.querySelector('.trova')), true, 'il vecchio tasto non apre più la barra');
+    await tasto('KeyG', 'g');
+    await ready('.trova input');
+    await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: null } });
+    await pausa(200);
+    await tasto('KeyG', 'g'); await pausa(150);
+    assert.equal(await run(() => !document.querySelector('.trova')), true, 'tolta: nessun tasto apre la barra');
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K' } });
+    await pausa(200);
+    await tasto('KeyF', 'f');
+    await ready('.trova input');
+    await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    console.log('FILO_TROVA_TASTO_OK');
 
     // testo scelto + clic destro: Copia, Seleziona tutto, Chiedi a clotch AI; senza testo scelto solo Seleziona tutto
     // la pagina si comporta come se avesse il fuoco (:focus vale) senza prenderlo davvero: la finestra resta non attiva
