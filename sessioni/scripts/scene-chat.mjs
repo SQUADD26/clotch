@@ -62,6 +62,7 @@ const TURNO_8036 = [
 const FINITO = { situazione: { adesso: "turno_finito", strumento: null, inCoda: 0, segni: [] } };
 scena("8036", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036));
 scena("23727", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-risposta" });
+scena("20859", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-sessione" });
 
 // —— «Stati» e «Chat al lavoro» ——
 const ASPETTA = { stato: "aspetta" }, FERMA = { stato: "ferma" };

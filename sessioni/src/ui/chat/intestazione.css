@@ -10,3 +10,4 @@
 .intestazione .stato, .intestazione .ramo { gap: var(--spazio-1); }
 .intestazione .codice { font-family: var(--testo-famiglia-codice); }
 .intestazione .azioni { display: flex; gap: var(--spazio-0-5); flex: none; }
+.intestazione .con-menu { position: relative; display: flex; }
