@@ -54,3 +54,12 @@ test("archiviate: registro di Friday (fine archiviata, comando archivia riuscito
     { id: "c3", titolo: "Da comando", dove: "23 ott 2026, 12:00" },
   ]);
 });
+
+test("archiviate: un «ripristina» riuscito dopo «archivia» toglie la chat; un «archivia» dopo la rimette (#456)", () => {
+  const t = (g: number) => Date.UTC(2026, 9, g, 12, 0);
+  const cmd = (id: string, c: string, g: number, esito = "ok") => ({ id, cmd: c, t: t(g), args: { chat: "m1" }, esito });
+  const ids = (comandi: ReturnType<typeof cmd>[]) => archiviate([], reg({ chat: { m1: { titolo: "Motore" } }, comandi }), "UTC").map((x) => x.id);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2)]), []);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2), cmd("c", "archivia", 3)]), ["m1"]);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2, "rifiutato")]), ["m1"]);
+});
