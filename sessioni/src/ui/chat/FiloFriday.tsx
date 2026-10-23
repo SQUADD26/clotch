@@ -22,13 +22,14 @@ export function useVociFriday() {
   return useMemo(() => {
     if (!r) return [];
     const da = r.comandi.filter((c) => c.cmd === "parla").map((c) => ({ chi: "roberto" as const, id: c.id, t: c.t ?? 0, testo: String(c.args.testo ?? "") }));
-    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
+    const di = r.avvisi.filter((a) => a.motivo === "risposta" || a.motivo === "domanda").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
     return [...da, ...di].sort((a, b) => a.t - b.t);
   }, [r]);
 }
 
 // I componenti esportati portano il proprio scope CSS anche dentro un altro pezzo.
-export function FiloFriday() {
+/** `children`: cosa aspetta Roberto in fondo al filo (i permessi delle sessioni, 101-37492). */
+export function FiloFriday({ children }: { children?: ReactNode }) {
   const voci = useVociFriday();
   const elenco = useElenco().dati?.sessioni ?? [];
   const { dati: r } = useRegistro();
@@ -38,7 +39,7 @@ export function FiloFriday() {
     return s ? [{ s, c: r?.chat.get(id) ?? null }] : [];
   });
   const filo = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length]);
+  useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length, !!children]);
   return (
     <Pezzo nome="chat"><div className="filo" ref={filo}>
       {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : (
@@ -47,6 +48,7 @@ export function FiloFriday() {
           <SessioniCitate citate={citate(v.sessioni)} />
         </div>
       ))}
+      {children}
     </div></Pezzo>
   );
 }

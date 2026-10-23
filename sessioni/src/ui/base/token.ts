@@ -205,6 +205,7 @@ export type Token =
   | "misura-legenda"
   | "misura-riferimento"
   | "misura-riga-compatta"
+  | "misura-onda-barra"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -422,6 +423,7 @@ export const valori: Record<Token, string> = {
   "misura-legenda": "8px",
   "misura-riferimento": "24px",
   "misura-riga-compatta": "28px",
+  "misura-onda-barra": "3px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",

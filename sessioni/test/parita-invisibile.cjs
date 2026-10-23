@@ -226,8 +226,8 @@ function notificationCalls(silent) {
   fiducia.autorizzaIpc(sender, documentPath);
   const trusted = { sender, senderFrame: frame };
   const secured = await run(['--parita', '101-8036'], {});
-  assert.equal(channels.length, 25); assert.equal(new Set(channels).size, 25);
-  assert.equal(secured.handlers.size, 25);
+  assert.equal(channels.length, 27); assert.equal(new Set(channels).size, 27);
+  assert.equal(secured.handlers.size, 27);
   for (const [channel, invoke] of secured.handlers) {
     assert.deepEqual(await invoke(trusted, 'fixture', 7), ['fixture', 7]);
     assert.equal(secured.calls.filter(c => c === 'ipc:' + channel).length, 1);
@@ -255,10 +255,10 @@ function notificationCalls(silent) {
   for (const invoke of secured.handlers.values()) await assert.rejects(invoke(trusted), /non autorizzato/);
   sender.isDestroyed = () => false;
   const before = secured.calls.filter(c => c.startsWith('ipc:')).length;
-  assert.equal(before, 25, 'nessun callback di canale eseguito per chiamante respinto');
+  assert.equal(before, 27, 'nessun callback di canale eseguito per chiamante respinto');
   assert.deepEqual(await secured.handlers.get('sessioni:elenco')(trusted), []);
   console.log('IPC_REJECTS_CHILD_FOREIGN_WINDOW_URL_AND_DESTROYED_OK');
   console.log('IPC_ENCODED_FILE_QUERY_HASH_AND_VALID_CALLER_OK');
-  console.log('IPC_ALL_CHANNELS_TRUST_OK channels=25 refusedCallbacks=0');
+  console.log('IPC_ALL_CHANNELS_TRUST_OK channels=27 refusedCallbacks=0');
   console.log('PREVIEW_450_OK');
 })().catch(error => { console.error(error); process.exitCode = 1; });

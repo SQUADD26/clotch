@@ -35,6 +35,13 @@ const friday: FridayApi = {
   comando: (cmd, args) => ipcRenderer.invoke("friday:comando", cmd, args),
   registro: () => ipcRenderer.invoke("friday:registro"),
   avvia: () => ipcRenderer.invoke("friday:avvia"),
+  voce: () => ipcRenderer.invoke("friday:voce"),
+  interrompiVoce: () => ipcRenderer.invoke("friday:interrompi-voce"),
+  onVoce: (cb) => {
+    const f = (_e: unknown, parla: boolean) => cb(parla);
+    ipcRenderer.on("friday:voce", f);
+    return () => ipcRenderer.removeListener("friday:voce", f);
+  },
   onRegistro: (cb) => {
     const f = (_e: unknown, r: unknown) => cb(r);
     ipcRenderer.on("friday:registro", f);

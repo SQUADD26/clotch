@@ -82,3 +82,11 @@ export function regolePerDove(r: Registro) {
 }
 
 export const sessioniAlLavoro = (r: Registro) => [...r.chat.values()].filter((c) => viva(c) && c.stato === "lavora" && !c.fermata).length;
+
+/** «Cosa aspetta me?» c'è sempre; le altre due solo se il registro conosce dei progetti. */
+export function suggerimenti(r: Registro, ora: number): string[] {
+  const { progetti } = casella(r, ora);
+  const lavora = progetti.filter((p) => p.alLavoro > 0).sort((a, b) => b.alLavoro - a.alLavoro)[0] ?? progetti[0];
+  const altro = progetti.find((p) => p !== lavora);
+  return ["Cosa aspetta me?", ...(lavora ? [`Ferma le sessioni di ${lavora.nome}`] : []), ...(altro ? [`Com’è messo ${altro.nome}?`] : [])];
+}
