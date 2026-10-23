@@ -56,6 +56,19 @@ test("aiutante (fixture): Agent aperto, chiuso dal completed dello stesso thread
   assert.equal((a.esito as { errore: boolean } | null)?.errore, false);
 });
 
+test("nessun doppione: l'aiutante (spawn_agent + SubAgentActivity) esce una sola volta, con il suo esito", () => {
+  const c = new ConvertitoreCodex();
+  const sub = (kind: string) => item({ type: "SubAgentActivity", id: "call_9", kind, agent_thread_id: "T", agent_path: "/root/lavoro" });
+  const righe = [
+    { type: "response_item", payload: { type: "function_call", name: "spawn_agent", call_id: "call_9", arguments: "{}" } },
+    { type: "response_item", payload: { type: "function_call_output", call_id: "call_9", output: "{\"agent_id\":\"T\"}" } },
+    sub("started"), sub("completed"),
+  ];
+  const s = strumenti(righe.flatMap((o) => c.riga(o).nuovi));
+  assert.equal(s.length, 1);
+  assert.deepEqual([s[0].nome, s[0].ingresso, s[0].esito], ["Agent", { description: "lavoro" }, { testo: "Completato", errore: false }]);
+});
+
 test("nessun doppione: la stessa chiamata MCP come response_item e come item_completed esce una volta, con lo stato vero", () => {
   const c = new ConvertitoreCodex();
   const chiamata = { type: "response_item", payload: { type: "function_call", name: "js", call_id: "call_1", arguments: "{}" } };

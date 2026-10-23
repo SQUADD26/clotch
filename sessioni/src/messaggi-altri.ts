@@ -67,13 +67,18 @@ export class ConvertitoreCodex {
       const fonti = (i.results ?? []).map((x: any) => ({ title: x?.title, url: x?.url }));
       nuovo(String(i.id), "WebSearch", { query: i.query }, `Links: ${JSON.stringify(fonti)}`, false);
     } else if (i?.type === "SubAgentActivity" && (i.kind === "started" || i.kind === "completed")) {
-      const id = `agente:${i.agent_thread_id}`, m = this.chiamate.get(id);
-      if (i.kind === "started") {
-        const a: Strumento = { tipo: "strumento", id, nome: "Agent", ingresso: { description: String(i.agent_path ?? "").split("/").pop() }, esito: null, t: quando };
+      const id = `agente:${i.agent_thread_id}`, m = this.chiamate.get(id), descrizione = { description: String(i.agent_path ?? "").split("/").pop() };
+      const spawn = this.chiamate.get(String(i.id)); // il function_call spawn_agent già letto ha l'id dell'item: diventa lui l'aiutante, una sola riga
+      if (i.kind === "started" && spawn) {
+        Object.assign(spawn, { nome: "Agent", ingresso: descrizione });
+        this.chiamate.set(id, spawn);
+        r.aggiornati.push(spawn);
+      } else if (i.kind === "started") {
+        const a: Strumento = { tipo: "strumento", id, nome: "Agent", ingresso: descrizione, esito: null, t: quando };
         this.chiamate.set(id, a);
         r.nuovi.push(a);
       } else if (m) { m.esito = { testo: "Completato", errore: false }; r.aggiornati.push(m); }
-      else nuovo(id, "Agent", { description: String(i.agent_path ?? "").split("/").pop() }, "Completato", false);
+      else nuovo(id, "Agent", descrizione, "Completato", false);
     }
     return r;
   }
