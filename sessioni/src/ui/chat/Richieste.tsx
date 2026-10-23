@@ -45,7 +45,7 @@ type Scelta = "consenti" | "consenti_sempre" | "nega";
 export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: string | null }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
   const ris = useRiserva();
-  const cmd = ris.comando(testoCampo(r.ingresso, "command"));
+  const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
   const mostra = cmd ? `$ ${cmd}` : r.strumento;
   if (scelta) {
     return scelta === "nega"
