@@ -1,7 +1,8 @@
 // figma: 101-35494 — «vista Casella»: obiettivi e chat in attesa per progetto. Stati: vuota 101-35803, caricamento 101-36010,
 // registro non leggibile 101-36225, obiettivo proposto 101-47170 (con Clotch) e 101-47297 (senza).
 import { useEffect } from "react";
-import { clotchAcceso, type Registro } from "../../friday";
+import type { Registro } from "../../friday";
+import { acceso as clotchAcceso } from "../pannello/clotch";
 import caricamento from "../../../design/figma/101-36010.json";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
