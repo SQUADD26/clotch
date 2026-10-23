@@ -36,10 +36,13 @@ async function verifica() {
     const testo = fs.readFileSync(path.join(__dirname, "../src/ui", nome), "utf8");
     if (!nome.endsWith(".html")) assert.deepEqual(vecchiNomi(testo, nome), [], nome);
   }
-  const dati = path.join(app.getPath("appData"), "clotch-sessioni");
   impostaNome();
   assert.equal(app.getName(), "clotch");
-  assert.equal(app.getPath("userData"), dati);
+  const dati = app.getPath("userData");
+  assert.notEqual(dati, path.join(app.getPath("appData"), "clotch-sessioni"));
+  assert.equal(path.basename(dati), "userData");
+  assert.match(path.basename(path.dirname(dati)), /^clotch-prova-/);
+  assert.equal(app.getPath("sessionData"), path.join(path.dirname(dati), "sessionData"));
   await app.whenReady();
   impostaIdentita();
   const icona = iconaApp();

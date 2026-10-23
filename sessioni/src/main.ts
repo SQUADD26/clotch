@@ -2,24 +2,11 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Sessioni } from "./api";
-import { collegaAvvisi } from "./avvisi-mac";
-import { collegaBarraMenu } from "./barra-menu";
 import { impostaIdentita, impostaNome } from "./branding";
-import { apriFinestra, parita } from "./finestra";
-import { collegaFriday } from "./friday-ipc";
-import { collegaImpostazioni } from "./impostazioni";
-import { collegaIndice } from "./indice-ipc";
-import { leggiImpostazioni } from "./preferenze";
-import { collegaPreferenze } from "./preferenze-ipc";
-import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
-import { collegaScena, fileScena, leggiScena } from "./scena";
-import type { OpzioniCronologia } from "./cronologia-tipi";
-import type { PaginaMessaggi } from "./tipi";
 import { provaSilenziosa } from "./modalita-prova";
 import { verificaChiamante } from "./ipc-fiducia";
 
-// la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
+// Bootstrap prima degli import con accesso a preferenze, log e dati dell'app.
 const iParita = process.argv.indexOf("--parita");
 const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
 if (iParita > 0) {
@@ -30,18 +17,35 @@ if (iParita > 0) {
   app.commandLine.appendSwitch("mute-audio");
   if (process.platform === "darwin") app.setActivationPolicy("accessory");
 }
+impostaNome();
+
+import { Sessioni } from "./api";
+import { collegaAvvisi } from "./avvisi-mac";
+import { collegaBarraMenu } from "./barra-menu";
+import { apriFinestra, parita } from "./finestra";
+import { collegaFriday } from "./friday-ipc";
+import { collegaImpostazioni } from "./impostazioni";
+import { collegaIndice } from "./indice-ipc";
+import { leggiImpostazioni } from "./preferenze";
+import { collegaPreferenze } from "./preferenze-ipc";
+import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
+import { collegaScena, fileScena, leggiScena } from "./scena";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import type { PaginaMessaggi } from "./tipi";
+
+// la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const scena = (() => {
   try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }
   catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
 })();
 
-impostaNome();
 const sessioni = new Sessioni();
 
 // impostazioni lette dal file a ogni uso (così seguono i cambi); file rotto = valori di partenza
 const filePreferenze = path.join(app.getPath("userData"), "preferenze.json");
 const impostazioniApp = (): Record<string, unknown> => { try { return leggiImpostazioni(filePreferenze); } catch { return {}; } };
-const registra = (m: string) => scriviRegistro(String(impostazioniApp().cartellaRegistro || CARTELLA_REGISTRO), m);
+const registra = (m: string) => scriviRegistro(provaSilenziosa() ? path.join(app.getPath("userData"), "logs")
+  : String(impostazioniApp().cartellaRegistro || CARTELLA_REGISTRO), m);
 process.on("uncaughtException", (e) => registra(`eccezione non gestita: ${testoErrore(e)}`));
 process.on("unhandledRejection", (e) => registra(`promessa rifiutata: ${testoErrore(e)}`));
 // un solo punto per tutti i canali IPC: ogni errore di un canale va nel registro e poi torna al renderer
