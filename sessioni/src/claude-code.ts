@@ -7,7 +7,9 @@ import { Radice } from "./radici";
 import { situazioneClaude } from "./situazione";
 import { ErroreLettura, Sessione } from "./tipi";
 
-const cache = new Map<string, { chiave: string; s: Sessione | null }>();
+type Voci = Map<string, { chiave: string; s: Sessione | null }>;
+/** Per radice, e rifatta a ogni giro: un file sparito esce dalla cache. */
+const cache = new Map<string, Voci>();
 
 /** Ultimo pezzo della cartella: il nome del progetto. */
 export const nomeProgetto = (cartella: string) => path.basename(cartella.replace(/\/+$/, "")) || cartella;
@@ -55,10 +57,11 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[]
   try {
     cartelle = fs.readdirSync(progetti);
   } catch (e: any) {
+    cache.delete(radice.path);
     if (e.code !== "ENOENT") errori.push({ percorso: progetti, messaggio: msgErrore(e) });
     return [];
   }
-  const out: Sessione[] = [];
+  const prima = cache.get(radice.path), nuova: Voci = new Map(), out: Sessione[] = [];
   for (const c of cartelle) {
     let files: string[];
     try {
@@ -71,17 +74,16 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[]
       const file = path.join(progetti, c, n);
       try {
         const st = fs.statSync(file);
-        const chiave = `${st.mtimeMs}:${st.size}`;
-        let e = cache.get(file);
-        if (!e || e.chiave !== chiave) {
-          e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) };
-          cache.set(file, e);
-        }
+        const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
+        let e = prima?.get(file);
+        if (!e || e.chiave !== chiave) e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) };
+        nuova.set(file, e);
         if (e.s) out.push({ ...e.s });
       } catch (err: any) {
         errori.push({ percorso: file, messaggio: msgErrore(err) });
       }
     }
   }
+  cache.set(radice.path, nuova);
   return out;
 }
