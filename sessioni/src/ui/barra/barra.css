@@ -8,6 +8,10 @@
 .riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .riga .lato { flex: none; white-space: nowrap; }
 .riga.titolo-sezione, .riga.titolo-sezione:hover { background: none; }
+/* stato di Friday a destra della sua riga: Attiva, In pausa, Spenta */
+.stato-successo { color: var(--colore-testo-successo); }
+.stato-secondario { color: var(--colore-testo-secondario); }
+.stato-errore { color: var(--colore-testo-errore); }
 
 .elenco {
   flex: 1; min-height: 0; overflow-y: auto; padding-top: var(--spazio-3);
@@ -40,7 +44,8 @@
   width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-pieno); flex: none;
   display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-bottone-secondario);
 }
-.piede .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.piede .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+.piede .testi > * { max-width: 100%; }
 .piede .testi > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* stati della barra: vuoto 101:8772, caricamento 101:8824, errore 101:8931 */
