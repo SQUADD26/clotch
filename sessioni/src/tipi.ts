@@ -157,7 +157,8 @@ export interface ImpostazioniApp {
 export interface CartellaAccount { percorso: string; dettaglio: string; errore: boolean }
 /** `giorni`: uso al giorno dell'account (scheda Andamento), dal più vecchio a oggi; `giorno` = data ISO. `letto`: quando il feed ha letto i numeri (ms). */
 export interface QuotaUso { account: string; usato: number; ripartenza: string; letto?: number; giorni?: { giorno: string; v: number }[] }
-export interface Archiviata { titolo: string; dove: string }
+/** `id` = id della sessione (CLI), serve a «Ripristina». */
+export interface Archiviata { id: string; titolo: string; dove: string }
 
 /** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
 export interface ImpostazioniApi {
