@@ -1,12 +1,12 @@
 /* figma: 101-7873 — «intestazione» della sessione aperta */
-.intestazione { min-height: var(--misura-intestazione); flex: none; padding: var(--spazio-2) var(--spazio-4); gap: var(--spazio-3); display: flex; align-items: center; }
-.intestazione .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
-.intestazione .riga-titolo { display: flex; align-items: flex-start; gap: var(--spazio-2); }
-.intestazione .riga-titolo > :first-child { margin-top: var(--spazio-0-5); flex: none; }
-.intestazione .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
-.intestazione .dati, .intestazione .stato, .intestazione .dato, .intestazione .ramo { display: flex; align-items: center; white-space: nowrap; }
-.intestazione .dati { gap: var(--spazio-2); min-width: 0; overflow: hidden; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
-.intestazione .dato { gap: var(--spazio-2); }
-.intestazione .stato, .intestazione .ramo { gap: var(--spazio-1); }
-.intestazione .codice { font-family: var(--testo-famiglia-codice); }
-.intestazione .azioni { display: flex; gap: var(--spazio-0-5); flex: none; }
+.pezzo-chat .intestazione { min-height: var(--misura-intestazione); flex: none; padding: var(--spazio-2) var(--spazio-4); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-chat .intestazione .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-chat .intestazione .riga-titolo { display: flex; align-items: flex-start; gap: var(--spazio-2); }
+.pezzo-chat .intestazione .riga-titolo > :first-child { margin-top: var(--spazio-0-5); flex: none; }
+.pezzo-chat .intestazione .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .intestazione .dati, .pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .dato, .pezzo-chat .intestazione .ramo { display: flex; align-items: center; white-space: nowrap; }
+.pezzo-chat .intestazione .dati { gap: var(--spazio-2); min-width: 0; overflow: hidden; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .intestazione .dato { gap: var(--spazio-2); }
+.pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .ramo { gap: var(--spazio-1); }
+.pezzo-chat .intestazione .codice { font-family: var(--testo-famiglia-codice); }
+.pezzo-chat .intestazione .azioni { display: flex; gap: var(--spazio-0-5); flex: none; }

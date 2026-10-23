@@ -1,28 +1,28 @@
 /* figma: 113-51111 — pannello obiettivo; 101-46496 pillola «Clotch collegato»; 101-49891 pillola «schermo occupato» */
-.pannello-obiettivo {
+.pezzo-pannello .pannello-obiettivo {
   width: var(--misura-pannello); padding: var(--spazio-4); gap: var(--spazio-4);
   display: flex; flex-direction: column;
   background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl);
 }
-.pannello-obiettivo .sezione { display: flex; flex-direction: column; gap: var(--spazio-1); }
-.pannello-obiettivo .sezione.prove { gap: var(--spazio-2); }
-.pannello-obiettivo .divisore { height: var(--misura-tratto); flex: none; background: var(--colore-bordo-leggero); }
-.pannello-obiettivo .prova { display: flex; gap: var(--spazio-2); }
-.pannello-obiettivo .errore { color: var(--colore-testo-errore); }
-.pannello-obiettivo .riga-file { display: flex; gap: var(--spazio-2); }
-.pannello-obiettivo .conteggio { flex: 1; }
-.pannello-obiettivo .numero { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
-.pannello-obiettivo .aggiunte { color: var(--colore-testo-successo); }
-.pannello-obiettivo .tolte { color: var(--colore-testo-errore); }
+.pezzo-pannello .pannello-obiettivo .sezione { display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-pannello .pannello-obiettivo .sezione.prove { gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo .divisore { height: var(--misura-tratto); flex: none; background: var(--colore-bordo-leggero); }
+.pezzo-pannello .pannello-obiettivo .prova { display: flex; gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo .errore { color: var(--colore-testo-errore); }
+.pezzo-pannello .pannello-obiettivo .riga-file { display: flex; gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo .conteggio { flex: 1; }
+.pezzo-pannello .pannello-obiettivo .numero { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
+.pezzo-pannello .pannello-obiettivo .aggiunte { color: var(--colore-testo-successo); }
+.pezzo-pannello .pannello-obiettivo .tolte { color: var(--colore-testo-errore); }
 
-.pillola-clotch {
+.pezzo-pannello .pillola-clotch {
   height: var(--misura-bottone); padding: 0 var(--spazio-2); gap: var(--spazio-1);
   display: inline-flex; align-items: center; flex: none; white-space: nowrap;
   border-radius: var(--raggio-pieno); background: var(--colore-fondo-bottone-secondario);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm);
 }
-.pillola-clotch.schermo { background: var(--colore-fondo-riga-scelta); }
+.pezzo-pannello .pillola-clotch.schermo { background: var(--colore-fondo-riga-scelta); }
 
 /* foglio degli stati per la prova di parità (frame 113-51111) */
-.foglio-stati { display: flex; gap: var(--spazio-8); align-items: flex-start; }
-.foglio-stati > div { display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-pannello .foglio-stati { display: flex; gap: var(--spazio-8); align-items: flex-start; }
+.pezzo-pannello .foglio-stati > div { display: flex; flex-direction: column; gap: var(--spazio-3); }
