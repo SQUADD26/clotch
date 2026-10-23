@@ -7,12 +7,16 @@ export interface Prova {
   registrazione?: boolean;
   /** Account: l'avviso «Cartella rimossa» dopo «Rimuovi» (101:10461). */
   dopoRimuovi?: boolean;
+  /** Dati: il dialogo «Eliminare i dati di Sessioni?» aperto (119:57106). */
+  conferma?: boolean;
 }
 
 const PROVE: Record<string, Prova> = {
   "101-32827": { aperta: "Lingua" },
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
+  "119-56891": { aperta: "Cronologia" },
+  "119-57106": { conferma: true },
 };
 
 const id = new URLSearchParams(location.search).get("parita");

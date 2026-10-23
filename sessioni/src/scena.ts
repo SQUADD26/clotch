@@ -62,7 +62,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
   "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
-  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate"];
+  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
+  "impostazioni:elimina-dati"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));
