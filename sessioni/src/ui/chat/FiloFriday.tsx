@@ -7,6 +7,7 @@ import { Icona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { useNavigazione } from "../base/navigazione";
 import { SegnoStato } from "../base/SegnoStato";
+import { Pezzo } from "../base/Pezzo";
 import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
 import { Risposta } from "./Risposta";
@@ -26,6 +27,7 @@ export function useVociFriday() {
   }, [r]);
 }
 
+// I componenti esportati portano il proprio scope CSS anche dentro un altro pezzo.
 export function FiloFriday() {
   const voci = useVociFriday();
   const elenco = useElenco().dati?.sessioni ?? [];
@@ -38,14 +40,14 @@ export function FiloFriday() {
   const filo = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length]);
   return (
-    <div className="filo" ref={filo}>
+    <Pezzo nome="chat"><div className="filo" ref={filo}>
       {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : (
         <div key={v.id} className="risposta-friday">
           <Risposta testo={v.testo} inScrittura={false} />
           <SessioniCitate citate={citate(v.sessioni)} />
         </div>
       ))}
-    </div>
+    </div></Pezzo>
   );
 }
 
@@ -86,7 +88,7 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
 
   const stato = spenta ? "disabilitata" : testo ? "scritta" : "vuota";
   return (
-    <div className="area-casella con-menu">
+    <Pezzo nome="chat"><div className="area-casella con-menu">
       {trovate.length > 0 && (
         <div className="menu-sessioni" role="listbox">
           <div className="titolo-gruppo">Sessioni</div>
@@ -116,6 +118,6 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
           </button>
         </div>
       </div>
-    </div>
+    </div></Pezzo>
   );
 }
