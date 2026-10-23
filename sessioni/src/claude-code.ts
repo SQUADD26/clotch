@@ -12,19 +12,22 @@ const cache = new Map<string, { chiave: string; s: Sessione | null }>();
 /** Ultimo pezzo della cartella: il nome del progetto. */
 export const nomeProgetto = (cartella: string) => path.basename(cartella.replace(/\/+$/, "")) || cartella;
 
+const testo = (x: unknown) => (typeof x === "string" ? x : "");
+/** Testo di un messaggio utente: stringa o blocchi `text`. */
+const testoUtente = (c: unknown) => (Array.isArray(c) ? c.map((b: any) => (b?.type === "text" ? testo(b.text) : "")).join("") : testo(c));
+
 function daFile(file: string, radice: Radice, size: number, mtime: number): Sessione | null {
   const { testa, coda } = testaECoda(file, size);
-  const primo = testa.find((o) => typeof o.cwd === "string");
-  const ultimo = [...coda].reverse().find((o) => typeof o.cwd === "string") ?? primo;
-  if (!primo) return null; // solo righe di servizio: non è una sessione di lavoro
+  const dietro = [...coda].reverse();
+  const conCwd = (o: any) => typeof o.cwd === "string";
+  const ultimo = dietro.find(conCwd) ?? testa.find(conCwd); // la prima riga può superare la testa letta (testo incollato): la coda basta
+  if (!ultimo) return null; // solo righe di servizio: non è una sessione di lavoro
+  const campo = (tipo: string, nome: string) => dietro.find((o) => o.type === tipo && testo(o[nome]))?.[nome] as string | undefined;
   const titolo =
-    [...coda].reverse().find((o) => o.type === "ai-title" && o.aiTitle)?.aiTitle ??
-    [...coda].reverse().find((o) => o.type === "custom-title" && o.customTitle)?.customTitle ??
-    [...coda].reverse().find((o) => o.type === "last-prompt" && o.lastPrompt)?.lastPrompt ??
-    testa.find((o) => o.type === "user" && typeof o.message?.content === "string")?.message.content ??
-    "";
-  const modello = [...coda].reverse().find((o) => o.type === "assistant" && o.message?.model)?.message.model ?? null;
-  const t = [...coda].reverse().map((o) => aMillisecondi(o.timestamp)).find((x) => x !== null) ?? mtime;
+    campo("ai-title", "aiTitle") ?? campo("custom-title", "customTitle") ?? campo("last-prompt", "lastPrompt") ??
+    testa.map((o) => (o.type === "user" ? testoUtente(o.message?.content) : "")).find(Boolean) ?? "";
+  const modello = dietro.find((o) => o.type === "assistant" && testo(o.message?.model))?.message.model ?? null;
+  const t = dietro.map((o) => aMillisecondi(o.timestamp)).find((x) => x !== null) ?? mtime;
   const cartella = ultimo.cwd as string;
   return {
     id: path.basename(file, ".jsonl"),
@@ -32,10 +35,10 @@ function daFile(file: string, radice: Radice, size: number, mtime: number): Sess
     account: radice.account,
     email: radice.email,
     idApp: null,
-    titolo: String(titolo).slice(0, 200),
+    titolo: titolo.slice(0, 200),
     progetto: nomeProgetto(cartella),
     cartella,
-    ramo: ultimo.gitBranch || null,
+    ramo: testo(ultimo.gitBranch) || null,
     modello,
     stato: "ferma", // lo stato vero lo mette elenco.ts
     perche: null,
