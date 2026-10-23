@@ -162,7 +162,7 @@ app.whenReady().then(async () => {
     await check('QUERY_OSTILE_' + JSON.stringify(q).slice(1, 60), async () => {
       await carica(q); await attesa(500);
       assert.equal(await radiceViva(), true, 'app bianca'); assert.equal(await run(() => !!window.__x), false);
-    }, ['constructor', '__proto__'].includes(q.sezione) ? { noto: 'UI-SEZIONE-EREDITATA' } : {});
+    });
   }
 
   const spostano = [];
