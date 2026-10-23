@@ -173,4 +173,6 @@ export interface ImpostazioniApi {
   uso(): Promise<QuotaUso[] | null>;
   /** Sessioni archiviate (#375). */
   archiviate(): Promise<Archiviata[]>;
+  /** «Elimina dati…»: toglie indice, cache e impostazioni dell'app; le sessioni originali non si toccano. */
+  eliminaDati(): Promise<void>;
 }

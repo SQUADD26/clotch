@@ -5,6 +5,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { app, dialog, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
+import type { Indice } from "./indice";
+import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { trovaRadici } from "./radici";
 import type { CartellaAccount, Elenco } from "./tipi";
 
@@ -25,8 +27,14 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
   });
 }
 
+/** «Elimina dati…» (frame 119:57106): indice, cache e impostazioni dell'app. Le preferenze per sessione e le sessioni originali restano. */
+export function eliminaDati(indice: Pick<Indice, "svuota">, filePreferenze: string) {
+  indice.svuota();
+  impostaImpostazioni(filePreferenze, Object.fromEntries(Object.keys(leggiImpostazioni(filePreferenze)).map((k) => [k, null])));
+}
+
 /** Canali di `window.impostazioni` (preload.ts). Le risposte della prova di parità le dà la scena (scena.ts). */
-export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, home = os.homedir()) {
+export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: Indice, invia: (canale: string, dati: unknown) => void, home = os.homedir()) {
   ipc.handle("impostazioni:radici", () => trovaRadici(home).map((r) => accorcia(r.path, home)));
   ipc.handle("impostazioni:cartelle", (_e, percorsi: string[]) => cartelleAccount(percorsi.map(String), sessioni.elencoSessioni()));
   ipc.handle("impostazioni:scegli-cartella", async () => {
@@ -37,6 +45,11 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, home = os.
   ipc.handle("impostazioni:apri", async (_e, p: string) => { const err = await shell.openPath(espandi(String(p), home)); if (err) throw new Error(err); });
   ipc.handle("impostazioni:versione", () => app.getVersion());
   ipc.handle("impostazioni:avvio", (_e, acceso: boolean) => app.setLoginItemSettings({ openAtLogin: acceso === true }));
+  ipc.handle("impostazioni:elimina-dati", () => {
+    eliminaDati(indice, path.join(app.getPath("userData"), "preferenze.json"));
+    invia("sessioni:impostazioni", {});
+    void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
+  });
   // nessuna fonte ancora: quote d'uso #374, archiviate #375
   ipc.handle("impostazioni:uso", () => null);
   ipc.handle("impostazioni:archiviate", () => []);
