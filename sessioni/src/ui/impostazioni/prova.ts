@@ -7,12 +7,16 @@ export interface Prova {
   registrazione?: boolean;
   /** Account: l'avviso «Cartella rimossa» dopo «Rimuovi» (101:10461). */
   dopoRimuovi?: boolean;
+  /** Info: il dialogo «Novità della versione» già aperto (119:57552). */
+  novita?: boolean;
 }
 
 const PROVE: Record<string, Prova> = {
   "101-32827": { aperta: "Lingua" },
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
+  "119-57404": { aperta: "Versione" },
+  "119-57552": { novita: true },
 };
 
 const id = new URLSearchParams(location.search).get("parita");

@@ -52,5 +52,7 @@ const impostazioni: ImpostazioniApi = {
   avvio: (acceso) => ipcRenderer.invoke("impostazioni:avvio", acceso),
   uso: () => ipcRenderer.invoke("impostazioni:uso"),
   archiviate: () => ipcRenderer.invoke("impostazioni:archiviate"),
+  novita: () => ipcRenderer.invoke("impostazioni:novita"),
+  aggiornamenti: (fai) => ipcRenderer.invoke("impostazioni:aggiornamenti", fai),
 };
 contextBridge.exposeInMainWorld("impostazioni", impostazioni);

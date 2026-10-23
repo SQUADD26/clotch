@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./friday";
 import { piano } from "./friday-ipc";
-import type { Archiviata, CartellaAccount, Elenco, Messaggio, PaginaMessaggi, PreferenzeSessione, QuotaUso } from "./tipi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PaginaMessaggi, PreferenzeSessione, QuotaUso } from "./tipi";
 import { DIM_PAGINA } from "./messaggi";
 
 export interface Scena {
@@ -22,6 +22,9 @@ export interface Scena {
   archiviate?: Archiviata[];
   spazio?: { indice: number; messaggi: number; immagini: number };
   versione?: string;
+  /** Info (#351): le note della versione e se c'è «Controlla aggiornamenti». */
+  novita?: Novita;
+  aggiornamenti?: boolean;
   /** Registro di Friday come lo dà `friday:registro`. */
   registro?: unknown;
 }
@@ -53,6 +56,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "impostazioni:versione": return s.versione ?? "";
     case "impostazioni:uso": return s.uso ?? null;
     case "impostazioni:archiviate": return s.archiviate ?? [];
+    case "impostazioni:novita": return s.novita ?? null;
+    case "impostazioni:aggiornamenti": return args[0] === true ? undefined : s.aggiornamenti ?? false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
     case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
     default: return undefined;
@@ -62,7 +67,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
   "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
-  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate"];
+  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
+  "impostazioni:novita", "impostazioni:aggiornamenti"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

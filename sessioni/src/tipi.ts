@@ -173,4 +173,10 @@ export interface ImpostazioniApi {
   uso(): Promise<QuotaUso[] | null>;
   /** Sessioni archiviate (#375). */
   archiviate(): Promise<Archiviata[]>;
+  /** Note della versione in uso; null finché non c'è una fonte. */
+  novita(): Promise<Novita | null>;
+  /** `false`: c'è un modo di controllare gli aggiornamenti? `true`: controlla. */
+  aggiornamenti(fai: boolean): Promise<boolean>;
 }
+
+export interface Novita { data: string; voci: string[] }
