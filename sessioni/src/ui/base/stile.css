@@ -18,6 +18,7 @@ button { cursor: default; }
 /* prova di parità: il riquadro del frame Figma intorno alla finestra */
 .parita body { background: var(--colore-fondo-riquadro); padding: var(--spazio-16); }
 .parita .cornice { border-radius: var(--raggio-md); }
+.parita.scena body { background: none; padding: 0; }
 
 .t-xs { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
 .t-sm { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
