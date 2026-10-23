@@ -3,10 +3,12 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
 import { Sessioni } from "./api";
+import { collegaAvvisi } from "./avvisi-mac";
 import { apriFinestra, parita } from "./finestra";
 import { collegaFriday } from "./friday-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaIndice } from "./indice-ipc";
+import { leggiImpostazioni } from "./preferenze";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { collegaScena, fileScena, leggiScena } from "./scena";
 
@@ -30,7 +32,10 @@ app.whenReady().then(() => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
     const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
     if (ids.size) indice.metti(sessioni.elencoSessioni().sessioni.filter((s) => ids.has(s.id)));
+    avvisa(a);
   });
+  // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
+  const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, () => leggiImpostazioni(path.join(app.getPath("userData"), "preferenze.json")));
 
   if (idParita) return parita(idParita);
   apriFinestra();
