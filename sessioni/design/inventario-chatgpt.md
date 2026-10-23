@@ -2,7 +2,7 @@
 
 Fonte: vault squadd-v2 `Research/App/ChatGPT` (estrazione REA). Pagina Figma «Sessioni» (node 101:6839), solo tema scuro.
 
-Totale righe: 192 · già in Figma prima: 50 · disegnate ora: 75 · escluse con motivo: 67
+Totale righe: 199 · già in Figma prima: 50 · disegnate ora: 82 · escluse con motivo: 67
 
 | # | Elemento ChatGPT | In Sessioni | Stato | Schermata o motivo |
 |---|---|---|---|---|
@@ -198,3 +198,17 @@ Totale righe: 192 · già in Figma prima: 50 · disegnate ora: 75 · escluse con
 | R1 | Richiesta di Roberto: info sulla sessione | Pannello Info sessione | disegnato ora | Info sessione (`101-33775.png`) |
 | R2 | Richiesta di Roberto: sessioni figlie e PR | Righe madre e figlia con indicatore PR | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
 | R3 | Richiesta di Roberto: shimmer giallo | Nome giallo con banda chiara | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
+
+## Friday nell’app (lavagna Sistema Friday, sezioni 14 e 15)
+
+Roberto: «L’app electron E’ friday, è un estensione, così come clotch».
+
+| # | Funzione | In Sessioni | Stato | Schermate |
+|---|---|---|---|---|
+| FR1 | Vede: casella e obiettivi per progetto | Vista Casella: obiettivo, passi, chat che aspettano, fatto oggi | disegnato ora | Casella: per progetto (`101-35494.png`), Casella: vuota (`101-35803.png`), Casella: caricamento (`101-36010.png`), Casella: registro non leggibile (`101-36225.png`) |
+| FR2 | Parla: voce e chat con Friday | Chat Friday, voce in ascolto e mentre parla, avviso di Friday | disegnato ora | Friday: prima apertura (`101-36642.png`), Friday: ti ascolta (`101-36832.png`), Friday: sta parlando (`101-37055.png`), Friday: microfono non disponibile (`101-37278.png`), Friday: ti avvisa di un permesso (`101-37492.png`), Chat Friday (`101-16432.png`) |
+| FR3 | Comanda: Ferma tutto | Bottone fisso in alto, conferma, in corso, fatto, errore | disegnato ora | Ferma tutto: conferma (`101-37696.png`), Ferma tutto: in corso (`101-37879.png`), Ferma tutto: fatto (`101-38124.png`), Ferma tutto: errore (`101-38374.png`) |
+| FR4 | Comanda: Non disturbare | Menu della durata e stato attivo con avvisi tenuti per dopo | disegnato ora | Non disturbare: scegli quanto (`101-38626.png`), Non disturbare: attivo (`101-38897.png`) |
+| FR5 | Comanda: annulla le decisioni di Friday | Elenco Decisioni, conferma, annullata, errore, vuoto | disegnato ora | Decisioni di Friday (`101-39266.png`), Decisioni: conferma annulla (`101-39512.png`), Decisioni: annullata (`101-39767.png`), Decisioni: annullo non riuscito (`101-40016.png`), Decisioni: vuoto (`101-40267.png`) |
+| FR6 | Regole imparate da Friday | Elenco per repo, modifica, salvataggio, salvata, errore, vuoto | disegnato ora | Regole imparate (`101-40473.png`), Regole: modifica (`101-40699.png`), Regole: salvataggio (`101-40936.png`), Regole: salvata (`101-41166.png`), Regole: errore (`101-41397.png`), Regole: vuoto (`101-41628.png`) |
+| FR7 | Avvio: l’app avvia Friday e mostra se è accesa | Stato di Friday nella barra laterale: attiva, avvio, spenta, riavvio | disegnato ora | Friday: avvio (`101-41834.png`), Friday: spenta (`101-42000.png`), Friday: riavvio in corso (`101-42245.png`) |
