@@ -1,6 +1,6 @@
 // figma: 101-7873 — punto di montaggio della chat (#349): `Intestazione` sopra, `Chat` nella colonna centrale (101:8036, 101:8610).
 // Vuota 101:9841; caricamento ed errore coi pezzi della base. Friday monta `FiloFriday` e `CasellaFriday`.
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
@@ -42,7 +42,10 @@ export default function Chat() {
   const c = useChatFriday(s?.id ?? null);
   const adesso = useOra();
   const vivo = s?.stato === "lavora" && s.situazione?.adesso !== "turno_finito";
-  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella, m.identita), [m.messaggi, vivo, s?.cartella, m.identita]);
+  const precedenti = useRef<{ sessione: string | null; voci: Voce[] }>({ sessione: null, voci: [] });
+  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella, m.identita,
+    precedenti.current.sessione === s?.id ? precedenti.current.voci : [], s?.id), [m.messaggi, vivo, s?.cartella, m.identita, s?.id]);
+  useLayoutEffect(() => { precedenti.current = { sessione: s?.id ?? null, voci }; }, [s?.id, voci]);
 
   useEffect(() => {
     const messaggio = m.altriErrore ?? (m.messaggi.length ? m.errore : null);
@@ -76,7 +79,7 @@ export default function Chat() {
   }
   return (
     <>
-      <Filo voci={voci} chat={s.id} vivo={vivo && !muta} finita={s.stato === "finita"} c={c}
+      <Filo key={s.id} voci={voci} chat={s.id} vivo={vivo && !muta} finita={s.stato === "finita"} c={c}
         da={s.stato === "aspetta" ? daQuanto(s.ultimaAttivita, adesso) : null}
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione} />
