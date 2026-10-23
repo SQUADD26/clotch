@@ -26,7 +26,7 @@ function useImpostazioniFriday(): Valori | null {
 
 /** Testi dei frame: «Friday non risponde» se non ha preso il comando, se no il perché di Friday o «Comando non riuscito». */
 export const testoEsito = (e: EsitoComando) =>
-  e.esito === "scaduto" && !e.preso ? "Friday non risponde" : e.testo || "Comando non riuscito";
+  e.esito === "scaduto" && !e.preso ? "clotch AI non risponde" : e.testo || "Comando non riuscito";
 
 export default function Friday() {
   const letti = useImpostazioniFriday();
@@ -55,13 +55,13 @@ export default function Friday() {
   const lista = (x: unknown) => (Array.isArray(x) ? x.map(String) : undefined);
 
   return (
-    <Pagina titolo="Friday">
+    <Pagina titolo="clotch AI">
       <Gruppo>
-        <Riga etichetta="Friday attiva" descrizione="Sempre in ascolto, fissa in alto nella barra laterale">
-          <Interruttore etichetta="Friday attiva" acceso={attiva}
+        <Riga etichetta="clotch AI attiva" descrizione="Sempre in ascolto, fissa in alto nella barra laterale">
+          <Interruttore etichetta="clotch AI attiva" acceso={attiva}
             onCambia={(x) => manda("attiva", x, () => (x ? window.friday.avvia() : window.friday.comando("spegni")))} />
         </Riga>
-        <Riga etichetta="Microfono" descrizione="Quello che Friday ascolta">
+        <Riga etichetta="Microfono" descrizione="Quello che clotch AI ascolta">
           <Scelta etichetta="Microfono" valore={String(v.microfono ?? "")} voci={lista(v.microfoni_disponibili)}
             onScegli={(x) => imposta("microfono", x)} disabled={spenti} />
         </Riga>

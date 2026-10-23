@@ -43,7 +43,7 @@ export function MenuCartella({ sessioni, a, onChiudi }: { sessioni: Sessione[]; 
 export function MenuProfilo({ dettaglio, a, onImpostazioni, onChiudi }: { dettaglio: string; a: Punto; onImpostazioni(): void; onChiudi(): void }) {
   const voci: VoceMenu[] = [
     { icona: "impostazioni", etichetta: "Impostazioni", scorciatoia: "⌘,", fai: onImpostazioni },
-    { icona: "info", etichetta: "Info su Sessioni", fai: onImpostazioni },
+    { icona: "info", etichetta: "Info su clotch", fai: onImpostazioni },
   ];
   return <Menu testata={{ titolo: "Roberto Bondici", dettaglio }} voci={voci} onChiudi={onChiudi} style={posto(a)} />;
 }

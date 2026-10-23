@@ -25,7 +25,7 @@ export function PannelloObiettivo({ dati }: { dati: DatiPannello }) {
     <section className="pannello-obiettivo">
       <div className="sezione">
         <div className="t-base medio">Obiettivo</div>
-        <div className="t-sm secondario">{obiettivo ?? "Nessun obiettivo. Friday lo propone quando capisce il lavoro della sessione."}</div>
+        <div className="t-sm secondario">{obiettivo ?? "Nessun obiettivo. clotch AI lo propone quando capisce il lavoro della sessione."}</div>
       </div>
       <div className="divisore" />
       <div className="sezione prove">

@@ -5,6 +5,7 @@ import * as path from "node:path";
 import { Sessioni } from "./api";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
+import { impostaIdentita, impostaNome } from "./branding";
 import { apriFinestra, parita } from "./finestra";
 import { collegaFriday } from "./friday-ipc";
 import { collegaImpostazioni } from "./impostazioni";
@@ -19,6 +20,7 @@ const iParita = process.argv.indexOf("--parita");
 const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
 const scena = idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null;
 
+impostaNome();
 const sessioni = new Sessioni();
 
 // impostazioni lette dal file a ogni uso (così seguono i cambi); file rotto = valori di partenza
@@ -40,6 +42,7 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   ipcMain.handle("sessioni:elenco", elenco);
   const indice = collegaIndice(ipcMain, sessioni);

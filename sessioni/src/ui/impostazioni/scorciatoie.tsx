@@ -8,7 +8,7 @@ import { imposta, useImpostazioni } from "./stato";
 import { tastiDi } from "./tasti";
 
 const AZIONI: [string, string][] = [
-  ["cerca", "Cerca sessioni"], ["friday", "Scrivi a Friday"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
+  ["cerca", "Cerca sessioni"], ["friday", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
   ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra barra laterale"], ["impostazioni", "Apri impostazioni"],
   ["inviaInterrompi", "Invia e interrompi la sessione"], ["coda", "Metti in coda"],
 ];

@@ -21,7 +21,7 @@ export default function Generale() {
   return (
     <Pagina titolo="Generale">
       <Gruppo>
-        <Riga etichetta="Apri all’avvio del Mac" descrizione="Sessioni parte quando accendi il Mac">
+        <Riga etichetta="Apri all’avvio del Mac" descrizione="clotch parte quando accendi il Mac">
           <Interruttore etichetta="Apri all’avvio del Mac" acceso={v.apriAllAvvio} onCambia={(x) => imposta("apriAllAvvio", x)} />
         </Riga>
         <Riga etichetta="Mostra nella barra dei menu" descrizione="Un’icona con il numero di sessioni in attesa di te">
@@ -36,7 +36,7 @@ export default function Generale() {
         <Riga etichetta="Apri una sessione" descrizione="Cosa succede quando ne scegli una dall’elenco">
           <Scelta etichetta="Apri una sessione" valore={v.apriSessione} voci={APERTURE} onScegli={(x) => imposta("apriSessione", x)} />
         </Riga>
-        <Riga etichetta="Cartella del registro" descrizione="Dove Sessioni scrive gli errori" azione>
+        <Riga etichetta="Cartella del registro" descrizione="Dove clotch scrive gli errori" azione>
           <CampoTesto valore={v.cartellaRegistro} />
           <Bottone tipo="secondario" onClick={cambiaCartella}>Cambia</Bottone>
         </Riga>

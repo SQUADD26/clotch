@@ -27,7 +27,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
             {copiato && <span className="suggerimento">Copiato</span>}
           </span>
           {/* shortcut: nessun comando di Friday legge un testo ad alta voce (COMANDI in src/friday.ts); il bottone torna attivo quando c'è */}
-          <BottoneIcona icona="microfono" etichetta="Leggi con Friday" className="al-passaggio" disabled />
+          <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" disabled />
           <span className="con-menu al-passaggio">
             <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
             {menu && (
