@@ -18,7 +18,7 @@ app.whenReady().then(async () => {
   win.webContents.setWindowOpenHandler(({ url }) => { finestre.push(url); return { action: 'deny' }; });
   const run = (fn) => win.webContents.executeJavaScript(`(${fn})()`);
   try {
-    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'friday' } });
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'clotch-ai' } });
     await win.webContents.executeJavaScript(`new Promise((resolve,reject)=>{ const end=Date.now()+5000; const tick=()=>document.querySelectorAll('.risposta').length===3?resolve():Date.now()>end?reject(Error('Risposte assenti')):setTimeout(tick,20);tick();})`);
     await run(() => { window.__markdownCopies = []; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async text => { window.__markdownCopies.push(text); } } }); });
     const state = await run(() => {

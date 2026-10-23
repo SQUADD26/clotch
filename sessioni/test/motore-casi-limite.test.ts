@@ -1,14 +1,15 @@
-// Casi limite del collegamento col motore Friday (#456): registro, obiettivi e passi, casella dei comandi, annulla.
-// Solo HOME temporanee e una Friday finta: nessun motore vero (per quello: motore-integrato.test.ts).
+// Casi limite del collegamento col motore clotch AI (#456): registro, obiettivi e passi, casella dei comandi, annulla.
+// Solo HOME temporanee e una clotch AI finta: nessun motore vero (per quello: motore-integrato.test.ts).
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as crypto from "node:crypto";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { leggiRegistro } from "../src/friday";
+import { leggiRegistro } from "../src/clotch-ai";
 import { inviaComando } from "../src/comandi";
-import { piano } from "../src/friday-ipc";
+import { piano } from "../src/clotch-ai-ipc";
+const MOTORE = "friday"; // nome del protocollo del motore
 
 const casa = () => fs.mkdtempSync(path.join(os.tmpdir(), "motore-"));
 const dirReg = (h: string) => path.join(h, ".claude", "registro");
@@ -24,12 +25,12 @@ function scrivi(h: string, ...righe: (object | string)[]) {
 }
 const canon = (v: any): string => Array.isArray(v) ? `[${v.map(canon).join(", ")}]`
   : v && typeof v === "object" ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}: ${canon(v[k])}`).join(", ")}}` : JSON.stringify(v);
-/** Una decisione di Friday con la sua ricevuta locale (come `decidi`, per dati ASCII). */
+/** Una decisione di clotch AI con la sua ricevuta locale (come `decidi`, per dati ASCII). */
 function decisione(h: string, dati: object = {}, ricevuta = true) {
-  const e = ev("friday", "decisione", { cosa: "Fermata la chat", perche: "test", inverso: ["python3", "x"], chat: "", genere: "fermo", non_annullabile: "", effetto_annullo: "riparte", ...dati });
+  const e = ev(MOTORE, "decisione", { cosa: "Fermata la chat", perche: "test", inverso: ["python3", "x"], chat: "", genere: "fermo", non_annullabile: "", effetto_annullo: "riparte", ...dati });
   scrivi(h, e);
   if (ricevuta) {
-    const d = path.join(h, ".claude", "friday", "eventi-locali", "decisione");
+    const d = path.join(h, ".claude", "friday", "eventi-locali", "decisione"); // nome del protocollo del motore
     fs.mkdirSync(d, { recursive: true });
     fs.writeFileSync(path.join(d, e.id), crypto.createHash("sha256").update(canon(e)).digest("hex"));
   }
@@ -37,13 +38,13 @@ function decisione(h: string, dati: object = {}, ricevuta = true) {
 }
 const annulla = (h: string, id: string, esito?: string, testo = "") => {
   const cid = `c-${String(++seq).padStart(12, "0")}`;
-  scrivi(h, ev("friday", "comando", { id: cid, cmd: "annulla", da: "app", args: { decisione: id } }));
-  if (esito) scrivi(h, ev("friday", "comando_fatto", { comando: cid, esito, testo }));
+  scrivi(h, ev(MOTORE, "comando", { id: cid, cmd: "annulla", da: "app", args: { decisione: id } }));
+  if (esito) scrivi(h, ev(MOTORE, "comando_fatto", { comando: cid, esito, testo }));
   return cid;
 };
 
-/** Una Friday finta: prende ogni comando dalla casella (in presi/), scrive `comando` e, dopo `ritardo` ms, `comando_fatto`. */
-function fridayFinta(t: test.TestContext, h: string, risposta: (c: any) => { esito: string; testo: string } | null, ritardo = 0) {
+/** Una clotch AI finta: prende ogni comando dalla casella (in presi/), scrive `comando` e, dopo `ritardo` ms, `comando_fatto`. */
+function clotchAiFinta(t: test.TestContext, h: string, risposta: (c: any) => { esito: string; testo: string } | null, ritardo = 0) {
   const visti = new Set<string>(), iv = setInterval(() => {
     let nomi: string[] = [];
     try { nomi = fs.readdirSync(casella(h)).filter((n) => n.endsWith(".json")); } catch {}
@@ -53,9 +54,9 @@ function fridayFinta(t: test.TestContext, h: string, risposta: (c: any) => { esi
       const c = JSON.parse(fs.readFileSync(path.join(casella(h), n), "utf8"));
       fs.mkdirSync(path.join(casella(h), "presi"), { recursive: true });
       fs.renameSync(path.join(casella(h), n), path.join(casella(h), "presi", n));
-      scrivi(h, ev("friday", "comando", c));
+      scrivi(h, ev(MOTORE, "comando", c));
       const r = risposta(c);
-      if (r) setTimeout(() => scrivi(h, ev("friday", "comando_fatto", { comando: c.id, ...r })), ritardo);
+      if (r) setTimeout(() => scrivi(h, ev(MOTORE, "comando_fatto", { comando: c.id, ...r })), ritardo);
     }
   }, 5);
   t.after(() => clearInterval(iv));
@@ -112,7 +113,7 @@ test("evento troncato dal produttore (oltre 60 KB): i passi di prima restano, la
   scrivi(h, ev("a", "passi", { agente: "", passi: [{ testo: "Scrivere il test", stato: "in_progress", prova: "", tolto: false }] }));
   scrivi(h, ev("a", "passi", { troncato: true, inizio: '{"passi":[' }));
   const id = decisione(h, {});
-  scrivi(h, ev("friday", "decisione", { troncato: true, inizio: "{" }, { id: "r-aaaaaaaaaaaa" }));
+  scrivi(h, ev(MOTORE, "decisione", { troncato: true, inizio: "{" }, { id: "r-aaaaaaaaaaaa" }));
   const r = leggiRegistro(h);
   assert.deepEqual(r.chat.get("a")!.passi, [{ testo: "Scrivere il test", stato: "in_progress" }]);
   assert.deepEqual(r.decisioni.map((d) => [d.id === id, d.annullabile]), [[true, true], [false, false]]);
@@ -129,7 +130,7 @@ test("obiettivo: aperto, proposto, bloccato, raggiunto, rifiutato, passato; ogni
 test("obiettivo: un evento vecchio (versione più bassa) arrivato in ritardo non riporta indietro lo stato", () => {
   const h = casa();
   const o = (stato: string, versione?: number) => ev("a", "obiettivo", { stato, testo: "T", ...(versione ? { versione } : {}) });
-  // le righe remote in ritardo (friday_segui) entrano in fondo al file con la loro `t`: l'ordine del file non è quello delle versioni
+  // le righe remote in ritardo (friday_segui) entrano in fondo al file con la loro `t`: l'ordine del file non è quello delle versioni // nome del protocollo del motore
   scrivi(h, o("aperto", 1), o("raggiunto", 3), o("aperto", 1));
   assert.equal(leggiRegistro(h).chat.get("a")!.obiettivo!.stato, "raggiunto");
   scrivi(h, o("raggiunto", 3), o("bloccato")); // stessa versione (consegna almeno una volta) e senza versione: si applicano
@@ -182,11 +183,11 @@ test("dopo il cambio di chat (handoff) gli eventi in ritardo restano alla chat g
 
 test("limite d'uso con account o ripartenza illeggibili, motore spento e impostazioni", () => {
   const h = casa();
-  scrivi(h, ev("a", "stato", { stato: "ferma_limite", account: 5, riparte_alle: "domani" }), ev("friday", "friday", { evento: "stop" }),
-    ev("friday", "impostazioni", { attiva: false, account: "" }), ev("friday", "non_disturbare", { acceso: true, fino: "mai", tenuti: "x" }));
+  scrivi(h, ev("a", "stato", { stato: "ferma_limite", account: 5, riparte_alle: "domani" }), ev(MOTORE, MOTORE, { evento: "stop" }),
+    ev(MOTORE, "impostazioni", { attiva: false, account: "" }), ev(MOTORE, "non_disturbare", { acceso: true, fino: "mai", tenuti: "x" }));
   const r = leggiRegistro(h);
   assert.deepEqual(r.chat.get("a")!.limite, { account: null, ripartenza: null });
-  assert.deepEqual([r.friday?.evento, r.impostazioni?.attiva, r.nonDisturbare], ["stop", false, { fino: null, tenuti: 0 }]);
+  assert.deepEqual([r.clotchAi?.evento, r.impostazioni?.attiva, r.nonDisturbare], ["stop", false, { fino: null, tenuti: 0 }]);
 });
 
 test("riavvio: una nuova lettura degli stessi file dà lo stesso stato, con l'annullata ancora annullata", () => {
@@ -212,7 +213,7 @@ test("annulla: proposta solo con inverso e ricevuta; ricevuta di un'altra decisi
   const h = casa();
   const buona = decisione(h), senzaInverso = decisione(h, { inverso: null, non_annullabile: "una merge" }), senzaRicevuta = decisione(h, {}, false);
   const altra = decisione(h, { cosa: "Altra" }, false);
-  const d = path.join(h, ".claude", "friday", "eventi-locali", "decisione");
+  const d = path.join(h, ".claude", "friday", "eventi-locali", "decisione"); // nome del protocollo del motore
   fs.copyFileSync(path.join(d, buona), path.join(d, altra)); // la ricevuta di un'altra decisione
   const r = leggiRegistro(h);
   assert.deepEqual(r.decisioni.map((x) => [x.id, x.annullabile]), [[buona, true], [senzaInverso, false], [senzaRicevuta, false], [altra, false]]);
@@ -233,7 +234,7 @@ test("annulla: un comando scaduto o fallito si può ritentare, una decisione gi�
 
 test("doppio invio e doppio clic: un solo comando nella casella, entrambi ricevono la stessa risposta", async (t) => {
   const h = casa();
-  fridayFinta(t, h, () => ({ esito: "ok", testo: "fatto" }), 60);
+  clotchAiFinta(t, h, () => ({ esito: "ok", testo: "fatto" }), 60);
   const args = { chat: "11111111-0000-4000-8000-000000000001", testo: "Vai avanti" };
   const [x, y] = await Promise.all([inviaComando(h, "manda", args, opz), inviaComando(h, "manda", { ...args }, opz)]);
   assert.deepEqual(x, y);
@@ -256,8 +257,8 @@ test("doppio invio con la casella non scrivibile: nessun comando, la stessa spie
 
 test("risposte collegate al comando giusto anche se arrivano in ordine inverso e doppie", async (t) => {
   const h = casa();
-  fridayFinta(t, h, (c) => ({ esito: c.args.chat === "A" ? "ok" : "rifiutato", testo: `per ${c.args.chat}` }), 0);
-  fridayFinta(t, h, () => null); // un secondo lettore che non risponde mai non cambia nulla
+  clotchAiFinta(t, h, (c) => ({ esito: c.args.chat === "A" ? "ok" : "rifiutato", testo: `per ${c.args.chat}` }), 0);
+  clotchAiFinta(t, h, () => null); // un secondo lettore che non risponde mai non cambia nulla
   const [a, b] = await Promise.all([inviaComando(h, "interrompi", { chat: "A" }, opz), inviaComando(h, "interrompi", { chat: "B" }, opz)]);
   assert.deepEqual([a.esito, a.testo, b.esito, b.testo], ["ok", "per A", "rifiutato", "per B"]);
 });
@@ -265,24 +266,24 @@ test("risposte collegate al comando giusto anche se arrivano in ordine inverso e
 test("risposta dopo un cambio di chat o di mese: l'esito arriva al comando, i dati restano alla chat del comando", async (t) => {
   const h = casa();
   scrivi(h, ev("A", "stato", { stato: "lavora" }));
-  fridayFinta(t, h, () => null);
+  clotchAiFinta(t, h, () => null);
   const p = inviaComando(h, "manda", { chat: "A", testo: "Ciao" }, opz);
   await new Promise((ok) => setTimeout(ok, 80));
   scrivi(h, ev("A", "fine", { motivo: "handoff", chat_nuova: "B" }), ev("B", "inizio", { titolo: "Nuova", da_handoff: "A" }));
   const cid = leggiRegistro(h).comandi[0].id;
   fs.mkdirSync(dirReg(h), { recursive: true });
-  fs.appendFileSync(fileMese(h, "2026-11"), JSON.stringify(ev("friday", "comando_fatto", { comando: cid, esito: "ok", testo: "mese nuovo" })) + "\n");
+  fs.appendFileSync(fileMese(h, "2026-11"), JSON.stringify(ev(MOTORE, "comando_fatto", { comando: cid, esito: "ok", testo: "mese nuovo" })) + "\n");
   const e = await p;
   assert.deepEqual([e.esito, e.testo], ["ok", "mese nuovo"]);
   const r = leggiRegistro(h);
   assert.deepEqual([r.comandi[0].args.chat, r.chat.get("A")!.chatNuova, r.chat.get("B")!.daHandoff], ["A", "B", "A"]);
 });
 
-test("Friday spenta, scaduto dopo la scadenza e poi l'esito arriva: il riavvio lo trova", async () => {
+test("clotch AI spenta, scaduto dopo la scadenza e poi l'esito arriva: il riavvio lo trova", async () => {
   const h = casa();
   const e = await inviaComando(h, "ferma_chat", { chat: "A" }, { ogniMs: 10, scadenzaMs: 80 });
   assert.deepEqual([e.esito, (e as any).preso, fs.readdirSync(casella(h))], ["scaduto", false, []]);
-  scrivi(h, ev("friday", "comando_fatto", { comando: e.id, esito: "rifiutato", testo: "Comando scaduto" }));
+  scrivi(h, ev(MOTORE, "comando_fatto", { comando: e.id, esito: "rifiutato", testo: "Comando scaduto" }));
   assert.equal(leggiRegistro(h).esiti.get(e.id!)?.esito, "rifiutato");
 });
 
@@ -296,4 +297,4 @@ test("casella senza permessi di scrittura: non_scritto, senza .tmp lasciati", as
   assert.deepEqual([e.esito, e.id, fs.readdirSync(casella(h))], ["non_scritto", null, []]);
 });
 
-test("non risponde: soglia dell'app diversa da quella del motore (20 min)", { todo: "aperto-codex: src/ui/chat/friday.ts e NON_RISPONDE_MS usano 180 s, il contratto e friday_triage.FERMO_S 20 min" }, () => {});
+test("non risponde: soglia dell'app diversa da quella del motore (20 min)", { todo: "aperto-codex: src/ui/chat/clotch-ai.ts e NON_RISPONDE_MS usano 180 s, il contratto e friday_triage.FERMO_S 20 min" }, () => {}); // nome del protocollo del motore

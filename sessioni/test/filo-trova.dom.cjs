@@ -25,7 +25,7 @@ app.whenReady().then(async () => {
     { tipo: 'strumento', id: 'b2', nome: 'Bash', ingresso: { command: 'npm test' }, esito: { testo: righe, errore: false }, t: inizioOggi + 2 * MIN + 1000 },
     { tipo: 'assistente', testo: 'Altro controllo, poi basta', modello: null, t: inizioOggi + 3 * MIN },
   ];
-  scene.registro = { chat: {}, fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] };
+  scene.registro = { chat: {}, fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] };
   collegaScena(ipcMain, scene);
   const history = creaCronologiaScena((sid) => scene.messaggi[sid] ?? []);
   ipcMain.removeHandler('sessioni:messaggi');

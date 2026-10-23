@@ -1,6 +1,6 @@
 {
  "navigazione": {
-  "vista": "friday",
+  "vista": "clotch-ai",
   "sezione": "scheda:l1"
  },
  "elenco": {
@@ -137,7 +137,7 @@
     "account": ".claude-accountmanager",
     "email": null,
     "idApp": null,
-    "titolo": "Friday: casella e sandbox",
+    "titolo": "clotch AI: casella e sandbox",
     "progetto": "clotch",
     "cartella": "",
     "ramo": "feat/333-sessioni-lettura",
@@ -353,7 +353,7 @@
     "sorgente": "claude-code",
     "daHandoff": null,
     "stato": "lavora",
-    "dettaglio": "Disegno le schermate di Friday nell’app.",
+    "dettaglio": "Disegno le schermate di clotch AI nell’app.",
     "aspetto": null,
     "domanda": null,
     "limite": null,
@@ -415,7 +415,7 @@
    }
   ],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [
    {
     "id": "c0",

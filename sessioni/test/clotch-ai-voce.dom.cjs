@@ -1,0 +1,107 @@
+// Stati di clotch AI nel renderer vero (101-36642, 36832, 37055, 37278, 37492): finestra invisibile e muta, IPC intercettato.
+// Solo dati finti del registro: nessun microfono, nessuna voce, nessun comando vero.
+const { app, BrowserWindow, ipcMain } = require('electron');
+process.env.CLOTCH_TEST_SILENT = '1';
+app.commandLine.appendSwitch('mute-audio');
+app.on('web-contents-created', (_event, contents) => contents.setAudioMuted(true));
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
+app.whenReady().then(async () => {
+  const ORA = Date.now(), MIN = 60_000;
+  const chat = (id, progetto, stato, extra = {}) => ({ chat: id, titolo: `${progetto}: ${id}`, madre: null, progetto, account: null, sorgente: null, daHandoff: null, stato,
+    dettaglio: null, aspetto: null, domanda: null, limite: null, richieste: [], battito: ORA, aiutanti: {}, compattazioni: 0, interrotta: null, coda: [], obiettivo: null,
+    passi: [], visto: ORA, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0, ...extra });
+  const registro = (extra = {}) => ({ chat: { friday: chat('friday', '', 'lavora'), a: chat('a', 'clotch', 'lavora'), b: chat('b', 'squadd-v2', 'serve_roberto') }, // nome del protocollo del motore
+    fermoTutto: false, avvisi: [], clotch: null, clotchAi: { evento: 'avvio', t: ORA }, comandi: [], decisioni: [], regole: [], nonDisturbare: null,
+    impostazioni: null, esiti: {}, errori: [], ...extra });
+  const scena = { navigazione: { vista: 'clotch-ai' }, elenco: { sessioni: [], errori: [] }, messaggi: {}, preferenze: {}, registro: registro() };
+  collegaScena(ipcMain, scena);
+  const comandi = [];
+  let interrotta = 0;
+  ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
+  ipcMain.removeHandler('clotch-ai:interrompi-voce');
+  ipcMain.handle('clotch-ai:interrompi-voce', () => { interrotta++; });
+  const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
+    webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+  let mostrate = 0, focalizzate = 0;
+  win.on('show', () => mostrate++);
+  win.on('focus', () => focalizzate++);
+  const run = (fn, ...args) => win.webContents.executeJavaScript(`(${fn})(...${JSON.stringify(args)})`);
+  const wait = (fn) => win.webContents.executeJavaScript(`new Promise((resolve, reject) => {
+    const end = Date.now() + 5000;
+    const tick = () => { if ((${fn})()) resolve(); else if (Date.now() > end) reject(new Error('Attesa DOM scaduta: ' + ${JSON.stringify(String(fn))})); else setTimeout(tick, 20); };
+    tick();
+  })`);
+  const carica = async (r, extra = {}) => {
+    Object.assign(scena, { registro: r, voce: false, ...extra });
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'clotch-ai' } });
+    await wait(() => !!document.querySelector('.intestazione-clotch-ai .stato span'));
+  };
+  const testo = (sel) => run((s) => document.querySelector(s)?.textContent ?? null, sel);
+  const stato = () => testo('.intestazione-clotch-ai .stato span');
+  const fallite = [];
+  const check = async (nome, prova) => { try { await prova(); console.log(`${nome}: OK`); } catch (e) { fallite.push(`${nome}: ${e.message}`); console.error(`FAIL ${nome}: ${e.message}`); } };
+  try {
+    await check('PRIMA_APERTURA', async () => {
+      await carica(registro({ clotchAi: { evento: 'avvio', t: ORA } }));
+      await wait(() => !!document.querySelector('.prima-apertura'));
+      assert.equal(await testo('.prima-apertura .titolo'), 'Cosa vuoi sapere?');
+      const chips = await run(() => [...document.querySelectorAll('.prima-apertura .suggerimento')].map((b) => b.textContent));
+      assert.deepEqual(chips, ['Cosa aspetta me?', 'Ferma le sessioni di clotch', 'Com’è messo squadd-v2?']);
+      await run(() => document.querySelectorAll('.prima-apertura .suggerimento')[1].click());
+      await new Promise((ok) => setTimeout(ok, 200));
+      assert.deepEqual(comandi.at(-1), { cmd: 'parla', args: { testo: 'Ferma le sessioni di clotch' } });
+    });
+    await check('TI_ASCOLTA', async () => {
+      await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA } }));
+      await wait(() => !!document.querySelector('.barra-voce.ascolta'));
+      assert.equal(await stato(), 'Ti ascolta');
+      assert.equal(await run(() => !!document.querySelector('.area-casella textarea')), false, 'la barra prende il posto della casella');
+      assert.equal(await run(() => !!document.querySelector('.barra-voce button')), false, 'Clotch non ha un comando per finire: nessun bottone finto');
+      assert.equal(await run(() => document.querySelectorAll('.barra-voce .barra').length), 8);
+    });
+    await check('STA_PARLANDO_CLOTCH', async () => {
+      await carica(registro({ clotch: { voce: 'accesa', parla: true, ascolta: false, t: ORA } }));
+      await wait(() => !!document.querySelector('.barra-voce.parla'));
+      assert.equal(await stato(), 'Sta parlando');
+      assert.equal(await run(() => !!document.querySelector('.barra-voce button')), false, 'la voce di Clotch non si ferma da qui');
+    });
+    await check('STA_PARLANDO_APP_INTERROMPI', async () => {
+      await carica(registro(), { voce: true });
+      await wait(() => !!document.querySelector('.barra-voce.parla button'));
+      assert.equal(await testo('.barra-voce .testo'), 'clotch AI sta parlando');
+      await run(() => document.querySelector('.barra-voce.parla button').click());
+      await new Promise((ok) => setTimeout(ok, 200));
+      assert.equal(interrotta, 1, 'Interrompi chiama il main');
+    });
+    await check('MICROFONO_NON_DISPONIBILE', async () => {
+      await carica(registro({ impostazioni: { attiva: true, microfono: '', microfoni_disponibili: [], voci_disponibili: ['Italiana'] } }));
+      await wait(() => !!document.querySelector('.avviso-f'));
+      assert.equal(await stato(), 'Microfono non disponibile');
+      assert.match(await testo('.avviso-f'), /Microfono non disponibile.*Intanto puoi scrivere/);
+      assert.equal(await run(() => !!document.querySelector('.area-casella textarea')), true, 'si può ancora scrivere');
+    });
+    await check('PERMESSO_DELLA_SESSIONE', async () => {
+      const q = { rid: 'q1', genere: 'permesso', strumento: 'Bash', ingresso: { command: 'supabase db push --db-url $DEV', description: 'Porta su dev la migrazione 0042 delle policy.' }, domande: [] };
+      const r = registro({ avvisi: [{ id: 'a0', t: ORA - 2 * MIN, testo: '«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti.', livello: 'normale', motivo: 'domanda', dettoDa: 'app', sessioni: [] }] });
+      r.chat.b = chat('b', 'squadd-v2', 'serve_roberto', { titolo: 'Backend: auth e RLS', richieste: [q] });
+      await carica(r);
+      await wait(() => !!document.querySelector('.carta-richiesta'));
+      assert.equal(await testo('.carta-richiesta .titolo'), 'Backend: auth e RLS chiede un permesso');
+      assert.equal(await run(() => !!document.querySelector('.prima-apertura')), false, 'con un avviso e un permesso la chat non è vuota');
+      assert.match(await testo('.risposta-clotch-ai'), /aspetta un tuo permesso da 12 minuti/);
+      await run(() => [...document.querySelectorAll('.carta-richiesta button')].find((b) => b.textContent === 'Consenti sempre').click());
+      await new Promise((ok) => setTimeout(ok, 200));
+      assert.deepEqual(comandi.at(-1), { cmd: 'rispondi_permesso', args: { chat: 'b', rid: 'q1', scelta: 'consenti_sempre' } });
+    });
+    assert.deepEqual(fallite, []);
+    assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false);
+    assert.equal(win.webContents.isAudioMuted(), true);
+    assert.equal(mostrate, 0); assert.equal(focalizzate, 0);
+    console.log('CLOTCH_AI_VOCE_OK shows=0 focus=0'); app.exit(0);
+  } catch (error) { console.error(error); console.log('FAIL clotch-ai-voce'); app.exit(1); }
+});

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
-import type { Aggiornamento, CasellaApi, FridayApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
+import type { Aggiornamento, CasellaApi, ClotchAiApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -34,24 +34,24 @@ const api: SessioniApi = {
 };
 contextBridge.exposeInMainWorld("sessioni", api);
 
-const friday: FridayApi = {
-  comando: (cmd, args) => ipcRenderer.invoke("friday:comando", cmd, args),
-  registro: () => ipcRenderer.invoke("friday:registro"),
-  avvia: () => ipcRenderer.invoke("friday:avvia"),
-  voce: () => ipcRenderer.invoke("friday:voce"),
-  interrompiVoce: () => ipcRenderer.invoke("friday:interrompi-voce"),
+const clotchAi: ClotchAiApi = {
+  comando: (cmd, args) => ipcRenderer.invoke("clotch-ai:comando", cmd, args),
+  registro: () => ipcRenderer.invoke("clotch-ai:registro"),
+  avvia: () => ipcRenderer.invoke("clotch-ai:avvia"),
+  voce: () => ipcRenderer.invoke("clotch-ai:voce"),
+  interrompiVoce: () => ipcRenderer.invoke("clotch-ai:interrompi-voce"),
   onVoce: (cb) => {
     const f = (_e: unknown, parla: boolean) => cb(parla);
-    ipcRenderer.on("friday:voce", f);
-    return () => ipcRenderer.removeListener("friday:voce", f);
+    ipcRenderer.on("clotch-ai:voce", f);
+    return () => ipcRenderer.removeListener("clotch-ai:voce", f);
   },
   onRegistro: (cb) => {
     const f = (_e: unknown, r: unknown) => cb(r);
-    ipcRenderer.on("friday:registro", f);
-    return () => ipcRenderer.removeListener("friday:registro", f);
+    ipcRenderer.on("clotch-ai:registro", f);
+    return () => ipcRenderer.removeListener("clotch-ai:registro", f);
   },
 };
-contextBridge.exposeInMainWorld("friday", friday);
+contextBridge.exposeInMainWorld("clotchAi", clotchAi);
 
 const impostazioni: ImpostazioniApi = {
   radici: () => ipcRenderer.invoke("impostazioni:radici"),

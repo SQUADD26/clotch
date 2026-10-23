@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
-import { daPiano } from "../friday/registro";
+import { daPiano } from "../clotch-ai/registro";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
@@ -19,8 +19,8 @@ function useVersioneClotch(): string | null {
   const [v, setV] = useState<string | null>(null);
   useEffect(() => {
     const prendi = (p: unknown) => setV(daPiano(p).clotch?.versione ?? null);
-    window.friday.registro().then(prendi, () => {});
-    return window.friday.onRegistro(prendi);
+    window.clotchAi.registro().then(prendi, () => {});
+    return window.clotchAi.onRegistro(prendi);
   }, []);
   return v;
 }

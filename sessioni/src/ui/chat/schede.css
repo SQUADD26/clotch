@@ -1,5 +1,5 @@
 /* figma: 101-44748 — «scheda sessione», «riferimento sessione», «testo con riferimenti»; scheda al passaggio 101:44989 */
-.pezzo-chat .risposta-friday { display: flex; flex-direction: column; gap: var(--spazio-6); }
+.pezzo-chat .risposta-clotch-ai { display: flex; flex-direction: column; gap: var(--spazio-6); }
 .pezzo-chat .sessioni-citate { display: flex; flex-direction: column; gap: var(--spazio-2); }
 .pezzo-chat .scheda-sessione {
   width: var(--misura-dialogo); display: flex; flex-direction: column; gap: var(--spazio-2); padding: var(--spazio-3);

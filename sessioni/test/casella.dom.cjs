@@ -24,8 +24,8 @@ app.whenReady().then(async () => {
   ipcMain.handle('sessioni:imposta-preferenze', (_e, id, parte) => { preferenze.push({ id, parte }); });
   const comandi = [];
   let esito = 'scaduto';
-  ipcMain.removeHandler('friday:comando');
-  ipcMain.handle('friday:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { id: 'c', esito, testo: '', ...(esito === 'scaduto' ? { preso: false } : {}) }; });
+  ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { id: 'c', esito, testo: '', ...(esito === 'scaduto' ? { preso: false } : {}) }; });
 
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });

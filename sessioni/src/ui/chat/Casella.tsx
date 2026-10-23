@@ -15,7 +15,7 @@ import { Aggiungi } from "./Aggiungi";
 import { ChipAllegato } from "./Allegati";
 import { ChipContesto, ChipModello, ChipPermessi, impostaDi } from "./Chip";
 import { useAvvisiSopra } from "./avvisiSopra";
-import { comanda, comandaEsito } from "./friday";
+import { comanda, comandaEsito } from "./clotch-ai";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
 import { casella, conPercorsi } from "./percorsi";

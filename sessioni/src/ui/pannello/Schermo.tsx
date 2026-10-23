@@ -1,7 +1,7 @@
 // figma: 101-49592 — pillola «Uno script usa lo schermo · 0:42» al centro della barra del titolo (con Clotch; senza, la nota 101-49632 sta nella chat).
 // Il main legge `schermo_in_arrivo` / `schermo_libero` da eventi.jsonl (stato-app.ts) e lo manda dentro il registro.
-import { useOra } from "../chat/friday";
-import { useRegistro } from "../friday/dati";
+import { useOra } from "../chat/clotch-ai";
+import { useRegistro } from "../clotch-ai/dati";
 import { PillolaSchermoOccupato } from "./Pillole";
 
 /** Come SCHERMO_SCADUTO_MS di stato-app.ts, che usa node:fs e non entra nel renderer: uno script senza «libero» smette di contare. */

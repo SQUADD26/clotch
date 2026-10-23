@@ -1,6 +1,6 @@
 {
  "navigazione": {
-  "vista": "friday"
+  "vista": "clotch-ai"
  },
  "elenco": {
   "sessioni": [],
@@ -63,7 +63,7 @@
    }
   ],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [
    {
     "id": "c0",

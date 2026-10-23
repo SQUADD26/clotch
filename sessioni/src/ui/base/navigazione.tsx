@@ -3,11 +3,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "./dati";
 
-export type Vista = "sessione" | "friday" | "casella" | "decisioni" | "regole" | "impostazioni";
-/** Le viste di Friday: montano friday/, senza pannello. */
-export const VISTE_FRIDAY: readonly Vista[] = ["friday", "casella", "decisioni", "regole"];
+export type Vista = "sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
+/** Le viste di clotch AI: montano clotch-ai/, senza pannello. */
+export const VISTE_CLOTCH_AI: readonly Vista[] = ["clotch-ai", "casella", "decisioni", "regole"];
 /** `sezione`: sottopagina libera della vista (es. «generale» nelle impostazioni). */
-interface Passo { vista: Vista; sessione: string | null; sezione: string | null; /** La sessione è stata aperta da una vista di clotch AI (101-45507): la barra del titolo ha «Torna a clotch AI». */ daFriday?: boolean }
+interface Passo { vista: Vista; sessione: string | null; sezione: string | null; /** La sessione è stata aperta da una vista di clotch AI (101-45507): la barra del titolo ha «Torna a clotch AI». */ daClotchAi?: boolean }
 
 export interface Navigazione extends Passo {
   /** `sessione` assente = resta quella di prima; `sezione` assente = nessuna. */
@@ -38,8 +38,8 @@ const Contesto = createContext<Navigazione | null>(null);
 export function ConNavigazione({ children }: { children: ReactNode }) {
   const [storia, setStoria] = useState(() => {
     const q = new URLSearchParams(location.search);
-    // le scene di prova aprono una sessione «da clotch AI» con `sezione` = «da-friday»
-    return { passi: [{ vista: (q.get("vista") ?? "sessione") as Vista, sessione: q.get("sessione"), sezione: q.get("sezione"), daFriday: chiaveDi("da-friday") }], i: 0 };
+    // le scene di prova aprono una sessione «da clotch AI» con `sezione` = «da-clotch-ai»
+    return { passi: [{ vista: (q.get("vista") ?? "sessione") as Vista, sessione: q.get("sessione"), sezione: q.get("sezione"), daClotchAi: chiaveDi("da-clotch-ai") }], i: 0 };
   });
   const [misura, setMisura] = useState({ stretta: false, largo: true });
   // scene di prova 101:29280 (barra chiusa) e 101:29552 (barra sopra aperta)
@@ -55,7 +55,7 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
   const adatta = useCallback((stretta: boolean, largo: boolean) => setMisura((m) => (m.stretta === stretta && m.largo === largo ? m : { stretta, largo })), []);
   const vai = useCallback((vista: Vista, sessione?: string | null, sezione?: string | null) => setStoria(({ passi, i }) => {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null,
-      daFriday: vista === "sessione" && VISTE_FRIDAY.includes(passi[i].vista) };
+      daClotchAi: vista === "sessione" && VISTE_CLOTCH_AI.includes(passi[i].vista) };
     if (passo.vista === passi[i].vista && passo.sessione === passi[i].sessione && passo.sezione === passi[i].sezione) return { passi, i };
     // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine.
     if (vista === "impostazioni" && passi[i].vista === "impostazioni")

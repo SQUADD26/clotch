@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { Pezzo } from "../base/Pezzo";
-import { dettatura, fineDettatura, fineDettaturaClotch, interrompiVoce, type Voce } from "../friday/dettatura";
+import { dettatura, fineDettatura, fineDettaturaClotch, interrompiVoce, type Voce } from "../clotch-ai/dettatura";
 import { useAvvisiSopra } from "./avvisiSopra";
 import "./casella.css";
 import "./voce.css";

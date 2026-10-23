@@ -23,19 +23,19 @@ test("fa: il tempo vero dall'ultimo dato", () => {
 test("quoteDalFeed: una riga per account, 7 giorni; 5 ore piene = limite raggiunto; dati vecchi o ripartiti", () => {
   const feed = { rows: [
     riga("accountmanager@x.it", S - 60, [10, S + H], [38, S + 6 * G + 22 * H + 60]),
-    riga("friday@x.it", S - 60, [100, S + 3 * H], [50, S + G]),
+    riga("clotch-ai@x.it", S - 60, [100, S + 3 * H], [50, S + G]),
     riga("vecchio@x.it", S - 2 * G, [1, S + H], [1, S + G]),
     riga("senza@x.it", S - 60, [null, null], [null, null]),
     riga("ripartito@x.it", S - 60, [5, S + H], [90, S - 10]),
   ] };
   const q = quoteDalFeed(feed, ORA)!;
   const per = (n: string) => q.find((x) => x.account === n)!;
-  assert.deepEqual(q.map((x) => x.account).sort(), ["accountmanager", "friday", "ripartito"]);
+  assert.deepEqual(q.map((x) => x.account).sort(), ["accountmanager", "clotch-ai", "ripartito"]);
   assert.equal(per("accountmanager").usato, 38);
   assert.equal(per("accountmanager").ripartenza, "Riparte tra 6 giorni e 22 ore");
   assert.equal(per("accountmanager").letto, ORA - 60_000);
-  assert.equal(per("friday").usato, 100);
-  assert.match(per("friday").ripartenza, /^Limite raggiunto · riparte alle \d\d:\d\d$/);
+  assert.equal(per("clotch-ai").usato, 100);
+  assert.match(per("clotch-ai").ripartenza, /^Limite raggiunto · riparte alle \d\d:\d\d$/);
   assert.deepEqual([per("ripartito").usato, per("ripartito").ripartenza], [0, ""]);
 });
 

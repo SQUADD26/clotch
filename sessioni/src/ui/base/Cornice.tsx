@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import Barra from "../barra";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
 import { Dialoghi } from "../dialoghi";
-import Friday, { Intestazione as IntestazioneFriday } from "../friday";
+import ClotchAi, { Intestazione as IntestazioneClotchAi } from "../clotch-ai";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
@@ -13,7 +13,7 @@ import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { Pezzo } from "./Pezzo";
 import { LARGHEZZA_BARRA_FISSA, ManigliaBarra, useEscChiude, useLarghezza, useLarghezzaBarra } from "./layout";
-import { ConNavigazione, useNavigazione, VISTE_FRIDAY } from "./navigazione";
+import { ConNavigazione, useNavigazione, VISTE_CLOTCH_AI } from "./navigazione";
 import { useScorciatoie } from "./scorciatoie";
 import { numero } from "./token";
 import "./cornice.css";
@@ -39,7 +39,7 @@ function Corpo() {
   useEscChiude(!largo && n.pannelloAperto, n.alternaPannello);
   const attributi = { ref: corpo, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
   if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
-  const friday = VISTE_FRIDAY.includes(n.vista);
+  const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
   const fissa = n.barraAperta && !n.sovrapposta;
   return (
     <>
@@ -48,13 +48,13 @@ function Corpo() {
         {fissa && <ManigliaBarra corpo={corpo} {...barra} />}
         <main className="area-principale">
           <div className="superficie">
-            {friday ? <Pezzo nome="friday"><IntestazioneFriday /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
+            {clotchAi ? <Pezzo nome="clotch-ai"><IntestazioneClotchAi /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
             <div className="contenuto" ref={contenuto}>
               <div className="colonna" ref={colonna}>
-                {friday ? <Pezzo nome="friday"><Friday /></Pezzo> : <Pezzo nome="chat"><Chat /></Pezzo>}
+                {clotchAi ? <Pezzo nome="clotch-ai"><ClotchAi /></Pezzo> : <Pezzo nome="chat"><Chat /></Pezzo>}
                 <AreaAvvisi />
               </div>
-              {!friday && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
+              {!clotchAi && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
             </div>
           </div>
         </main>

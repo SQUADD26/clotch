@@ -8,7 +8,7 @@ import { Menu, type VoceMenu } from "../base/Menu";
 import type { Punto } from "./Sovrapposti";
 
 const azione = (id: string, a: AzioneSessione) => () => { void api().azione(id, a); };
-const archivia = (id: string) => window.friday.comando("archivia", { chat: id });
+const archivia = (id: string) => window.clotchAi.comando("archivia", { chat: id });
 const posto = (a: Punto) => ({ position: "fixed" as const, left: a.x, top: a.y });
 
 /** «Menu della sessione» (101:21206, 101:20859): lo stesso sulla riga della barra e sul «…» dell'intestazione della chat. */

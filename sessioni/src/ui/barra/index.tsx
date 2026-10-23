@@ -1,4 +1,4 @@
-// figma: 101-7728 — barra laterale (#348): comandi, Friday, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
+// figma: 101-7728 — barra laterale (#348): comandi, clotch AI, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
 // caricamento 101:8824, errore cartella 101:8931, 200 sessioni 101:9109, titolo lunghissimo 101:9359.
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import caricamento from "../../../design/figma/101-8824.json";
@@ -13,7 +13,7 @@ import { useApriSessione } from "./apri";
 import { conFiglie } from "./figlie";
 import { componi, dettaglioProfilo, opzioni, type Proprieta, type Vista } from "./elenco";
 import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
-import { RigheFriday, useRegistro } from "./Friday";
+import { RigheClotchAi, useRegistro } from "./ClotchAi";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
 import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
@@ -70,7 +70,7 @@ export default function Barra() {
 
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {
-      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.friday.comando("archivia", { chat: n.sessione }); }
+      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.clotchAi.comando("archivia", { chat: n.sessione }); }
       if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
     };
     addEventListener("keydown", tasto);
@@ -111,7 +111,7 @@ export default function Barra() {
       <RigaComando icona="cerca" etichetta="Cerca sessioni" lato={tastoCerca ?? undefined} onClick={() => setRicerca(true)} />
       <RigaComando icona="filtra" etichetta="Filtra" lato={filtri.length ? `${filtri.length} attivi` : undefined}
         onClick={(e) => setAperto({ tipo: "raggruppa", a: accanto(e.currentTarget, -numero("spazio-1")) })} />
-      <RigheFriday r={registro} adesso={adesso} pagina={pagina} />
+      <RigheClotchAi r={registro} adesso={adesso} pagina={pagina} />
       <Pillole filtri={filtri} onApri={(i, e) => setAperto({ tipo: "opzioni", i, a: accanto(e.currentTarget, numero("spazio-1")) })}
         onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })} />
 

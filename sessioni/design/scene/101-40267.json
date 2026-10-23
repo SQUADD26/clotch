@@ -458,11 +458,11 @@
     "rifiuto": null,
     "persi": 0
    },
-   "m-friday": {
-    "chat": "m-friday",
-    "titolo": "Friday: casella unica",
+   "m-clotch-ai": {
+    "chat": "m-clotch-ai",
+    "titolo": "clotch AI: casella unica",
     "madre": null,
-    "progetto": "friday-mac-v2",
+    "progetto": "clotch-ai-mac-v2",
     "account": ".claude",
     "sorgente": "app",
     "daHandoff": null,
@@ -522,9 +522,9 @@
    },
    "f-lavora-1": {
     "chat": "f-lavora-1",
-    "titolo": "Friday: lavoro 1",
-    "madre": "m-friday",
-    "progetto": "friday-mac-v2",
+    "titolo": "clotch AI: lavoro 1",
+    "madre": "m-clotch-ai",
+    "progetto": "clotch-ai-mac-v2",
     "account": ".claude",
     "sorgente": "app",
     "daHandoff": null,
@@ -552,9 +552,9 @@
    },
    "f-lavora-2": {
     "chat": "f-lavora-2",
-    "titolo": "Friday: lavoro 2",
-    "madre": "m-friday",
-    "progetto": "friday-mac-v2",
+    "titolo": "clotch AI: lavoro 2",
+    "madre": "m-clotch-ai",
+    "progetto": "clotch-ai-mac-v2",
     "account": ".claude",
     "sorgente": "app",
     "daHandoff": null,
@@ -582,9 +582,9 @@
    },
    "f-fatta": {
     "chat": "f-fatta",
-    "titolo": "Friday: fatta",
-    "madre": "m-friday",
-    "progetto": "friday-mac-v2",
+    "titolo": "clotch AI: fatta",
+    "madre": "m-clotch-ai",
+    "progetto": "clotch-ai-mac-v2",
     "account": ".claude",
     "sorgente": "app",
     "daHandoff": null,
@@ -614,7 +614,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [],
   "regole": [

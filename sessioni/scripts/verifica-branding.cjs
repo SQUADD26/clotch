@@ -21,7 +21,7 @@ function vecchiNomi(testo, nome) {
   function visita(nodo) {
     if (ts.isStringLiteralLike(nodo) || ts.isJsxText(nodo) || ts.isTemplateHead(nodo) || ts.isTemplateMiddle(nodo) || ts.isTemplateTail(nodo)) {
       const testo = nodo.text;
-      if (!testo.startsWith(".") && (/\bFriday\b|\bClotch\b/.test(testo) || /(?:di|da|su|in) Sessioni\b|Sessioni (?:parte|scrive|fa|le rilegge)/.test(testo))) vecchi.push(testo);
+      if (!testo.startsWith(".") && (/\bFriday\b|\bClotch\b/.test(testo) || /(?:di|da|su|in) Sessioni\b|Sessioni (?:parte|scrive|fa|le rilegge)/.test(testo))) vecchi.push(testo); // guardia sul vecchio nome: la parola resta qui per essere trovata
     }
     ts.forEachChild(nodo, visita);
   }
@@ -30,7 +30,7 @@ function vecchiNomi(testo, nome) {
 }
 
 async function verifica() {
-  assert.equal(vecchiNomi('const nome = "Friday"; <span>Clotch</span>', "controllo.tsx").length, 2);
+  assert.equal(vecchiNomi('const nome = "Friday"; <span>Clotch</span>', "controllo.tsx").length, 2); // guardia sul vecchio nome: la parola resta qui per essere trovata
   for (const nome of fs.readdirSync(path.join(__dirname, "../src/ui"), { recursive: true })) {
     if (!/\.(tsx?|html)$/.test(nome) || /(?:^|\/)(?:prova|scene)\./.test(nome)) continue;
     const testo = fs.readFileSync(path.join(__dirname, "../src/ui", nome), "utf8");
@@ -57,7 +57,7 @@ async function verifica() {
   await finestra.loadFile(path.join(__dirname, "../renderer/index.html"));
   assert.equal(finestra.getTitle(), "clotch");
   console.log(`branding OK: app=${app.getName()}, titolo=${finestra.getTitle()}, icona=${icona.getSize().width}x${icona.getSize().height}, dati conservati`);
-  console.log("nomi UI OK: nessun Friday, Clotch o nome app Sessioni; controllo positivo verificato");
+  console.log("nomi UI OK: nessun vecchio nome dell'assistente, Clotch o nome app Sessioni; controllo positivo verificato");
   assert.equal(finestra.isVisible(), false);
   assert.equal(finestra.isFocused(), false);
   assert.equal(mostrate, 0);

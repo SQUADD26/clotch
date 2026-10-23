@@ -1,6 +1,6 @@
 // figma: 101-49067 — banda «via dal mac» sotto Regole: con Clotch (AFK acceso, 101:49347) e senza (101-49194, 101:49566).
 // AFK: `afk.json` e `afk-fatto.jsonl` di Clotch, letti dal main (stato-app.ts) e mandati dentro il registro.
-import type { Registro } from "../../friday";
+import type { Registro } from "../../clotch-ai";
 import { Icona } from "../base/Icona";
 import { durata } from "../chat/testi";
 import { acceso as clotchAcceso } from "../pannello/clotch";

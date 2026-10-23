@@ -72,8 +72,8 @@ async function check(nome, fn, { noto, consenti = /^$/ } = {}) {
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
-  for (const c of ['sessioni:messaggi', 'sessioni:elenco', 'friday:comando']) ipcMain.removeHandler(c);
-  ipcMain.handle('friday:comando', () => ({ esito: 'ok' }));
+  for (const c of ['sessioni:messaggi', 'sessioni:elenco', 'clotch-ai:comando']) ipcMain.removeHandler(c);
+  ipcMain.handle('clotch-ai:comando', () => ({ esito: 'ok' }));
   ipcMain.handle('sessioni:elenco', () => (finto.elenco ? finto.elenco() : scene.elenco));
   ipcMain.handle('sessioni:messaggi', (_e, id, pagina, opz) => {
     const r = storia.pagina(id, pagina, opz);
@@ -105,7 +105,7 @@ app.whenReady().then(async () => {
 
   await check('PONTE_DEL_PRELOAD', async () => { // l'eval rifiutato dalla CSP è il segnale atteso, non rumore
     await carica({ vista: 'sessione', sessione: 's1' });
-    const r = await run(() => ({ nodo: [typeof require, typeof process, typeof Buffer, typeof module, typeof electron], k: Object.keys(window.sessioni).sort(), f: Object.keys(window.friday).sort(), i: Object.keys(window.impostazioni).sort(),
+    const r = await run(() => ({ nodo: [typeof require, typeof process, typeof Buffer, typeof module, typeof electron], k: Object.keys(window.sessioni).sort(), f: Object.keys(window.clotchAi).sort(), i: Object.keys(window.impostazioni).sort(),
       fn: (() => { try { return window.sessioni.elencoSessioni.constructor('return typeof process')(); } catch (e) { return 'bloccato'; } })() }));
     assert.deepEqual(r.nodo, ['undefined', 'undefined', 'undefined', 'undefined', 'undefined']);
     assert.notEqual(r.fn, 'object', 'il costruttore di Function non raggiunge Node');

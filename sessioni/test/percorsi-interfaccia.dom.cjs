@@ -76,8 +76,8 @@ async function check(nome, fn, { noto, consenti = /^$/ } = {}) {
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
-  ipcMain.removeHandler('sessioni:messaggi'); ipcMain.removeHandler('sessioni:elenco'); ipcMain.removeHandler('sessioni:cerca'); ipcMain.removeHandler('friday:comando');
-  ipcMain.handle('friday:comando', () => ({ esito: 'ok' }));
+  ipcMain.removeHandler('sessioni:messaggi'); ipcMain.removeHandler('sessioni:elenco'); ipcMain.removeHandler('sessioni:cerca'); ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', () => ({ esito: 'ok' }));
   ipcMain.handle('sessioni:elenco', () => (finto.elenco ? finto.elenco() : scene.elenco));
   ipcMain.handle('sessioni:cerca', (_e, testo) => (finto.cerca ? finto.cerca(testo) : []));
   ipcMain.handle('sessioni:messaggi', (_e, id, pagina, opz) => {

@@ -47,13 +47,13 @@ app.whenReady().then(async () => {
     tick();
   })`);
   try {
-    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'friday' } });
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'clotch-ai' } });
     await ready('.area-casella textarea');
-    await ready('.risposta-friday .risposta');
+    await ready('.risposta-clotch-ai .risposta');
     assert.equal(await run(() => document.querySelector('.messaggio-roberto .bolla').textContent), 'Mostra il lavoro in corso');
-    assert.equal(await run(() => document.querySelector('.risposta-friday .testo-risposta').textContent), 'Controllo le sessioni aperte.');
+    assert.equal(await run(() => document.querySelector('.risposta-clotch-ai .testo-risposta').textContent), 'Controllo le sessioni aperte.');
     console.log('AI_SHARED_MESSAGE_CONTENT_OK');
-    const styles = await run(() => Object.fromEntries(['.filo', '.area-casella', '.casella', '.messaggio-roberto', '.risposta-friday', '.risposta'].map((q) => [q, getComputedStyle(document.querySelector(q)).display])));
+    const styles = await run(() => Object.fromEntries(['.filo', '.area-casella', '.casella', '.messaggio-roberto', '.risposta-clotch-ai', '.risposta'].map((q) => [q, getComputedStyle(document.querySelector(q)).display])));
     const failures = [];
     for (const [selector, display] of Object.entries(styles)) {
       console.log(`CHAT_STYLE ${selector}: ${display}`);

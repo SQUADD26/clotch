@@ -1,7 +1,7 @@
 // figma: 101-8036 — «Filo» della sessione aperta: messaggi di Roberto, turni coi loro blocchi, «Carica precedenti» (101:9628),
-// fine turno (101:15335), richieste vive di Friday (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
+// fine turno (101:15335), richieste vive di clotch AI (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
 import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { ChatFriday } from "../../friday";
+import type { ChatClotchAi } from "../../clotch-ai";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { numero } from "../base/token";
@@ -19,7 +19,7 @@ import { provaDi, quanti } from "./testi";
 import { Visore } from "./Visore";
 import "./nuovi.css";
 
-type Richiesta = ChatFriday["richieste"][number];
+type Richiesta = ChatClotchAi["richieste"][number];
 
 /** Un blocco del turno. `vivo`: l'ultimo turno di una sessione che lavora (le modifiche si vedono aperte, 101:14631). */
 function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
@@ -50,7 +50,7 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
 const righeDel = (voci: Voce[]) => voci.reduce((n, v) => n + (v.tipo === "turno" ? v.blocchi.length : 1), 0);
 
 export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCarica, inFondo, inCima, prova = null }: {
-  voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatFriday | null; da: string | null;
+  voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatClotchAi | null; da: string | null;
   /** Messaggi più vecchi non ancora caricati (null = non si sa, ma ci sono). */
   prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode; inCima?: ReactNode;
   /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727),
@@ -68,7 +68,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const [nuovi, setNuovi] = useState(0); // righe arrivate in fondo mentre si leggeva più su
   const inFondoDel = () => daFondo.current <= numero("spazio-6");
   const richiesta = (g: string) => c?.richieste.find((r) => r.genere === g) ?? null;
-  // permessi aperti: non stanno nella trascrizione, solo nel registro di Friday
+  // permessi aperti: non stanno nella trascrizione, solo nel registro di clotch AI
   const permessi = c?.richieste.filter((r) => r.genere === "permesso") ?? [];
   const ultimo = voci.length - 1;
   const aperti = provaDi(prova, "aperti")?.split(",") ?? [];

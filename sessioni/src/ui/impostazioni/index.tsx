@@ -13,7 +13,7 @@ import Archiviazione from "./archiviazione";
 import Aspetto from "./aspetto";
 import Clotch from "./clotch";
 import Dati from "./dati";
-import Friday from "./friday";
+import ClotchAi from "./clotch-ai";
 import Generale from "./generale";
 import Info from "./info";
 import Notifiche from "./notifiche";
@@ -24,7 +24,7 @@ import { Ricerca } from "./Ricerca";
 import "./impostazioni.css";
 
 const PAGINE: Record<Sezione, ComponentType<{ sotto?: string }>> = {
-  generale: Generale, aspetto: Aspetto, notifiche: Notifiche, friday: Friday, scorciatoie: Scorciatoie, sorgenti: Sorgenti,
+  generale: Generale, aspetto: Aspetto, notifiche: Notifiche, "clotch-ai": ClotchAi, scorciatoie: Scorciatoie, sorgenti: Sorgenti,
   account: Account, uso: Uso, archiviate: Archiviate, archiviazione: Archiviazione, dati: Dati, info: Info, clotch: Clotch,
 };
 

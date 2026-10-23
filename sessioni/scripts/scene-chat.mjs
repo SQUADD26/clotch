@@ -39,7 +39,7 @@ const chat = (x = {}) => ({
   compattazioni: 0, interrotta: null, coda: [], obiettivo: null, passi: [], visto: ORA, fine: null, chatNuova: null, fermata: false,
   quarantena: null, errore: null, rifiuto: null, persi: 0, ...x,
 });
-const registro = (c) => ({ chat: c ? { s1: c } : {}, fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [],
+const registro = (c) => ({ chat: c ? { s1: c } : {}, fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [],
   regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] });
 
 function scena(id, s, msg, { c = null, sezione, info } = {}) {
@@ -111,8 +111,8 @@ scena("14396", {}, messaggi([PORTA, st("ExitPlanMode", { plan: PIANO }, "ok", 1)
   agente("Lettore", null, 12), agente("Controllo tipi", null, 8), agente("Prove", null, 41), [{ tipo: "pensiero", testo: "…" }, 1]]), { c: chat(AIUTANTI) });
 scena("14631", {}, messaggi([u("Togli i gruppi per data dalla barra laterale."), st("Grep", { pattern: "raggruppaPerData", path: "sessioni/src" }, "ok", 1),
   st("Edit", { file_path: "sessioni/src/BarraLaterale.tsx", old_string: "  const sessioni = useSessioni(filtro);\n  const gruppi = raggruppaPerData(sessioni);\n  return <Gruppi gruppi={gruppi} />;",
-    new_string: "  const sessioni = useSessioni(filtro);\n  const progetti = raggruppaPerCartella(sessioni);\n  return <>\n    <RigaFriday />\n    <Progetti progetti={progetti} /></>;" }, "ok", 1),
-  a("Ho tolto i gruppi per data: ora la barra laterale mostra solo le cartelle dei progetti, con Friday fissa in alto. Adesso controllo che i titoli lunghi si taglino bene")]));
+    new_string: "  const sessioni = useSessioni(filtro);\n  const progetti = raggruppaPerCartella(sessioni);\n  return <>\n    <RigaClotchAi />\n    <Progetti progetti={progetti} /></>;" }, "ok", 1),
+  a("Ho tolto i gruppi per data: ora la barra laterale mostra solo le cartelle dei progetti, con clotch AI fissa in alto. Adesso controllo che i titoli lunghi si taglino bene")]));
 const ELENCO = [u("Aggiungi lo stato con 200 sessioni."), leggi("sessioni/src/Elenco.tsx"), bash("npm test -- elenco", null, 1)];
 const CODA = chat({ coda: [{ voce: "v1", testo: "Ascolta, ho bisogno anche di un’altra cosa: sul mio Mac c’è un collegamento che non apre la cartella giusta e vorrei capire perché" }] });
 scena("14849", {}, messaggi(ELENCO), { c: CODA });
@@ -141,43 +141,43 @@ scena("45507", { ...ASPETTA, titolo: "Backend: auth e RLS", icona: "database", p
     prove: [{ testo: "Test delle policy: 14 su 14", fatta: true }, { testo: "Migrazione 0042 provata su dev", fatta: true }, { testo: "Sì di Roberto alla promozione", fatta: false }] } },
 messaggi([u("Applica le policy RLS di «sessioni» e promuovi su main."), bash("gh pr checks 2412", "ok", 6),
   a("I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?")]),
-  { sezione: "da-friday", info: { contesto: null, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }); // aperta da clotch AI (101:45507)
+  { sezione: "da-clotch-ai", info: { contesto: null, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }); // aperta da clotch AI (101:45507)
 
-// —— Chat Friday (101:16432) e sessioni da citare dopo @ (101:45260) ——
-function scenaFriday(id, domande, sezione, sessioni = [], chats = {}) {
-  const r = registro(chat({ chat: "friday", progetto: null, visto: ORA - 10_000, battito: ORA - 10_000 }));
-  r.chat = { friday: r.chat.s1, ...chats };
+// —— Chat clotch AI (101:16432) e sessioni da citare dopo @ (101:45260) ——
+function scenaClotchAi(id, domande, sezione, sessioni = [], chats = {}) {
+  const r = registro(chat({ chat: "friday", progetto: null, visto: ORA - 10_000, battito: ORA - 10_000 })); // nome del protocollo del motore
+  r.chat = { friday: r.chat.s1, ...chats }; // nome del protocollo del motore
   let t = ORA - 10 * MIN;
   for (const [i, [d, rs, citate = []]] of domande.entries()) {
     r.comandi.push({ id: `c${i}`, t: (t += 20_000), cmd: "parla", da: "app", args: { testo: d } });
     r.avvisi.push({ id: `a${i}`, t: (t += 20_000), testo: rs, livello: "info", motivo: "risposta", dettoDa: null, sessioni: citate });
   }
-  const dati = { navigazione: { vista: "friday", ...(sezione ? { sezione } : {}) }, elenco: { sessioni, errori: [] }, messaggi: {},
+  const dati = { navigazione: { vista: "clotch-ai", ...(sezione ? { sezione } : {}) }, elenco: { sessioni, errori: [] }, messaggi: {},
     preferenze: Object.fromEntries(sessioni.map((s) => [s.id, { icona: s.icona }])), registro: r };
   writeFileSync(new URL(`../design/scene/101-${id}.json`, import.meta.url), JSON.stringify(dati, null, 1) + "\n");
 }
 const BACKEND = [["Com’è messa la sessione del backend?", "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev."]];
-scenaFriday("16432", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]]);
-scenaFriday("45260", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]], "scritta:Ferma @back", [
+scenaClotchAi("16432", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]]);
+scenaClotchAi("45260", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]], "scritta:Ferma @back", [
   sessione({ id: "b1", titolo: "Backend: auth e RLS", icona: "database", progetto: "squadd-v2", stato: "aspetta" }),
   sessione({ id: "b2", titolo: "Backup Hetzner sulle VPS", icona: "pacco", progetto: "squadd-v2", stato: "finita" }),
   sessione({ id: "b3", titolo: "Backend: webhook pagamenti", icona: "database", progetto: "dentalspace", stato: "ferma" }),
 ]);
 
-// —— Friday cita le sessioni (101:44748) e scheda al passaggio (101:44989) ——
+// —— clotch AI cita le sessioni (101:44748) e scheda al passaggio (101:44989) ——
 const CITATE = [
   sessione({ id: "b1", titolo: "Backend: auth e RLS", icona: "database", progetto: "squadd-v2", ramo: "feat/2412-rls-sessioni", stato: "aspetta", ultimaAttivita: ORA - 12 * MIN }),
   sessione({ id: "f1", titolo: "Figma: schermate app Sessioni", icona: "tavolozza", ramo: "design/332-sessioni-figma-3", stato: "aspetta", ultimaAttivita: ORA - 5 * MIN }),
   sessione({ id: "l1", titolo: "Sessioni: disegno e app Electron", icona: "stella", ramo: "design/332-sessioni-figma-3" }),
-  sessione({ id: "l2", titolo: "Friday: casella e sandbox", icona: "fulmine" }),
+  sessione({ id: "l2", titolo: "clotch AI: casella e sandbox", icona: "fulmine" }),
   sessione({ id: "l3", titolo: "Notch: avviso schermo", icona: "schermo" }),
 ];
 const passi5 = ["completed", "completed", "completed", "in_progress", "pending"].map((stato, i) => ({ testo: `passo ${i}`, stato }));
 const CHAT_CITATE = {
   b1: chat({ chat: "b1", stato: "serve_roberto", dettaglio: "Vuoi che promuova adesso?", richieste: [{ rid: "rb", genere: "permesso", strumento: "Bash", ingresso: {}, domande: [] }] }),
   f1: chat({ chat: "f1", stato: "serve_roberto", domanda: "Dove salvo le immagini della prova di parità?", richieste: [{ rid: "rf", genere: "domanda", strumento: "AskUserQuestion", ingresso: {}, domande: [] }] }),
-  l1: chat({ chat: "l1", dettaglio: "Disegno le schermate di Friday nell’app.", passi: passi5 }),
+  l1: chat({ chat: "l1", dettaglio: "Disegno le schermate di clotch AI nell’app.", passi: passi5 }),
 };
 const ASPETTANO = [["Cosa aspetta me?", "Due sessioni aspettano te.", ["b1", "f1", "l1", "l2", "l3"]]];
-scenaFriday("44748", ASPETTANO, null, CITATE, CHAT_CITATE);
-scenaFriday("44989", ASPETTANO, "scheda:l1", CITATE, CHAT_CITATE);
+scenaClotchAi("44748", ASPETTANO, null, CITATE, CHAT_CITATE);
+scenaClotchAi("44989", ASPETTANO, "scheda:l1", CITATE, CHAT_CITATE);

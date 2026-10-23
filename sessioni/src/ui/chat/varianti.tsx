@@ -1,6 +1,6 @@
 // figma: 101-19480 — «Varianti della chat»: il foglio con un'istanza di ogni variante dei pezzi, ognuna al suo posto (misure dal json del frame).
 // Prova di parità: `npm run parita -- 101-19480`. Disegna i pezzi veri con i loro dati; quelli che il ramo non ha ancora o che sono d'altri gruppi
-// (Riga Friday, Casella spunta, Pillola filtro, Riga sessione, Chip allegato, Indicatore PR, Riga sessione annidata, Casella voce, Avviso a comparsa,
+// (Riga clotch AI, Casella spunta, Pillola filtro, Riga sessione, Chip allegato, Indicatore PR, Riga sessione annidata, Casella voce, Avviso a comparsa,
 // Riferimento sessione, Scheda sessione) restano vuoti nel foglio: li disegna chi li costruisce, a unione fatta.
 import type { ReactElement, ReactNode } from "react";
 import foglio from "../../../design/figma/101-19480.json";

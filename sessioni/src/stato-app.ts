@@ -1,4 +1,4 @@
-// Cosa Clotch scrive fuori dal registro di Friday e l'app legge (solo lettura): schermo occupato da uno script (eventi.jsonl,
+// Cosa Clotch scrive fuori dal registro di clotch AI e l'app legge (solo lettura): schermo occupato da uno script (eventi.jsonl,
 // contratto motore claude-config#2278) e «sei via dal Mac» (afk.json e afk-fatto.jsonl, modalità AFK di Clotch #106).
 import * as fs from "node:fs";
 import * as path from "node:path";

@@ -1,5 +1,5 @@
 // figma: 101-7873 — punto di montaggio della chat (#349): `Intestazione` sopra, `Chat` nella colonna centrale (101:8036, 101:8610).
-// Vuota 101:9841; caricamento ed errore coi pezzi della base. Friday monta `FiloFriday` e `CasellaFriday`.
+// Vuota 101:9841; caricamento ed errore coi pezzi della base. clotch AI monta `FiloClotchAi` e `CasellaClotchAi`.
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
@@ -9,14 +9,14 @@ import { useClotchAcceso } from "../pannello/Pillole";
 import { Casella } from "./Casella";
 import { NotaSchermo } from "./CasellaVoce";
 import { Filo } from "./Filo";
-import { nonRisponde, useChatFriday, useOra } from "./friday";
+import { nonRisponde, useChatClotchAi, useOra } from "./clotch-ai";
 import { TestaSessione } from "./Intestazione";
 import { Trova } from "./Trova";
 import { Limite, NonRisponde } from "./Lavoro";
 import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
-export { CasellaFriday, FiloFriday } from "./FiloFriday";
+export { CasellaClotchAi, FiloClotchAi } from "./FiloClotchAi";
 export { scene } from "./varianti";
 
 /** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
@@ -34,7 +34,7 @@ function useSessione() {
 export function Intestazione() {
   const { s } = useSessione();
   const p = usePreferenze().dati;
-  const c = useChatFriday(s?.id ?? null);
+  const c = useChatClotchAi(s?.id ?? null);
   const adesso = useOra();
   if (!s) return null;
   return <TestaSessione s={s} nonRisponde={!!c && nonRisponde(c, adesso)} pref={p[s.id]} />;
@@ -43,7 +43,7 @@ export function Intestazione() {
 export default function Chat() {
   const { elenco, s, sezione } = useSessione();
   const m = useMessaggi(s?.id ?? null);
-  const c = useChatFriday(s?.id ?? null);
+  const c = useChatClotchAi(s?.id ?? null);
   const adesso = useOra();
   const clotch = useClotchAcceso();
   const vivo = s?.stato === "lavora" && s.situazione?.adesso !== "turno_finito";

@@ -1,4 +1,4 @@
-/* figma: 101-7728 — barra laterale: righe comando, Friday, titolo sezione, cartella, sessione, piede (101:7728, 101:21065) */
+/* figma: 101-7728 — barra laterale: righe comando, clotch AI, titolo sezione, cartella, sessione, piede (101:7728, 101:21065) */
 .pezzo-barra .riga {
   height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2); flex: none;
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left; width: 100%;
@@ -8,7 +8,7 @@
 .pezzo-barra .riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pezzo-barra .riga .lato { flex: none; white-space: nowrap; }
 .pezzo-barra .riga.titolo-sezione, .pezzo-barra .riga.titolo-sezione:hover { background: none; }
-/* stato di Friday a destra della sua riga: Attiva, In pausa, Spenta */
+/* stato di clotch AI a destra della sua riga: Attiva, In pausa, Spenta */
 .pezzo-barra .stato-successo { color: var(--colore-testo-successo); }
 .pezzo-barra .stato-secondario { color: var(--colore-testo-secondario); }
 .pezzo-barra .stato-errore { color: var(--colore-testo-errore); }
@@ -58,7 +58,7 @@
 }
 .pezzo-barra .avviso-cartella .testi { display: flex; flex-direction: column; gap: var(--spazio-1); min-width: 0; }
 
-/* bande sopra la riga Friday: «Non disturbare» 101:39071, «Via dal Mac» 101:49347 */
+/* bande sopra la riga clotch AI: «Non disturbare» 101:39071, «Via dal Mac» 101:49347 */
 .pezzo-barra .banda {
   padding: var(--spazio-2); gap: var(--spazio-1); border-radius: var(--raggio-md); flex: none;
   display: flex; flex-direction: column; background: var(--colore-fondo-attesa);

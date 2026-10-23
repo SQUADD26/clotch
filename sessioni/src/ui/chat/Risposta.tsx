@@ -1,5 +1,5 @@
-// figma: 101-23727 — «Azioni sulla risposta»: copia (poi spunta e «Copiato»), leggi con Friday, menu «…» con
-// Copia testo, Copia come Markdown, Leggi con Friday, Mostra nel file della sessione.
+// figma: 101-23727 — «Azioni sulla risposta»: copia (poi spunta e «Copiato»), leggi con clotch AI, menu «…» con
+// Copia testo, Copia come Markdown, Leggi con clotch AI, Mostra nel file della sessione.
 import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
@@ -25,7 +25,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
             <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta="Copia" onClick={() => copia(senzaMarkdown(testo))} />
             {copiato && <span className="suggerimento">Copiato</span>}
           </span>
-          {/* shortcut: nessun comando di Friday legge un testo ad alta voce (COMANDI in src/friday.ts); il bottone torna attivo quando c'è */}
+          {/* shortcut: nessun comando di clotch AI legge un testo ad alta voce (COMANDI in src/clotch-ai.ts); il bottone torna attivo quando c'è */}
           <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" disabled />
           <span className="con-menu al-passaggio">
             <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />

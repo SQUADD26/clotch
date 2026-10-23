@@ -53,7 +53,7 @@ export function MenuSelezione({ filo, prova = null }: { filo: RefObject<HTMLElem
       <Menu onChiudi={() => setAperto(null)} style={{ position: "static" }} voci={[
         ...(t ? [{ icona: "copia" as const, etichetta: "Copia", scorciatoia: "⌘C", fai: copia }] : []),
         { etichetta: "Seleziona tutto", scorciatoia: "⌘A", fai: () => getSelection()?.selectAllChildren(f) },
-        ...(t ? ["separatore" as const, { icona: "scintille" as const, etichetta: "Chiedi a clotch AI", fai: () => { chiediA(`«${t}»\n`); n.apri("friday"); } }] : []),
+        ...(t ? ["separatore" as const, { icona: "scintille" as const, etichetta: "Chiedi a clotch AI", fai: () => { chiediA(`«${t}»\n`); n.apri("clotch-ai"); } }] : []),
       ]} />
     </div>,
     document.body,

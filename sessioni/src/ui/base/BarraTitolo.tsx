@@ -1,19 +1,19 @@
 // figma: 101-7712 — «Barra titolo»: posto del semaforo del Mac, navigazione (barra laterale, indietro, avanti) e,
 // a destra, «comandi globali» (101-37696) montati dai pezzi che esportano `ComandiTitolo`.
 import type { ComponentType } from "react";
-import * as friday from "../friday";
+import * as clotchAi from "../clotch-ai";
 import * as pannello from "../pannello";
 import { Attivita } from "./Attivita";
 import { useImpostazioni } from "../impostazioni/stato";
 import { BottoneIcona } from "./Bottone";
 import { Suggerimento } from "./Suggerimento";
 import { Pezzo } from "./Pezzo";
-import { TornaAFriday } from "./TornaAFriday";
+import { TornaAClotchAi } from "./TornaAClotchAi";
 import { useNavigazione } from "./navigazione";
 
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
 const comandi = (m: object) => (m as { ComandiTitolo?: ComponentType }).ComandiTitolo;
-const ComandiPannello = comandi(pannello), ComandiFriday = comandi(friday);
+const ComandiPannello = comandi(pannello), ComandiClotchAi = comandi(clotchAi);
 const CentroPannello = (pannello as { CentroTitolo?: ComponentType }).CentroTitolo; // pillola «schermo occupato» (101-49592)
 
 export function BarraTitolo() {
@@ -37,7 +37,7 @@ export function BarraTitolo() {
         <Suggerimento testo="Indietro"><BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} {...nuda} /></Suggerimento>
         <Suggerimento testo="Avanti"><BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} {...nuda} /></Suggerimento>
       </div>
-      <TornaAFriday />
+      <TornaAClotchAi />
       {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
       {n.vista !== "impostazioni" && (
         <>
@@ -46,7 +46,7 @@ export function BarraTitolo() {
           {CentroPannello && <Pezzo nome="pannello"><CentroPannello /></Pezzo>}
           <div className="comandi-globali">
             {ComandiPannello && <Pezzo nome="pannello"><ComandiPannello /></Pezzo>}
-            {ComandiFriday && <Pezzo nome="friday"><ComandiFriday /></Pezzo>}
+            {ComandiClotchAi && <Pezzo nome="clotch-ai"><ComandiClotchAi /></Pezzo>}
           </div>
         </>
       )}

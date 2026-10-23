@@ -15,12 +15,12 @@ test("manda: con un modello scelto il comando scritto ha l'id CLI, mai l'etichet
   const registro = path.join(h, ".claude", "registro", `${new Date().toISOString().slice(0, 7)}.jsonl`);
   const p = inviaComando(h, "manda", argsManda("chat-1", "ciao", "subito", "Sonnet 5.5", null), { ogniMs: 10, scadenzaMs: 3000 });
   let c: any;
-  while (!c) { // Friday finta: legge il comando e risponde «rifiutato» come il motore in coda con modello
+  while (!c) { // clotch AI finta: legge il comando e risponde «rifiutato» come il motore in coda con modello
     const f = fs.existsSync(dir) ? fs.readdirSync(dir).find((n) => n.endsWith(".json")) : null;
     if (f) c = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); else await new Promise((ok) => setTimeout(ok, 5));
   }
   fs.mkdirSync(path.dirname(registro), { recursive: true });
-  fs.appendFileSync(registro, JSON.stringify({ v: 1, id: "r-000000000000", t: new Date().toISOString(), n: 1, chat: "friday", macchina: "mac", hook_v: "x", tipo: "comando_fatto", dati: { comando: c.id, esito: "rifiutato", testo: RIFIUTO } }) + "\n");
+  fs.appendFileSync(registro, JSON.stringify({ v: 1, id: "r-000000000000", t: new Date().toISOString(), n: 1, chat: "friday", macchina: "mac", hook_v: "x", tipo: "comando_fatto", dati: { comando: c.id, esito: "rifiutato", testo: RIFIUTO } }) + "\n"); // nome del protocollo del motore
   assert.deepEqual(c.args, { chat: "chat-1", testo: "ciao", modo: "subito", modello: "claude-sonnet-5-5" });
   const e = await p;
   assert.equal(e.esito, "rifiutato");

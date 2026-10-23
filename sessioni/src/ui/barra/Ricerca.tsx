@@ -25,7 +25,7 @@ export async function copiaUltimoBlocco(id: string) {
   }
 }
 
-/** «friday-mac-v2 · Codex»: l'account solo se non è il nome della sorgente (101:10247). */
+/** «clotch-ai-mac-v2 · Codex»: l'account solo se non è il nome della sorgente (101:10247). */
 const dettaglio = (s: Sessione) =>
   [s.progetto, nomeSorgente(s.sorgente), s.account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : s.account].filter(Boolean).join(" · ");
 

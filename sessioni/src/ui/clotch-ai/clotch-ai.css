@@ -1,0 +1,61 @@
+/* figma: 101-35494 — viste di clotch AI: intestazione, Casella (101-35494), Decisioni (101-39266), Regole (101-40473), comandi del titolo (101-37879) */
+.pezzo-clotch-ai .intestazione-clotch-ai { height: var(--misura-intestazione); flex: none; padding: 0 var(--spazio-4); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-clotch-ai .intestazione-clotch-ai .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-clotch-ai .intestazione-clotch-ai .riga-titolo, .pezzo-clotch-ai .intestazione-clotch-ai .stato { display: flex; align-items: center; }
+.pezzo-clotch-ai .intestazione-clotch-ai .riga-titolo { gap: var(--spazio-2); }
+.pezzo-clotch-ai .intestazione-clotch-ai .stato { gap: var(--spazio-1); }
+.pezzo-clotch-ai .azioni-f { display: flex; gap: var(--spazio-0-5); }
+
+/* «vista Casella» / «vista Decisioni» / «vista Regole»: colonna larga `colonna`, scorre da sola */
+.pezzo-clotch-ai .vista-clotch-ai {
+  flex: 1; min-height: 0; overflow-y: auto; padding: var(--spazio-6) 0;
+  display: flex; flex-direction: column; gap: var(--spazio-4);
+}
+
+/* scheda di progetto e «obiettivo proposto» */
+.pezzo-clotch-ai .scheda { background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl); padding: var(--spazio-4); display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-clotch-ai .scheda.proposta { background: none; border: var(--misura-tratto) solid var(--colore-bordo-fuoco); gap: var(--spazio-2); }
+.pezzo-clotch-ai .riga-f { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
+.pezzo-clotch-ai .riga-f .riempi { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-clotch-ai .colonna-f { display: flex; flex-direction: column; }
+.pezzo-clotch-ai .gap-1 { gap: var(--spazio-1); }
+.pezzo-clotch-ai .gap-2 { gap: var(--spazio-2); }
+.pezzo-clotch-ai .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
+.pezzo-clotch-ai .barra-uso > div { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
+.pezzo-clotch-ai .attesa { background: var(--colore-fondo-riga-passaggio); border-radius: var(--raggio-md); padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-clotch-ai .nota-clotch { padding: 0 var(--spazio-2); }
+.pezzo-clotch-ai .sagoma-f { height: var(--misura-icona); border-radius: var(--raggio-md); background: var(--colore-fondo-sagoma); }
+
+/* gruppi di Decisioni e Regole */
+.pezzo-clotch-ai .gruppo-f { background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl); padding: var(--spazio-2); display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-clotch-ai .gruppo-f .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-clotch-ai .voce-f { border-radius: var(--raggio-md); padding: var(--spazio-2); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-clotch-ai .voce-f .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+
+/* «vuoto» e «Avviso» rosso (registro non leggibile, clotch AI spenta) */
+.pezzo-clotch-ai .vuoto-f { padding: var(--spazio-16) var(--spazio-4) var(--spazio-4); display: flex; flex-direction: column; align-items: center; gap: var(--spazio-2); text-align: center; }
+.pezzo-clotch-ai .avviso-f { background: var(--colore-fondo-errore); border-radius: var(--raggio-lg); padding: var(--spazio-3); display: flex; gap: var(--spazio-3); }
+.pezzo-clotch-ai .avviso-f .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
+
+/* «comandi globali» della barra del titolo: luna di Non disturbare e «Ferma tutto» */
+.pezzo-clotch-ai .comandi-titolo { position: relative; display: flex; align-items: center; gap: var(--spazio-2); -webkit-app-region: no-drag; }
+.pezzo-clotch-ai .comandi-titolo .bottone-icona.aperto { background: var(--colore-fondo-riga-passaggio); }
+/* 101-38626: il menu ha il bordo destro sulla luna, 6 px sotto */
+.pezzo-clotch-ai .comandi-titolo .ancora-menu { position: relative; display: flex; }
+.pezzo-clotch-ai .comandi-titolo .menu { top: calc(var(--misura-bottone) + var(--spazio-1-5)); right: 0; }
+.pezzo-clotch-ai .menu .titolo-menu { padding: var(--spazio-1) var(--spazio-2); }
+.pezzo-clotch-ai .menu .nota-menu { min-height: var(--misura-riga); padding: 0 var(--spazio-2); display: flex; align-items: center; }
+
+/* testo dentro le righe */
+.pezzo-clotch-ai .t-primario { color: var(--colore-testo-primario); }
+.pezzo-clotch-ai .t-errore { color: var(--colore-testo-errore); }
+
+/* «testo regola» nel dialogo Modifica regola (101-40699) */
+.pezzo-clotch-ai .testo-regola {
+  min-height: calc(var(--misura-riga) * 3); padding: var(--spazio-2) var(--spazio-3); resize: none;
+  background: var(--colore-fondo-casella); color: var(--colore-testo-primario); font: inherit;
+  border: var(--misura-tratto) solid var(--colore-bordo-fuoco); border-radius: var(--raggio-lg); outline: none;
+}
+
+/* 101-42000: lo stato di clotch AI sta in fondo al filo, subito sopra la casella (lo spazio lo dà il gap di `colonna`) */
+.pezzo-clotch-ai .vista-clotch-ai.chat-clotch-ai { flex: none; padding: 0; overflow: visible; }

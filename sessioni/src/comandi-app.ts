@@ -1,4 +1,4 @@
-// Comandi che l'app fa da sé, senza passare dalla casella di Friday: fermare la propria voce e parlare con Clotch. Clotch li ascolta
+// Comandi che l'app fa da sé, senza passare dalla casella di clotch AI: fermare la propria voce e parlare con Clotch. Clotch li ascolta
 // come notifiche distribuite del Mac nella stessa sessione di login (come `com.squadd.clotch.dettatura` di AppDelegate.swift).
 import { fermaVoce } from "./voce-app";
 import { provaSilenziosa } from "./modalita-prova";

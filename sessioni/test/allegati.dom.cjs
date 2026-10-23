@@ -13,8 +13,8 @@ app.whenReady().then(async () => {
   const scena = JSON.parse(JSON.stringify(require('../design/scene/101-28041.json')));
   collegaScena(ipcMain, scena);
   const comandi = [];
-  ipcMain.removeHandler('friday:comando');
-  ipcMain.handle('friday:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok' }; });
+  ipcMain.removeHandler('clotch-ai:comando');
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok' }; });
   ipcMain.removeHandler('casella:scegli');
   ipcMain.handle('casella:scegli', () => [{ percorso: '/tmp/prova.png', nome: 'prova.png', tipo: 'immagine', byte: 312000 }]);
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,

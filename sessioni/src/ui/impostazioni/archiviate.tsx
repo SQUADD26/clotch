@@ -6,7 +6,7 @@ import type { Archiviata } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { Campo } from "../base/Campo";
-import { testoEsito } from "./friday";
+import { testoEsito } from "./clotch-ai";
 import { Gruppo, Pagina, Riga, VuotoLista } from "./controlli";
 
 export default function Archiviate() {
@@ -14,7 +14,7 @@ export default function Archiviate() {
   useEffect(() => { window.impostazioni.archiviate().then(setTutte, () => {}); }, []);
   const [cerca, setCerca] = useState("");
   const ripristina = async (id: string) => {
-    const e = await window.friday.comando("ripristina", { chat: id }).catch(() => null);
+    const e = await window.clotchAi.comando("ripristina", { chat: id }).catch(() => null);
     if (e?.esito === "ok") return setTutte((t) => t.filter((s) => s.id !== id));
     avvisa({ tipo: "errore", messaggio: e ? testoEsito(e) : "Comando non riuscito" });
   };

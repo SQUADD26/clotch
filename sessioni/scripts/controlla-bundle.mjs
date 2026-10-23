@@ -1,4 +1,4 @@
-// Confine del renderer (#447): nel bundle non entra niente di Node, di Electron o del main Friday.
+// Confine del renderer (#447): nel bundle non entra niente di Node, di Electron o del main clotch AI.
 // Un modulo Node importato dal renderer viene "externalized" da Vite e sparisce dal codice: lo si vede solo nei
 // warning della build, quindi qui si ricostruisce in una cartella temporanea ascoltandoli, oltre a leggere renderer/.
 // Uso: npm run build && node scripts/controlla-bundle.mjs     Stampa BUNDLE_OK oppure l'elenco e esce 1.
@@ -13,7 +13,7 @@ const NODE = 'node:[\\w/]+|fs|path|os|child_process|electron|crypto|net|http|htt
 const SCHEMI = [
   [new RegExp(`\\b(?:require|import)\\s*\\(\\s*["'\`](?:${NODE})(?:/[\\w/]*)?["'\`]\\s*\\)`, 'g'), 'import dinamico o require di un modulo Node'],
   [new RegExp(`\\bfrom\\s*["'](?:${NODE})(?:/[\\w/]*)?["']`, 'g'), 'import statico di un modulo Node'],
-  [/\.\.\/\.\.\/friday["'`]|\/src\/friday(?:\.ts)?["'`]/g, 'import del main Friday'],
+  [/\.\.\/\.\.\/clotch-ai["'`]|\/src\/clotch-ai(?:\.ts)?["'`]/g, 'import del main clotch AI'],
   [/__vite-browser-external/g, 'modulo Node sostituito da Vite'],
 ];
 const trova = (codice, dove) => SCHEMI.flatMap(([re, cosa]) => [...codice.matchAll(re)].map((m) => `${dove}: ${cosa}: ${m[0].slice(0, 80)}`));
@@ -42,5 +42,5 @@ try {
   for (const f of file) problemi.push(...trova(fs.readFileSync(path.join(dist, f), 'utf8'), `renderer/${f}`));
   problemi.push(...await ricostruisci({ root: path.join(root, 'src/ui'), configFile: path.join(root, 'vite.config.mjs'), build: { outDir: path.join(tmp, 'renderer'), emptyOutDir: true } }));
   if (problemi.length) { console.log(`BUNDLE_NON_OK (${problemi.length}):\n${[...new Set(problemi)].map((p) => '  - ' + p).join('\n')}`); process.exit(1); }
-  console.log(`BUNDLE_OK: ${file.filter((f) => f.endsWith('.js')).length} file js in renderer/, nessun modulo Node, electron o main Friday; la ricostruzione non segnala moduli esternalizzati`);
+  console.log(`BUNDLE_OK: ${file.filter((f) => f.endsWith('.js')).length} file js in renderer/, nessun modulo Node, electron o main clotch AI; la ricostruzione non segnala moduli esternalizzati`);
 } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
