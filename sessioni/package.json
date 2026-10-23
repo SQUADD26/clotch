@@ -1,0 +1,18 @@
+{
+  "name": "clotch-sessioni",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Legge in sola lettura le sessioni di lavoro del Mac (Claude Code, app Claude, Codex, Cursor). Nessuna interfaccia: l'API per il renderer è in src/api.ts.",
+  "main": "dist/src/main.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test \"dist/test/*.test.js\"",
+    "elenco": "tsc && node dist/src/elenco-cli.js",
+    "start": "tsc && electron ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "electron": "^38.0.0",
+    "typescript": "^5.9.0"
+  }
+}
