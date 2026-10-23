@@ -34,7 +34,7 @@ export function descrivi(nome: string, ingresso: unknown, stato: StatoStrumento,
     case "Grep": case "Glob": {
       const dove = relativo(campo(ingresso, "path"), cartella);
       const cosa = campo(ingresso, "pattern");
-      return { etichetta: "Cercato", icona: "cerca", dettaglio: dove ? `${cosa} in ${dove}` : cosa, comando: null };
+      return { etichetta: "Cercato", icona: "cerca-file", dettaglio: dove ? `${cosa} in ${dove}` : cosa, comando: null };
     }
     case "Edit": case "MultiEdit": case "Write": case "NotebookEdit":
       return { etichetta: "Modificato", icona: "matita", dettaglio: file, comando: null };

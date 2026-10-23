@@ -140,8 +140,11 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
       tu.blocchi.push({ tipo: "modifica", id: m.id, file, righe, ...contaRighe(righe), durata: durata(i) });
       return;
     }
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: st, durata: durata(i), uscita: esito, ...descrivi(m.nome, m.ingresso, st, cartella) });
-    if (m.esito?.errore && BLOCCO.test(esito)) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "") });
+    // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
+    const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
+    const stRiga = bloccato ? "chiusa" : st;
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
+    if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 
   // turni finiti: le modifiche diventano un solo «File toccati» prima dell'ultima risposta

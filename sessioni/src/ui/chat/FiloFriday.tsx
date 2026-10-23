@@ -5,11 +5,13 @@ import { BottoneIcona } from "../base/Bottone";
 import { useElenco, usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
+import { useNavigazione } from "../base/navigazione";
 import { SegnoStato } from "../base/SegnoStato";
 import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
 import { Risposta } from "./Risposta";
 import { comanda } from "./friday";
+import { provaDi } from "./testi";
 import "./casella.css";
 
 /** Le voci della chat con Friday, in ordine di tempo. */
@@ -38,7 +40,7 @@ const MENZIONE = /@([^\s@]*)$/;
 
 /** `microfono`: il bottone della voce di Friday; `spenta`: Friday non risponde, la casella non manda. */
 export function CasellaFriday({ microfono, spenta = false }: { microfono?: ReactNode; spenta?: boolean }) {
-  const [testo, setTesto] = useState("");
+  const [testo, setTesto] = useState(provaDi(useNavigazione().sezione, "scritta") ?? ""); // scena di prova 101:45260
   const [scelta, setScelta] = useState(0);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);

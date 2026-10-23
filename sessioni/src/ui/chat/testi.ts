@@ -24,3 +24,9 @@ export const SORGENTE: Record<Sessione["sorgente"], string> = {
 export const nomeAccount = (account: string) => account.replace(/^\./, "").replace(/^claude-/, "");
 
 export const ora = (ms: number) => new Date(ms).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+
+/** Stato di una scena di prova: `sezione` = «chiave:valore|chiave»; null se la chiave non c'è, "" se non ha valore. */
+export const provaDi = (prova: string | null | undefined, chiave: string) => {
+  const x = prova?.split("|").find((p) => p === chiave || p.startsWith(`${chiave}:`));
+  return x == null ? null : x.slice(chiave.length + 1);
+};

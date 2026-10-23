@@ -9,22 +9,22 @@ import { FileToccati, MessaggioRoberto, Modifica, Pensiero, RicercaWeb, Strument
 import { Risposta } from "./Risposta";
 import { riepilogo, type Blocco, type Voce } from "./modello";
 import { Domanda, Esito, Permesso, Piano, passiPiano } from "./Richieste";
-import { quanti } from "./testi";
+import { provaDi, quanti } from "./testi";
 
 type Richiesta = ChatFriday["richieste"][number];
 
 /** Un blocco del turno. `vivo`: l'ultimo turno di una sessione che lavora (le modifiche si vedono aperte, 101:14631). */
-function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello }: {
-  b: Blocco; chat: string; vivo: boolean; richiesta(g: string): Richiesta | null; da: string | null; prova: boolean; modello: string | null;
+function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
+  b: Blocco; chat: string; vivo: boolean; richiesta(g: string): Richiesta | null; da: string | null; prova: boolean; modello: string | null; aperto: boolean;
 }) {
   switch (b.tipo) {
-    case "pensiero": return <Pensiero b={b} />;
-    case "strumento": return <Strumento b={b} />;
+    case "pensiero": return <Pensiero b={b} aperto={aperto} />;
+    case "strumento": return <Strumento b={b} aperta={aperto} />;
     case "modifica": return <Modifica b={b} aperta={vivo} />;
     case "web": return <RicercaWeb b={b} />;
     case "attivita": return <Attivita passi={b.passi} />;
     case "aiutanti": return <Aiutanti aiutanti={b.aiutanti} modello={modello} />;
-    case "file-toccati": return <FileToccati b={b} />;
+    case "file-toccati": return <FileToccati b={b} aperto={aperto} />;
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
     case "errore": return <AvvisoFilo tipo="errore" titolo={b.testo} />;
@@ -42,7 +42,8 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatFriday | null; da: string | null;
   /** Messaggi più vecchi non ancora caricati (null = non si sa, ma ci sono). */
   prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode;
-  /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727). */
+  /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727),
+   *  «aperti:pensiero,strumento» parte coi blocchi di quei tipi aperti, come dopo un clic (101:8309, 8610, 9628). */
   prova?: string | null;
 }) {
   const filo = useRef<HTMLDivElement>(null);
@@ -51,6 +52,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   // permessi aperti: non stanno nella trascrizione, solo nel registro di Friday
   const permessi = c?.richieste.filter((r) => r.genere === "permesso") ?? [];
   const ultimo = voci.length - 1;
+  const aperti = provaDi(prova, "aperti")?.split(",") ?? [];
   // il modello degli aiutanti lo sa solo il registro («Sonnet 5.5», 101:14396)
   const modello = nomeModello([...(c?.aiutanti.values() ?? [])].find((x) => x.modello)?.modello ?? null);
 
@@ -81,8 +83,8 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
         return (
           <div key={v.chiave} className="turno">
             {v.blocchi.map((b, i) => (
-              <BloccoTurno key={i} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} modello={modello}
-                prova={prova === "menu-risposta" && k === ultimo && i === v.blocchi.length - 1} />
+              <BloccoTurno key={i} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} modello={modello} aperto={aperti.includes(b.tipo)}
+                prova={provaDi(prova, "menu-risposta") !== null && k === ultimo && i === v.blocchi.length - 1} />
             ))}
             {k === ultimo && finita && <FineTurno ms={r.durata} strumenti={r.strumenti} file={r.file} aiutanti={r.aiutanti} />}
           </div>

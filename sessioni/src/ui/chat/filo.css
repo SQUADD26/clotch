@@ -109,3 +109,5 @@
 /* microfono e «…» compaiono al passaggio sulla risposta («risposta al passaggio», 101:23727) */
 .risposta:not(:hover) .azioni:not(.fisse) .al-passaggio { display: none; }
 .turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
+/* avvisi e modifiche aperte stanno a spazio/6 dai vicini del turno (101:15790, 101:14631) */
+.turno > .avviso-filo, .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }

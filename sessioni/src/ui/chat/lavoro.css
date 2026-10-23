@@ -24,3 +24,4 @@
 .avviso-filo .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
 .avviso-filo .titolo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
 .avviso-filo .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+

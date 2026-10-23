@@ -1,7 +1,8 @@
 {
  "navigazione": {
   "vista": "sessione",
-  "sessione": "s1"
+  "sessione": "s1",
+  "sezione": "aperti:strumento"
  },
  "elenco": {
   "sessioni": [
@@ -18,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792767136337,
+    "ultimaAttivita": 1792767937442,
     "obiettivo": {
      "testo": "Leggere dal disco le sessioni di tutte le cartelle ~/.claude-*, di Codex e di Cursor, senza interfaccia.",
      "stato": "aperto",
@@ -54,7 +55,7 @@
    {
     "tipo": "utente",
     "testo": "Leggi le sessioni dal disco: tutte le cartelle ~/.claude-*, Codex e Cursor.",
-    "t": 1792767121337
+    "t": 1792767922442
    },
    {
     "tipo": "strumento",
@@ -64,17 +65,17 @@
      "path": "~/Library"
     },
     "esito": {
-     "testo": "ok",
+     "testo": "",
      "errore": false
     },
-    "t": 1792767122337,
+    "t": 1792767923442,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Trovo 6 cartelle di account e 312 sessioni. Scrivo il lettore e i test.",
     "modello": "claude-opus-5-5",
-    "t": 1792767124337
+    "t": 1792767925442
    },
    {
     "tipo": "strumento",
@@ -86,7 +87,7 @@
      "testo": "PASS sessioni/lettore.test.ts (11 test)\nTests: 11 passed, 11 total",
      "errore": false
     },
-    "t": 1792767125337,
+    "t": 1792767926442,
     "id": "t1"
    },
    {
@@ -96,13 +97,13 @@
      "command": "npm test -- cartelle"
     },
     "esito": null,
-    "t": 1792767134337,
+    "t": 1792767935442,
     "id": "t2"
    },
    {
     "tipo": "pensiero",
     "testo": "…",
-    "t": 1792767135337
+    "t": 1792767936442
    }
   ]
  },

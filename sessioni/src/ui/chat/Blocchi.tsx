@@ -23,8 +23,8 @@ function Testata({ icona, colore = "secondaria", aperta, onClick, children }: {
   );
 }
 
-export function Pensiero({ b }: { b: Extract<Blocco, { tipo: "pensiero" }> }) {
-  const [aperto, setAperto] = useState(false);
+export function Pensiero({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "pensiero" }>; aperto?: boolean }) {
+  const [aperto, setAperto] = useState(iniziale);
   if (b.inCorso) return <div className="pensiero"><div className="testata"><span className="etichetta">Ragionando…</span></div></div>;
   return (
     <div className="pensiero">
@@ -46,8 +46,8 @@ export function BloccoCodice({ comando, uscita, errore = false }: { comando?: st
   );
 }
 
-export function Strumento({ b }: { b: Extract<Blocco, { tipo: "strumento" }> }) {
-  const [aperta, setAperta] = useState(b.stato === "errore");
+export function Strumento({ b, aperta: iniziale = false }: { b: Extract<Blocco, { tipo: "strumento" }>; aperta?: boolean }) {
+  const [aperta, setAperta] = useState(iniziale || b.stato === "errore");
   const apribile = b.stato !== "in-corso" && !!(b.comando || b.uscita);
   return (
     <div className="strumento">
@@ -88,8 +88,8 @@ export function Modifica({ b, aperta: iniziale }: { b: Extract<Blocco, { tipo: "
   );
 }
 
-export function FileToccati({ b }: { b: Extract<Blocco, { tipo: "file-toccati" }> }) {
-  const [aperto, setAperto] = useState(false);
+export function FileToccati({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "file-toccati" }>; aperto?: boolean }) {
+  const [aperto, setAperto] = useState(iniziale);
   const somma = b.file.reduce((s, f) => ({ aggiunte: s.aggiunte + f.aggiunte, tolte: s.tolte + f.tolte }), { aggiunte: 0, tolte: 0 });
   return (
     <div className="file-toccati">

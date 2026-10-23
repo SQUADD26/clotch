@@ -67,14 +67,14 @@ scena("23727", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "men
 const ASPETTA = { stato: "aspetta" }, FERMA = { stato: "ferma" };
 const DISCO = { titolo: "Sessioni: lettura dal disco", obiettivo: { ...OBIETTIVO, testo: "Leggere dal disco le sessioni di tutte le cartelle ~/.claude-*, di Codex e di Cursor, senza interfaccia." } };
 scena("8309", DISCO, messaggi([
-  u("Leggi le sessioni dal disco: tutte le cartelle ~/.claude-*, Codex e Cursor."), st("Grep", { pattern: "«claude-code-sessions»", path: "~/Library" }, "ok", 2),
+  u("Leggi le sessioni dal disco: tutte le cartelle ~/.claude-*, Codex e Cursor."), st("Grep", { pattern: "«claude-code-sessions»", path: "~/Library" }, "", 2),
   a("Trovo 6 cartelle di account e 312 sessioni. Scrivo il lettore e i test."),
   bash("npm test -- lettore", "PASS sessioni/lettore.test.ts (11 test)\nTests: 11 passed, 11 total", 9), bash("npm test -- cartelle", null, 1), [{ tipo: "pensiero", testo: "…" }, 1],
-]));
+]), { sezione: "aperti:strumento" });
 scena("8610", { ...ELECTRON, ...FINITO }, messaggi([
   u("Fammi l'app Sessioni in Electron con l'aspetto di ChatGPT."), p(14), a("Leggo il riferimento di ChatGPT e creo le variabili con i colori scuri."),
   u("Aggiungi lo stato con 200 sessioni."), ...TRE_FILE, a("Fatto. Manca solo il tuo sì sul disegno."),
-]), { sezione: "scritta:Aggiungi anche lo stato con 200 sessioni" });
+]), { sezione: "scritta:Aggiungi anche lo stato con 200 sessioni|aperti:pensiero" });
 const ALLE_18 = new Date(ORA).setHours(18, 0, 0, 0);
 const LIMITE = { limite: { account: ".claude-accountmanager", ripartenza: ALLE_18 }, stato: "ferma_limite" };
 scena("9340", { titolo: "AFK: foto dello schermo", icona: "schermo", ramo: "feat/301-afk-foto", ...FERMA, situazione: { adesso: "limite", strumento: null, inCoda: 0, segni: [] },
@@ -87,7 +87,7 @@ const RIFIUTI = Array.from({ length: 44 }, () => st("Bash", { command: "x" }, "T
 scena("9628", { ...ELECTRON, ...FINITO, titolo: "Clotch: sessioni in Electron con lettura dal disco di tutte le cartelle degli account, filtri per sorgente e stato, ricerca globale e impostazioni come quelle di ChatGPT" },
   [...Array.from({ length: 4812 }, (_, i) => ({ tipo: "assistente", testo: `vecchio ${i}`, modello: null, t: ORA - 86_400_000 })), ...messaggi([...RIFIUTI,
     u("Controlla anche la sessione con migliaia di messaggi."), bash("swift test --filter Sessioni", "Test Suite 'SessioniTests' passed\nExecuted 14 tests, with 0 failures in 0.412 seconds", 12),
-    ...TRE_FILE, a("Si apre sugli ultimi 50 messaggi. Gli altri 4.812 si caricano quando sali.")])]);
+    ...TRE_FILE, a("Si apre sugli ultimi 50 messaggi. Gli altri 4.812 si caricano quando sali.")])], { sezione: "aperti:strumento,file-toccati" });
 scena("9841", { titolo: "Voce: parole inglesi", icona: "microfono", ramo: "fix/323-parole-inglesi", ...FERMA, obiettivo: null, situazione: null }, []);
 const RICOMPILA = [u("Ricompila l’app dopo il cambio della barra laterale."), leggi("sessioni/package.json"), a("La cartella della build è vecchia: la svuoto e ricompilo.")];
 scena("13650", ASPETTA, messaggi(RICOMPILA), { c: chat({ stato: "serve_roberto", richieste: [{ rid: "r1", genere: "permesso", strumento: "Bash",
@@ -126,11 +126,11 @@ scena("15335", { stato: "finita", situazione: { adesso: "turno_finito", strument
   a("Fatto. Le 14 schermate sono pari al disegno; la PR verso dev è aperta."),
 ]), { c: chat({ aiutanti: { a1: { ...AIUTANTI.aiutanti.a1, finito: true } } }) });
 const LINK = (t, u) => ({ title: t, url: u });
-scena("15577", {}, messaggi([u("Come si fa la barra laterale trasparente su Mac?"),
+scena("15577", FINITO, messaggi([u("Come si fa la barra laterale trasparente su Mac?"),
   st("WebSearch", { query: "electron vibrancy sidebar macOS" }, `Links: ${JSON.stringify([LINK("BrowserWindow: vibrancy e visualEffectState", "https://electronjs.org/docs"),
     LINK("Barra laterale trasparente su macOS", "https://github.com/x"), LINK("NSVisualEffectView", "https://developer.apple.com/x"), LINK("Barra del titolo nascosta con i semafori", "https://stackoverflow.com/x")])}`, 1),
   a("Con vibrancy «sidebar» sulla finestra e lo sfondo della barra trasparente. Lo provo adesso.")]));
-scena("15790", {}, messaggi([u("Spedisci tutto in produzione."), bash("git push origin main", "PreToolUse:Bash git push su main non è permesso. La sessione prova un’altra strada.", 0.4, true),
+scena("15790", FINITO, messaggi([u("Spedisci tutto in produzione."), bash("git push origin main", "PreToolUse:Bash git push su main non è permesso. La sessione prova un’altra strada.", 0.4, true),
   a("Apro la PR verso dev: la promozione a main parte da lì.")]));
 scena("15993", {}, messaggi([u("Lancia tutte le prove."), bash("npm test", null, 1)], 6 * MIN), { c: chat({ battito: ORA - 6 * MIN }) });
 scena("16211", { ...FERMA, situazione: { adesso: "limite", strumento: null, inCoda: 0, segni: [] } },
@@ -140,3 +140,24 @@ scena("45507", { ...ASPETTA, titolo: "Backend: auth e RLS", icona: "database", p
     prove: [{ testo: "Test delle policy: 14 su 14", fatta: true }, { testo: "Migrazione 0042 provata su dev", fatta: true }, { testo: "Sì di Roberto alla promozione", fatta: false }] } },
 messaggi([u("Applica le policy RLS di «sessioni» e promuovi su main."), bash("gh pr checks 2412", "ok", 6),
   a("I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?")]));
+
+// —— Chat Friday (101:16432) e sessioni da citare dopo @ (101:45260) ——
+function scenaFriday(id, domande, sezione, sessioni = []) {
+  const r = registro(chat({ chat: "friday", progetto: null, visto: ORA - 10_000, battito: ORA - 10_000 }));
+  r.chat = { friday: r.chat.s1 };
+  let t = ORA - 10 * MIN;
+  for (const [i, [d, rs]] of domande.entries()) {
+    r.comandi.push({ id: `c${i}`, t: (t += 20_000), cmd: "parla", da: "app", args: { testo: d } });
+    r.avvisi.push({ id: `a${i}`, t: (t += 20_000), testo: rs, livello: "info", motivo: "risposta", dettoDa: null });
+  }
+  const dati = { navigazione: { vista: "friday", ...(sezione ? { sezione } : {}) }, elenco: { sessioni, errori: [] }, messaggi: {},
+    preferenze: Object.fromEntries(sessioni.map((s) => [s.id, { icona: s.icona }])), registro: r };
+  writeFileSync(new URL(`../design/scene/101-${id}.json`, import.meta.url), JSON.stringify(dati, null, 1) + "\n");
+}
+const BACKEND = [["Com’è messa la sessione del backend?", "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev."]];
+scenaFriday("16432", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]]);
+scenaFriday("45260", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è partita; ti avviso quando finisce."]], "scritta:Ferma @back", [
+  sessione({ id: "b1", titolo: "Backend: auth e RLS", icona: "database", progetto: "squadd-v2", stato: "aspetta" }),
+  sessione({ id: "b2", titolo: "Backup Hetzner sulle VPS", icona: "pacco", progetto: "squadd-v2", stato: "finita" }),
+  sessione({ id: "b3", titolo: "Backend: webhook pagamenti", icona: "database", progetto: "dentalspace", stato: "ferma" }),
+]);

@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792767136337,
+    "ultimaAttivita": 1792767937442,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Porta il disegno Sessioni nel codice, pari pari.",
-    "t": 1792767071337
+    "t": 1792767872442
    },
    {
     "tipo": "strumento",
@@ -66,7 +66,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767072337,
+    "t": 1792767873442,
     "id": "t0"
    },
    {
@@ -100,7 +100,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767073337,
+    "t": 1792767874442,
     "id": "t1"
    },
    {
@@ -111,7 +111,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792767074337,
+    "t": 1792767875442,
     "id": "t2"
    },
    {
@@ -122,7 +122,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792767086337,
+    "t": 1792767887442,
     "id": "t3"
    },
    {
@@ -133,13 +133,13 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792767094337,
+    "t": 1792767895442,
     "id": "t4"
    },
    {
     "tipo": "pensiero",
     "testo": "…",
-    "t": 1792767135337
+    "t": 1792767936442
    }
   ]
  },
@@ -164,7 +164,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792767236337,
+    "battito": 1792768037442,
     "aiutanti": {
      "a1": {
       "tipo": "general-purpose",
@@ -179,7 +179,7 @@
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792767256337,
+    "visto": 1792768057442,
     "fine": null,
     "chatNuova": null,
     "fermata": false,

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { comanda } from "./friday";
-import { quanti } from "./testi";
+import { provaDi, quanti } from "./testi";
 import "./casella.css";
 
 export interface VoceCoda { voce: string; testo: string }
@@ -44,11 +44,13 @@ function Coda({ voci, modifica, onModifica, chat, suggerimento }: {
 
 /** `segnaposto`: «In attesa della sessione» (101:15993), «Riparte alle 18:00» (101:16211); di solito «Scrivi alla sessione». */
 /** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945). */
-export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto = "Scrivi alla sessione", prova = null }: {
+export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false }: {
   chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; disabilitata: boolean; segnaposto?: string; prova?: string | null;
+  /** Roberto ha appena interrotto e mandato (101:43535): i tasti restano sotto la casella. */
+  appenaMandato?: boolean;
 }) {
-  const inModifica = prova === "modifica" ? coda[0] ?? null : null;
-  const [testo, setTesto] = useState(prova?.startsWith("scritta:") ? prova.slice(8) : inModifica?.testo ?? "");
+  const inModifica = provaDi(prova, "modifica") !== null ? coda[0] ?? null : null;
+  const [testo, setTesto] = useState(provaDi(prova, "scritta") ?? inModifica?.testo ?? "");
   const [modifica, setModifica] = useState<VoceCoda | null>(inModifica);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
@@ -81,7 +83,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
     <div className="area-casella">
-      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={prova === "suggerimento"} modifica={modifica?.voce ?? null} onModifica={(v) => { setModifica(v); setTesto(v.testo); area.current?.focus(); }} />}
+      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { setModifica(v); setTesto(v.testo); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
@@ -103,7 +105,8 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
           </button>
         </div>
       </div>
-      {lavora && !disabilitata && (
+      {/* i tasti servono mentre scrivi, con messaggi in coda o subito dopo «interrompi e manda» (101:14849, 43332, 43535) */}
+      {lavora && !disabilitata && (testo || coda.length > 0 || appenaMandato) && (
         <div className="tasti-casella">
           <Tasto t="↵" /><span>interrompe e manda subito</span>
           <Tasto t="⌘↵" /><span>mette in coda</span>

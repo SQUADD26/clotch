@@ -9,10 +9,16 @@ import { Filo } from "./Filo";
 import { nonRisponde, useChatFriday, useOra } from "./friday";
 import { TestaSessione } from "./Intestazione";
 import { Limite, NonRisponde } from "./Lavoro";
-import { voci as daMessaggi } from "./modello";
+import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario } from "./testi";
 
 export { CasellaFriday, FiloFriday } from "./FiloFriday";
+
+/** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
+function dopoInterruzione(voci: Voce[]) {
+  const k = voci.map((v) => v.tipo).lastIndexOf("roberto"), prima = voci[k - 1];
+  return prima?.tipo === "turno" && prima.blocchi.at(-1)?.tipo === "interrotta";
+}
 
 function useSessione() {
   const { sessione, sezione } = useNavigazione();
@@ -50,6 +56,7 @@ export default function Chat() {
     : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
   const casella = (
     <Casella chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} prova={sezione}
+      appenaMandato={dopoInterruzione(voci)}
       segnaposto={muta ? "In attesa della sessione" : limite && ripartenza ? `Riparte alle ${ripartenza}` : undefined} />
   );
 
