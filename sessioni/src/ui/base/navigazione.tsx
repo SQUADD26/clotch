@@ -19,7 +19,7 @@ export interface Navigazione extends Passo {
 const Contesto = createContext<Navigazione | null>(null);
 
 export function ConNavigazione({ children }: { children: ReactNode }) {
-  const [storia, setStoria] = useState({ passi: [{ vista: "sessione", sessione: null }] as Passo[], i: 0 });
+  const [storia, setStoria] = useState(() => ({ passi: [{ vista: "sessione", sessione: new URLSearchParams(location.search).get("sessione") }] as Passo[], i: 0 }));
   const [barraAperta, setBarra] = useState(true);
   const [pannelloAperto, setPannello] = useState(true);
   const apri = useCallback((vista: Vista, sessione?: string | null) => setStoria(({ passi, i }) => {
