@@ -86,7 +86,24 @@ export interface SessioniApi {
   elencoSessioni(): Promise<Elenco>;
   messaggi(id: string, pagina: number): Promise<PaginaMessaggi>;
   onAggiornamento(cb: (a: Aggiornamento) => void): () => void;
+  /** Preferenze dell'app per id di sessione (#360). */
+  preferenze(): Promise<Record<string, PreferenzeSessione>>;
+  /** Unisce `parte` (un campo a null si toglie); `onPreferenze` riceve il nuovo insieme. */
+  impostaPreferenze(id: string, parte: { [K in keyof PreferenzeSessione]?: PreferenzeSessione[K] | null }): Promise<void>;
+  onPreferenze(cb: (p: Record<string, PreferenzeSessione>) => void): () => void;
+  azione(id: string, azione: AzioneSessione): Promise<void>;
 }
+
+export interface PreferenzeSessione {
+  /** Nome di un'icona «Icona/…» del file Figma (NomeIcona in ui/base/icone.ts). */
+  icona?: string;
+  /** Nome di un colore «colore/sessione/…» del file Figma, es. «blu». */
+  colore?: string;
+  fissa?: boolean;
+  nonLetta?: boolean;
+}
+
+export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder";
 
 /** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
 export interface FridayApi {

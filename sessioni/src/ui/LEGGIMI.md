@@ -28,7 +28,7 @@ Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvat
 
 ## Dati dal processo main
 
-Un solo modo: `base/dati.ts`. `useElenco()`, `useMessaggi(id)`, `useAggiornamenti(cb)`, `useChiamata(fn, deps)`. Danno `stato` (`carica` | `pronto` | `errore`), `errore` e `riprova()`; gli aggiornamenti dal vivo ricaricano senza svuotare lo schermo. Un canale nuovo del main va in `src/tipi.ts` (`SessioniApi`), `src/preload.ts` e `src/main.ts`, una riga per file.
+Un solo modo: `base/dati.ts`. `useElenco()`, `useMessaggi(id)`, `useAggiornamenti(cb)`, `usePreferenze()` (icona, colore, fissa, non letta per sessione), `useChiamata(fn, deps)`. Azioni su una sessione: `api().azione(id, "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder")`. Danno `stato` (`carica` | `pronto` | `errore`), `errore` e `riprova()`; gli aggiornamenti dal vivo ricaricano senza svuotare lo schermo. Un canale nuovo del main va in `src/tipi.ts` (`SessioniApi`), `src/preload.ts` e `src/main.ts`, una riga per file.
 
 ## Prova di parità
 

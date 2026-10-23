@@ -15,7 +15,8 @@ function frame(id: string) {
   return { w: f.frame.w as number, h: f.frame.h as number, finestra: finestra as { w: number; h: number } };
 }
 
-export function apriFinestra(): BrowserWindow | null {
+/** `sessione`: la finestra si apre già su quella sessione («Apri in una nuova finestra»). */
+export function apriFinestra(sessione?: string): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
   const w = new BrowserWindow({
@@ -26,7 +27,7 @@ export function apriFinestra(): BrowserWindow | null {
     trafficLightPosition: { x: numero("spazio-5"), y: (numero("misura-barra-titolo") - numero("misura-semaforo")) / 2 },
     webPreferences: { preload, contextIsolation: true },
   });
-  w.loadFile(pagina);
+  w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
   return w;
 }
 

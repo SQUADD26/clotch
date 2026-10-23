@@ -4,6 +4,7 @@ import * as os from "node:os";
 import { Sessioni } from "./api";
 import { apriFinestra, parita } from "./finestra";
 import { collegaFriday } from "./friday-ipc";
+import { collegaPreferenze } from "./preferenze-ipc";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
@@ -14,6 +15,7 @@ app.whenReady().then(() => {
   ipcMain.handle("sessioni:elenco", () => sessioni.elencoSessioni());
   ipcMain.handle("sessioni:messaggi", (_e, id: string, pagina: number) => sessioni.messaggi(String(id), Number(pagina) | 0));
   collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
+  collegaPreferenze(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), sessioni);
   sessioni.osserva((a) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a)));
 
   if (iParita > 0) return parita(process.argv[iParita + 1]);
