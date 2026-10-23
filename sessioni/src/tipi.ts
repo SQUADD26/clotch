@@ -1,4 +1,5 @@
 // Tipi esportati verso il renderer (via preload). Nessun legame con Electron.
+import type { Situazione } from "./situazione";
 
 export type Sorgente = "claude-code" | "claude-desktop" | "codex" | "cursor";
 export type Stato = "lavora" | "aspetta" | "ferma" | "finita";
@@ -36,6 +37,8 @@ export interface Sessione {
   /** Millisecondi epoch dell'ultima attività. */
   ultimaAttivita: number;
   obiettivo: Obiettivo | null;
+  /** Cosa succede adesso secondo la coda della trascrizione; null se la sorgente non lo dice (Cursor, app senza file). */
+  situazione: Situazione | null;
   /** File da cui è stata letta: serve a `messaggi()` e all'osservatore. */
   file: string;
 }

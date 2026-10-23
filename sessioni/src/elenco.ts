@@ -48,7 +48,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     tutte.push({
       id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: null, idApp: a.idApp, titolo: a.titolo,
       progetto: nomeProgetto(cartella), cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
-      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, file: a.file,
+      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file,
     });
   }
   tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori), ...leggiCursor(opz.home, errori));

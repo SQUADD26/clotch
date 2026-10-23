@@ -4,12 +4,13 @@ import * as path from "node:path";
 import { testaECoda, trovaFile, msgErrore } from "./jsonl";
 import { nomeProgetto } from "./claude-code";
 import { aMillisecondi } from "./registri";
+import { situazioneCodex } from "./situazione";
 import { ErroreLettura, Sessione } from "./tipi";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const base = (): Sessione => ({
   id: "", sorgente: "codex", account: "", email: null, idApp: null, titolo: "", progetto: "", cartella: "", ramo: null, modello: null,
-  stato: "ferma", perche: null, ultimaAttivita: 0, obiettivo: null, file: "",
+  stato: "ferma", perche: null, ultimaAttivita: 0, obiettivo: null, situazione: null, file: "",
 });
 
 export function leggiCodex(home: string, env: NodeJS.ProcessEnv, errori: ErroreLettura[]): Sessione[] {
@@ -33,6 +34,7 @@ export function leggiCodex(home: string, env: NodeJS.ProcessEnv, errori: ErroreL
           cartella,
           ramo: meta.git?.branch ?? null,
           modello: ctx.model ?? null,
+          situazione: situazioneCodex(coda),
           ultimaAttivita: [...coda].reverse().map((o) => aMillisecondi(o.timestamp)).find((x) => x !== null) ?? st.mtimeMs,
           file,
         });
