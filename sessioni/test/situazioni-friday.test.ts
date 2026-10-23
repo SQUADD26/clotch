@@ -44,8 +44,8 @@ test("avviso: risposta di Friday a Roberto distinta dalla domanda di una session
   assert.ok(reg.avvisi.every((a) => (MOTIVI_AVVISO as readonly string[]).includes(a.motivo)));
 });
 
-test("decisioni: annullabile, già annullata, senza inverso", () => {
-  assert.deepEqual(reg.decisioni.map((d) => d.annullabile), [true, false, false]);
+test("decisioni storiche senza ricevuta: non annullabili", () => {
+  assert.deepEqual(reg.decisioni.map((d) => d.annullabile), [false, false, false]);
 });
 
 test("esito dei comandi: ok e rifiutato", () => {
