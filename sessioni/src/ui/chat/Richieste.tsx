@@ -1,8 +1,9 @@
 // figma: 101-13650 — richieste a Roberto: «Richiesta permesso» 101:13247, «Domanda» 101:13280 (101:13896), «Piano» 101:13314 (101:14132).
 // Ogni risposta è un comando nella casella di Friday (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { registraAzione } from "../base/scorciatoie";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
 import { comanda } from "./friday";
@@ -47,12 +48,18 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
   const ris = useRiserva();
   const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
   const mostra = cmd ? `$ ${cmd}` : r.strumento;
+  const rispondi = async (s: Scelta) => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); };
+  // finché aspetta la risposta, le scorciatoie salvate «Consenti» e «Nega» rispondono a questo permesso
+  useEffect(() => {
+    if (scelta) return;
+    const fuori = [registraAzione("consenti", () => void rispondi("consenti")), registraAzione("nega", () => void rispondi("nega"))];
+    return () => fuori.forEach((f) => f());
+  }, [scelta, chat, r.rid]); // eslint-disable-line react-hooks/exhaustive-deps
   if (scelta) {
     return scelta === "nega"
       ? <Esito icona="chiudi" colore="errore" esito="Negato da te" dettaglio={cmd || r.strumento || ""} codice />
       : <Esito icona="spunta" colore="successo" esito="Consentito da te" dettaglio={cmd || r.strumento || ""} codice />;
   }
-  const rispondi = async (s: Scelta) => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); };
   return (
     <Carta icona="mano" titolo="Permesso richiesto" dettaglio={da}>
       {cmd && <div className="domanda">Eseguire questo comando?</div>}
