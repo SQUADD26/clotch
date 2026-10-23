@@ -14,7 +14,7 @@ const external = { internal: false, workArea: { x: 0, y: 25, width: 2560, height
 const internal = { internal: true, workArea: { x: -1512, y: 38, width: 1512, height: 907 } };
 function normalWindow(silent, displays = [external, internal], primary = external, options = {}) {
   const calls = [], screenCalls = [], logs = [];
-  let createdOptions, ready, visible = false, muted = false;
+  let createdOptions, ready, visible = false, muted = false, permissionsReady = false;
   const output = {};
   const windowCode = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/finestra.ts'), 'utf8'),
     { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
@@ -39,6 +39,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
         };
       }
       loadFile(file) {
+        assert.equal(permissionsReady, true, 'policy permessi prima del caricamento');
         this.webContents.mainFrame.url = pathToFileURL(file).href;
         fiducia.verificaChiamante({ sender: this.webContents, senderFrame: this.webContents.mainFrame });
         calls.push({ name: 'load' });
@@ -58,6 +59,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     './link-esterni': { proteggiLinkEsterni() {} },
     './modalita-prova': { provaSilenziosa: () => silent },
     './ipc-fiducia': fiducia,
+    './permessi': { impostaPermessi() { permissionsReady = true; } },
   };
   vm.runInNewContext(windowCode, {
     exports: output, __dirname: path.join(__dirname, '../dist/src'), console: { log: line => logs.push(line) },
@@ -216,6 +218,7 @@ function notificationCalls(silent) {
   await parityWindow.loaded;
   assert.ok(parityWindow.logs.some(line => line.startsWith('PARITA_HIDDEN_OK')));
   console.log('IPC_FACTORIES_REGISTER_BEFORE_LOAD_OK');
+  console.log('PERMESSI_FACTORIES_BEFORE_LOAD_OK');
   const documentPath = '/tmp/clotch fixture #1/renderer/index.html';
   const expectedUrl = pathToFileURL(documentPath).href;
   const frame = { url: expectedUrl + '?sessione=s%201#messaggio' };
