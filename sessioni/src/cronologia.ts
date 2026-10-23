@@ -1,13 +1,13 @@
 // Un solo ledger per snapshot e live: le identità nascono dai byte del file, mai dal contenuto.
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { parseRiga, msgErrore } from "./jsonl";
-import { DIM_PAGINA, firmaFile, lettoreCronologia, versioneFile } from "./messaggi";
+import { DIM_PAGINA, firmaFile, lettoreCronologia, versioneFile, type Campione } from "./messaggi";
 import type { DeltaCronologia, ErroreCronologia, OpzioniCronologia, RigaCronologia, SnapshotPagina } from "./cronologia-tipi";
 import type { PaginaMessaggi, Sessione } from "./tipi";
 
 type Sorgente = Pick<Sessione, "id" | "file" | "sorgente">;
 interface Stato {
-  epoca: string; file: string; sorgente: Sessione["sorgente"]; identita: string; firma: string; offset: number; digest: string;
+  epoca: string; file: string; sorgente: Sessione["sorgente"]; identita: string; firma: string; offset: number; campioni: Campione[];
   seq: number; righe: RigaCronologia[]; chiavi: WeakMap<object, number>;
   leggi: ReturnType<typeof lettoreCronologia>; byte: number; invalido: boolean;
 }
@@ -15,7 +15,6 @@ type Ancora = Omit<Stato, "righe" | "chiavi" | "leggi" | "byte" | "invalido"> & 
 interface Snapshot { dati: SnapshotPagina; righe: RigaCronologia[]; scade: number; byte: number }
 export interface LimitiCronologia { statoByte?: number; snapshotByte?: number; snapshotNumero?: number; ttlMs?: number; fileByte?: number }
 const copia = <T>(v: T): T => structuredClone(v);
-const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 
 export class Cronologia {
   private stati = new Map<string, Stato>();
@@ -41,30 +40,33 @@ export class Cronologia {
   /** Il primo evento riscalda il parser dalla testa; pubblica solo ciò che segue il confine iniziale. */
   aggiorna(s: Sorgente, confineIniziale?: number): Stato | ErroreCronologia {
     const precedente = this.stati.get(s.id), sospeso = this.sospesi.get(s.id), ancora = precedente ?? sospeso;
+    let parsing = false; // un errore prima del parser lascia il ledger intatto: non va invalidato
     try {
       if (precedente && !precedente.invalido && precedente.file === s.file && precedente.sorgente === s.sorgente && precedente.firma === firmaFile(s.file)) {
         this.stati.delete(s.id); this.stati.set(s.id, precedente);
         return precedente;
       }
-      const v = versioneFile(s.file, this.limiti.fileByte);
-      const motivo = ancora && (ancora.file !== s.file || ancora.sorgente !== s.sorgente ? "percorso"
-        : ancora.identita !== v.identita ? "replace" : v.dati.length < ancora.offset ? "truncate"
-        : precedente?.invalido || digest(v.dati.subarray(0, ancora.offset)) !== ancora.digest ? "riscrittura" : null);
+      const stessa = !!ancora && ancora.file === s.file && ancora.sorgente === s.sorgente;
+      // Con un ledger vivo legge solo la coda (più i campioni del prefisso); da zero se serve riscaldare il parser.
+      const v = versioneFile(s.file, this.limiti.fileByte, stessa ? { identita: ancora!.identita, offset: ancora!.offset,
+        campioni: precedente?.invalido ? null : ancora!.campioni } : undefined, !precedente);
+      parsing = true;
+      const motivo = ancora && (!stessa ? "percorso" : v.motivo);
       const nuovo = !precedente || !!motivo, ripristino = !!ancora && !precedente && !motivo;
       const pubblicaDa = ripristino ? ancora!.offset : confineIniziale;
       const stato: Stato = nuovo ? { epoca: ripristino ? ancora!.epoca : randomUUID(), file: s.file, sorgente: s.sorgente, identita: v.identita,
-        firma: v.firma, offset: 0, digest: digest(Buffer.alloc(0)), seq: ripristino ? ancora!.seq : 0, righe: [], chiavi: new WeakMap(),
+        firma: v.firma, offset: 0, campioni: [], seq: ripristino ? ancora!.seq : 0, righe: [], chiavi: new WeakMap(),
         leggi: lettoreCronologia(s), byte: 0, invalido: false } : precedente!;
-      if (stato.offset === v.dati.length && !nuovo) {
-        stato.firma = v.firma;
+      if (stato.offset === v.fine && !nuovo) {
+        stato.firma = v.firma; stato.campioni = v.campioni;
         this.stati.delete(s.id); this.stati.set(s.id, stato);
         return stato;
       }
       const righe = stato.righe.slice(), cambiate = new Map<number, RigaCronologia>();
       const seq = stato.seq + 1;
-      let da = stato.offset, mutato = false, byte = nuovo ? 512 : stato.byte;
-      while (da < v.dati.length) {
-        const fine = v.dati.indexOf(10, da), o = parseRiga(v.dati.subarray(da, fine).toString("utf8"));
+      let da = v.da, mutato = false, byte = nuovo ? 512 : stato.byte;
+      while (da < v.fine) {
+        const fine = v.da + v.dati.indexOf(10, da - v.da), o = parseRiga(v.dati.subarray(da - v.da, fine - v.da).toString("utf8"));
         if (o) {
           const x = stato.leggi(o);
           if ((!ripristino || da >= pubblicaDa!) && (x.nuovi.length || x.aggiornati.length)) mutato = true;
@@ -91,7 +93,7 @@ export class Cronologia {
       }
       if (byte > this.limiti.statoByte) throw new Error("Cronologia oltre il limite di memoria");
       Object.assign(stato, { righe, byte, seq: mutato ? seq : stato.seq,
-        offset: v.dati.length, firma: v.firma, digest: digest(v.dati), invalido: false });
+        offset: v.fine, firma: v.firma, campioni: v.campioni, invalido: false });
       this.stati.delete(s.id); this.stati.set(s.id, stato); this.sospesi.delete(s.id);
       while ([...this.stati.values()].reduce((n, x) => n + x.byte, 0) > this.limiti.statoByte) {
         const [id, vecchio] = this.stati.entries().next().value!;
@@ -99,14 +101,14 @@ export class Cronologia {
         this.stati.delete(id); this.sospesi.delete(id); this.sospesi.set(id, { ...ancora, revisioni: Float64Array.from(_righe.map((r) => r.revisione)) });
       }
       // Solo metadati fisici: nessun messaggio o parser rimane nei ledger espulsi.
-      while (this.sospesi.size > 4096 || [...this.sospesi.values()].reduce((n, a) => n + 512 + a.revisioni.byteLength, 0) > 8 * 1024 * 1024)
+      while (this.sospesi.size > 4096 || [...this.sospesi.values()].reduce((n, a) => n + 512 + a.campioni.length * 128 + a.revisioni.byteLength, 0) > 8 * 1024 * 1024)
         this.sospesi.delete(this.sospesi.keys().next().value!);
       if (motivo && ancora) this.invia({ tipo: "reset", sessione: s.id, epocaPrecedente: ancora.epoca, epoca: stato.epoca, motivo });
       if (cambiate.size) this.invia({ tipo: "upsert", sessione: s.id, epoca: stato.epoca,
         daSeq: nuovo && !ripristino ? 0 : seq - 1, aSeq: stato.seq, righe: copia([...cambiate.values()]), totale: righe.length });
       return stato;
     } catch (e) {
-      if (precedente) precedente.invalido = true;
+      if (precedente && parsing) precedente.invalido = true;
       const errore = this.errore(e);
       this.invia({ tipo: "errore", sessione: s.id, epoca: ancora?.epoca ?? null, errore });
       return errore;

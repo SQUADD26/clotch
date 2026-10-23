@@ -1,4 +1,5 @@
 // Messaggi di una sessione, a pagine dalla fine del file: un file di molti MB non si carica intero.
+import { createHash } from "node:crypto";
 import * as fs from "node:fs";
 import { parseRiga, leggiBlocco, msgErrore } from "./jsonl";
 import { Convertitore } from "./messaggi-claude";
@@ -51,25 +52,57 @@ export function leggiPagina(s: Pick<Sessione, "file" | "sorgente">, pagina: numb
 const firmaStat = (s: fs.BigIntStats) => `${s.dev}:${s.ino}:${s.size}:${s.mtimeNs}:${s.ctimeNs}`;
 export const firmaFile = (file: string) => firmaStat(fs.statSync(file, { bigint: true }));
 
-/** Versione validata del file: solo righe complete, offset e identità fisica. */
-export function versioneFile(file: string, massimoByte = 64 * 1024 * 1024) {
+const CAMPIONE = 1024, CAMPIONI_MAX = 16, CAMPIONI_INIZIALI = 8;
+const sha = (b: Buffer) => createHash("sha256").update(b).digest("hex");
+/** Finestra del prefisso già letto: se i suoi byte cambiano, il file è stato riscritto. */
+export interface Campione { pos: number; len: number; hash: string }
+export interface AncoraFile { identita: string; offset: number; campioni: Campione[] | null }
+export type MotivoFile = "replace" | "truncate" | "riscrittura";
+
+function leggiByte(fd: number, pos: number, len: number): Buffer {
+  const b = Buffer.alloc(len);
+  let n = 0;
+  while (n < len) {
+    const k = fs.readSync(fd, b, n, len - n, pos + n);
+    if (!k) break;
+    n += k;
+  }
+  return b.subarray(0, n);
+}
+/** `quante` finestre da CAMPIONE byte distribuite in [da, fine) (testa e coda incluse); con una sola, la coda. */
+function campiona(dati: Buffer, da: number, fine: number, quante: number): Campione[] {
+  const tot = fine - da, largo = Math.max(0, tot - CAMPIONE);
+  if (tot <= 0) return [];
+  const pos = new Set(Array.from({ length: quante }, (_, i) => da + Math.floor((quante > 1 ? i / (quante - 1) : 1) * largo)));
+  return [...pos].map((p) => { const b = dati.subarray(p - da, Math.min(p + CAMPIONE, fine) - da); return { pos: p, len: b.length, hash: sha(b) }; });
+}
+
+/**
+ * Versione validata del file: solo righe complete. Con un'ancora (stato già letto) controlla inode, dimensione e le finestre
+ * campione del prefisso (al più CAMPIONI_MAX KiB) e legge solo dall'offset; senza ancora, o se il controllo fallisce, legge da 0.
+ * `intero`: legge da 0 comunque (parser da riscaldare). Limite noto: una modifica in-place a stessa dimensione fuori dalle
+ * finestre campione, con stesso inode, non si rileva.
+ */
+export function versioneFile(file: string, massimoByte = 64 * 1024 * 1024, ancora?: AncoraFile, intero = false) {
   for (let tentativo = 0; tentativo < 3; tentativo++) {
     const fd = fs.openSync(file, "r");
     try {
-      const prima = fs.fstatSync(fd, { bigint: true });
+      const prima = fs.fstatSync(fd, { bigint: true }), identita = `${prima.dev}:${prima.ino}`;
       if (prima.size > BigInt(massimoByte)) throw new Error("Trascrizione troppo grande per la cronologia in memoria");
-      const dati = Buffer.alloc(Number(prima.size));
-      let letti = 0;
-      while (letti < dati.length) {
-        const n = fs.readSync(fd, dati, letti, dati.length - letti, letti);
-        if (!n) break;
-        letti += n;
+      let da = 0, motivo: MotivoFile | null = null;
+      if (ancora) {
+        motivo = ancora.identita !== identita ? "replace" : prima.size < BigInt(ancora.offset) ? "truncate"
+          : !ancora.campioni || ancora.campioni.some((c) => sha(leggiByte(fd, c.pos, c.len)) !== c.hash) ? "riscrittura" : null;
+        if (!motivo && !intero) da = ancora.offset;
       }
+      const letti = leggiByte(fd, da, Number(prima.size) - da);
       const dopo = fs.fstatSync(fd, { bigint: true }), corrente = fs.statSync(file, { bigint: true });
-      if (BigInt(letti) !== prima.size || [dopo, corrente].some((x) => x.dev !== prima.dev || x.ino !== prima.ino ||
+      if (BigInt(da + letti.length) !== prima.size || [dopo, corrente].some((x) => x.dev !== prima.dev || x.ino !== prima.ino ||
         x.size !== prima.size || x.mtimeNs !== prima.mtimeNs || x.ctimeNs !== prima.ctimeNs)) continue;
-      const fine = dati.lastIndexOf(10) + 1;
-      return { dati: dati.subarray(0, fine), identita: `${prima.dev}:${prima.ino}`, firma: firmaStat(prima), dimensione: Number(prima.size) };
+      const dati = letti.subarray(0, letti.lastIndexOf(10) + 1), fine = da + dati.length;
+      const campioni = da === 0 ? campiona(dati, 0, fine, CAMPIONI_INIZIALI) : [...ancora!.campioni!, ...campiona(dati, da, fine, 1)];
+      return { dati, da, fine, motivo, identita, firma: firmaStat(prima),
+        campioni: campioni.length > CAMPIONI_MAX ? campioni.filter((_, i) => i % 2 === 0 || i === campioni.length - 1) : campioni };
     } finally { fs.closeSync(fd); }
   }
   throw new Error("sorgente_instabile");
