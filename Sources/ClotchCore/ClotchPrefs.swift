@@ -15,7 +15,7 @@ public enum ClotchPrefs {
     /// Tabs of the open notch Roberto turned off, comma separated (`NotchTab` raw values).
     public static let hiddenTabs = "clotchHiddenTabs"
     public static let hiddenTabsDefault = ""
-    /// The light on the notch while the Overseer speaks, and its strength.
+    /// The light on the notch while the Friday speaks, and its strength.
     public static let voiceLight = "clotchVoiceLight"
     public static let voiceLightDefault = true
     public static let voiceLightStrength = "clotchVoiceLightStrength"

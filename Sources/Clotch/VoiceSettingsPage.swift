@@ -86,7 +86,7 @@ struct VoiceSettingsPage: View {
             }
             SettingsGroup(title: "Lettura") { reading }
             SettingsGroup(title: "Novità a voce") {
-                CardRow(title: "Modello novità", note: "Legge a voce le novità delle sessioni. Il modello dell’Overseer si sceglie in Dettatura.") {
+                CardRow(title: "Modello novità", note: "Legge a voce le novità delle sessioni. Il modello di Friday si sceglie in Dettatura.") {
                     CardMenu(label: "Modello novità", selection: Binding(get: { rewriterModel }, set: { rewriterModel = $0; saveRewriter() }),
                              options: [("claude-haiku-5-5", "Haiku 5.5"), ("claude-sonnet-5-5", "Sonnet 5.5"), ("claude-opus-5-5", "Opus 5.5")])
                         .disabled(configBroken)

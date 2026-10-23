@@ -24,6 +24,8 @@ extension VoiceInputController {
 
     /// The button under the error.
     func perform(_ action: VoiceInput.Action) {
+        Self.log.notice("button: \(String(describing: action), privacy: .public)")  // #314: a click that arrived, in the log
+        if let act { return act(action) }
         switch action {
         case .openPrivacy:
             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!)

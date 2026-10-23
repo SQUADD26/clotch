@@ -33,7 +33,7 @@ final class VoiceInputCaptureTests: XCTestCase {
     }
 
     func testLongUtteranceIsKeptWhole() async throws {
-        let text = "Correggi la barra della dettatura in Clotch, poi controlla che la voce arrivi all'Overseer, "
+        let text = "Correggi la barra della dettatura in Clotch, poi controlla che la voce arrivi a Friday, "
             + "apri la pull request su dev e scrivi nel rapporto quanto tempo serve per accendere il microfono, alla fine chiudi tutto stasera"
         let said = try await dictate(text, stopBeforeEnd: 0.2)
         XCTAssertTrue(said.contains("correggi"), said)
@@ -59,6 +59,19 @@ final class VoiceInputCaptureTests: XCTestCase {
         XCTAssertLessThan(wait, 1, "text after the second press in \(wait) s")
         XCTAssertTrue(c.sure.lowercased().contains("sessioni"), c.sure)
         c.cancel()
+    }
+
+    /// #304: no microphone is opened while Roberto does not dictate (AirPods would switch to call mode): not at launch,
+    /// not after an utterance, not after an audio change. Only the press makes one.
+    func testNoMicrophoneOutsideDictation() async throws {
+        let c = VoiceInputController(files: VoiceFiles(home: home))
+        var made = 0
+        c.makeCapture = { made += 1; return VoiceCapture(microphone: $0) }
+        c.prewarm()
+        NotificationCenter.default.post(name: VoiceCapture.audioChanged, object: nil)
+        c.press()
+        c.cancel()
+        XCTAssertEqual(made, 0, "a microphone was made outside a press")
     }
 
     // MARK: - Presses

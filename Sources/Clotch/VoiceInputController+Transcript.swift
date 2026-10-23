@@ -4,6 +4,8 @@ import ClotchCore
 extension VoiceInputController {
     func scribeEvent(_ event: VoiceInput.ScribeEvent, run me: Int) {
         guard me == run else { return }
+        // #314: no audio at the commit after a real listen is a deaf microphone; after a quick double press it is a choice (#147)
+        if case .failure(.nothingHeard) = event, listened < 1 { scribeCommitted = true; return }
         if case .failure(let why) = event { return fail(why, run: me) }
         // «No voice» answers the closing commit: the wait ends and the words already heard still go (#174); empty = folds quietly (#147).
         if case .quiet = event { scribeCommitted = true; return }

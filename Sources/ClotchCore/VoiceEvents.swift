@@ -49,14 +49,23 @@ public struct VoiceEvent: Equatable, Sendable {
 
     /// What Haiku turns into one spoken line: cleaned for the ear, cut like a turn's report. The proof stays out (#1854).
     public var report: String {
-        let body = text.isEmpty ? subject : text
         // The engine already writes «Obiettivo raggiunto:» in front of its text (obiettivo_registro.py): the prefix is said once (#204).
-        let said = body.range(of: kind.label + ":", options: [.anchored, .caseInsensitive]) != nil ? body : "\(kind.label): \(body)"
+        // The job is always in the report (#299): Haiku said «Mi confermi se funziona?» when it sat only in `<contesto>`.
+        let body = text.isEmpty ? subject : text
+        let own = body.range(of: kind.label + ":", options: [.anchored, .caseInsensitive])
+        let bare = own.map { String(body[$0.upperBound...]).trimmingCharacters(in: .whitespaces) } ?? body
+        let job = text.isEmpty || subject.isEmpty ? "" : "Lavoro «\(subject.prefix(200))». "
+        let said = "\(kind.label): \(job)\(bare)"
         return VoiceTurn.cut(VoiceClean.clean(String(said.prefix(VoiceTurn.maxRaw))), VoiceTurn.maxSpoken)
     }
 
     /// The job, for the parlatore's `<contesto>` (#204): the subject, which `report` only carries when there is no text.
     public var context: String { text.isEmpty ? "" : VoiceClean.clean(String(subject.prefix(200))) }
+
+    /// News Roberto can do nothing about (#299: «non ho aperto la sessione… riprova tra poco»): never said.
+    var nothingToDo: Bool {
+        kind == .custom && ["riprova tra poco", "riprova più tardi", "adesso non si può", "adesso non si puo"].contains { text.lowercased().contains($0) }
+    }
 
     var urgent: Bool { level == "alto" }
 }
@@ -99,7 +108,7 @@ public enum VoiceEvents {
         // The mark's line still there: what follows it. Gone (rewritten): what is newer than it.
         let new = !mark.id.isEmpty ? all.lastIndex(where: { $0.id == mark.id }).map { Array(all[($0 + 1)...]) } : nil
         let fresh = new ?? all.filter { $0.at > mark.at }
-        return (fresh.compactMap(\.event), last, fresh.filter { $0.event == nil }.map(\.type))
+        return (fresh.compactMap(\.event), last, fresh.filter { $0.event == nil && !ScreenNotice.types.contains($0.type) }.map(\.type))
     }
 
     /// Any well-formed line, known type or not: the mark moves past a type the voice does not say.

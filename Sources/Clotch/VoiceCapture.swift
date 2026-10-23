@@ -5,7 +5,6 @@ import ClotchCore
 
 /// The microphone as 16 kHz mono (#110): every tap buffer is converted once and handed over both as the buffer (the local
 /// model takes it as is) and as 16-bit PCM (Scribe's socket and the level meter). `onAudio` runs on the audio thread.
-/// `prepare` does the slow part (the input unit, the device) before the key is pressed, so `start` only turns the microphone on (#174).
 /// Not final: the tests feed a recorded voice through a subclass.
 class VoiceCapture: @unchecked Sendable {
     private(set) var engine = AVAudioEngine()
@@ -17,9 +16,9 @@ class VoiceCapture: @unchecked Sendable {
     private var prepared = false
     private var preparedAt = Date()
     private var observer: NSObjectProtocol?
-    /// When this one was made: the spare is bound to the audio setup of that moment (#269).
-    let madeAt = Date()
-    /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A spare made before it hears nothing.
+    /// `setup()` when the engine last started; nil before.
+    private var ranOn: String?
+    /// When macOS last moved the audio setup (a device came, went or became the default, input or output). A prepared engine made before it hears nothing.
     nonisolated(unsafe) private(set) static var audioChangedAt = Date.distantPast
     static let audioChanged = Notification.Name("ClotchAudioChanged")
     private static let watching: Void = {
@@ -80,6 +79,7 @@ class VoiceCapture: @unchecked Sendable {
         // A device came or went while the key was not down (or while macOS asked for a permission): the prepared engine hears the old one.
         if Self.audioChangedAt > preparedAt { rebuild() }
         try run()
+        ranOn = setup()
         // AirPods, headphones or the default input changing under an open microphone stops the engine: start it again on the new one.
         observer = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
             self?.recover()
@@ -96,6 +96,17 @@ class VoiceCapture: @unchecked Sendable {
         try engine.start()
     }
 
+    /// The device the capture wants now (the chosen one, else the system's input) and the input format: what a real change moves.
+    func setup() -> String {
+        var device = AudioDeviceID(0)
+        var size = UInt32(MemoryLayout<AudioDeviceID>.size)
+        var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyDefaultInputDevice, mScope: kAudioObjectPropertyScopeGlobal,
+                                                 mElement: kAudioObjectPropertyElementMain)
+        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &device)
+        let format = engine.inputNode.inputFormat(forBus: 0)
+        return "\(Self.deviceID(uid: microphone) ?? device) \(format.sampleRate) \(format.channelCount)"
+    }
+
     /// A fresh engine bound to whatever the system's audio setup is now.
     private func rebuild() {
         engine.inputNode.removeTap(onBus: 0)
@@ -106,18 +117,26 @@ class VoiceCapture: @unchecked Sendable {
 
     func recover() {
         guard observer != nil else { return }
+        // #314: the engine posts a change of its own when it starts (the input and output units joined); a new engine for it posted
+        // another, about 30 restarts in 4 s and no audio reached Scribe. Same device, same format: the same engine starts again.
+        if let ranOn, ranOn == setup() { return restart() }
         NotificationCenter.default.removeObserver(observer!)
         rebuild()
         converter = nil
         try? run()
+        ranOn = setup()
         observer = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
             self?.recover()
         }
     }
 
+    /// The same engine, started again after a change of its own.
+    func restart() { try? engine.start() }
+
     func stop() {
         observer.map(NotificationCenter.default.removeObserver)
         observer = nil
+        ranOn = nil
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         converter = nil

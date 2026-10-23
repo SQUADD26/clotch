@@ -3,7 +3,7 @@ import Combine
 import CoreServices
 import ClotchCore
 
-/// Publishes the Overseer's voice state (contract in `ClotchCore/NotchVoice.swift`): `status` is non-nil from the moment
+/// Publishes the Friday's voice state (contract in `ClotchCore/NotchVoice.swift`): `status` is non-nil from the moment
 /// the player writes ~/.config/voce/stato.json until `t_fine` or until it writes `parla:false`. No polling: one FSEventStream
 /// with file events (no coalescing delay beyond 50 ms, so the light starts at once) and one one-shot timer for `t_fine`.
 /// Read-only: it never creates a directory. It watches ~/.config (not ~/.config/voce) so the file shows up even if the folder
@@ -32,10 +32,10 @@ final class VoiceStore: ObservableObject {
             let list = (unsafeBitCast(eventPaths, to: NSArray.self) as? [String]) ?? []
             let paths = list.prefix(count)
             // The same stream tells the alerts engine about new events (#57).
-            if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged() } }
+            if paths.contains(where: { $0.hasSuffix("/voce/eventi.jsonl") }) { MainActor.assumeIsolated { VoiceAlertCenter.shared.eventsChanged(); ScreenNoticeStore.shared.changed() } }
             // And AFK's files (#106).
             if paths.contains(where: { $0.hasSuffix("/voce/afk.json") || $0.contains("/clotch/afk-") }) { MainActor.assumeIsolated { AfkStore.shared.reload() } }
-            // And the Overseer heartbeat's steps (#184).
+            // And the Friday heartbeat's steps (#184).
             if paths.contains(where: { $0.hasSuffix("/coda-overseer/battito/passi.json") }) { MainActor.assumeIsolated { NotchNotifier.shared.stepsChanged() } }
             guard paths.contains(where: { $0.hasSuffix("/voce/stato.json") }) else { return }
             let store = Unmanaged<VoiceStore>.fromOpaque(info).takeUnretainedValue()

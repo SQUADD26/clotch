@@ -61,4 +61,31 @@ final class RequestTextWholeTests: XCTestCase {
         XCTAssertGreaterThan(try answered(words(200), "adhd-risposta-200").height, try answered(words(40), "adhd-risposta-40").height,
                              "the answer wraps too (it was cut «…su quel…»)")
     }
+
+    /// True when some pixel row holds both white text and yellow text: two lines drawn on top of each other (#301).
+    private func linesOverlap(_ image: CGImage) -> Bool {
+        let w = image.width, h = image.height
+        var px = [UInt8](repeating: 0, count: w * h * 4)
+        let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+        return (0..<h).contains { y in
+            var white = false, yellow = false
+            for x in 0..<w {
+                let (r, g, b) = (px[(y * w + x) * 4], px[(y * w + x) * 4 + 1], px[(y * w + x) * 4 + 2])
+                if r > 200, g > 200, b > 200 { white = true }
+                if r > 200, g > 150, b < 90 { yellow = true }
+            }
+            return white && yellow
+        }
+    }
+
+    /// Capped height (the notch's maxHeight): long questions wrap and never stack on the line under them (#301).
+    func testAdhdTabCappedHeightKeepsLines() throws {
+        let q = words(90)
+        let rows = (1...4).map { #"{"id":"Q-\#($0)","domanda_chiara":"\#(q)","responsabile":"Clotch","volte":1}"# }.joined(separator: ",")
+        let items = GoalSources.parseAdhd(Data(("[" + rows + "]").utf8))
+        let image = try render(AdhdTab(items: items).frame(width: 460).hugging(maxHeight: 200), "adhd-tetto")
+        XCTAssertFalse(linesOverlap(image), "the second line of a question sits on the yellow line")
+    }
 }

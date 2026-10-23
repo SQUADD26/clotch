@@ -15,6 +15,7 @@ enum FigmaToken {
         static let campoFondo = coppia(chiaro: rgb(0xffffff), scuro: rgb(0x2b2b2e))  // campo/fondo
         static let campoBordo = coppia(chiaro: rgb(0xd3d3d8), scuro: rgb(0x4a4a4e))  // campo/bordo
         static let accento = coppia(chiaro: rgb(0x0070e0), scuro: rgb(0x0a6cdb))  // accento
+        static let accentoTesto: Color = Color(nsColor: rgb(0xffffff))  // accento-testo
         static let traccia = coppia(chiaro: rgb(0xdddde1), scuro: rgb(0x4a4a4e))  // traccia
         static let selezioneFondo = coppia(chiaro: rgb(0xe6e6ea), scuro: rgb(0x38383b))  // selezione/fondo
         static let segmentoFondo = coppia(chiaro: rgb(0xe3e3e7), scuro: rgb(0x353538))  // segmento/fondo
@@ -152,13 +153,29 @@ enum FigmaToken {
         static let notchMisura120: CGFloat = 120  // notch/misura/120
         static let notchMisura420: CGFloat = 420  // notch/misura/420
         static let notchMisura422: CGFloat = 422  // notch/misura/422
+        static let notchMisura434: CGFloat = 434  // notch/misura/434
+        static let notchMisura440: CGFloat = 440  // notch/misura/440
         static let notchMisura458: CGFloat = 458  // notch/misura/458
         static let notchMisura488: CGFloat = 488  // notch/misura/488
         static let notchMisura578: CGFloat = 578  // notch/misura/578
+        static let notchMisura106_5: CGFloat = 106.5  // notch/misura/106_5
         static let notchMisura103_5: CGFloat = 103.5  // notch/misura/103_5
         static let notchFontFamiglia: String = "SF Pro"  // notch/font/famiglia
         static let notchFontMedio: String = "Medium"  // notch/font/medio
         static let notchFontSemibold: String = "Semibold"  // notch/font/semibold
+        static let notchAvvisoSchermo: Color = Color(nsColor: rgb(0xbf5af2))  // notch/avviso-schermo
+        static let notchAvvisoBarraAltezza: CGFloat = 3  // notch/avviso/barra-altezza
+        static let notchAvvisoBarraRaggio: CGFloat = 1.5  // notch/avviso/barra-raggio
+        static let notchAvvisoIcona: CGFloat = 16  // notch/avviso/icona
+        static let notchAvvisoMargine: CGFloat = 30  // notch/avviso/margine
+        static let notchAvvisoTrattoIcona: CGFloat = 1.600000023841858  // notch/avviso/tratto-icona
+        static let notchAvvisoTrattoSpunta: CGFloat = 2.200000047683716  // notch/avviso/tratto-spunta
+        static let notchAvvisoSchermoA90: Color = Color(nsColor: rgb(0xbf5af2, 0.898))  // notch/avviso-schermo-a90
+        static let notchAvvisoSchermoA60: Color = Color(nsColor: rgb(0xbf5af2, 0.6))  // notch/avviso-schermo-a60
+        static let durataLuceDissolvenza: TimeInterval = 0.6  // durata/luce/dissolvenza
+        static let durataLuceRossaCompare: TimeInterval = 0.5  // durata/luce-rossa/compare
+        static let durataLuceRossaAccesa: TimeInterval = 1  // durata/luce-rossa/accesa
+        static let durataLuceRossaSpegne: TimeInterval = 1  // durata/luce-rossa/spegne
         static let impostazioniRaggio4: CGFloat = 4  // impostazioni/raggio/4
         static let impostazioniRaggio8: CGFloat = 8  // impostazioni/raggio/8
         static let impostazioniSpazio5: CGFloat = 5  // impostazioni/spazio/5
@@ -194,7 +211,9 @@ enum FigmaToken {
         static let impostazioniFontMonospazio: String = "Andale Mono"  // impostazioni/font/monospazio
         static let impostazioniInterlinea15: CGFloat = 15  // impostazioni/interlinea/15
         static let impostazioniOpacita40: Double = 40  // impostazioni/opacita/40
-        static let accentoTesto: Color = Color(nsColor: rgb(0xffffff))  // accento-testo
+        static let attesaAvvisoSchermo: TimeInterval = 1.5  // attesa/avviso-schermo
+        static let attesaAvvisoPasso: TimeInterval = 0.1  // attesa/avviso-passo
+        static let attesaSchermoLibero: TimeInterval = 1.2  // attesa/schermo-libero
     }
 }
 

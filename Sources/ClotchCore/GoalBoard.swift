@@ -4,7 +4,7 @@ import Foundation
 
 public struct GoalProof: Equatable, Sendable {
     public let text: String; public let done: Bool; public let at: Date?
-    /// A proof with no command (`cmd` empty): only Roberto or the Overseer can tick it (#171). No view yet: the button goes through Figma.
+    /// A proof with no command (`cmd` empty): only Roberto or the Friday can tick it (#171). No view yet: the button goes through Figma.
     public var waitsForRoberto = false
 }
 
@@ -252,7 +252,7 @@ public enum GoalBoard {
 
     /// The goal chased now, among open goals (not reached, not proposed), latest activity first:
     /// (a) proofs in progress (0 < done < total), else (b) any declared proofs, else (c) any open goal.
-    /// An always-active goal without proofs (the Overseer) never beats one whose proofs are moving.
+    /// An always-active goal without proofs (the Friday) never beats one whose proofs are moving.
     public static func chased(_ rows: [GoalRow]) -> GoalRow? {
         let open = rows.filter { r in
             if case .reached = r.status { return false }
@@ -295,6 +295,11 @@ public enum GoalBoard {
 
     /// The title as written, icons included (★, ◰︎, 🎨, #79), spaces collapsed.
     static func clean(_ t: String) -> String {
-        t.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        t.split(whereSeparator: \.isWhitespace).joined(separator: " ").asFriday
     }
+}
+
+extension String {
+    /// The engine still writes «Overseer» in titles and labels (claude-config renames later): Roberto reads Friday.
+    var asFriday: String { replacingOccurrences(of: "Overseer", with: "Friday") }
 }

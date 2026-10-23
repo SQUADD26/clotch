@@ -111,7 +111,7 @@ final class VoiceSpeaker {
         day.chiamate += 1
         saveDay(day)
         let input = VoiceTurn.haikuInput(report: event.report, context: event.context, previousTopic: lastTopic())
-        guard let spoken = await VoiceTurn.line(haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else {
+        guard let spoken = await VoiceTurn.line(subject: event.subject, haiku: { await Self.haiku(prompt: prompt, input: input, config: config) }) else {
             return Self.log.error("news not said: no usable line from Haiku (see ClaudeRun)")
         }
         let text = spoken.text
