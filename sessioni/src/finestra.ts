@@ -1,10 +1,12 @@
 // La finestra dell'app e la prova di parità (`npm run parita -- <node-id>`): stessa pagina, stessa misura del frame Figma.
 import { app, BrowserWindow } from "electron";
+import * as assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { numero, valori } from "./ui/base/token";
 import { iconaApp, NOME_APP } from "./branding";
 import { proteggiLinkEsterni } from "./link-esterni";
+import { provaSilenziosa } from "./modalita-prova";
 
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
@@ -32,6 +34,7 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
     trafficLightPosition: { x: numero("spazio-5"), y: (numero("misura-barra-titolo") - numero("misura-semaforo")) / 2 },
     webPreferences: { preload, contextIsolation: true, webviewTag: false },
   });
+  if (provaSilenziosa()) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w);
   w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
   return w;
@@ -40,7 +43,14 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
 /** Disegna la pagina alla misura del frame, a scala 1, e salva design/app/<id>.png. `navigazione`: vista di partenza (scena.ts). */
 export async function parita(id: string, navigazione?: Record<string, string | undefined>) {
   const { w: larga, h: alta } = frame(id);
-  const w = new BrowserWindow({ width: larga, height: alta, show: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true, webviewTag: false } });
+  const w = new BrowserWindow({ width: larga, height: alta, show: false, focusable: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true, webviewTag: false } });
+  w.webContents.setAudioMuted(true);
+  assert.equal(w.webContents.isAudioMuted(), true);
+  let mostrate = 0, focalizzate = 0;
+  w.on("show", () => mostrate++);
+  w.on("focus", () => focalizzate++);
+  assert.equal(w.isVisible(), false);
+  assert.equal(w.isFocused(), false);
   proteggiLinkEsterni(w);
   await w.loadFile(pagina, { query: { ...Object.fromEntries(Object.entries(navigazione ?? {}).filter(([, v]) => v)) as Record<string, string>, parita: id } });
   // i dati arrivano dai canali IPC dopo il primo disegno: si aspetta che la rete dei canali si calmi, poi due fotogrammi
@@ -50,5 +60,11 @@ export async function parita(id: string, navigazione?: Record<string, string | u
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, img.toPNG());
   console.log(`parità: ${out} ${img.getSize().width}x${img.getSize().height}`);
+  assert.equal(w.isVisible(), false);
+  assert.equal(w.isFocused(), false);
+  assert.equal(mostrate, 0);
+  assert.equal(focalizzate, 0);
+  assert.equal(w.webContents.isAudioMuted(), true);
+  console.log("PARITA_HIDDEN_OK: visible=false focused=false show=0 focus=0 muted=true");
   app.quit();
 }

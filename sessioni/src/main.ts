@@ -20,7 +20,11 @@ import type { PaginaMessaggi } from "./tipi";
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
 const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
-const scena = idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null;
+if (iParita > 0 && process.platform === "darwin") app.setActivationPolicy("prohibited");
+const scena = (() => {
+  try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }
+  catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
+})();
 
 impostaNome();
 const sessioni = new Sessioni();
@@ -44,6 +48,11 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  if (iParita > 0 && !scena) {
+    console.error(`parità: scena non disponibile per ${idParita || "nessun frame"}; servizi dal vivo disattivati`);
+    app.exit(1);
+    return;
+  }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   ipcMain.handle("sessioni:elenco", elenco);
@@ -85,7 +94,6 @@ app.whenReady().then(() => {
   // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
   const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
 
-  if (idParita) return parita(idParita);
   barraMenu();
   apriFinestra();
   app.on("activate", () => BrowserWindow.getAllWindows().length || apriFinestra());
