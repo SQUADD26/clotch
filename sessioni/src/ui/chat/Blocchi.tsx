@@ -1,11 +1,12 @@
 // figma: 101-8036 — blocchi del filo: «Messaggio Roberto» 101:7210, «Risposta» 101:7216, «Blocco codice» 101:7213,
-// «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525.
+// «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525 (finestra «Ricerca sul web»: 101-15577).
 import { useState, type ReactNode } from "react";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Blocco } from "./modello";
 import { durata, quanti } from "./testi";
 import { useRiserva } from "./riserva";
 import "./filo.css";
+import "./uscita.css";
 
 export function MessaggioRoberto({ testo }: { testo: string }) {
   const r = useRiserva();
@@ -49,8 +50,14 @@ export function BloccoCodice({ comando, uscita, errore = false }: { comando?: st
   );
 }
 
+// un'uscita di più di RIGHE_LUNGA righe si vede per RIGHE_ANTEPRIMA righe, con «Mostra tutto (84 righe)» sotto (101:28652)
+const RIGHE_LUNGA = 8, RIGHE_ANTEPRIMA = 3;
+
 export function Strumento({ b, aperta: iniziale = false }: { b: Extract<Blocco, { tipo: "strumento" }>; aperta?: boolean }) {
   const [aperta, setAperta] = useState(iniziale || b.stato === "errore");
+  const [tutto, setTutto] = useState(false);
+  const righe = b.uscita.replace(/\n+$/, "").split("\n");
+  const lunga = righe.length > RIGHE_LUNGA;
   const apribile = b.stato !== "in-corso" && !!(b.comando || b.uscita);
   const r = useRiserva();
   const dettaglio = b.comando ? r.comando(b.dettaglio) : r.testo(b.dettaglio);
@@ -62,7 +69,14 @@ export function Strumento({ b, aperta: iniziale = false }: { b: Extract<Blocco, 
         <span className="dettaglio">{dettaglio}</span>
         {b.durata != null && b.stato !== "in-corso" && <span className="durata">{durata(b.durata)}</span>}
       </Testata>
-      {aperta && apribile && <BloccoCodice comando={b.comando && `$ ${dettaglio}`} uscita={b.uscita && r.testo(b.uscita)} errore={b.stato === "errore"} />}
+      {aperta && apribile && <BloccoCodice comando={b.comando && `$ ${dettaglio}`} errore={b.stato === "errore"}
+        uscita={b.uscita && r.testo(lunga && !tutto ? righe.slice(0, RIGHE_ANTEPRIMA).join("\n") : b.uscita)} />}
+      {aperta && apribile && lunga && (
+        <button type="button" className={tutto ? "mostra-tutto aperto" : "mostra-tutto"} aria-expanded={tutto} onClick={() => setTutto(!tutto)}>
+          <span>{tutto ? "Mostra meno" : `Mostra tutto (${quanti(righe.length, "riga", "righe")})`}</span>
+          <Icona nome="giu" />
+        </button>
+      )}
     </div>
   );
 }

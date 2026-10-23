@@ -4,7 +4,9 @@ import type { ComponentType } from "react";
 import * as friday from "../friday";
 import * as pannello from "../pannello";
 import { Attivita } from "./Attivita";
+import { useImpostazioni } from "../impostazioni/stato";
 import { BottoneIcona } from "./Bottone";
+import { Suggerimento } from "./Suggerimento";
 import { Pezzo } from "./Pezzo";
 import { useNavigazione } from "./navigazione";
 
@@ -14,6 +16,9 @@ const ComandiPannello = comandi(pannello), ComandiFriday = comandi(friday);
 
 export function BarraTitolo() {
   const n = useNavigazione();
+  const { scorciatoie } = useImpostazioni();
+  // il suggerimento sostituisce quello nativo (title); «suggerimento-barra» nella sezione di una scena di prova lo tiene aperto (101-24069)
+  const nuda = { title: undefined };
   return (
     <div className="barra-titolo">
       {/* il semaforo vero è del Mac (trafficLightPosition in finestra.ts); le luci si disegnano solo nella prova di parità */}
@@ -22,9 +27,13 @@ export function BarraTitolo() {
       </div>
       <div className="navigazione">
         {/* nelle impostazioni la navigazione ha solo indietro e avanti (101-17193) */}
-        {n.vista !== "impostazioni" && <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} />}
-        <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
-        <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
+        {n.vista !== "impostazioni" && (
+          <Suggerimento testo={n.barraAperta ? "Nascondi barra laterale" : "Mostra barra laterale"} scorciatoia={scorciatoie.barra} forzato={n.sezione === "suggerimento-barra"}>
+            <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} {...nuda} />
+          </Suggerimento>
+        )}
+        <Suggerimento testo="Indietro"><BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} {...nuda} /></Suggerimento>
+        <Suggerimento testo="Avanti"><BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} {...nuda} /></Suggerimento>
       </div>
       {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
       {n.vista !== "impostazioni" && (

@@ -2,6 +2,7 @@
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
 import type { Messaggio } from "../../tipi";
+import { ramoCreato } from "./eventi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
@@ -26,8 +27,10 @@ export type Blocco = (
   | { tipo: "errore"; testo: string }) & { chiave?: string; origini?: string[] };
 
 export type Voce =
-  | { tipo: "roberto"; chiave: string; testo: string }
+  | { tipo: "roberto"; chiave: string; testo: string; t: number | null }
   | { tipo: "riassunto"; chiave: string }
+  /** Cosa è successo nella sessione (101:28725): `testo` è già la riga da scrivere. */
+  | { tipo: "evento"; chiave: string; testo: string; t: number | null }
   | { tipo: "turno"; chiave: string; blocchi: Blocco[]; origini?: string[]; inizio: number | null; fine: number | null };
 
 const MODIFICHE = new Set(["Edit", "MultiEdit", "Write", "NotebookEdit"]);
@@ -101,9 +104,12 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;
       inizio = m.t;
-      out.push({ tipo: "roberto", chiave, testo: m.testo });
+      out.push({ tipo: "roberto", chiave, testo: m.testo, t: m.t });
       return;
     }
+    // un ramo creato finisce il turno: la riga dell'evento sostituisce il comando e il filo riparte da lei
+    const ramo = m.tipo === "strumento" && m.esito && !m.esito.errore && m.nome === "Bash" ? ramoCreato(testoCampo(m.ingresso, "command")) : null;
+    if (ramo) { turno = null; out.push({ tipo: "evento", chiave, testo: `Ramo creato: ${ramo}`, t: m.t }); return; }
     const tu = turno ?? apri(m.t, chiave);
     if (m.t != null) tu.fine = m.t;
     const ultimo = i === messaggi.length - 1;

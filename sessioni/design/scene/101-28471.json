@@ -1,0 +1,88 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1",
+  "sezione": "selezione:565,793"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Clotch: sessioni in Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "design/332-sessioni-figma",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792768244164,
+    "obiettivo": {
+     "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Controllo del file: nessun errore",
+       "fatta": true
+      },
+      {
+       "testo": "Schermate guardate intere",
+       "fatta": true
+      },
+      {
+       "testo": "Sì di Roberto sul disegno",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "turno_finito",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "stella"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Cosa succede con una cartella che non si legge?",
+    "t": 1792703400000
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Il lettore salta le cartelle senza permesso e lo scrive nel registro.",
+    "modello": "claude-opus-5-5",
+    "t": 1792703460000
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "stella"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}
