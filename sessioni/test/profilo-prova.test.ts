@@ -88,12 +88,14 @@ test("parità: profilo prima import/ready; errori IPC/processo non leggono o scr
   for (const scena of [{ navigazione: {} }, null, new SyntaxError("scena fixture rotta")]) {
     const f = ambiente(["--parita", "101-8036"]);
     const handlers = new Map<string, (...a: any[]) => any>();
+    const eventoIpc = { fixture: "chiamante autorizzato" };
     let letturePreferenze = 0;
     try {
       const modules: Record<string, unknown> = {
         electron: { app: f.app, ipcMain: { handle: (id: string, fn: (...a: any[]) => any) => handlers.set(id, fn) }, BrowserWindow: {} },
         "node:os": os, "node:path": path,
         "./branding": { ...f.branding, impostaIdentita() {} }, "./modalita-prova": f.modo,
+        "./ipc-fiducia": { verificaChiamante: (evento: unknown) => assert.equal(evento, eventoIpc) },
         "./api": { Sessioni: class {} }, "./avvisi-mac": {}, "./barra-menu": {}, "./finestra": { parita() {} },
         "./friday-ipc": {}, "./impostazioni": {}, "./indice-ipc": {}, "./preferenze-ipc": {},
         "./preferenze": { leggiImpostazioni: (...a: string[]) => { letturePreferenze++; return f.preferenze.leggiImpostazioni(...a); } },
@@ -118,7 +120,7 @@ test("parità: profilo prima import/ready; errori IPC/processo non leggono o scr
       fs.writeFileSync(path.join(f.paths.userData, "preferenze.json"), fs.readFileSync(f.sentinella));
       f.processo.emit("uncaughtException", new Error("errore processo fixture"));
       f.processo.emit("unhandledRejection", new Error("promessa fixture"));
-      if (scena && !(scena instanceof Error)) await assert.rejects(handlers.get("fixture:errore")!(), /errore IPC fixture/);
+      if (scena && !(scena instanceof Error)) await assert.rejects(handlers.get("fixture:errore")!(eventoIpc), /errore IPC fixture/);
       else assert.ok(f.eventi.includes("exit:1"));
       assert.equal(letturePreferenze, 0, "nessuna lettura preferenze per logger di prova");
       const logs = fs.readdirSync(path.join(f.paths.userData, "logs"));
