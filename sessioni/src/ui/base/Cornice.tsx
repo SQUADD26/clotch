@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Barra from "../barra";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
+import { Dialoghi } from "../dialoghi";
 import Friday, { Intestazione as IntestazioneFriday } from "../friday";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
@@ -62,6 +63,7 @@ export function Cornice() {
       <div className="cornice">
         <BarraTitolo />
         <Corpo />
+        <Pezzo nome="dialoghi"><Dialoghi /></Pezzo>
       </div>
     </ConNavigazione>
   );

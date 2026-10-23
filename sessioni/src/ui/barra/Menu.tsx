@@ -1,8 +1,9 @@
 // figma: 101-21206 — menu della barra: sulla riga (101:21206), sulla cartella (101:21348), del profilo (101:21498). Testi dai frame.
 // Le voci senza un comando o un'azione del main non ci sono finché il comando non esiste (Figma non ha la voce spenta):
-// Rinomina…, Rinomina etichetta…, Nascondi cartella, Scorciatoie da tastiera, Novità, Verifica aggiornamenti….
+// Rinomina…, Rinomina etichetta…, Nascondi cartella, Novità.
 import type { AzioneSessione, PreferenzeSessione, Sessione } from "../../tipi";
 import { api } from "../base/dati";
+import { apriDialogo, verificaAggiornamenti } from "../base/dialoghi";
 import { Menu, type VoceMenu } from "../base/Menu";
 import type { Punto } from "./Sovrapposti";
 
@@ -43,6 +44,8 @@ export function MenuCartella({ sessioni, a, onChiudi }: { sessioni: Sessione[]; 
 export function MenuProfilo({ dettaglio, a, onImpostazioni, onChiudi }: { dettaglio: string; a: Punto; onImpostazioni(): void; onChiudi(): void }) {
   const voci: VoceMenu[] = [
     { icona: "impostazioni", etichetta: "Impostazioni", scorciatoia: "⌘,", fai: onImpostazioni },
+    { icona: "tastiera", etichetta: "Scorciatoie da tastiera", scorciatoia: "⌘/", fai: () => apriDialogo("scorciatoie") },
+    { icona: "aggiorna", etichetta: "Verifica aggiornamenti…", fai: () => void verificaAggiornamenti() },
     { icona: "info", etichetta: "Info su clotch", fai: onImpostazioni },
   ];
   return <Menu testata={{ titolo: "Roberto Bondici", dettaglio }} voci={voci} onChiudi={onChiudi} style={posto(a)} />;

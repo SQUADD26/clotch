@@ -10,6 +10,8 @@ import { nomeProgetto } from "./claude-code";
 import { leggiApp, type SessioneApp } from "./desktop";
 import { leggiRegistro, type Registro } from "./friday";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
+import { creaAggiornamenti } from "./aggiornamento";
+import { provaSilenziosa } from "./modalita-prova";
 import { quoteUso } from "./quote-uso";
 import { accorcia, espandi, trovaRadici } from "./radici";
 import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
@@ -67,6 +69,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   // shell.openPath torna "" se riesce, se no il perché
   ipc.handle("impostazioni:apri", async (_e, p: string) => { const err = await shell.openPath(espandi(String(p), home)); if (err) throw new Error(err); });
   ipc.handle("impostazioni:versione", () => app.getVersion());
+  const aggiornamenti = creaAggiornamenti({ dir: app.getAppPath(), silenzioso: provaSilenziosa(), riapri: () => { app.relaunch(); app.exit(0); } });
   ipc.handle("impostazioni:avvio", (_e, acceso: boolean) => app.setLoginItemSettings({ openAtLogin: acceso === true }));
   ipc.handle("impostazioni:elimina-dati", () => {
     eliminaDati(indice, path.join(app.getPath("userData"), "preferenze.json"));
@@ -78,5 +81,5 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
-  ipc.handle("impostazioni:aggiornamenti", () => false);
+  ipc.handle("impostazioni:aggiornamenti", (_e, fai) => aggiornamenti(fai));
 }

@@ -141,6 +141,10 @@ FRAME["101-10297"] = () => ricerca("lettura");
 FRAME["101-23003"] = () => ricerca("copia");
 FRAME["101-23248"] = () => ricerca("kubernetes");
 
+// i dialoghi (#437) stanno sopra la sessione aperta, con la barra di «Sessione aperta»
+FRAME["101-22137"] = FRAME["101-8036"];
+FRAME["101-22186"] = FRAME["101-8036"];
+
 let una: Prova | null | undefined;
 /** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */
 export function prova(): Prova | null {
