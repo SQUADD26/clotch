@@ -18,6 +18,9 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
   return { stato: "ferma", perche: null };
 }
 
+/** Quante sessioni aspettano te: stato «aspetta» (un permesso o una risposta). */
+export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
+
 /** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
 export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown> }): Elenco {
   const errori: ErroreLettura[] = [];

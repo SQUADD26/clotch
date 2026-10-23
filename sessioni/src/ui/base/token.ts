@@ -23,6 +23,9 @@ export type Token =
   | "primitivo-arancio-ff8549"
   | "primitivo-verde-40c977"
   | "primitivo-verde-40c977-a16"
+  | "primitivo-verde-37915b"
+  | "primitivo-verde-265f3d"
+  | "primitivo-verde-f3fbf6"
   | "primitivo-rosso-ff6764"
   | "primitivo-rosso-fa423e-a16"
   | "primitivo-semaforo-rosso"
@@ -31,9 +34,21 @@ export type Token =
   | "primitivo-pagina-riquadro"
   | "primitivo-nero-a19"
   | "primitivo-nero-a50"
+  | "primitivo-blu-145694"
   | "primitivo-blu-339cff"
+  | "primitivo-blu-339cff-a16"
+  | "primitivo-blu-1982e5"
+  | "primitivo-blu-f0f7fe"
   | "primitivo-viola-ad7bf9"
+  | "primitivo-viola-ad7bf9-a16"
+  | "primitivo-viola-9965e8"
+  | "primitivo-viola-6925d0"
+  | "primitivo-viola-f6f1fd"
   | "primitivo-argento-c4c8ce"
+  | "primitivo-argento-c4c8ce-a16"
+  | "primitivo-argento-7a818d"
+  | "primitivo-argento-50555c"
+  | "primitivo-argento-f6f7f8"
   | "primitivo-giallo-f2c14e"
   | "primitivo-giallo-fff1c2"
   | "colore-fondo-cornice"
@@ -54,6 +69,18 @@ export type Token =
   | "colore-fondo-manopola"
   | "colore-fondo-aggiunta"
   | "colore-fondo-attesa"
+  | "colore-fondo-accento-blu"
+  | "colore-fondo-bolla-blu"
+  | "colore-fondo-attesa-blu"
+  | "colore-fondo-accento-verde"
+  | "colore-fondo-bolla-verde"
+  | "colore-fondo-attesa-verde"
+  | "colore-fondo-accento-viola"
+  | "colore-fondo-bolla-viola"
+  | "colore-fondo-attesa-viola"
+  | "colore-fondo-accento-argento"
+  | "colore-fondo-bolla-argento"
+  | "colore-fondo-attesa-argento"
   | "colore-testo-primario"
   | "colore-testo-secondario"
   | "colore-testo-su-primario"
@@ -64,6 +91,10 @@ export type Token =
   | "colore-testo-link"
   | "colore-testo-lavoro"
   | "colore-testo-lavoro-luce"
+  | "colore-testo-bolla-blu"
+  | "colore-testo-bolla-verde"
+  | "colore-testo-bolla-viola"
+  | "colore-testo-bolla-argento"
   | "colore-icona-primaria"
   | "colore-icona-secondaria"
   | "colore-icona-terziaria"
@@ -73,10 +104,18 @@ export type Token =
   | "colore-icona-su-accento"
   | "colore-icona-viola"
   | "colore-icona-lavoro"
+  | "colore-icona-accento-blu"
+  | "colore-icona-accento-verde"
+  | "colore-icona-accento-viola"
+  | "colore-icona-accento-argento"
   | "colore-bordo-normale"
   | "colore-bordo-leggero"
   | "colore-bordo-forte"
   | "colore-bordo-fuoco"
+  | "colore-bordo-fuoco-blu"
+  | "colore-bordo-fuoco-verde"
+  | "colore-bordo-fuoco-viola"
+  | "colore-bordo-fuoco-argento"
   | "colore-ombra-colore"
   | "colore-semaforo-rosso"
   | "colore-semaforo-giallo"
@@ -121,6 +160,8 @@ export type Token =
   | "testo-riga-xl"
   | "testo-famiglia-ui"
   | "testo-famiglia-codice"
+  | "testo-famiglia-arrotondato"
+  | "testo-famiglia-monospaziato"
   | "misura-barra-titolo"
   | "misura-barra-laterale"
   | "misura-riga"
@@ -163,6 +204,7 @@ export type Token =
   | "misura-barra-uso"
   | "misura-legenda"
   | "misura-riferimento"
+  | "misura-riga-compatta"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -198,6 +240,9 @@ export const valori: Record<Token, string> = {
   "primitivo-arancio-ff8549": "#ff8549",
   "primitivo-verde-40c977": "#40c977",
   "primitivo-verde-40c977-a16": "#40c97729",
+  "primitivo-verde-37915b": "#37915b",
+  "primitivo-verde-265f3d": "#265f3d",
+  "primitivo-verde-f3fbf6": "#f3fbf6",
   "primitivo-rosso-ff6764": "#ff6764",
   "primitivo-rosso-fa423e-a16": "#fa423e29",
   "primitivo-semaforo-rosso": "#ff5f57",
@@ -206,9 +251,21 @@ export const valori: Record<Token, string> = {
   "primitivo-pagina-riquadro": "#2c2c30",
   "primitivo-nero-a19": "#00000030",
   "primitivo-nero-a50": "#00000080",
+  "primitivo-blu-145694": "#145694",
   "primitivo-blu-339cff": "#339cff",
+  "primitivo-blu-339cff-a16": "#339cff29",
+  "primitivo-blu-1982e5": "#1982e5",
+  "primitivo-blu-f0f7fe": "#f0f7fe",
   "primitivo-viola-ad7bf9": "#ad7bf9",
+  "primitivo-viola-ad7bf9-a16": "#ad7bf929",
+  "primitivo-viola-9965e8": "#9965e8",
+  "primitivo-viola-6925d0": "#6925d0",
+  "primitivo-viola-f6f1fd": "#f6f1fd",
   "primitivo-argento-c4c8ce": "#c4c8ce",
+  "primitivo-argento-c4c8ce-a16": "#c4c8ce29",
+  "primitivo-argento-7a818d": "#7a818d",
+  "primitivo-argento-50555c": "#50555c",
+  "primitivo-argento-f6f7f8": "#f6f7f8",
   "primitivo-giallo-f2c14e": "#f2c14e",
   "primitivo-giallo-fff1c2": "#fff1c2",
   "colore-fondo-cornice": "#232323",
@@ -229,6 +286,18 @@ export const valori: Record<Token, string> = {
   "colore-fondo-manopola": "#ffffff",
   "colore-fondo-aggiunta": "#40c97729",
   "colore-fondo-attesa": "#ee7c3729",
+  "colore-fondo-accento-blu": "#1982e5",
+  "colore-fondo-bolla-blu": "#145694",
+  "colore-fondo-attesa-blu": "#339cff29",
+  "colore-fondo-accento-verde": "#37915b",
+  "colore-fondo-bolla-verde": "#265f3d",
+  "colore-fondo-attesa-verde": "#40c97729",
+  "colore-fondo-accento-viola": "#9965e8",
+  "colore-fondo-bolla-viola": "#6925d0",
+  "colore-fondo-attesa-viola": "#ad7bf929",
+  "colore-fondo-accento-argento": "#7a818d",
+  "colore-fondo-bolla-argento": "#50555c",
+  "colore-fondo-attesa-argento": "#c4c8ce29",
   "colore-testo-primario": "#ffffff",
   "colore-testo-secondario": "#ffffffb5",
   "colore-testo-su-primario": "#2d2d2d",
@@ -239,6 +308,10 @@ export const valori: Record<Token, string> = {
   "colore-testo-link": "#339cff",
   "colore-testo-lavoro": "#f2c14e",
   "colore-testo-lavoro-luce": "#fff1c2",
+  "colore-testo-bolla-blu": "#f0f7fe",
+  "colore-testo-bolla-verde": "#f3fbf6",
+  "colore-testo-bolla-viola": "#f6f1fd",
+  "colore-testo-bolla-argento": "#f6f7f8",
   "colore-icona-primaria": "#ffffffe7",
   "colore-icona-secondaria": "#ffffffb5",
   "colore-icona-terziaria": "#ffffff82",
@@ -248,10 +321,18 @@ export const valori: Record<Token, string> = {
   "colore-icona-su-accento": "#ffffff",
   "colore-icona-viola": "#ad7bf9",
   "colore-icona-lavoro": "#f2c14e",
+  "colore-icona-accento-blu": "#339cff",
+  "colore-icona-accento-verde": "#40c977",
+  "colore-icona-accento-viola": "#ad7bf9",
+  "colore-icona-accento-argento": "#c4c8ce",
   "colore-bordo-normale": "#ffffff15",
   "colore-bordo-leggero": "#ffffff0b",
   "colore-bordo-forte": "#ffffff28",
   "colore-bordo-fuoco": "#ee7c37",
+  "colore-bordo-fuoco-blu": "#339cff",
+  "colore-bordo-fuoco-verde": "#40c977",
+  "colore-bordo-fuoco-viola": "#ad7bf9",
+  "colore-bordo-fuoco-argento": "#c4c8ce",
   "colore-ombra-colore": "#00000030",
   "colore-semaforo-rosso": "#ff5f57",
   "colore-semaforo-giallo": "#febc2e",
@@ -296,6 +377,8 @@ export const valori: Record<Token, string> = {
   "testo-riga-xl": "36px",
   "testo-famiglia-ui": "SF Pro",
   "testo-famiglia-codice": "Menlo",
+  "testo-famiglia-arrotondato": "SF Pro Rounded",
+  "testo-famiglia-monospaziato": "SF Mono",
   "misura-barra-titolo": "44px",
   "misura-barra-laterale": "266px",
   "misura-riga": "32px",
@@ -338,6 +421,7 @@ export const valori: Record<Token, string> = {
   "misura-barra-uso": "6px",
   "misura-legenda": "8px",
   "misura-riferimento": "24px",
+  "misura-riga-compatta": "28px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",

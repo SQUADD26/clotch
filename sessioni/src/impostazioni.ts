@@ -7,6 +7,7 @@ import { app, dialog, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
+import { quoteUso } from "./quote-uso";
 import { accorcia, espandi, trovaRadici } from "./radici";
 import type { CartellaAccount, Elenco } from "./tipi";
 
@@ -45,8 +46,8 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     sessioni.impostazioni({});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  // nessuna fonte ancora: quote d'uso #374, archiviate #375
-  ipc.handle("impostazioni:uso", () => null);
+  ipc.handle("impostazioni:uso", () => quoteUso());
+  // nessuna fonte ancora: archiviate #375
   ipc.handle("impostazioni:archiviate", () => []);
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);

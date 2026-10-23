@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
+import { registraAzione } from "../base/scorciatoie";
+import { useImpostazioni } from "../impostazioni/stato";
+import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { comanda } from "./friday";
 import { provaDi, quanti } from "./testi";
 import "./casella.css";
@@ -54,6 +57,9 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const [modifica, setModifica] = useState<VoceCoda | null>(inModifica);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
+  const { scorciatoie } = useImpostazioni();
+
+  useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
   // la casella cresce col testo (101:25542 «testo lungo»)
   useEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
@@ -73,9 +79,11 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
 
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Escape" && modifica) { setModifica(null); setTesto(""); return; }
-    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (e.nativeEvent.isComposing) return;
+    const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
+    if (azione !== "inviaInterrompi" && azione !== "coda") return;
     e.preventDefault();
-    void manda(e.metaKey ? "coda" : "subito");
+    void manda(azione === "coda" ? "coda" : "subito");
   };
 
   const ferma = lavora && !testo.trim();
