@@ -25,7 +25,7 @@ function frame(id: string) {
 /** `sessione`: la finestra si apre già su quella sessione («Apri in una nuova finestra»). */
 export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
-  const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
+  const grande = frame("101-8036").finestra, piccola = frame("101-29971").finestra; // la più piccola: «Finestra 480»
   const silenziosa = provaSilenziosa(), anteprima = silenziosa && opzioni.show !== false;
   const area = anteprima ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
   const larghezza = area ? Math.min(grande.w, area.width) : grande.w;

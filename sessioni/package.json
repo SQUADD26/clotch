@@ -13,7 +13,7 @@
     "elenco": "tsc && node dist/src/elenco-cli.js",
     "prove": "tsc && node dist/src/prove-collegamento.js",
     "start": "npm run build && electron .",
-    "parita": "node scripts/scene-chat.mjs && node scripts/scene-allegati.mjs && node scripts/scene-filo.mjs && npm run build && electron --force-device-scale-factor=1 --force-color-profile=srgb . --parita",
+    "parita": "node scripts/scene-chat.mjs && node scripts/scene-allegati.mjs && node scripts/scene-filo.mjs && node scripts/scene-layout.mjs && npm run build && electron --force-device-scale-factor=1 --force-color-profile=srgb . --parita",
     "pacchetto:mac": "node scripts/pacchetto.mjs"
   },
   "devDependencies": {

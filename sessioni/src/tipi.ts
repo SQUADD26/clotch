@@ -201,6 +201,8 @@ export interface FridayApi {
 export interface ImpostazioniApp {
   apriAllAvvio: boolean; barraDeiMenu: boolean; lingua: string; modello: string; apriSessione: string; cartellaRegistro: string;
   colore: string; carattere: string; dimensione: string; densita: string; pannelloAperto: boolean; iconeSessioni: boolean;
+  /** Larghezza della barra laterale in px, se trascinata (frame 101:29399); assente = quella del disegno. */
+  barraLarghezza?: number;
   avvisoAttesa: boolean; avvisoFinita: boolean; avvisoErrori: boolean; avvisoLimite: boolean; suono: string; silenzio: string;
   sorgenteClaudeCode: boolean; sorgenteClaude: boolean; sorgenteCodex: boolean; sorgenteCursor: boolean;
   /** Cartelle ~/.claude-* tolte o aggiunte a mano, oltre a quelle trovate dal main. */
