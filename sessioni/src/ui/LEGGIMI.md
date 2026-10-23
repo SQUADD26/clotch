@@ -24,7 +24,7 @@ Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvat
 
 - Mai un valore a mano: solo `var(--nome)` (CSS) o `t("nome")` (`base/token.ts`). I nomi sono quelli di Figma con `-`: `colore/fondo/cornice` diventa `--colore-fondo-cornice`.
 - Un valore che manca: prima la variabile in Figma, poi si riesporta `design/tokens.json` e si lancia `npm run token`. I file generati non si toccano.
-- Componenti in `base/`: `Bottone`, `BottoneIcona`, `Pillola` (Bottone.tsx), `Icona` (le icone «Icona/*» di Figma), `Campo`, `Menu` (voci, `testata`, voce `pericolo`), `IconaSessione` (icona e colore di una sessione, dalle preferenze), `Glifo` (icona in un colore token qualunque), `SegnoStato`, `MessaggioAlCentro` e `StatoErrore` (vuoto ed errore), `Sagome` (caricamento), avvisi a comparsa.
+- Componenti in `base/`: `Bottone`, `BottoneIcona`, `Pillola` (Bottone.tsx), `Icona` (le icone «Icona/*» di Figma), `Campo`, `Menu` (voci, `testata`, voce `pericolo`, voci con `scelta` e spunta), `IconaSessione` (icona e colore di una sessione, dalle preferenze), `Glifo` (icona in un colore token qualunque), `SegnoStato`, `MessaggioAlCentro` e `StatoErrore` (vuoto ed errore), `Sagome` (caricamento), avvisi a comparsa.
 - Avviso a comparsa, uno solo per tutta l'app: `avvisa({ tipo: "info" | "successo" | "errore" | "caricamento", messaggio, azione? })`, poi `aggiornaAvviso(id, …)` o `chiudiAvviso(id)`. La pila sta in basso al centro della colonna; la chat la alza sopra la casella con `--avvisi-basso` sulla colonna.
 - Classi di testo in `base/stile.css`: `t-xs`…`t-xl`, `medio`, `codice`, `secondario`, `terziario`.
 
