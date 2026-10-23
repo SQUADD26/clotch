@@ -28,6 +28,9 @@ export type Aperto =
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
 const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
 
+// La vista (filtri, raggruppa, ordina) vive quanto la finestra: la barra si smonta nelle impostazioni e deve ritrovarla.
+let vistaRicordata: Vista | null = null;
+
 export default function Barra() {
   const n = useNavigazione();
   const apriSessione = useApriSessione();
@@ -42,7 +45,8 @@ export default function Barra() {
   const adesso = p?.ora ?? Date.now();
   const sessioni = elenco.dati?.sessioni ?? [];
 
-  const [vista, setVista] = useState<Vista>(p?.vista ?? { filtri: [], raggruppa: "cartella", ordina: "attivita" });
+  const [vista, setVistaLocale] = useState<Vista>(p?.vista ?? vistaRicordata ?? { filtri: [], raggruppa: "cartella", ordina: "attivita" });
+  const setVista = (v: Vista) => { if (!p) vistaRicordata = v; setVistaLocale(v); };
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
   const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
   const [chiuse, setChiuse] = useState<Set<string>>(new Set());
@@ -50,9 +54,13 @@ export default function Barra() {
   const barra = useMemo(() => componi(sessioni, vista, pref, adesso), [sessioni, vista, pref, adesso]);
   const pagina = p?.pagina ?? n.vista;
   const scelta = pagina === "sessione" ? (p?.scelta ?? n.sessione) : null;
-  // aperta: la cartella della sessione scelta e quelle aperte a mano; chiuse a mano restano chiuse
+  // aperta: la cartella della sessione scelta, quelle aperte a mano e, con un filtro attivo, tutte (i risultati si vedono);
+  // chiuse a mano restano chiuse, finché il filtro non cambia
+  const filtrato = vista.filtri.some((f) => f.valori.length);
+  const firmaFiltri = JSON.stringify(vista.filtri);
+  useEffect(() => setChiuse(new Set()), [firmaFiltri]);
   const [aperteAMano, setAperteAMano] = useState<Set<string>>(new Set(p?.aperte ?? []));
-  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
+  const aperta = (chiave: string) => !chiuse.has(chiave) && (filtrato || aperteAMano.has(chiave) || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
     setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });

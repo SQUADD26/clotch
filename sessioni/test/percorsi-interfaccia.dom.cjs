@@ -162,7 +162,6 @@ app.whenReady().then(async () => {
     await clicca('.menu-filtro .voce .etichetta', 'Sorgente');
     await clicca('.menu-filtro .voce .etichetta', 'Codex');
     await run(() => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
-    await clicca('.barra-laterale button.riga .testo', 'clotch'); // la cartella con i risultati: vedi FILTRO_MOSTRA_I_RISULTATI
     assert.deepEqual(await sidebar(), ['Beta due'], 'solo Codex');
     assert.match(await run(() => document.querySelector('.pillola-filtro')?.textContent || ''), /Sorgente:\s*Codex/);
     await clicca('.pillola-filtro', 'Sorgente:Codex'); await clicca('.menu-filtro .voce .etichetta', 'Codex'); // tolta la spunta: nessun filtro
@@ -179,7 +178,7 @@ app.whenReady().then(async () => {
     await clicca('.menu-filtro .voce .etichetta', 'Sorgente'); await clicca('.menu-filtro .voce .etichetta', 'Codex');
     await run(() => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     assert.deepEqual(await sidebar(), ['Beta due'], 'dopo il filtro la sessione trovata è visibile senza aprire la cartella');
-  }, { noto: 'UI-FILTRO-CARTELLA-CHIUSA' });
+  });
 
   await check('FILTRO_RESTA_DOPO_IMPOSTAZIONI', async () => {
     await caricaChat();
@@ -191,7 +190,7 @@ app.whenReady().then(async () => {
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());
     await wait(() => !!document.querySelector('.barra-laterale'));
     assert.equal(await run(() => !!document.querySelector('.pillola-filtro')), true, 'il filtro scelto è ancora attivo');
-  }, { noto: 'UI-FILTRO-PERSO' });
+  });
 
   await check('FILTRI_CHE_ESCLUDONO_TUTTO', async () => {
     await caricaChat();
