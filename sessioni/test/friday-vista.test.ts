@@ -96,3 +96,12 @@ test("vista: il registro passa il ponte del preload senza Map e torna uguale", (
   const passato = structuredClone(piano(r)); // come il ponte: niente Map, niente classi
   assert.deepEqual(daPiano(passato), r);
 });
+
+test("registro: l'ultimo evento impostazioni resta in Registro.impostazioni", () => {
+  const r = registro([
+    [5, "friday", "impostazioni", { attiva: true, voce: "Alice", microfoni_disponibili: ["AirPods"] }],
+    [2, "friday", "impostazioni", { attiva: true, voce: "Luca", microfoni_disponibili: ["AirPods", "Mac"] }],
+  ]);
+  assert.deepEqual(r.impostazioni, { attiva: true, voce: "Luca", microfoni_disponibili: ["AirPods", "Mac"] });
+  assert.deepEqual(daPiano(structuredClone(piano(r))).impostazioni, r.impostazioni);
+});

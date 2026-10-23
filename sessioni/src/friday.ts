@@ -11,7 +11,7 @@ export const STATI_FRIDAY = ["lavora", "aspetta", "finito", "serve_roberto", "se
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia", "obiettivo",
+  "riprendi_altrove", "archivia", "obiettivo", "spegni", "imposta",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 180 s». Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 180_000;
@@ -72,6 +72,8 @@ export interface Registro {
   regole: { testo: string; perche: string; dove: string; t: number | null }[];
   /** Ultimo evento `non_disturbare` acceso: `fino` null = finché non si toglie; `tenuti` = avvisi tenuti per dopo. */
   nonDisturbare: { fino: number | null; tenuti: number } | null;
+  /** Ultimo evento `impostazioni`, con i campi del contratto (attiva, microfono, voce, account, puo_dare_permessi, legge_ad_alta_voce, microfoni_disponibili, voci_disponibili). */
+  impostazioni: Record<string, unknown> | null;
   esiti: Map<string, { esito: string; testo: string }>;
   errori: ErroreLettura[];
 }
@@ -86,7 +88,7 @@ const nuova = (chat: string): ChatFriday => ({
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
-  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, esiti: new Map(), errori: [] };
+  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [] };
   const dir = cartellaRegistro(home, env);
   let mesi: string[];
   try {
@@ -183,6 +185,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
           break;
         case "non_disturbare": r.nonDisturbare = d.acceso === true ? { fino: aMillisecondi(d.fino), tenuti: Number(d.tenuti) || 0 } : null; break;
+        case "impostazioni": r.impostazioni = d; break;
         case "friday": if (t !== null) r.friday = { evento: String(d.evento ?? ""), t }; break;
         case "comando_fatto": {
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
