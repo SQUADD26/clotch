@@ -17,6 +17,17 @@ const api: SessioniApi = {
     return () => ipcRenderer.removeListener("sessioni:preferenze", f);
   },
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
+  impostazioni: () => ipcRenderer.invoke("sessioni:impostazioni"),
+  impostaImpostazioni: (parte) => ipcRenderer.invoke("sessioni:imposta-impostazioni", parte),
+  onImpostazioni: (cb) => {
+    const f = (_e: unknown, i: Record<string, unknown>) => cb(i);
+    ipcRenderer.on("sessioni:impostazioni", f);
+    return () => ipcRenderer.removeListener("sessioni:impostazioni", f);
+  },
+  cerca: (testo) => ipcRenderer.invoke("sessioni:cerca", testo),
+  spazio: () => ipcRenderer.invoke("sessioni:spazio"),
+  ricostruisci: () => ipcRenderer.invoke("sessioni:ricostruisci"),
+  svuota: () => ipcRenderer.invoke("sessioni:svuota"),
 };
 contextBridge.exposeInMainWorld("sessioni", api);
 
