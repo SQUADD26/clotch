@@ -4,7 +4,7 @@
   "id": "101:12461",
   "nome": "Varianti",
   "w": 3428,
-  "h": 4968
+  "h": 5180
  },
  "variabili": {
   "colore/fondo/superficie": "#181818",
@@ -100,7 +100,7 @@
     "x": 0,
     "y": 0,
     "w": 3428,
-    "h": 4968
+    "h": 5180
    },
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
@@ -9564,6 +9564,73 @@
    "senza": []
   },
   {
+   "id": "I101:12845;121:58602;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 276,
+    "y": 2615,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:12845;121:58602;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 2621,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:12845;121:58602;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 283.3336181640625,
+    "y": 2621.66650390625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:12845;121:58602;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 296,
+    "y": 2611,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
+  },
+  {
    "id": "101:12860",
    "nome": "gruppo Piede barra laterale",
    "tipo": "FRAME",
@@ -14774,6 +14841,453 @@
    },
    "senza": [],
    "testo": "Voce",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "121:58710",
+   "nome": "gruppo Bottone attività",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 4944,
+    "w": 3300,
+    "h": 172
+   },
+   "variabili": {
+    "itemSpacing": "spazio/3"
+   },
+   "senza": []
+  },
+  {
+   "id": "121:58711",
+   "nome": "nome componente",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 4944,
+    "w": 202,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Bottone attività · Popover attività",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "121:58712",
+   "nome": "varianti Bottone attività",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 4974,
+    "w": 3300,
+    "h": 142
+   },
+   "variabili": {
+    "itemSpacing": "spazio/6"
+   },
+   "senza": [
+    "counterAxisSpacing 24"
+   ]
+  },
+  {
+   "id": "121:58776",
+   "nome": "Bottone attività",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I121:58776;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58776;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 70,
+    "y": 4980,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58776;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 71.3336181640625,
+    "y": 4980.666015625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58776;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 84,
+    "y": 4970,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "121:58782",
+   "nome": "Bottone attività",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 116,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I121:58782;121:58582",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 116,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58782;121:58582;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 122,
+    "y": 4980,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58782;121:58582;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 123.3336181640625,
+    "y": 4980.666015625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58782;121:58586",
+   "nome": "contatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 132,
+    "y": 4970,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-primario",
+    "cornerRadius": "raggio/pieno",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58782;121:58587",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 136,
+    "y": 4970,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "121:58788",
+   "nome": "aperto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 168,
+    "y": 4974,
+    "w": 260,
+    "h": 142
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "121:58789",
+   "nome": "Bottone attività",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 168,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I121:58789;121:58589",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 168,
+    "y": 4974,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58789;121:58589;101:7142",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 174,
+    "y": 4980,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58789;121:58589;101:7142;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 175.3336181640625,
+    "y": 4980.666015625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58789;121:58593",
+   "nome": "contatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 184,
+    "y": 4970,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-primario",
+    "cornerRadius": "raggio/pieno",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58789;121:58594",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 188,
+    "y": 4970,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "121:58795",
+   "nome": "Popover attività",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 168,
+    "y": 5010,
+    "w": 260,
+    "h": 106
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/3",
+    "paddingRight": "spazio/3",
+    "paddingTop": "spazio/3",
+    "paddingBottom": "spazio/3",
+    "width": "misura/menu"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58795;121:58597",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 180,
+    "y": 5022,
+    "w": 236,
+    "h": 20
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I121:58795;121:58598",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 180,
+    "y": 5022,
+    "w": 220,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Attività",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I121:58795;121:58599",
+   "nome": "icona chiudi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 400,
+    "y": 5024,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58795;121:58599;101:6935",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 403.33306884765625,
+    "y": 5027.3330078125,
+    "w": 9.333883285522461,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I121:58795;121:58600",
+   "nome": "corpo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 180,
+    "y": 5050,
+    "w": 236,
+    "h": 54
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Qui trovi le sessioni che aspettano te: permessi, domande e piani da approvare.",
    "font": "SF Pro Regular"
   }
  ]
