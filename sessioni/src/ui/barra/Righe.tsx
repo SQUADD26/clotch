@@ -3,6 +3,7 @@ import type { MouseEvent, ReactNode } from "react";
 import type { PreferenzeSessione, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { IconaSessione } from "../base/IconaSessione";
 import { SegnoStato } from "../base/SegnoStato";
 import "./barra.css";
 
@@ -31,14 +32,14 @@ export function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nom
   );
 }
 
-/** Icona scelta per la sessione (101:12169) nel suo colore «colore/sessione/…»; senza scelta: stella grigia. */
-export function IconaSessione({ pref }: { pref?: PreferenzeSessione }) {
-  const nome = (pref?.icona ?? "stella") as NomeIcona;
-  return (
-    <span className="icona-sessione" style={{ color: `var(--colore-sessione-${pref?.colore ?? "grigio"})` }}>
-      <Icona nome={nome} />
-    </span>
-  );
+/** Segno all'inizio del titolo → icona (★ = stella arancione); senza scelta né segno: la stella argento di serie (101:12491). */
+const SEGNI: Record<string, [string, string?]> = {
+  "★": ["stella", "arancione"], "⛁": ["database"], "🎨": ["tavolozza"], "⚠": ["insetto"], "◰": ["strati"], "☁": ["globo"], "⚙": ["chiave"],
+  "⌘": ["casa"], "⌕": ["bussola"], "☑": ["scudo"], "✎": ["libro"], "⇋": ["fulmine"], "♺": ["pacco"],
+};
+export function IconaRiga({ titolo, pref }: { titolo: string; pref?: PreferenzeSessione }) {
+  const [icona, colore] = SEGNI[[...titolo.trim()][0]?.replace("\uFE0E", "") ?? ""] ?? [];
+  return <IconaSessione icona={pref?.icona ?? icona} colore={pref?.colore ?? (pref?.icona ? undefined : colore)} />;
 }
 
 interface PropsSessione {
@@ -69,7 +70,7 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, onApri, onIc
       onKeyDown={(e) => { if (e.key === "Enter") onApri(); }}
     >
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
-        <IconaSessione pref={pref} />
+        <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
       <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>{s.titolo}</span>
       <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.stato} />}</span>

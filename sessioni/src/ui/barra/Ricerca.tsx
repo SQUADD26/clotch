@@ -4,7 +4,7 @@ import type { AzioneSessione, PreferenzeSessione, Sessione } from "../../tipi";
 import { Campo } from "../base/Campo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { giorno, nomeSorgente } from "./elenco";
-import { IconaSessione } from "./Righe";
+import { IconaRiga } from "./Righe";
 import "./ricerca.css";
 
 /** Azioni sulla sessione aperta, coi testi di 101:23035. */
@@ -75,7 +75,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", onApri, on
           {!!trovate.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Sessioni</span></div>}
           {trovate.map((v) => v.tipo === "sessione" && (
             <button key={v.s.id} type="button" className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
-              <IconaSessione pref={pref[v.s.id]} />
+              <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo">{v.s.titolo}</span>
                 <span className="testo t-sm secondario">{[v.s.progetto, nomeSorgente(v.s.sorgente), v.s.account].join(" · ")}</span>
