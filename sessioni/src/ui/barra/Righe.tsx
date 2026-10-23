@@ -88,7 +88,7 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figl
         </button>
       )}
       {s.app?.prs.length ? <IndicatorePr pr={s.app.prs[s.app.prs.length - 1]} /> : null}
-      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.stato} />}</span>
+      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.situazione?.adesso === "errore" ? "errore" : s.stato} />}</span>
       <span className="azioni" onClick={(e) => e.stopPropagation()}>
         <BottoneIcona icona="spillo" etichetta="Fissa in alto" onClick={onFissa} />
         <BottoneIcona icona="altro" etichetta="Altre azioni" onClick={onMenu} />

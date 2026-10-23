@@ -1,6 +1,6 @@
 {
  "navigazione": {
-  "vista": "friday",
+  "vista": "clotch-ai",
   "sezione": "dettatura:Ferma la sessione del backend e dimmi perché aspettava…"
  },
  "elenco": {
@@ -25,14 +25,14 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792786831964,
+    "battito": 1792793169933,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792786831964,
+    "visto": 1792793169933,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -46,7 +46,7 @@
   "avvisi": [
    {
     "id": "a0",
-    "t": 1792786281964,
+    "t": 1792792619933,
     "testo": "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev.",
     "livello": "info",
     "motivo": "risposta",
@@ -55,7 +55,7 @@
    },
    {
     "id": "a1",
-    "t": 1792786321964,
+    "t": 1792792659933,
     "testo": "Fatto. La migrazione è partita; ti avviso quando finisce.",
     "livello": "info",
     "motivo": "risposta",
@@ -70,11 +70,11 @@
    "versione": "2.4",
    "t": -60000
   },
-  "friday": null,
+  "clotchAi": null,
   "comandi": [
    {
     "id": "c0",
-    "t": 1792786261964,
+    "t": 1792792599933,
     "cmd": "parla",
     "da": "app",
     "args": {
@@ -83,7 +83,7 @@
    },
    {
     "id": "c1",
-    "t": 1792786301964,
+    "t": 1792792639933,
     "cmd": "parla",
     "da": "app",
     "args": {

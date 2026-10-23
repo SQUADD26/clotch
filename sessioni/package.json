@@ -14,7 +14,7 @@
     "prove": "tsc && node dist/src/prove-collegamento.js",
     "start": "npm run build && electron .",
     "scene": "node scripts/scene-chat.mjs && node scripts/scene-allegati.mjs && node scripts/scene-filo.mjs && node scripts/scene-layout.mjs && node scripts/scene-info.mjs && node scripts/scene-clotch-ai.mjs && node scripts/scene-clotch-ai-voce.mjs && node scripts/scene-barra.mjs && node scripts/scene-dialoghi.mjs && node scripts/scene-casella.mjs && node scripts/scene-clotch.mjs",
-    "parita": "npm run scene && npm run build && electron --force-device-scale-factor=1 --force-color-profile=srgb . --parita",
+    "parita": "npm run build && npm run scene && node scripts/parita-tutti.mjs",
     "pacchetto:mac": "node scripts/pacchetto.mjs"
   },
   "devDependencies": {

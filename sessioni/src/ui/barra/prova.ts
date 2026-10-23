@@ -156,6 +156,7 @@ const TANTE: [string, string, Stato][] = [
 ];
 FRAME["101-9340"] = () => {
   const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
+  for (const x of lista) if (/^(Hook|ESP32):/.test(x.titolo)) x.situazione = { adesso: "errore", strumento: null, inCoda: 0, segni: [] }; // 101:9109: segno rosso
   const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
   const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("clotch-ai-mac-v2", 27, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro({ aspettano: 3 }), scelta: lista[3].id };
