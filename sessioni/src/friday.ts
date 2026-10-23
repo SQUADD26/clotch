@@ -24,6 +24,7 @@ export interface ChatFriday {
   chat: string;
   titolo: string | null;
   madre: string | null;
+  progetto: string | null;
   account: string | null;
   sorgente: string | null;
   daHandoff: string | null;
@@ -42,6 +43,8 @@ export interface ChatFriday {
   interrotta: string | null;
   coda: { voce: string; testo: string }[];
   obiettivo: { stato: string; testo: string } | null;
+  /** Passi dell'agente principale (agente ""), dall'ultimo evento `passi`. */
+  passi: { testo: string; stato: string }[];
   /** ms dell'ultima riga di questa chat (battito o altro). */
   visto: number | null;
   fine: string | null;
@@ -57,14 +60,18 @@ export interface ChatFriday {
 export interface Registro {
   chat: Map<string, ChatFriday>;
   fermoTutto: boolean;
-  avvisi: { id: string; testo: string; livello: string; motivo: string; dettoDa: string | null }[];
+  avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null }[];
   clotch: { voce: string; parla: boolean; ascolta: boolean; t: number } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
   friday: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
   comandi: { id: string; cmd: string; da: string }[];
   /** Decisioni di Friday ancora annullabili (inverso non nullo e nessun `annulla` fatto). */
-  decisioni: { id: string; cosa: string; perche: string; annullabile: boolean }[];
+  decisioni: { id: string; t: number | null; cosa: string; perche: string; annullabile: boolean }[];
+  /** Regole imparate vive: ogni `regola` aggiunge, con `togli` toglie (stesso testo e dove). */
+  regole: { testo: string; perche: string; dove: string; t: number | null }[];
+  /** Ultimo `non_disturbare` andato a buon fine: Senza `minuti` il motore usa 60. */
+  nonDisturbare: { da: number; fino: number } | null;
   esiti: Map<string, { esito: string; testo: string }>;
   errori: ErroreLettura[];
 }
@@ -72,14 +79,14 @@ export interface Registro {
 export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => env.FRIDAY_REGISTRO || path.join(home, ".claude", "registro");
 
 const nuova = (chat: string): ChatFriday => ({
-  chat, titolo: null, madre: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
+  chat, titolo: null, madre: null, progetto: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
   domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
-  obiettivo: null, visto: null, fine: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
+  obiettivo: null, passi: [], visto: null, fine: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
-  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], esiti: new Map(), errori: [] };
+  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, esiti: new Map(), errori: [] };
   const dir = cartellaRegistro(home, env);
   let mesi: string[];
   try {
@@ -114,7 +121,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
       if (t !== null) c.visto = Math.max(c.visto ?? 0, t);
       switch (o.tipo) {
         case "inizio":
-          Object.assign(c, { titolo: s(d.titolo), madre: s(d.madre), account: s(d.account), sorgente: s(d.sorgente), daHandoff: s(d.da_handoff), fine: null });
+          Object.assign(c, { titolo: s(d.titolo), madre: s(d.madre), progetto: s(d.progetto), account: s(d.account), sorgente: s(d.sorgente), daHandoff: s(d.da_handoff), fine: null });
           break;
         case "battito":
           if (t !== null) c.battito = Math.max(c.battito ?? 0, t);
@@ -143,6 +150,15 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "compattazione": c.compattazioni++; break;
         case "interrotta": c.interrotta = s(d.da) ?? "roberto"; break;
         case "coda": c.coda = Array.isArray(d.voci) ? d.voci.map((v: any) => ({ voce: String(v?.voce ?? ""), testo: String(v?.testo ?? "") })) : []; break;
+        case "passi":
+          if (!d.agente && Array.isArray(d.passi)) c.passi = d.passi.filter((p: any) => !p?.tolto).map((p: any) => ({ testo: String(p?.testo ?? ""), stato: String(p?.stato ?? "") }));
+          break;
+        case "regola": {
+          const dove = String(d.dove ?? "claude-config"); // default del motore (friday_comandi.py)
+          r.regole = r.regole.filter((x) => !(x.testo === String(d.testo ?? "") && x.dove === dove));
+          if (d.togli !== true) r.regole.push({ testo: String(d.testo ?? ""), perche: String(d.perche ?? ""), dove, t });
+          break;
+        }
         case "obiettivo": c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") }; break;
         case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, t }; break;
         case "fermo":
@@ -160,8 +176,8 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           q.quarantena = d.acceso === true ? s(d.perche) ?? "quarantena" : null;
           break;
         }
-        case "avviso": r.avvisi.push({ id: String(o.id), testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), annullabile: Array.isArray(d.inverso) }); break;
+        case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), annullabile: Array.isArray(d.inverso) }); break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), cmd: String(d.cmd ?? ""), da: String(d.da ?? "") });
@@ -171,6 +187,11 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
           const cmd = comandi.get(String(d.comando));
           if (d.esito === "ok" && cmd?.cmd === "annulla" && s(cmd.args?.decisione)) annullate.add(cmd.args.decisione);
+          const da = aMillisecondi(cmd?.t);
+          if (d.esito === "ok" && cmd?.cmd === "non_disturbare" && da !== null) {
+            // shortcut: il motore non scrive un evento di Non disturbare; si ricava dal comando riuscito, finché il contratto non ne ha uno
+            r.nonDisturbare = cmd.args?.acceso === true ? { da, fino: da + (Number.isFinite(cmd.args?.minuti) ? cmd.args.minuti : 60) * 60_000 } : null; // 60 = default del motore
+          }
           break;
         }
       }
