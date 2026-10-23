@@ -71,8 +71,16 @@ app.whenReady().then(async () => {
 
     win.setSize(600, 1000); // 101:29770: sotto la bolla piena la casella è compatta
     await wait(() => !!document.querySelector('.corpo[data-compatta]'));
+    const mostrati = () => run(() => Object.fromEntries(['.chip .etichetta', '.chip .livello', '.contesto'].map((s) => { const e = document.querySelector('.casella ' + s); return [s, e ? getComputedStyle(e).display !== 'none' : null]; })));
+    const stretti = await mostrati();
+    assert.equal(stretti['.chip .etichetta'], false, '«Chiedi approvazione» nascosto nella casella compatta');
+    assert.equal(stretti['.chip .livello'], false, '«Medio» nascosto nella casella compatta');
+    assert.notEqual(stretti['.contesto'], true, 'il contesto non si vede nella casella compatta');
     win.setSize(768, 1000);
     await wait(() => !document.querySelector('.corpo[data-compatta]'));
+    const larghi = await mostrati();
+    assert.equal(larghi['.chip .etichetta'], true, 'larga: il testo dei chip c\'è');
+    assert.equal(larghi['.chip .livello'], true, 'larga: lo sforzo c\'è');
     win.setSize(1800, 1000); // tornati larghi: ognuno ha il suo stato, la barra è dov'era e il pannello pure
     await wait(() => !!document.querySelector('.barra-laterale') && !!document.querySelector('.pannello') && !document.querySelector('.pannello.sopra'));
     console.log('LAYOUT_COMPATTA_E_RITORNO_OK');
