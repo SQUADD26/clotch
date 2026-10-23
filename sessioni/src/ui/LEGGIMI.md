@@ -14,7 +14,9 @@ Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostaz
 | `friday` | `Intestazione`, `default` | al posto della chat quando la vista è `friday`, senza pannello |
 | `impostazioni` | `default` | tutto il corpo sotto la barra del titolo; usa `Superficie` da `base/Cornice` |
 
-Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, `apri()`, indietro/avanti, barra e pannello aperti).
+Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `friday`, `casella`, `decisioni`, `regole` (le quattro di Friday montano `friday/`), `impostazioni`.
+
+Barra del titolo: a destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
 
 Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvato.
 
@@ -38,5 +40,7 @@ P=~/.claude/skills/figma-ui-design/parita.mjs
 node $P token design/figma/101-8036.json design/tokens.json $(grep -rl "figma:" src/ui --include=*.tsx --include=*.css)
 node $P immagine design/figma/101-8036.png design/app/101-8036.png --soglia 0.08
 ```
+
+Scena di prova: `design/scene/<node-id>.json` = `{ navigazione?: { vista, sessione?, sezione? }, elenco?, messaggi?: { <id sessione>: [...] }, preferenze?, registro? }` (tipo `Scena` in `src/scena.ts`). Se c'è, in parità il main risponde coi suoi dati al posto di quelli del Mac e la finestra parte da quella vista. Un file per frame; un canale nuovo del main aggiunge la sua chiave in `src/scena.ts`.
 
 `npm run parita -- <node-id>` disegna la pagina a scala 1 alla misura del frame `design/figma/<node-id>.json` e salva `design/app/<node-id>.png`. Il frame si legge prima con `leggi-frame.js` e il suo PNG si esporta da Figma a scala 1 (skill `figma-ui-design`). Per la sola cornice: `design/figma/101-8036-cornice.png` e `101-8610-cornice.png` (frame con i pezzi nascosti).
