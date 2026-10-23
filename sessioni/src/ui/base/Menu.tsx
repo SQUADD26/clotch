@@ -1,11 +1,12 @@
 // figma: 101-21010 — «menu sessione»: voci con icona, scorciatoia e separatori; testata del «menu profilo» 101-21498;
-// voce pericolo rossa con la sua icona (101-21348). Si chiude con Esc o un clic fuori.
+// voce pericolo rossa con la sua icona (101-21348); voci con scelta fatta, spunta a sinistra (101-32999). Esc o clic fuori chiudono.
 import { useEffect, useRef, type CSSProperties } from "react";
 import { Icona, type NomeIcona } from "./Icona";
 import "./menu.css";
 
 export type VoceMenu =
-  | { icona?: NomeIcona; etichetta: string; scorciatoia?: string; pericolo?: boolean; fai(): void }
+  /** `scelta`: se una voce la ha, tutte tengono il posto della spunta; si vede solo su quella scelta. */
+  | { icona?: NomeIcona; etichetta: string; scorciatoia?: string; pericolo?: boolean; scelta?: boolean; fai(): void }
   | "separatore";
 
 interface Props {
@@ -17,9 +18,10 @@ interface Props {
 }
 
 export function Menu({ voci, onChiudi, testata, style }: Props) {
+  const conScelta = voci.some((v) => v !== "separatore" && v.scelta !== undefined);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelector<HTMLButtonElement>("button"))?.focus();
     const tasto = (e: KeyboardEvent) => {
       if (e.key === "Escape") onChiudi();
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
@@ -47,7 +49,9 @@ export function Menu({ voci, onChiudi, testata, style }: Props) {
       {voci.map((v, i) => v === "separatore"
         ? <div key={i} className="separatore" role="separator"><div className="linea" /></div>
         : (
-          <button key={i} type="button" role="menuitem" className="voce" onClick={() => { onChiudi(); v.fai(); }}>
+          <button key={i} type="button" role={conScelta ? "menuitemradio" : "menuitem"} aria-checked={conScelta ? !!v.scelta : undefined}
+            className={v.scelta ? "voce scelta" : "voce"} onClick={() => { onChiudi(); v.fai(); }}>
+            {conScelta && <span className={v.scelta ? "spunta" : "spunta nascosta"}><Icona nome="spunta" colore="primaria" /></span>}
             {v.icona && <Icona nome={v.icona} colore={v.pericolo ? "errore" : "secondaria"} />}
             <span className={`etichetta t-sm ${v.pericolo ? "pericolo" : ""}`}>{v.etichetta}</span>
             {v.scorciatoia && <span className="t-sm secondario">{v.scorciatoia}</span>}
