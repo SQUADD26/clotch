@@ -5,6 +5,11 @@ const { once } = require('node:events');
 const { apriFinestra } = require('../dist/src/finestra.js');
 const { urlWeb } = require('../dist/src/link-esterni.js');
 
+// Impedisce anche l'attivazione dell'app di prova sul Mac, prima di ready.
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
+let shown = 0;
+app.on('browser-window-created', (_event, window) => window.on('show', () => shown++));
+
 app.whenReady().then(async () => {
   let win;
   try {
@@ -16,9 +21,9 @@ app.whenReady().then(async () => {
       if (rejectOpen) throw new Error('TEST_OPEN_REJECTED');
     };
     dialog.showMessageBox = async (...args) => { errors.push(args.at(-1)); return { response: 0 }; };
-    win = apriFinestra();
+    win = apriFinestra(undefined, { show: false });
     assert.ok(win, 'pagina applicazione costruita');
-    win.hide();
+    assert.equal(win.isVisible(), false, 'factory nascosta dalla costruzione');
     win.webContents.on('did-create-window', () => children++);
     win.webContents.on('did-fail-load', (_e, code, description, url, main) => failedNavigations.push({ code, description, url, main }));
     await once(win.webContents, 'did-finish-load');
@@ -36,14 +41,20 @@ app.whenReady().then(async () => {
       assert.equal(win.webContents.getURL().split('#')[0], original);
       assert.equal(children, 0, 'nessuna finestra figlia');
       assert.equal(BrowserWindow.getAllWindows().length, 1);
+      assert.equal(win.isVisible(), false, 'app di prova sempre nascosta');
+      assert.equal(shown, 0, 'nessuna finestra di prova mostrata');
     };
 
     // La stessa azione senza confine deve davvero intercettare una finestra figlia.
     const control = new BrowserWindow({ show: false });
+    assert.equal(control.isVisible(), false);
+    control.webContents.setWindowOpenHandler(() => ({ action: 'allow', overrideBrowserWindowOptions: { show: false } }));
     await control.loadURL('about:blank');
     const childCreated = once(control.webContents, 'did-create-window');
     await control.webContents.executeJavaScript("window.open('about:blank'); void 0");
-    const [child] = await childCreated; assert.ok(child); child.destroy(); control.destroy();
+    const [child] = await childCreated;
+    assert.ok(child); assert.equal(child.isVisible(), false, 'popup positivo nascosto dalla costruzione');
+    assert.equal(shown, 0); child.destroy(); control.destroy();
     console.log('EXTERNAL_POSITIVE_CONTROL: child-window rilevata');
 
     assert.equal(urlWeb('HTTPS://Example.COM:443/a b?q=1#c'), 'https://example.com/a%20b?q=1#c');
@@ -97,6 +108,8 @@ app.whenReady().then(async () => {
     assert.equal(errors[0].type, 'error');
     assert.match(errors[0].message, /non aperto/i); unchanged();
     console.log('EXTERNAL_FAILURE: callback apertura rifiutata e dialogo intercettato OK');
+    assert.equal(shown, 0);
+    console.log('EXTERNAL_HIDDEN_WINDOWS_OK: factory e popup mai mostrati');
     console.log('EXTERNAL_LINKS_OK'); app.exit(0);
   } catch (error) { console.error(error); win?.destroy(); app.exit(1); }
 });

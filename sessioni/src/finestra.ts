@@ -19,10 +19,11 @@ function frame(id: string) {
 }
 
 /** `sessione`: la finestra si apre già su quella sessione («Apri in una nuova finestra»). */
-export function apriFinestra(sessione?: string): BrowserWindow | null {
+export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-8610").finestra;
   const w = new BrowserWindow({
+    show: opzioni.show ?? true,
     title: NOME_APP, icon: iconaApp(),
     width: grande.w, height: grande.h, minWidth: piccola.w, minHeight: piccola.h,
     backgroundColor: valori["colore-fondo-cornice"],
