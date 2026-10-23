@@ -1,0 +1,131 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:49566",
+  "nome": "via dal mac",
+  "w": 250,
+  "h": 54,
+  "dentro": "101:49194"
+ },
+ "variabili": {
+  "raggio/md": 10,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "colore/testo/primario": "#ffffff",
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/fondo/riga-passaggio": "#ffffff0d",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16
+ },
+ "nodi": [
+  {
+   "id": "101:49566",
+   "nome": "via dal mac",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 250,
+    "h": 54
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/1",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:49567",
+   "nome": "riga",
+   "tipo": "FRAME",
+   "box": {
+    "x": 8,
+    "y": 8,
+    "w": 234,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:49569",
+   "nome": "icona info",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 9,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:49569;101:18272",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 8.66650390625,
+    "y": 9.6640625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:49568",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 32,
+    "y": 8,
+    "w": 210,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sessioni non sa quando sei via",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "101:49571",
+   "nome": "dettaglio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 8,
+    "y": 30,
+    "w": 408,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Con Clotch gli avvisi aspettano il tuo ritorno. Intanto usa Non disturbare.",
+   "font": "SF Pro Regular"
+  }
+ ]
+}
