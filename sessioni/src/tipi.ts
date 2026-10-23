@@ -87,3 +87,13 @@ export interface SessioniApi {
   messaggi(id: string, pagina: number): Promise<PaginaMessaggi>;
   onAggiornamento(cb: (a: Aggiornamento) => void): () => void;
 }
+
+/** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
+export interface FridayApi {
+  comando(cmd: import("./friday").Comando, args?: Record<string, unknown>): Promise<import("./comandi").EsitoComando>;
+  /** Il registro senza Map: `daPiano` (ui/friday/registro.ts) lo riporta a `Registro`. */
+  registro(): Promise<unknown>;
+  onRegistro(cb: (registro: unknown) => void): () => void;
+  /** `friday avvia`, quando Friday è spenta. */
+  avvia(): Promise<{ ok: boolean; testo: string }>;
+}

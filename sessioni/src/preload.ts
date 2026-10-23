@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { Aggiornamento, SessioniApi } from "./tipi";
+import type { Aggiornamento, FridayApi, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -11,3 +11,15 @@ const api: SessioniApi = {
   },
 };
 contextBridge.exposeInMainWorld("sessioni", api);
+
+const friday: FridayApi = {
+  comando: (cmd, args) => ipcRenderer.invoke("friday:comando", cmd, args),
+  registro: () => ipcRenderer.invoke("friday:registro"),
+  avvia: () => ipcRenderer.invoke("friday:avvia"),
+  onRegistro: (cb) => {
+    const f = (_e: unknown, r: unknown) => cb(r);
+    ipcRenderer.on("friday:registro", f);
+    return () => ipcRenderer.removeListener("friday:registro", f);
+  },
+};
+contextBridge.exposeInMainWorld("friday", friday);

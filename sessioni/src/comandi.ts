@@ -7,7 +7,7 @@ import { cartellaRegistro, Comando, mandaComando } from "./friday";
 
 export type EsitoComando =
   /** Friday ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string }
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[] }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
   /** Nessuna risposta in tempo. `preso: false` = Friday non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
@@ -52,7 +52,10 @@ export async function inviaComando(home: string, cmd: Comando, args: Record<stri
     for (const r of nuove()) {
       if (r.v !== 1 || r.tipo !== "comando_fatto" || r.dati?.comando !== id) continue;
       const e = r.dati.esito;
-      return { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
+      const fatto: EsitoComando = { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
+      if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da Friday
+      if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
+      return fatto;
     }
     if (Date.now() >= limite) return { id, esito: "scaduto", testo: "", preso: !ritira(home, id) };
     await new Promise((ok) => setTimeout(ok, ogniMs));
