@@ -1,17 +1,45 @@
 // Prova il renderer vero con IPC della scena: nessun dato o comando reale del Mac.
 const { app, BrowserWindow, ipcMain } = require('electron');
+process.env.CLOTCH_TEST_SILENT = '1';
+app.commandLine.appendSwitch('mute-audio');
+app.on('web-contents-created', (_event, contents) => contents.setAudioMuted(true));
+if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
+const { creaCronologiaScena } = require('../dist/src/scena-cronologia.js');
 
 app.whenReady().then(async () => {
-  collegaScena(ipcMain, { registro: {
+  const scene = require('../design/scene/101-8036.json');
+  const sessionId = scene.elenco.sessioni[0].id;
+  scene.messaggi[sessionId] = [{ tipo: 'utente', testo: 'Sessione reale v1 verificata', t: null }];
+  scene.registro = {
     comandi: [{ cmd: 'parla', id: 'dom-domanda', t: 1, args: { testo: 'Mostra il lavoro in corso' } }],
     avvisi: [{ motivo: 'risposta', id: 'dom-risposta', t: 2, testo: 'Controllo le sessioni aperte.', sessioni: [] }],
-  } });
-  const win = new BrowserWindow({ show: false, width: 1440, height: 1000,
+  };
+  collegaScena(ipcMain, scene);
+  const history = creaCronologiaScena((id) => scene.messaggi[id] ?? []);
+  let historyReads = 0;
+  ipcMain.removeHandler('sessioni:messaggi');
+  ipcMain.handle('sessioni:messaggi', (_event, id, pagina, opzioni) => {
+    assert.equal(opzioni?.v, 1); const p = history.pagina(id, pagina, opzioni);
+    assert.equal(p.cronologia?.sessione, id); historyReads++; return p;
+  });
+  const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
+  let showEvents = 0, focusEvents = 0;
+  win.on('show', () => showEvents++);
+  win.on('focus', () => focusEvents++);
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  const hidden = () => {
+    assert.equal(win.isVisible(), false, 'finestra mai visibile');
+    assert.equal(win.isFocused(), false, 'finestra mai attiva');
+    assert.equal(win.webContents.isAudioMuted(), true, 'audio renderer sempre muto');
+    assert.equal(showEvents, 0, 'nessun evento show');
+    assert.equal(focusEvents, 0, 'nessun evento focus');
+  };
+  hidden();
   const run = (fn) => win.webContents.executeJavaScript(`(${fn})()`);
   const ready = (selector) => win.webContents.executeJavaScript(`new Promise((resolve, reject) => {
     const end = Date.now() + 5000;
@@ -22,6 +50,9 @@ app.whenReady().then(async () => {
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'friday' } });
     await ready('.area-casella textarea');
     await ready('.risposta-friday .risposta');
+    assert.equal(await run(() => document.querySelector('.messaggio-roberto .bolla').textContent), 'Mostra il lavoro in corso');
+    assert.equal(await run(() => document.querySelector('.risposta-friday .testo-risposta').textContent), 'Controllo le sessioni aperte.');
+    console.log('AI_SHARED_MESSAGE_CONTENT_OK');
     const styles = await run(() => Object.fromEntries(['.filo', '.area-casella', '.casella', '.messaggio-roberto', '.risposta-friday', '.risposta'].map((q) => [q, getComputedStyle(document.querySelector(q)).display])));
     const failures = [];
     for (const [selector, display] of Object.entries(styles)) {
@@ -62,6 +93,12 @@ app.whenReady().then(async () => {
     console.log('SETTINGS_FORWARD_LAST_SECTION: Generale');
     // Il prefisso chat rimane confinato ai componenti condivisi.
     assert.equal(await run(() => !!document.querySelector('.pezzo-barra .pezzo-chat')), false);
+    await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: sessionId } });
+    await ready('.messaggio-roberto .bolla');
+    assert.equal(await run(() => document.querySelector('.messaggio-roberto .bolla').textContent), 'Sessione reale v1 verificata');
+    assert.ok(historyReads > 0, 'sessione v1 letta realmente dal renderer');
+    console.log('SESSION_SHARED_V1_CONTENT_OK');
+    hidden(); console.log('HIDDEN_WINDOW_OK shows=0 focus=0');
     console.log('CHAT_NAV_DOM_OK');
     app.exit(0);
   } catch (error) {

@@ -83,7 +83,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
         return (
           <div key={v.chiave} className="turno">
             {v.blocchi.map((b, i) => (
-              <BloccoTurno key={i} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} modello={modello} aperto={aperti.includes(b.tipo)}
+              <BloccoTurno key={b.chiave ?? `${v.chiave}:${i}`} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} modello={modello} aperto={aperti.includes(b.tipo)}
                 prova={provaDi(prova, "menu-risposta") !== null && k === ultimo && i === v.blocchi.length - 1} />
             ))}
             {k === ultimo && finita && <FineTurno ms={r.durata} strumenti={r.strumenti} file={r.file} aiutanti={r.aiutanti} />}

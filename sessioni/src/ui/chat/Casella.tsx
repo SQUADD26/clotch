@@ -1,13 +1,14 @@
 // figma: 101-43332 — «Casella di scrittura» 101:7407 (Vuota, Scritta, Fuoco, In corso, Disabilitata), «Messaggio in coda» 101:13488,
 // coda (101:14849), modifica della voce (101:43708), «invia ora» (101:43945), Invio diretto (101:43535).
 // Mentre la sessione lavora: ↵ interrompe e manda subito (`manda` modo subito), ⌘↵ mette in coda (`manda` modo coda).
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { comanda } from "./friday";
+import { useBozza } from "./bozze";
 import { provaDi, quanti } from "./testi";
 import "./casella.css";
 
@@ -53,9 +54,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   appenaMandato?: boolean;
 }) {
   const inModifica = provaDi(prova, "modifica") !== null ? coda[0] ?? null : null;
-  const [testo, setTesto] = useState(provaDi(prova, "scritta") ?? inModifica?.testo ?? "");
-  const [modifica, setModifica] = useState<VoceCoda | null>(inModifica);
-  const [invio, setInvio] = useState(false);
+  const { testo, modifica, invio, bozza } = useBozza(chat, provaDi(prova, "scritta") ?? inModifica?.testo ?? "", inModifica);
   const area = useRef<HTMLTextAreaElement>(null);
   const { scorciatoie } = useImpostazioni();
 
@@ -65,20 +64,21 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   useEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
 
   const manda = async (modo: "subito" | "coda") => {
-    const t = testo.trim();
-    if (!t || invio) return;
-    setInvio(true);
-    const ok = modifica
-      ? modo === "coda"
-        ? await comanda("coda_modifica", { chat, voce: modifica.voce, testo: t })
-        : (await comanda("manda", { chat, testo: t, modo: "subito" })) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
-      : await comanda("manda", { chat, testo: t, modo: lavora ? modo : "subito" });
-    setInvio(false);
-    if (ok) { setTesto(""); setModifica(null); }
+    const richiesta = bozza.inizia();
+    if (!richiesta) return;
+    const t = richiesta.testo.trim(), modifica = richiesta.modifica;
+    let ok = false;
+    try {
+      ok = modifica
+        ? modo === "coda"
+          ? await comanda("coda_modifica", { chat, voce: modifica.voce, testo: t })
+          : (await comanda("manda", { chat, testo: t, modo: "subito" })) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
+        : await comanda("manda", { chat, testo: t, modo: lavora ? modo : "subito" });
+    } finally { richiesta.finisci(ok); }
   };
 
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Escape" && modifica) { setModifica(null); setTesto(""); return; }
+    if (e.key === "Escape" && modifica) { bozza.esci(); return; }
     if (e.nativeEvent.isComposing) return;
     const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
     if (azione !== "inviaInterrompi" && azione !== "coda") return;
@@ -91,13 +91,13 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
     <div className="area-casella">
-      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { setModifica(v); setTesto(v.testo); area.current?.focus(); }} />}
+      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
       <div className={`casella ${stato}${modifica ? " fuoco" : ""}`}>
         <div className="area-testo">
-          <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => setTesto(e.target.value)} onKeyDown={tasti}
+          <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => bozza.scrivi(e.target.value)} onKeyDown={tasti}
             placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>
         <div className="azioni">

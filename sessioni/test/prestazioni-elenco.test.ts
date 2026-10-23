@@ -197,8 +197,20 @@ test("osservatore: un giro senza cambi non apre trascrizioni; una radice nuova v
     fs.rmSync(path.join(h, ".claude-nuovo"), { recursive: true });
     o.giro();
     assert.ok(!o.elenco.sessioni.some((s) => s.id === U(500)));
-    for (const f of (o as any).offset.keys()) assert.ok(o.elenco.sessioni.some((s) => s.file === f), `offset orfano ${f}`);
+    for (const f of (o as any).firme.keys()) assert.ok(o.elenco.sessioni.some((s) => s.file === f), `firma orfana ${f}`);
   } finally { o.ferma(); }
+});
+
+test("osservatore: la riga a metà all'avvio non si perde, anche se l'ultima riga chiusa si cerca solo al primo evento", () => {
+  const h = casa(), f = claude(h, 1, "prima");
+  fs.appendFileSync(f, '{"type":"user","message":{"role":"user","content":"me');
+  const arrivi: any[] = [], o = new Osservatore(h, (a) => arrivi.push(a), {}, 20);
+  fs.appendFileSync(f, 'zza"}}\n' + JSON.stringify({ type: "user", message: { role: "user", content: "dopo" } }) + "\n");
+  o.tocca(f);
+  o.giro();
+  o.ferma();
+  const testi = arrivi.flatMap((a) => a.nuoviMessaggi).flatMap((n: any) => n.messaggi).map((m: any) => m.testo);
+  assert.deepEqual(testi, ["mezza", "dopo"]);
 });
 
 test("misure (stampate, nessun limite): avvio con 2000 sessioni, memoria, giro inattivo, ricerca grande, append su file grande", () => {
@@ -211,10 +223,10 @@ test("misure (stampate, nessun limite): avvio con 2000 sessioni, memoria, giro i
   const d: DatiIndice = {}, memo = new Map(), m1 = mb();
   const primo = conta(() => lista.forEach((s) => aggiornaVoce(d, s, memo)), jsonl), secondo = conta(() => lista.forEach((s) => aggiornaVoce(d, s, memo)), jsonl);
   stampa("indice", { voci: Object.keys(d).length, primoMs: +primo.ms.toFixed(1), primoByte: primo.byte, secondoMs: +secondo.ms.toFixed(1), secondoAperti: secondo.aperti.length, heapMB: +(mb() - m1).toFixed(1) });
-  const o = new Osservatore(h, () => {}, {}, 20);
+  const avvio = conta(() => new Osservatore(h, () => {}, {}, 20), jsonl), o = avvio.r;
   o.giro();
   const g = conta(() => o.giro(), jsonl), g2 = conta(() => o.giro(), jsonl);
-  stampa("osservatore-inattivo", { giroMs: +g.ms.toFixed(1), giroAperti: g.aperti.length, giroByte: g.byte, secondoGiroMs: +g2.ms.toFixed(1) });
+  stampa("osservatore-inattivo", { costruttoreMs: +avvio.ms.toFixed(1), costruttoreAperti: avvio.aperti.length, costruttoreByte: avvio.byte, giroMs: +g.ms.toFixed(1), giroAperti: g.aperti.length, giroByte: g.byte, secondoGiroMs: +g2.ms.toFixed(1) });
   const grande: DatiIndice = {}, testo = (k: number) => `parola${k} ` + "lorem ipsum dolor sit amet ".repeat(8);
   for (let i = 0; i < N; i++) grande[`s${i}`] = { file: "x.jsonl", mtime: i, size: 1, titolo: `titolo ${i}`, conteggio: 100, testi: Array.from({ length: 50 }, (_, k) => ({ testo: testo(i * 50 + k), t: k })) };
   const q = (t: string) => { const r = conta(() => cerca(grande, t)); return { ms: +r.ms.toFixed(1), trovate: r.r.length }; };

@@ -23,11 +23,11 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
     if (!s) throw new Error("sessione non trovata");
     switch (azione) {
       case "nuova-finestra": apriFinestra(s.id); return;
-      case "copia-id": clipboard.writeText(s.id); return;
-      case "copia-cartella": clipboard.writeText(s.cartella); return;
+      case "copia-id": return clipboard.writeText(s.id);
+      case "copia-cartella": return clipboard.writeText(s.cartella);
       case "copia-link":
         if (!s.idApp) throw new Error("questa sessione non è dell'app Claude: nessun link");
-        clipboard.writeText(`claude://code/continue?session=${s.idApp}`); return;
+        return clipboard.writeText(`claude://code/continue?session=${s.idApp}`);
       case "mostra-nel-finder": shell.showItemInFolder(s.cartella); return;
       case "apri-terminale":
         if (!s.cartella) throw new Error("questa sessione non ha una cartella");

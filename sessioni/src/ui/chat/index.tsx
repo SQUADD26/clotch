@@ -1,6 +1,7 @@
 // figma: 101-7873 — punto di montaggio della chat (#349): `Intestazione` sopra, `Chat` nella colonna centrale (101:8036, 101:8610).
 // Vuota 101:9841; caricamento ed errore coi pezzi della base. Friday monta `FiloFriday` e `CasellaFriday`.
-import { useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
 import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
@@ -41,12 +42,20 @@ export default function Chat() {
   const c = useChatFriday(s?.id ?? null);
   const adesso = useOra();
   const vivo = s?.stato === "lavora" && s.situazione?.adesso !== "turno_finito";
-  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella), [m.messaggi, vivo, s?.cartella]);
+  const precedenti = useRef<{ sessione: string | null; voci: Voce[] }>({ sessione: null, voci: [] });
+  const voci = useMemo(() => daMessaggi(m.messaggi, vivo, s?.cartella, m.identita,
+    precedenti.current.sessione === s?.id ? precedenti.current.voci : [], s?.id), [m.messaggi, vivo, s?.cartella, m.identita, s?.id]);
+  useLayoutEffect(() => { precedenti.current = { sessione: s?.id ?? null, voci }; }, [s?.id, voci]);
 
-  if (elenco.stato === "carica" || (s && m.stato === "carica")) return <Sagome />;
+  useEffect(() => {
+    const messaggio = m.altriErrore ?? (m.messaggi.length ? m.errore : null);
+    if (messaggio) avvisa({ tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: m.altriErrore ? m.riprovaAltri : m.riprova } });
+  }, [m.errore, m.altriErrore]);
+
+  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={elenco.errore} riprova={elenco.riprova} />;
   if (!s) return null;
-  if (m.stato === "errore") return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
@@ -55,7 +64,7 @@ export default function Chat() {
     ? <NonRisponde da={daQuanto(c.battito ?? 0, adesso)} terminale={() => void api().azione(s.id, "apri-terminale")} />
     : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
   const casella = (
-    <Casella chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} prova={sezione}
+    <Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} prova={sezione}
       appenaMandato={dopoInterruzione(voci)}
       segnaposto={muta ? "In attesa della sessione" : limite && ripartenza ? `Riparte alle ${ripartenza}` : undefined} />
   );
@@ -70,7 +79,7 @@ export default function Chat() {
   }
   return (
     <>
-      <Filo voci={voci} chat={s.id} vivo={vivo && !muta} finita={s.stato === "finita"} c={c}
+      <Filo key={s.id} voci={voci} chat={s.id} vivo={vivo && !muta} finita={s.stato === "finita"} c={c}
         da={s.stato === "aspetta" ? daQuanto(s.ultimaAttivita, adesso) : null}
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione} />

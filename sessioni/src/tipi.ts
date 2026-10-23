@@ -1,5 +1,6 @@
 // Tipi esportati verso il renderer (via preload). Nessun legame con Electron.
 import type { Situazione } from "./situazione";
+import type { DeltaCronologia, ErroreCronologia, OpzioniCronologia, SnapshotPagina } from "./cronologia-tipi";
 
 export type Sorgente = "claude-code" | "claude-desktop" | "codex" | "cursor";
 export type Stato = "lavora" | "aspetta" | "ferma" | "finita";
@@ -74,19 +75,25 @@ export interface PaginaMessaggi {
   pagina: number;
   haAltre: boolean;
   errore: string | null;
-  /** Messaggi di tutta la sessione, dall'indice di ricerca quando la conosce già; altrimenti null. */
+  /** Nel protocollo v1: totaleSnapshot; legacy: conteggio dell'indice se aggiornato. */
   totale: number | null;
+  /** Presente nelle risposte al protocollo v1 riuscite. */
+  cronologia?: SnapshotPagina;
+  /** Errore previsto: nessun cursore o watermark del renderer deve avanzare. */
+  erroreCronologia?: ErroreCronologia;
 }
 
 export interface Aggiornamento {
   /** Ids delle sessioni nuove o cambiate (da rileggere con `elencoSessioni()`) e dei messaggi arrivati. */
   sessioni: string[];
   nuoviMessaggi: { id: string; messaggi: Messaggio[] }[];
+  /** Con v1 è questa la fonte della chat; nuoviMessaggi resta per i consumatori legacy. */
+  cronologia?: DeltaCronologia[];
 }
 
 export interface SessioniApi {
   elencoSessioni(): Promise<Elenco>;
-  messaggi(id: string, pagina: number): Promise<PaginaMessaggi>;
+  messaggi(id: string, pagina: number, opzioni?: OpzioniCronologia): Promise<PaginaMessaggi>;
   onAggiornamento(cb: (a: Aggiornamento) => void): () => void;
   /** Preferenze dell'app per id di sessione (#360). */
   preferenze(): Promise<Record<string, PreferenzeSessione>>;

@@ -3,7 +3,7 @@ import type { Aggiornamento, FridayApi, ImpostazioniApi, PreferenzeSessione, Ses
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
-  messaggi: (id, pagina) => ipcRenderer.invoke("sessioni:messaggi", id, pagina),
+  messaggi: (id, pagina, opzioni) => ipcRenderer.invoke("sessioni:messaggi", id, pagina, opzioni),
   onAggiornamento: (cb) => {
     const f = (_e: unknown, a: Aggiornamento) => cb(a);
     ipcRenderer.on("sessioni:aggiornamento", f);

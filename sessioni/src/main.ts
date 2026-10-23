@@ -14,11 +14,25 @@ import { leggiImpostazioni } from "./preferenze";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import type { PaginaMessaggi } from "./tipi";
+import { provaSilenziosa } from "./modalita-prova";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
 const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
-const scena = idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null;
+if (iParita > 0) {
+  process.env.CLOTCH_TEST_SILENT = "1";
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("prohibited");
+} else if (provaSilenziosa()) {
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("accessory");
+}
+const scena = (() => {
+  try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }
+  catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
+})();
 
 impostaNome();
 const sessioni = new Sessioni();
@@ -42,11 +56,32 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  if (iParita > 0 && !scena) {
+    console.error(`parità: scena non disponibile per ${idParita || "nessun frame"}; servizi dal vivo disattivati`);
+    app.exit(1);
+    return;
+  }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   ipcMain.handle("sessioni:elenco", elenco);
   const indice = collegaIndice(ipcMain, sessioni);
-  ipcMain.handle("sessioni:messaggi", (_e, id: string, pagina: number) => ({ ...sessioni.messaggi(String(id), Number(pagina) | 0), totale: indice.totale(String(id)) }));
+  ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
+    if (opzioni !== undefined && (
+      !opzioni || typeof opzioni !== "object" || Array.isArray(opzioni) || opzioni.v !== 1 ||
+      (opzioni.cursore !== undefined && (typeof opzioni.cursore !== "string" || opzioni.cursore.length > 4096))
+    )) throw new Error("Richiesta cronologia non valida. Riprova.");
+    if (opzioni && (!Number.isSafeInteger(pagina) || pagina < 0))
+      throw new Error("Pagina cronologia non valida. Riprova.");
+    const leggi: (id: string, pagina: number, opzioni?: OpzioniCronologia) => PaginaMessaggi | Promise<PaginaMessaggi>
+      = sessioni.messaggi.bind(sessioni);
+    const risposta = await leggi(String(id), opzioni ? pagina : Number(pagina) | 0, opzioni);
+    if (opzioni) {
+      if (!risposta.cronologia && !risposta.erroreCronologia)
+        throw new Error("Cronologia non disponibile. Riprova.");
+      return risposta;
+    }
+    return { ...risposta, totale: indice.totale(String(id)) };
+  });
   collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
   const invia = (c: string, d: unknown) => {
@@ -67,7 +102,6 @@ app.whenReady().then(() => {
   // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
   const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
 
-  if (idParita) return parita(idParita);
   barraMenu();
   apriFinestra();
   app.on("activate", () => BrowserWindow.getAllWindows().length || apriFinestra());

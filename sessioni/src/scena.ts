@@ -5,8 +5,9 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./friday";
 import { piano } from "./friday-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PaginaMessaggi, PreferenzeSessione, QuotaUso } from "./tipi";
-import { DIM_PAGINA } from "./messaggi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import { creaCronologiaScena } from "./scena-cronologia";
 
 export interface Scena {
   /** Vista di partenza, come `useNavigazione()`: vista, sessione scelta, sezione. */
@@ -38,14 +39,19 @@ function conOra(r: unknown): unknown {
   return c && c.t <= 0 ? { ...(r as object), clotch: { ...c, t: Date.now() + c.t } } : r;
 }
 
+const cronologie = new WeakMap<Scena, ReturnType<typeof creaCronologiaScena>>();
+
 /** Risposta di un canale IPC dalla scena; i canali che scrivono non fanno niente. */
 export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknown {
   switch (canale) {
     case "sessioni:elenco": return s.elenco ?? { sessioni: [], errori: [] };
     case "sessioni:messaggi": {
-      const tutti = s.messaggi?.[String(args[0])] ?? [], p = Number(args[1]) | 0;
-      const fine = tutti.length - p * DIM_PAGINA;
-      return { messaggi: tutti.slice(Math.max(0, fine - DIM_PAGINA), Math.max(0, fine)), pagina: p, haAltre: fine - DIM_PAGINA > 0, errore: null, totale: tutti.length } satisfies PaginaMessaggi;
+      let cronologia = cronologie.get(s);
+      if (!cronologia) {
+        cronologia = creaCronologiaScena((id) => s.messaggi?.[id] ?? []);
+        cronologie.set(s, cronologia);
+      }
+      return cronologia.pagina(String(args[0]), args[1] as number, args[2] as OpzioniCronologia | undefined);
     }
     case "sessioni:preferenze": return s.preferenze ?? {};
     case "sessioni:impostazioni": return s.impostazioni ?? {};

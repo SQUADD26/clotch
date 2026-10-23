@@ -3,7 +3,9 @@
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Aggiornamento, Elenco, Messaggio, PreferenzeSessione, SessioniApi } from "../../tipi";
+import type { Aggiornamento, Elenco, PreferenzeSessione, SessioniApi } from "../../tipi";
+
+import { applicaDelta, applicaPagina, fallita, nuovaCronologia, righeOrdinate, type CronologiaStato } from "./cronologia-stato";
 
 declare global {
   interface Window { sessioni: SessioniApi }
@@ -50,31 +52,74 @@ export function useElenco() {
   return c;
 }
 
-/** Messaggi di una sessione: pagina 0 (i più recenti), `altri()` per le pagine vecchie, i nuovi arrivano dal vivo. */
+/** Snapshot immutabile e delta fisici; il listener precede sempre la prima richiesta. */
 export function useMessaggi(id: string | null) {
-  const [pagine, setPagine] = useState({ messaggi: [] as Messaggio[], pagina: 0, haAltre: false, totale: null as number | null });
-  const c = useChiamata(async () => {
-    if (!id) return null;
-    const p = await api().messaggi(id, 0);
-    if (p.errore) throw new Error(p.errore);
-    setPagine({ messaggi: p.messaggi, pagina: 0, haAltre: p.haAltre, totale: p.totale });
-    return p;
-  }, [id]);
+  const [dati, setDati] = useState(() => nuovaCronologia(id));
+  const [carica, setCarica] = useState(true);
   const [altriCarica, setAltriCarica] = useState(false);
-  useAggiornamenti((a) => {
-    const nuovi = a.nuoviMessaggi.filter((n) => n.id === id).flatMap((n) => n.messaggi);
-    if (nuovi.length) setPagine((p) => ({ ...p, messaggi: [...p.messaggi, ...nuovi], totale: p.totale === null ? null : p.totale + nuovi.length }));
-  });
+  const [altriErrore, setAltriErrore] = useState<string | null>(null);
+  const stato = useRef(dati), corrente = useRef(id), giro = useRef(0);
+  const precedente = useRef<object | null>(null);
+  if (corrente.current !== id) {
+    corrente.current = id; giro.current++; precedente.current = null;
+  }
+  const pubblica = (s: CronologiaStato) => { stato.current = s; setDati(s); };
+  const riprova = useCallback(() => {
+    if (corrente.current !== id) return;
+    const mio = ++giro.current;
+    precedente.current = null; setAltriCarica(false); setAltriErrore(null);
+    const prima = stato.current;
+    pubblica({ ...nuovaCronologia(id), righe: prima.sessione === id ? prima.righe : new Map() });
+    setCarica(!!id);
+    if (!id) return;
+    api().messaggi(id, 0, { v: 1 }).then((p) => {
+      if (mio !== giro.current || corrente.current !== id) return;
+      pubblica(applicaPagina(stato.current, p));
+    }).catch((e) => {
+      if (mio === giro.current && corrente.current === id) pubblica(fallita(stato.current, messaggioErrore(e)));
+    }).finally(() => {
+      if (mio === giro.current && corrente.current === id) setCarica(false);
+    });
+  }, [id]);
+  useEffect(() => {
+    // Nessun fallback alle pagine numeriche: una risposta senza v1 è un errore visibile.
+    let attivo = true;
+    const stop = api().onAggiornamento((a) => {
+      if (!attivo || corrente.current !== id) return;
+      let s = stato.current;
+      for (const d of a.cronologia ?? []) s = applicaDelta(s, d);
+      if (s !== stato.current) pubblica(s);
+    });
+    riprova();
+    return () => { attivo = false; stop(); giro.current++; precedente.current = null; };
+  }, [id, riprova]);
   const altri = async () => {
-    if (!id || altriCarica || !pagine.haAltre) return;
-    setAltriCarica(true);
+    const s = stato.current;
+    if (!id || corrente.current !== id || s.sessione !== id || precedente.current || !s.snapshot || !s.cursore || s.invalida || carica) return;
+    const mio = giro.current, richiesta = {};
+    precedente.current = richiesta; setAltriCarica(true); setAltriErrore(null);
     try {
-      const p = await api().messaggi(id, pagine.pagina + 1);
-      if (p.errore) throw new Error(p.errore);
-      setPagine((x) => ({ messaggi: [...p.messaggi, ...x.messaggi], pagina: p.pagina, haAltre: p.haAltre, totale: p.totale ?? x.totale }));
-    } finally { setAltriCarica(false); }
+      const p = await api().messaggi(id, s.pagina + 1, { v: 1, cursore: s.cursore });
+      if (mio !== giro.current || corrente.current !== id || precedente.current !== richiesta) return;
+      const prossimo = applicaPagina(stato.current, p);
+      if (prossimo.errore) {
+        setAltriErrore(prossimo.errore);
+        pubblica({ ...prossimo, errore: null });
+      } else pubblica(prossimo);
+    } catch (e) {
+      if (mio === giro.current && corrente.current === id && precedente.current === richiesta) setAltriErrore(messaggioErrore(e));
+    } finally {
+      if (mio === giro.current && corrente.current === id && precedente.current === richiesta) {
+        precedente.current = null; setAltriCarica(false);
+      }
+    }
   };
-  return { stato: c.stato, errore: c.errore, riprova: c.riprova, ...pagine, altri, altriCarica };
+  const s = dati.sessione === id ? dati : nuovaCronologia(id);
+  const righe = righeOrdinate(s);
+  return { stato: s.errore ? "errore" : carica || dati.sessione !== id ? "carica" : "pronto",
+    errore: s.errore, riprova, messaggi: righe.map((r) => r.messaggio), identita: righe,
+    pagina: s.pagina, haAltre: !!s.cursore && !s.invalida, totale: s.totale,
+    altri, altriCarica, altriErrore, riprovaAltri: s.invalida ? riprova : altri };
 }
 
 /** Preferenze dell'app per sessione (#360): `dati[id]`, `imposta(id, parte)`; si aggiornano da sole quando cambiano. */

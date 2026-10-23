@@ -2,9 +2,11 @@
 import { Notification } from "electron";
 import { daAvvisare, type ImpostazioniAvvisi } from "./avvisi";
 import type { Aggiornamento, Sessione } from "./tipi";
+import { provaSilenziosa } from "./modalita-prova";
 
 /** `elenco`: le sessioni di adesso; `impostazioni`: lette ogni volta dal file (un cambio vale subito; file rotto = {}). Il primo elenco è lo stato di partenza: niente avvisi per ciò che c'era già. */
 export function collegaAvvisi(elenco: () => Sessione[], impostazioni: () => ImpostazioniAvvisi, ora = () => new Date()) {
+  if (provaSilenziosa()) return (_a: Aggiornamento) => {};
   let viste = new Map(elenco().map((s) => [s.id, s]));
   return (a: Aggiornamento) => {
     const adesso = elenco();
