@@ -42,7 +42,18 @@ function ritira(home: string, id: string): boolean {
   } catch { return false; } // Friday l'ha preso proprio ora
 }
 
-export async function inviaComando(home: string, cmd: Comando, args: Record<string, unknown> = {}, o: OpzioniComando = {}): Promise<EsitoComando> {
+const inVolo = new Map<string, Promise<EsitoComando>>();
+
+/** Doppio invio o doppio clic: lo stesso comando con gli stessi argomenti ancora in attesa è lo stesso comando, un file solo nella casella. */
+export function inviaComando(home: string, cmd: Comando, args: Record<string, unknown> = {}, o: OpzioniComando = {}): Promise<EsitoComando> {
+  let chiave: string;
+  try { chiave = `${home}\0${cmd}\0${JSON.stringify(args)}`; } catch { return invia(home, cmd, args, o); } // argomenti non serializzabili: l'errore lo dà la scrittura
+  let p = inVolo.get(chiave);
+  if (!p) inVolo.set(chiave, p = invia(home, cmd, args, o).finally(() => inVolo.delete(chiave)));
+  return p;
+}
+
+async function invia(home: string, cmd: Comando, args: Record<string, unknown>, o: OpzioniComando): Promise<EsitoComando> {
   const { env = {}, scadenzaMs = 30_000, ogniMs = 250 } = o;
   const nuove = righeDaOra(cartellaRegistro(home, env)); // prima di scrivere: la risposta non può sfuggire
   let id: string;

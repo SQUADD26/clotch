@@ -103,6 +103,8 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
   }
   const ultimoN = new Map<string, number>();
   const annullate = new Set<string>();
+  const nonRiprovabili = new Set<string>(); // annulla rifiutata dal motore per sempre: inutile riproporla
+  const versioniObiettivo = new Map<string, number>();
   const comandi = new Map<string, any>();
   for (const m of mesi) {
     let testo: string;
@@ -165,7 +167,14 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           if (d.togli !== true) r.regole.push({ testo: String(d.testo ?? ""), perche: String(d.perche ?? ""), dove, t });
           break;
         }
-        case "obiettivo": c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") }; break;
+        case "obiettivo": {
+          // la versione sale a ogni cambio: una riga in ritardo (remota, riemessa) con versione più bassa non riporta indietro lo stato
+          const v = Number.isInteger(d.versione) ? d.versione : null;
+          if (v !== null && v < (versioniObiettivo.get(o.chat) ?? 0)) break;
+          if (v !== null) versioniObiettivo.set(o.chat, v);
+          c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") };
+          break;
+        }
         case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
@@ -185,7 +194,10 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
           // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
           sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false });
+          // annullata dal terminale: nessun comando dell'app, solo la decisione «annullata <id>» che il motore firma con la sua ricevuta
+          if (String(d.cosa).startsWith("annullata ") && ricevutaLocale(o, home, env)) annullate.add(String(d.cosa).slice(10));
+          break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
@@ -196,13 +208,21 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "comando_fatto": {
           r.esiti.set(String(d.comando), { esito: String(d.esito ?? ""), testo: String(d.testo ?? "") });
           const cmd = comandi.get(String(d.comando));
-          if (d.esito === "ok" && cmd?.cmd === "annulla" && s(cmd.args?.decisione)) annullate.add(cmd.args.decisione);
+          if (cmd?.cmd === "annulla" && s(cmd.args?.decisione)) {
+            const testo = String(d.testo ?? "");
+            // shortcut: il motore non dà un codice, si legge la frase; un rifiuto nuovo non riconosciuto lascia l'annulla riprovabile (fino a un codice nel contratto)
+            if (d.esito === "ok" || (d.esito === "rifiutato" && /gi[aà]'? annullata/i.test(testo))) annullate.add(cmd.args.decisione);
+            else if (d.esito === "rifiutato" && /interrott|non annullabile|senza provenienza|fuori dai comandi|non e'? un argv|non è un argv/i.test(testo)) nonRiprovabili.add(cmd.args.decisione);
+          }
           break;
         }
       }
     }
   }
-  for (const d of r.decisioni) if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
+  for (const d of r.decisioni) {
+    if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
+    else if (nonRiprovabili.has(d.id)) d.annullabile = false;
+  }
   return r;
 }
 
