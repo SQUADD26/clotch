@@ -44,6 +44,9 @@ export class Osservatore {
         this.watchers.push(w);
       } catch { /* watch non disponibile su questa cartella */ }
     }
+    // macOS (FSEvents) comincia a mandare eventi qualche istante dopo fs.watch: quello che si scrive prima non arriva.
+    // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; ogni giro poi raccoglie ogni file cresciuto (giro()).
+    this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
 
   ferma() {
@@ -66,7 +69,8 @@ export class Osservatore {
     const cambiate = this.elenco.sessioni.filter((s) => prima.get(s.id) !== JSON.stringify(s)).map((s) => s.id);
     const nuovi: Aggiornamento["nuoviMessaggi"] = [];
     for (const s of this.elenco.sessioni) {
-      if (!s.file.endsWith(".jsonl") || !file.includes(s.file)) continue;
+      // non solo i file dell'evento: un evento perso non deve perdere messaggi, basta che il file sia cresciuto
+      if (!s.file.endsWith(".jsonl") || !(file.includes(s.file) || safeSize(s.file) > (this.offset.get(s.file) ?? 0))) continue;
       const m = this.coda(s);
       if (m.length) nuovi.push({ id: s.id, messaggi: m });
     }

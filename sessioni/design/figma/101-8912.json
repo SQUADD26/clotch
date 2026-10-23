@@ -369,7 +369,22 @@
    "senza": []
   },
   {
-   "id": "101:8825",
+   "id": "117:51665",
+   "nome": "comandi barra laterale",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 108,
+    "w": 250,
+    "h": 202
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51476",
    "nome": "comando cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -388,7 +403,7 @@
    "senza": []
   },
   {
-   "id": "I101:8825;101:7172",
+   "id": "I117:51665;117:51476;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -404,7 +419,7 @@
    "senza": []
   },
   {
-   "id": "I101:8825;101:7172;101:6869",
+   "id": "I117:51665;117:51476;101:7172;101:6869",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -419,7 +434,7 @@
    "senza": []
   },
   {
-   "id": "I101:8825;101:7174",
+   "id": "I117:51665;117:51476;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -438,7 +453,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:8825;101:7175",
+   "id": "I117:51665;117:51476;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -457,7 +472,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:8830",
+   "id": "I117:51665;117:51481",
    "nome": "comando filtra",
    "tipo": "INSTANCE",
    "box": {
@@ -476,7 +491,7 @@
    "senza": []
   },
   {
-   "id": "I101:8830;101:7172",
+   "id": "I117:51665;117:51481;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -492,7 +507,7 @@
    "senza": []
   },
   {
-   "id": "I101:8830;101:7172;101:6874",
+   "id": "I117:51665;117:51481;101:7172;101:6874",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -507,13 +522,13 @@
    "senza": []
   },
   {
-   "id": "I101:8830;101:7174",
+   "id": "I117:51665;117:51481;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 104,
     "y": 148,
-    "w": 210,
+    "w": 202,
     "h": 20
    },
    "variabili": {
@@ -526,7 +541,26 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:13578",
+   "id": "I117:51665;117:51481;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 149,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51486",
    "nome": "riga Friday",
    "tipo": "INSTANCE",
    "box": {
@@ -545,7 +579,7 @@
    "senza": []
   },
   {
-   "id": "I101:13578;101:13544",
+   "id": "I117:51665;117:51486;101:13544",
    "nome": "icona scintille",
    "tipo": "INSTANCE",
    "box": {
@@ -561,7 +595,7 @@
    "senza": []
   },
   {
-   "id": "I101:13578;101:13544;101:11153",
+   "id": "I117:51665;117:51486;101:13544;101:11153",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -576,7 +610,7 @@
    "senza": []
   },
   {
-   "id": "I101:13578;101:13543",
+   "id": "I117:51665;117:51486;101:13543",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
@@ -595,7 +629,7 @@
    "font": "SF Pro Medium"
   },
   {
-   "id": "I101:13578;101:13546",
+   "id": "I117:51665;117:51486;101:13546",
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
@@ -614,14 +648,278 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "I117:51665;117:51495",
+   "nome": "voce Casella",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 210,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51495;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 80,
+    "y": 218,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51495;101:7172;101:11094",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 80.66650390625,
+    "y": 219.99966430664062,
+    "w": 14.667144775390625,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51495;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 104,
+    "y": 216,
+    "w": 193,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Casella",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51495;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 305,
+    "y": 217,
+    "w": 9,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "3",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51500",
+   "nome": "voce Decisioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 244,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51500;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 80,
+    "y": 252,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51500;101:7172;101:11183",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 80.66650390625,
+    "y": 253.3330078125,
+    "w": 14.6669921875,
+    "h": 13.333658218383789
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51500;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 104,
+    "y": 250,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Decisioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51500;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 251,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51505",
+   "nome": "voce Regole",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 278,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51505;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 80,
+    "y": 286,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51505;101:7172;101:11137",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 81.99951171875,
+    "y": 286.6660461425781,
+    "w": 12,
+    "h": 14.668789863586426
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51665;117:51505;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 104,
+    "y": 284,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Regole",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51665;117:51505;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 285,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
    "id": "101:8836",
    "nome": "Elenco",
    "tipo": "FRAME",
    "box": {
     "x": 72,
-    "y": 210,
+    "y": 312,
     "w": 250,
-    "h": 692
+    "h": 590
    },
    "variabili": {
     "itemSpacing": "spazio/0-5",
@@ -631,105 +929,6 @@
   },
   {
    "id": "101:8837",
-   "nome": "riga sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 72,
-    "y": 222,
-    "w": 250,
-    "h": 32
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/riga"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8838",
-   "nome": "sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 80,
-    "y": 232,
-    "w": 150,
-    "h": 12
-   },
-   "variabili": {
-    "fills[0]": "colore/fondo/sagoma",
-    "cornerRadius": "raggio/xs"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8839",
-   "nome": "riga sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 72,
-    "y": 256,
-    "w": 250,
-    "h": 32
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/riga"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8840",
-   "nome": "sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 80,
-    "y": 266,
-    "w": 120,
-    "h": 12
-   },
-   "variabili": {
-    "fills[0]": "colore/fondo/sagoma",
-    "cornerRadius": "raggio/xs"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8841",
-   "nome": "riga sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 72,
-    "y": 290,
-    "w": 250,
-    "h": 32
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/riga"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8842",
-   "nome": "sagoma",
-   "tipo": "FRAME",
-   "box": {
-    "x": 80,
-    "y": 300,
-    "w": 180,
-    "h": 12
-   },
-   "variabili": {
-    "fills[0]": "colore/fondo/sagoma",
-    "cornerRadius": "raggio/xs"
-   },
-   "senza": []
-  },
-  {
-   "id": "101:8843",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -746,13 +945,13 @@
    "senza": []
   },
   {
-   "id": "101:8844",
+   "id": "101:8838",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 334,
-    "w": 96,
+    "w": 150,
     "h": 12
    },
    "variabili": {
@@ -762,7 +961,7 @@
    "senza": []
   },
   {
-   "id": "101:8845",
+   "id": "101:8839",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -779,13 +978,13 @@
    "senza": []
   },
   {
-   "id": "101:8846",
+   "id": "101:8840",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 368,
-    "w": 140,
+    "w": 120,
     "h": 12
    },
    "variabili": {
@@ -795,7 +994,7 @@
    "senza": []
   },
   {
-   "id": "101:8847",
+   "id": "101:8841",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -812,13 +1011,13 @@
    "senza": []
   },
   {
-   "id": "101:8848",
+   "id": "101:8842",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 402,
-    "w": 170,
+    "w": 180,
     "h": 12
    },
    "variabili": {
@@ -828,7 +1027,7 @@
    "senza": []
   },
   {
-   "id": "101:8849",
+   "id": "101:8843",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -845,13 +1044,13 @@
    "senza": []
   },
   {
-   "id": "101:8850",
+   "id": "101:8844",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 436,
-    "w": 110,
+    "w": 96,
     "h": 12
    },
    "variabili": {
@@ -861,7 +1060,7 @@
    "senza": []
   },
   {
-   "id": "101:8851",
+   "id": "101:8845",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -878,13 +1077,13 @@
    "senza": []
   },
   {
-   "id": "101:8852",
+   "id": "101:8846",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 470,
-    "w": 150,
+    "w": 140,
     "h": 12
    },
    "variabili": {
@@ -894,7 +1093,7 @@
    "senza": []
   },
   {
-   "id": "101:8853",
+   "id": "101:8847",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -911,13 +1110,13 @@
    "senza": []
   },
   {
-   "id": "101:8854",
+   "id": "101:8848",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 504,
-    "w": 120,
+    "w": 170,
     "h": 12
    },
    "variabili": {
@@ -927,7 +1126,7 @@
    "senza": []
   },
   {
-   "id": "101:8855",
+   "id": "101:8849",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -944,13 +1143,13 @@
    "senza": []
   },
   {
-   "id": "101:8856",
+   "id": "101:8850",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 538,
-    "w": 180,
+    "w": 110,
     "h": 12
    },
    "variabili": {
@@ -960,7 +1159,7 @@
    "senza": []
   },
   {
-   "id": "101:8857",
+   "id": "101:8851",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -977,13 +1176,13 @@
    "senza": []
   },
   {
-   "id": "101:8858",
+   "id": "101:8852",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 572,
-    "w": 96,
+    "w": 150,
     "h": 12
    },
    "variabili": {
@@ -993,7 +1192,7 @@
    "senza": []
   },
   {
-   "id": "101:8859",
+   "id": "101:8853",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -1010,13 +1209,13 @@
    "senza": []
   },
   {
-   "id": "101:8860",
+   "id": "101:8854",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 606,
-    "w": 140,
+    "w": 120,
     "h": 12
    },
    "variabili": {
@@ -1026,7 +1225,7 @@
    "senza": []
   },
   {
-   "id": "101:8861",
+   "id": "101:8855",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -1043,13 +1242,13 @@
    "senza": []
   },
   {
-   "id": "101:8862",
+   "id": "101:8856",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 640,
-    "w": 170,
+    "w": 180,
     "h": 12
    },
    "variabili": {
@@ -1059,7 +1258,7 @@
    "senza": []
   },
   {
-   "id": "101:8863",
+   "id": "101:8857",
    "nome": "riga sagoma",
    "tipo": "FRAME",
    "box": {
@@ -1076,12 +1275,111 @@
    "senza": []
   },
   {
-   "id": "101:8864",
+   "id": "101:8858",
    "nome": "sagoma",
    "tipo": "FRAME",
    "box": {
     "x": 80,
     "y": 674,
+    "w": 96,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/xs"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8859",
+   "nome": "riga sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 72,
+    "y": 698,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8860",
+   "nome": "sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 80,
+    "y": 708,
+    "w": 140,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/xs"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8861",
+   "nome": "riga sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 72,
+    "y": 732,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8862",
+   "nome": "sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 80,
+    "y": 742,
+    "w": 170,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/xs"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8863",
+   "nome": "riga sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 72,
+    "y": 766,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:8864",
+   "nome": "sagoma",
+   "tipo": "FRAME",
+   "box": {
+    "x": 80,
+    "y": 776,
     "w": 110,
     "h": 12
    },
