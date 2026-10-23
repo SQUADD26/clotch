@@ -1,0 +1,2 @@
+{"sessionId": "bbbbbbbb-0000-4000-8000-000000000002", "cwd": "/Users/x/altro", "gitBranch": "main", "isSidechain": false, "type": "user", "timestamp": "2026-10-21T09:00:00.000Z", "message": {"role": "user", "content": "Ciao dall'altro account"}}
+{"sessionId": "bbbbbbbb-0000-4000-8000-000000000002", "cwd": "/Users/x/altro", "gitBranch": "main", "isSidechain": false, "type": "assistant", "timestamp": "2026-10-21T09:00:02.000Z", "message": {"model": "claude-sonnet-5", "role": "assistant", "content": [{"type": "text", "text": "Ciao."}]}}

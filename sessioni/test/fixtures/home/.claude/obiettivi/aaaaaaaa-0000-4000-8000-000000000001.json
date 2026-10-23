@@ -1,0 +1,1 @@
+{"cli": "aaaaaaaa-0000-4000-8000-000000000001", "obiettivo": "Chiudere la prova", "stato": "aperto", "ultima_attivita": "2026-10-20T10:00:09", "prove": [{"testo": "test verde", "fatta": true, "t": 1}, {"testo": "PR unita", "fatta": false}], "valido": true}
