@@ -1,10 +1,8 @@
 // figma: 101-17193 — Impostazioni · Generale; tendina della lingua aperta: 101-32827.
-import { useEffect } from "react";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
 import { CampoTesto, Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
-import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
 
 const LINGUE = ["Rilevamento automatico", "Italiano", "English"]; // voci della «tendina lingua» 101:32999
@@ -18,8 +16,6 @@ async function cambiaCartella() {
 
 export default function Generale() {
   const v = useImpostazioni();
-  // prova di parità del frame con la tendina aperta: la si apre come farebbe un clic
-  useEffect(() => { if (prova?.linguaAperta) document.querySelector<HTMLButtonElement>(".riga-lingua .valore")?.click(); }, []);
   return (
     <Pagina titolo="Generale">
       <Gruppo>
@@ -29,7 +25,7 @@ export default function Generale() {
         <Riga etichetta="Mostra nella barra dei menu" descrizione="Un’icona con il numero di sessioni in attesa di te">
           <Interruttore etichetta="Mostra nella barra dei menu" acceso={v.barraDeiMenu} onCambia={(x) => imposta("barraDeiMenu", x)} />
         </Riga>
-        <Riga etichetta="Lingua" descrizione="Testi dell’app" className="riga-lingua">
+        <Riga etichetta="Lingua" descrizione="Testi dell’app">
           <Scelta etichetta="Lingua" valore={v.lingua} voci={LINGUE} onScegli={(x) => imposta("lingua", x)} />
         </Riga>
         <Riga etichetta="Modello per i tuoi messaggi" descrizione="Usato quando scrivi a una sessione da qui">

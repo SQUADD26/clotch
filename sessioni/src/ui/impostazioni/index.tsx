@@ -4,6 +4,7 @@ import { AreaAvvisi } from "../base/Avvisi";
 import { Superficie } from "../base/Cornice";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
+import { prova } from "./prova";
 import { SEZIONI, type Sezione } from "./sezioni";
 import { caricaImpostazioni } from "./stato";
 import Account from "./account";
@@ -29,6 +30,8 @@ const PAGINE: Record<Sezione, ComponentType<{ sotto?: string }>> = {
 export default function Impostazioni() {
   const n = useNavigazione();
   useEffect(caricaImpostazioni, []);
+  // prova di parità di un frame con una tendina aperta: la si apre come farebbe un clic
+  useEffect(() => { if (prova?.aperta) document.querySelector<HTMLButtonElement>(`.scelta .valore[aria-label^="${prova.aperta}:"]`)?.click(); }, []);
   // la sezione sta nella navigazione (indietro e avanti la seguono); «dati/cartelle» è una sottopagina di Dati
   const [prima, sotto] = (n.sezione ?? "generale").split("/");
   const sezione: Sezione = prima in PAGINE ? (prima as Sezione) : "generale";
