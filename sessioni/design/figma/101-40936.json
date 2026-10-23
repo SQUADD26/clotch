@@ -4182,12 +4182,12 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:41162",
+   "id": "101:44433",
    "nome": "avviso a comparsa",
-   "tipo": "FRAME",
+   "tipo": "INSTANCE",
    "box": {
-    "x": 604,
-    "y": 844,
+    "x": 733,
+    "y": 805,
     "w": 360,
     "h": 34
    },
@@ -4204,12 +4204,12 @@
    "senza": []
   },
   {
-   "id": "101:41164",
-   "nome": "icona spinner",
+   "id": "I101:44433;101:44350",
+   "nome": "icona",
    "tipo": "INSTANCE",
    "box": {
-    "x": 616,
-    "y": 853,
+    "x": 745,
+    "y": 814,
     "w": 16,
     "h": 16
    },
@@ -4220,12 +4220,12 @@
    "senza": []
   },
   {
-   "id": "I101:41164;101:20032",
+   "id": "I101:44433;101:44350;101:20032",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 617.3330078125,
-    "y": 854.33203125,
+    "x": 746.3330078125,
+    "y": 815.33203125,
     "w": 13.333984375,
     "h": 13.333564758300781
    },
@@ -4235,13 +4235,13 @@
    "senza": []
   },
   {
-   "id": "101:41163",
-   "nome": "testo",
+   "id": "I101:44433;101:44351",
+   "nome": "messaggio",
    "tipo": "TEXT",
    "box": {
-    "x": 640,
-    "y": 852,
-    "w": 312,
+    "x": 769,
+    "y": 813,
+    "w": 288,
     "h": 18
    },
    "variabili": {
@@ -4252,6 +4252,37 @@
    "senza": [],
    "testo": "Apro la PR in claude-config…",
    "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:44433;101:44353",
+   "nome": "chiudi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1065,
+    "y": 814,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44433;101:44353;101:6935",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1068.3330078125,
+    "y": 817.33203125,
+    "w": 9.333883285522461,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
   }
  ]
 }

@@ -2,7 +2,7 @@
 
 Fonte: vault squadd-v2 `Research/App/ChatGPT` (estrazione REA). Pagina Figma «Sessioni» (node 101:6839), solo tema scuro.
 
-Totale righe: 200 · già in Figma prima: 50 · disegnate ora: 83 · escluse con motivo: 67
+Totale righe: 202 · già in Figma prima: 50 · disegnate ora: 85 · escluse con motivo: 67
 
 | # | Elemento ChatGPT | In Sessioni | Stato | Schermata o motivo |
 |---|---|---|---|---|
@@ -199,6 +199,8 @@ Totale righe: 200 · già in Figma prima: 50 · disegnate ora: 83 · escluse con
 | R2 | Richiesta di Roberto: sessioni figlie e PR | Righe madre e figlia con indicatore PR | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
 | R3 | Richiesta di Roberto: shimmer giallo | Nome giallo con banda chiara | disegnato ora | Sessioni figlie e PR (`101-34605.png`) |
 | R4 | Richiesta di Roberto: coda dei messaggi | Invio interrompe e manda subito; ⌘ Invio mette in coda; barra «1 messaggio in coda» con manda ora, modifica, togli | disegnato ora | Messaggi in coda (`101-14849.png`), Casella mentre lavora: Invio o ⌘ Invio (`101-43332.png`), Invio diretto: interrompe e manda subito (`101-43535.png`), Coda: modifica del messaggio (`101-43708.png`), Coda: invia ora (`101-43945.png`) |
+| R5 | Richiesta di Roberto: un solo sistema di avvisi a comparsa | Componente «Avviso a comparsa» con 4 tipi (info, fatto, errore, in corso), sempre centrato sopra la casella; sostituisce i 12 fatti a mano | disegnato ora | Avvisi a comparsa (`101-24007.png`), Ferma tutto: in corso (`101-37879.png`), Impostazioni · Account dopo Rimuovi (`101-10461.png`) |
+| R6 | Richiesta di Roberto: citare le sessioni in chat e aprirle | Pastiglia della sessione, anteprima al passaggio, scheda nel filo, @ nella casella, apertura con «Torna a Friday» | disegnato ora | Friday cita le sessioni (`101-44748.png`), Sessione citata: anteprima al passaggio (`101-44989.png`), Cita una sessione con @ (`101-45260.png`), Sessione aperta da Friday (`101-45507.png`) |
 
 ## Friday nell’app (lavagna Sistema Friday, sezioni 14 e 15)
 

@@ -4502,12 +4502,12 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:40012",
+   "id": "101:44419",
    "nome": "avviso a comparsa",
-   "tipo": "FRAME",
+   "tipo": "INSTANCE",
    "box": {
-    "x": 604,
-    "y": 844,
+    "x": 733,
+    "y": 805,
     "w": 360,
     "h": 34
    },
@@ -4524,12 +4524,12 @@
    "senza": []
   },
   {
-   "id": "101:40014",
-   "nome": "icona reimposta",
+   "id": "I101:44419;101:44330",
+   "nome": "icona",
    "tipo": "INSTANCE",
    "box": {
-    "x": 616,
-    "y": 853,
+    "x": 745,
+    "y": 814,
     "w": 16,
     "h": 16
    },
@@ -4540,14 +4540,14 @@
    "senza": []
   },
   {
-   "id": "I101:40014;101:20003",
+   "id": "I101:44419;101:44330;101:18272",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 617.3330078125,
-    "y": 854.33203125,
-    "w": 13.333259582519531,
-    "h": 13.333259582519531
+    "x": 745.66650390625,
+    "y": 814.66796875,
+    "w": 14.6669921875,
+    "h": 14.6669921875
    },
    "variabili": {
     "fills[0]": "colore/icona/secondaria"
@@ -4555,13 +4555,13 @@
    "senza": []
   },
   {
-   "id": "101:40013",
-   "nome": "testo",
+   "id": "I101:44419;101:10460",
+   "nome": "messaggio",
    "tipo": "TEXT",
    "box": {
-    "x": 640,
-    "y": 852,
-    "w": 312,
+    "x": 769,
+    "y": 813,
+    "w": 288,
     "h": 18
    },
    "variabili": {
@@ -4572,6 +4572,37 @@
    "senza": [],
    "testo": "Decisione annullata. La sessione aspetta te.",
    "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:44419;101:44333",
+   "nome": "chiudi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1065,
+    "y": 814,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:44419;101:44333;101:6935",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1068.3330078125,
+    "y": 817.33203125,
+    "w": 9.333883285522461,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
   }
  ]
 }

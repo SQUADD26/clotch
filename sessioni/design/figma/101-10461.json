@@ -51,7 +51,8 @@
   "colore/fondo/bottone-primario": "#ffffff",
   "colore/testo/su-primario": "#2d2d2d",
   "colore/fondo/elevato": "#2d2d2d",
-  "spazio/2-5": 10
+  "misura/toast": 360,
+  "colore/icona/terziaria": "#ffffff82"
  },
  "nodi": [
   {
@@ -2052,19 +2053,51 @@
    "nome": "avviso a comparsa",
    "tipo": "INSTANCE",
    "box": {
-    "x": 579,
+    "x": 512,
     "y": 748,
-    "w": 234,
-    "h": 52
+    "w": 360,
+    "h": 34
    },
    "variabili": {
     "fills[0]": "colore/fondo/elevato",
-    "cornerRadius": "raggio/lg",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/4",
+    "cornerRadius": "raggio/xl",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
-    "paddingTop": "spazio/2-5",
-    "paddingBottom": "spazio/2-5"
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2",
+    "width": "misura/toast"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10546;101:44330",
+   "nome": "icona",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 524,
+    "y": 757,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10546;101:44330;101:18272",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 524.666015625,
+    "y": 757.6663208007812,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
   },
@@ -2073,58 +2106,69 @@
    "nome": "messaggio",
    "tipo": "TEXT",
    "box": {
-    "x": 595,
-    "y": 764,
-    "w": 107,
-    "h": 20
+    "x": 548,
+    "y": 756,
+    "w": 233,
+    "h": 18
    },
    "variabili": {
     "fills[0]": "colore/testo/primario",
-    "fontSize": "testo/dimensione/base",
-    "lineHeight": "testo/riga/base"
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
    },
    "senza": [],
    "testo": "Cartella rimossa",
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:10546;101:10458",
-   "nome": "bottone annulla",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 718,
-    "y": 758,
-    "w": 83,
-    "h": 32
-   },
-   "variabili": {
-    "fills[0]": "colore/fondo/bottone-secondario",
-    "cornerRadius": "raggio/pieno",
-    "itemSpacing": "spazio/2",
-    "paddingLeft": "spazio/4",
-    "paddingRight": "spazio/4",
-    "height": "misura/bottone-invio"
-   },
-   "senza": []
-  },
-  {
-   "id": "I101:10546;101:10458;101:7465",
-   "nome": "etichetta",
+   "id": "I101:10546;101:44332",
+   "nome": "azione",
    "tipo": "TEXT",
    "box": {
-    "x": 734,
-    "y": 764,
-    "w": 51,
-    "h": 20
+    "x": 789,
+    "y": 756,
+    "w": 47,
+    "h": 18
    },
    "variabili": {
     "fills[0]": "colore/testo/primario",
-    "fontSize": "testo/dimensione/base",
-    "lineHeight": "testo/riga/base"
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
    },
    "senza": [],
    "testo": "Annulla",
    "font": "SF Pro Medium"
+  },
+  {
+   "id": "I101:10546;101:44333",
+   "nome": "chiudi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 844,
+    "y": 757,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:10546;101:44333;101:6935",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 847.3330078125,
+    "y": 760.3330688476562,
+    "w": 9.333883285522461,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
   }
  ]
 }
