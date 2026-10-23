@@ -84,3 +84,11 @@ export function usePreferenze() {
   useEffect(() => api().onPreferenze(setDal), []);
   return { stato: c.stato, errore: c.errore, riprova: c.riprova, dati: dal ?? c.dati ?? {}, imposta: api().impostaPreferenze };
 }
+
+/** Impostazioni dell'app (#368), nello stesso file delle preferenze: `dati`, `imposta(parte)` (null toglie); si aggiornano da sole. */
+export function useImpostazioni() {
+  const c = useChiamata(() => api().impostazioni(), []);
+  const [dal, setDal] = useState<Record<string, unknown> | null>(null);
+  useEffect(() => api().onImpostazioni(setDal), []);
+  return { stato: c.stato, errore: c.errore, riprova: c.riprova, dati: dal ?? c.dati ?? {}, imposta: api().impostaImpostazioni };
+}

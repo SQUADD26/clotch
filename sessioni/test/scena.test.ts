@@ -11,9 +11,13 @@ test("scena: elenco vuoto di base, messaggi a pagine dalla fine, canali che scri
   assert.equal(p0.messaggi.length, 50);
   assert.equal((p0.messaggi[0] as { testo: string }).testo, "m10");
   assert.equal(p0.haAltre, true);
+  assert.equal((p0 as { totale?: number }).totale, 60);
   const p1 = rispostaScena(s, "sessioni:messaggi", ["a", 1]) as { messaggi: Messaggio[]; haAltre: boolean };
   assert.deepEqual(p1.messaggi.map((m) => (m as { testo: string }).testo), Array.from({ length: 10 }, (_, i) => `m${i}`));
   assert.equal(p1.haAltre, false);
   assert.equal(rispostaScena(s, "sessioni:azione", ["a", "copia-id"]), undefined);
   assert.ok(rispostaScena(s, "friday:registro", []));
+  assert.deepEqual([rispostaScena(s, "sessioni:cerca", ["x"]), rispostaScena(s, "sessioni:spazio", []), rispostaScena(s, "sessioni:impostazioni", [])],
+    [[], { indice: 0, messaggi: 0, immagini: 0 }, {}]);
+  assert.equal(rispostaScena(s, "sessioni:svuota", []), undefined);
 });

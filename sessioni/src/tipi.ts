@@ -74,6 +74,8 @@ export interface PaginaMessaggi {
   pagina: number;
   haAltre: boolean;
   errore: string | null;
+  /** Messaggi di tutta la sessione, dall'indice di ricerca quando la conosce già; altrimenti null. */
+  totale: number | null;
 }
 
 export interface Aggiornamento {
@@ -92,6 +94,28 @@ export interface SessioniApi {
   impostaPreferenze(id: string, parte: { [K in keyof PreferenzeSessione]?: PreferenzeSessione[K] | null }): Promise<void>;
   onPreferenze(cb: (p: Record<string, PreferenzeSessione>) => void): () => void;
   azione(id: string, azione: AzioneSessione): Promise<void>;
+  /** Impostazioni dell'app (#368), nello stesso file delle preferenze: `imposta` unisce (null toglie), `on` riceve il nuovo insieme. */
+  impostazioni(): Promise<Record<string, unknown>>;
+  impostaImpostazioni(parte: Record<string, unknown>): Promise<void>;
+  onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
+  /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
+  cerca(testo: string): Promise<RisultatoRicerca[]>;
+  /** Byte su disco dell'indice e delle cache dell'app. */
+  spazio(): Promise<{ indice: number; messaggi: number; immagini: number }>;
+  /** Rifà l'indice da capo; si risolve quando ha finito. */
+  ricostruisci(): Promise<void>;
+  /** Toglie l'indice e le cache dal disco. */
+  svuota(): Promise<void>;
+}
+
+/** Una sessione trovata: l'ultimo messaggio che contiene il testo (`frammento` intorno al punto), o il titolo se nessuno. */
+export interface RisultatoRicerca {
+  id: string;
+  titolo: string;
+  frammento: string;
+  /** Tempo del messaggio trovato; null se trovata solo nel titolo o se la sorgente non lo dà. */
+  t: number | null;
+  nelTitolo: boolean;
 }
 
 export interface PreferenzeSessione {
@@ -103,7 +127,7 @@ export interface PreferenzeSessione {
   nonLetta?: boolean;
 }
 
-export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder";
+export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale";
 
 /** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
 export interface FridayApi {
