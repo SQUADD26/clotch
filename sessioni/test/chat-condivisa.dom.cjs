@@ -1,5 +1,8 @@
 // Prova il renderer vero con IPC della scena: nessun dato o comando reale del Mac.
 const { app, BrowserWindow, ipcMain } = require('electron');
+process.env.CLOTCH_TEST_SILENT = '1';
+app.commandLine.appendSwitch('mute-audio');
+app.on('web-contents-created', (_event, contents) => contents.setAudioMuted(true));
 if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -20,6 +23,7 @@ app.whenReady().then(async () => {
   const hidden = () => {
     assert.equal(win.isVisible(), false, 'finestra mai visibile');
     assert.equal(win.isFocused(), false, 'finestra mai attiva');
+    assert.equal(win.webContents.isAudioMuted(), true, 'audio renderer sempre muto');
     assert.equal(showEvents, 0, 'nessun evento show');
     assert.equal(focusEvents, 0, 'nessun evento focus');
   };
