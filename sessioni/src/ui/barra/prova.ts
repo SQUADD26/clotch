@@ -1,7 +1,7 @@
 // figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
 // Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
 import type { Registro } from "../../friday";
-import type { Elenco, PreferenzeSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
+import type { Elenco, PreferenzeSessione, PrSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
 import type { Stato as StatoChiamata } from "../base/dati";
 import type { Vista } from "./elenco";
 import type { Aperto } from "./index";
@@ -67,6 +67,8 @@ function base(icone = ICONE, extra: Partial<Prova> = {}): Prova {
 const FRAME: Record<string, () => Prova> = {
   "101-8036": () => base(),
   "101-8309": () => base(),
+  "101-33775": () => base(),
+  "101-34190": () => base(),
   "101-9628": () => base(),
   "101-35109": () => base(),
   "101-8805": () => ({ ora: ORA, elenco: pronto([]), pref: {}, registro: registro() }),
@@ -89,6 +91,31 @@ const FRAME: Record<string, () => Prova> = {
   "101-30238": () => ({ ...base(), aperto: { tipo: "raggruppa", a: { x: 326, y: 142 } } }),
   "101-38897": () => ({ ...base(), pagina: "friday", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
   "101-42000": () => ({ ...base(), pagina: "friday", registro: registro({ stato: "spenta", aspettano: 3 }) }),
+};
+
+// sessioni figlie e PR (101:34605): madri e figlie con l'indicatore della loro PR
+const pr = (numero: number, stato: PrSessione["stato"]): PrSessione => ({ numero, stato, verso: "dev", url: `https://github.com/SQUADD26/clotch/pull/${numero}` });
+FRAME["101-34605"] = () => {
+  const f = (x: Sessione, idApp: string, padre: string | null, p?: PrSessione): Sessione => ({ ...x, idApp,
+    app: { padre, prs: p ? [p] : [], connettori: [], strumentiMcp: 0, cli: null, ospite: null, remoto: false } });
+  const lista = [
+    f(s("Sessioni: disegno e app Electron", "clotch", "lavora", 1), "local_1", null, pr(336, "aperta")),
+    f(s("Figma: schermate app Sessioni", "clotch", "lavora", 2), "local_2", "local_1", pr(335, "aperta")),
+    f(s("Sessioni: lettura dal disco", "clotch", "finita", 3), "local_3", "local_1", pr(334, "unita")),
+    f(s("Notch: avviso schermo", "clotch", "finita", 4), "local_4", null, pr(319, "unita")),
+    f(s("clotch AI: casella e sandbox", "squadd-v2", "lavora", 5), "local_5", null, pr(2412, "aperta")),
+    f(s("Figma: lavagna sistema clotch AI", "squadd-v2", "aspetta", 6), "local_6", "local_5"),
+    f(s("Backend: auth e RLS", "squadd-v2", "ferma", 7), "local_7", null, pr(2398, "chiusa")),
+  ];
+  const icone = ["stella", "tavolozza", "database", "schermo", "fulmine", "tavolozza", "database"];
+  const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: icone[i] }]));
+  return { ora: ORA, elenco: pronto([...lista, ...riempi("dentalspace", 9, 200), ...riempi("friday-mac-v2", 14, 400)]), pref, registro: registro(), scelta: lista[0].id, aperte: ["squadd-v2"] };
+};
+
+// sessione aperta da clotch AI (101:45507): la barra ha solo la cartella della sessione
+FRAME["101-45507"] = () => {
+  const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];
+  return { ora: ORA, elenco: pronto(lista), pref: { [lista[0].id]: { icona: "database" }, [lista[1].id]: { icona: "stella" } }, registro: registro({ aspettano: 3 }), scelta: lista[0].id };
 };
 
 function filtrata(aperto?: Aperto): Prova {

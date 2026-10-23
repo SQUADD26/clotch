@@ -8,6 +8,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { BottoneIcona } from "./Bottone";
 import { Suggerimento } from "./Suggerimento";
 import { Pezzo } from "./Pezzo";
+import { TornaAFriday } from "./TornaAFriday";
 import { useNavigazione } from "./navigazione";
 
 // export facoltativo: il pezzo lo aggiunge quando ne ha bisogno, la base non tocca il suo file
@@ -35,6 +36,7 @@ export function BarraTitolo() {
         <Suggerimento testo="Indietro"><BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} {...nuda} /></Suggerimento>
         <Suggerimento testo="Avanti"><BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} {...nuda} /></Suggerimento>
       </div>
+      <TornaAFriday />
       {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
       {n.vista !== "impostazioni" && (
         <>

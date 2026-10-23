@@ -1,0 +1,197 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: disegno e app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "design/332-sessioni-figma",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792785911957,
+    "obiettivo": {
+     "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Controllo del file: nessun errore",
+       "fatta": true
+      },
+      {
+       "testo": "Schermate guardate intere",
+       "fatta": true
+      },
+      {
+       "testo": "Sì di Roberto sul disegno",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "turno_finito",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "stella"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Fammi l'app Sessioni in Electron con l'aspetto di ChatGPT. Prima il disegno in Figma, poi il codice pari al disegno.",
+    "t": 1792785874957
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
+    "t": 1792785875957
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "Research/App/ChatGPT/token-stile.md"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792785889957,
+    "id": "t0"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "swift test --filter Sessioni"
+    },
+    "esito": {
+     "testo": "Test Suite 'SessioniTests' passed",
+     "errore": false
+    },
+    "t": 1792785890957,
+    "id": "t1"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Ho letto il riferimento di ChatGPT: token, icone e 37 schermate. Creo le variabili con i colori scuri di ChatGPT, poi i componenti.",
+    "modello": "claude-opus-5-5",
+    "t": 1792785902957
+   },
+   {
+    "tipo": "utente",
+    "testo": "Aggiungi anche lo stato con 200 sessioni.",
+    "t": 1792785903957
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm run build"
+    },
+    "esito": {
+     "testo": "src/sessioni/lettore.ts(42,7): error TS2339: Property 'cwd' does not exist on type 'Sessione'.",
+     "errore": true
+    },
+    "t": 1792785904957,
+    "id": "t2"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Edit",
+    "ingresso": {
+     "file_path": "sessioni/lettore.ts",
+     "old_string": "prima 0\nprima 1\nprima 2",
+     "new_string": "dopo 0\ndopo 1\ndopo 2\ndopo 3\ndopo 4\ndopo 5\ndopo 6\ndopo 7\ndopo 8\ndopo 9\ndopo 10\ndopo 11\ndopo 12\ndopo 13\ndopo 14\ndopo 15\ndopo 16\ndopo 17\ndopo 18\ndopo 19\ndopo 20\ndopo 21\ndopo 22\ndopo 23\ndopo 24\ndopo 25\ndopo 26\ndopo 27\ndopo 28\ndopo 29\ndopo 30\ndopo 31\ndopo 32\ndopo 33\ndopo 34\ndopo 35\ndopo 36\ndopo 37\ndopo 38\ndopo 39\ndopo 40\ndopo 41\ndopo 42\ndopo 43\ndopo 44\ndopo 45\ndopo 46\ndopo 47\ndopo 48\ndopo 49\ndopo 50\ndopo 51\ndopo 52\ndopo 53\ndopo 54\ndopo 55\ndopo 56\ndopo 57\ndopo 58\ndopo 59\ndopo 60\ndopo 61\ndopo 62\ndopo 63\ndopo 64\ndopo 65\ndopo 66\ndopo 67\ndopo 68\ndopo 69\ndopo 70\ndopo 71\ndopo 72\ndopo 73\ndopo 74\ndopo 75\ndopo 76\ndopo 77\ndopo 78\ndopo 79\ndopo 80\ndopo 81\ndopo 82\ndopo 83\ndopo 84\ndopo 85\ndopo 86\ndopo 87\ndopo 88\ndopo 89\ndopo 90\ndopo 91\ndopo 92\ndopo 93\ndopo 94\ndopo 95\ndopo 96\ndopo 97\ndopo 98\ndopo 99\ndopo 100\ndopo 101\ndopo 102\ndopo 103\ndopo 104\ndopo 105\ndopo 106\ndopo 107\ndopo 108\ndopo 109\ndopo 110\ndopo 111\ndopo 112\ndopo 113\ndopo 114\ndopo 115\ndopo 116\ndopo 117\ndopo 118\ndopo 119\ndopo 120\ndopo 121\ndopo 122\ndopo 123\ndopo 124\ndopo 125\ndopo 126\ndopo 127\ndopo 128\ndopo 129\ndopo 130\ndopo 131\ndopo 132\ndopo 133\ndopo 134\ndopo 135\ndopo 136\ndopo 137\ndopo 138\ndopo 139\ndopo 140\ndopo 141"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792785907957,
+    "id": "t3"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Edit",
+    "ingresso": {
+     "file_path": "sessioni/cartelle.ts",
+     "old_string": "prima 0\nprima 1\nprima 2\nprima 3\nprima 4\nprima 5\nprima 6\nprima 7\nprima 8",
+     "new_string": "dopo 0\ndopo 1\ndopo 2\ndopo 3\ndopo 4\ndopo 5\ndopo 6\ndopo 7\ndopo 8\ndopo 9\ndopo 10\ndopo 11\ndopo 12\ndopo 13\ndopo 14\ndopo 15\ndopo 16\ndopo 17\ndopo 18\ndopo 19\ndopo 20\ndopo 21\ndopo 22\ndopo 23\ndopo 24\ndopo 25\ndopo 26\ndopo 27\ndopo 28\ndopo 29\ndopo 30\ndopo 31\ndopo 32\ndopo 33\ndopo 34\ndopo 35\ndopo 36\ndopo 37\ndopo 38\ndopo 39\ndopo 40\ndopo 41\ndopo 42\ndopo 43\ndopo 44\ndopo 45\ndopo 46\ndopo 47\ndopo 48\ndopo 49\ndopo 50\ndopo 51\ndopo 52\ndopo 53\ndopo 54\ndopo 55\ndopo 56\ndopo 57\ndopo 58\ndopo 59\ndopo 60"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792785908957,
+    "id": "t4"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Edit",
+    "ingresso": {
+     "file_path": "sessioni/lettore.test.ts",
+     "old_string": "",
+     "new_string": "dopo 0\ndopo 1\ndopo 2\ndopo 3\ndopo 4\ndopo 5\ndopo 6\ndopo 7\ndopo 8\ndopo 9\ndopo 10"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792785909957,
+    "id": "t5"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Errore corretto. Il controllo del file torna vuoto. Manca solo il tuo sì sul disegno.",
+    "modello": "claude-opus-5-5",
+    "t": 1792785910957
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "stella"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ },
+ "info": {
+  "s1": {
+   "contesto": null,
+   "file": {
+    "quanti": 3,
+    "aggiunte": 214,
+    "tolte": 12
+   }
+  }
+ }
+}

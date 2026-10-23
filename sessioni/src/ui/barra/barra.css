@@ -21,6 +21,9 @@
 .pezzo-barra .riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
 .pezzo-barra .riga-sessione:hover .azioni, .pezzo-barra .riga-sessione.passaggio .azioni { display: flex; }
 .pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno { display: none; }
+/* madri, figlie e PR (101:34605): freccia dopo il titolo, indicatore PR a destra */
+.pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
+.pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
 
 /* shimmer sul nome di una sessione al lavoro (101:35045): banda chiara che scorre, ciclo 1,8 s */

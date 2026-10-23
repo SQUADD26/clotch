@@ -40,6 +40,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     if (!a) continue;
     s.sorgente = "claude-desktop";
     s.idApp = a.idApp;
+    s.app = a.app;
     s.titolo = a.titolo || s.titolo;
     s.cartella = a.cartella ?? s.cartella;
     s.progetto = nomeProgetto(s.cartella);
@@ -54,7 +55,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     tutte.push({
       id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: null, idApp: a.idApp, titolo: a.titolo,
       progetto: nomeProgetto(cartella), cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
-      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file,
+      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file, app: a.app,
     });
   }
   if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));

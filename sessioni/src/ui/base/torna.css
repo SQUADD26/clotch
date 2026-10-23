@@ -1,0 +1,6 @@
+/* figma: 101-45507 — «torna a Friday»: pillola alta `riferimento`, a 12 px dalla navigazione (il gap della barra è 24) */
+.torna-friday {
+  height: var(--misura-riferimento); padding: 0 var(--spazio-2); gap: var(--spazio-1); margin-left: calc(var(--spazio-3) - var(--spazio-6)); flex: none;
+  display: flex; align-items: center; white-space: nowrap; -webkit-app-region: no-drag;
+  border-radius: var(--raggio-pieno); background: var(--colore-fondo-bottone-secondario);
+}

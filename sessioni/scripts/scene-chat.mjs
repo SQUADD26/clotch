@@ -42,9 +42,9 @@ const chat = (x = {}) => ({
 const registro = (c) => ({ chat: c ? { s1: c } : {}, fermoTutto: false, avvisi: [], clotch: null, friday: null, comandi: [], decisioni: [],
   regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] });
 
-function scena(id, s, msg, { c = null, sezione } = {}) {
+function scena(id, s, msg, { c = null, sezione, info } = {}) {
   const dati = { navigazione: { vista: "sessione", sessione: "s1", ...(sezione ? { sezione } : {}) }, elenco: { sessioni: [sessione(s)], errori: [] },
-    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c) };
+    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c), ...(info ? { info: { s1: info } } : {}) };
   writeFileSync(new URL(`../design/scene/101-${id}.json`, import.meta.url), JSON.stringify(dati, null, 1) + "\n");
 }
 
@@ -140,7 +140,8 @@ scena("45507", { ...ASPETTA, titolo: "Backend: auth e RLS", icona: "database", p
   obiettivo: { ...OBIETTIVO, testo: "Policy RLS di «sessioni» per ogni studio, provate sul database di sviluppo e promosse su main.",
     prove: [{ testo: "Test delle policy: 14 su 14", fatta: true }, { testo: "Migrazione 0042 provata su dev", fatta: true }, { testo: "Sì di Roberto alla promozione", fatta: false }] } },
 messaggi([u("Applica le policy RLS di «sessioni» e promuovi su main."), bash("gh pr checks 2412", "ok", 6),
-  a("I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?")]));
+  a("I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?")]),
+  { sezione: "da-friday", info: { contesto: null, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }); // aperta da clotch AI (101:45507)
 
 // —— Chat Friday (101:16432) e sessioni da citare dopo @ (101:45260) ——
 function scenaFriday(id, domande, sezione, sessioni = [], chats = {}) {

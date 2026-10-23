@@ -24,6 +24,7 @@ import { collegaCasella } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
 import { apriFinestra, parita } from "./finestra";
+import { infoSessione } from "./info-sessione";
 import { collegaFriday } from "./friday-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaIndice } from "./indice-ipc";
@@ -71,6 +72,7 @@ app.whenReady().then(() => {
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   ipcMain.handle("sessioni:elenco", elenco);
+  ipcMain.handle("sessioni:info", (_e, id: string) => infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))));
   const indice = collegaIndice(ipcMain, sessioni);
   ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
     if (opzioni !== undefined && (

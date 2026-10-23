@@ -46,6 +46,33 @@ export interface Sessione {
   situazione: Situazione | null;
   /** File da cui è stata letta: serve a `messaggi()` e all'osservatore. */
   file: string;
+  /** Solo per le sessioni dell'app Claude desktop: legami e dati che la trascrizione non ha. */
+  app?: AppSessione;
+}
+
+export interface PrSessione { numero: number; stato: "aperta" | "unita" | "chiusa"; verso: string | null; url: string }
+
+/** Dal file `local_*.json` dell'app Claude desktop. */
+export interface AppSessione {
+  /** `idApp` della sessione che l'ha avviata (`spawnedFrom`): la barra la mostra sotto la madre. */
+  padre: string | null;
+  prs: PrSessione[];
+  /** Nomi dei connettori remoti (MCP) della sessione. */
+  connettori: string[];
+  strumentiMcp: number;
+  /** Versione di Claude Code, «2.1.299». */
+  cli: string | null;
+  /** Macchina dove gira, se non è questo Mac (`sshConfig.sshHost`). */
+  ospite: string | null;
+  /** Controllo remoto attivo (la sessione ha un ponte). */
+  remoto: boolean;
+}
+
+/** Numeri che la trascrizione dà (`info-sessione.ts`): pannello «Info sessione». */
+export interface InfoSessione {
+  /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
+  contesto: number | null;
+  file: { quanti: number; aggiunte: number; tolte: number };
 }
 
 export interface ErroreLettura {
@@ -129,6 +156,8 @@ export interface SessioniApi {
   file(id: string, testo: string): Promise<string[]>;
   /** Byte su disco dell'indice e delle cache dell'app. */
   spazio(): Promise<{ indice: number; messaggi: number; immagini: number; altro: number }>;
+  /** Contesto usato e file toccati di una sessione, dalla trascrizione. */
+  info(id: string): Promise<InfoSessione>;
   /** Rifà l'indice da capo; si risolve quando ha finito. */
   ricostruisci(): Promise<void>;
   /** Toglie l'indice e le cache dal disco. */

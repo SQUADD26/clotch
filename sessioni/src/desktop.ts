@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { trovaFile } from "./jsonl";
 import { aMillisecondi } from "./registri";
-import { ErroreLettura } from "./tipi";
+import { AppSessione, ErroreLettura, PrSessione } from "./tipi";
 
 export interface SessioneApp {
   idApp: string;
@@ -18,9 +18,29 @@ export interface SessioneApp {
   /** Profilo dell'app: `Claude`, `Claude-x`. */
   profilo: string;
   file: string;
+  app?: AppSessione;
 }
 
 const testo = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
+
+const STATO_PR: Record<string, PrSessione["stato"]> = { OPEN: "aperta", MERGED: "unita", CLOSED: "chiusa" };
+
+/** Legami e dati del file dell'app che la trascrizione non ha. Le PR tolte dalla persona (`dismissed`) non contano. */
+export function datiApp(d: any): AppSessione {
+  const prs: PrSessione[] = (Array.isArray(d.prs) ? d.prs : [])
+    .filter((p: any) => p && !p.dismissed && Number.isInteger(p.prNumber) && STATO_PR[p.state] && testo(p.url))
+    .map((p: any) => ({ numero: p.prNumber, stato: STATO_PR[p.state], verso: testo(p.baseRef), url: p.url }));
+  return {
+    padre: testo(d.spawnedFrom?.sessionId),
+    prs,
+    connettori: (Array.isArray(d.remoteMcpServersConfig) ? d.remoteMcpServersConfig : []).map((c: any) => testo(c?.name)).filter((n: string | null): n is string => !!n),
+    strumentiMcp: Object.values(d.enabledMcpTools ?? {}).filter((v) => v === true).length,
+    cli: testo(d.toolSurfaceSnapshot?.cliVersion),
+    ospite: testo(d.sshConfig?.sshHost),
+    // shortcut: «controllo remoto» = la sessione ha un ponte (bridgeSessionIds); il file non dice altro, si conferma sul Mac
+    remoto: Array.isArray(d.bridgeSessionIds) && d.bridgeSessionIds.length > 0,
+  };
+}
 
 export function leggiApp(home: string, errori: ErroreLettura[]): SessioneApp[] {
   const support = path.join(home, "Library", "Application Support");
@@ -55,6 +75,7 @@ export function leggiApp(home: string, errori: ErroreLettura[]): SessioneApp[] {
         ultimaAttivita: aMillisecondi(d.lastActivityAt),
         profilo,
         file,
+        app: datiApp(d),
       });
     }
   }
