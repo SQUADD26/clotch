@@ -64,6 +64,17 @@ const regole = [
 ];
 const viva = [[fa(0.5), "friday", "battito", { stato: "lavora" }]];
 const spenta = [[alle(14, 2), "friday", "friday", { evento: "avvio" }], [alle(14, 2), "friday", "battito", { stato: "lavora" }]];
+// filo della chat Friday di 101-42000: due domande di Roberto (`parla`) e due risposte (avvisi «risposta»), prima della chiusura
+const parla = (h, m, testo) => [alle(h, m), "friday", "comando", { id: `parla-${h}${m}`, cmd: "parla", da: "app", args: { testo } }];
+const risponde = (h, m, testo) => [alle(h, m), "friday", "avviso", { testo, livello: "normale", motivo: "risposta" }];
+const filo = [
+  parla(13, 58, "Com’è messa la sessione del backend?"),
+  risponde(13, 59, "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev."),
+  parla(14, 0, "Consentila tu."),
+  risponde(14, 1, "Fatto. La migrazione è partita; ti avviso quando finisce."),
+];
+// Friday chiusa alle 14:02: niente di Friday dopo (le decisioni delle 14:12 la terrebbero «vista» più tardi)
+const primaDellaChiusura = (righe) => righe.filter(([t, c]) => c !== "friday" || t <= alle(14, 2));
 const quiete = (fino) => [[fa(30), "friday", "non_disturbare", { acceso: true, fino, tenuti: 3 }]];
 const clotch = [[fa(1), "clotch", "clotch", { voce: "accesa", parla: false, ascolta: false }]];
 const proposto = chat("m-proposto", "Clotch: barra annidata", "clotch", "", "aspetta", [["obiettivo", { stato: "proposto", testo: "Le sessioni annidate e le PR nella barra laterale, pari al disegno.", versione: 1 }]]);
@@ -96,8 +107,8 @@ const SCENE = {
   "101-41397": ["regole", "salvataggio-errore:Regola non salvata: la PR non si apre.", [...tutto, ...viva]],
   "101-41628": ["regole", null, [...casella, ...decisioni, ...viva]],
   "101-41834": ["friday", "avvio", [...tutto]],
-  "101-42000": ["friday", null, [...tutto, ...spenta]],
-  "101-42245": ["friday", "riavvio", [...tutto, ...spenta]],
+  "101-42000": ["friday", null, primaDellaChiusura([...tutto, ...spenta, ...filo])],
+  "101-42245": ["friday", "riavvio", primaDellaChiusura([...tutto, ...spenta, ...filo])],
   "101-47170": ["casella", null, [...tutto, ...viva, ...proposto, ...clotch]],
   "101-47297": ["casella", null, [...tutto, ...viva, ...proposto]],
 };

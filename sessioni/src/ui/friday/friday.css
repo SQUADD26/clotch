@@ -56,3 +56,6 @@
   background: var(--colore-fondo-casella); color: var(--colore-testo-primario); font: inherit;
   border: var(--misura-tratto) solid var(--colore-bordo-fuoco); border-radius: var(--raggio-lg); outline: none;
 }
+
+/* 101-42000: lo stato di Friday sta in fondo al filo, subito sopra la casella (lo spazio lo dà il gap di `colonna`) */
+.vista-friday.chat-friday { flex: none; padding: 0; overflow: visible; }

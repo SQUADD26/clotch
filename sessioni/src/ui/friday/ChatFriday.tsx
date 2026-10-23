@@ -1,5 +1,5 @@
 // figma: 101-42000 — chat Friday: Friday spenta (101-42000), riavvio in corso (101-42245), avvio (101-41834).
-// Il filo della chat Friday (101-16432) e la casella sono della chat (#349): qui lo stato di Friday sopra il filo.
+// Il filo della chat Friday (101-16432) e la casella sono della chat (#349): qui lo stato di Friday tra il filo e la casella.
 import { Bottone } from "../base/Bottone";
 import { CasellaFriday, FiloFriday } from "../chat";
 import { avviaFriday, useAvvio, useRegistro } from "./dati";
@@ -14,6 +14,7 @@ export function ChatFriday() {
   const spenta = !avvio && st?.stato === "spenta";
   return (
     <>
+      <FiloFriday />
       {(avvio === "riavvio" || spenta) && <div className="vista-friday chat-friday">
         {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio Friday" corpo="Riprendo le sessioni e gli avvisi da dove erano." />}
         {!avvio && st?.stato === "spenta" && (
@@ -23,7 +24,6 @@ export function ChatFriday() {
           </>
         )}
       </div>}
-      <FiloFriday />
       <CasellaFriday spenta={spenta} />
     </>
   );
