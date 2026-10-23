@@ -17,6 +17,14 @@ export interface Prova {
 
 const PROVE: Record<string, Prova> = {
   "101-32827": { aperta: "Lingua" },
+  "119-55555": { aperta: "Modello per i tuoi messaggi" },
+  "119-55726": { aperta: "Apri una sessione" },
+  "119-55904": { aperta: "Colore principale" },
+  "119-56054": { aperta: "Carattere" },
+  "119-56211": { aperta: "Dimensione del testo" },
+  "119-56375": { aperta: "Densità dell’elenco" },
+  "119-56546": { aperta: "Suono" },
+  "119-56715": { aperta: "Silenzio" },
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
   "119-56891": { aperta: "Cronologia" },

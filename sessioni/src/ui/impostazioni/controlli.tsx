@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { Icona } from "../base/Icona";
 import { Menu } from "../base/Menu";
 import "./impostazioni.css";
+import "./tendine.css";
 
 export function Pagina({ titolo, sopra, children }: { titolo: string; sopra?: ReactNode; children: ReactNode }) {
   return (
@@ -42,9 +43,9 @@ export function Interruttore({ acceso, etichetta, onCambia, disabled }: {
   );
 }
 
-/** Valore con la freccia: con `voci` apre la tendina (101:32999), senza è solo il valore (opzioni non ancora disegnate). */
-export function Scelta({ valore, etichetta, voci, onScegli, disabled }: {
-  valore: string; etichetta: string; voci?: string[]; onScegli?(v: string): void; disabled?: boolean;
+/** Valore con la freccia: con `voci` apre la tendina (101:32999), senza è solo il valore. `dettagli`: la nota a destra di una voce (119:55555). */
+export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }: {
+  valore: string; etichetta: string; voci?: string[]; dettagli?: Record<string, string>; onScegli?(v: string): void; disabled?: boolean;
 }) {
   const [aperta, setAperta] = useState(false);
   const chiudi = () => setAperta(false);
@@ -57,7 +58,7 @@ export function Scelta({ valore, etichetta, voci, onScegli, disabled }: {
       </button>
       {aperta && voci && (
         <Menu onChiudi={chiudi} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }}
-          voci={voci.map((v) => ({ etichetta: v, scelta: v === valore, fai: () => onScegli?.(v) }))} />
+          voci={voci.map((v) => ({ etichetta: v, scorciatoia: dettagli?.[v], scelta: v === valore, fai: () => onScegli?.(v) }))} />
       )}
     </div>
   );
