@@ -29,6 +29,12 @@ export interface Scena {
 export const fileScena = (radice: string, id: string) => path.join(radice, "design", "scene", `${id}.json`);
 export const leggiScena = (file: string): Scena | null => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : null);
 
+/** «Clotch acceso» scade dopo 10 min (#350): nella scena `clotch.t` ≤ 0 vuol dire «tanti ms fa», da adesso. */
+function conOra(r: unknown): unknown {
+  const c = (r as { clotch?: { t: number } | null }).clotch;
+  return c && c.t <= 0 ? { ...(r as object), clotch: { ...c, t: Date.now() + c.t } } : r;
+}
+
 /** Risposta di un canale IPC dalla scena; i canali che scrivono non fanno niente. */
 export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknown {
   switch (canale) {
@@ -47,7 +53,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "impostazioni:versione": return s.versione ?? "";
     case "impostazioni:uso": return s.uso ?? null;
     case "impostazioni:archiviate": return s.archiviate ?? [];
-    case "friday:registro": return s.registro ?? piano(leggiRegistro(path.join(path.sep, "nessuna-home")));
+    // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
+    case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
     default: return undefined;
   }
 }

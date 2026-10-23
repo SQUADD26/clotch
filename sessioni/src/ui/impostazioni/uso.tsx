@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { QuotaUso } from "../../tipi";
 import { Icona } from "../base/Icona";
-import { useClotchAcceso } from "./clotch-acceso";
+import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Pagina } from "./controlli";
 
 const NOTA = {

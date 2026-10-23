@@ -24,10 +24,13 @@ export function BarraTitolo() {
         <BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} />
         <BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} />
       </div>
-      <div className="comandi-globali">
-        {ComandiPannello && <ComandiPannello />}
-        {ComandiFriday && <ComandiFriday />}
-      </div>
+      {/* le impostazioni non hanno i comandi globali (101-17193) */}
+      {n.vista !== "impostazioni" && (
+        <div className="comandi-globali">
+          {ComandiPannello && <ComandiPannello />}
+          {ComandiFriday && <ComandiFriday />}
+        </div>
+      )}
     </div>
   );
 }

@@ -92,3 +92,10 @@
 .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); }
 .campione { width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
 .riga.calcolo { gap: var(--spazio-2); }
+
+/* Dati, Info, Clotch (101:17893, 101:33235, 101:18054, 101:45956) */
+.valore-scelta { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
+.indietro { display: flex; align-items: center; gap: var(--spazio-1); align-self: flex-start !important; }
+.link { color: var(--colore-testo-link); }
+.bottone.pericolo { font-weight: 400; }
+.riga.stato-clotch { gap: var(--spazio-3); }
