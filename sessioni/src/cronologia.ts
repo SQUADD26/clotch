@@ -11,6 +11,7 @@ interface Stato {
   seq: number; righe: RigaCronologia[]; chiavi: WeakMap<object, number>;
   leggi: ReturnType<typeof lettoreCronologia>; byte: number; invalido: boolean;
 }
+type Ancora = Omit<Stato, "righe" | "chiavi" | "leggi" | "byte" | "invalido"> & { revisioni: Float64Array };
 interface Snapshot { dati: SnapshotPagina; righe: RigaCronologia[]; scade: number; byte: number }
 export interface LimitiCronologia { statoByte?: number; snapshotByte?: number; snapshotNumero?: number; ttlMs?: number; fileByte?: number }
 const copia = <T>(v: T): T => structuredClone(v);
@@ -19,6 +20,7 @@ const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 export class Cronologia {
   private stati = new Map<string, Stato>();
   private snapshots = new Map<string, Snapshot>();
+  private sospesi = new Map<string, Ancora>();
   private segreto = randomUUID();
   private invia: (d: DeltaCronologia) => void = () => {};
   private limiti: Required<LimitiCronologia>;
@@ -38,19 +40,20 @@ export class Cronologia {
   }
   /** Il primo evento riscalda il parser dalla testa; pubblica solo ciò che segue il confine iniziale. */
   aggiorna(s: Sorgente, confineIniziale?: number): Stato | ErroreCronologia {
-    const precedente = this.stati.get(s.id);
+    const precedente = this.stati.get(s.id), sospeso = this.sospesi.get(s.id), ancora = precedente ?? sospeso;
     try {
       if (precedente && !precedente.invalido && precedente.file === s.file && precedente.sorgente === s.sorgente && precedente.firma === firmaFile(s.file)) {
         this.stati.delete(s.id); this.stati.set(s.id, precedente);
         return precedente;
       }
       const v = versioneFile(s.file, this.limiti.fileByte);
-      const motivo = precedente && (precedente.file !== s.file || precedente.sorgente !== s.sorgente ? "percorso"
-        : precedente.identita !== v.identita ? "replace" : v.dati.length < precedente.offset ? "truncate"
-        : precedente.invalido || digest(v.dati.subarray(0, precedente.offset)) !== precedente.digest ? "riscrittura" : null);
-      const nuovo = !precedente || !!motivo;
-      const stato: Stato = nuovo ? { epoca: randomUUID(), file: s.file, sorgente: s.sorgente, identita: v.identita,
-        firma: v.firma, offset: 0, digest: digest(Buffer.alloc(0)), seq: 0, righe: [], chiavi: new WeakMap(),
+      const motivo = ancora && (ancora.file !== s.file || ancora.sorgente !== s.sorgente ? "percorso"
+        : ancora.identita !== v.identita ? "replace" : v.dati.length < ancora.offset ? "truncate"
+        : precedente?.invalido || digest(v.dati.subarray(0, ancora.offset)) !== ancora.digest ? "riscrittura" : null);
+      const nuovo = !precedente || !!motivo, ripristino = !!ancora && !precedente && !motivo;
+      const pubblicaDa = ripristino ? ancora!.offset : confineIniziale;
+      const stato: Stato = nuovo ? { epoca: ripristino ? ancora!.epoca : randomUUID(), file: s.file, sorgente: s.sorgente, identita: v.identita,
+        firma: v.firma, offset: 0, digest: digest(Buffer.alloc(0)), seq: ripristino ? ancora!.seq : 0, righe: [], chiavi: new WeakMap(),
         leggi: lettoreCronologia(s), byte: 0, invalido: false } : precedente!;
       if (stato.offset === v.dati.length && !nuovo) {
         stato.firma = v.firma;
@@ -64,22 +67,24 @@ export class Cronologia {
         const fine = v.dati.indexOf(10, da), o = parseRiga(v.dati.subarray(da, fine).toString("utf8"));
         if (o) {
           const x = stato.leggi(o);
-          if (x.nuovi.length || x.aggiornati.length) mutato = true;
+          if ((!ripristino || da >= pubblicaDa!) && (x.nuovi.length || x.aggiornati.length)) mutato = true;
           x.nuovi.forEach((m, i) => {
             const ordine = righe.length;
             stato.chiavi.set(m, ordine);
-            const r = { chiave: `${stato.epoca}:${da}:${i}`, ordine, revisione: seq, messaggio: copia(m) };
+            const revisione = ripristino && da < pubblicaDa! ? sospeso!.revisioni[ordine] : seq;
+            const r = { chiave: `${stato.epoca}:${da}:${i}`, ordine, revisione, messaggio: copia(m) };
             byte += 129 + Buffer.byteLength(JSON.stringify(r));
             righe.push(r);
-            if (!nuovo || motivo || (confineIniziale !== undefined && da >= confineIniziale)) cambiate.set(ordine, r);
+            if (!nuovo || motivo || (pubblicaDa !== undefined && da >= pubblicaDa)) cambiate.set(ordine, r);
           });
           for (const m of x.aggiornati) {
             const ordine = stato.chiavi.get(m);
             if (ordine === undefined) throw new Error("Continuità dello strumento non verificata");
-            const r = { ...righe[ordine], revisione: seq, messaggio: copia(m) };
+            const revisione = ripristino && da < pubblicaDa! ? sospeso!.revisioni[ordine] : seq;
+            const r = { ...righe[ordine], revisione, messaggio: copia(m) };
             byte += Buffer.byteLength(JSON.stringify(r)) - Buffer.byteLength(JSON.stringify(righe[ordine]));
             righe[ordine] = r;
-            if (!nuovo || motivo || (confineIniziale !== undefined && da >= confineIniziale)) cambiate.set(ordine, r);
+            if (!nuovo || motivo || (pubblicaDa !== undefined && da >= pubblicaDa)) cambiate.set(ordine, r);
           }
         }
         da = fine + 1;
@@ -87,17 +92,23 @@ export class Cronologia {
       if (byte > this.limiti.statoByte) throw new Error("Cronologia oltre il limite di memoria");
       Object.assign(stato, { righe, byte, seq: mutato ? seq : stato.seq,
         offset: v.dati.length, firma: v.firma, digest: digest(v.dati), invalido: false });
-      this.stati.delete(s.id); this.stati.set(s.id, stato);
-      while ([...this.stati.values()].reduce((n, x) => n + x.byte, 0) > this.limiti.statoByte)
-        this.stati.delete(this.stati.keys().next().value!);
-      if (motivo && precedente) this.invia({ tipo: "reset", sessione: s.id, epocaPrecedente: precedente.epoca, epoca: stato.epoca, motivo });
+      this.stati.delete(s.id); this.stati.set(s.id, stato); this.sospesi.delete(s.id);
+      while ([...this.stati.values()].reduce((n, x) => n + x.byte, 0) > this.limiti.statoByte) {
+        const [id, vecchio] = this.stati.entries().next().value!;
+        const { righe: _righe, chiavi: _chiavi, leggi: _leggi, byte: _byte, invalido: _invalido, ...ancora } = vecchio;
+        this.stati.delete(id); this.sospesi.delete(id); this.sospesi.set(id, { ...ancora, revisioni: Float64Array.from(_righe.map((r) => r.revisione)) });
+      }
+      // Solo metadati fisici: nessun messaggio o parser rimane nei ledger espulsi.
+      while (this.sospesi.size > 4096 || [...this.sospesi.values()].reduce((n, a) => n + 512 + a.revisioni.byteLength, 0) > 8 * 1024 * 1024)
+        this.sospesi.delete(this.sospesi.keys().next().value!);
+      if (motivo && ancora) this.invia({ tipo: "reset", sessione: s.id, epocaPrecedente: ancora.epoca, epoca: stato.epoca, motivo });
       if (cambiate.size) this.invia({ tipo: "upsert", sessione: s.id, epoca: stato.epoca,
-        daSeq: nuovo ? 0 : seq - 1, aSeq: stato.seq, righe: copia([...cambiate.values()]), totale: righe.length });
+        daSeq: nuovo && !ripristino ? 0 : seq - 1, aSeq: stato.seq, righe: copia([...cambiate.values()]), totale: righe.length });
       return stato;
     } catch (e) {
       if (precedente) precedente.invalido = true;
       const errore = this.errore(e);
-      this.invia({ tipo: "errore", sessione: s.id, epoca: precedente?.epoca ?? null, errore });
+      this.invia({ tipo: "errore", sessione: s.id, epoca: ancora?.epoca ?? null, errore });
       return errore;
     }
   }
