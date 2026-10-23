@@ -1,0 +1,28 @@
+/* figma: 101-44748 — «scheda sessione», «riferimento sessione», «testo con riferimenti»; scheda al passaggio 101:44989 */
+.risposta-friday { display: flex; flex-direction: column; gap: var(--spazio-6); }
+.sessioni-citate { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.scheda-sessione {
+  width: var(--misura-dialogo); display: flex; flex-direction: column; gap: var(--spazio-2); padding: var(--spazio-3);
+  border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.scheda-sessione.sospesa {
+  position: absolute; bottom: calc(100% + var(--spazio-1-5)); left: 0; z-index: 4; border-color: transparent; background: var(--colore-fondo-elevato);
+}
+.scheda-sessione .testata, .scheda-sessione .stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
+.scheda-sessione .stato { gap: var(--spazio-1); color: var(--colore-testo-primario); }
+.scheda-sessione .titolo {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario);
+}
+.scheda-sessione .dettagli { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.scheda-sessione .ultimo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scheda-sessione .bottoni { display: flex; gap: var(--spazio-2); }
+.testo-con-riferimenti { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spazio-1); }
+.testo-con-riferimenti .testo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); }
+.con-scheda { position: relative; display: inline-flex; }
+.riferimento-sessione {
+  display: inline-flex; align-items: center; gap: var(--spazio-1); height: var(--misura-riferimento); padding: 0 var(--spazio-2) 0 var(--spazio-1);
+  border-radius: var(--raggio-md); background: var(--colore-fondo-bottone-secondario);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500; color: var(--colore-testo-primario);
+}

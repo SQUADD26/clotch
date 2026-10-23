@@ -142,13 +142,13 @@ messaggi([u("Applica le policy RLS di «sessioni» e promuovi su main."), bash("
   a("I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?")]));
 
 // —— Chat Friday (101:16432) e sessioni da citare dopo @ (101:45260) ——
-function scenaFriday(id, domande, sezione, sessioni = []) {
+function scenaFriday(id, domande, sezione, sessioni = [], chats = {}) {
   const r = registro(chat({ chat: "friday", progetto: null, visto: ORA - 10_000, battito: ORA - 10_000 }));
-  r.chat = { friday: r.chat.s1 };
+  r.chat = { friday: r.chat.s1, ...chats };
   let t = ORA - 10 * MIN;
-  for (const [i, [d, rs]] of domande.entries()) {
+  for (const [i, [d, rs, citate = []]] of domande.entries()) {
     r.comandi.push({ id: `c${i}`, t: (t += 20_000), cmd: "parla", da: "app", args: { testo: d } });
-    r.avvisi.push({ id: `a${i}`, t: (t += 20_000), testo: rs, livello: "info", motivo: "risposta", dettoDa: null });
+    r.avvisi.push({ id: `a${i}`, t: (t += 20_000), testo: rs, livello: "info", motivo: "risposta", dettoDa: null, sessioni: citate });
   }
   const dati = { navigazione: { vista: "friday", ...(sezione ? { sezione } : {}) }, elenco: { sessioni, errori: [] }, messaggi: {},
     preferenze: Object.fromEntries(sessioni.map((s) => [s.id, { icona: s.icona }])), registro: r };
@@ -161,3 +161,21 @@ scenaFriday("45260", [...BACKEND, ["Consentila tu.", "Fatto. La migrazione è pa
   sessione({ id: "b2", titolo: "Backup Hetzner sulle VPS", icona: "pacco", progetto: "squadd-v2", stato: "finita" }),
   sessione({ id: "b3", titolo: "Backend: webhook pagamenti", icona: "database", progetto: "dentalspace", stato: "ferma" }),
 ]);
+
+// —— Friday cita le sessioni (101:44748) e scheda al passaggio (101:44989) ——
+const CITATE = [
+  sessione({ id: "b1", titolo: "Backend: auth e RLS", icona: "database", progetto: "squadd-v2", ramo: "feat/2412-rls-sessioni", stato: "aspetta", ultimaAttivita: ORA - 12 * MIN }),
+  sessione({ id: "f1", titolo: "Figma: schermate app Sessioni", icona: "tavolozza", ramo: "design/332-sessioni-figma-3", stato: "aspetta", ultimaAttivita: ORA - 5 * MIN }),
+  sessione({ id: "l1", titolo: "Sessioni: disegno e app Electron", icona: "stella", ramo: "design/332-sessioni-figma-3" }),
+  sessione({ id: "l2", titolo: "Friday: casella e sandbox", icona: "fulmine" }),
+  sessione({ id: "l3", titolo: "Notch: avviso schermo", icona: "schermo" }),
+];
+const passi5 = ["completed", "completed", "completed", "in_progress", "pending"].map((stato, i) => ({ testo: `passo ${i}`, stato }));
+const CHAT_CITATE = {
+  b1: chat({ chat: "b1", stato: "serve_roberto", dettaglio: "Vuoi che promuova adesso?", richieste: [{ rid: "rb", genere: "permesso", strumento: "Bash", ingresso: {}, domande: [] }] }),
+  f1: chat({ chat: "f1", stato: "serve_roberto", domanda: "Dove salvo le immagini della prova di parità?", richieste: [{ rid: "rf", genere: "domanda", strumento: "AskUserQuestion", ingresso: {}, domande: [] }] }),
+  l1: chat({ chat: "l1", dettaglio: "Disegno le schermate di Friday nell’app.", passi: passi5 }),
+};
+const ASPETTANO = [["Cosa aspetta me?", "Due sessioni aspettano te.", ["b1", "f1", "l1", "l2", "l3"]]];
+scenaFriday("44748", ASPETTANO, null, CITATE, CHAT_CITATE);
+scenaFriday("44989", ASPETTANO, "scheda:l1", CITATE, CHAT_CITATE);

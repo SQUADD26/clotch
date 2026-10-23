@@ -10,6 +10,7 @@ import { SegnoStato } from "../base/SegnoStato";
 import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
 import { Risposta } from "./Risposta";
+import { SessioniCitate, type Citata } from "./SchedeSessioni";
 import { comanda } from "./friday";
 import { provaDi } from "./testi";
 import "./casella.css";
@@ -20,18 +21,30 @@ export function useVociFriday() {
   return useMemo(() => {
     if (!r) return [];
     const da = r.comandi.filter((c) => c.cmd === "parla").map((c) => ({ chi: "roberto" as const, id: c.id, t: c.t ?? 0, testo: String(c.args.testo ?? "") }));
-    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo }));
+    const di = r.avvisi.filter((a) => a.motivo === "risposta").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
     return [...da, ...di].sort((a, b) => a.t - b.t);
   }, [r]);
 }
 
 export function FiloFriday() {
   const voci = useVociFriday();
+  const elenco = useElenco().dati?.sessioni ?? [];
+  const { dati: r } = useRegistro();
+  // sessioni citate nella risposta: solo quelle che l'elenco conosce
+  const citate = (ids: string[]): Citata[] => ids.flatMap((id) => {
+    const s = elenco.find((x) => x.id === id);
+    return s ? [{ s, c: r?.chat.get(id) ?? null }] : [];
+  });
   const filo = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight; }, [voci.length]);
   return (
     <div className="filo" ref={filo}>
-      {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : <Risposta key={v.id} testo={v.testo} inScrittura={false} />)}
+      {voci.map((v) => v.chi === "roberto" ? <MessaggioRoberto key={v.id} testo={v.testo} /> : (
+        <div key={v.id} className="risposta-friday">
+          <Risposta testo={v.testo} inScrittura={false} />
+          <SessioniCitate citate={citate(v.sessioni)} />
+        </div>
+      ))}
     </div>
   );
 }

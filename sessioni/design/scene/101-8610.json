@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792767997617,
+    "ultimaAttivita": 1792768244164,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -56,23 +56,23 @@
    {
     "tipo": "utente",
     "testo": "Fammi l'app Sessioni in Electron con l'aspetto di ChatGPT.",
-    "t": 1792767976617
+    "t": 1792768223164
    },
    {
     "tipo": "pensiero",
     "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
-    "t": 1792767977617
+    "t": 1792768224164
    },
    {
     "tipo": "assistente",
     "testo": "Leggo il riferimento di ChatGPT e creo le variabili con i colori scuri.",
     "modello": "claude-opus-5-5",
-    "t": 1792767991617
+    "t": 1792768238164
    },
    {
     "tipo": "utente",
     "testo": "Aggiungi lo stato con 200 sessioni.",
-    "t": 1792767992617
+    "t": 1792768239164
    },
    {
     "tipo": "strumento",
@@ -86,7 +86,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767993617,
+    "t": 1792768240164,
     "id": "t0"
    },
    {
@@ -101,7 +101,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767994617,
+    "t": 1792768241164,
     "id": "t1"
    },
    {
@@ -116,14 +116,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767995617,
+    "t": 1792768242164,
     "id": "t2"
    },
    {
     "tipo": "assistente",
     "testo": "Fatto. Manca solo il tuo sì sul disegno.",
     "modello": "claude-opus-5-5",
-    "t": 1792767996617
+    "t": 1792768243164
    }
   ]
  },
