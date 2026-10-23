@@ -32,6 +32,10 @@ export interface Sessione {
   cartella: string;
   ramo: string | null;
   modello: string | null;
+  /** Modalità dei permessi dell'ultimo messaggio di Roberto (`permissionMode` della trascrizione Claude Code): default, acceptEdits, plan, bypassPermissions. */
+  permessi?: string | null;
+  /** Token nel contesto all'ultima risposta (input, cache letta e creata); null se la sorgente non li dà. */
+  contesto?: number | null;
   stato: Stato;
   /** Perché lo stato (frase del registro `sessioni-stato`), se c'è. */
   perche: string | null;
@@ -107,6 +111,10 @@ export interface SessioniApi {
   onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
   cerca(testo: string): Promise<RisultatoRicerca[]>;
+  /** Comandi con «/» che la sessione conosce (suoi, dell'account e del progetto). */
+  comandi(id: string): Promise<VoceComando[]>;
+  /** File della cartella della sessione che contengono `testo` nel percorso (al massimo 8), per «@». */
+  file(id: string, testo: string): Promise<string[]>;
   /** Byte su disco dell'indice e delle cache dell'app. */
   spazio(): Promise<{ indice: number; messaggi: number; immagini: number; altro: number }>;
   /** Rifà l'indice da capo; si risolve quando ha finito. */
@@ -125,6 +133,9 @@ export interface RisultatoRicerca {
   nelTitolo: boolean;
 }
 
+/** Un comando con «/» nel menu della casella; `gruppo`: «Comandi» o «Skill». */
+export interface VoceComando { nome: string; descrizione: string; gruppo: "Comandi" | "Skill" }
+
 export interface PreferenzeSessione {
   /** Nome di un'icona «Icona/…» del file Figma (NomeIcona in ui/base/icone.ts). */
   icona?: string;
@@ -132,6 +143,11 @@ export interface PreferenzeSessione {
   colore?: string;
   fissa?: boolean;
   nonLetta?: boolean;
+  /** Scelte della casella (#437): id del modello CLI (claude-opus-5-5, claude-fable-5-1, …) che #457 manda al motore; sforzo: low, medium, high, xhigh, max; modalità rapida; permessi: default, acceptEdits, plan, bypassPermissions. */
+  modello?: string;
+  sforzo?: string;
+  rapida?: boolean;
+  permessi?: string;
 }
 
 export type AzioneSessione = "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale";

@@ -68,7 +68,7 @@
   "raggio/xl": 15,
   "misura/pannello": 320,
   "colore/fondo/elevato": "#2d2d2d",
-  "misura/menu": 260,
+  "misura/menu-permessi": 336,
   "colore/fondo/riga-passaggio": "#ffffff0d",
   "spazio/1-5": 6,
   "colore/icona/primaria": "#ffffffe7"
@@ -4691,7 +4691,7 @@
    "box": {
     "x": 414,
     "y": 674,
-    "w": 260,
+    "w": 336,
     "h": 216
    },
    "variabili": {
@@ -4701,7 +4701,7 @@
     "paddingRight": "spazio/1",
     "paddingTop": "spazio/1",
     "paddingBottom": "spazio/1",
-    "width": "misura/menu"
+    "width": "misura/menu-permessi"
    },
    "senza": []
   },
@@ -4712,7 +4712,7 @@
    "box": {
     "x": 418,
     "y": 678,
-    "w": 252,
+    "w": 328,
     "h": 24
    },
    "variabili": {
@@ -4749,7 +4749,7 @@
    "box": {
     "x": 418,
     "y": 702,
-    "w": 252,
+    "w": 328,
     "h": 46
    },
    "variabili": {
@@ -4801,7 +4801,7 @@
    "box": {
     "x": 450,
     "y": 708,
-    "w": 212,
+    "w": 288,
     "h": 34
    },
    "variabili": {},
@@ -4814,7 +4814,7 @@
    "box": {
     "x": 450,
     "y": 708,
-    "w": 212,
+    "w": 288,
     "h": 18
    },
    "variabili": {
@@ -4852,7 +4852,7 @@
    "box": {
     "x": 418,
     "y": 748,
-    "w": 252,
+    "w": 328,
     "h": 46
    },
    "variabili": {
@@ -4903,7 +4903,7 @@
    "box": {
     "x": 450,
     "y": 754,
-    "w": 212,
+    "w": 288,
     "h": 34
    },
    "variabili": {},
@@ -4916,7 +4916,7 @@
    "box": {
     "x": 450,
     "y": 754,
-    "w": 212,
+    "w": 288,
     "h": 18
    },
    "variabili": {
@@ -4954,7 +4954,7 @@
    "box": {
     "x": 418,
     "y": 794,
-    "w": 252,
+    "w": 328,
     "h": 46
    },
    "variabili": {
@@ -5005,7 +5005,7 @@
    "box": {
     "x": 450,
     "y": 800,
-    "w": 212,
+    "w": 288,
     "h": 34
    },
    "variabili": {},
@@ -5018,7 +5018,7 @@
    "box": {
     "x": 450,
     "y": 800,
-    "w": 212,
+    "w": 288,
     "h": 18
    },
    "variabili": {
@@ -5056,7 +5056,7 @@
    "box": {
     "x": 418,
     "y": 840,
-    "w": 252,
+    "w": 328,
     "h": 46
    },
    "variabili": {
@@ -5107,7 +5107,7 @@
    "box": {
     "x": 450,
     "y": 846,
-    "w": 212,
+    "w": 288,
     "h": 34
    },
    "variabili": {},
@@ -5120,7 +5120,7 @@
    "box": {
     "x": 450,
     "y": 846,
-    "w": 212,
+    "w": 288,
     "h": 18
    },
    "variabili": {

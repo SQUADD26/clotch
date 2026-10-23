@@ -27,6 +27,11 @@ function daFile(file: string, radice: Radice, size: number, mtime: number): Sess
     campo("ai-title", "aiTitle") ?? campo("custom-title", "customTitle") ?? campo("last-prompt", "lastPrompt") ??
     testa.map((o) => (o.type === "user" ? testoUtente(o.message?.content) : "")).find(Boolean) ?? "";
   const modello = dietro.find((o) => o.type === "assistant" && testo(o.message?.model))?.message.model ?? null;
+  // shortcut: la modalità è scritta solo su alcune righe utente; se né coda né testa la hanno, resta null e la casella mostra «Chiedi approvazione»
+  const conModo = (o: any) => o.type === "user" && testo(o.permissionMode);
+  const permessi = (dietro.find(conModo) ?? testa.find(conModo))?.permissionMode ?? null;
+  const u = dietro.find((o) => o.type === "assistant" && o.message?.usage)?.message.usage;
+  const contesto = u ? (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0) + (Number(u.cache_creation_input_tokens) || 0) : null;
   const t = dietro.map((o) => aMillisecondi(o.timestamp)).find((x) => x !== null) ?? mtime;
   const cartella = ultimo.cwd as string;
   return {
@@ -40,6 +45,8 @@ function daFile(file: string, radice: Radice, size: number, mtime: number): Sess
     cartella,
     ramo: testo(ultimo.gitBranch) || null,
     modello,
+    permessi,
+    contesto,
     stato: "ferma", // lo stato vero lo mette elenco.ts
     perche: null,
     ultimaAttivita: Math.max(t, 0),

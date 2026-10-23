@@ -24,9 +24,12 @@ export function useOra(ogniMs = 30_000) {
 const NON_RISPONDE_MS = 180_000;
 export const nonRisponde = (c: ChatFriday, ora: number) => c.stato === "lavora" && !c.fine && ora - (c.battito ?? 0) > NON_RISPONDE_MS;
 
+/** Manda un comando a Friday e dà l'esito intero (null = il canale verso il motore è caduto), senza avvisi: chi lo usa mostra il perché da sé. */
+export const comandaEsito = (cmd: Parameters<FridayApi["comando"]>[0], args: Record<string, unknown>) => friday().comando(cmd, args).catch(() => null);
+
 /** Manda un comando a Friday. true = fatto; altrimenti avviso con «Riprova». */
 export async function comanda(cmd: Parameters<FridayApi["comando"]>[0], args: Record<string, unknown>): Promise<boolean> {
-  const e = await friday().comando(cmd, args).catch(() => null);
+  const e = await comandaEsito(cmd, args);
   if (e?.esito === "ok") return true;
   // rifiutato dal motore: riprovare darebbe lo stesso rifiuto, si mostra il suo testo senza «Riprova»
   avvisa({ tipo: "errore", messaggio: erroreComando(e), azione: e?.esito === "rifiutato" ? undefined : { etichetta: "Riprova", fai: () => void comanda(cmd, args) } });

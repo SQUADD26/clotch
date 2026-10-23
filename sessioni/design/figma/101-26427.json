@@ -68,6 +68,7 @@
   "raggio/xl": 15,
   "misura/pannello": 320,
   "colore/fondo/elevato": "#2d2d2d",
+  "misura/menu-modello": 320,
   "colore/fondo/riga-passaggio": "#ffffff0d",
   "spazio/1-5": 6,
   "colore/icona/primaria": "#ffffffe7",
@@ -4705,7 +4706,7 @@
     "paddingRight": "spazio/1",
     "paddingTop": "spazio/1",
     "paddingBottom": "spazio/1",
-    "width": "misura/pannello"
+    "width": "misura/menu-modello"
    },
    "senza": []
   },

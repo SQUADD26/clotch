@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./friday";
 import { piano } from "./friday-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -26,6 +26,9 @@ export interface Scena {
   /** Info (#351): le note della versione e se c'è «Controlla aggiornamenti». */
   novita?: Novita;
   aggiornamenti?: boolean;
+  /** Menu della casella (#437): comandi con «/» e file con «@» che il main darebbe a quella sessione. */
+  comandi?: VoceComando[];
+  file?: string[];
   /** Registro di Friday come lo dà `friday:registro`. */
   registro?: unknown;
 }
@@ -56,6 +59,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "sessioni:preferenze": return s.preferenze ?? {};
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
+    case "sessioni:comandi": return s.comandi ?? [];
+    case "sessioni:file": return (s.file ?? []).filter((f) => f.toLowerCase().includes(String(args[1] ?? "").toLowerCase()));
     case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
     case "impostazioni:radici": return (s.cartelle ?? []).map((c) => c.percorso);
     case "impostazioni:cartelle": return (s.cartelle ?? []).filter((c) => (args[0] as string[]).includes(c.percorso));
@@ -71,7 +76,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
-  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
+  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:file", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
   "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",

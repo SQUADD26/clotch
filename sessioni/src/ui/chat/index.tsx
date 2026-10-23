@@ -64,7 +64,7 @@ export default function Chat() {
     ? <NonRisponde da={daQuanto(c.battito ?? 0, adesso)} terminale={() => void api().azione(s.id, "apri-terminale")} />
     : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
   const casella = (
-    <Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} prova={sezione}
+    <Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} permessi={s.permessi} contesto={s.contesto} disabilitata={s.sorgente === "cursor"} prova={sezione}
       appenaMandato={dopoInterruzione(voci)}
       segnaposto={muta ? "In attesa della sessione" : limite && ripartenza ? `Riparte alle ${ripartenza}` : undefined} />
   );

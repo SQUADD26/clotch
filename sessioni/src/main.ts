@@ -27,6 +27,7 @@ import { collegaFriday } from "./friday-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaIndice } from "./indice-ipc";
 import { leggiImpostazioni } from "./preferenze";
+import { collegaCasella } from "./casella-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
@@ -94,6 +95,7 @@ app.whenReady().then(() => {
     if (c === "sessioni:impostazioni") barraMenu();
   };
   collegaPreferenze(ipcMain, invia, sessioni);
+  collegaCasella(ipcMain, sessioni);
   collegaImpostazioni(ipcMain, sessioni, indice, invia);
   sessioni.osserva((a) => {
     barraMenu();
