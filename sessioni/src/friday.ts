@@ -67,7 +67,7 @@ export interface Registro {
   /** Comandi presi dalla casella, in ordine. */
   comandi: { id: string; t: number | null; cmd: string; da: string; args: Record<string, any> }[];
   /** Decisioni di Friday ancora annullabili (inverso non nullo e nessun `annulla` fatto). */
-  decisioni: { id: string; t: number | null; cosa: string; perche: string; chat: string | null; genere: string; nonAnnullabile: string | null; annullabile: boolean }[];
+  decisioni: { id: string; t: number | null; cosa: string; perche: string; chat: string | null; genere: string; nonAnnullabile: string | null; effettoAnnullo: string | null; annullabile: boolean; annullata: boolean }[];
   /** Regole imparate vive: ogni `regola` aggiunge, con `togli` toglie (stesso testo e dove). */
   regole: { testo: string; perche: string; dove: string; t: number | null }[];
   /** Ultimo evento `non_disturbare` acceso: `fino` null = finché non si toglie; `tenuti` = avvisi tenuti per dopo. */
@@ -179,7 +179,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         }
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), annullabile: Array.isArray(d.inverso) }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso), annullata: false }); break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
@@ -196,7 +196,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
       }
     }
   }
-  for (const d of r.decisioni) if (annullate.has(d.id)) d.annullabile = false;
+  for (const d of r.decisioni) if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
   return r;
 }
 

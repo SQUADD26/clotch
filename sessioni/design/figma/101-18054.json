@@ -37,6 +37,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "spazio/12": 48,
   "testo/dimensione/xl": 28,
@@ -49,8 +50,7 @@
   "colore/fondo/accento": "#d25e28",
   "misura/interruttore-largo": 32,
   "misura/interruttore-alto": 20,
-  "colore/fondo/manopola": "#ffffff",
-  "colore/testo/link": "#339cff"
+  "colore/fondo/manopola": "#ffffff"
  },
  "nodi": [
   {
@@ -1382,11 +1382,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:18072",
@@ -1438,11 +1437,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/xl"
+    "cornerRadius": "raggio/xl",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:18184",
@@ -1901,7 +1899,7 @@
    "box": {
     "x": 389,
     "y": 425,
-    "w": 434,
+    "w": 414,
     "h": 20
    },
    "variabili": {
@@ -1929,23 +1927,69 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:33230",
-   "nome": "link",
+   "id": "120:58398",
+   "nome": "valore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 815,
+    "y": 426,
+    "w": 180,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "120:58399",
+   "nome": "testo valore",
    "tipo": "TEXT",
    "box": {
-    "x": 835,
+    "x": 815,
     "y": 426,
     "w": 160,
     "h": 18
    },
    "variabili": {
-    "fills[0]": "colore/testo/link",
+    "fills[0]": "colore/testo/secondario",
     "fontSize": "testo/dimensione/sm",
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
    "testo": "Novità della versione 0.1.0",
    "font": "SF Pro Regular"
+  },
+  {
+   "id": "120:58400",
+   "nome": "icona giu",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 979,
+    "y": 427,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I120:58400;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 984.3330078125,
+    "y": 430.3330078125,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
   }
  ]
 }

@@ -37,6 +37,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "spazio/12": 48,
   "testo/dimensione/xl": 28,
@@ -1381,11 +1382,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:17381",
@@ -1437,11 +1437,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/xl"
+    "cornerRadius": "raggio/xl",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:17493",

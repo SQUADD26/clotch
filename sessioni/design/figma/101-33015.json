@@ -37,6 +37,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "spazio/12": 48,
   "testo/dimensione/xl": 28,
@@ -51,7 +52,8 @@
   "colore/testo/errore": "#ff6764",
   "misura/bottone-invio": 32,
   "colore/fondo/errore": "#fa423e29",
-  "colore/bordo/fuoco": "#ee7c37"
+  "colore/bordo/fuoco": "#ee7c37",
+  "misura/tratto-forte": 2
  },
  "nodi": [
   {
@@ -1383,11 +1385,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:33037",
@@ -1439,11 +1440,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/xl"
+    "cornerRadius": "raggio/xl",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:33040",
@@ -2123,11 +2123,10 @@
     "paddingLeft": "spazio/2",
     "paddingRight": "spazio/2",
     "paddingTop": "spazio/0-5",
-    "paddingBottom": "spazio/0-5"
+    "paddingBottom": "spazio/0-5",
+    "strokeWeight": "misura/tratto-forte"
    },
-   "senza": [
-    "strokeWeight 2"
-   ]
+   "senza": []
   },
   {
    "id": "101:33199",

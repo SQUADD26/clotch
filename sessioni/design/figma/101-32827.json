@@ -37,6 +37,7 @@
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
+  "misura/tratto": 1,
   "spazio/4": 16,
   "spazio/12": 48,
   "testo/dimensione/xl": 28,
@@ -56,8 +57,10 @@
   "colore/fondo/bottone-secondario": "#ffffff0d",
   "colore/fondo/elevato": "#2d2d2d",
   "misura/menu": 260,
-  "colore/fondo/riga-passaggio": "#ffffff0d",
-  "colore/icona/primaria": "#ffffffe7"
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "colore/icona/primaria": "#ffffffe7",
+  "colore/fondo/riga-passaggio": "#ffffff0d"
  },
  "nodi": [
   {
@@ -1389,11 +1392,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:32849",
@@ -1445,11 +1447,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/xl"
+    "cornerRadius": "raggio/xl",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:32852",
@@ -2187,7 +2188,7 @@
    "box": {
     "x": 389,
     "y": 555,
-    "w": 326,
+    "w": 319,
     "h": 40
    },
    "variabili": {
@@ -2238,9 +2239,9 @@
    "nome": "campo cartella",
    "tipo": "INSTANCE",
    "box": {
-    "x": 727,
+    "x": 720,
     "y": 559,
-    "w": 173,
+    "w": 180,
     "h": 32
    },
    "variabili": {
@@ -2250,22 +2251,21 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
+    "strokeWeight": "misura/tratto",
     "width": "misura/pannello",
     "height": "misura/bottone-invio"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:32866;101:22043",
    "nome": "valore",
    "tipo": "TEXT",
    "box": {
-    "x": 740,
-    "y": 555,
-    "w": 147,
-    "h": 40
+    "x": 733,
+    "y": 565,
+    "w": 154,
+    "h": 20
    },
    "variabili": {
     "fills[0]": "colore/testo/primario",
@@ -2316,9 +2316,9 @@
    "font": "SF Pro Medium"
   },
   {
-   "id": "101:32999",
-   "nome": "tendina lingua",
-   "tipo": "FRAME",
+   "id": "119:57059",
+   "nome": "menu a tendina",
+   "tipo": "INSTANCE",
    "box": {
     "x": 735,
     "y": 395,
@@ -2337,9 +2337,28 @@
    "senza": []
   },
   {
-   "id": "101:33000",
-   "nome": "voce",
-   "tipo": "FRAME",
+   "id": "I119:57059;119:55514",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 743,
+    "y": 399,
+    "w": 44,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Gruppo",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I119:57059;119:55515",
+   "nome": "voce 1",
+   "tipo": "INSTANCE",
    "box": {
     "x": 739,
     "y": 399,
@@ -2356,8 +2375,8 @@
    "senza": []
   },
   {
-   "id": "101:33001",
-   "nome": "icona spunta",
+   "id": "I119:57059;119:55515;119:55492",
+   "nome": "spunta",
    "tipo": "INSTANCE",
    "box": {
     "x": 747,
@@ -2372,7 +2391,7 @@
    "senza": []
   },
   {
-   "id": "I101:33001;101:6902",
+   "id": "I119:57059;119:55515;119:55492;101:6902",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -2382,25 +2401,12 @@
     "h": 8.666566848754883
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/primaria"
    },
    "senza": []
   },
   {
-   "id": "101:33003",
-   "nome": "testi",
-   "tipo": "FRAME",
-   "box": {
-    "x": 771,
-    "y": 406,
-    "w": 212,
-    "h": 18
-   },
-   "variabili": {},
-   "senza": []
-  },
-  {
-   "id": "101:33004",
+   "id": "I119:57059;119:55515;119:55494",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -2419,9 +2425,9 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:33005",
-   "nome": "voce",
-   "tipo": "FRAME",
+   "id": "I119:57059;119:55520",
+   "nome": "voce 2",
+   "tipo": "INSTANCE",
    "box": {
     "x": 739,
     "y": 431,
@@ -2439,8 +2445,8 @@
    "senza": []
   },
   {
-   "id": "101:33006",
-   "nome": "icona spunta",
+   "id": "I119:57059;119:55520;119:55507",
+   "nome": "spunta",
    "tipo": "INSTANCE",
    "box": {
     "x": 747,
@@ -2455,7 +2461,7 @@
    "senza": []
   },
   {
-   "id": "I101:33006;101:6902",
+   "id": "I119:57059;119:55520;119:55507;101:6902",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -2470,20 +2476,7 @@
    "senza": []
   },
   {
-   "id": "101:33008",
-   "nome": "testi",
-   "tipo": "FRAME",
-   "box": {
-    "x": 771,
-    "y": 438,
-    "w": 212,
-    "h": 18
-   },
-   "variabili": {},
-   "senza": []
-  },
-  {
-   "id": "101:33009",
+   "id": "I119:57059;119:55520;119:55509",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -2502,9 +2495,9 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:33010",
-   "nome": "voce",
-   "tipo": "FRAME",
+   "id": "I119:57059;119:55525",
+   "nome": "voce 3",
+   "tipo": "INSTANCE",
    "box": {
     "x": 739,
     "y": 463,
@@ -2521,8 +2514,8 @@
    "senza": []
   },
   {
-   "id": "101:33011",
-   "nome": "icona spunta",
+   "id": "I119:57059;119:55525;119:55492",
+   "nome": "spunta",
    "tipo": "INSTANCE",
    "box": {
     "x": 747,
@@ -2537,7 +2530,7 @@
    "senza": []
   },
   {
-   "id": "I101:33011;101:6902",
+   "id": "I119:57059;119:55525;119:55492;101:6902",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -2547,25 +2540,12 @@
     "h": 8.666566848754883
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/primaria"
    },
    "senza": []
   },
   {
-   "id": "101:33013",
-   "nome": "testi",
-   "tipo": "FRAME",
-   "box": {
-    "x": 771,
-    "y": 470,
-    "w": 212,
-    "h": 18
-   },
-   "variabili": {},
-   "senza": []
-  },
-  {
-   "id": "101:33014",
+   "id": "I119:57059;119:55525;119:55494",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -2581,6 +2561,256 @@
    },
    "senza": [],
    "testo": "English",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57059;119:55530;119:55492",
+   "nome": "spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 747,
+    "y": 503,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55530;119:55492;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 749,
+    "y": 506.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55530;119:55494",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 771,
+    "y": 502,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Voce",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57059;119:55535;119:55492",
+   "nome": "spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 747,
+    "y": 535,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55535;119:55492;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 749,
+    "y": 538.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55535;119:55494",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 771,
+    "y": 534,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Voce",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57059;119:55540;119:55492",
+   "nome": "spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 747,
+    "y": 535,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55540;119:55492;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 749,
+    "y": 538.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55540;119:55494",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 771,
+    "y": 534,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Voce",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57059;119:55545;119:55492",
+   "nome": "spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 747,
+    "y": 535,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55545;119:55492;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 749,
+    "y": 538.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55545;119:55494",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 771,
+    "y": 534,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Voce",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57059;119:55550;119:55492",
+   "nome": "spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 747,
+    "y": 535,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55550;119:55492;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 749,
+    "y": 538.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I119:57059;119:55550;119:55494",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 771,
+    "y": 534,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Voce",
    "font": "SF Pro Regular"
   }
  ]

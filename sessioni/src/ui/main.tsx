@@ -17,4 +17,5 @@ if (parita) document.documentElement.classList.add("parita");
 const scene = Object.assign({}, ...[barra, chat, friday, impostazioni, pannello]
   .map((m) => (m as { scene?: Record<string, () => JSX.Element> }).scene ?? {})) as Record<string, () => JSX.Element>;
 const Scena = parita ? scene[parita] : undefined;
+if (Scena) document.documentElement.classList.add("scena");
 createRoot(document.getElementById("radice")!).render(Scena ? <Scena /> : <Cornice />);
