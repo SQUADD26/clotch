@@ -1,0 +1,68 @@
+/* figma: 101-17193 — pagina Impostazioni: navigazione a sinistra, superficie con la colonna delle sezioni */
+.impostazioni { flex: 1; min-width: 0; display: flex; }
+.impostazioni .superficie { position: relative; --avvisi-basso: var(--spazio-10); }
+
+.nav-impostazioni {
+  width: var(--misura-impostazioni-nav); flex: none; padding: 0 var(--spazio-2) var(--spazio-2);
+  display: flex; flex-direction: column; gap: var(--spazio-0-5); overflow-y: auto;
+}
+.nav-impostazioni .titolo { padding: var(--spazio-1) var(--spazio-2) var(--spazio-3); }
+.nav-impostazioni .voce {
+  height: var(--misura-riga); flex: none; padding: 0 var(--spazio-2); gap: var(--spazio-2);
+  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
+}
+.nav-impostazioni .voce:hover { background: var(--colore-fondo-riga-passaggio); }
+.nav-impostazioni .voce.scelta { background: var(--colore-fondo-riga-scelta); }
+
+.scorre-impostazioni { flex: 1; min-height: 0; overflow-y: auto; }
+.contenuto-impostazioni {
+  max-width: calc(var(--misura-impostazioni-colonna) + 2 * var(--spazio-4)); margin: 0 auto;
+  padding: var(--spazio-12) var(--spazio-4) var(--spazio-4);
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--spazio-6);
+}
+.contenuto-impostazioni > * { align-self: stretch; }
+.contenuto-impostazioni > .bottone { align-self: flex-start; }
+.titolo-pagina { margin: 0; font-weight: 400; }
+.contenuto-impostazioni .errore { color: var(--colore-testo-errore); }
+
+.gruppo { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl); }
+.riga {
+  padding: var(--spazio-3) var(--spazio-4); gap: var(--spazio-4);
+  display: flex; align-items: center;
+}
+.riga.azione { gap: var(--spazio-3); }
+.riga + .riga { border-top: var(--misura-tratto) solid var(--colore-bordo-leggero); }
+.riga .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+
+/* Interruttore: Acceso=Sì | No */
+.interruttore {
+  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none;
+  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
+  display: flex;
+}
+.interruttore.acceso { background: var(--colore-fondo-accento); justify-content: flex-end; }
+.manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
+
+/* Riga scelta: valore e freccia, con la tendina sotto a destra */
+.scelta { position: relative; flex: none; }
+.scelta .valore { display: flex; align-items: center; gap: var(--spazio-1); }
+
+.tasto {
+  flex: none; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
+  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
+}
+.tasto.errore { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+
+.campo-testo {
+  max-width: var(--misura-pannello); min-width: 0; flex: 0 1 auto; height: var(--misura-bottone-invio); padding: 0 var(--spazio-3);
+  display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
+}
+
+.vuoto-lista {
+  padding: var(--spazio-8) var(--spazio-4); gap: var(--spazio-1);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.vuoto-lista.con-bottone { gap: var(--spazio-2); }
+
+.bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }

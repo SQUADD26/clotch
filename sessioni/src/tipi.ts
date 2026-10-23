@@ -114,3 +114,13 @@ export interface FridayApi {
   /** `friday avvia`, quando Friday è spenta. */
   avvia(): Promise<{ ok: boolean; testo: string }>;
 }
+
+/** `window.impostazioni` (#351): impostazioni dell'app in userData (src/impostazioni.ts). Quelle di Friday passano da `window.friday`. */
+export interface ImpostazioniApi {
+  leggi(): Promise<Record<string, unknown>>;
+  scrivi(parte: Record<string, unknown>): Promise<Record<string, unknown>>;
+  radici(): Promise<{ percorso: string; account: string }[]>;
+  scegliCartella(): Promise<string | null>;
+  apri(percorso: string): Promise<void>;
+  versione(): Promise<string>;
+}
