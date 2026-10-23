@@ -5,6 +5,7 @@ import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Aiutante, Passo } from "./modello";
 import { durata, quanti } from "./testi";
+import { useRiserva } from "./riserva";
 import "./lavoro.css";
 
 const SEGNO_PASSO: Record<Passo["stato"], [NomeIcona, "successo" | "accento" | "terziaria"]> = {
@@ -84,12 +85,13 @@ export function FineTurno({ ms, strumenti, file, aiutanti }: { ms: number | null
 
 /** Avvisi nel filo: bloccata (fondo attesa, scudo), non risponde e limite di uso (fondo errore). */
 export function AvvisoFilo({ tipo, titolo, corpo, children }: { tipo: "attesa" | "errore"; titolo: string; corpo?: string; children?: ReactNode }) {
+  const r = useRiserva();
   return (
     <div className={`avviso-filo ${tipo}`}>
       <Icona nome={tipo === "attesa" ? "scudo" : "avviso"} colore={tipo === "attesa" ? "accento" : "errore"} />
       <div className="testi">
-        <div className="titolo">{titolo}</div>
-        {corpo && <div className="corpo">{corpo}</div>}
+        <div className="titolo">{r.testo(titolo)}</div>
+        {corpo && <div className="corpo">{r.testo(corpo)}</div>}
       </div>
       {children}
     </div>
