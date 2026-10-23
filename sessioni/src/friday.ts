@@ -63,7 +63,8 @@ export interface Registro {
   chat: Map<string, ChatFriday>;
   fermoTutto: boolean;
   avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null; sessioni: string[] }[];
-  clotch: { voce: string; parla: boolean; ascolta: boolean; t: number } | null;
+  /** `versione`: CFBundleShortVersionString di Clotch, se l'evento la porta (#344). */
+  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
   friday: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
@@ -164,7 +165,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         }
         case "obiettivo": c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") }; break;
-        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, t }; break;
+        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
           else if (d.ambito === "chat" && s(d.chi)) {

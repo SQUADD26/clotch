@@ -49,7 +49,8 @@ export function leggiApp(home: string, errori: ErroreLettura[]): SessioneApp[] {
         cartella: testo(d.cwd) ?? testo(d.originCwd),
         ramo: testo(d.branch) ?? testo(d.gitBranch), // shortcut: nomi non verificati su un file vero, il Mac li conferma
         modello: testo(d.model),
-        inCorso: d.isRunning === true,
+        // I file veri non hanno isRunning: l'app scrive postTurnSummaryFor (= lastAssistantUuid) solo a turno chiuso. Archiviata = non in corso (#340).
+        inCorso: d.isArchived !== true && testo(d.lastAssistantUuid) !== null && d.postTurnSummaryFor !== d.lastAssistantUuid,
         archiviata: d.isArchived === true,
         ultimaAttivita: aMillisecondi(d.lastActivityAt),
         profilo,

@@ -1,7 +1,9 @@
 // figma: 101-48825 — Impostazioni · Uso (Panoramica) con Clotch (dati dal notch); senza Clotch: 101-48888; scheda Andamento: 119-57613.
-// shortcut: il main non ha ancora una fonte delle quote d'uso (#374): finché `uso()` torna null il gruppo non c'è.
+// Dati veri dal feed di Clotch (quote-uso.ts, #374). Errore del feed: nessun numero (nessun testo di errore disegnato).
+// shortcut: il feed non dà l'uso al giorno, quindi la scheda Andamento resta vuota; quando la fonte ha la serie (`giorni`), si disegna da sola.
 import { useEffect, useState } from "react";
 import type { QuotaUso } from "../../tipi";
+import { fa } from "../../uso-testi";
 import { Icona } from "../base/Icona";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Pagina } from "./controlli";
@@ -9,8 +11,8 @@ import { prova } from "./prova";
 import "./uso.css";
 
 const NOTA = {
-  con: "Dati dal notch, aggiornati 1 min fa. Clotch avvisa a voce all’80% e al 90%.",
-  senza: "Dati letti da Sessioni, aggiornati 1 min fa. Avviso all’80% e al 90% in un avviso a comparsa.",
+  con: (quando: string) => `Dati dal notch, aggiornati ${quando}. Clotch avvisa a voce all’80% e al 90%.`,
+  senza: (quando: string) => `Dati letti da Sessioni, aggiornati ${quando}. Avviso all’80% e al 90% in un avviso a comparsa.`,
 };
 
 type Scheda = "panoramica" | "andamento";
@@ -31,7 +33,7 @@ function Panoramica({ quote }: { quote: QuotaUso[] }) {
               <span className={`t-sm ${pieno ? "errore" : "secondario"}`}>{q.usato}% usato</span>
             </div>
             <div className="barra-uso"><div className={pieno ? "pieno errore" : "pieno"} style={{ width: `${Math.min(q.usato, 100)}%` }} /></div>
-            <span className={`t-sm ${pieno ? "errore" : "secondario"}`}>{q.ripartenza}</span>
+            {q.ripartenza && <span className={`t-sm ${pieno ? "errore" : "secondario"}`}>{q.ripartenza}</span>}
           </div>
         );
       })}
@@ -41,6 +43,7 @@ function Panoramica({ quote }: { quote: QuotaUso[] }) {
 
 function Andamento({ quote }: { quote: QuotaUso[] }) {
   const giorni = quote[0]?.giorni ?? [];
+  if (!giorni.length) return null;
   const totale = giorni.map((_, i) => quote.reduce((s, q) => s + (q.giorni?.[i]?.v ?? 0), 0));
   const massimo = Math.max(...totale, 1);
   return (
@@ -77,7 +80,7 @@ export default function Uso() {
   const clotch = useClotchAcceso();
   const [quote, setQuote] = useState<QuotaUso[] | null>(null);
   const [scheda, setScheda] = useState<Scheda>(prova?.scheda ?? "panoramica");
-  useEffect(() => { window.impostazioni.uso().then(setQuote, () => {}); }, []);
+  useEffect(() => { window.impostazioni.uso().then(setQuote, () => setQuote(null)); }, []);
   return (
     <Pagina titolo="Uso">
       <div className="schede" role="tablist">
@@ -87,12 +90,12 @@ export default function Uso() {
         ))}
       </div>
       {quote && (scheda === "panoramica" ? <Panoramica quote={quote} /> : <Andamento quote={quote} />)}
-      {quote && scheda === "panoramica" && (
+      {quote?.length && scheda === "panoramica" ? (
         <div className="nota-uso">
           <Icona nome={clotch ? "schermo" : "grafico"} />
-          <span className="t-xs secondario">{clotch ? NOTA.con : NOTA.senza}</span>
+          <span className="t-xs secondario">{(clotch ? NOTA.con : NOTA.senza)(fa(Math.max(...quote.map((q) => q.letto ?? 0)) || undefined, Date.now()))}</span>
         </div>
-      )}
+      ) : null}
     </Pagina>
   );
 }

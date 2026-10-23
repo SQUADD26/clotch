@@ -10,6 +10,7 @@ import { nomeProgetto } from "./claude-code";
 import { leggiApp, type SessioneApp } from "./desktop";
 import { leggiRegistro, type Registro } from "./friday";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
+import { quoteUso } from "./quote-uso";
 import { trovaRadici } from "./radici";
 import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
 
@@ -78,8 +79,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     invia("sessioni:impostazioni", {});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  // nessuna fonte ancora: quote d'uso #374
-  ipc.handle("impostazioni:uso", () => null);
+  ipc.handle("impostazioni:uso", () => quoteUso());
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
