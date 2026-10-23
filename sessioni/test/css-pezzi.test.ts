@@ -14,7 +14,8 @@ test("css dei pezzi: ogni regola sotto .pezzo-<pezzo>", () => {
       const css = fs.readFileSync(path.join(UI, pezzo, f), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/@keyframes[^{]*\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, "");
       for (const m of css.matchAll(/(?:^|})\s*([^{}@]+)\{/g))
         for (const s of m[1].split(",").map((x) => x.trim()))
-          if (!s.startsWith(`.pezzo-${pezzo} `)) fuori.push(`${pezzo}/${f}: ${s}`);
+          // `.parita` sta su <html>: le regole della sola prova di parità la mettono prima del prefisso
+          if (!s.replace(/^\.parita /, "").startsWith(`.pezzo-${pezzo} `)) fuori.push(`${pezzo}/${f}: ${s}`);
     }
   assert.deepEqual(fuori, []);
 });
