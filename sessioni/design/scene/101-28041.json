@@ -1,0 +1,126 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Clotch: sessioni in Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "design/332-sessioni-figma",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792785864381,
+    "obiettivo": {
+     "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Controllo del file: nessun errore",
+       "fatta": true
+      },
+      {
+       "testo": "Schermate guardate intere",
+       "fatta": true
+      },
+      {
+       "testo": "Sì di Roberto sul disegno",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "turno_finito",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "icona": "stella"
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Guarda la schermata: il notch copre il titolo della sessione.\n@/Users/privato/Desktop/schermata-notch.png\n@/Users/privato/Desktop/lettore.ts",
+    "t": 1792785803381
+   },
+   {
+    "tipo": "strumento",
+    "id": "t-schermata",
+    "nome": "Screenshot",
+    "ingresso": {
+     "name": "notch-sopra-il-titolo.png"
+    },
+    "t": 1792785804381,
+    "esito": {
+     "testo": "",
+     "errore": false,
+     "immagini": [
+      {
+       "riga": "scena-schermata-0001",
+       "n": 0,
+       "mime": "image/png",
+       "byte": 136000
+      }
+     ]
+    }
+   },
+   {
+    "tipo": "assistente",
+    "testo": "Il notch copre i primi 40 px della barra del titolo. Sposto il titolo sotto i semafori.",
+    "modello": "claude-opus-5-5",
+    "t": 1792785806381
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "stella"
+  }
+ },
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ },
+ "allegati": [
+  {
+   "percorso": "/Users/privato/Desktop/schermata-notch.png",
+   "nome": "schermata-notch.png",
+   "tipo": "immagine",
+   "byte": 312000
+  },
+  {
+   "percorso": "/Users/privato/Desktop/lettore.ts",
+   "nome": "lettore.ts",
+   "tipo": "file",
+   "byte": 4000
+  }
+ ],
+ "immagini": {
+  "scena-schermata-0001:0": "design/scene/immagini/notch-sopra-il-titolo.png",
+  "/Users/privato/Desktop/schermata-notch.png": "design/scene/immagini/notch-sopra-il-titolo.png"
+ }
+}

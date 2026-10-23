@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./friday";
 import { piano } from "./friday-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, Messaggio, PreferenzeSessione, QuotaUso } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -28,6 +28,10 @@ export interface Scena {
   aggiornamenti?: boolean;
   /** Registro di Friday come lo dà `friday:registro`. */
   registro?: unknown;
+  /** Allegati e immagini (#437): i file che `casella:descrivi` trova, le immagini (file PNG del repo, per «<uuid riga>:<n>» o per percorso) e le skill. */
+  allegati?: FileAllegato[];
+  immagini?: Record<string, string>;
+  skill?: string[];
 }
 
 export const fileScena = (radice: string, id: string) => path.join(radice, "design", "scene", `${id}.json`);
@@ -64,6 +68,15 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "impostazioni:archiviate": return s.archiviate ?? [];
     case "impostazioni:novita": return s.novita ?? null;
     case "impostazioni:aggiornamenti": return args[0] === true ? undefined : s.aggiornamenti ?? false;
+    case "casella:descrivi": return (s.allegati ?? []).filter((a) => (args[0] as string[]).includes(a.percorso));
+    case "casella:immagine": {
+      const d = args[0] as { rif?: { riga: string; n: number }; percorso?: string };
+      const file = s.immagini?.[d.rif ? `${d.rif.riga}:${d.rif.n}` : String(d.percorso)];
+      return file ? `data:image/png;base64,${fs.readFileSync(path.join(__dirname, "..", "..", file)).toString("base64")}` : null;
+    }
+    case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
+    case "casella:scegli": return [];
+    case "casella:copia-immagine": case "casella:salva-immagine": return false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
     case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
     default: return undefined;
@@ -75,7 +88,8 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
-  "impostazioni:novita", "impostazioni:aggiornamenti"];
+  "impostazioni:novita", "impostazioni:aggiornamenti",
+  "casella:scegli", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

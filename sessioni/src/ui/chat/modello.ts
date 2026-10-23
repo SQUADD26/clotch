@@ -1,7 +1,8 @@
 // Dai messaggi della trascrizione alle voci del filo (frame 101:8036 e «Chat al lavoro»). Puro: niente DOM, niente IPC.
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
-import type { Messaggio } from "../../tipi";
+import type { Messaggio, RifImmagine } from "../../tipi";
+import { senzaPercorsi, senzaSegnaposto } from "./percorsi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
@@ -12,7 +13,7 @@ export interface Passo { testo: string; stato: "fatto" | "in-corso" | "da-fare" 
 
 export type Blocco = (
   | { tipo: "pensiero"; testo: string; durata: number | null; inCorso: boolean }
-  | ({ tipo: "strumento"; id: string; stato: StatoStrumento; durata: number | null; uscita: string } & Descrizione)
+  | ({ tipo: "strumento"; id: string; stato: StatoStrumento; durata: number | null; uscita: string; immagini?: RifImmagine[] } & Descrizione)
   | { tipo: "modifica"; id: string; file: string; aggiunte: number; tolte: number; righe: RigaDiff[]; durata: number | null }
   | { tipo: "web"; id: string; query: string; fonti: Fonte[] }
   | { tipo: "attivita"; passi: Passo[] }
@@ -26,7 +27,8 @@ export type Blocco = (
   | { tipo: "errore"; testo: string }) & { chiave?: string; origini?: string[] };
 
 export type Voce =
-  | { tipo: "roberto"; chiave: string; testo: string }
+  /** `immagini`: incollate (101:28041); `percorsi`: file scritti in fondo al testo come `@percorso` (la casella li mette così). */
+  | { tipo: "roberto"; chiave: string; testo: string; immagini?: RifImmagine[]; percorsi?: string[] }
   | { tipo: "riassunto"; chiave: string }
   | { tipo: "turno"; chiave: string; blocchi: Blocco[]; origini?: string[]; inizio: number | null; fine: number | null };
 
@@ -101,7 +103,8 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;
       inizio = m.t;
-      out.push({ tipo: "roberto", chiave, testo: m.testo });
+      const { testo, percorsi } = senzaPercorsi(m.immagini ? senzaSegnaposto(m.testo) : m.testo);
+      out.push({ tipo: "roberto", chiave, testo, ...(m.immagini ? { immagini: m.immagini } : {}), ...(percorsi.length ? { percorsi } : {}) });
       return;
     }
     const tu = turno ?? apri(m.t, chiave);
@@ -159,7 +162,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
     const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
     const stRiga = bloccato ? "chiusa" : st;
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 

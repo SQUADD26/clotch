@@ -1,13 +1,18 @@
 // figma: 101-43332 — «Casella di scrittura» 101:7407 (Vuota, Scritta, Fuoco, In corso, Disabilitata), «Messaggio in coda» 101:13488,
 // coda (101:14849), modifica della voce (101:43708), «invia ora» (101:43945), Invio diretto (101:43535).
 // Mentre la sessione lavora: ↵ interrompe e manda subito (`manda` modo subito), ⌘↵ mette in coda (`manda` modo coda).
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import type { FileAllegato } from "../../tipi";
+import { avvisa } from "../base/Avvisi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
+import { Aggiungi } from "./Aggiungi";
+import { ChipAllegato } from "./Allegati";
 import { comanda } from "./friday";
+import { casella, conPercorsi } from "./percorsi";
 import { useBozza } from "./bozze";
 import { argsManda, provaDi, quanti } from "./testi";
 import "./casella.css";
@@ -48,9 +53,10 @@ function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale }: {
 }
 
 /** `segnaposto`: «In attesa della sessione» (101:15993), «Riparte alle 18:00» (101:16211); di solito «Scrivi alla sessione». */
-/** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945). */
-export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false }: {
-  chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; disabilitata: boolean; segnaposto?: string; prova?: string | null;
+/** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945),
+ *  «menu-aggiungi» (101:25845), «rilascio» (101:27294). `account`: la cartella dell'account della sessione, per le sue skill. */
+export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false, account = "" }: {
+  chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; disabilitata: boolean; segnaposto?: string; prova?: string | null; account?: string;
   /** Roberto ha appena interrotto e mandato (101:43535): i tasti restano sotto la casella. */
   appenaMandato?: boolean;
 }) {
@@ -58,16 +64,49 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const { testo, modifica, invio, bozza } = useBozza(chat, provaDi(prova, "scritta") ?? inModifica?.testo ?? "", inModifica);
   const area = useRef<HTMLTextAreaElement>(null);
   const { scorciatoie, modello: preferenza } = useImpostazioni();
+  const [allegati, setAllegati] = useState<FileAllegato[]>([]);
+  const [menu, setMenu] = useState(() => provaDi(prova, "menu-aggiungi") !== null);
+  const [trascina, setTrascina] = useState(() => provaDi(prova, "rilascio") !== null);
+  const unisci = (nuovi: FileAllegato[]) => setAllegati((x) => [...x, ...nuovi.filter((n, i) => !x.some((y) => y.percorso === n.percorso) && nuovi.findIndex((m) => m.percorso === n.percorso) === i)]);
+  const allega = async () => unisci(await casella().scegli().catch(() => []));
+  /** «/goal », «/plan », «/<skill> »: il comando va in testa al messaggio, al posto di un altro già scritto. */
+  const comando = (c: string) => { bozza.scrivi(c + testo.replace(/^\/\S*\s*/, "")); area.current?.focus(); };
 
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
   // la casella cresce col testo (101:25542 «testo lungo»)
   useEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
 
+  // file trascinati sulla finestra: la zona di rilascio sulla casella; fuori dalla casella non si apre il file al posto dell'app
+  const aggiungi = useRef((_: string[]) => {});
+  aggiungi.current = async (percorsi) => {
+    const trovati = percorsi.length ? await casella().descrivi(percorsi).catch(() => []) : [];
+    if (trovati.length < percorsi.length) avvisa({ tipo: "errore", messaggio: "File non letto" });
+    unisci(trovati);
+  };
+  useEffect(() => {
+    if (disabilitata) return;
+    let dentro = 0;
+    const file = (e: DragEvent) => !!e.dataTransfer?.types.includes("Files");
+    const entra = (e: DragEvent) => { if (file(e)) { dentro++; setTrascina(true); } };
+    const esce = (e: DragEvent) => { if (file(e) && --dentro <= 0) { dentro = 0; setTrascina(false); } };
+    const sopra = (e: DragEvent) => { if (file(e)) e.preventDefault(); };
+    const lascia = (e: DragEvent) => {
+      if (!file(e)) return;
+      e.preventDefault();
+      dentro = 0;
+      setTrascina(false);
+      aggiungi.current([...e.dataTransfer!.files].map((f) => casella().percorso(f)).filter(Boolean));
+    };
+    const eventi = { dragenter: entra, dragleave: esce, dragover: sopra, drop: lascia };
+    for (const [n, f] of Object.entries(eventi)) addEventListener(n, f as EventListener);
+    return () => { for (const [n, f] of Object.entries(eventi)) removeEventListener(n, f as EventListener); };
+  }, [disabilitata]);
+
   const manda = async (modo: "subito" | "coda") => {
     const richiesta = bozza.inizia();
     if (!richiesta) return;
-    const t = richiesta.testo.trim(), modifica = richiesta.modifica;
+    const t = conPercorsi(richiesta.testo.trim(), allegati.map((a) => a.percorso)), modifica = richiesta.modifica;
     let ok = false;
     try {
       ok = modifica
@@ -75,12 +114,14 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
           ? await comanda("coda_modifica", { chat, voce: modifica.voce, testo: t })
           : (await comanda("manda", argsManda(chat, t, "subito", preferenza, modello))) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
         : await comanda("manda", argsManda(chat, t, lavora ? modo : "subito", preferenza, modello));
-    } finally { richiesta.finisci(ok); }
+    } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
 
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Escape" && modifica) { bozza.esci(); return; }
     if (e.nativeEvent.isComposing) return;
+    if (e.metaKey && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "u") { e.preventDefault(); void allega(); return; } // «Allega file o cartelle…» ⌘U
+    if (e.key === "Tab" && e.shiftKey) { e.preventDefault(); comando("/plan "); return; } // «Modalità piano» ⇧⇥
     const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
     if (azione !== "inviaInterrompi" && azione !== "coda") return;
     e.preventDefault();
@@ -96,13 +137,18 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
-      <div className={`casella ${stato}${modifica ? " fuoco" : ""}`}>
+      <div className={`casella ${stato}${modifica || menu ? " fuoco" : ""}`}>
+        {allegati.length > 0 && (
+          <div className="allegati-casella">
+            {allegati.map((a) => <ChipAllegato key={a.percorso} a={a} onRimuovi={() => setAllegati((x) => x.filter((y) => y !== a))} />)}
+          </div>
+        )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => bozza.scrivi(e.target.value)} onKeyDown={tasti}
             placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>
         <div className="azioni">
-          <BottoneIcona icona="piu" etichetta="Allega" disabled />
+          <Aggiungi account={account} disabilitata={disabilitata} aperto={menu} onApri={() => setMenu(true)} onChiudi={() => setMenu(false)} allega={() => void allega()} comando={comando} />
           <span className="chip"><Icona nome="mano" /><span className="etichetta">Chiedi approvazione</span><Icona nome="giu" /></span>
           <span className="spinta" />
           {nomeModello(modello) && <span className="chip"><span className="modello">{nomeModello(modello)}</span></span>}
@@ -113,6 +159,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
             <Icona nome={ferma ? "stop" : "invia"} colore={stato === "vuota" || stato === "disabilitata" ? "terziaria" : "su-accento"} />
           </button>
         </div>
+        {trascina && !disabilitata && <div className="zona-rilascio"><Icona nome="graffetta" colore="accento" /><span>Rilascia per allegare</span></div>}
       </div>
       {/* i tasti servono mentre scrivi, con messaggi in coda o subito dopo «interrompi e manda» (101:14849, 43332, 43535) */}
       {lavora && !disabilitata && (testo || coda.length > 0 || appenaMandato) && (
