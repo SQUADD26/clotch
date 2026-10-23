@@ -4,6 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { numero, valori } from "./ui/base/token";
 import { iconaApp, NOME_APP } from "./branding";
+import { proteggiLinkEsterni } from "./link-esterni";
 
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
@@ -28,8 +29,9 @@ export function apriFinestra(sessione?: string): BrowserWindow | null {
     titleBarStyle: "hiddenInset",
     // semaforo del Mac dove il disegno mette «semaforo»: padding della barra e centro verticale
     trafficLightPosition: { x: numero("spazio-5"), y: (numero("misura-barra-titolo") - numero("misura-semaforo")) / 2 },
-    webPreferences: { preload, contextIsolation: true },
+    webPreferences: { preload, contextIsolation: true, webviewTag: false },
   });
+  proteggiLinkEsterni(w);
   w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
   return w;
 }
@@ -37,7 +39,8 @@ export function apriFinestra(sessione?: string): BrowserWindow | null {
 /** Disegna la pagina alla misura del frame, a scala 1, e salva design/app/<id>.png. `navigazione`: vista di partenza (scena.ts). */
 export async function parita(id: string, navigazione?: Record<string, string | undefined>) {
   const { w: larga, h: alta } = frame(id);
-  const w = new BrowserWindow({ width: larga, height: alta, show: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true } });
+  const w = new BrowserWindow({ width: larga, height: alta, show: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true, webviewTag: false } });
+  proteggiLinkEsterni(w);
   await w.loadFile(pagina, { query: { ...Object.fromEntries(Object.entries(navigazione ?? {}).filter(([, v]) => v)) as Record<string, string>, parita: id } });
   // i dati arrivano dai canali IPC dopo il primo disegno: si aspetta che la rete dei canali si calmi, poi due fotogrammi
   await w.webContents.executeJavaScript(`document.fonts.ready.then(() => new Promise(r => setTimeout(r, ${ATTESA_DATI_MS}))).then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`);
