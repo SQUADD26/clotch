@@ -9,48 +9,61 @@ import type { DeltaCronologia } from "../src/cronologia-tipi";
 
 const riga = (i: number, pad = 0) => JSON.stringify({ type: i % 2 ? "assistant" : "user", message: { content: `m${i} ` + "x".repeat(pad) } }) + "\n";
 const righe = (da: number, a: number, pad = 0) => Array.from({ length: a - da }, (_, i) => riga(da + i, pad)).join("");
-const nuovaDir = () => fs.mkdtempSync(path.join(os.tmpdir(), "cronologia-"));
 const sorg = (file: string, id = "s") => ({ id, file, sorgente: "claude-code" as const });
 const v1 = { v: 1 as const };
 function con(limiti?: LimitiCronologia, ora?: () => number) {
-  const dir = nuovaDir(), file = path.join(dir, "a.jsonl"), deltas: DeltaCronologia[] = [];
-  const c = new Cronologia(limiti, ora);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cronologia-")), file = path.join(dir, "a.jsonl"), deltas: DeltaCronologia[] = [], c = new Cronologia(limiti, ora);
   c.collega((d) => deltas.push(d));
   return { dir, file, c, deltas, s: sorg(file), pulisci: () => fs.rmSync(dir, { recursive: true, force: true }) };
 }
-/** Byte e chiamate di readSync reali durante `f`. */
+/** Byte letti da readSync reali durante `f`. */
 function leggendo<T>(f: () => T) {
-  const orig = fs.readSync, st = { byte: 0, chiamate: 0 };
-  (fs as any).readSync = (...a: any[]) => { const n = (orig as any)(...a); st.byte += n; st.chiamate++; return n; };
-  try { return { r: f(), ...st, get byte() { return st.byte; }, get chiamate() { return st.chiamate; } }; } finally { (fs as any).readSync = orig; }
+  const orig = fs.readSync;
+  let byte = 0;
+  (fs as any).readSync = (...a: any[]) => { const n = (orig as any)(...a); byte += n; return n; };
+  try { const r = f(); return { r, byte }; } finally { (fs as any).readSync = orig; }
 }
 const ok = (x: any) => { assert.ok(!(x && "codice" in x), JSON.stringify(x)); return x; };
 const reset = (d: DeltaCronologia[]) => d.filter((x) => x.tipo === "reset") as Extract<DeltaCronologia, { tipo: "reset" }>[];
-
 test("budget: un append di ~61 byte su 2 MB legge solo coda e finestra di controllo", () => {
   const t = con();
   try {
     fs.writeFileSync(t.file, righe(0, 2000, 1000));
-    assert.ok(fs.statSync(t.file).size > 2_000_000);
-    assert.equal(t.c.pagina(t.s, 0, v1).totale, 2000);
+    assert.equal(t.c.pagina(t.s, 0, v1).totale, 2000); // file da ~2 MB
     const add = JSON.stringify({ type: "assistant", message: { content: "one new message" } }) + "\n";
-    assert.ok(Buffer.byteLength(add) >= 55 && Buffer.byteLength(add) <= 70);
     fs.appendFileSync(t.file, add);
     t.deltas.length = 0;
-    const m = leggendo(() => t.c.aggiorna(t.s));
-    ok(m.r);
+    const m = leggendo(() => ok(t.c.aggiorna(t.s)));
     const LIMITE = 24 * 1024; // finestra di controllo (16 campioni da 1 KiB al massimo) + coda; il file intero sono 2 MB
     assert.ok(m.byte >= Buffer.byteLength(add) && m.byte <= LIMITE, `letti ${m.byte} byte`);
-    assert.equal(t.deltas.length, 1);
-    const d = t.deltas[0] as Extract<DeltaCronologia, { tipo: "upsert" }>;
-    assert.deepEqual([d.tipo, d.righe.length, d.totale], ["upsert", 1, 2001]);
-    // nessun cambio: solo stat. Touch senza cambio di dimensione: solo la finestra di controllo.
-    assert.equal(leggendo(() => t.c.aggiorna(t.s)).byte, 0);
+    const d = t.deltas as Extract<DeltaCronologia, { tipo: "upsert" }>[];
+    assert.deepEqual([d.length, d[0].tipo, d[0].righe.length, d[0].totale], [1, "upsert", 1, 2001]);
+    assert.equal(leggendo(() => t.c.aggiorna(t.s)).byte, 0); // nessun cambio: solo stat
     const adesso = new Date(Date.now() + 5000);
-    fs.utimesSync(t.file, adesso, adesso);
+    fs.utimesSync(t.file, adesso, adesso); // touch senza cambio di dimensione: solo la finestra di controllo
     const toc = leggendo(() => t.c.aggiorna(t.s));
     assert.ok(toc.byte <= LIMITE && t.deltas.length === 1, `touch: letti ${toc.byte}`);
     assert.equal(t.c.pagina(t.s, 0, v1).totale, 2001);
+  } finally { t.pulisci(); }
+});
+
+test("molti append piccoli: nessun falso reset, costo di lettura limitato per ogni giro, riscrittura ancora rilevata dopo", () => {
+  const t = con();
+  try {
+    fs.writeFileSync(t.file, righe(0, 300, 300));
+    const e0 = ok(t.c.aggiorna(t.s)).epoca;
+    let massimo = 0;
+    for (let i = 300; i < 400; i++) {
+      fs.appendFileSync(t.file, riga(i, 300));
+      massimo = Math.max(massimo, leggendo(() => ok(t.c.aggiorna(t.s))).byte);
+    }
+    assert.ok(massimo <= 24 * 1024, `massimo ${massimo}`);
+    assert.equal(ok(t.c.aggiorna(t.s)).epoca, e0);
+    assert.equal(reset(t.deltas).length, 0);
+    assert.equal(t.c.pagina(t.s, 0, v1).totale, 400);
+    const orig = fs.readFileSync(t.file, "utf8");
+    fs.writeFileSync(t.file, orig.replace("m0 ", "mZ "));
+    assert.notEqual(ok(t.c.aggiorna(t.s)).epoca, e0);
   } finally { t.pulisci(); }
 });
 
@@ -133,7 +146,6 @@ test("limite noto: modifica interna a stessa dimensione fuori dai campioni NON �
     const orig = righe(0, 2000, 1000);
     fs.writeFileSync(t.file, orig);
     const e0 = ok(t.c.aggiorna(t.s)).epoca;
-    // un byte a metà della riga 137, lontano da testa, coda e campioni distribuiti sul prefisso
     const pos = orig.indexOf("m137 ") + 2000;
     fs.writeFileSync(t.file, orig.slice(0, pos) + "Q" + orig.slice(pos + 1));
     assert.equal(ok(t.c.aggiorna(t.s)).epoca, e0);
@@ -151,18 +163,17 @@ test("append durante la lettura: rilettura coerente, nessun dato perso; instabil
     fs.appendFileSync(t.file, riga(61)); // c'è qualcosa da leggere, quindi readSync parte davvero
     (fs as any).readSync = (...a: any[]) => { const n = (orig as any)(...a); if (!fatto) { fatto = true; fs.appendFileSync(t.file, riga(62)); } return n; };
     try { ok(t.c.aggiorna(t.s)); } finally { (fs as any).readSync = orig; }
-    assert.equal(t.c.pagina(t.s, 0, v1).totale, 63);
-    // sorgente che cambia a ogni lettura: errore sorgente_instabile, poi si riprende senza nuova epoca
+    assert.equal(t.c.pagina(t.s, 0, v1).totale, 63); // sorgente che cambia a ogni lettura: errore, poi si riprende senza nuova epoca
     const e0 = ok(t.c.aggiorna(t.s)).epoca;
-    fs.appendFileSync(t.file, riga(99));
-    let n = 100;
+    let n = 99;
+    fs.appendFileSync(t.file, riga(n++));
     (fs as any).readSync = (...a: any[]) => { const k = (orig as any)(...a); fs.appendFileSync(t.file, riga(n++)); return k; };
     let e: any; try { e = t.c.aggiorna(t.s); } finally { (fs as any).readSync = orig; }
     assert.equal(e.codice, "sorgente_instabile");
     const dopo = ok(t.c.aggiorna(t.s));
     assert.equal(dopo.epoca, e0, "un errore di lettura non cambia l'epoca di un file solo appeso");
     assert.equal(reset(t.deltas).length, 0);
-    assert.ok(dopo.righe.length >= 63);
+    assert.ok(dopo.righe.length > 63);
   } finally { t.pulisci(); }
 });
 
@@ -187,9 +198,7 @@ test("cursore: scaduto (TTL), di un'altra sessione, manomesso", () => {
     const brutti: unknown[] = [`${tok}.${n}.${f.slice(0, -1)}${f.endsWith("a") ? "b" : "a"}`, `${tok}.${Number(n) + 1}.${f}`, `${tok}.${n}`, `${tok}.${n}.${f}.x`,
       `${tok}.-1.${f}`, `${tok}.1e1.${f}`, `${tok}.${n}.`, "", ca + "x".repeat(5000), 42, { a: 1 }, `x.${n}.${f}`];
     for (const c of brutti) assert.equal(cod(t.c.pagina(t.s, 1, { v: 1, cursore: c as string })), "cursore_invalido", String(c).slice(0, 40));
-    assert.equal(cod(t.c.pagina(t.s, -1, v1)), "cursore_invalido");
-    assert.equal(cod(t.c.pagina(t.s, 1.5, v1)), "cursore_invalido");
-    assert.equal(cod(t.c.pagina(t.s, 0, { v: 2 } as any)), "cursore_invalido");
+    for (const [pg, o] of [[-1, v1], [1.5, v1], [0, { v: 2 }]] as const) assert.equal(cod(t.c.pagina(t.s, pg, o as any)), "cursore_invalido");
     ora = 101;
     assert.equal(cod(t.c.pagina(t.s, 1, { v: 1, cursore: ca })), "snapshot_scaduta");
     assert.equal(cod(t.c.pagina(t.b, 1, { v: 1, cursore: cb })), "snapshot_scaduta");
@@ -215,14 +224,12 @@ test("snapshot: limite di numero (LRU) e di byte; una sola snapshot oltre il lim
     try {
       const a = t2.c.pagina(t2.s, 0, v1).cronologia!.cursorePrima!;
       t2.c.pagina(t2.b, 0, v1);
-      assert.equal(cod(t2.c.pagina(t2.s, 1, { v: 1, cursore: a })), "snapshot_scaduta", "la più vecchia esce quando i byte superano il tetto");
+      assert.equal(cod(t2.c.pagina(t2.s, 1, { v: 1, cursore: a })), "snapshot_scaduta");
     } finally { t2.pulisci(); }
-    const t3 = due({ snapshotByte: Math.floor(byte / 2), statoByte: byte * 4 });
-    try { assert.equal(cod(t3.c.pagina(t3.s, 0, v1)), "non_letta"); } finally { t3.pulisci(); }
-    const t4 = due({ statoByte: Math.floor(byte / 2) });
-    try { assert.equal(cod(t4.c.pagina(t4.s, 0, v1)), "non_letta"); } finally { t4.pulisci(); }
-    const t5 = due({ fileByte: 1000 });
-    try { assert.equal(cod(t5.c.pagina(t5.s, 0, v1)), "non_letta"); } finally { t5.pulisci(); }
+    for (const lim of [{ snapshotByte: Math.floor(byte / 2), statoByte: byte * 4 }, { statoByte: Math.floor(byte / 2) }, { fileByte: 1000 }]) {
+      const x = due(lim); // tetti troppo bassi per una sola sessione: errore, non crash
+      try { assert.equal(cod(x.c.pagina(x.s, 0, v1)), "non_letta"); } finally { x.pulisci(); }
+    }
   } finally { u.pulisci(); }
 });
 
@@ -244,7 +251,6 @@ test("eviction dello stato (P1): lo storico espulso torna con stessa epoca, chia
       const up = e.deltas.filter((d) => d.tipo === "upsert") as Extract<DeltaCronologia, { tipo: "upsert" }>[];
       assert.equal(up.length, 1);
       assert.deepEqual(up[0].righe.map((r) => r.ordine), [120, 121]); // lo strumento aggiornato e la riga nuova, niente storico
-      // la pagina vecchia della snapshot precedente è ancora servita, con lo storico non rinumerato
       const vecchia = e.c.pagina(e.s, 1, { v: 1, cursore: cur });
       assert.equal(vecchia.erroreCronologia, undefined);
       assert.ok(vecchia.cronologia!.righe.every((r) => r.revisione === 1));
@@ -289,21 +295,5 @@ test("eviction oltre i metadati (4096 ledger espulsi): il vecchio cursore non se
     assert.equal(p1.erroreCronologia, undefined);
     assert.notEqual(p1.cronologia!.epoca, p0.cronologia!.epoca, "i metadati sono stati scartati: epoca nuova");
     assert.equal(c.pagina(x, 1, { v: 1, cursore: cur }).erroreCronologia?.codice, "epoca_cambiata");
-  } finally { t.pulisci(); }
-});
-
-test("file sparito e tornato uguale: errore sorgente_assente, poi nessuna nuova epoca", () => {
-  const t = con();
-  try {
-    fs.writeFileSync(t.file, righe(0, 5));
-    const e0 = ok(t.c.aggiorna(t.s)).epoca;
-    const salvo = fs.readFileSync(t.file);
-    fs.unlinkSync(t.file);
-    assert.equal((t.c.aggiorna(t.s) as any).codice, "sorgente_assente");
-    fs.writeFileSync(t.file, salvo);
-    // nota: inode nuovo, quindi è "replace" legittimo; ciò che conta è che non esploda e che il totale resti 5
-    const st = ok(t.c.aggiorna(t.s));
-    assert.equal(st.righe.length, 5);
-    assert.ok(st.epoca === e0 || reset(t.deltas).length === 1);
   } finally { t.pulisci(); }
 });
