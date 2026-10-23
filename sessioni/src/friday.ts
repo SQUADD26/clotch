@@ -48,6 +48,8 @@ export interface ChatFriday {
   /** ms dell'ultima riga di questa chat (battito o altro). */
   visto: number | null;
   fine: string | null;
+  /** ms dell'evento `fine`. */
+  fineT: number | null;
   chatNuova: string | null;
   fermata: boolean;
   quarantena: string | null;
@@ -83,7 +85,7 @@ export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => e
 const nuova = (chat: string): ChatFriday => ({
   chat, titolo: null, madre: null, progetto: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
   domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
-  obiettivo: null, passi: [], visto: null, fine: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
+  obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
@@ -138,7 +140,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           break;
         case "rifiuto": c.rifiuto = s(d.testo) ?? s(d.regola); break;
         case "errore": c.errore = s(d.testo); break;
-        case "fine": c.fine = s(d.motivo) ?? "fine"; c.chatNuova = s(d.chat_nuova); break;
+        case "fine": c.fine = s(d.motivo) ?? "fine"; c.fineT = t; c.chatNuova = s(d.chat_nuova); break;
         case "richiesta":
           c.richieste = c.richieste.filter((x) => x.rid !== String(d.rid)).concat({
             rid: String(d.rid), genere: String(d.genere ?? ""), strumento: s(d.strumento), ingresso: d.ingresso,

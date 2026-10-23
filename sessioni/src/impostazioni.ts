@@ -8,6 +8,7 @@ import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
 import { leggiApp, type SessioneApp } from "./desktop";
+import { leggiRegistro, type Registro } from "./friday";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { trovaRadici } from "./radici";
 import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
@@ -29,12 +30,28 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
   });
 }
 
-/** Archiviate dell'app Claude, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»). */
-export function archiviate(app: SessioneApp[], fuso?: string): Archiviata[] {
-  return app.filter((a) => a.archiviata).sort((a, b) => (b.ultimaAttivita ?? 0) - (a.ultimaAttivita ?? 0)).map((a) => {
-    const quando = a.ultimaAttivita == null ? null
-      : new Date(a.ultimaAttivita).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short", timeZone: fuso });
-    return { id: a.cliId, titolo: a.titolo, dove: [a.cartella ? nomeProgetto(a.cartella) : null, quando].filter(Boolean).join(" · ") };
+/** Archiviate di tutte le sorgenti, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»).
+ *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di Friday (`fine` motivo `archiviata`, comando `archivia` riuscito).
+ *  La data è il momento dell'archiviazione se il registro lo dà, se no l'ultima attività. Se l'app dice che la sessione non è archiviata, vince l'app. */
+export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "comandi" | "esiti">, fuso?: string): Archiviata[] {
+  const per = new Map<string, { titolo: string; progetto: string | null; quando: number | null }>();
+  const registro = (id: string, quando: number | null) => {
+    const c = reg.chat.get(id);
+    per.set(id, { titolo: c?.titolo ?? id, progetto: c?.progetto ? nomeProgetto(c.progetto) : null, quando });
+  };
+  for (const [id, c] of reg.chat) if (c.fine === "archiviata") registro(id, c.fineT);
+  for (const c of reg.comandi) {
+    const id = c.args?.chat;
+    if (c.cmd === "archivia" && typeof id === "string" && reg.esiti.get(c.id)?.esito === "ok" && !per.has(id)) registro(id, c.t);
+  }
+  for (const a of app) {
+    if (!a.archiviata) { per.delete(a.cliId); continue; }
+    const r = per.get(a.cliId);
+    per.set(a.cliId, { titolo: a.titolo || r?.titolo || a.cliId, progetto: a.cartella ? nomeProgetto(a.cartella) : r?.progetto ?? null, quando: r?.quando ?? a.ultimaAttivita });
+  }
+  return [...per].sort((x, y) => (y[1].quando ?? 0) - (x[1].quando ?? 0)).map(([id, v]) => {
+    const quando = v.quando == null ? null : new Date(v.quando).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short", timeZone: fuso });
+    return { id, titolo: v.titolo, dove: [v.progetto, quando].filter(Boolean).join(" · ") };
   });
 }
 
@@ -63,7 +80,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   });
   // nessuna fonte ancora: quote d'uso #374
   ipc.handle("impostazioni:uso", () => null);
-  ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, [])));
+  ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
   ipc.handle("impostazioni:aggiornamenti", () => false);
