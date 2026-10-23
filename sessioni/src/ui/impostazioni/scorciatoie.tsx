@@ -5,6 +5,7 @@ import { Icona } from "../base/Icona";
 import { Gruppo, Pagina, Tasto } from "./controlli";
 import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
+import { tastiDi } from "./tasti";
 
 const AZIONI: [string, string][] = [
   ["cerca", "Cerca sessioni"], ["friday", "Scrivi a Friday"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
@@ -12,15 +13,6 @@ const AZIONI: [string, string][] = [
   ["inviaInterrompi", "Invia e interrompi la sessione"], ["coda", "Metti in coda"],
 ];
 const nome = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
-
-const SIMBOLI: Record<string, string> = { Enter: "↵", Backspace: "⌫", Delete: "⌦", Tab: "⇥", " ": "Spazio", ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
-/** Tasti premuti scritti come nel disegno (⌘⇧F); null se è solo un tasto modificatore. */
-export function tastiDi(e: Pick<KeyboardEvent, "key" | "code" | "metaKey" | "shiftKey" | "altKey" | "ctrlKey">): string | null {
-  if (["Meta", "Shift", "Alt", "Control"].includes(e.key)) return null;
-  // con ⌥ o ⇧ `key` cambia carattere: per lettere e cifre vale il tasto fisico
-  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.key.length === 1 ? e.key.toUpperCase() : e.key);
-  return (e.ctrlKey ? "⌃" : "") + (e.altKey ? "⌥" : "") + (e.shiftKey ? "⇧" : "") + (e.metaKey ? "⌘" : "") + tasto;
-}
 
 interface Conflitto { azione: string; tasti: string; con: string }
 

@@ -8,6 +8,7 @@ import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
 import { BarraTitolo } from "./BarraTitolo";
 import { ConNavigazione, useNavigazione, VISTE_FRIDAY } from "./navigazione";
+import { useScorciatoie } from "./scorciatoie";
 import { numero } from "./token";
 import "./cornice.css";
 
@@ -26,6 +27,7 @@ function useLargo(ref: React.RefObject<HTMLElement | null>) {
 
 function Corpo() {
   const n = useNavigazione();
+  useScorciatoie();
   const contenuto = useRef<HTMLDivElement>(null);
   const largo = useLargo(contenuto);
   if (n.vista === "impostazioni") return <div className="corpo"><Impostazioni /></div>;
