@@ -3,7 +3,7 @@
 // Le impostazioni di Friday non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
 import * as os from "node:os";
 import * as path from "node:path";
-import { app, dialog, shell, type IpcMain } from "electron";
+import type { IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
@@ -58,6 +58,8 @@ export function eliminaDati(indice: Pick<Indice, "svuota">, filePreferenze: stri
 
 /** Canali di `window.impostazioni` (preload.ts). Le risposte della prova di parità le dà la scena (scena.ts). */
 export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: Indice, invia: (canale: string, dati: unknown) => void, home = os.homedir()) {
+  // letto qui e non in testa: i test Node importano il file senza il binario Electron scaricato
+  const { app, dialog, shell } = require("electron") as typeof import("electron");
   ipc.handle("impostazioni:radici", () => trovaRadici(home).map((r) => accorcia(r.path, home)));
   ipc.handle("impostazioni:cartelle", (_e, percorsi: string[]) => cartelleAccount(percorsi.map(String), sessioni.elencoSessioni()));
   ipc.handle("impostazioni:scegli-cartella", async () => {
