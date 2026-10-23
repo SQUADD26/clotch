@@ -71,7 +71,9 @@
   "colore/sessione/verde": "#40c977",
   "colore/sessione/blu": "#339cff",
   "colore/sessione/viola": "#ad7bf9",
-  "misura/cella-icona": 32
+  "misura/cella-icona": 32,
+  "misura/tratto": 1,
+  "misura/tratto-forte": 2
  },
  "nodi": [
   {
@@ -2050,11 +2052,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:12152",
@@ -2909,11 +2910,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12165;101:7280",
@@ -3168,11 +3168,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12167;101:7323",
@@ -4255,11 +4254,10 @@
     "strokes[0]": "colore/sessione/arancione",
     "cornerRadius": "raggio/pieno",
     "width": "misura/campione",
-    "height": "misura/campione"
+    "height": "misura/campione",
+    "strokeWeight": "misura/tratto-forte"
    },
-   "senza": [
-    "strokeWeight 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12169;101:11256;101:16661",
@@ -4363,11 +4361,10 @@
     "h": 100
    },
    "variabili": {
-    "itemSpacing": "spazio/0-5"
+    "itemSpacing": "spazio/0-5",
+    "counterAxisSpacing": "spazio/0-5"
    },
-   "senza": [
-    "counterAxisSpacing 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12169;101:11262",

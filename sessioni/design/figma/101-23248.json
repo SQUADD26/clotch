@@ -62,7 +62,8 @@
   "misura/dialogo-ricerca": 640,
   "testo/dimensione/lg": 16,
   "testo/riga/lg": 24,
-  "spazio/8": 32
+  "spazio/8": 32,
+  "misura/tratto": 1
  },
  "nodi": [
   {
@@ -2041,11 +2042,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:23270",
@@ -2944,11 +2944,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:23278;101:7323",
@@ -3461,7 +3460,8 @@
     "itemSpacing": "spazio/3",
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
-    "height": "misura/intestazione"
+    "height": "misura/intestazione",
+    "strokeWeight": "misura/tratto"
    },
    "senza": []
   },

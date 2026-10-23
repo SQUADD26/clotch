@@ -1,0 +1,27 @@
+/* figma: 101-12169 — «Scelta icona» */
+.pezzo-barra .scelta-icona {
+  z-index: 10; width: var(--misura-scelta-icona); padding: var(--spazio-3); gap: var(--spazio-3);
+  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-lg);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+}
+.pezzo-barra .cerca-icone {
+  height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2);
+  display: flex; align-items: center; border-radius: var(--raggio-md); background: var(--colore-fondo-bottone-secondario);
+}
+.pezzo-barra .cerca-icone input { flex: 1; min-width: 0; color: var(--colore-testo-primario); }
+.pezzo-barra .cerca-icone input::placeholder { color: var(--colore-testo-secondario); }
+.pezzo-barra .campioni { padding-left: var(--spazio-0-5); gap: var(--spazio-3); display: flex; align-items: center; }
+.pezzo-barra .campione {
+  width: var(--misura-campione); height: var(--misura-campione); border-radius: var(--raggio-pieno); flex: none;
+  display: flex; align-items: center; justify-content: center; background: currentColor;
+}
+.pezzo-barra .campione.scelto { background: none; border: var(--misura-tratto-forte) solid currentColor; }
+.pezzo-barra .campione .punto { width: var(--misura-campione-interno); height: var(--misura-campione-interno); border-radius: var(--raggio-pieno); background: currentColor; }
+.pezzo-barra .griglia { gap: var(--spazio-0-5); display: flex; flex-wrap: wrap; }
+.pezzo-barra .cella-icona {
+  width: var(--misura-cella-icona); height: var(--misura-cella-icona); border-radius: var(--raggio-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.pezzo-barra .cella-icona:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .cella-icona.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .scelta-icona .rimuovi { align-self: flex-start; }

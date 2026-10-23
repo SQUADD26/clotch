@@ -52,7 +52,8 @@
   "testo/riga/xl": 36,
   "colore/fondo/bottone-primario": "#ffffff",
   "misura/bottone-invio": 32,
-  "colore/testo/su-primario": "#2d2d2d"
+  "colore/testo/su-primario": "#2d2d2d",
+  "misura/tratto": 1
  },
  "nodi": [
   {
@@ -2135,11 +2136,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:9082",
