@@ -8,17 +8,27 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
+const { creaCronologiaScena } = require('../dist/src/scena-cronologia.js');
 app.whenReady().then(async () => {
   const scene = require('../design/scene/101-14849.json');
   const a = scene.elenco.sessioni[0];
   a.titolo = 'Bozza A';
   scene.elenco.sessioni.push({ ...a, id: 's2', titolo: 'Bozza B' });
-  scene.messaggi.s2 = scene.messaggi.s1;
+  scene.messaggi.s1 = [{ tipo: 'utente', testo: 'Messaggio A v1', t: null }];
+  scene.messaggi.s2 = [{ tipo: 'utente', testo: 'Messaggio B v1', t: null }];
   const chat = scene.registro.chat.s1;
   chat.battito = Date.now();
   chat.coda = [{ voce: 'v1', testo: 'Coda A uno' }, { voce: 'v2', testo: 'Coda A due' }];
   scene.registro.chat.s2 = { ...chat, chat: 's2', coda: [{ voce: 'v1', testo: 'Coda B uno' }] };
   collegaScena(ipcMain, scene);
+  const history = creaCronologiaScena((id) => scene.messaggi[id] ?? []);
+  let historyReads = 0;
+  ipcMain.removeHandler('sessioni:messaggi');
+  ipcMain.handle('sessioni:messaggi', (_event, id, pagina, opzioni) => {
+    assert.equal(opzioni?.v, 1, 'chat reale richiede snapshot v1');
+    const p = history.pagina(id, pagina, opzioni);
+    assert.equal(p.cronologia?.sessione, id); historyReads++; return p;
+  });
   ipcMain.removeHandler('friday:comando');
   let pending = null;
   const commands = [];
@@ -46,14 +56,19 @@ app.whenReady().then(async () => {
     const tick = () => { if ((${fn})()) resolve(); else if (Date.now() > end) reject(new Error('Attesa DOM scaduta')); else setTimeout(tick, 20); };
     tick();
   })`);
-  const load = async () => { await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: 's1' } }); await wait(() => !!document.querySelector('.area-casella textarea')); };
+  const load = async () => { await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: 's1' } }); await wait(() => !!document.querySelector('.area-casella textarea') && document.querySelector('.messaggio-roberto .bolla')?.textContent === 'Messaggio A v1'); };
   const type = (text) => run((text) => {
     const el = document.querySelector('.area-casella textarea');
     Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(el, text);
     el.dispatchEvent(new Event('input', { bubbles: true }));
   }, text);
   const value = () => run(() => document.querySelector('.area-casella textarea').value);
-  const select = async (title) => { await run((title) => [...document.querySelectorAll('.riga')].find((el) => el.querySelector('.testo')?.textContent === title).click(), title); await wait(() => !!document.querySelector('.area-casella textarea')); };
+  const select = async (title) => {
+    await run((title) => [...document.querySelectorAll('.riga')].find((el) => el.querySelector('.testo')?.textContent === title).click(), title);
+    const expected = title === 'Bozza A' ? 'Messaggio A v1' : 'Messaggio B v1';
+    await wait(() => !!document.querySelector('.area-casella textarea'));
+    assert.equal(await run(() => document.querySelector('.messaggio-roberto .bolla')?.textContent), expected);
+  };
   const edit = (index = 0) => run((i) => document.querySelectorAll('.messaggio-in-coda button[aria-label="Modifica"]')[i].click(), index);
   const escape = () => run(() => document.querySelector('textarea').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
   const failures = [];
@@ -121,6 +136,8 @@ app.whenReady().then(async () => {
       await select('Bozza B'); assert.equal(await value(), 'Altro testo B uno');
     });
     assert.deepEqual(failures, []);
+    assert.ok(historyReads >= 2, 'entrambe le chat hanno letto veri messaggi v1');
+    console.log('DRAFT_V1_MESSAGE_CONTENT_OK');
     hidden(); console.log('HIDDEN_WINDOW_OK shows=0 focus=0');
     console.log('DRAFT_ISOLATION_OK'); app.exit(0);
   } catch (error) { console.error(error); app.exit(1); }

@@ -9,9 +9,19 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
 const scene = require(path.join(root, 'design/scene/101-8036.json'));
+const { creaCronologiaScena } = require('../dist/src/scena-cronologia.js');
+const sessionId = scene.navigazione.sessione;
+scene.messaggi[sessionId] = [{ tipo: 'utente', testo: 'Messaggio responsive v1', t: null }];
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
+  const history = creaCronologiaScena((id) => scene.messaggi[id] ?? []);
+  let historyReads = 0;
+  ipcMain.removeHandler('sessioni:messaggi');
+  ipcMain.handle('sessioni:messaggi', (_event, id, pagina, opzioni) => {
+    assert.equal(opzioni?.v, 1); const p = history.pagina(id, pagina, opzioni);
+    assert.equal(p.cronologia?.sessione, id); historyReads++; return p;
+  });
   const win = new BrowserWindow({ show: false, focusable: false, width: 1800, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
   let showEvents = 0, focusEvents = 0;
@@ -36,6 +46,7 @@ app.whenReady().then(async () => {
   try {
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: scene.navigazione });
     await wait(() => !!document.querySelector('.pannello') && document.querySelector('.contenuto').getBoundingClientRect().width > 1200);
+    await wait(() => document.querySelector('.messaggio-roberto .bolla')?.textContent === 'Messaggio responsive v1');
     await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
     await wait(() => !!document.querySelector('.nav-impostazioni'));
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());
@@ -53,6 +64,9 @@ app.whenReady().then(async () => {
     win.setSize(1024, 1000);
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());
     await wait(() => !!document.querySelector('.contenuto') && !document.querySelector('.pannello'));
+    await wait(() => document.querySelector('.messaggio-roberto .bolla')?.textContent === 'Messaggio responsive v1');
+    assert.ok(historyReads >= 3, 'snapshot v1 riletta dopo ciascun ritorno dalle impostazioni');
+    console.log('RESPONSIVE_V1_MESSAGE_CONTENT_OK');
     hidden(); console.log('HIDDEN_WINDOW_OK shows=0 focus=0');
     console.log('RESPONSIVE_REMOUNT_OK');
     app.exit(0);
