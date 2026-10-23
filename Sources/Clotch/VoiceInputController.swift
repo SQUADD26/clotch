@@ -278,10 +278,10 @@ final class VoiceInputController: ObservableObject {
 
     private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
         switch outcome {
-        case .sent: return "Inviato a Friday"
-        case .queued: return "In coda per Friday"
+        case .sent: return "Inviato a clotch AI"
+        case .queued: return "In coda per clotch AI"
         case .copied: return "Testo copiato. Incolla con ⌘V"
-        case .notDelivered: return "Non risulta consegnato a Friday. Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato a clotch AI. Testo copiato. Incolla con ⌘V"
         }
     }
 

@@ -51,7 +51,7 @@ struct VoiceInputPill: View {
         case .thinking:
             row(Image(systemName: "ellipsis").font(.system(size: 15)).foregroundStyle(GoalInk.secondary), "Penso…") { EmptyView() }
         case .sending:
-            row(mic(0.45), "Invio a Friday") {
+            row(mic(0.45), "Invio a clotch AI") {
                 CancelButton(since: input.sendingSince, seconds: VoiceInputController.cancelSeconds) { input.cancel() }
             }
         case .result(let message):
