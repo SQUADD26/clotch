@@ -1,6 +1,6 @@
 // Prove di collegamento dal vivo (#338): app <> sessioni Claude, Friday, Clotch, Codex, su questa macchina.
 // Ogni prova stampa verde, fallita o in attesa (col perché). Uscita: 0 tutte verdi, 1 almeno una fallita, 3 qualcuna in attesa.
-// Uso: npm run prove [-- claude|friday|clotch|codex]
+// Uso: npm run prove [-- claude|friday|clotch|codex]   (PROVE_CLAUDE=<comando> per le sessioni vere; default claude)
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -39,8 +39,9 @@ function claude(): Prova[] {
 function sessioniVere(): Prova[] {
   const c = "app <> Claude (sessione vera)";
   if (process.platform === "darwin") return [p(c, "sessione di prova passa per le situazioni", "attesa", "sul Mac le sessioni `claude -p` di prova sono vietate (#1797): lanciare `npm run prove -- claude` su squaddv2")];
-  const bin = spawnSync("sh", ["-c", "command -v claude"], { encoding: "utf8" }).stdout.trim();
-  if (!bin) return [p(c, "sessione di prova", "attesa", "comando claude non trovato su questa macchina")];
+  const cmd = env.PROVE_CLAUDE || "claude"; // su squaddv2: PROVE_CLAUDE=claude-prove (token dedicato, max 2 sessioni vive)
+  const bin = spawnSync("sh", ["-c", 'command -v "$1"', "sh", cmd], { encoding: "utf8" }).stdout.trim();
+  if (!bin) return [p(c, "sessione di prova", "attesa", `comando ${cmd} non trovato su questa macchina`)];
   const casi: [string, string[], string, (s: Situazione, r: any) => boolean][] = [
     ["turno finito", [], "Rispondi solo: ok", (s) => s.adesso === "turno_finito"],
     ["modifica con differenze", ["--allowedTools", "Write"], "Crea il file prova.txt con scritto ciao, poi rispondi solo: fatto", (s) => s.segni.includes("modifica")],
