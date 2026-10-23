@@ -1,10 +1,17 @@
-// figma: 120-58165 — Impostazioni · Uso (Panoramica); scheda Andamento: 119-57613. Sostituisce 101-48825 e 101-48888, senza la nota sulla fonte dei dati.
+// figma: 101-48825 — Impostazioni · Uso (Panoramica) con Clotch (dati dal notch); senza Clotch: 101-48888; scheda Andamento: 119-57613.
 // shortcut: il main non ha ancora una fonte delle quote d'uso (#374): finché `uso()` torna null il gruppo non c'è.
 import { useEffect, useState } from "react";
 import type { QuotaUso } from "../../tipi";
+import { Icona } from "../base/Icona";
+import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Pagina } from "./controlli";
 import { prova } from "./prova";
 import "./uso.css";
+
+const NOTA = {
+  con: "Dati dal notch, aggiornati 1 min fa. Clotch avvisa a voce all’80% e al 90%.",
+  senza: "Dati letti da Sessioni, aggiornati 1 min fa. Avviso all’80% e al 90% in un avviso a comparsa.",
+};
 
 type Scheda = "panoramica" | "andamento";
 const SCHEDE: [Scheda, string][] = [["panoramica", "Panoramica"], ["andamento", "Andamento"]];
@@ -67,6 +74,7 @@ function Andamento({ quote }: { quote: QuotaUso[] }) {
 }
 
 export default function Uso() {
+  const clotch = useClotchAcceso();
   const [quote, setQuote] = useState<QuotaUso[] | null>(null);
   const [scheda, setScheda] = useState<Scheda>(prova?.scheda ?? "panoramica");
   useEffect(() => { window.impostazioni.uso().then(setQuote, () => {}); }, []);
@@ -79,6 +87,12 @@ export default function Uso() {
         ))}
       </div>
       {quote && (scheda === "panoramica" ? <Panoramica quote={quote} /> : <Andamento quote={quote} />)}
+      {quote && scheda === "panoramica" && (
+        <div className="nota-uso">
+          <Icona nome={clotch ? "schermo" : "grafico"} />
+          <span className="t-xs secondario">{clotch ? NOTA.con : NOTA.senza}</span>
+        </div>
+      )}
     </Pagina>
   );
 }

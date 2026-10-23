@@ -9,3 +9,6 @@
 /* schede: `.scheda` è già della scheda di progetto in friday.css, qui `.tab-uso` */
 .tab-uso { display: flex; align-items: center; height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-md); }
 .tab-uso.scelta { background: var(--colore-fondo-riga-scelta); }
+
+/* nota sulla fonte dei dati, sotto la Panoramica (101-48825, 101-48888) */
+.nota-uso { display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-2); align-self: flex-start !important; }
