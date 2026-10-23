@@ -96,7 +96,10 @@ async function renderer(dir) {
   }
 }
 await renderer('renderer');
-for (const file of ['assets/app-icon.png', 'design/figma/101-8036.json', 'design/figma/101-8610.json', 'design/scene/101-8036.json']) await copy(file);
+// Le misure delle finestre si leggono a runtime da design/figma/<id>.json: si copiano tutti i frame che finestra.ts chiede.
+const misure = [...(await fs.readFile(path.join(root, 'src', 'finestra.ts'), 'utf8')).matchAll(/frame\("([\d-]+)"\)/g)].map((m) => `design/figma/${m[1]}.json`);
+assert.ok(misure.length > 0, 'nessun frame di misura trovato in src/finestra.ts');
+for (const file of new Set(['assets/app-icon.png', ...misure, 'design/figma/101-8610.json', 'design/scene/101-8036.json'])) await copy(file);
 const appPackage = { name: pkg.name, productName: 'clotch', version: pkg.version, main: pkg.main, private: true };
 await fs.writeFile(path.join(stage, 'package.json'), JSON.stringify(appPackage, null, 2) + '\n');
 const { packager } = await import('@electron/packager');
