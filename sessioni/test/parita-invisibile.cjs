@@ -50,7 +50,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
       getBounds() { return createdOptions; }
       isVisible() { return visible; }
       isFocused() { return false; }
-      show() { assert.fail('show attivante non consentito'); }
+      show() { assert.equal(silent, false, 'show attivante solo fuori prova'); visible = true; calls.push({ name: 'show' }); }
       focus() { assert.fail('focus non consentito'); }
       hide() { assert.fail('hide tardivo non consentito'); }
     } },
@@ -173,12 +173,18 @@ function notificationCalls(silent) {
   assert.ok(preview.calls.indexOf('switch:mute-audio') < preview.calls.indexOf('ready'));
   assert.ok(!preview.calls.includes('policy:prohibited'));
   const production = normalWindow(false);
-  assert.deepEqual(production.calls, [{ name: 'construct', show: true }, { name: 'load' }]);
-  assert.deepEqual(production.screenCalls, []);
-  assert.equal(production.options.x, undefined);
+  assert.deepEqual(production.calls, [{ name: 'construct', show: false }, { name: 'load' }], 'mai show:true alla creazione');
+  assert.deepEqual(production.screenCalls, ['all']);
+  assert.equal(production.options.x, internal.workArea.x + Math.floor((internal.workArea.width - production.options.width) / 2), 'centrata nella workArea integrata');
+  assert.equal(production.options.backgroundColor, '#222222');
   production.emitReady();
-  assert.equal(production.calls.length, 2);
+  assert.deepEqual(production.calls.at(-1), { name: 'show' }, 'show solo dopo ready-to-show');
+  assert.equal(production.calls.length, 3);
   assert.deepEqual(production.logs, []);
+  const productionNoInternal = normalWindow(false, [external], external);
+  assert.deepEqual(productionNoInternal.screenCalls, ['all', 'primary'], 'senza integrato: schermo principale');
+  assert.ok(productionNoInternal.options.x >= external.workArea.x && productionNoInternal.options.x + productionNoInternal.options.width <= external.workArea.x + external.workArea.width);
+  console.log('WINDOW_NORMAL_INTERNAL_OK: finestra normale su integrato (o primario), show:false, show a ready-to-show, fondo impostato');
   const hidden = normalWindow(true, [], external, { show: false });
   assert.deepEqual(hidden.calls, [{ name: 'construct', show: false }, { name: 'mute', value: true }, { name: 'load' }]);
   assert.deepEqual(hidden.screenCalls, []);

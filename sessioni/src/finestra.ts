@@ -26,12 +26,13 @@ function frame(id: string) {
 export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-29971").finestra; // la più piccola: «Finestra 480»
-  const silenziosa = provaSilenziosa(), anteprima = silenziosa && opzioni.show !== false;
-  const area = anteprima ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
+  const silenziosa = provaSilenziosa(), visibile = opzioni.show !== false;
+  // finestra visibile: sempre sullo schermo integrato (se c'è), mai sul principale dove l'utente può avere un'app a schermo intero
+  const area = visibile ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
   const larghezza = area ? Math.min(grande.w, area.width) : grande.w;
   const altezza = area ? Math.min(grande.h, area.height) : grande.h;
   const w = new BrowserWindow({
-    show: anteprima ? false : opzioni.show ?? true,
+    show: false, // si mostra a ready-to-show, col fondo già dipinto
     title: NOME_APP, icon: iconaApp(),
     width: larghezza, height: altezza,
     minWidth: area ? Math.min(piccola.w, larghezza) : piccola.w,
@@ -47,7 +48,8 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
   impostaPermessi(w.webContents, pagina);
   if (silenziosa) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w, pagina);
-  if (anteprima) w.once("ready-to-show", () => {
+  if (visibile) w.once("ready-to-show", () => {
+    if (!silenziosa) return w.show();
     w.showInactive();
     console.log(`PREVIEW_READY internal=${screen.getDisplayMatching(w.getBounds()).internal} visible=${w.isVisible()} focused=${w.isFocused()} audioMuted=${w.webContents.isAudioMuted()}`);
   });

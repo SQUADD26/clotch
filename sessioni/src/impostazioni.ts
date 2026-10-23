@@ -3,7 +3,7 @@
 // Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
 import * as os from "node:os";
 import * as path from "node:path";
-import { app, dialog, shell, type IpcMain } from "electron";
+import { app, BrowserWindow, dialog, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
@@ -62,8 +62,10 @@ export function eliminaDati(indice: Pick<Indice, "svuota">, filePreferenze: stri
 export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: Indice, invia: (canale: string, dati: unknown) => void, home = os.homedir()) {
   ipc.handle("impostazioni:radici", () => trovaRadici(home).map((r) => accorcia(r.path, home)));
   ipc.handle("impostazioni:cartelle", (_e, percorsi: string[]) => cartelleAccount(percorsi.map(String), sessioni.elencoSessioni()));
-  ipc.handle("impostazioni:scegli-cartella", async () => {
-    const r = await dialog.showOpenDialog({ properties: ["openDirectory"], defaultPath: home });
+  ipc.handle("impostazioni:scegli-cartella", async (e) => {
+    const opzioni: Electron.OpenDialogOptions = { properties: ["openDirectory"], defaultPath: home };
+    const padre = BrowserWindow.fromWebContents(e.sender); // il dialogo compare sullo schermo della finestra
+    const r = await (padre ? dialog.showOpenDialog(padre, opzioni) : dialog.showOpenDialog(opzioni));
     return r.canceled || !r.filePaths[0] ? null : accorcia(r.filePaths[0], home);
   });
   // shell.openPath torna "" se riesce, se no il perché
