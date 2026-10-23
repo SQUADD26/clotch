@@ -46,10 +46,14 @@ export interface Scena {
 export const fileScena = (radice: string, id: string) => path.join(radice, "design", "scene", `${id}.json`);
 export const leggiScena = (file: string): Scena | null => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : null);
 
-/** «Clotch acceso» scade dopo 10 min (#350): nella scena `clotch.t` ≤ 0 vuol dire «tanti ms fa», da adesso. */
+/** «Clotch acceso» scade dopo 10 min (#350): nella scena `clotch.t`, `schermo.da` e `afk.da` ≤ 0 vogliono dire «tanti ms fa», da adesso. */
 function conOra(r: unknown): unknown {
-  const c = (r as { clotch?: { t: number } | null }).clotch;
-  return c && c.t <= 0 ? { ...(r as object), clotch: { ...c, t: Date.now() + c.t } } : r;
+  const o = { ...(r as Record<string, { t?: number; da?: number } | null | undefined>) }, ora = Date.now();
+  for (const [k, campo] of [["clotch", "t"], ["schermo", "da"], ["afk", "da"]] as const) {
+    const x = o[k], v = x?.[campo];
+    if (x && v !== undefined && v <= 0) o[k] = { ...x, [campo]: ora + v };
+  }
+  return o;
 }
 
 const cronologie = new WeakMap<Scena, ReturnType<typeof creaCronologiaScena>>();

@@ -14,6 +14,7 @@ import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
 import { ChipAllegato } from "./Allegati";
 import { ChipContesto, ChipModello, ChipPermessi, impostaDi } from "./Chip";
+import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./friday";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
@@ -65,6 +66,8 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const inModifica = provaDi(prova, "modifica") !== null ? coda[0] ?? null : null;
   const { testo, modifica, invio, bozza } = useBozza(chat, provaDi(prova, "scritta") ?? inModifica?.testo ?? "", inModifica);
   const area = useRef<HTMLTextAreaElement>(null);
+  const areaCasella = useRef<HTMLDivElement>(null);
+  useAvvisiSopra(areaCasella);
   const { scorciatoie, modello: globale } = useImpostazioni();
   const pref = usePreferenze().dati[chat], imposta = useMemo(() => impostaDi(chat), [chat]);
   const preferenza = etichettaModello(pref?.modello) ?? globale; // la scelta di questa chat vince su quella dell'app
@@ -182,7 +185,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
-    <div className="area-casella con-menu">
+    <div className="area-casella con-menu" ref={areaCasella}>
       {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
       {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello} preferenza={preferenza} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (

@@ -6,6 +6,8 @@ import { scene } from "./scene";
 
 export { PillolaClotch, PillolaSchermoOccupato, useClotchAcceso } from "./Pillole";
 export { clotchAcceso, suClotch } from "./clotch";
+export { PillolaClotch as ComandiTitolo } from "./Pillole";
+export { CentroTitolo } from "./Schermo";
 export { scene };
 
 export default function Pannello() {

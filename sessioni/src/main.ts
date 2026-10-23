@@ -20,7 +20,7 @@ if (iParita > 0) {
 impostaNome();
 
 import { Sessioni } from "./api";
-import { collegaCasella } from "./allegati-ipc";
+import { collegaCasella as collegaAllegati } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
 import { apriFinestra, parita } from "./finestra";
@@ -100,7 +100,7 @@ app.whenReady().then(() => {
   collegaPreferenze(ipcMain, invia, sessioni);
   collegaCasella(ipcMain, sessioni);
   collegaImpostazioni(ipcMain, sessioni, indice, invia);
-  collegaCasella(ipcMain, os.homedir(), (id) => sessioni.elencoSessioni().sessioni.find((x) => x.id === id)?.file ?? null);
+  collegaAllegati(ipcMain, os.homedir(), (id) => sessioni.elencoSessioni().sessioni.find((x) => x.id === id)?.file ?? null);
   sessioni.osserva((a) => {
     barraMenu();
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));

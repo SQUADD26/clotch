@@ -4,10 +4,11 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useAvvio, useRegistro } from "./dati";
-import { useVoce } from "./Voce";
+import { useVoce as useStatoVoce } from "./Voce";
 import type { StatoVoce } from "./statoVoce";
 import { orario } from "./formato";
 import { casella, decisioniPerGiorno, statoFriday } from "./vista";
+import { useVoce } from "./dettatura";
 
 type Colore = "secondaria" | "accento" | "successo" | "errore";
 interface Testa { icona: NomeIcona; accento?: boolean; titolo: string; segno?: [NomeIcona, Colore]; stato: string }
@@ -54,7 +55,9 @@ export function Intestazione() {
   const n = useNavigazione();
   const s = useRegistro();
   const avvio = useAvvio();
-  const t = testa(n.vista, s, avvio, useVoce().stato);
+  // Clotch, l'app o il microfono del Mac (dettatura): chi parla o ascolta; il resto (microfono assente) lo dice il registro
+  const voce = useVoce(), registro = useStatoVoce().stato;
+  const t = testa(n.vista, s, avvio, voce ? (voce.cosa === "parla" ? "parla" : "ascolta") : registro);
   return (
     <div className="intestazione-friday">
       <div className="testi">

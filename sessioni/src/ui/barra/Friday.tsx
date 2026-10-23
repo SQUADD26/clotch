@@ -8,6 +8,7 @@ import { useNavigazione } from "../base/navigazione";
 import { daPiano } from "../friday/registro";
 import { casella, statoFriday, type StatoFriday } from "../friday/vista";
 import { RigaComando } from "./Righe";
+import { ViaDalMac } from "./ViaDalMac";
 
 declare global {
   interface Window { friday: import("../../tipi").FridayApi }
@@ -57,6 +58,7 @@ export function RigheFriday({ r, adesso, pagina }: { r: Registro | null; adesso:
       <RigaComando icona="libro" etichetta="Decisioni" scelta={pagina === "decisioni"} onClick={() => n.apri("decisioni")} />
       <RigaComando icona="scudo" etichetta="Regole" scelta={pagina === "regole"} onClick={() => n.apri("regole")} />
       {r?.nonDisturbare && (r.nonDisturbare.fino === null || r.nonDisturbare.fino > adesso) && <NonDisturbare nd={r.nonDisturbare} />}
+      <ViaDalMac r={r} adesso={adesso} aspettano={aspettano} inCasella={pagina === "casella"} />
     </>
   );
 }

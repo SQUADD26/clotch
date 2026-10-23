@@ -10,6 +10,7 @@ import { SegnoStato } from "../base/SegnoStato";
 import { Pezzo } from "../base/Pezzo";
 import { useRegistro } from "../friday/dati";
 import { MessaggioRoberto } from "./Blocchi";
+import { useAvvisiSopra } from "./avvisiSopra";
 import { Risposta } from "./Risposta";
 import { SessioniCitate, type Citata } from "./SchedeSessioni";
 import { prendiChiesta } from "./chiedi";
@@ -23,7 +24,8 @@ export function useVociFriday() {
   return useMemo(() => {
     if (!r) return [];
     const da = r.comandi.filter((c) => c.cmd === "parla").map((c) => ({ chi: "roberto" as const, id: c.id, t: c.t ?? 0, testo: String(c.args.testo ?? "") }));
-    const di = r.avvisi.filter((a) => a.motivo === "risposta" || a.motivo === "domanda").map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
+    // tutti gli avvisi di Friday stanno nella sua chat, non solo le risposte (101:48368: «aspetta un tuo permesso»)
+    const di = r.avvisi.map((a) => ({ chi: "friday" as const, id: a.id, t: a.t ?? 0, testo: a.testo, sessioni: a.sessioni ?? [] }));
     return [...da, ...di].sort((a, b) => a.t - b.t);
   }, [r]);
 }
@@ -63,6 +65,8 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
   const [scelta, setScelta] = useState(0);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
+  const areaCasella = useRef<HTMLDivElement>(null);
+  useAvvisiSopra(areaCasella);
   const elenco = useElenco().dati?.sessioni ?? [];
   const pref = usePreferenze().dati;
 
@@ -94,7 +98,7 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
 
   const stato = spenta ? "disabilitata" : testo ? "scritta" : "vuota";
   return (
-    <Pezzo nome="chat"><div className="area-casella con-menu">
+    <Pezzo nome="chat"><div className="area-casella con-menu" ref={areaCasella}>
       {trovate.length > 0 && (
         <div className="menu-sessioni" role="listbox">
           <div className="titolo-gruppo">Sessioni</div>

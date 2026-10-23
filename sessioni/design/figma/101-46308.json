@@ -58,6 +58,7 @@
   "colore/fondo/casella": "#363636",
   "raggio/casella": 22,
   "misura/colonna": 760,
+  "misura/onda-barra": 3,
   "misura/bottone-invio": 32,
   "colore/testo/errore": "#ff6764",
   "colore/fondo/errore": "#fa423e29"
@@ -701,7 +702,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2222,7 +2223,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2883,7 +2884,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Friday sta parlando",
+   "testo": "clotch AI sta parlando",
    "font": "SF Pro Regular"
   },
   {
@@ -2913,7 +2914,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2929,7 +2931,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2945,7 +2948,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2961,7 +2965,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2977,7 +2982,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2993,7 +2999,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3009,7 +3016,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3025,7 +3033,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3099,7 +3108,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Chiedi a Friday",
+   "testo": "Chiedi a clotch AI",
    "font": "SF Pro Regular"
   },
   {

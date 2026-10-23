@@ -31,11 +31,14 @@ function clotch(icone: [string, string?][]) {
   return { lista, pref };
 }
 
-function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number } = {}): Registro {
+function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number; clotch?: boolean; afk?: number } = {}): Registro {
   const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]);
   for (let i = 0; i < (f.aspettano ?? 0); i++)
     chat.set(`c${i}`, { chat: `c${i}`, progetto: "clotch", visto: ORA, richieste: [{ genere: "permesso" }], stato: "serve_roberto", passi: [], aiutanti: new Map() });
-  return { chat, friday: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null } as unknown as Registro;
+  // «Con e senza Clotch» (#437): Clotch acceso da un minuto; `afk` = quanti avvisi tiene dopo 20 min via dal Mac
+  const clotch = f.clotch ? { voce: "accesa", parla: false, ascolta: false, t: ORA - MIN } : null;
+  const afk = f.afk === undefined ? null : { da: ORA - 20 * MIN, avvisi: f.afk };
+  return { chat, friday: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null, clotch, afk } as unknown as Registro;
 }
 
 interface Prova {
@@ -117,6 +120,14 @@ FRAME["101-45507"] = () => {
   const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];
   return { ora: ORA, elenco: pronto(lista), pref: { [lista[0].id]: { icona: "database" }, [lista[1].id]: { icona: "stella" } }, registro: registro({ aspettano: 3 }), scelta: lista[0].id };
 };
+// «Con e senza Clotch» (#437): la barra dei nove frame; 3 sessioni aspettano te, come la Casella del disegno
+const CON = (pagina: string, f: Parameters<typeof registro>[0] = {}) => () => ({ ...base(), pagina, aperte: ["clotch"], registro: registro({ aspettano: 3, ...f }) });
+for (const id of ["101-46268", "101-46701", "101-48368"]) FRAME[id] = CON("friday", { clotch: true });
+for (const id of ["101-46308", "101-46741"]) FRAME[id] = CON("friday");
+FRAME["101-49067"] = CON("casella", { clotch: true, afk: 4 });
+FRAME["101-49194"] = CON("casella");
+FRAME["101-49592"] = CON("sessione", { clotch: true });
+FRAME["101-49632"] = CON("sessione");
 
 function filtrata(aperto?: Aperto): Prova {
   const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];

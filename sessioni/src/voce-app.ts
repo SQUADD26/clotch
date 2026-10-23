@@ -21,6 +21,8 @@ export const staParlando = () => inCorso.size > 0;
 export function suVoce(f: (parla: boolean) => void) { ascoltatori.add(f); return () => { ascoltatori.delete(f); }; }
 /** Ferma la voce dell'app (`say`): ogni frase in corso esce con errore e il callback la toglie dall'insieme. */
 export function interrompiVoce() { inCorso.forEach((c) => c.kill()); }
+/** Stesso gesto con il nome che usa `comandi-app` (101:46308). */
+export const fermaVoce = interrompiVoce;
 
 /** Voce di sistema del Mac; altrove niente (la sandbox Linux non ha voce). */
 export function leggi(testo: string) {

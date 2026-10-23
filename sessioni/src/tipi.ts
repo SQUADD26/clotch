@@ -218,7 +218,7 @@ export interface CasellaApi {
 
 /** `window.friday` (#352): l'unico modo dell'interfaccia per comandare Friday e leggere il suo registro. */
 export interface FridayApi {
-  comando(cmd: import("./friday").Comando, args?: Record<string, unknown>): Promise<import("./comandi").EsitoComando>;
+  comando(cmd: import("./friday").Comando | import("./comandi-app").ComandoApp, args?: Record<string, unknown>): Promise<import("./comandi").EsitoComando>;
   /** Il registro senza Map: `daPiano` (ui/friday/registro.ts) lo riporta a `Registro`. */
   registro(): Promise<unknown>;
   onRegistro(cb: (registro: unknown) => void): () => void;
