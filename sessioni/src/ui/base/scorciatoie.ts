@@ -3,7 +3,10 @@
 import { useEffect } from "react";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
+import { useApriSessione } from "../barra/apri";
+import { useElenco } from "./dati";
 import { useNavigazione } from "./navigazione";
+import { prossimaInAttesa } from "./prossima";
 
 const azioni = new Map<string, () => void>();
 
@@ -19,16 +22,19 @@ const inCampo = (t: EventTarget | null) => t instanceof HTMLElement && (t.isCont
 export function useScorciatoie() {
   const n = useNavigazione();
   const { scorciatoie } = useImpostazioni();
+  const apriSessione = useApriSessione();
+  const sessioni = useElenco().dati?.sessioni;
   useEffect(() => {
     const premi = (e: KeyboardEvent) => {
       // già gestito (la pagina Scorciatoie che registra, la casella); nei campi di testo solo le combinazioni con ⌘
       if (e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
       const a = azioneDi(tastiDi(e), scorciatoie);
-      const navigazione: Record<string, () => void> = { friday: () => n.apri("friday"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni") };
+      const navigazione: Record<string, () => void> = { friday: () => n.apri("friday"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni"),
+        prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
       const fai = a && (navigazione[a] ?? azioni.get(a));
       if (fai) { e.preventDefault(); fai(); }
     };
     addEventListener("keydown", premi);
     return () => removeEventListener("keydown", premi);
-  }, [n, scorciatoie]);
+  }, [n, scorciatoie, sessioni, apriSessione]);
 }
