@@ -1,6 +1,7 @@
 // Stato condiviso della cornice: vista aperta, sessione scelta, sezione, cronologia (indietro/avanti), barra e pannello aperti.
 // Si parte da ?vista=&sessione=&sezione= (nuova finestra, scene di prova di scena.ts).
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { api } from "./dati";
 
 export type Vista = "sessione" | "friday" | "casella" | "decisioni" | "regole" | "impostazioni";
 /** Le viste di Friday: montano friday/, senza pannello. */
@@ -30,6 +31,8 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
   });
   const [barraAperta, setBarra] = useState(true);
   const [pannelloAperto, setPannello] = useState(true);
+  // «Pannello obiettivo» (Aspetto): com'è all'avvio; valore mancante nel file = aperto
+  useEffect(() => { api().impostazioni().then((v) => setPannello(v.pannelloAperto !== false), () => {}); }, []);
   const apri = useCallback((vista: Vista, sessione?: string | null, sezione?: string | null) => setStoria(({ passi, i }) => {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null };
     if (passo.vista === passi[i].vista && passo.sessione === passi[i].sessione && passo.sezione === passi[i].sezione) return { passi, i };
