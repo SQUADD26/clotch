@@ -4,6 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
+const { pathToFileURL } = require('node:url');
+const fiducia = require('../dist/src/ipc-fiducia.js');
+const channels = [...fs.readFileSync(path.join(__dirname, '../src/preload.ts'), 'utf8').matchAll(/invoke\("([^"]+)"/g)].map(m => m[1]);
 const source = fs.readFileSync(path.join(__dirname, '../src/main.ts'), 'utf8');
 const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
 
@@ -16,7 +19,7 @@ function normalWindow(silent, displays = [external, internal], primary = externa
   const windowCode = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/finestra.ts'), 'utf8'),
     { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
   const modules = {
-    electron: { screen: {
+    electron: { app: { quit() {} }, screen: {
       getAllDisplays() { screenCalls.push('all'); return displays; },
       getPrimaryDisplay() { screenCalls.push('primary'); return primary; },
       getDisplayMatching(bounds) {
@@ -28,12 +31,19 @@ function normalWindow(silent, displays = [external, internal], primary = externa
       constructor(options) {
         createdOptions = options;
         calls.push({ name: 'construct', show: options.show });
-        this.webContents = {
+        const frame = { url: '' };
+        this.webContents = { mainFrame: frame, getURL: () => frame.url, isDestroyed: () => false,
+          executeJavaScript: async () => {}, capturePage: async () => ({ toPNG: () => Buffer.alloc(0), getSize: () => ({ width: 1, height: 1 }) }),
           setAudioMuted: value => { muted = value; calls.push({ name: 'mute', value }); },
           isAudioMuted: () => muted,
         };
       }
-      loadFile() { calls.push({ name: 'load' }); }
+      loadFile(file) {
+        this.webContents.mainFrame.url = pathToFileURL(file).href;
+        fiducia.verificaChiamante({ sender: this.webContents, senderFrame: this.webContents.mainFrame });
+        calls.push({ name: 'load' });
+      }
+      on() {}
       once(event, callback) { assert.equal(event, 'ready-to-show'); ready = callback; }
       showInactive() { visible = true; calls.push({ name: 'showInactive' }); }
       getBounds() { return createdOptions; }
@@ -47,18 +57,19 @@ function normalWindow(silent, displays = [external, internal], primary = externa
     './branding': { iconaApp() {}, NOME_APP: 'clotch' },
     './link-esterni': { proteggiLinkEsterni() {} },
     './modalita-prova': { provaSilenziosa: () => silent },
+    './ipc-fiducia': fiducia,
   };
   vm.runInNewContext(windowCode, {
     exports: output, __dirname: path.join(__dirname, '../dist/src'), console: { log: line => logs.push(line) },
     require: name => {
-      if (name === 'node:fs') return { ...fs, existsSync: () => true };
+      if (name === 'node:fs') return { ...fs, existsSync: () => true, mkdirSync() {}, writeFileSync() {} };
       if (name.startsWith('node:')) return require(name);
       assert.ok(Object.hasOwn(modules, name), `confine finestra inatteso ${name}`);
       return modules[name];
     },
   });
-  output.apriFinestra(undefined, options);
-  return { calls, screenCalls, logs, options: createdOptions, emitReady: () => ready?.() };
+  const loaded = options.parita ? output.parita('101-8036') : output.apriFinestra(undefined, options);
+  return { loaded, calls, screenCalls, logs, options: createdOptions, emitReady: () => ready?.() };
 }
 
 async function run(args, scene, initialEnv = {}) {
@@ -71,7 +82,8 @@ async function run(args, scene, initialEnv = {}) {
     whenReady: () => { calls.push('ready'); return Promise.resolve(); },
     getPath: () => '/test-no-real-user', on() {}, exit: code => calls.push(`exit:${code}`),
   };
-  const ipcMain = { handle() {} };
+  const handlers = new Map();
+  const ipcMain = { handle: (canale, fn) => handlers.set(canale, fn) };
   const modules = {
     electron: { app, ipcMain, BrowserWindow: { getAllWindows: () => [] } },
     './api': { Sessioni: class {
@@ -88,8 +100,9 @@ async function run(args, scene, initialEnv = {}) {
     './preferenze': { leggiImpostazioni: () => ({}) },
     './preferenze-ipc': { collegaPreferenze: record('preferenze-live') },
     './registro': { CARTELLA_REGISTRO: '/test-no-real-user', scriviRegistro: record('registro-live'), testoErrore: String },
-    './scena': { leggiScena: () => { if (scene instanceof Error) throw scene; return scene; }, fileScena: () => '/test-fixture', collegaScena: record('scena') },
+    './scena': { leggiScena: () => { if (scene instanceof Error) throw scene; return scene; }, fileScena: () => '/test-fixture', collegaScena(ipc) { calls.push('scena'); for (const c of channels) ipc.handle(c, (_e, ...a) => { calls.push('ipc:' + c); return a; }); } },
     './modalita-prova': { provaSilenziosa: () => env.CLOTCH_TEST_SILENT === '1' },
+    './ipc-fiducia': fiducia,
   };
   vm.runInNewContext(code, {
     exports: {}, __dirname: '/test/dist/src',
@@ -102,7 +115,7 @@ async function run(args, scene, initialEnv = {}) {
     },
   });
   await new Promise(setImmediate);
-  return { calls, errors, env };
+  return { calls, errors, env, handlers };
 }
 
 function notificationCalls(silent) {
@@ -116,6 +129,7 @@ function notificationCalls(silent) {
       show() { calls.push('show'); }
     } },
     './modalita-prova': { provaSilenziosa: () => silent },
+    './ipc-fiducia': fiducia,
     './avvisi': { daAvvisare: () => ({ titolo: 'Test', corpo: 'Test', silenzioso: false, suono: 'default' }) },
   };
   vm.runInNewContext(notificationsCode, { exports: output, require: name => {
@@ -198,5 +212,50 @@ function notificationCalls(silent) {
   assert.deepEqual(notificationCalls(false), ['supported', 'construct', 'show'], 'controllo positivo notifiche normali');
   assert.deepEqual(notificationCalls(true), [], 'nessuna costruzione o invio OS in prova');
   console.log('PREVIEW_NOTIFICATIONS_BLOCKED_OK: zero API/istanze/invii OS in prova; controllo positivo normale preservato');
+  const parityWindow = normalWindow(true, [], external, { parita: true });
+  await parityWindow.loaded;
+  assert.ok(parityWindow.logs.some(line => line.startsWith('PARITA_HIDDEN_OK')));
+  console.log('IPC_FACTORIES_REGISTER_BEFORE_LOAD_OK');
+  const documentPath = '/tmp/clotch fixture #1/renderer/index.html';
+  const expectedUrl = pathToFileURL(documentPath).href;
+  const frame = { url: expectedUrl + '?sessione=s%201#messaggio' };
+  const sender = { mainFrame: frame, getURL: () => frame.url, isDestroyed: () => false };
+  fiducia.autorizzaIpc(sender, documentPath);
+  const trusted = { sender, senderFrame: frame };
+  const secured = await run(['--parita', '101-8036'], {});
+  assert.equal(channels.length, 25); assert.equal(new Set(channels).size, 25);
+  assert.equal(secured.handlers.size, 25);
+  for (const [channel, invoke] of secured.handlers) {
+    assert.deepEqual(await invoke(trusted, 'fixture', 7), ['fixture', 7]);
+    assert.equal(secured.calls.filter(c => c === 'ipc:' + channel).length, 1);
+  }
+  const rejected = [
+    { sender, senderFrame: { url: frame.url } }, // iframe identico URL, stesso webContents
+    { sender: { ...sender }, senderFrame: frame }, // finestra estranea, stesso URL
+    { sender, senderFrame: null },
+    { sender: { ...sender, isDestroyed: () => true }, senderFrame: frame },
+    { sender, get senderFrame() { throw Error('frame distrutto'); } },
+  ];
+  for (const event of rejected) {
+    for (const invoke of secured.handlers.values()) await assert.rejects(invoke(event), /non autorizzato/);
+  }
+  for (const url of ['https://example.org/renderer/index.html', 'file:///tmp/evil/index.html',
+    expectedUrl + '.evil', expectedUrl + '/evil', 'file://estraneo/tmp/index.html',
+    'data:text/html,fixture', 'about:blank', 'url non valido']) {
+    frame.url = url;
+    for (const invoke of secured.handlers.values()) await assert.rejects(invoke(trusted), /non autorizzato/);
+  }
+  frame.url = expectedUrl;
+  sender.getURL = () => 'https://example.org/';
+  for (const invoke of secured.handlers.values()) await assert.rejects(invoke(trusted), /non autorizzato/);
+  sender.getURL = () => frame.url; sender.isDestroyed = () => true;
+  for (const invoke of secured.handlers.values()) await assert.rejects(invoke(trusted), /non autorizzato/);
+  sender.isDestroyed = () => false;
+  const before = secured.calls.filter(c => c.startsWith('ipc:')).length;
+  assert.equal(before, 25, 'nessun callback di canale eseguito per chiamante respinto');
+  assert.deepEqual(await secured.handlers.get('sessioni:elenco')(trusted), []);
+  console.log('IPC_REJECTS_CHILD_FOREIGN_WINDOW_URL_AND_DESTROYED_OK');
+  console.log('IPC_ENCODED_FILE_QUERY_HASH_AND_VALID_CALLER_OK');
+  console.log('IPC_ALL_CHANNELS_TRUST_OK channels=25 refusedCallbacks=0');
   console.log('PREVIEW_450_OK');
 })().catch(error => { console.error(error); process.exitCode = 1; });

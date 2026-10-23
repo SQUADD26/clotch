@@ -17,6 +17,7 @@ import { collegaScena, fileScena, leggiScena } from "./scena";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import type { PaginaMessaggi } from "./tipi";
 import { provaSilenziosa } from "./modalita-prova";
+import { verificaChiamante } from "./ipc-fiducia";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
@@ -46,7 +47,7 @@ process.on("unhandledRejection", (e) => registra(`promessa rifiutata: ${testoErr
 // un solo punto per tutti i canali IPC: ogni errore di un canale va nel registro e poi torna al renderer
 const handle = ipcMain.handle.bind(ipcMain);
 ipcMain.handle = (canale, fn) => handle(canale, async (...a) => {
-  try { return await fn(...a); } catch (e) { registra(`${canale}: ${testoErrore(e)}`); throw e; }
+  try { verificaChiamante(a[0]); return await fn(...a); } catch (e) { registra(`${canale}: ${testoErrore(e)}`); throw e; }
 });
 const lettiMale = new Set<string>();
 const elenco = () => {

@@ -7,6 +7,7 @@ import { numero, valori } from "./ui/base/token";
 import { iconaApp, NOME_APP } from "./branding";
 import { proteggiLinkEsterni } from "./link-esterni";
 import { provaSilenziosa } from "./modalita-prova";
+import { autorizzaIpc } from "./ipc-fiducia";
 
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
@@ -41,6 +42,7 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
     trafficLightPosition: { x: numero("spazio-5"), y: (numero("misura-barra-titolo") - numero("misura-semaforo")) / 2 },
     webPreferences: { preload, contextIsolation: true, webviewTag: false },
   });
+  autorizzaIpc(w.webContents, pagina);
   if (silenziosa) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w);
   if (anteprima) w.once("ready-to-show", () => {
@@ -55,6 +57,7 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
 export async function parita(id: string, navigazione?: Record<string, string | undefined>) {
   const { w: larga, h: alta } = frame(id);
   const w = new BrowserWindow({ width: larga, height: alta, show: false, focusable: false, frame: false, useContentSize: true, webPreferences: { preload, contextIsolation: true, webviewTag: false } });
+  autorizzaIpc(w.webContents, pagina);
   w.webContents.setAudioMuted(true);
   assert.equal(w.webContents.isAudioMuted(), true);
   let mostrate = 0, focalizzate = 0;
