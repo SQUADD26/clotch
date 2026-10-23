@@ -33,20 +33,17 @@
     "colore/testo/secondario": "#ffffffb5",
     "testo/dimensione/sm": 13,
     "testo/riga/sm": 18,
+    "colore/icona/accento": "#ee7c37",
+    "colore/testo/successo": "#40c977",
+    "testo/dimensione/xs": 12,
+    "testo/riga/xs": 16,
     "spazio/3": 12,
     "colore/fondo/riga-scelta": "#ffffff14",
     "colore/sessione/arancione": "#ff8549",
-    "colore/sessione/blu": "#339cff",
-    "colore/sessione/viola": "#ad7bf9",
+    "colore/sessione/grigio": "#c4c8ce",
     "colore/icona/successo": "#40c977",
     "colore/icona/terziaria": "#ffffff82",
-    "colore/sessione/verde": "#40c977",
-    "colore/icona/accento": "#ee7c37",
-    "colore/sessione/grigio": "#ffffffb5",
-    "colore/icona/errore": "#ff6764",
     "colore/fondo/bottone-secondario": "#ffffff0d",
-    "testo/dimensione/xs": 12,
-    "testo/riga/xs": 16,
     "colore/fondo/superficie": "#181818",
     "colore/bordo/leggero": "#ffffff0b",
     "raggio/lg": 12.5,
@@ -57,10 +54,10 @@
     "spazio/2-5": 10,
     "colore/testo/bolla": "#fdf5f1",
     "testo/riga/messaggio": 21,
+    "colore/icona/errore": "#ff6764",
     "colore/testo/errore": "#ff6764",
     "colore/fondo/codice": "#141414",
     "colore/bordo/normale": "#ffffff15",
-    "colore/testo/successo": "#40c977",
     "colore/fondo/casella": "#363636",
     "raggio/casella": 22,
     "misura/bottone-invio": 32,
@@ -70,6 +67,10 @@
     "misura/scelta-icona": 304,
     "misura/campione": 20,
     "colore/sessione/rosso": "#ff6764",
+    "misura/campione-interno": 12,
+    "colore/sessione/verde": "#40c977",
+    "colore/sessione/blu": "#339cff",
+    "colore/sessione/viola": "#ad7bf9",
     "misura/cella-icona": 32
   },
   "nodi": [
@@ -249,9 +250,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 167.3330078125,
-        "y": 80.239990234375,
-        "w": 13.33375072479248,
-        "h": 11.51333236694336
+        "y": 79.3330078125,
+        "w": 13.333984375,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -296,10 +297,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 201.332763671875,
-        "y": 81.960205078125,
-        "w": 9.333861351013184,
-        "h": 8
+        "x": 200.666259765625,
+        "y": 80.666748046875,
+        "w": 10.6669921875,
+        "h": 10.666565895080566
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -344,10 +345,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 233.333251953125,
-        "y": 81.960205078125,
-        "w": 9.327195167541504,
-        "h": 8
+        "x": 232.666259765625,
+        "y": 80.66650390625,
+        "w": 10.6669921875,
+        "h": 10.666892051696777
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -426,10 +427,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 81.666748046875,
-        "y": 117.666748046875,
-        "w": 12.661666870117188,
-        "h": 12.661666870117188
+        "x": 81.3330078125,
+        "y": 117.3330078125,
+        "w": 13.333462715148926,
+        "h": 13.333462715148926
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -514,10 +515,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 82,
-        "y": 152,
-        "w": 12,
-        "h": 12.587235450744629
+        "x": 81.3330078125,
+        "y": 153.3330078125,
+        "w": 13.333984375,
+        "h": 9.333984375
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -544,14 +545,102 @@
       "font": "SF Pro Regular"
     },
     {
+      "id": "101:13568",
+      "nome": "riga Friday",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 72,
+        "y": 176,
+        "w": 250,
+        "h": 32
+      },
+      "variabili": {
+        "cornerRadius": "raggio/md",
+        "itemSpacing": "spazio/2",
+        "paddingLeft": "spazio/2",
+        "paddingRight": "spazio/2",
+        "height": "misura/riga"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:13568;101:13544",
+      "nome": "icona scintille",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 80,
+        "y": 184,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {
+        "width": "misura/icona",
+        "height": "misura/icona"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:13568;101:13544;101:11153",
+      "nome": "forma",
+      "tipo": "VECTOR",
+      "box": {
+        "x": 80.667236328125,
+        "y": 184.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
+      },
+      "variabili": {
+        "fills[0]": "colore/icona/accento"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:13568;101:13543",
+      "nome": "titolo",
+      "tipo": "TEXT",
+      "box": {
+        "x": 104,
+        "y": 182,
+        "w": 169,
+        "h": 20
+      },
+      "variabili": {
+        "fills[0]": "colore/testo/primario",
+        "fontSize": "testo/dimensione/base",
+        "lineHeight": "testo/riga/base"
+      },
+      "senza": [],
+      "testo": "Friday",
+      "font": "SF Pro Medium"
+    },
+    {
+      "id": "I101:13568;101:13546",
+      "nome": "stato",
+      "tipo": "TEXT",
+      "box": {
+        "x": 281,
+        "y": 184,
+        "w": 33,
+        "h": 16
+      },
+      "variabili": {
+        "fills[0]": "colore/testo/successo",
+        "fontSize": "testo/dimensione/xs",
+        "lineHeight": "testo/riga/xs"
+      },
+      "senza": [],
+      "testo": "Attiva",
+      "font": "SF Pro Regular"
+    },
+    {
       "id": "101:12125",
       "nome": "Elenco",
       "tipo": "FRAME",
       "box": {
         "x": 72,
-        "y": 176,
+        "y": 210,
         "w": 250,
-        "h": 726
+        "h": 692
       },
       "variabili": {
         "itemSpacing": "spazio/0-5",
@@ -565,7 +654,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 72,
-        "y": 188,
+        "y": 222,
         "w": 250,
         "h": 32
       },
@@ -582,7 +671,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 80,
-        "y": 195,
+        "y": 229,
         "w": 234,
         "h": 18
       },
@@ -601,7 +690,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 72,
-        "y": 222,
+        "y": 256,
         "w": 250,
         "h": 32
       },
@@ -620,7 +709,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 80,
-        "y": 230,
+        "y": 264,
         "w": 16,
         "h": 16
       },
@@ -635,10 +724,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 80.99658203125,
-        "y": 231.9951171875,
-        "w": 14.795753479003906,
-        "h": 12.005000114440918
+        "x": 80.666259765625,
+        "y": 265.3330078125,
+        "w": 14.668932914733887,
+        "h": 12.667033195495605
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -651,7 +740,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 104,
-        "y": 228,
+        "y": 262,
         "w": 193,
         "h": 20
       },
@@ -670,7 +759,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 305,
-        "y": 229,
+        "y": 263,
         "w": 9,
         "h": 18
       },
@@ -689,7 +778,7 @@
       "tipo": "FRAME",
       "box": {
         "x": 72,
-        "y": 256,
+        "y": 290,
         "w": 250,
         "h": 134
       },
@@ -705,7 +794,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 96,
-        "y": 256,
+        "y": 290,
         "w": 226,
         "h": 32
       },
@@ -725,7 +814,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 104,
-        "y": 264,
+        "y": 298,
         "w": 16,
         "h": 16
       },
@@ -741,7 +830,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 104,
-        "y": 264,
+        "y": 298,
         "w": 16,
         "h": 16
       },
@@ -756,10 +845,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 104.97607421875,
-        "y": 264.69677734375,
-        "w": 14.04141616821289,
-        "h": 13.507473945617676
+        "x": 104.6650390625,
+        "y": 298.66650390625,
+        "w": 14.668047904968262,
+        "h": 14.048399925231934
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -772,7 +861,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 128,
-        "y": 262,
+        "y": 296,
         "w": 162,
         "h": 20
       },
@@ -791,7 +880,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 298,
-        "y": 264,
+        "y": 298,
         "w": 16,
         "h": 16
       },
@@ -804,7 +893,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 298,
-        "y": 264,
+        "y": 298,
         "w": 16,
         "h": 16
       },
@@ -819,8 +908,8 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 298.666748046875,
-        "y": 264.666748046875,
+        "x": 298.666259765625,
+        "y": 298.666259765625,
         "w": 14.666666984558105,
         "h": 14.666666984558105
       },
@@ -831,135 +920,6 @@
     },
     {
       "id": "101:12130",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 96,
-        "y": 290,
-        "w": 226,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 104,
-        "y": 298,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:11383;101:11215",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 104,
-        "y": 298,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:11383;101:11215;101:11147",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 104.666259765625,
-        "y": 298.66650390625,
-        "w": 14.677791595458984,
-        "h": 14.660784721374512
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/blu"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 128,
-        "y": 296,
-        "w": 162,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Sessioni: lettura dal disco",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12130;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 298,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:7694;101:7123",
-      "nome": "icona in-corso",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 298,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12130;101:7694;101:7123;101:6864",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 298.666748046875,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/secondaria"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12131",
       "nome": "riga sessione",
       "tipo": "INSTANCE",
       "box": {
@@ -978,7 +938,7 @@
       "senza": []
     },
     {
-      "id": "I101:12131;101:11383",
+      "id": "I101:12130;101:11383",
       "nome": "icona sessione",
       "tipo": "INSTANCE",
       "box": {
@@ -994,7 +954,7 @@
       "senza": []
     },
     {
-      "id": "I101:12131;101:11383;101:11218",
+      "id": "I101:12130;101:11383;101:11203",
       "nome": "glifo",
       "tipo": "INSTANCE",
       "box": {
@@ -1010,22 +970,22 @@
       "senza": []
     },
     {
-      "id": "I101:12131;101:11383;101:11218;101:7099",
+      "id": "I101:12130;101:11383;101:11203;101:11147",
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 104.666748046875,
-        "y": 333.333251953125,
-        "w": 14.666666984558105,
-        "h": 13.333333015441895
+        "x": 104.666259765625,
+        "y": 332.666015625,
+        "w": 14.678117752075195,
+        "h": 14.661109924316406
       },
       "variabili": {
-        "fills[0]": "colore/sessione/viola"
+        "fills[0]": "colore/sessione/grigio"
       },
       "senza": []
     },
     {
-      "id": "I101:12131;101:7146",
+      "id": "I101:12130;101:7146",
       "nome": "titolo",
       "tipo": "TEXT",
       "box": {
@@ -1040,11 +1000,11 @@
         "lineHeight": "testo/riga/base"
       },
       "senza": [],
-      "testo": "Notch: avviso schermo",
+      "testo": "Sessioni: lettura dal disco",
       "font": "SF Pro Regular"
     },
     {
-      "id": "I101:12131;101:7694",
+      "id": "I101:12130;101:7694",
       "nome": "segno",
       "tipo": "INSTANCE",
       "box": {
@@ -1057,8 +1017,8 @@
       "senza": []
     },
     {
-      "id": "I101:12131;101:7694;101:7132",
-      "nome": "icona finita",
+      "id": "I101:12130;101:7694;101:7123",
+      "nome": "icona in-corso",
       "tipo": "INSTANCE",
       "box": {
         "x": 298,
@@ -1073,22 +1033,22 @@
       "senza": []
     },
     {
-      "id": "I101:12131;101:7694;101:7132;101:6920",
+      "id": "I101:12130;101:7694;101:7123;101:6864",
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 298.666748046875,
-        "y": 332.666748046875,
+        "x": 298.666259765625,
+        "y": 332.666259765625,
         "w": 14.666666984558105,
         "h": 14.666666984558105
       },
       "variabili": {
-        "fills[0]": "colore/icona/successo"
+        "fills[0]": "colore/icona/secondaria"
       },
       "senza": []
     },
     {
-      "id": "101:12132",
+      "id": "101:12131",
       "nome": "riga sessione",
       "tipo": "INSTANCE",
       "box": {
@@ -1107,7 +1067,7 @@
       "senza": []
     },
     {
-      "id": "I101:12132;101:11383",
+      "id": "I101:12131;101:11383",
       "nome": "icona sessione",
       "tipo": "INSTANCE",
       "box": {
@@ -1123,7 +1083,7 @@
       "senza": []
     },
     {
-      "id": "I101:12132;101:11383;101:11215",
+      "id": "I101:12131;101:11383;101:11203",
       "nome": "glifo",
       "tipo": "INSTANCE",
       "box": {
@@ -1139,17 +1099,146 @@
       "senza": []
     },
     {
-      "id": "I101:12132;101:11383;101:11215;101:6994",
+      "id": "I101:12131;101:11383;101:11203;101:7099",
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 106.85791015625,
-        "y": 367.666748046875,
-        "w": 10.27738094329834,
-        "h": 12.666666984558105
+        "x": 104.666259765625,
+        "y": 367.3330078125,
+        "w": 14.6669921875,
+        "h": 13.333984375
       },
       "variabili": {
-        "fills[0]": "colore/sessione/blu"
+        "fills[0]": "colore/sessione/grigio"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12131;101:7146",
+      "nome": "titolo",
+      "tipo": "TEXT",
+      "box": {
+        "x": 128,
+        "y": 364,
+        "w": 162,
+        "h": 20
+      },
+      "variabili": {
+        "fills[0]": "colore/testo/primario",
+        "fontSize": "testo/dimensione/base",
+        "lineHeight": "testo/riga/base"
+      },
+      "senza": [],
+      "testo": "Notch: avviso schermo",
+      "font": "SF Pro Regular"
+    },
+    {
+      "id": "I101:12131;101:7694",
+      "nome": "segno",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 298,
+        "y": 366,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {},
+      "senza": []
+    },
+    {
+      "id": "I101:12131;101:7694;101:7132",
+      "nome": "icona finita",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 298,
+        "y": 366,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {
+        "width": "misura/icona",
+        "height": "misura/icona"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12131;101:7694;101:7132;101:6920",
+      "nome": "forma",
+      "tipo": "VECTOR",
+      "box": {
+        "x": 298.666259765625,
+        "y": 366.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
+      },
+      "variabili": {
+        "fills[0]": "colore/icona/successo"
+      },
+      "senza": []
+    },
+    {
+      "id": "101:12132",
+      "nome": "riga sessione",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 96,
+        "y": 392,
+        "w": 226,
+        "h": 32
+      },
+      "variabili": {
+        "cornerRadius": "raggio/md",
+        "itemSpacing": "spazio/2",
+        "paddingLeft": "spazio/2",
+        "paddingRight": "spazio/2",
+        "height": "misura/riga"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12132;101:11383",
+      "nome": "icona sessione",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 104,
+        "y": 400,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {
+        "width": "misura/icona",
+        "height": "misura/icona"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12132;101:11383;101:11203",
+      "nome": "glifo",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 104,
+        "y": 400,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {
+        "width": "misura/icona",
+        "height": "misura/icona"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12132;101:11383;101:11203;101:6994",
+      "nome": "forma",
+      "tipo": "VECTOR",
+      "box": {
+        "x": 106.666259765625,
+        "y": 400.666259765625,
+        "w": 10.6669921875,
+        "h": 14.667318344116211
+      },
+      "variabili": {
+        "fills[0]": "colore/sessione/grigio"
       },
       "senza": []
     },
@@ -1159,7 +1248,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 128,
-        "y": 364,
+        "y": 398,
         "w": 162,
         "h": 20
       },
@@ -1178,7 +1267,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 298,
-        "y": 366,
+        "y": 400,
         "w": 16,
         "h": 16
       },
@@ -1191,7 +1280,7 @@
       "tipo": "INSTANCE",
       "box": {
         "x": 298,
-        "y": 366,
+        "y": 400,
         "w": 16,
         "h": 16
       },
@@ -1206,10 +1295,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 298.666748046875,
-        "y": 366.666748046875,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
+        "x": 298.666259765625,
+        "y": 400.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/terziaria"
@@ -1218,94 +1307,6 @@
     },
     {
       "id": "101:12133",
-      "nome": "riga progetto",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 392,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12133;101:7164",
-      "nome": "icona cartella",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 400,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12133;101:7164;101:6885",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.33203125,
-        "y": 402,
-        "w": 13.336000442504883,
-        "h": 12
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/secondaria"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12133;101:7166",
-      "nome": "progetto",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 398,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "squadd-v2",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12133;101:7167",
-      "nome": "conteggio",
-      "tipo": "TEXT",
-      "box": {
-        "x": 298,
-        "y": 399,
-        "w": 16,
-        "h": 18
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/secondario",
-        "fontSize": "testo/dimensione/sm",
-        "lineHeight": "testo/riga/sm"
-      },
-      "senza": [],
-      "testo": "23",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "101:12134",
       "nome": "riga progetto",
       "tipo": "INSTANCE",
       "box": {
@@ -1324,7 +1325,7 @@
       "senza": []
     },
     {
-      "id": "I101:12134;101:7164",
+      "id": "I101:12133;101:7164",
       "nome": "icona cartella",
       "tipo": "INSTANCE",
       "box": {
@@ -1340,14 +1341,14 @@
       "senza": []
     },
     {
-      "id": "I101:12134;101:7164;101:6885",
+      "id": "I101:12133;101:7164;101:6885",
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 81.33203125,
-        "y": 436,
-        "w": 13.336000442504883,
-        "h": 12
+        "x": 80.666259765625,
+        "y": 435.3330078125,
+        "w": 14.6669921875,
+        "h": 12.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -1355,13 +1356,13 @@
       "senza": []
     },
     {
-      "id": "I101:12134;101:7166",
+      "id": "I101:12133;101:7166",
       "nome": "progetto",
       "tipo": "TEXT",
       "box": {
         "x": 104,
         "y": 432,
-        "w": 193,
+        "w": 186,
         "h": 20
       },
       "variabili": {
@@ -1370,17 +1371,17 @@
         "lineHeight": "testo/riga/base"
       },
       "senza": [],
-      "testo": "dentalspace",
+      "testo": "squadd-v2",
       "font": "SF Pro Regular"
     },
     {
-      "id": "I101:12134;101:7167",
+      "id": "I101:12133;101:7167",
       "nome": "conteggio",
       "tipo": "TEXT",
       "box": {
-        "x": 305,
+        "x": 298,
         "y": 433,
-        "w": 9,
+        "w": 16,
         "h": 18
       },
       "variabili": {
@@ -1389,11 +1390,11 @@
         "lineHeight": "testo/riga/sm"
       },
       "senza": [],
-      "testo": "9",
+      "testo": "23",
       "font": "SF Pro Regular"
     },
     {
-      "id": "101:12135",
+      "id": "101:12134",
       "nome": "riga progetto",
       "tipo": "INSTANCE",
       "box": {
@@ -1412,7 +1413,7 @@
       "senza": []
     },
     {
-      "id": "I101:12135;101:7164",
+      "id": "I101:12134;101:7164",
       "nome": "icona cartella",
       "tipo": "INSTANCE",
       "box": {
@@ -1428,14 +1429,102 @@
       "senza": []
     },
     {
+      "id": "I101:12134;101:7164;101:6885",
+      "nome": "forma",
+      "tipo": "VECTOR",
+      "box": {
+        "x": 80.666259765625,
+        "y": 469.3330078125,
+        "w": 14.6669921875,
+        "h": 12.6669921875
+      },
+      "variabili": {
+        "fills[0]": "colore/icona/secondaria"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12134;101:7166",
+      "nome": "progetto",
+      "tipo": "TEXT",
+      "box": {
+        "x": 104,
+        "y": 466,
+        "w": 193,
+        "h": 20
+      },
+      "variabili": {
+        "fills[0]": "colore/testo/primario",
+        "fontSize": "testo/dimensione/base",
+        "lineHeight": "testo/riga/base"
+      },
+      "senza": [],
+      "testo": "dentalspace",
+      "font": "SF Pro Regular"
+    },
+    {
+      "id": "I101:12134;101:7167",
+      "nome": "conteggio",
+      "tipo": "TEXT",
+      "box": {
+        "x": 305,
+        "y": 467,
+        "w": 9,
+        "h": 18
+      },
+      "variabili": {
+        "fills[0]": "colore/testo/secondario",
+        "fontSize": "testo/dimensione/sm",
+        "lineHeight": "testo/riga/sm"
+      },
+      "senza": [],
+      "testo": "9",
+      "font": "SF Pro Regular"
+    },
+    {
+      "id": "101:12135",
+      "nome": "riga progetto",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 72,
+        "y": 494,
+        "w": 250,
+        "h": 32
+      },
+      "variabili": {
+        "cornerRadius": "raggio/md",
+        "itemSpacing": "spazio/2",
+        "paddingLeft": "spazio/2",
+        "paddingRight": "spazio/2",
+        "height": "misura/riga"
+      },
+      "senza": []
+    },
+    {
+      "id": "I101:12135;101:7164",
+      "nome": "icona cartella",
+      "tipo": "INSTANCE",
+      "box": {
+        "x": 80,
+        "y": 502,
+        "w": 16,
+        "h": 16
+      },
+      "variabili": {
+        "width": "misura/icona",
+        "height": "misura/icona"
+      },
+      "senza": []
+    },
+    {
       "id": "I101:12135;101:7164;101:6885",
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 81.33203125,
-        "y": 470,
-        "w": 13.336000442504883,
-        "h": 12
+        "x": 80.666259765625,
+        "y": 503.3330078125,
+        "w": 14.6669921875,
+        "h": 12.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -1448,7 +1537,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 104,
-        "y": 466,
+        "y": 500,
         "w": 187,
         "h": 20
       },
@@ -1467,7 +1556,7 @@
       "tipo": "TEXT",
       "box": {
         "x": 299,
-        "y": 467,
+        "y": 501,
         "w": 15,
         "h": 18
       },
@@ -1479,1404 +1568,6 @@
       "senza": [],
       "testo": "14",
       "font": "SF Pro Regular"
-    },
-    {
-      "id": "101:12136",
-      "nome": "titolo sezione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 494,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12136;101:7170",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 80,
-        "y": 501,
-        "w": 234,
-        "h": 18
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/secondario",
-        "fontSize": "testo/dimensione/sm",
-        "lineHeight": "testo/riga/sm"
-      },
-      "senza": [],
-      "testo": "Oggi",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "101:12137",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 528,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 536,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:11383;101:11212",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 536,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:11383;101:11212;101:11040",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.333251953125,
-        "y": 536.666748046875,
-        "w": 13.333333015441895,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/verde"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 534,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Backend: auth e RLS",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12137;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 536,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:7694;101:7126",
-      "nome": "icona mano",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 536,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12137;101:7694;101:7126;101:7043",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.59619140625,
-        "y": 536.666748046875,
-        "w": 14.737022399902344,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/accento"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12138",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 562,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 570,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:11383;101:11218",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 570,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:11383;101:11218;101:11054",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 80.666748046875,
-        "y": 570.66650390625,
-        "w": 14.643229484558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/viola"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 568,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Figma: tabella CRM interno",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12138;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 570,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:7694;101:7123",
-      "nome": "icona in-corso",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 570,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12138;101:7694;101:7123;101:6864",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 570.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/secondaria"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12139",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 596,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 604,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:11383;101:11209",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 604,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:11383;101:11209;101:11030",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 80.97607421875,
-        "y": 604.69677734375,
-        "w": 14.04141616821289,
-        "h": 13.507473945617676
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/arancione"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 602,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "dentalspace: agenda del dentista",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12139;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 604,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 604,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12139;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 604.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12140",
-      "nome": "titolo sezione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 630,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12140;101:7170",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 80,
-        "y": 637,
-        "w": 234,
-        "h": 18
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/secondario",
-        "fontSize": "testo/dimensione/sm",
-        "lineHeight": "testo/riga/sm"
-      },
-      "senza": [],
-      "testo": "Ieri",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "101:12141",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 664,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 672,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:11383;101:11203",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 672,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:11383;101:11203;101:11110",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.3310546875,
-        "y": 672.6650390625,
-        "w": 13.338005065917969,
-        "h": 14.670159339904785
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/grigio"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 670,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Friday: computer use per ogni app",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12141;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 672,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:7694;101:7135",
-      "nome": "icona avviso",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 672,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12141;101:7694;101:7135;101:6930",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 672.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/errore"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12142",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 698,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 706,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:11383;101:11215",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 706,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:11383;101:11215;101:11059",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.333251953125,
-        "y": 710.66259765625,
-        "w": 13.333333015441895,
-        "h": 6.71956205368042
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/blu"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 704,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Codex: revisione del ramo dev",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12142;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 706,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 706,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12142;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 706.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12143",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 732,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 740,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:11383;101:11203",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 740,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:11383;101:11203;101:11131",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 82,
-        "y": 741.33349609375,
-        "w": 12.666666984558105,
-        "h": 12.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/grigio"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 738,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Cursor: fix del login",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12143;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 740,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:7694;101:7129",
-      "nome": "icona pausa",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 740,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12143;101:7694;101:7129;101:6912",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 740.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/terziaria"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12144",
-      "nome": "titolo sezione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 766,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12144;101:7170",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 80,
-        "y": 773,
-        "w": 234,
-        "h": 18
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/secondario",
-        "fontSize": "testo/dimensione/sm",
-        "lineHeight": "testo/riga/sm"
-      },
-      "senza": [],
-      "testo": "Ultimi 7 giorni",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "101:12145",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 800,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 808,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:11383;101:11209",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 808,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:11383;101:11209;101:11030",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 80.97607421875,
-        "y": 808.69677734375,
-        "w": 14.04141616821289,
-        "h": 13.507473945617676
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/arancione"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 806,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Squadd: promozione di dev",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12145;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 808,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 808,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12145;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 808.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12146",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 834,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 842,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:11383;101:11212",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 842,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:11383;101:11212;101:11165",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.333251953125,
-        "y": 842.66796875,
-        "w": 13.333333015441895,
-        "h": 14.665299415588379
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/verde"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 840,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Backup Hetzner sulle VPS",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12146;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 842,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 842,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12146;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 842.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12147",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 868,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 876,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:11383;101:11218",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 876,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:11383;101:11218;101:11153",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 81.186767578125,
-        "y": 877.16650390625,
-        "w": 13.64666748046875,
-        "h": 13.653332710266113
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/viola"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 874,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Overseer: voce in Clotch",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12147;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 876,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 876,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12147;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 876.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
-    },
-    {
-      "id": "101:12148",
-      "nome": "riga sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 72,
-        "y": 902,
-        "w": 250,
-        "h": 32
-      },
-      "variabili": {
-        "cornerRadius": "raggio/md",
-        "itemSpacing": "spazio/2",
-        "paddingLeft": "spazio/2",
-        "paddingRight": "spazio/2",
-        "height": "misura/riga"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:11383",
-      "nome": "icona sessione",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 910,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:11383;101:11203",
-      "nome": "glifo",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 80,
-        "y": 910,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:11383;101:11203;101:11120",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 82.666748046875,
-        "y": 911.41943359375,
-        "w": 10.666666984558105,
-        "h": 13.247174263000488
-      },
-      "variabili": {
-        "fills[0]": "colore/sessione/grigio"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:7146",
-      "nome": "titolo",
-      "tipo": "TEXT",
-      "box": {
-        "x": 104,
-        "y": 908,
-        "w": 186,
-        "h": 20
-      },
-      "variabili": {
-        "fills[0]": "colore/testo/primario",
-        "fontSize": "testo/dimensione/base",
-        "lineHeight": "testo/riga/base"
-      },
-      "senza": [],
-      "testo": "Handoff: stato vivo",
-      "font": "SF Pro Regular"
-    },
-    {
-      "id": "I101:12148;101:7694",
-      "nome": "segno",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 910,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {},
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:7694;101:7132",
-      "nome": "icona finita",
-      "tipo": "INSTANCE",
-      "box": {
-        "x": 298,
-        "y": 910,
-        "w": 16,
-        "h": 16
-      },
-      "variabili": {
-        "width": "misura/icona",
-        "height": "misura/icona"
-      },
-      "senza": []
-    },
-    {
-      "id": "I101:12148;101:7694;101:7132;101:6920",
-      "nome": "forma",
-      "tipo": "VECTOR",
-      "box": {
-        "x": 298.666748046875,
-        "y": 910.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
-      },
-      "variabili": {
-        "fills[0]": "colore/icona/successo"
-      },
-      "senza": []
     },
     {
       "id": "101:12149",
@@ -3024,10 +1715,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 293.544677734375,
-        "y": 923,
-        "w": 12.905132293701172,
-        "h": 13.979999542236328
+        "x": 293.32177734375,
+        "y": 922.66650390625,
+        "w": 13.356658935546875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -3154,10 +1845,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 347.97607421875,
-        "y": 120.69677734375,
-        "w": 14.04141616821289,
-        "h": 13.507473945617676
+        "x": 347.6650390625,
+        "y": 120.66650390625,
+        "w": 14.668047904968262,
+        "h": 14.048399925231934
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -3248,7 +1939,7 @@
       "tipo": "VECTOR",
       "box": {
         "x": 347.66650390625,
-        "y": 140.666748046875,
+        "y": 140.666259765625,
         "w": 14.666666984558105,
         "h": 14.666666984558105
       },
@@ -3369,10 +2060,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 489.33349609375,
-        "y": 141.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 489.3330078125,
+        "y": 141.3330078125,
+        "w": 13.333984375,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -3527,10 +2218,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1428.33349609375,
-        "y": 130.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 1428.3330078125,
+        "y": 130.3330078125,
+        "w": 13.333984375,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -3575,10 +2266,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1459,
-        "y": 135.666748046875,
-        "w": 12,
-        "h": 2.6666667461395264
+        "x": 1458.99951171875,
+        "y": 135.666259765625,
+        "w": 12.000325202941895,
+        "h": 2.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -3755,8 +2446,8 @@
       "box": {
         "x": 365.66650390625,
         "y": 613.66650390625,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/errore"
@@ -3841,10 +2532,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1111.666015625,
-        "y": 618.29345703125,
-        "w": 10.700224876403809,
-        "h": 6.033557891845703
+        "x": 1112.3330078125,
+        "y": 618.3330078125,
+        "w": 9.333883285522461,
+        "h": 5.333883762359619
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -3968,10 +2659,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 380.076171875,
-        "y": 727.97509765625,
-        "w": 11.942031860351562,
-        "h": 11.942031860351562
+        "x": 378.6669921875,
+        "y": 726.666015625,
+        "w": 14.666559219360352,
+        "h": 14.666609764099121
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -4057,9 +2748,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 1101.3330078125,
-        "y": 728.666015625,
-        "w": 5.994390487670898,
-        "h": 10.6274995803833
+        "y": 729.3330078125,
+        "w": 5.333883762359619,
+        "h": 9.333883285522461
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -4153,10 +2844,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 372.330078125,
-        "y": 802.330078125,
-        "w": 13.336817741394043,
-        "h": 13.336817741394043
+        "x": 371.66650390625,
+        "y": 801.66650390625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -4274,10 +2965,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 387.33349609375,
-        "y": 907.33349609375,
-        "w": 9.333333015441895,
-        "h": 9.333333015441895
+        "x": 386.66650390625,
+        "y": 906.66650390625,
+        "w": 10.6669921875,
+        "h": 10.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -4354,10 +3045,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1052.85791015625,
-        "y": 905.66650390625,
-        "w": 10.27738094329834,
-        "h": 12.666666984558105
+        "x": 1052.66650390625,
+        "y": 904.66650390625,
+        "w": 10.6669921875,
+        "h": 14.667318344116211
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -4403,10 +3094,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1092.03955078125,
-        "y": 907.3330078125,
-        "w": 7.920608997344971,
-        "h": 9.333861351013184
+        "x": 1090.66650390625,
+        "y": 906.66650390625,
+        "w": 10.666565895080566,
+        "h": 10.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/terziaria"
@@ -4574,9 +3265,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 1175.66650390625,
-        "y": 320.666748046875,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
+        "y": 320.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/successo"
@@ -4639,9 +3330,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 1175.66650390625,
-        "y": 346.666748046875,
-        "w": 14.666666984558105,
-        "h": 14.666666984558105
+        "y": 346.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/successo"
@@ -4703,10 +3394,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 1176.33349609375,
-        "y": 373.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 1175.66650390625,
+        "y": 372.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/icona/terziaria"
@@ -4916,10 +3607,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 356.66650390625,
-        "y": 190.666748046875,
-        "w": 12.661666870117188,
-        "h": 12.661666870117188
+        "x": 356.3330078125,
+        "y": 190.3330078125,
+        "w": 13.333462715148926,
+        "h": 13.333462715148926
       },
       "variabili": {
         "fills[0]": "colore/icona/secondaria"
@@ -5027,8 +3718,7 @@
         "h": 20
       },
       "variabili": {
-        "fills[0]": "colore/sessione/arancione",
-        "strokes[0]": "colore/testo/primario",
+        "strokes[0]": "colore/sessione/arancione",
         "cornerRadius": "raggio/pieno",
         "width": "misura/campione",
         "height": "misura/campione"
@@ -5036,6 +3726,24 @@
       "senza": [
         "strokeWeight 2"
       ]
+    },
+    {
+      "id": "I101:12169;101:11256;101:16661",
+      "nome": "punto",
+      "tipo": "FRAME",
+      "box": {
+        "x": 417,
+        "y": 257,
+        "w": 12,
+        "h": 12
+      },
+      "variabili": {
+        "fills[0]": "colore/sessione/arancione",
+        "cornerRadius": "raggio/pieno",
+        "width": "misura/campione-interno",
+        "height": "misura/campione-interno"
+      },
+      "senza": []
     },
     {
       "id": "I101:12169;101:11257",
@@ -5182,10 +3890,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 355.97607421875,
-        "y": 321.69677734375,
-        "w": 14.04141616821289,
-        "h": 13.507473945617676
+        "x": 355.6650390625,
+        "y": 321.66650390625,
+        "w": 14.668047904968262,
+        "h": 14.048399925231934
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5246,10 +3954,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 390.33349609375,
-        "y": 321.666748046875,
-        "w": 13.333333015441895,
-        "h": 14.666666984558105
+        "x": 390.3330078125,
+        "y": 321.666259765625,
+        "w": 13.333984375,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5311,9 +4019,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 423.66650390625,
-        "y": 321.666748046875,
-        "w": 14.643229484558105,
-        "h": 14.666666984558105
+        "y": 321.666259765625,
+        "w": 14.662109375,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5374,10 +4082,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 458.33349609375,
-        "y": 325.66259765625,
-        "w": 13.333333015441895,
-        "h": 6.71956205368042
+        "x": 457.66650390625,
+        "y": 324.3330078125,
+        "w": 14.667217254638672,
+        "h": 9.333883285522461
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5438,10 +4146,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 492,
-        "y": 321.666259765625,
-        "w": 14.333319664001465,
-        "h": 14.333483695983887
+        "x": 491.99951171875,
+        "y": 321.6669921875,
+        "w": 14.33333969116211,
+        "h": 14.332781791687012
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5502,10 +4210,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 526.99755859375,
-        "y": 322.331298828125,
-        "w": 12.00235652923584,
-        "h": 13.335375785827637
+        "x": 525.66650390625,
+        "y": 321.66650390625,
+        "w": 14.666666984558105,
+        "h": 13.99994945526123
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5566,10 +4274,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 561.6630859375,
-        "y": 322.328857421875,
-        "w": 10.670150756835938,
-        "h": 13.337712287902832
+        "x": 559.66650390625,
+        "y": 322.3330078125,
+        "w": 14.6669921875,
+        "h": 13.333658218383789
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5630,10 +4338,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 595,
-        "y": 323,
-        "w": 12,
-        "h": 12
+        "x": 594.3330078125,
+        "y": 322.3330078125,
+        "w": 13.333984375,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5694,10 +4402,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 357,
-        "y": 356.333251953125,
-        "w": 12,
-        "h": 12.666666984558105
+        "x": 356.3330078125,
+        "y": 355.666259765625,
+        "w": 13.333984375,
+        "h": 14.667317390441895
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5758,10 +4466,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 390.33349609375,
-        "y": 356.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 389.74169921875,
+        "y": 355.666259765625,
+        "w": 14.592182159423828,
+        "h": 14.61944580078125
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5822,10 +4530,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 424.33349609375,
-        "y": 357.666748046875,
-        "w": 13.333333015441895,
-        "h": 10.666666984558105
+        "x": 423.66650390625,
+        "y": 356.999755859375,
+        "w": 14.667144775390625,
+        "h": 12
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5886,10 +4594,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 458.33349609375,
-        "y": 356.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 457.66650390625,
+        "y": 355.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -5950,10 +4658,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 493.33349609375,
-        "y": 355.666748046875,
-        "w": 11.33335018157959,
-        "h": 14.659010887145996
+        "x": 494.3330078125,
+        "y": 355.666259765625,
+        "w": 9.333984375,
+        "h": 14.667318344116211
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6015,9 +4723,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 526.3310546875,
-        "y": 355.6650390625,
-        "w": 13.338005065917969,
-        "h": 14.670159339904785
+        "y": 355.66455078125,
+        "w": 13.337800979614258,
+        "h": 14.670222282409668
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6078,10 +4786,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 560.36181640625,
-        "y": 356.99560546875,
-        "w": 13.270015716552734,
-        "h": 12.002758026123047
+        "x": 559.66650390625,
+        "y": 356.3330078125,
+        "w": 14.6669921875,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6142,10 +4850,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 595.66650390625,
-        "y": 356.41943359375,
-        "w": 10.666666984558105,
-        "h": 13.247174263000488
+        "x": 594.99951171875,
+        "y": 355.666259765625,
+        "w": 12,
+        "h": 14.666666984558105
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6206,10 +4914,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 356.66650390625,
-        "y": 390.957763671875,
-        "w": 12.66673755645752,
-        "h": 12.042195320129395
+        "x": 356.3330078125,
+        "y": 389.666748046875,
+        "w": 13.333984375,
+        "h": 14.000304222106934
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6270,10 +4978,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 391,
-        "y": 390.333251953125,
-        "w": 12.666666984558105,
-        "h": 12.666666984558105
+        "x": 389.66650390625,
+        "y": 389.641357421875,
+        "w": 14.692731857299805,
+        "h": 14.691822052001953
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6334,10 +5042,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 425,
-        "y": 389.666259765625,
+        "x": 424.99951171875,
+        "y": 389.666015625,
         "w": 12,
-        "h": 14.668551445007324
+        "h": 14.668789863586426
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6399,9 +5107,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 457.66650390625,
-        "y": 389.66650390625,
-        "w": 14.677791595458984,
-        "h": 14.660784721374512
+        "y": 389.666015625,
+        "w": 14.678117752075195,
+        "h": 14.661109924316406
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6462,10 +5170,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 492.1865234375,
-        "y": 390.166748046875,
-        "w": 13.64666748046875,
-        "h": 13.653332710266113
+        "x": 491.66748046875,
+        "y": 389.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6526,9 +5234,9 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 526.33349609375,
-        "y": 389.66796875,
-        "w": 13.333333015441895,
+        "x": 526.3330078125,
+        "y": 389.667724609375,
+        "w": 13.333984375,
         "h": 14.665299415588379
       },
       "variabili": {
@@ -6591,9 +5299,9 @@
       "tipo": "VECTOR",
       "box": {
         "x": 559.66650390625,
-        "y": 389.666748046875,
-        "w": 14.666666984558105,
-        "h": 13.333333015441895
+        "y": 389.666259765625,
+        "w": 14.6669921875,
+        "h": 13.333984375
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
@@ -6654,10 +5362,10 @@
       "nome": "forma",
       "tipo": "VECTOR",
       "box": {
-        "x": 594.33349609375,
-        "y": 390.333251953125,
-        "w": 13.333333015441895,
-        "h": 13.333333015441895
+        "x": 593.66650390625,
+        "y": 389.666259765625,
+        "w": 14.6669921875,
+        "h": 14.6669921875
       },
       "variabili": {
         "fills[0]": "colore/sessione/arancione"
