@@ -4,12 +4,11 @@ import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
 import { Menu } from "../base/Menu";
+import { Markdown, senzaMarkdown } from "./Markdown";
 import { useRiserva } from "./riserva";
 import "./filo.css";
 
-/** Il testo senza i segni del Markdown: titoli, grassetto, codice, link. */
-export const senzaMarkdown = (t: string) => t
-  .replace(/^#{1,6}\s+/gm, "").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+export { senzaMarkdown } from "./Markdown";
 
 /** `sessione`: per «Mostra nel file della sessione»; `prova`: stato del frame 101:23727 (copiato e menu aperto). */
 export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }: { testo: string; inScrittura: boolean; sessione?: string; prova?: boolean }) {
@@ -19,7 +18,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
   const copia = (t: string) => navigator.clipboard.writeText(t).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); });
   return (
     <div className="risposta">
-      <div className="testo-risposta">{testo}{inScrittura && <span className="cursore" />}</div>
+      <div className="testo-risposta"><Markdown testo={testo} />{inScrittura && <span className="cursore" />}</div>
       {!inScrittura && (
         <div className={menu ? "azioni fisse" : "azioni"}>
           <span className="con-suggerimento">
