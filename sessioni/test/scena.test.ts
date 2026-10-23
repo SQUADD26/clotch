@@ -18,6 +18,6 @@ test("scena: elenco vuoto di base, messaggi a pagine dalla fine, canali che scri
   assert.equal(rispostaScena(s, "sessioni:azione", ["a", "copia-id"]), undefined);
   assert.ok(rispostaScena(s, "friday:registro", []));
   assert.deepEqual([rispostaScena(s, "sessioni:cerca", ["x"]), rispostaScena(s, "sessioni:spazio", []), rispostaScena(s, "sessioni:impostazioni", [])],
-    [[], { indice: 0, messaggi: 0, immagini: 0 }, {}]);
+    [[], { indice: 0, messaggi: 0, immagini: 0, altro: 0 }, {}]);
   assert.equal(rispostaScena(s, "sessioni:svuota", []), undefined);
 });

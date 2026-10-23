@@ -29,8 +29,8 @@ function claude(): Prova[] {
   const out = [
     p("app <> Claude CLI", "il lettore vede le sessioni vere", cli.length && !senza ? "verde" : "fallita",
       `${cli.length} sessioni, ${senza} senza situazione, errori di lettura ${e.errori.length}`),
-    p("app <> app Claude", "il lettore vede le sessioni dell'app", app.length ? "verde" : "fallita",
-      `${app.length} sessioni, ${app.filter((s) => s.situazione).length} con trascrizione e situazione`),
+    p("app <> app Claude", "il lettore vede le sessioni dell'app", app.length ? "verde" : "attesa", // l'app Claude gira sul Mac: dalla sandbox non si vede
+      app.length ? `${app.length} sessioni, ${app.filter((s) => s.situazione).length} con trascrizione e situazione` : "nessuna sessione dell'app su questa macchina: provare sul Mac"),
   ];
   return out.concat(sessioniVere());
 }
@@ -45,7 +45,7 @@ function sessioniVere(): Prova[] {
   const casi: [string, string[], string, (s: Situazione, r: any) => boolean][] = [
     ["turno finito", [], "Rispondi solo: ok", (s) => s.adesso === "turno_finito"],
     ["modifica con differenze", ["--allowedTools", "Write"], "Crea il file prova.txt con scritto ciao, poi rispondi solo: fatto", (s) => s.segni.includes("modifica")],
-    ["permesso negato", ["--permission-mode", "default"], "Esegui con lo strumento Bash: echo ciao. Poi rispondi solo: fatto",
+    ["permesso negato", ["--settings", '{"permissions":{"deny":["Bash(echo:*)"]}}'] /* regola di rifiuto: nella sandbox un hook approva i permessi chiesti */, "Esegui con lo strumento Bash: echo ciao. Poi rispondi solo: fatto",
       (s, r) => (r.permission_denials?.length ?? 0) > 0 && (s.segni.includes("negata_da_regola") || s.segni.includes("rifiutata_da_te"))],
   ];
   return casi.map(([nome, extra, prompt, ok]) => {

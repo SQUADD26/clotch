@@ -69,13 +69,15 @@ test("Indice: coda in background, totale, spazio, svuota toglie indice e cache s
   const sp = i.spazio();
   assert.ok(sp.indice > 0);
   assert.deepEqual([sp.messaggi, sp.immagini], [5, 0]);
+  fs.writeFileSync(path.join(dir, "preferenze.json"), "123");
+  assert.equal(i.spazio().altro, 3); // il resto della cartella dell'app
   assert.equal(Object.keys(new Indice(dir).dati).length, 2); // riletto dal disco
   fs.appendFileSync(a, riga("user", "ancora", "04T00:00:00"));
   assert.equal(i.totale("a"), null); // file cambiato: il conto vecchio non vale
   await i.metti(sessioni.slice(1), true); // «a» non è più tra le sessioni: esce dall'indice
   assert.equal(i.dati.a, undefined);
   i.svuota();
-  assert.deepEqual(i.spazio(), { indice: 0, messaggi: 0, immagini: 0 });
+  assert.deepEqual(i.spazio(), { indice: 0, messaggi: 0, immagini: 0, altro: 3 });
   assert.ok(!fs.existsSync(path.join(dir, "indice.json")) && !fs.existsSync(path.join(dir, "cache", "messaggi")));
   assert.ok(fs.existsSync(a)); // le trascrizioni non si toccano
   assert.deepEqual(i.cerca("gatto"), []);

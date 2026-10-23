@@ -101,7 +101,7 @@ export interface SessioniApi {
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
   cerca(testo: string): Promise<RisultatoRicerca[]>;
   /** Byte su disco dell'indice e delle cache dell'app. */
-  spazio(): Promise<{ indice: number; messaggi: number; immagini: number }>;
+  spazio(): Promise<{ indice: number; messaggi: number; immagini: number; altro: number }>;
   /** Rifà l'indice da capo; si risolve quando ha finito. */
   ricostruisci(): Promise<void>;
   /** Toglie l'indice e le cache dal disco. */
@@ -138,3 +138,48 @@ export interface FridayApi {
   /** `friday avvia`, quando Friday è spenta. */
   avvia(): Promise<{ ok: boolean; testo: string }>;
 }
+
+/** Impostazioni dell'app (#351) nel file delle preferenze (`SessioniApi.impostazioni`); i valori di partenza sono quelli del disegno. */
+export interface ImpostazioniApp {
+  apriAllAvvio: boolean; barraDeiMenu: boolean; lingua: string; modello: string; apriSessione: string; cartellaRegistro: string;
+  colore: string; carattere: string; dimensione: string; densita: string; pannelloAperto: boolean; iconeSessioni: boolean;
+  avvisoAttesa: boolean; avvisoFinita: boolean; avvisoErrori: boolean; avvisoLimite: boolean; suono: string; silenzio: string;
+  sorgenteClaudeCode: boolean; sorgenteClaude: boolean; sorgenteCodex: boolean; sorgenteCursor: boolean;
+  /** Cartelle ~/.claude-* tolte o aggiunte a mano, oltre a quelle trovate dal main. */
+  accountTolti: string[]; accountAggiunti: string[];
+  comandiInteri: boolean; nascondiChiavi: boolean; cartelleEscluse: string[]; cronologia: string;
+  aggiornamentiAutomatici: boolean;
+  clotchVoce: boolean; clotchDettatura: boolean; clotchAvvisi: boolean; clotchObiettivi: boolean;
+  /** Tasti per azione; null = scorciatoia tolta. */
+  scorciatoie: Record<string, string | null>;
+}
+
+export interface CartellaAccount { percorso: string; dettaglio: string; errore: boolean }
+/** `giorni`: uso al giorno dell'account (scheda Andamento), dal più vecchio a oggi; `giorno` = data ISO. */
+export interface QuotaUso { account: string; usato: number; ripartenza: string; giorni?: { giorno: string; v: number }[] }
+export interface Archiviata { titolo: string; dove: string }
+
+/** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
+export interface ImpostazioniApi {
+  /** Cartelle ~/.claude* trovate nella home. */
+  radici(): Promise<string[]>;
+  /** Una riga per cartella, con le sessioni lette o l'errore. */
+  cartelle(percorsi: string[]): Promise<CartellaAccount[]>;
+  scegliCartella(): Promise<string | null>;
+  apri(percorso: string): Promise<void>;
+  versione(): Promise<string>;
+  /** «Apri all'avvio del Mac»: voce degli elementi di login. */
+  avvio(acceso: boolean): Promise<void>;
+  /** Quote d'uso per account; null finché non c'è una fonte (#374). */
+  uso(): Promise<QuotaUso[] | null>;
+  /** Sessioni archiviate (#375). */
+  archiviate(): Promise<Archiviata[]>;
+  /** «Elimina dati…»: toglie indice, cache e impostazioni dell'app; le sessioni originali non si toccano. */
+  eliminaDati(): Promise<void>;
+  /** Note della versione in uso; null finché non c'è una fonte. */
+  novita(): Promise<Novita | null>;
+  /** `false`: c'è un modo di controllare gli aggiornamenti? `true`: controlla. */
+  aggiornamenti(fai: boolean): Promise<boolean>;
+}
+
+export interface Novita { data: string; voci: string[] }

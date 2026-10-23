@@ -16,7 +16,7 @@ Ogni pezzo tocca solo la sua cartella: `barra/`, `chat/`, `pannello/`, `impostaz
 
 Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione scelta, sezione, `apri(vista, sessione?, sezione?)`, indietro/avanti, barra e pannello aperti). Viste: `sessione`, `friday`, `casella`, `decisioni`, `regole` (le quattro di Friday montano `friday/`), `impostazioni`.
 
-Barra del titolo: a destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
+Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `friday/` lo esportano con nome.
 
 Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvato.
 
@@ -30,7 +30,7 @@ Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvat
 
 ## Dati dal processo main
 
-Un solo modo: `base/dati.ts`. `useElenco()`, `useMessaggi(id)` (con `totale`: messaggi di tutta la sessione, null finché l'indice non la conosce), `useAggiornamenti(cb)`, `usePreferenze()` (icona, colore, fissa, non letta per sessione), `useImpostazioni()` (impostazioni dell'app: `dati`, `imposta(parte)`, null toglie), `useChiamata(fn, deps)`. Azioni su una sessione: `api().azione(id, "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale")`. Ricerca e spazio hanno un solo indice e una sola cache, nel main: `api().cerca(testo)` (al massimo 50 `RisultatoRicerca`: `id`, `titolo`, `frammento`, `t`, `nelTitolo`; prima i titoli, poi i più recenti), `api().spazio()` (byte di indice e cache), `api().ricostruisci()`, `api().svuota()`; `PaginaMessaggi.totale` = messaggi di tutta la sessione (null finché l'indice non la conosce). Nessun pezzo tiene un suo indice o un suo file di impostazioni. Danno `stato` (`carica` | `pronto` | `errore`), `errore` e `riprova()`; gli aggiornamenti dal vivo ricaricano senza svuotare lo schermo. Un canale nuovo del main va in `src/tipi.ts` (`SessioniApi`), `src/preload.ts` e `src/main.ts`, una riga per file.
+Un solo modo: `base/dati.ts`. `useElenco()`, `useMessaggi(id)` (con `totale`: messaggi di tutta la sessione, null finché l'indice non la conosce), `useAggiornamenti(cb)`, `usePreferenze()` (icona, colore, fissa, non letta per sessione), `useImpostazioni()` (impostazioni dell'app: `dati`, `imposta(parte)`, null toglie), `useChiamata(fn, deps)`. Azioni su una sessione: `api().azione(id, "nuova-finestra" | "copia-id" | "copia-cartella" | "copia-link" | "mostra-nel-finder" | "apri-terminale")`. Ricerca e spazio hanno un solo indice e una sola cache, nel main: `api().cerca(testo)` (al massimo 50 `RisultatoRicerca`: `id`, `titolo`, `frammento`, `t`, `nelTitolo`; prima i titoli, poi i più recenti), `api().spazio()` (byte di indice, cache e `altro`, il resto della cartella dell'app), `api().ricostruisci()`, `api().svuota()`; `PaginaMessaggi.totale` = messaggi di tutta la sessione (null finché l'indice non la conosce). Nessun pezzo tiene un suo indice o un suo file di impostazioni. Danno `stato` (`carica` | `pronto` | `errore`), `errore` e `riprova()`; gli aggiornamenti dal vivo ricaricano senza svuotare lo schermo. Un canale nuovo del main va in `src/tipi.ts` (`SessioniApi`), `src/preload.ts` e `src/main.ts`, una riga per file.
 
 ## Prova di parità
 

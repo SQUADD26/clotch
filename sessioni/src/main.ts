@@ -5,6 +5,7 @@ import * as path from "node:path";
 import { Sessioni } from "./api";
 import { apriFinestra, parita } from "./finestra";
 import { collegaFriday } from "./friday-ipc";
+import { collegaImpostazioni } from "./impostazioni";
 import { collegaIndice } from "./indice-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { collegaScena, fileScena, leggiScena } from "./scena";
@@ -22,7 +23,9 @@ app.whenReady().then(() => {
   const indice = collegaIndice(ipcMain, sessioni);
   ipcMain.handle("sessioni:messaggi", (_e, id: string, pagina: number) => ({ ...sessioni.messaggi(String(id), Number(pagina) | 0), totale: indice.totale(String(id)) }));
   collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
-  collegaPreferenze(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), sessioni);
+  const invia = (c: string, d: unknown) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
+  collegaPreferenze(ipcMain, invia, sessioni);
+  collegaImpostazioni(ipcMain, sessioni, indice, invia);
   sessioni.osserva((a) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
     const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
