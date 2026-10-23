@@ -83,7 +83,7 @@ test("vista: decisioni per giorno, annullate e non annullabili; regole per dove 
   assert.deepEqual([g[0].voci[1].genere, g[0].voci[1].nonAnnullabile, g[1].voci[0].genere], ["promozione", "Già su main", "altro"]);
   assert.deepEqual(g.map((x) => [x.titolo, x.voci.map((v) => [v.cosa, v.annullabile])]), [
     ["Oggi", [["Consentita la migrazione", false], ["Promosso dev a main", false]]],
-    ["Ieri", [["Archiviate 4 sessioni", true]]],
+    ["Ieri", [["Archiviate 4 sessioni", false]]],
   ]);
   assert.deepEqual(regolePerDove(r).map((x) => [x.dove, x.regole.map((y) => y.testo)]), [["claude-config", ["Più nuova", "Parla chiaro"]], ["/r/clotch", ["Figma prima"]]]);
 });

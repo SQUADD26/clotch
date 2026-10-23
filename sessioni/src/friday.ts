@@ -6,6 +6,7 @@ import * as crypto from "node:crypto";
 import { parseRiga, msgErrore } from "./jsonl";
 import { aMillisecondi } from "./registri";
 import { ErroreLettura } from "./tipi";
+import { ricevutaLocale } from "./friday-ricevuta";
 
 export const STATI_FRIDAY = ["lavora", "aspetta", "finito", "serve_roberto", "serve_madre", "bloccato", "ferma_limite"] as const;
 export const COMANDI = [
@@ -184,7 +185,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
           // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
           sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso), annullata: false }); break;
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false }); break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
