@@ -9,6 +9,10 @@ const AVVISI: [Chiave, string, string][] = [
   ["avvisoLimite", "Limite di uso", "Quando un account si ferma e quando riparte"],
 ];
 
+const SUONI = ["Vetro", "Campanello", "Pop", "Nessun suono"]; // 119:56546
+const ORE = "Scegli le ore…";
+const SILENZI = ["Mai", "22:00–8:00", "23:00–7:00", ORE]; // 119:56715
+
 export default function Notifiche() {
   const v = useImpostazioni();
   return (
@@ -19,9 +23,9 @@ export default function Notifiche() {
             <Interruttore etichetta={etichetta} acceso={v[k] === true} onCambia={(x) => imposta(k, x)} />
           </Riga>
         ))}
-        {/* le opzioni di Suono e Silenzio non sono ancora disegnate (BLOCCATO in #351) */}
-        <Riga etichetta="Suono" descrizione="Per le sessioni in attesa di te"><Scelta etichetta="Suono" valore={v.suono} /></Riga>
-        <Riga etichetta="Silenzio" descrizione="Niente notifiche in queste ore"><Scelta etichetta="Silenzio" valore={v.silenzio} /></Riga>
+        <Riga etichetta="Suono" descrizione="Per le sessioni in attesa di te"><Scelta etichetta="Suono" valore={v.suono} voci={SUONI} onScegli={(x) => imposta("suono", x)} /></Riga>
+        <Riga etichetta="Silenzio" descrizione="Niente notifiche in queste ore"><Scelta etichetta="Silenzio" valore={v.silenzio} voci={SILENZI}
+          onScegli={(x) => { if (x !== ORE) imposta("silenzio", x); /* shortcut: il selettore delle ore non è disegnato (BLOCCATO in issue 351), la voce non fa niente */ }} /></Riga>
       </Gruppo>
     </Pagina>
   );
