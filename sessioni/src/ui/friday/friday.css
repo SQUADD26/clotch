@@ -40,7 +40,9 @@
 /* «comandi globali» della barra del titolo: luna di Non disturbare e «Ferma tutto» */
 .comandi-titolo { position: relative; display: flex; align-items: center; gap: var(--spazio-2); -webkit-app-region: no-drag; }
 .comandi-titolo .bottone-icona.aperto { background: var(--colore-fondo-riga-passaggio); }
-.comandi-titolo .menu { top: calc(var(--misura-bottone) + var(--spazio-1)); right: 0; }
+/* 101-38626: il menu ha il bordo destro sulla luna, 6 px sotto */
+.comandi-titolo .ancora-menu { position: relative; display: flex; }
+.comandi-titolo .menu { top: calc(var(--misura-bottone) + var(--spazio-1-5)); right: 0; }
 .menu .titolo-menu { padding: var(--spazio-1) var(--spazio-2); }
 .menu .nota-menu { min-height: var(--misura-riga); padding: 0 var(--spazio-2); display: flex; align-items: center; }
 

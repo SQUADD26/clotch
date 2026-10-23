@@ -75,6 +75,7 @@ test("vista: decisioni per giorno, annullate e non annullabili; regole per dove 
     [50, "friday", "regola", { testo: "Parla chiaro", perche: "", dove: "claude-config", togli: false }],
     [40, "friday", "regola", { testo: "Via", perche: "", dove: "claude-config", togli: false }],
     [35, "friday", "regola", { testo: "Figma prima", perche: "", dove: "/r/clotch", togli: false }],
+    [30, "friday", "regola", { testo: "Più nuova", perche: "", dove: "claude-config", togli: false }],
     [20, "friday", "regola", { testo: "Via", perche: "", dove: "claude-config", togli: true }],
   ]);
   const g = decisioniPerGiorno(r, ORA);
@@ -84,7 +85,7 @@ test("vista: decisioni per giorno, annullate e non annullabili; regole per dove 
     ["Oggi", [["Consentita la migrazione", false], ["Promosso dev a main", false]]],
     ["Ieri", [["Archiviate 4 sessioni", true]]],
   ]);
-  assert.deepEqual(regolePerDove(r).map((x) => [x.dove, x.regole.map((y) => y.testo)]), [["claude-config", ["Parla chiaro"]], ["/r/clotch", ["Figma prima"]]]);
+  assert.deepEqual(regolePerDove(r).map((x) => [x.dove, x.regole.map((y) => y.testo)]), [["claude-config", ["Più nuova", "Parla chiaro"]], ["/r/clotch", ["Figma prima"]]]);
 });
 
 test("vista: il registro passa il ponte del preload senza Map e torna uguale", () => {

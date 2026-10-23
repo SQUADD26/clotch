@@ -75,7 +75,9 @@ export function decisioniPerGiorno(r: Registro, ora: number) {
 /** Regole a gruppi per `dove` (repo o cartella), in ordine di arrivo. */
 export function regolePerDove(r: Registro) {
   const gruppi = new Map<string, Registro["regole"]>();
-  for (const x of r.regole) gruppi.set(x.dove, [...(gruppi.get(x.dove) ?? []), x]);
+  // dalla più nuova (101-40473); senza data in fondo
+  const nuove = [...r.regole].sort((a, b) => (b.t ?? 0) - (a.t ?? 0));
+  for (const x of nuove) gruppi.set(x.dove, [...(gruppi.get(x.dove) ?? []), x]);
   return [...gruppi].map(([dove, regole]) => ({ dove, regole }));
 }
 

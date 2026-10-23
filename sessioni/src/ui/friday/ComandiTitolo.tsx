@@ -87,11 +87,13 @@ export function ComandiTitolo() {
   }, [chiusa]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="comandi-titolo">
+      <span className="ancora-menu">
       <button type="button" aria-label="Non disturbare" title="Non disturbare" aria-expanded={menu}
         className={`bottone-icona ${menu || quiete ? "aperto" : ""}`} onClick={() => menuQuiete.metti(!menu)}>
         <Icona nome="luna" colore={quiete ? "accento" : "secondaria"} />
       </button>
       {menu && <MenuNonDisturbare clotch={!!r && clotchAcceso(r, Date.now())} onChiudi={chiudi} />}
+      </span>
       <Bottone tipo="pericolo" piccolo disabled={stato === "in-corso"} onClick={() => fermo.metti("conferma")}>
         {stato === "in-corso" ? "Fermo…" : "Ferma tutto"}
       </Bottone>
