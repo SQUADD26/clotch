@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "sessioni/src/ui/barra/barra.css"
+        ],
+        "createdAt": "2026-10-23T14:24:29.682Z",
+        "reason": "design Figma 101:35045 «Shimmer sul nome»: segnala lo stato lavora, non decorazione"
+      }
+    ]
+  }
+}
