@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "finita",
     "perche": null,
-    "ultimaAttivita": 1792767937442,
+    "ultimaAttivita": 1792767997617,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,12 +54,12 @@
    {
     "tipo": "utente",
     "testo": "This session is being continued from a previous conversation that ran out of context.",
-    "t": 1792767869442
+    "t": 1792767929617
    },
    {
     "tipo": "utente",
     "testo": "Porta il disegno Sessioni nel codice, pari pari.",
-    "t": 1792767870442
+    "t": 1792767930617
    },
    {
     "tipo": "strumento",
@@ -92,7 +92,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767871442,
+    "t": 1792767931617,
     "id": "t0"
    },
    {
@@ -106,7 +106,7 @@
      "testo": "Ha letto 4 file",
      "errore": false
     },
-    "t": 1792767872442,
+    "t": 1792767932617,
     "id": "t1"
    },
    {
@@ -120,7 +120,7 @@
      "testo": "Nessun errore",
      "errore": false
     },
-    "t": 1792767884442,
+    "t": 1792767944617,
     "id": "t2"
    },
    {
@@ -134,7 +134,7 @@
      "testo": "14 stati pari al disegno",
      "errore": false
     },
-    "t": 1792767892442,
+    "t": 1792767952617,
     "id": "t3"
    },
    {
@@ -149,7 +149,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767933442,
+    "t": 1792767993617,
     "id": "t4"
    },
    {
@@ -164,7 +164,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767934442,
+    "t": 1792767994617,
     "id": "t5"
    },
    {
@@ -179,14 +179,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767935442,
+    "t": 1792767995617,
     "id": "t6"
    },
    {
     "tipo": "assistente",
     "testo": "Fatto. Le 14 schermate sono pari al disegno; la PR verso dev è aperta.",
     "modello": "claude-opus-5-5",
-    "t": 1792767936442
+    "t": 1792767996617
    }
   ]
  },
@@ -211,7 +211,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792768037442,
+    "battito": 1792768097617,
     "aiutanti": {
      "a1": {
       "tipo": "general-purpose",
@@ -226,7 +226,7 @@
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792768057442,
+    "visto": 1792768117617,
     "fine": null,
     "chatNuova": null,
     "fermata": false,

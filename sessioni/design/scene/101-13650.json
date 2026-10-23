@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792767937442,
+    "ultimaAttivita": 1792767997617,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Ricompila l’app dopo il cambio della barra laterale.",
-    "t": 1792767934442
+    "t": 1792767994617
    },
    {
     "tipo": "strumento",
@@ -66,14 +66,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792767935442,
+    "t": 1792767995617,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "La cartella della build è vecchia: la svuoto e ricompilo.",
     "modello": "claude-opus-5-5",
-    "t": 1792767936442
+    "t": 1792767996617
    }
   ]
  },
@@ -109,14 +109,14 @@
       "domande": []
      }
     ],
-    "battito": 1792768037442,
+    "battito": 1792768097617,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792768057442,
+    "visto": 1792768117617,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
