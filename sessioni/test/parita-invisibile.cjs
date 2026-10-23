@@ -85,22 +85,23 @@ async function run(args, scene, initialEnv = {}) {
     getPath: () => '/test-no-real-user', on() {}, exit: code => calls.push(`exit:${code}`),
   };
   const handlers = new Map();
+  let ready; // ready-to-show della finestra finta
   const ipcMain = { handle: (canale, fn) => handlers.set(canale, fn) };
   const modules = {
     electron: { app, ipcMain, BrowserWindow: { getAllWindows: () => [] } },
     './allegati-ipc': { collegaAllegati: record('casella-live') },
     './api': { Sessioni: class {
-      elencoSessioni() { return { sessioni: [], errori: [] }; }
+      elencoSessioni() { calls.push('elenco-letto'); return { sessioni: [], errori: [] }; }
       osserva() { calls.push('osserva'); }
     } },
     './avvisi-mac': { collegaAvvisi: record('avvisi-live') },
     './barra-menu': { collegaBarraMenu: () => record('tray-live') },
     './branding': { impostaNome: record('nome'), impostaIdentita: record('identita') },
-    './finestra': { apriFinestra: record('finestra-live'), parita: record('parita') },
+    './finestra': { apriFinestra: () => { calls.push('finestra-live'); return { once: (_ev, cb) => { ready = cb; } }; }, parita: record('parita') },
     './clotch-ai-ipc': { collegaClotchAi: record('clotch-ai-live') },
     './impostazioni': { collegaImpostazioni: record('impostazioni-live') },
     './info-sessione': { infoSessione() {} },
-    './indice-ipc': { collegaIndice: () => { calls.push('indice-live'); return {}; } },
+    './indice-ipc': { collegaIndice: (_ipc, _s, quando) => { quando.then(() => calls.push('indice-live')); return {}; } },
     './preferenze': { leggiImpostazioni: () => ({}) },
     './casella-ipc': { collegaCasella: record('casella-live') },
     './preferenze-ipc': { collegaPreferenze: record('preferenze-live') },
@@ -110,7 +111,7 @@ async function run(args, scene, initialEnv = {}) {
     './ipc-fiducia': fiducia,
   };
   vm.runInNewContext(code, {
-    exports: {}, __dirname: '/test/dist/src',
+    exports: {}, __dirname: '/test/dist/src', setImmediate, setTimeout: () => ({ unref() {} }),
     process: { platform: 'darwin', argv: ['electron', '.', ...args], env, on() {} },
     console: { error: (...args) => errors.push(args.join(' ')) },
     require: name => {
@@ -120,7 +121,7 @@ async function run(args, scene, initialEnv = {}) {
     },
   });
   await new Promise(setImmediate);
-  return { calls, errors, env, handlers };
+  return { calls, errors, env, handlers, ready: () => ready() };
 }
 
 function notificationCalls(silent) {
@@ -168,6 +169,24 @@ function notificationCalls(silent) {
   assert.equal(normal.env.CLOTCH_TEST_SILENT, undefined);
   assert.ok(normal.calls.includes('clotch-ai-live') && normal.calls.includes('finestra-live'));
   assert.ok(!normal.calls.some(c => c.startsWith('exit:')));
+  // #463: la finestra parte prima di ogni lettura di sessioni; canali già registrati, risposta dopo il ready-to-show
+  const calls463 = normal.calls;
+  assert.ok(calls463.indexOf('finestra-live') > calls463.indexOf('clotch-ai-live'), 'canali registrati prima del caricamento');
+  for (const c of ['elenco-letto', 'osserva', 'avvisi-live', 'tray-live', 'indice-live']) assert.ok(!calls463.includes(c), `${c} prima della prima finestra`);
+  const doc463 = '/tmp/avvio 463/renderer/index.html', fr463 = { url: pathToFileURL(doc463).href };
+  const sender463 = { mainFrame: fr463, getURL: () => fr463.url, isDestroyed: () => false };
+  fiducia.autorizzaIpc(sender463, doc463);
+  let risposta463 = null;
+  normal.handlers.get('sessioni:elenco')({ sender: sender463, senderFrame: fr463 }).then(e => { risposta463 = e; });
+  await new Promise(setImmediate);
+  assert.equal(risposta463, null, 'elenco in attesa finché la finestra non è pronta');
+  assert.ok(!calls463.includes('elenco-letto'));
+  normal.ready();
+  for (let i = 0; i < 3; i++) await new Promise(setImmediate);
+  for (const c of ['elenco-letto', 'osserva', 'avvisi-live', 'tray-live', 'indice-live']) assert.ok(calls463.indexOf(c) > calls463.indexOf('finestra-live'), `${c} dopo la finestra`);
+  assert.ok(calls463.indexOf('osserva') < calls463.indexOf('avvisi-live'), 'avvisi dopo osserva');
+  assert.deepEqual(risposta463, { sessioni: [], errori: [] }, 'elenco risposto dopo la finestra');
+  console.log('AVVIO_463_OK: finestra prima di elenco, osservatore, avvisi, menu e indice');
   const preview = await run([], null, { CLOTCH_TEST_SILENT: '1' });
   assert.ok(preview.calls.indexOf('policy:accessory') < preview.calls.indexOf('ready'));
   assert.ok(preview.calls.indexOf('switch:mute-audio') < preview.calls.indexOf('ready'));
