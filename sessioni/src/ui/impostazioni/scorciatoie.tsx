@@ -1,0 +1,83 @@
+// figma: 101-17716 — Impostazioni · Scorciatoie; registrazione (in ascolto, tasti già usati, non assegnata): 101-33015.
+import { useEffect, useState } from "react";
+import { Bottone } from "../base/Bottone";
+import { Icona } from "../base/Icona";
+import { Gruppo, Pagina, Tasto } from "./controlli";
+import { prova } from "./prova";
+import { imposta, useImpostazioni } from "./stato";
+
+const AZIONI: [string, string][] = [
+  ["cerca", "Cerca sessioni"], ["friday", "Scrivi a Friday"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
+  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra barra laterale"], ["impostazioni", "Apri impostazioni"],
+  ["inviaInterrompi", "Invia e interrompi la sessione"], ["coda", "Metti in coda"],
+];
+const nome = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
+
+const SIMBOLI: Record<string, string> = { Enter: "↵", Backspace: "⌫", Delete: "⌦", Tab: "⇥", " ": "Spazio", ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
+/** Tasti premuti scritti come nel disegno (⌘⇧F); null se è solo un tasto modificatore. */
+export function tastiDi(e: Pick<KeyboardEvent, "key" | "code" | "metaKey" | "shiftKey" | "altKey" | "ctrlKey">): string | null {
+  if (["Meta", "Shift", "Alt", "Control"].includes(e.key)) return null;
+  // con ⌥ o ⇧ `key` cambia carattere: per lettere e cifre vale il tasto fisico
+  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  return (e.ctrlKey ? "⌃" : "") + (e.altKey ? "⌥" : "") + (e.shiftKey ? "⇧" : "") + (e.metaKey ? "⌘" : "") + tasto;
+}
+
+interface Conflitto { azione: string; tasti: string; con: string }
+
+export default function Scorciatoie() {
+  const v = useImpostazioni();
+  const [ascolta, setAscolta] = useState<string | null>(prova?.registrazione ? "ferma" : null);
+  const [conflitto, setConflitto] = useState<Conflitto | null>(prova?.registrazione ? { azione: "nega", tasti: "⌘K", con: "cerca" } : null);
+  const tasti = prova?.registrazione ? { ...v.scorciatoie, barra: null } : v.scorciatoie;
+
+  useEffect(() => {
+    if (!ascolta || prova) return;
+    const premi = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.key === "Escape") return setAscolta(null);
+      const t = tastiDi(e);
+      if (!t) return;
+      setAscolta(null);
+      const con = Object.entries(v.scorciatoie).find(([a, x]) => x === t && a !== ascolta)?.[0];
+      if (con) setConflitto({ azione: ascolta, tasti: t, con });
+      else { setConflitto(null); imposta("scorciatoie", { ...v.scorciatoie, [ascolta]: t }); }
+    };
+    addEventListener("keydown", premi, true); // prima delle scorciatoie dell'app
+    return () => removeEventListener("keydown", premi, true);
+  }, [ascolta, v.scorciatoie]);
+
+  const registra = (azione: string) => { setConflitto(null); setAscolta(azione); };
+  const sostituisci = (c: Conflitto) => { setConflitto(null); imposta("scorciatoie", { ...v.scorciatoie, [c.con]: null, [c.azione]: c.tasti }); };
+
+  return (
+    <Pagina titolo="Scorciatoie">
+      <Gruppo>
+        {AZIONI.map(([azione, etichetta]) => {
+          const c = conflitto?.azione === azione ? conflitto : null;
+          const t = tasti[azione];
+          return (
+            <div key={azione} className="riga">
+              <div className="testi"><div className="t-base">{etichetta}</div></div>
+              {c && (
+                <div className="conflitto">
+                  <span className="t-sm errore">Già usata da «{nome(c.con)}»</span>
+                  <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>
+                </div>
+              )}
+              {ascolta === azione ? <span className="tasto t-sm in-ascolto">Premi i tasti…</span>
+                : c ? <Tasto tasti={c.tasti} errore />
+                : t ? <button type="button" aria-label={`Cambia ${etichetta}`} onClick={() => registra(azione)}><Tasto tasti={t} /></button>
+                : (
+                  <>
+                    <span className="t-sm secondario">Non assegnata</span>
+                    <button type="button" aria-label={`Assegna ${etichetta}`} onClick={() => registra(azione)}><Icona nome="matita" /></button>
+                  </>
+                )}
+            </div>
+          );
+        })}
+      </Gruppo>
+    </Pagina>
+  );
+}

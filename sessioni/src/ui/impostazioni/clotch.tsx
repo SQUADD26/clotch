@@ -1,0 +1,55 @@
+// figma: 101-45956 — Impostazioni · Clotch con Clotch collegato; senza Clotch: 101-45993.
+// shortcut: la versione di Clotch arriva nel registro di Friday con #344; finché manca, la descrizione la salta.
+import { useEffect, useState } from "react";
+import { Bottone } from "../base/Bottone";
+import { Icona } from "../base/Icona";
+import { daPiano } from "../friday/registro";
+import { useClotchAcceso } from "../pannello/Pillole";
+import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
+import { imposta, useImpostazioni, type Chiave } from "./stato";
+
+const VOCI: [Chiave, string, string][] = [
+  ["clotchVoce", "Voce dal notch", "Friday parla da Clotch; qui vedi l’indicatore"],
+  ["clotchDettatura", "Dettatura dal notch", "⌥Spazio apre il microfono di Clotch"],
+  ["clotchAvvisi", "Avvisi nel notch", "Gli avvisi compaiono sotto il notch"],
+  ["clotchObiettivi", "Obiettivi anche nel notch", "Accetta e rifiuta dal notch o da qui"],
+];
+
+function useVersioneClotch(): string | null {
+  const [v, setV] = useState<string | null>(null);
+  useEffect(() => {
+    const prendi = (p: unknown) => setV((daPiano(p).clotch as { versione?: string } | null)?.versione ?? null);
+    window.friday.registro().then(prendi, () => {});
+    return window.friday.onRegistro(prendi);
+  }, []);
+  return v;
+}
+
+export default function Clotch() {
+  const acceso = useClotchAcceso();
+  const versione = useVersioneClotch();
+  const v = useImpostazioni();
+  return (
+    <Pagina titolo="Clotch">
+      <Gruppo>
+        <div className="riga stato-clotch">
+          <Icona nome="schermo" colore={acceso ? "successo" : "terziaria"} />
+          <div className="testi">
+            <div className="t-base medio">{acceso ? "Clotch è collegato" : "Clotch non è installato"}</div>
+            <div className="t-sm secondario">
+              {acceso
+                ? `${versione ? `Versione ${versione} · v` : "V"}oce, dettatura e avvisi passano dal notch`
+                : "Sessioni fa tutto da sola: voce, dettatura e avvisi stanno qui"}
+            </div>
+          </div>
+          {!acceso && <Bottone tipo="secondario" disabled>Scarica Clotch</Bottone>}
+        </div>
+        {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
+          <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>
+            <Interruttore etichetta={etichetta} acceso={v[chiave] as boolean} onCambia={(x) => imposta(chiave, x)} />
+          </Riga>
+        ))}
+      </Gruppo>
+    </Pagina>
+  );
+}

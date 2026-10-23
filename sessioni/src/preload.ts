@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { Aggiornamento, FridayApi, PreferenzeSessione, SessioniApi } from "./tipi";
+import type { Aggiornamento, FridayApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -42,3 +42,18 @@ const friday: FridayApi = {
   },
 };
 contextBridge.exposeInMainWorld("friday", friday);
+
+const impostazioni: ImpostazioniApi = {
+  radici: () => ipcRenderer.invoke("impostazioni:radici"),
+  cartelle: (percorsi) => ipcRenderer.invoke("impostazioni:cartelle", percorsi),
+  scegliCartella: () => ipcRenderer.invoke("impostazioni:scegli-cartella"),
+  apri: (percorso) => ipcRenderer.invoke("impostazioni:apri", percorso),
+  versione: () => ipcRenderer.invoke("impostazioni:versione"),
+  avvio: (acceso) => ipcRenderer.invoke("impostazioni:avvio", acceso),
+  uso: () => ipcRenderer.invoke("impostazioni:uso"),
+  archiviate: () => ipcRenderer.invoke("impostazioni:archiviate"),
+  eliminaDati: () => ipcRenderer.invoke("impostazioni:elimina-dati"),
+  novita: () => ipcRenderer.invoke("impostazioni:novita"),
+  aggiornamenti: (fai) => ipcRenderer.invoke("impostazioni:aggiornamenti", fai),
+};
+contextBridge.exposeInMainWorld("impostazioni", impostazioni);
