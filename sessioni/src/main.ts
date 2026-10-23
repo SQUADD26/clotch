@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
 import { Sessioni } from "./api";
+import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
 import { apriFinestra, parita } from "./finestra";
 import { collegaFriday } from "./friday-ipc";
@@ -58,7 +59,10 @@ app.whenReady().then(() => {
     const el = sessioni.elencoSessioni().sessioni;
     const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
     if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
+    avvisa(a);
   });
+  // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
+  const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
 
   if (idParita) return parita(idParita);
   barraMenu();
