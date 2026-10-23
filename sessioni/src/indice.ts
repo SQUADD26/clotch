@@ -3,7 +3,8 @@
 // Si rilegge solo il file che ha cambiato mtime o dimensione, una sessione per giro del ciclo: la finestra non si blocca.
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { parseRiga, righeIn } from "./jsonl";
+import { createHash } from "node:crypto";
+import { leggiBlocco, parseRiga } from "./jsonl";
 import { nuovoConvertitore } from "./messaggi";
 import type { RisultatoRicerca, Sessione } from "./tipi";
 
@@ -19,26 +20,60 @@ export function leggiIndice(file: string): DatiIndice {
   } catch { return {}; }
 }
 
-/** Rilegge tutta la trascrizione solo se mtime o dimensione sono cambiati. Vero se la voce è cambiata. */
-export function aggiornaVoce(d: DatiIndice, s: DaIndicizzare): boolean {
+/** Come riprendere una trascrizione che è solo cresciuta: dove sono arrivato, con la memoria del convertitore. Solo in memoria. */
+interface Memo { file: string; ino: number; fine: number; conteggio: number; nTesti: number; firma: string; conv: ReturnType<typeof nuovoConvertitore> }
+export type MemoIndice = Map<string, Memo>;
+const MAX_MEMO = 32; // il convertitore tiene le chiamate senza esito: poche sessioni, le ultime toccate
+const FINESTRA = 16 * 1024;
+
+// shortcut: si presume che una trascrizione cresca solo in coda; lo controlla il hash di testa e degli ultimi 16 KB prima del punto di ripresa,
+// non tutto il prefisso (costerebbe O(dimensione) a ogni append). Un file riscritto nel mezzo senza cambiare né testa né coda arriva fino alla ricostruzione.
+function firma(file: string, fine: number, buf?: Buffer): string {
+  const blocco = (da: number, a: number) => (buf && a <= buf.length ? buf.subarray(da, a) : leggiByte(file, da, a)); // `buf` = i byte da 0 in poi, se già letti
+  return createHash("md5").update(blocco(0, Math.min(fine, FINESTRA))).update("|").update(blocco(Math.max(0, fine - FINESTRA), fine)).digest("hex");
+}
+
+function leggiByte(file: string, da: number, a: number): Buffer {
+  const fd = fs.openSync(file, "r");
+  try {
+    const buf = Buffer.alloc(a - da);
+    return buf.subarray(0, fs.readSync(fd, buf, 0, buf.length, da));
+  } finally { fs.closeSync(fd); }
+}
+
+/**
+ * Rilegge la trascrizione solo se mtime o dimensione sono cambiati: spostata senza cambiare contenuto, aggiorna solo il percorso;
+ * cresciuta in coda (con `memo`), legge solo le righe nuove. Vero se la voce è cambiata.
+ */
+export function aggiornaVoce(d: DatiIndice, s: DaIndicizzare, memo?: MemoIndice): boolean {
   const v = d[s.id];
   let st: fs.Stats;
-  try { st = fs.statSync(s.file); } catch { delete d[s.id]; return !!v; } // file sparito
-  if (v && v.file === s.file && v.mtime === st.mtimeMs && v.size === st.size) {
-    if (v.titolo === s.titolo) return false;
+  try { st = fs.statSync(s.file); } catch { delete d[s.id]; memo?.delete(s.id); return !!v; } // file sparito
+  if (v && v.mtime === st.mtimeMs && v.size === st.size) {
+    if (v.file === s.file && v.titolo === s.titolo) return false;
+    v.file = s.file; // `mv` tra due account tiene mtime e dimensione: il contenuto è quello
     v.titolo = s.titolo;
+    const m = memo?.get(s.id);
+    if (m) m.file = s.file;
     return true;
   }
-  const testi: Voce["testi"] = [];
-  let conteggio = 0;
+  let testi: Voce["testi"] = [], conteggio = 0;
   if (s.file.endsWith(".jsonl")) {
-    const c = nuovoConvertitore(s);
-    for (const r of righeIn(s.file, 0, st.size)) {
-      const o = parseRiga(r);
-      for (const m of o ? c.riga(o).nuovi : []) {
-        conteggio++;
-        if (m.tipo === "utente" || m.tipo === "assistente") testi.push({ testo: m.testo, t: m.t });
-      }
+    let m = memo?.get(s.id);
+    memo?.delete(s.id);
+    if (m && v && m.file === s.file && m.ino === st.ino && st.size >= m.fine && firma(s.file, m.fine) === m.firma) {
+      testi = v.testi.slice(0, m.nTesti);
+      conteggio = m.conteggio;
+    } else m = undefined;
+    const c = m?.conv ?? nuovoConvertitore(s), da = m?.fine ?? 0;
+    const buf = leggiByte(s.file, da, st.size), chiuse = buf.lastIndexOf(10) + 1;
+    const dentro = (r: string) => { const o = parseRiga(r); for (const x of o ? c.riga(o).nuovi : []) { conteggio++; if (x.tipo === "utente" || x.tipo === "assistente") testi.push({ testo: x.testo, t: x.t }); } };
+    if (chiuse) buf.toString("utf8", 0, chiuse).split("\n").forEach(dentro);
+    const base = { conteggio, nTesti: testi.length };
+    if (chiuse < buf.length) dentro(buf.toString("utf8", chiuse)); // riga ancora a metà: conta se è già JSON valido, ma si riprende da prima
+    if (memo) {
+      memo.set(s.id, { file: s.file, ino: st.ino, fine: da + chiuse, ...base, firma: firma(s.file, da + chiuse, da ? undefined : buf), conv: c });
+      if (memo.size > MAX_MEMO) memo.delete(memo.keys().next().value!);
     }
   }
   d[s.id] = { file: s.file, mtime: st.mtimeMs, size: st.size, titolo: s.titolo, conteggio, testi };
@@ -59,7 +94,11 @@ export function cerca(d: DatiIndice, testo: string, max = 50): RisultatoRicerca[
   for (const [id, v] of Object.entries(d)) {
     const nelTitolo = v.titolo.toLowerCase().includes(q);
     let m: Voce["testi"][number] | undefined, i = -1;
-    for (let k = v.testi.length - 1; k >= 0 && i < 0; k--) if ((i = v.testi[k].testo.toLowerCase().indexOf(q)) >= 0) m = v.testi[k];
+    for (let k = v.testi.length - 1; k >= 0 && i < 0; k--) {
+      const t = v.testi[k].testo, l = t.toLowerCase();
+      // alcune maiuscole cambiano lunghezza (İ): l'indice vale per il minuscolo, che allora è il testo da ritagliare
+      if ((i = l.indexOf(q)) >= 0) m = { testo: l.length === t.length ? t : l, t: v.testi[k].t };
+    }
     if (!nelTitolo && !m) continue;
     out.push({ id, titolo: v.titolo, frammento: m ? frammento(m.testo, i, q.length) : v.titolo, t: m?.t ?? null, nelTitolo, quando: m?.t ?? v.mtime });
   }
@@ -78,6 +117,7 @@ export class Indice {
   dati: DatiIndice;
   private coda = new Map<string, DaIndicizzare>();
   private attese: (() => void)[] = [];
+  private memo: MemoIndice = new Map();
   private inGiro = false;
   private scrittura: NodeJS.Timeout | null = null;
   readonly file: string;
@@ -94,7 +134,7 @@ export class Indice {
   metti(sessioni: DaIndicizzare[], tutte = false): Promise<void> {
     if (tutte) {
       const ids = new Set(sessioni.map((s) => s.id));
-      for (const id of Object.keys(this.dati)) if (!ids.has(id)) { delete this.dati[id]; this.daScrivere(); }
+      for (const id of Object.keys(this.dati)) if (!ids.has(id)) { delete this.dati[id]; this.memo.delete(id); this.daScrivere(); }
     }
     for (const s of sessioni) this.coda.set(s.id, s);
     const p = new Promise<void>((ok) => this.attese.push(ok));
@@ -106,7 +146,7 @@ export class Indice {
     const s = this.coda.values().next().value;
     if (!s) { this.inGiro = false; this.attese.splice(0).forEach((ok) => ok()); return; }
     this.coda.delete(s.id);
-    try { if (aggiornaVoce(this.dati, s)) this.daScrivere(); } catch { /* file illeggibile: resta la voce di prima */ }
+    try { if (aggiornaVoce(this.dati, s, this.memo)) this.daScrivere(); } catch { /* file illeggibile: resta la voce di prima */ }
     setImmediate(() => this.passo());
   }
 
@@ -124,6 +164,7 @@ export class Indice {
 
   ricostruisci(sessioni: DaIndicizzare[]): Promise<void> {
     this.dati = {};
+    this.memo.clear();
     this.coda.clear();
     return this.metti(sessioni, true);
   }
@@ -134,6 +175,7 @@ export class Indice {
     if (this.scrittura) clearTimeout(this.scrittura);
     this.scrittura = null;
     this.dati = {};
+    this.memo.clear();
     for (const p of [this.file, ...this.cache]) fs.rmSync(p, { recursive: true, force: true });
   }
 

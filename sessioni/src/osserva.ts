@@ -2,23 +2,26 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { leggiElenco } from "./elenco";
-import { fineCompleta, firmaFile } from "./messaggi";
+import { firmaFile } from "./messaggi";
 import { Cronologia } from "./cronologia";
 import { Aggiornamento, Elenco } from "./tipi";
 
 export class Osservatore {
   elenco: Elenco;
-  private iniziali = new Map<string, number>();
+  private iniziali = new Map<string, number>(); // file -> dimensione all'avvio: l'ultima riga chiusa si cerca solo al primo evento, non per ogni sessione all'avvio
   private firme = new Map<string, string>();
-  private watchers: fs.FSWatcher[] = [];
+  private firmeSessioni = new Map<string, string>(); // id -> JSON della sessione all'ultimo giro: si confronta, non si rifà ogni volta
+  private watchers = new Map<string, fs.FSWatcher>();
+  private avviato = false;
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
 
   constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia()) {
     this.elenco = leggiElenco({ home, env, impostazioni: imp?.() });
+    for (const s of this.elenco.sessioni) this.firmeSessioni.set(s.id, JSON.stringify(s));
     for (const s of this.elenco.sessioni) if (s.file.endsWith(".jsonl")) {
       this.firme.set(s.file, firma(s.file));
-      try { this.iniziali.set(s.file, fineCompleta(s.file)); } catch { /* l'evento successivo riporterà l'errore */ }
+      try { this.iniziali.set(s.file, fs.statSync(s.file).size); } catch { /* l'evento successivo riporterà l'errore */ }
     }
     this.cronologia.collega((d) => this.cb({ sessioni: [d.sessione], cronologia: [d],
       nuoviMessaggi: d.tipo === "upsert" ? [{ id: d.sessione, messaggi: d.righe.map((r) => r.messaggio) }] : [] }));
@@ -41,22 +44,32 @@ export class Osservatore {
     ].filter((d) => fs.existsSync(d));
   }
 
-  avvia() {
-    for (const d of this.cartelle()) {
+  /** Guarda le cartelle che ci sono ora e lascia quelle sparite: un account aggiunto o tolto a app aperta ha il suo osservatore. */
+  private guarda() {
+    const ora = this.cartelle();
+    for (const [d, w] of this.watchers) if (!ora.includes(d)) { w.close(); this.watchers.delete(d); }
+    for (const d of ora) {
+      if (this.watchers.has(d)) continue;
       try {
         const w = fs.watch(d, { recursive: true }, (_ev, nome) => this.tocca(nome ? path.join(d, String(nome)) : d));
         w.on("error", () => this.tocca(d)); // riconcilia i file noti senza creare polling
-        this.watchers.push(w);
+        this.watchers.set(d, w);
       } catch { /* watch non disponibile su questa cartella */ }
     }
+  }
+
+  avvia() {
+    this.avviato = true;
+    this.guarda();
     // macOS (FSEvents) comincia a mandare eventi qualche istante dopo fs.watch: quello che si scrive prima non arriva.
     // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; ogni giro poi raccoglie ogni file cresciuto (giro()).
     this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
 
   ferma() {
+    this.avviato = false;
     this.watchers.forEach((w) => w.close());
-    this.watchers = [];
+    this.watchers.clear();
     if (this.timer) clearTimeout(this.timer);
   }
 
@@ -69,17 +82,18 @@ export class Osservatore {
   giro() {
     const file = [...this.dirty];
     this.dirty.clear();
-    const prima = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
+    if (this.avviato) this.guarda();
+    const prima = this.firmeSessioni;
     this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.() });
-    const dopo = new Set(this.elenco.sessioni.map((s) => s.id));
+    this.firmeSessioni = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
     // anche quelle sparite (spenta una sorgente, cartella esclusa): il renderer deve rileggere l'elenco
-    const cambiate = [...this.elenco.sessioni.filter((s) => prima.get(s.id) !== JSON.stringify(s)).map((s) => s.id), ...[...prima.keys()].filter((id) => !dopo.has(id))];
+    const cambiate = [...this.firmeSessioni.keys()].filter((id) => prima.get(id) !== this.firmeSessioni.get(id)).concat([...prima.keys()].filter((id) => !this.firmeSessioni.has(id)));
     for (const s of this.elenco.sessioni) {
       if (!s.file.endsWith(".jsonl")) continue;
       const attuale = firma(s.file);
       // La riconciliazione parte solo da avvio/evento; include rename, riscritture e crescita senza evento nominato.
       if (attuale === this.firme.get(s.file) && !file.some((f) => s.file === f || s.file.startsWith(`${f}${path.sep}`))) continue;
-      this.cronologia.aggiorna(s, this.iniziali.get(s.file) ?? 0);
+      this.cronologia.aggiorna(s, fineCompletaFinoA(s.file, this.iniziali.get(s.file) ?? 0));
       this.iniziali.delete(s.file);
       this.firme.set(s.file, attuale);
     }
@@ -94,3 +108,20 @@ const firma = (file: string) => {
   try { return firmaFile(file); }
   catch { return "assente"; }
 };
+
+/** Ultima newline entro i primi `limite` byte: i byte già scritti all'avvio non cambiano, quindi vale come se fosse stata cercata allora. */
+function fineCompletaFinoA(file: string, limite: number): number {
+  if (!limite) return 0;
+  try {
+    const fd = fs.openSync(file, "r");
+    try {
+      for (let fine = limite; fine > 0;) {
+        const inizio = Math.max(0, fine - 65536), b = Buffer.alloc(fine - inizio);
+        const i = b.subarray(0, fs.readSync(fd, b, 0, b.length, inizio)).lastIndexOf(10);
+        if (i >= 0) return inizio + i + 1;
+        fine = inizio;
+      }
+      return 0;
+    } finally { fs.closeSync(fd); }
+  } catch { return 0; } // file sparito o illeggibile: l'evento riporterà l'errore
+}
