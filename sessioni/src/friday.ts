@@ -60,7 +60,7 @@ export interface ChatFriday {
 export interface Registro {
   chat: Map<string, ChatFriday>;
   fermoTutto: boolean;
-  avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null }[];
+  avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null; sessioni: string[] }[];
   clotch: { voce: string; parla: boolean; ascolta: boolean; t: number } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */
   friday: { evento: string; t: number } | null;
@@ -178,7 +178,9 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           q.quarantena = d.acceso === true ? s(d.perche) ?? "quarantena" : null;
           break;
         }
-        case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da) }); break;
+        case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
+          // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
+          sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
         case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso), annullata: false }); break;
         case "comando":
           comandi.set(String(d.id), d);
