@@ -32,13 +32,13 @@ export function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nom
   );
 }
 
-/** Segno all'inizio del titolo → icona (★ = stella arancione); senza scelta né segno: la stella argento di serie (101:12491). */
+/** Segno all'inizio del titolo → icona (tabella 120:58483; ★ = stella arancione); senza scelta né segno: la stella argento di serie (101:12491). */
 const SEGNI: Record<string, [string, string?]> = {
   "★": ["stella", "arancione"], "⛁": ["database"], "🎨": ["tavolozza"], "⚠": ["insetto"], "◰": ["strati"], "☁": ["globo"], "⚙": ["chiave"],
   "⌘": ["casa"], "⌕": ["bussola"], "☑": ["scudo"], "✎": ["libro"], "⇋": ["fulmine"], "♺": ["pacco"],
 };
 export function IconaRiga({ titolo, pref }: { titolo: string; pref?: PreferenzeSessione }) {
-  const [icona, colore] = SEGNI[[...titolo.trim()][0]?.replace("\uFE0E", "") ?? ""] ?? [];
+  const [icona, colore] = SEGNI[[...titolo.trim()][0] ?? ""] ?? [];
   return <IconaSessione icona={pref?.icona ?? icona} colore={pref?.colore ?? (pref?.icona ? undefined : colore)} />;
 }
 

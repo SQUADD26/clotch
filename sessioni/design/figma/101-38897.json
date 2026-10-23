@@ -61,7 +61,8 @@
   "colore/testo/successo": "#40c977",
   "colore/testo/errore": "#ff6764",
   "colore/fondo/riga-passaggio": "#ffffff0d",
-  "colore/fondo/errore": "#fa423e29"
+  "colore/fondo/errore": "#fa423e29",
+  "misura/tratto": 1
  },
  "nodi": [
   {

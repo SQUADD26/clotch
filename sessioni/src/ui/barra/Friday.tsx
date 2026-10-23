@@ -1,5 +1,5 @@
-// figma: 101-38901 — righe di Friday nella barra: banda «Non disturbare» (101:39071), «Riga Friday» (Attiva 101:7728,
-// In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004). Dati: registro di Friday (src/ui/friday).
+// figma: 101-38901 — righe di Friday nella barra: «Riga Friday» (Attiva 101:7728,
+// In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di Friday (src/ui/friday).
 import { useEffect, useState } from "react";
 import type { Registro } from "../../friday";
 import { useChiamata } from "../base/dati";
@@ -42,22 +42,21 @@ export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"
   );
 }
 
-export function RigheFriday({ r, adesso }: { r: Registro | null; adesso: number }) {
+export function RigheFriday({ r, adesso, pagina }: { r: Registro | null; adesso: number; pagina: string }) {
   const n = useNavigazione();
   const stato = r ? STATO[statoFriday(r, adesso).stato] : null;
   const aspettano = r ? casella(r, adesso).aspettano : 0;
-  const apri = () => n.apri("friday");
   return (
     <>
-      {r?.nonDisturbare && (r.nonDisturbare.fino === null || r.nonDisturbare.fino > adesso) && <NonDisturbare nd={r.nonDisturbare} />}
-      <button type="button" className={`riga riga-friday ${n.vista === "friday" ? "scelta" : ""}`} onClick={apri}>
+      <button type="button" className={`riga riga-friday ${pagina === "friday" ? "scelta" : ""}`} onClick={() => n.apri("friday")}>
         <Icona nome="scintille" colore="accento" />
         <span className="testo medio">Friday</span>
         {stato && <span className={`lato t-xs stato-${stato.classe}`}>{stato.testo}</span>}
       </button>
-      <RigaComando icona="posta" etichetta="Casella" lato={aspettano ? String(aspettano) : undefined} onClick={apri} />
-      <RigaComando icona="libro" etichetta="Decisioni" onClick={apri} />
-      <RigaComando icona="scudo" etichetta="Regole" onClick={apri} />
+      <RigaComando icona="posta" etichetta="Casella" lato={aspettano ? String(aspettano) : undefined} scelta={pagina === "casella"} onClick={() => n.apri("casella")} />
+      <RigaComando icona="libro" etichetta="Decisioni" scelta={pagina === "decisioni"} onClick={() => n.apri("decisioni")} />
+      <RigaComando icona="scudo" etichetta="Regole" scelta={pagina === "regole"} onClick={() => n.apri("regole")} />
+      {r?.nonDisturbare && (r.nonDisturbare.fino === null || r.nonDisturbare.fino > adesso) && <NonDisturbare nd={r.nonDisturbare} />}
     </>
   );
 }

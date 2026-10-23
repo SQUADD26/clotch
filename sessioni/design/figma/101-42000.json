@@ -61,7 +61,8 @@
   "colore/fondo/casella": "#363636",
   "colore/bordo/normale": "#ffffff15",
   "raggio/casella": 22,
-  "colore/testo/successo": "#40c977"
+  "colore/testo/successo": "#40c977",
+  "misura/tratto": 1
  },
  "nodi": [
   {
