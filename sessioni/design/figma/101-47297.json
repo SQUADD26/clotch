@@ -382,7 +382,22 @@
    "senza": []
   },
   {
-   "id": "101:47302",
+   "id": "117:55026",
+   "nome": "comandi barra laterale",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 72,
+    "y": 108,
+    "w": 250,
+    "h": 202
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:55026;117:51476",
    "nome": "comando cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -401,7 +416,7 @@
    "senza": []
   },
   {
-   "id": "I101:47302;101:7172",
+   "id": "I117:55026;117:51476;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -417,7 +432,7 @@
    "senza": []
   },
   {
-   "id": "I101:47302;101:7172;101:6869",
+   "id": "I117:55026;117:51476;101:7172;101:6869",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -432,7 +447,7 @@
    "senza": []
   },
   {
-   "id": "I101:47302;101:7174",
+   "id": "I117:55026;117:51476;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -451,7 +466,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:47302;101:7175",
+   "id": "I117:55026;117:51476;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -470,7 +485,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:47303",
+   "id": "I117:55026;117:51481",
    "nome": "comando filtra",
    "tipo": "INSTANCE",
    "box": {
@@ -489,7 +504,7 @@
    "senza": []
   },
   {
-   "id": "I101:47303;101:7172",
+   "id": "I117:55026;117:51481;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -505,7 +520,7 @@
    "senza": []
   },
   {
-   "id": "I101:47303;101:7172;101:6874",
+   "id": "I117:55026;117:51481;101:7172;101:6874",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -520,13 +535,13 @@
    "senza": []
   },
   {
-   "id": "I101:47303;101:7174",
+   "id": "I117:55026;117:51481;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 104,
     "y": 148,
-    "w": 210,
+    "w": 202,
     "h": 20
    },
    "variabili": {
@@ -539,7 +554,26 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:47304",
+   "id": "I117:55026;117:51481;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 149,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:55026;117:51486",
    "nome": "riga Friday",
    "tipo": "INSTANCE",
    "box": {
@@ -558,7 +592,7 @@
    "senza": []
   },
   {
-   "id": "I101:47304;101:13544",
+   "id": "I117:55026;117:51486;101:13544",
    "nome": "icona scintille",
    "tipo": "INSTANCE",
    "box": {
@@ -574,7 +608,7 @@
    "senza": []
   },
   {
-   "id": "I101:47304;101:13544;101:11153",
+   "id": "I117:55026;117:51486;101:13544;101:11153",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -589,7 +623,7 @@
    "senza": []
   },
   {
-   "id": "I101:47304;101:13543",
+   "id": "I117:55026;117:51486;101:13543",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
@@ -608,7 +642,7 @@
    "font": "SF Pro Medium"
   },
   {
-   "id": "I101:47304;101:13546",
+   "id": "I117:55026;117:51486;101:13546",
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
@@ -627,7 +661,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:47305",
+   "id": "I117:55026;117:51495",
    "nome": "voce Casella",
    "tipo": "INSTANCE",
    "box": {
@@ -647,7 +681,7 @@
    "senza": []
   },
   {
-   "id": "I101:47305;101:7177",
+   "id": "I117:55026;117:51495;101:7177",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -663,7 +697,7 @@
    "senza": []
   },
   {
-   "id": "I101:47305;101:7177;101:11094",
+   "id": "I117:55026;117:51495;101:7177;101:11094",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -678,7 +712,7 @@
    "senza": []
   },
   {
-   "id": "I101:47305;101:7179",
+   "id": "I117:55026;117:51495;101:7179",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -697,7 +731,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:47305;101:7180",
+   "id": "I117:55026;117:51495;101:7180",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -716,7 +750,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:47306",
+   "id": "I117:55026;117:51500",
    "nome": "voce Decisioni",
    "tipo": "INSTANCE",
    "box": {
@@ -735,7 +769,7 @@
    "senza": []
   },
   {
-   "id": "I101:47306;101:7172",
+   "id": "I117:55026;117:51500;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -751,7 +785,7 @@
    "senza": []
   },
   {
-   "id": "I101:47306;101:7172;101:11183",
+   "id": "I117:55026;117:51500;101:7172;101:11183",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -766,7 +800,7 @@
    "senza": []
   },
   {
-   "id": "I101:47306;101:7174",
+   "id": "I117:55026;117:51500;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -785,7 +819,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:47306;101:7175",
+   "id": "I117:55026;117:51500;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -804,7 +838,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:47307",
+   "id": "I117:55026;117:51505",
    "nome": "voce Regole",
    "tipo": "INSTANCE",
    "box": {
@@ -823,7 +857,7 @@
    "senza": []
   },
   {
-   "id": "I101:47307;101:7172",
+   "id": "I117:55026;117:51505;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -839,7 +873,7 @@
    "senza": []
   },
   {
-   "id": "I101:47307;101:7172;101:11137",
+   "id": "I117:55026;117:51505;101:7172;101:11137",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -854,7 +888,7 @@
    "senza": []
   },
   {
-   "id": "I101:47307;101:7174",
+   "id": "I117:55026;117:51505;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -873,7 +907,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:47307;101:7175",
+   "id": "I117:55026;117:51505;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
