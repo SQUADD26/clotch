@@ -14,6 +14,8 @@ import { leggiImpostazioni } from "./preferenze";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import type { PaginaMessaggi } from "./tipi";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
 const iParita = process.argv.indexOf("--parita");
@@ -46,7 +48,23 @@ app.whenReady().then(() => {
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   ipcMain.handle("sessioni:elenco", elenco);
   const indice = collegaIndice(ipcMain, sessioni);
-  ipcMain.handle("sessioni:messaggi", (_e, id: string, pagina: number) => ({ ...sessioni.messaggi(String(id), Number(pagina) | 0), totale: indice.totale(String(id)) }));
+  ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
+    if (opzioni !== undefined && (
+      !opzioni || typeof opzioni !== "object" || Array.isArray(opzioni) || opzioni.v !== 1 ||
+      (opzioni.cursore !== undefined && (typeof opzioni.cursore !== "string" || opzioni.cursore.length > 4096))
+    )) throw new Error("Richiesta cronologia non valida. Riprova.");
+    if (opzioni && (!Number.isSafeInteger(pagina) || pagina < 0))
+      throw new Error("Pagina cronologia non valida. Riprova.");
+    const leggi: (id: string, pagina: number, opzioni?: OpzioniCronologia) => PaginaMessaggi | Promise<PaginaMessaggi>
+      = sessioni.messaggi.bind(sessioni);
+    const risposta = await leggi(String(id), opzioni ? pagina : Number(pagina) | 0, opzioni);
+    if (opzioni) {
+      if (!risposta.cronologia && !risposta.erroreCronologia)
+        throw new Error("Cronologia non disponibile. Riprova.");
+      return risposta;
+    }
+    return { ...risposta, totale: indice.totale(String(id)) };
+  });
   collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
   const invia = (c: string, d: unknown) => {
