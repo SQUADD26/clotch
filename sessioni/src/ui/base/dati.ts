@@ -3,7 +3,7 @@
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Aggiornamento, Elenco, PreferenzeSessione, SessioniApi } from "../../tipi";
+import type { Aggiornamento, Elenco, PreferenzeSessione, Sessione, SessioniApi } from "../../tipi";
 
 import { applicaDelta, applicaPagina, fallita, nuovaCronologia, righeOrdinate, type CronologiaStato } from "./cronologia-stato";
 
@@ -38,16 +38,36 @@ export function useChiamata<T>(fn: () => Promise<T>, deps: unknown[]) {
   return { ...s, ricarica: () => vai(true), riprova: () => vai(false) };
 }
 
+/** Confine: un aggiornamento dal main può arrivare malformato, lo riduciamo a una forma sicura. */
+const normalizzaAggiornamento = (a: unknown): Aggiornamento => {
+  const o = (a && typeof a === "object" ? a : {}) as Partial<Aggiornamento>;
+  return {
+    sessioni: Array.isArray(o.sessioni) ? o.sessioni.filter((x) => typeof x === "string") : [],
+    nuoviMessaggi: Array.isArray(o.nuoviMessaggi) ? o.nuoviMessaggi : [],
+    cronologia: Array.isArray(o.cronologia) ? o.cronologia.filter((d) => !!d && typeof d === "object") : undefined,
+  };
+};
+
 /** Ascolta gli aggiornamenti dal vivo del main (file delle sessioni cambiati). */
 export function useAggiornamenti(cb: (a: Aggiornamento) => void) {
   const ultimo = useRef(cb);
   ultimo.current = cb;
-  useEffect(() => api().onAggiornamento((a) => ultimo.current(a)), []);
+  useEffect(() => api().onAggiornamento((a) => ultimo.current(normalizzaAggiornamento(a))), []);
 }
+
+/** Confine: l'elenco deve avere `sessioni` come array; le voci senza i campi che la barra legge si scartano. */
+const sessioneValida = (s: Sessione): boolean =>
+  !!s && typeof s === "object" &&
+  (["id", "titolo", "sorgente", "account", "progetto", "stato"] as const).every((k) => typeof s[k] === "string") &&
+  typeof s.ultimaAttivita === "number";
+const normalizzaElenco = (e: Elenco): Elenco => {
+  if (!e || !Array.isArray(e.sessioni)) throw new Error("Elenco delle sessioni non valido.");
+  return { sessioni: e.sessioni.filter(sessioneValida), errori: Array.isArray(e.errori) ? e.errori : [] };
+};
 
 /** Elenco delle sessioni, ricaricato in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
 export function useElenco() {
-  const c = useChiamata<Elenco>(() => api().elencoSessioni(), []);
+  const c = useChiamata<Elenco>(() => api().elencoSessioni().then(normalizzaElenco), []);
   useAggiornamenti((a) => { if (a.sessioni.length) c.ricarica(); });
   return c;
 }
@@ -87,7 +107,7 @@ export function useMessaggi(id: string | null) {
     const stop = api().onAggiornamento((a) => {
       if (!attivo || corrente.current !== id) return;
       let s = stato.current;
-      for (const d of a.cronologia ?? []) s = applicaDelta(s, d);
+      for (const d of normalizzaAggiornamento(a).cronologia ?? []) s = applicaDelta(s, d);
       if (s !== stato.current) pubblica(s);
     });
     riprova();

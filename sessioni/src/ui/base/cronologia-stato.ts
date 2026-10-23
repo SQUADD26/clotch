@@ -1,6 +1,6 @@
 // Cronologia v1 del renderer: valori immutabili, nessun DOM, IPC o dedup per testo.
 import type { DeltaCronologia, RigaCronologia, SnapshotPagina } from "../../cronologia-tipi";
-import type { PaginaMessaggi } from "../../tipi";
+import type { Messaggio, PaginaMessaggi } from "../../tipi";
 
 export interface CronologiaStato {
   sessione: string | null;
@@ -22,7 +22,14 @@ export const nuovaCronologia = (sessione: string | null): CronologiaStato => ({
 });
 export const righeOrdinate = (s: CronologiaStato) => [...s.righe.values()].sort((a, b) => a.ordine - b.ordine);
 export const fallita = (s: CronologiaStato, errore: string, invalida = true): CronologiaStato => ({ ...s, errore, invalida });
-const valida = (r: RigaCronologia) => typeof r.chiave === "string" && !!r.chiave && Number.isInteger(r.ordine) && r.ordine >= 0 && Number.isInteger(r.revisione) && r.revisione >= 0;
+const TIPI = new Set(["utente", "assistente", "pensiero", "strumento", "errore"]);
+// Il messaggio arriva dal main: ne controlliamo forma e tipi prima di darlo da disegnare.
+const messaggioValido = (m: Messaggio): boolean => {
+  if (!m || typeof m !== "object" || !TIPI.has(m.tipo)) return false;
+  if (m.tipo === "strumento") return typeof m.id === "string" && typeof m.nome === "string";
+  return typeof (m as { testo: unknown }).testo === "string";
+};
+const valida = (r: RigaCronologia) => typeof r.chiave === "string" && !!r.chiave && Number.isInteger(r.ordine) && r.ordine >= 0 && Number.isInteger(r.revisione) && r.revisione >= 0 && messaggioValido(r.messaggio);
 const copia = (r: RigaCronologia) => structuredClone(r);
 
 export function applicaDelta(s: CronologiaStato, d: DeltaCronologia): CronologiaStato {

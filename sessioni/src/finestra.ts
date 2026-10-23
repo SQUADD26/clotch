@@ -46,7 +46,7 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
   autorizzaIpc(w.webContents, pagina);
   impostaPermessi(w.webContents, pagina);
   if (silenziosa) w.webContents.setAudioMuted(true);
-  proteggiLinkEsterni(w);
+  proteggiLinkEsterni(w, pagina);
   if (anteprima) w.once("ready-to-show", () => {
     w.showInactive();
     console.log(`PREVIEW_READY internal=${screen.getDisplayMatching(w.getBounds()).internal} visible=${w.isVisible()} focused=${w.isFocused()} audioMuted=${w.webContents.isAudioMuted()}`);
@@ -68,7 +68,7 @@ export async function parita(id: string, navigazione?: Record<string, string | u
   w.on("focus", () => focalizzate++);
   assert.equal(w.isVisible(), false);
   assert.equal(w.isFocused(), false);
-  proteggiLinkEsterni(w);
+  proteggiLinkEsterni(w, pagina);
   await w.loadFile(pagina, { query: { ...Object.fromEntries(Object.entries(navigazione ?? {}).filter(([, v]) => v)) as Record<string, string>, parita: id } });
   // i dati arrivano dai canali IPC dopo il primo disegno: si aspetta che la rete dei canali si calmi, poi due fotogrammi
   await w.webContents.executeJavaScript(`document.fonts.ready.then(() => new Promise(r => setTimeout(r, ${ATTESA_DATI_MS}))).then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`);

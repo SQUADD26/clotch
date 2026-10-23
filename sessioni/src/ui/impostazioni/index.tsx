@@ -36,7 +36,7 @@ export default function Impostazioni() {
   useEffect(() => { if (prova?.aperta) document.querySelector<HTMLButtonElement>(`.scelta .valore[aria-label^="${prova.aperta}:"]`)?.click(); }, []);
   // la sezione sta nella navigazione (indietro e avanti la seguono); «dati/cartelle» è una sottopagina di Dati
   const [prima, sotto] = (n.sezione ?? "generale").split("/");
-  const sezione: Sezione = prima in PAGINE ? (prima as Sezione) : "generale";
+  const sezione: Sezione = Object.hasOwn(PAGINE, prima) ? (prima as Sezione) : "generale";
   const Pagina = PAGINE[sezione];
   return (
     <div className="impostazioni">
