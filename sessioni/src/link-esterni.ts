@@ -1,5 +1,6 @@
 // Confine main condiviso: il renderer locale non diventa mai un browser.
 import { BrowserWindow, dialog, shell } from "electron";
+import { pathToFileURL } from "node:url";
 
 /** Nessun protocollo del sistema, credenziale o carattere di controllo. */
 export function urlWeb(valore: string): string | null {
@@ -11,8 +12,18 @@ export function urlWeb(valore: string): string | null {
   } catch { return null; }
 }
 
-export function proteggiLinkEsterni(finestra: BrowserWindow): void {
+function documento(url: string): string {
+  try {
+    const u = new URL(url);
+    u.search = "";
+    u.hash = "";
+    return u.href;
+  } catch { return url; }
+}
+
+export function proteggiLinkEsterni(finestra: BrowserWindow, pagina: string): void {
   const contenuto = finestra.webContents;
+  const appDoc = pathToFileURL(pagina).href;
   const apri = (valore: string) => {
     const url = urlWeb(valore);
     if (!url) return;
@@ -38,4 +49,9 @@ export function proteggiLinkEsterni(finestra: BrowserWindow): void {
     if (evento.isMainFrame) apri(evento.url);
   });
   contenuto.on("will-attach-webview", (evento) => evento.preventDefault());
+  // Gli schemi interni del browser (about:, chrome:, devtools:, view-source:) non emettono
+  // will-navigate: se una pagina porta altrove, si torna subito al documento dell'app.
+  contenuto.on("did-navigate", (_evento, url) => {
+    if (documento(url) !== appDoc && !finestra.isDestroyed()) void contenuto.loadFile(pagina);
+  });
 }
