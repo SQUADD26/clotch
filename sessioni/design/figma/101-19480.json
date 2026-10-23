@@ -58,6 +58,7 @@
   "raggio/casella": 22,
   "misura/colonna": 760,
   "spazio/0-5": 2,
+  "misura/onda-barra": 3,
   "raggio/xl": 15,
   "misura/toast": 360,
   "misura/riferimento": 24,
@@ -7813,7 +7814,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7829,7 +7831,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7845,7 +7848,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7861,7 +7865,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7877,7 +7882,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7893,7 +7899,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7909,7 +7916,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7925,7 +7933,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8067,7 +8076,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8083,7 +8093,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8099,7 +8110,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8115,7 +8127,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8131,7 +8144,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8147,7 +8161,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8163,7 +8178,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8179,7 +8195,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
