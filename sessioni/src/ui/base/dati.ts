@@ -3,7 +3,7 @@
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Aggiornamento, Elenco, PreferenzeSessione, SessioniApi } from "../../tipi";
+import type { Aggiornamento, Elenco, Messaggio, PreferenzeSessione, SessioniApi } from "../../tipi";
 
 import { applicaDelta, applicaPagina, fallita, nuovaCronologia, righeOrdinate, type CronologiaStato } from "./cronologia-stato";
 
@@ -38,17 +38,31 @@ export function useChiamata<T>(fn: () => Promise<T>, deps: unknown[]) {
   return { ...s, ricarica: () => vai(true), riprova: () => vai(false) };
 }
 
+// Il main è fidato ma un suo dato storto non deve abbattere il render: si scarta qui, al confine, e il resto resta usabile.
+const oggetto = (x: unknown): x is Record<string, unknown> => !!x && typeof x === "object";
+const sono = (o: Record<string, unknown>, tipo: string, ...campi: string[]) => campi.every((k) => typeof o[k] === tipo);
+const sessioneValida = (s: unknown) => oggetto(s) && sono(s, "string", "id", "titolo", "progetto", "account", "cartella") && Number.isFinite(s.ultimaAttivita);
+export const messaggioValido = (m: unknown): m is Messaggio => oggetto(m) && (m.tipo === "strumento"
+  ? sono(m, "string", "id", "nome") && (m.esito == null || (oggetto(m.esito) && sono(m.esito, "string", "testo")))
+  : ["utente", "assistente", "pensiero", "errore"].includes(m.tipo as string) && sono(m, "string", "testo"));
+
+/** Elenco con la forma controllata: `sessioni` non è un array = errore con «Riprova»; le sessioni storte si scartano. */
+export function elencoValido(e: unknown): Elenco {
+  if (!oggetto(e) || !Array.isArray(e.sessioni)) throw new Error("Elenco delle sessioni non valido.");
+  return { sessioni: e.sessioni.filter(sessioneValida), errori: Array.isArray(e.errori) ? e.errori.filter((x) => oggetto(x) && sono(x, "string", "percorso", "messaggio")) : [] };
+}
+
 /** Ascolta gli aggiornamenti dal vivo del main (file delle sessioni cambiati). */
 export function useAggiornamenti(cb: (a: Aggiornamento) => void) {
   const ultimo = useRef(cb);
   ultimo.current = cb;
-  useEffect(() => api().onAggiornamento((a) => ultimo.current(a)), []);
+  useEffect(() => api().onAggiornamento((a) => { if (oggetto(a)) ultimo.current(a); }), []);
 }
 
 /** Elenco delle sessioni, ricaricato in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
 export function useElenco() {
-  const c = useChiamata<Elenco>(() => api().elencoSessioni(), []);
-  useAggiornamenti((a) => { if (a.sessioni.length) c.ricarica(); });
+  const c = useChiamata<Elenco>(() => api().elencoSessioni().then(elencoValido), []);
+  useAggiornamenti((a) => { if (Array.isArray(a.sessioni) && a.sessioni.length) c.ricarica(); });
   return c;
 }
 
@@ -85,9 +99,9 @@ export function useMessaggi(id: string | null) {
     // Nessun fallback alle pagine numeriche: una risposta senza v1 è un errore visibile.
     let attivo = true;
     const stop = api().onAggiornamento((a) => {
-      if (!attivo || corrente.current !== id) return;
+      if (!attivo || corrente.current !== id || !oggetto(a) || !Array.isArray(a.cronologia)) return;
       let s = stato.current;
-      for (const d of a.cronologia ?? []) s = applicaDelta(s, d);
+      for (const d of a.cronologia) if (oggetto(d)) s = applicaDelta(s, d);
       if (s !== stato.current) pubblica(s);
     });
     riprova();
@@ -115,7 +129,7 @@ export function useMessaggi(id: string | null) {
     }
   };
   const s = dati.sessione === id ? dati : nuovaCronologia(id);
-  const righe = righeOrdinate(s);
+  const righe = righeOrdinate(s).filter((r) => messaggioValido(r.messaggio));
   return { stato: s.errore ? "errore" : carica || dati.sessione !== id ? "carica" : "pronto",
     errore: s.errore, riprova, messaggi: righe.map((r) => r.messaggio), identita: righe,
     pagina: s.pagina, haAltre: !!s.cursore && !s.invalida, totale: s.totale,

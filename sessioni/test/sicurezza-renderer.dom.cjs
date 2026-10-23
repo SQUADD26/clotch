@@ -122,7 +122,7 @@ app.whenReady().then(async () => {
     }
     await wait(() => [...document.querySelectorAll('.riga-sessione .testo')].some((e) => e.textContent === 'Enorme rinominata'));
     assert.equal(await radiceViva(), true); scene.elenco.sessioni[1].titolo = 'Enorme';
-  }, { noto: 'UI-AGGIORNAMENTO-MALFORMATO' });
+  });
 
   await check('ERRORE_DEL_PROTOTIPO_NON_INQUINA', async () => {
     await carica({ vista: 'sessione', sessione: 's1' }); await wait(() => document.querySelectorAll('.riga-sessione').length === 2);
@@ -146,7 +146,7 @@ app.whenReady().then(async () => {
       if (!(await radiceViva())) bianche.push(JSON.stringify(m));
     }
     assert.equal(bianche.length, 0, 'app bianca con: ' + bianche.join(' ; '));
-  }, { noto: 'UI-MESSAGGIO-MALFORMATO' });
+  });
 
   await check('ELENCO_MALFORMATO_NON_ROMPE_L_APP', async () => {
     const bianche = [];
@@ -155,7 +155,7 @@ app.whenReady().then(async () => {
       if (!(await radiceViva())) bianche.push(nome);
     }
     assert.equal(bianche.length, 0, 'app bianca con: ' + bianche.join(' ; '));
-  }, { noto: 'UI-ELENCO-MALFORMATO' });
+  });
 
   for (const q of [{ vista: 'constructor' }, { vista: 'impostazioni', sezione: 'constructor' }, { vista: 'impostazioni', sezione: '__proto__' }, { vista: 'impostazioni', sezione: 'toString' },
     { vista: 'sessione', sessione: '<script>window.__x=1</script>' }, { vista: 'sessione', sessione: 's999' }, { vista: 'sessione', sessione: 'x'.repeat(8000) }]) {
