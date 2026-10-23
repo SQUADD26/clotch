@@ -1,0 +1,136 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "aspetta",
+    "perche": null,
+    "ultimaAttivita": 1792767136337,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Porta il disegno Sessioni nel codice, pari pari.",
+    "t": 1792767120337
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
+    "t": 1792767121337
+   },
+   {
+    "tipo": "strumento",
+    "nome": "ExitPlanMode",
+    "ingresso": {
+     "plan": "Porto la pagina «Sessioni» nel codice, una schermata alla volta.\n1. Leggo token e frame dal disegno\n2. Scrivo barra laterale e conversazione\n3. Disegno ogni stato a scala 1 e lo confronto col disegno\n4. Apro la PR verso dev con le prove"
+    },
+    "esito": null,
+    "t": 1792767135337,
+    "id": "t0"
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "titolo": null,
+    "madre": null,
+    "progetto": "clotch",
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r3",
+      "genere": "piano",
+      "strumento": "ExitPlanMode",
+      "ingresso": {
+       "plan": "Porto la pagina «Sessioni» nel codice, una schermata alla volta.\n1. Leggo token e frame dal disegno\n2. Scrivo barra laterale e conversazione\n3. Disegno ogni stato a scala 1 e lo confronto col disegno\n4. Apro la PR verso dev con le prove"
+      },
+      "domande": []
+     }
+    ],
+    "battito": 1792767236337,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792767256337,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

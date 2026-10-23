@@ -98,3 +98,14 @@
 .fonte { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); border-radius: var(--raggio-md); }
 .fonte .titolo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
 .fonte .sito { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+
+/* «4.812 messaggi prima di questi» e «Carica precedenti» (101:9628) */
+.precedenti {
+  display: flex; align-items: center; justify-content: center; gap: var(--spazio-3);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.risposta .con-menu { position: relative; display: inline-flex; }
+.risposta .aperto { background: var(--colore-fondo-riga-passaggio); }
+/* microfono e «…» compaiono al passaggio sulla risposta («risposta al passaggio», 101:23727) */
+.risposta:not(:hover) .azioni:not(.fisse) .al-passaggio { display: none; }
+.turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */

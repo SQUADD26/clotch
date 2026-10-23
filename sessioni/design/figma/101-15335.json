@@ -2040,11 +2040,10 @@
    "variabili": {
     "fills[0]": "colore/fondo/superficie",
     "strokes[0]": "colore/bordo/leggero",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:15357",
@@ -2734,11 +2733,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:15265;101:13341",
@@ -3166,11 +3164,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:15291;101:13394",
@@ -3577,11 +3574,10 @@
    },
    "variabili": {
     "strokes[0]": "colore/bordo/normale",
-    "cornerRadius": "raggio/lg"
+    "cornerRadius": "raggio/lg",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:15315;101:7280",
@@ -3920,11 +3916,10 @@
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
-    "paddingBottom": "spazio/2-5"
+    "paddingBottom": "spazio/2-5",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:15368;101:7323",

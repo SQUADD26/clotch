@@ -5,7 +5,7 @@
   padding: var(--spazio-3) var(--spazio-3) var(--spazio-2-5) var(--spazio-3);
   background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-casella);
 }
-.casella:focus-within { border-color: var(--colore-bordo-fuoco); }
+.casella:focus-within, .casella.fuoco { border-color: var(--colore-bordo-fuoco); }
 .casella .area-testo { display: flex; padding-left: var(--spazio-1); }
 .casella textarea {
   flex: 1; min-width: 0; resize: none; border: 0; outline: none; background: none; padding: 0; margin: 0;
@@ -48,4 +48,19 @@
 
 /* suggerimento sopra il bottone, al passaggio (101:43945) */
 .con-suggerimento.sopra .suggerimento { display: none; top: auto; bottom: calc(100% + var(--spazio-1)); align-items: center; gap: var(--spazio-2); }
-.con-suggerimento.sopra:hover .suggerimento { display: inline-flex; }
+.con-suggerimento.sopra:hover .suggerimento, .con-suggerimento.sopra.visibile .suggerimento { display: inline-flex; }
+
+/* «menu sessioni» sopra la casella, dopo @ (101:45260) */
+.area-casella.con-menu { position: relative; }
+.menu-sessioni {
+  position: absolute; left: 0; right: 0; bottom: calc(100% - var(--spazio-4) + var(--spazio-2)); z-index: 3;
+  display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-xl); background: var(--colore-fondo-elevato);
+}
+.menu-sessioni .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.menu-sessioni .voce {
+  display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-riga); padding: 0 var(--spazio-2); border-radius: var(--raggio-md);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); text-align: left;
+}
+.menu-sessioni .voce.scelta { background: var(--colore-fondo-riga-passaggio); }
+.menu-sessioni .etichetta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-primario); }
+.menu-sessioni .valore { flex: none; color: var(--colore-testo-secondario); }

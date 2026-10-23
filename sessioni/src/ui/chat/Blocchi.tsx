@@ -1,7 +1,6 @@
 // figma: 101-8036 — blocchi del filo: «Messaggio Roberto» 101:7210, «Risposta» 101:7216, «Blocco codice» 101:7213,
 // «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525.
 import { useState, type ReactNode } from "react";
-import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Blocco } from "./modello";
 import { durata, quanti } from "./testi";
@@ -9,25 +8,6 @@ import "./filo.css";
 
 export function MessaggioRoberto({ testo }: { testo: string }) {
   return <div className="messaggio-roberto"><div className="bolla">{testo}</div></div>;
-}
-
-/** Copia: al passaggio «Copia», dopo il clic «Copiato» (suggerimento del frame 101:23727). */
-export function Risposta({ testo, inScrittura }: { testo: string; inScrittura: boolean }) {
-  const [copiato, setCopiato] = useState(false);
-  const copia = () => navigator.clipboard.writeText(testo).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); });
-  return (
-    <div className="risposta">
-      <div className="testo-risposta">{testo}{inScrittura && <span className="cursore" />}</div>
-      {!inScrittura && (
-        <div className="azioni">
-          <span className="con-suggerimento">
-            <BottoneIcona icona="copia" etichetta="Copia" onClick={copia} />
-            {copiato && <span className="suggerimento">Copiato</span>}
-          </span>
-        </div>
-      )}
-    </div>
-  );
 }
 
 /** Testata apribile: freccia a destra da chiusa, in giù da aperta (varianti Chiusa/Aperta del disegno). */

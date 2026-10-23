@@ -1,23 +1,15 @@
 // La chat e Friday: registro dal vivo (canale `friday:registro`) e comandi nella casella (contratto v1, «Comandi»).
 // Esito non riuscito: l'avviso unico «Sessione non raggiunta» con «Riprova» (frame 101:24007).
 import { useEffect, useState } from "react";
-import type { ChatFriday, Registro } from "../../friday";
+import type { ChatFriday } from "../../friday";
 import type { FridayApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
-import { daPiano } from "../friday/registro";
+import { friday, useRegistro } from "../friday/dati";
 
-const friday = () => (window as unknown as { friday: FridayApi }).friday;
-
-/** Registro di Friday, aggiornato a ogni riga nuova; null finché non arriva o se il canale non risponde. */
-export function useRegistro(): Registro | null {
-  const [r, setR] = useState<Registro | null>(null);
-  useEffect(() => {
-    let vivo = true;
-    friday().registro().then((p) => vivo && setR(daPiano(p)), () => {});
-    const via = friday().onRegistro((p) => setR(daPiano(p)));
-    return () => { vivo = false; via(); };
-  }, []);
-  return r;
+/** La chat di Friday di una sessione (permessi, domande, coda, battito); null se Friday non la conosce o il registro manca. */
+export function useChatFriday(id: string | null): ChatFriday | null {
+  const { dati } = useRegistro();
+  return (id && dati?.chat.get(id)) || null;
 }
 
 /** Ora che scorre, per «da 2 min» e «non risponde». */

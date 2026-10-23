@@ -63,7 +63,8 @@
   "misura/dialogo": 420,
   "colore/fondo/cornice": "#232323",
   "misura/pannello": 320,
-  "colore/bordo/leggero": "#ffffff0b"
+  "colore/bordo/leggero": "#ffffff0b",
+  "misura/tratto-forte": 2
  },
  "nodi": [
   {
@@ -100,11 +101,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19481;101:13217",
@@ -586,11 +586,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19509;101:13249",
@@ -1139,11 +1138,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19539;101:13282",
@@ -1669,11 +1667,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19569;101:13315",
@@ -2101,11 +2098,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19595;101:13341",
@@ -2533,11 +2529,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19621;101:13370",
@@ -2949,11 +2944,10 @@
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
     "paddingTop": "spazio/4",
-    "paddingBottom": "spazio/4"
+    "paddingBottom": "spazio/4",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19645;101:13394",
@@ -4333,11 +4327,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "101:19725",
@@ -4444,11 +4437,10 @@
     "itemSpacing": "spazio/1",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
-    "height": "misura/bottone"
+    "height": "misura/bottone",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19730;101:16684",
@@ -4717,11 +4709,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19734;101:16701",
@@ -4929,11 +4920,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19734;101:16713",
@@ -5020,11 +5010,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19734;101:16718",
@@ -5111,11 +5100,10 @@
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
     "width": "misura/icona",
-    "height": "misura/icona"
+    "height": "misura/icona",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:19734;101:16723",
@@ -5831,11 +5819,10 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/2",
     "paddingRight": "spazio/2",
-    "height": "misura/riga"
+    "height": "misura/riga",
+    "strokeWeight": "misura/tratto-forte"
    },
-   "senza": [
-    "strokeWeight 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:35377;101:35102",
@@ -6003,11 +5990,10 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
-    "height": "misura/bottone-invio"
+    "height": "misura/bottone-invio",
+    "strokeWeight": "misura/tratto-forte"
    },
-   "senza": [
-    "strokeWeight 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:35387;101:35108",
@@ -7745,11 +7731,10 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/colonna"
+    "width": "misura/colonna",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:43247;101:36613",
@@ -8881,11 +8866,10 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/dialogo"
+    "width": "misura/dialogo",
+    "strokeWeight": "misura/tratto"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:45915;101:44475",

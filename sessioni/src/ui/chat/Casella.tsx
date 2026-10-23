@@ -18,7 +18,9 @@ export const nomeModello = (m: string | null) => {
 
 const Tasto = ({ t }: { t: string }) => <span className="tasto">{t}</span>;
 
-function Coda({ voci, modifica, onModifica, chat }: { voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string }) {
+function Coda({ voci, modifica, onModifica, chat, suggerimento }: {
+  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean;
+}) {
   const subito = async (v: VoceCoda) => { if (await comanda("manda", { chat, testo: v.testo, modo: "subito" })) await comanda("coda_togli", { chat, voce: v.voce }); };
   return (
     <div className="coda">
@@ -27,7 +29,7 @@ function Coda({ voci, modifica, onModifica, chat }: { voci: VoceCoda[]; modifica
           {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
           <span className="testo">{v.testo}</span>
           <div className="azioni">
-            <span className="con-suggerimento sopra">
+            <span className={suggerimento && i === 0 ? "con-suggerimento sopra visibile" : "con-suggerimento sopra"}>
               <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
               <span className="suggerimento">Interrompi e manda ora <Tasto t="↵" /></span>
             </span>
@@ -40,11 +42,14 @@ function Coda({ voci, modifica, onModifica, chat }: { voci: VoceCoda[]; modifica
   );
 }
 
-export function Casella({ chat, lavora, coda, modello, disabilitata }: {
-  chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; disabilitata: boolean;
+/** `segnaposto`: «In attesa della sessione» (101:15993), «Riparte alle 18:00» (101:16211); di solito «Scrivi alla sessione». */
+/** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945). */
+export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto = "Scrivi alla sessione", prova = null }: {
+  chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; disabilitata: boolean; segnaposto?: string; prova?: string | null;
 }) {
-  const [testo, setTesto] = useState("");
-  const [modifica, setModifica] = useState<VoceCoda | null>(null);
+  const inModifica = prova === "modifica" ? coda[0] ?? null : null;
+  const [testo, setTesto] = useState(prova?.startsWith("scritta:") ? prova.slice(8) : inModifica?.testo ?? "");
+  const [modifica, setModifica] = useState<VoceCoda | null>(inModifica);
   const [invio, setInvio] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
 
@@ -72,17 +77,18 @@ export function Casella({ chat, lavora, coda, modello, disabilitata }: {
   };
 
   const ferma = lavora && !testo.trim();
+  const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
     <div className="area-casella">
-      {coda.length > 0 && <Coda voci={coda} chat={chat} modifica={modifica?.voce ?? null} onModifica={(v) => { setModifica(v); setTesto(v.testo); area.current?.focus(); }} />}
+      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={prova === "suggerimento"} modifica={modifica?.voce ?? null} onModifica={(v) => { setModifica(v); setTesto(v.testo); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
-      <div className={`casella ${stato}`}>
+      <div className={`casella ${stato}${modifica ? " fuoco" : ""}`}>
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => setTesto(e.target.value)} onKeyDown={tasti}
-            placeholder={disabilitata ? "Rispondi da Cursor" : "Scrivi alla sessione"} aria-label="Scrivi alla sessione" />
+            placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>
         <div className="azioni">
           <BottoneIcona icona="piu" etichetta="Allega" disabled />

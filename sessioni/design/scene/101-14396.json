@@ -1,0 +1,204 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792767136337,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": ""
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Porta il disegno Sessioni nel codice, pari pari.",
+    "t": 1792767071337
+   },
+   {
+    "tipo": "strumento",
+    "nome": "ExitPlanMode",
+    "ingresso": {
+     "plan": "Porto la pagina «Sessioni» nel codice, una schermata alla volta.\n1. Leggo token e frame dal disegno\n2. Scrivo barra laterale e conversazione\n3. Disegno ogni stato a scala 1 e lo confronto col disegno\n4. Apro la PR verso dev con le prove"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792767072337,
+    "id": "t0"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "TodoWrite",
+    "ingresso": {
+     "todos": [
+      {
+       "content": "Leggere i token dal disegno",
+       "status": "completed"
+      },
+      {
+       "content": "Scrivere la barra laterale",
+       "status": "completed"
+      },
+      {
+       "content": "Scrivere la conversazione",
+       "status": "in_progress"
+      },
+      {
+       "content": "Confrontare ogni stato col disegno",
+       "status": "pending"
+      },
+      {
+       "content": "Aprire la PR verso dev",
+       "status": "pending"
+      }
+     ]
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792767073337,
+    "id": "t1"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Agent",
+    "ingresso": {
+     "description": "Lettore",
+     "subagent_type": "general-purpose"
+    },
+    "esito": null,
+    "t": 1792767074337,
+    "id": "t2"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Agent",
+    "ingresso": {
+     "description": "Controllo tipi",
+     "subagent_type": "general-purpose"
+    },
+    "esito": null,
+    "t": 1792767086337,
+    "id": "t3"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Agent",
+    "ingresso": {
+     "description": "Prove",
+     "subagent_type": "general-purpose"
+    },
+    "esito": null,
+    "t": 1792767094337,
+    "id": "t4"
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "…",
+    "t": 1792767135337
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "titolo": null,
+    "madre": null,
+    "progetto": "clotch",
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "lavora",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [],
+    "battito": 1792767236337,
+    "aiutanti": {
+     "a1": {
+      "tipo": "general-purpose",
+      "modello": "claude-sonnet-5-5",
+      "testo": null,
+      "esito": null,
+      "finito": false
+     }
+    },
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792767256337,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "friday": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

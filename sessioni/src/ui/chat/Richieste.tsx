@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
-import { clotchAcceso } from "../pannello/clotch";
+import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
 import { comanda } from "./friday";
 import { testoCampo } from "./strumenti";
@@ -115,7 +115,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
 
 /** Nota sotto la richiesta, con o senza Clotch (coppia CL5 di «Con e senza Clotch», 101:47850 e 101:47883). */
 export function NotaVoce({ acceso, spento }: { acceso: string; spento: string }) {
-  const c = clotchAcceso();
+  const c = useClotchAcceso();
   return <div className="nota-voce"><Icona nome={c ? "schermo" : "microfono"} /><span>{c ? acceso : spento}</span></div>;
 }
 
