@@ -17,6 +17,7 @@ const FISSI = [
   "User rejected tool use", "User has approved your plan.", "<tool_use_error>PreToolUse:", "PreToolUse:", "Error: Permission to use", "Permission to use", "No response after", "Async agent launched successfully", "You've hit your session limit", "API Error",
   "Conversation compacted", "No response requested.", "[Tool call interrupted", "<cross-session-message", "Claude AI usage limit reached",
   "Background (from the session that started this one)", "<side-sessions-event>", "Claude needs your permission",
+  "<command-name>/clear</command-name>", "<command-name>/model</command-name>", "<local-command-caveat>", "<local-command-stdout>",
 ];
 
 const finto = (v) => v.replace(/[0-9a-f]/gi, (_, i) => crypto.createHash("sha1").update(v).digest("hex")[i % 40]);

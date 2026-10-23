@@ -7,7 +7,7 @@ extension VoiceInputController {
     @MainActor static var stills: [(String, VoiceInputController)] {
         let bars = [0.2, 0.5, 0.8, 0.4, 0.9, 0.6, 0.3, 0.7]
         let said = "Dimmi a che punto è la PR del notch e se ci sono errori nella compilazione"
-        let long = "Quando hai un momento guarda la sessione che sta lavorando sulla voce in ingresso e dimmi se la scheda Dettatura è pronta, poi chiedi a Friday di avvisare la master Clotch che può compilare sul Mac, e infine controlla che il modo tieni premuto funzioni con ⌥Spazio"
+        let long = "Quando hai un momento guarda la sessione che sta lavorando sulla voce in ingresso e dimmi se la scheda Dettatura è pronta, poi chiedi a clotch AI di avvisare la master Clotch che può compilare sul Mac, e infine controlla che il modo tieni premuto funzioni con ⌥Spazio"
         func fail(_ why: VoiceInput.Failure) -> VoiceInputController { .still(.failure(why)) }
         return [
             ("1-parla-pure", .still(.ready)),

@@ -9,7 +9,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { comanda } from "./friday";
 import { useBozza } from "./bozze";
-import { provaDi, quanti } from "./testi";
+import { argsManda, provaDi, quanti } from "./testi";
 import "./casella.css";
 
 export interface VoceCoda { voce: string; testo: string }
@@ -22,10 +22,11 @@ export const nomeModello = (m: string | null) => {
 
 const Tasto = ({ t }: { t: string }) => <span className="tasto">{t}</span>;
 
-function Coda({ voci, modifica, onModifica, chat, suggerimento }: {
-  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean;
+function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale }: {
+  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean; attuale: string | null;
 }) {
-  const subito = async (v: VoceCoda) => { if (await comanda("manda", { chat, testo: v.testo, modo: "subito" })) await comanda("coda_togli", { chat, voce: v.voce }); };
+  const { modello } = useImpostazioni();
+  const subito = async (v: VoceCoda) => { if (await comanda("manda", argsManda(chat, v.testo, "subito", modello, attuale))) await comanda("coda_togli", { chat, voce: v.voce }); };
   return (
     <div className="coda">
       {voci.map((v, i) => (
@@ -56,7 +57,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const inModifica = provaDi(prova, "modifica") !== null ? coda[0] ?? null : null;
   const { testo, modifica, invio, bozza } = useBozza(chat, provaDi(prova, "scritta") ?? inModifica?.testo ?? "", inModifica);
   const area = useRef<HTMLTextAreaElement>(null);
-  const { scorciatoie } = useImpostazioni();
+  const { scorciatoie, modello: preferenza } = useImpostazioni();
 
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
@@ -72,8 +73,8 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
       ok = modifica
         ? modo === "coda"
           ? await comanda("coda_modifica", { chat, voce: modifica.voce, testo: t })
-          : (await comanda("manda", { chat, testo: t, modo: "subito" })) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
-        : await comanda("manda", { chat, testo: t, modo: lavora ? modo : "subito" });
+          : (await comanda("manda", argsManda(chat, t, "subito", preferenza, modello))) && (await comanda("coda_togli", { chat, voce: modifica.voce }))
+        : await comanda("manda", argsManda(chat, t, lavora ? modo : "subito", preferenza, modello));
     } finally { richiesta.finisci(ok); }
   };
 
@@ -91,7 +92,7 @@ export function Casella({ chat, lavora, coda, modello, disabilitata, segnaposto 
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
   return (
     <div className="area-casella">
-      {altre.length > 0 && <Coda voci={altre} chat={chat} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
+      {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello}suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}

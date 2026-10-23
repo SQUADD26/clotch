@@ -19,12 +19,12 @@ final class GoalBoardTests: GoalTestCase {
         XCTAssertEqual(t("◰\u{FE0E} Clotch: correzioni"), "◰\u{FE0E} Clotch: correzioni", "text variation selector kept")
         XCTAssertEqual(t("🎨 Figma:  palette"), "🎨 Figma: palette", "only spaces collapsed")
         XCTAssertEqual(t("👨‍💻 dentalspace 🇮🇹"), "👨‍💻 dentalspace 🇮🇹")
-        XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "⭕ Friday ⭕", "session title too")
+        XCTAssertEqual(rows([g("m")], [s("local_m", cli: "m", title: "⭕ Overseer ⭕")])[0].title, "⭕ clotch AI ⭕", "session title too")
     }
 
     func testTitleIsNeverEmpty() {
         let t = { (titolo: String, session: String) in self.rows([self.g("m", titolo: titolo)], [self.s("local_m", cli: "m", title: session)])[0].title }
-        XCTAssertEqual(t("★ ⭕", "⭕ Overseer"), "⭕ Friday", "signs-only register title: the session title")
+        XCTAssertEqual(t("★ ⭕", "⭕ Overseer"), "⭕ clotch AI", "signs-only register title: the session title")
         XCTAssertEqual(t("", "★ · —"), "Fare il dato vivo", "signs-only session title: the goal's first words")
         XCTAssertEqual(rows([g("m")])[0].title, "Fare il dato vivo", "no session at all")
         XCTAssertEqual(GoalBoard.firstWords("uno due tre quattro cinque sei sette"), "uno due tre quattro cinque sei…")

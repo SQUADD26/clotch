@@ -120,5 +120,13 @@ test("casella: i comandi dell'app per permesso, domanda, piano, coda, interrompi
   assert.equal(fs.readdirSync(path.join(home, ".claude", "casella", "comandi")).length, 5);
 });
 
-// Fuori dalla v1 del contratto (sezione 5): Codex e Cursor non scrivono nel registro.
-test("attende formato Friday: Codex e Cursor nel registro (v2)", { todo: true }, () => {});
+// Fuori dalla v1 del contratto (CONTRATTO.md sezione 5): una riga con "v" diverso da 1 (es. Codex/Cursor di una v2 futura) è sconosciuta e si salta.
+test("registro: riga di una versione futura saltata, le righe v1 intorno restano", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "registro-v2-"));
+  const riga = (v: number, chat: string, n: number) => JSON.stringify({ v, id: `r-${n}`, t: "2026-10-23T10:00:00.000Z", n, chat, macchina: "mac",
+    hook_v: "x", tipo: "inizio", sorgente: v === 1 ? "cli" : "codex", dati: { titolo: "t", madre: "", progetto: "p", cwd: "/x", modo: "cli" } });
+  fs.writeFileSync(path.join(dir, "2026-10.jsonl"), [riga(1, "a1", 1), riga(2, "b2", 2), riga(1, "c3", 3)].join("\n") + "\n");
+  const r = leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: dir });
+  assert.deepEqual(r.errori, []);
+  assert.deepEqual([...r.chat.keys()].sort(), ["a1", "c3"]);
+});

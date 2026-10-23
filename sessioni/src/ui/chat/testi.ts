@@ -1,4 +1,5 @@
 // Testi composti della chat, nelle forme del disegno: «12 s», «4 min 12 s», «da 2 min», «Claude Code · accountmanager».
+import type { EsitoComando } from "../../comandi";
 import type { Sessione } from "../../tipi";
 
 /** Durata in ms -> «1 s», «41 s», «4 min 12 s», «2 h 5 min». */
@@ -30,3 +31,21 @@ export const provaDi = (prova: string | null | undefined, chiave: string) => {
   const x = prova?.split("|").find((p) => p === chiave || p.startsWith(`${chiave}:`));
   return x == null ? null : x.slice(chiave.length + 1);
 };
+
+/** Una sola lista dei modelli: etichetta del selettore «Modello per i tuoi messaggi» (119:55555) -> id CLI del motore e nota (mai l'etichetta nel comando). */
+export const MODELLI: Record<string, { id: string; dettaglio: string }> = {
+  "Opus 5.5": { id: "claude-opus-5-5", dettaglio: "Il più capace" }, "Sonnet 5.5": { id: "claude-sonnet-5-5", dettaglio: "Veloce" },
+  "Haiku 5.5": { id: "claude-haiku-5-5", dettaglio: "Il più rapido" }, "Fable 5.1": { id: "claude-fable-5-1", dettaglio: "Casi difficili" },
+};
+/** Id CLI di un'etichetta; undefined se non è un modello noto. */
+export const idModello = (etichetta: string) => MODELLI[etichetta]?.id;
+
+/** Argomenti di `manda`. `modello` con `subito`, se la preferenza è diversa dal modello della sessione (`attuale`, dalla trascrizione: può avere un suffisso di data) o se questo non si conosce; mai in coda: il motore lo rifiuta. */
+export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string, attuale: string | null) => {
+  const id = idModello(preferenza);
+  const modello = modo === "subito" && id && !attuale?.startsWith(id) ? id : undefined;
+  return { chat, testo, modo, ...(modello ? { modello } : {}) };
+};
+
+/** Testo dell'errore di un comando non riuscito: se il motore l'ha rifiutato, il suo testo. */
+export const erroreComando = (e: EsitoComando | null) => (e?.esito === "rifiutato" && e.testo) || "Sessione non raggiunta";

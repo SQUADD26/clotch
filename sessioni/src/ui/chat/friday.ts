@@ -5,6 +5,7 @@ import type { ChatFriday } from "../../friday";
 import type { FridayApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { friday, useRegistro } from "../friday/dati";
+import { erroreComando } from "./testi";
 
 /** La chat di Friday di una sessione (permessi, domande, coda, battito); null se Friday non la conosce o il registro manca. */
 export function useChatFriday(id: string | null): ChatFriday | null {
@@ -27,6 +28,7 @@ export const nonRisponde = (c: ChatFriday, ora: number) => c.stato === "lavora" 
 export async function comanda(cmd: Parameters<FridayApi["comando"]>[0], args: Record<string, unknown>): Promise<boolean> {
   const e = await friday().comando(cmd, args).catch(() => null);
   if (e?.esito === "ok") return true;
-  avvisa({ tipo: "errore", messaggio: "Sessione non raggiunta", azione: { etichetta: "Riprova", fai: () => void comanda(cmd, args) } });
+  // rifiutato dal motore: riprovare darebbe lo stesso rifiuto, si mostra il suo testo senza «Riprova»
+  avvisa({ tipo: "errore", messaggio: erroreComando(e), azione: e?.esito === "rifiutato" ? undefined : { etichetta: "Riprova", fai: () => void comanda(cmd, args) } });
   return false;
 }
