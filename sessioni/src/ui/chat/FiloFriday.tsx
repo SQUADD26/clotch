@@ -106,7 +106,7 @@ export function CasellaFriday({ microfono, spenta = false }: { microfono?: React
       <div className={`casella ${stato}`}>
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={spenta} onChange={(e) => { setTesto(e.target.value); setScelta(0); }} onKeyDown={tasti}
-            placeholder={spenta ? "Friday non risponde" : "Chiedi a Friday"} aria-label="Chiedi a Friday" />
+            placeholder={spenta ? "clotch AI non risponde" : "Chiedi a clotch AI"} aria-label="Chiedi a clotch AI" />
         </div>
         <div className="azioni">
           <BottoneIcona icona="piu" etichetta="Allega" disabled />

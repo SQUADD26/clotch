@@ -1,10 +1,12 @@
 {
   "name": "clotch-sessioni",
+  "productName": "clotch",
   "version": "0.1.0",
   "private": true,
-  "description": "App Sessioni: legge in sola lettura le sessioni di lavoro del Mac (Claude Code, app Claude, Codex, Cursor). Main in src/, interfaccia React in src/ui.",
+  "description": "clotch: legge in sola lettura le sessioni di lavoro del Mac (Claude Code, app Claude, Codex, Cursor). Main in src/, interfaccia React in src/ui.",
   "main": "dist/src/main.js",
   "scripts": {
+    "verifica:brand": "electron scripts/verifica-branding.cjs",
     "build": "tsc && tsc -p src/ui && vite build",
     "test": "node scripts/token-css.mjs --check && node scripts/icone.mjs --check && tsc && tsc -p src/ui && node --test \"dist/test/*.test.js\"",
     "token": "node scripts/token-css.mjs && node scripts/icone.mjs",

@@ -33,7 +33,7 @@ function CartelleEscluse() {
       <Gruppo>
         {v.cartelleEscluse.length === 0
           ? (
-            <VuotoLista titolo="Nessuna cartella esclusa" corpo="Le sessioni di una cartella esclusa non compaiono in Sessioni.">
+            <VuotoLista titolo="Nessuna cartella esclusa" corpo="Le sessioni di una cartella esclusa non compaiono in clotch.">
               <Bottone tipo="secondario" onClick={() => escludi(v.cartelleEscluse)}>Aggiungi cartella</Bottone>
             </VuotoLista>
           )
@@ -76,12 +76,12 @@ export default function Dati({ sotto }: { sotto?: string }) {
         <Riga etichetta="Cronologia" descrizione="Per quanto tempo restano le sessioni finite">
           <Scelta etichetta="Cronologia" valore={v.cronologia} voci={CRONOLOGIA} onScegli={(x) => imposta("cronologia", x)} />
         </Riga>
-        <Riga etichetta="Dati di Sessioni" descrizione="Indice e impostazioni. Le sessioni originali non si toccano." azione>
+        <Riga etichetta="Dati di clotch" descrizione="Indice e impostazioni. Le sessioni originali non si toccano." azione>
           <Bottone tipo="secondario" className="pericolo" onClick={() => setConferma(true)}>Elimina dati…</Bottone>
         </Riga>
       </Gruppo>
       {conferma && (
-        <Dialogo titolo="Eliminare i dati di Sessioni?" corpo="Cancello indice, cache e impostazioni. Le sessioni originali non si toccano e Sessioni le rilegge da capo."
+        <Dialogo titolo="Eliminare i dati di clotch?" corpo="Cancello indice, cache e impostazioni. Le sessioni originali non si toccano e clotch le rilegge da capo."
           onChiudi={() => setConferma(false)}
           bottoni={<>
             <Bottone tipo="secondario" onClick={() => setConferma(false)}>Annulla</Bottone>

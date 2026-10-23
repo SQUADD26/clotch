@@ -36,7 +36,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
   const segno: Testa["segno"] = avvio ? ["spinner", "secondaria"] : st ? SEGNO_FRIDAY[st.stato] : undefined;
   const stato = avvio === "avvio" ? "Avvio…" : avvio === "riavvio" ? "Riavvio…" : !st ? "" : st.stato === "spenta" ? "Spenta"
     : st.stato === "pausa" ? (st.da ? `In pausa fino alle ${orario(st.da)}` : "In pausa") : "Sempre attiva";
-  return { icona: "scintille", accento: true, titolo: "Friday", segno, stato };
+  return { icona: "scintille", accento: true, titolo: "clotch AI", segno, stato };
 }
 
 export function Intestazione() {

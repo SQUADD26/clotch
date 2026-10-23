@@ -9,8 +9,8 @@ import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
 
 const VOCI: [Chiave, string, string][] = [
-  ["clotchVoce", "Voce dal notch", "Friday parla da Clotch; qui vedi l’indicatore"],
-  ["clotchDettatura", "Dettatura dal notch", "⌥Spazio apre il microfono di Clotch"],
+  ["clotchVoce", "Voce dal notch", "clotch AI parla da clotch; qui vedi l’indicatore"],
+  ["clotchDettatura", "Dettatura dal notch", "⌥Spazio apre il microfono di clotch"],
   ["clotchAvvisi", "Avvisi nel notch", "Gli avvisi compaiono sotto il notch"],
   ["clotchObiettivi", "Obiettivi anche nel notch", "Accetta e rifiuta dal notch o da qui"],
 ];
@@ -30,19 +30,19 @@ export default function Clotch() {
   const versione = useVersioneClotch();
   const v = useImpostazioni();
   return (
-    <Pagina titolo="Clotch">
+    <Pagina titolo="clotch">
       <Gruppo>
         <div className="riga stato-clotch">
           <Icona nome="schermo" colore={acceso ? "successo" : "terziaria"} />
           <div className="testi">
-            <div className="t-base medio">{acceso ? "Clotch è collegato" : "Clotch non è installato"}</div>
+            <div className="t-base medio">{acceso ? "clotch è collegato" : "clotch non è installato"}</div>
             <div className="t-sm secondario">
               {acceso
                 ? `${versione ? `Versione ${versione} · v` : "V"}oce, dettatura e avvisi passano dal notch`
-                : "Sessioni fa tutto da sola: voce, dettatura e avvisi stanno qui"}
+                : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
             </div>
           </div>
-          {!acceso && <Bottone tipo="secondario" disabled>Scarica Clotch</Bottone>}
+          {!acceso && <Bottone tipo="secondario" disabled>Scarica clotch</Bottone>}
         </div>
         {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
           <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>

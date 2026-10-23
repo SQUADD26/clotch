@@ -11,8 +11,8 @@ import { prova } from "./prova";
 import "./uso.css";
 
 const NOTA = {
-  con: (quando: string) => `Dati dal notch, aggiornati ${quando}. Clotch avvisa a voce all’80% e al 90%.`,
-  senza: (quando: string) => `Dati letti da Sessioni, aggiornati ${quando}. Avviso all’80% e al 90% in un avviso a comparsa.`,
+  con: (quando: string) => `Dati dal notch, aggiornati ${quando}. clotch avvisa a voce all’80% e al 90%.`,
+  senza: (quando: string) => `Dati letti da clotch, aggiornati ${quando}. Avviso all’80% e al 90% in un avviso a comparsa.`,
 };
 
 type Scheda = "panoramica" | "andamento";

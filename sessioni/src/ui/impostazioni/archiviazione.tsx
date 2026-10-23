@@ -28,7 +28,7 @@ export default function Archiviazione() {
     <Pagina titolo="Archiviazione">
       {spazio.dati && (
         <div className="spazio-usato">
-          <div className="t-base">Usati da Sessioni: {mb(totale)}</div>
+          <div className="t-base">Usati da clotch: {mb(totale)}</div>
           <div className="barra-segmentata">
             {PARTI.map((p) => <div key={p.chiave} style={{ flex: spazio.dati![p.chiave], background: `var(${p.colore})` }} />)}
           </div>

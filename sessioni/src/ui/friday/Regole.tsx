@@ -63,7 +63,7 @@ export function Regole() {
   const gruppi = r ? regolePerDove(r) : [];
   const tutte = gruppi.flatMap((g) => g.regole);
   if (r && !gruppi.length) {
-    return <div className="vista-friday"><Vuoto icona="scudo" titolo="Nessuna regola imparata" corpo="Quando correggi Friday, la correzione diventa una regola e la trovi qui." /></div>;
+    return <div className="vista-friday"><Vuoto icona="scudo" titolo="Nessuna regola imparata" corpo="Quando correggi clotch AI, la correzione diventa una regola e la trovi qui." /></div>;
   }
   return (
     <div className="vista-friday">

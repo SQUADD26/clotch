@@ -16,11 +16,11 @@ export function ChatFriday() {
     <>
       <FiloFriday />
       {(avvio === "riavvio" || spenta) && <div className="vista-friday chat-friday">
-        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio Friday" corpo="Riprendo le sessioni e gli avvisi da dove erano." />}
+        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Riprendo le sessioni e gli avvisi da dove erano." />}
         {!avvio && st?.stato === "spenta" && (
           <>
-            <AvvisoRosso titolo={st.da ? `Friday si è chiusa alle ${orario(st.da)}` : "Friday si è chiusa"} corpo="L’app prova a riaprirla. Se non riparte, riavviala tu." />
-            <div className="riga-f"><Bottone tipo="secondario" onClick={() => avviaFriday("riavvio")}>Riavvia Friday</Bottone></div>
+            <AvvisoRosso titolo={st.da ? `clotch AI si è chiusa alle ${orario(st.da)}` : "clotch AI si è chiusa"} corpo="L’app prova a riaprirla. Se non riparte, riavviala tu." />
+            <div className="riga-f"><Bottone tipo="secondario" onClick={() => avviaFriday("riavvio")}>Riavvia clotch AI</Bottone></div>
           </>
         )}
       </div>}

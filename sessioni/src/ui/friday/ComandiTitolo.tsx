@@ -32,7 +32,7 @@ export function esitoFermo(id: number, quante: number, non: string[] | null, tes
   if (non && !non.length) {
     aggiornaAvviso(id, { tipo: "info", messaggio: `${plurale(quante, "sessione ferma", "sessioni ferme")}`, azione: { etichetta: "Riprendi tutte", fai: () => friday().comando("riprendi_tutto") } });
   } else {
-    const messaggio = non ? (non.length === 1 ? "1 sessione non si è fermata" : `${non.length} sessioni non si sono fermate`) : testo || "Friday non risponde";
+    const messaggio = non ? (non.length === 1 ? "1 sessione non si è fermata" : `${non.length} sessioni non si sono fermate`) : testo || "clotch AI non risponde";
     aggiornaAvviso(id, { tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: () => fermaTutto(quante) } });
   }
 }
@@ -64,7 +64,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
       ))}
       <div className="separatore" role="separator"><div className="linea" /></div>
       <div className="nota-menu t-sm secondario">
-        {clotch ? "Vale anche per Clotch: niente voce né microfono." : "Friday continua a lavorare e tiene gli avvisi per dopo."}
+        {clotch ? "Vale anche per clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
       </div>
     </div>
   );
