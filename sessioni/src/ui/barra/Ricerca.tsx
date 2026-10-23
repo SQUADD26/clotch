@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AzioneSessione, PreferenzeSessione, Sessione } from "../../tipi";
 import { Campo } from "../base/Campo";
+import { api } from "../base/dati";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { giorno, nomeSorgente } from "./elenco";
 import { IconaRiga } from "./Righe";
@@ -32,10 +33,23 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", onApri, on
   const [q, setQ] = useState(iniziale);
   const [i, setI] = useState(0);
   const parole = q.trim().toLowerCase();
-  const voci = useMemo<Voce[]>(() => [
-    ...(aperta && parole ? AZIONI.filter((a) => a.etichetta.toLowerCase().includes(parole)).map((a) => ({ tipo: "azione" as const, a })) : []),
-    ...sessioni.filter((s) => s.titolo.toLowerCase().includes(parole)).sort((a, b) => b.ultimaAttivita - a.ultimaAttivita).map((s) => ({ tipo: "sessione" as const, s })),
-  ], [sessioni, aperta, parole]);
+  // indice del main: titoli e testo dei messaggi, nel suo ordine; prima che risponda, solo i titoli
+  const [dalMain, setDalMain] = useState<string[]>([]);
+  useEffect(() => {
+    let vivo = true;
+    setDalMain([]);
+    if (parole) api().cerca(parole).then((r) => { if (vivo) setDalMain(r.map((x) => x.id)); }, () => {});
+    return () => { vivo = false; };
+  }, [parole]);
+  const voci = useMemo<Voce[]>(() => {
+    const perId = new Map(sessioni.map((s) => [s.id, s]));
+    const nelTitolo = sessioni.filter((s) => s.titolo.toLowerCase().includes(parole)).sort((a, b) => b.ultimaAttivita - a.ultimaAttivita);
+    const trovate = [...new Set([...dalMain.filter((id) => perId.has(id)), ...nelTitolo.map((s) => s.id)])].map((id) => perId.get(id)!);
+    return [
+      ...(aperta && parole ? AZIONI.filter((a) => a.etichetta.toLowerCase().includes(parole)).map((a) => ({ tipo: "azione" as const, a })) : []),
+      ...trovate.map((s) => ({ tipo: "sessione" as const, s })),
+    ];
+  }, [sessioni, aperta, parole, dalMain]);
   useEffect(() => setI(0), [parole]);
 
   const scegli = (v: Voce) => {
