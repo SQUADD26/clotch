@@ -71,14 +71,16 @@ app.whenReady().then(() => {
   }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
-  // Nessuna lettura di sessioni prima della prima finestra (#463): i canali sono già registrati, ma rispondono dopo `dopo`.
+  // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
+  // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
   let apri!: () => void;
   const dopo = new Promise<void>((ok) => { apri = ok; });
-  ipcMain.handle("sessioni:elenco", async () => { await dopo; return elenco(); });
-  ipcMain.handle("sessioni:info", async (_e, id: string) => { await dopo; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
-  const indice = collegaIndice(ipcMain, sessioni, dopo);
+  const pronte = dopo.then(() => caricaSessioni());
+  ipcMain.handle("sessioni:elenco", async () => { await pronte; return elenco(); });
+  ipcMain.handle("sessioni:info", async (_e, id: string) => { await pronte; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
+  const indice = collegaIndice(ipcMain, sessioni, pronte);
   ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
-    await dopo;
+    await pronte;
     if (opzioni !== undefined && (
       !opzioni || typeof opzioni !== "object" || Array.isArray(opzioni) || opzioni.v !== 1 ||
       (opzioni.cursore !== undefined && (typeof opzioni.cursore !== "string" || opzioni.cursore.length > 4096))
@@ -110,8 +112,8 @@ app.whenReady().then(() => {
   // la finestra la mostra il suo ready-to-show (registrato prima di questo): solo dopo si legge. Il timer evita l'attesa infinita se non arriva.
   if (finestra) finestra.once("ready-to-show", () => setImmediate(apri)); else apri();
   setTimeout(apri, 10_000).unref();
-  dopo.then(() => {
-    sessioni.osserva((a) => {
+  const caricaSessioni = async () => {
+    await sessioni.osservaInWorker((a) => {
       barraMenu();
       BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
       const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
@@ -120,10 +122,10 @@ app.whenReady().then(() => {
       if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
       avvisa(a);
     });
-    // dopo osserva(): da qui l'elenco è quello dell'osservatore
+    // dopo l'osservatore: da qui l'elenco è il suo
     avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();
-  });
+  };
   app.on("activate", () => BrowserWindow.getAllWindows().length || apriFinestra());
 });
 

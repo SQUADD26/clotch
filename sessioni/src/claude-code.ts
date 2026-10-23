@@ -7,7 +7,8 @@ import { Radice } from "./radici";
 import { situazioneClaude } from "./situazione";
 import { ErroreLettura, Sessione } from "./tipi";
 
-const cache = new Map<string, { chiave: string; s: Sessione | null }>();
+/** Esportata: il worker d'avvio la riempie e il main la copia (cache.ts). */
+export const cache = new Map<string, { chiave: string; s: Sessione | null }>();
 
 /** Ultimo pezzo della cartella: il nome del progetto. */
 export const nomeProgetto = (cartella: string) => path.basename(cartella.replace(/\/+$/, "")) || cartella;

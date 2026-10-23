@@ -6,23 +6,33 @@ import { firmaFile } from "./messaggi";
 import { Cronologia } from "./cronologia";
 import { Aggiornamento, Elenco } from "./tipi";
 
+/** Lo stato di partenza dell'osservatore: la lettura pesante (30 s con migliaia di trascrizioni). Gira anche in un worker (avvio-worker.ts, #463). */
+export interface StatoIniziale { elenco: Elenco; firmeSessioni: Map<string, string>; firme: Map<string, string>; iniziali: Map<string, number> }
+export function statoIniziale(home: string, env: NodeJS.ProcessEnv, impostazioni?: Record<string, unknown>): StatoIniziale {
+  const elenco = leggiElenco({ home, env, impostazioni });
+  const firmeSessioni = new Map(elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
+  const firme = new Map<string, string>(), iniziali = new Map<string, number>(); // iniziali: file -> dimensione all'avvio: l'ultima riga chiusa si cerca solo al primo evento, non per ogni sessione all'avvio
+  for (const s of elenco.sessioni) if (s.file.endsWith(".jsonl")) {
+    firme.set(s.file, firma(s.file));
+    try { iniziali.set(s.file, fs.statSync(s.file).size); } catch { /* l'evento successivo riporterà l'errore */ }
+  }
+  return { elenco, firmeSessioni, firme, iniziali };
+}
+
 export class Osservatore {
   elenco: Elenco;
-  private iniziali = new Map<string, number>(); // file -> dimensione all'avvio: l'ultima riga chiusa si cerca solo al primo evento, non per ogni sessione all'avvio
-  private firme = new Map<string, string>();
-  private firmeSessioni = new Map<string, string>(); // id -> JSON della sessione all'ultimo giro: si confronta, non si rifà ogni volta
+  private iniziali: Map<string, number>;
+  private firme: Map<string, string>;
+  private firmeSessioni: Map<string, string>; // id -> JSON della sessione all'ultimo giro: si confronta, non si rifà ogni volta
   private watchers = new Map<string, fs.FSWatcher>();
   private avviato = false;
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
 
-  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia()) {
-    this.elenco = leggiElenco({ home, env, impostazioni: imp?.() });
-    for (const s of this.elenco.sessioni) this.firmeSessioni.set(s.id, JSON.stringify(s));
-    for (const s of this.elenco.sessioni) if (s.file.endsWith(".jsonl")) {
-      this.firme.set(s.file, firma(s.file));
-      try { this.iniziali.set(s.file, fs.statSync(s.file).size); } catch { /* l'evento successivo riporterà l'errore */ }
-    }
+  /** `partenza`: lo stato già letto altrove (worker); senza, si legge qui. */
+  constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia(), private partenza?: StatoIniziale) {
+    const p = this.partenza ?? statoIniziale(home, env, imp?.());
+    ({ elenco: this.elenco, firmeSessioni: this.firmeSessioni, firme: this.firme, iniziali: this.iniziali } = p);
     this.cronologia.collega((d) => this.cb({ sessioni: [d.sessione], cronologia: [d],
       nuoviMessaggi: d.tipo === "upsert" ? [{ id: d.sessione, messaggi: d.righe.map((r) => r.messaggio) }] : [] }));
   }
@@ -63,7 +73,8 @@ export class Osservatore {
     this.guarda();
     // macOS (FSEvents) comincia a mandare eventi qualche istante dopo fs.watch: quello che si scrive prima non arriva.
     // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; ogni giro poi raccoglie ogni file cresciuto (giro()).
-    this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
+    // shortcut: con lo stato letto da un worker niente giro subito (costa ~2,5 s di main con migliaia di sessioni): ciò che è cambiato nel frattempo si riconcilia al primo evento, quando si abbassa il costo del giro si rimette.
+    if (!this.partenza) this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
 
   ferma() {
