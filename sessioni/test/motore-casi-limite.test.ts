@@ -149,6 +149,13 @@ test("passi: creati, modificati, completati, tolti; i passi di un sottoagente e 
   assert.deepEqual(leggiRegistro(h).chat.get("a")!.passi, []);
 });
 
+test("passi scritti dal motore in italiano (fatto, in_corso, da_fare): l'app li legge come completed, in_progress, pending", () => {
+  const h = casa();
+  const passo = (stato: string) => ({ testo: "Un passo", stato, prova: "", tolto: false });
+  scrivi(h, ev("a", "passi", { agente: "", passi: ["fatto", "in_corso", "da_fare", "pending", "constructor", "boh"].map(passo) }));
+  assert.deepEqual(leggiRegistro(h).chat.get("a")!.passi.map((x) => x.stato), ["completed", "in_progress", "pending", "pending", "constructor", "boh"]);
+});
+
 test("piano con un passo fallito e la ripresa: lo stato segue il motore, i passi restano", () => {
   const h = casa();
   const passi = (stato: string) => ev("a", "passi", { agente: "", passi: [{ testo: "Lanciare la suite", stato, prova: "", tolto: false }] });

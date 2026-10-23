@@ -89,6 +89,8 @@ const nuova = (chat: string): ChatFriday => ({
   domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
   obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
+/** friday_hook.py scrive i passi in italiano; l'app li legge con i nomi di TodoWrite. */
+const STATO_PASSO = new Map([["fatto", "completed"], ["in_corso", "in_progress"], ["da_fare", "pending"]]);
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
@@ -159,7 +161,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
         case "interrotta": c.interrotta = s(d.da) ?? "roberto"; break;
         case "coda": c.coda = Array.isArray(d.voci) ? d.voci.map((v: any) => ({ voce: String(v?.voce ?? ""), testo: String(v?.testo ?? "") })) : []; break;
         case "passi":
-          if (!d.agente && Array.isArray(d.passi)) c.passi = d.passi.filter((p: any) => !p?.tolto).map((p: any) => ({ testo: String(p?.testo ?? ""), stato: String(p?.stato ?? "") }));
+          if (!d.agente && Array.isArray(d.passi)) c.passi = d.passi.filter((p: any) => !p?.tolto).map((p: any) => ({ testo: String(p?.testo ?? ""), stato: STATO_PASSO.get(p?.stato) ?? String(p?.stato ?? "") }));
           break;
         case "regola": {
           const dove = String(d.dove ?? "claude-config"); // default del motore (friday_comandi.py)
