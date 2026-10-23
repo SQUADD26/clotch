@@ -1,0 +1,497 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:21348",
+  "nome": "menu cartella",
+  "w": 260,
+  "h": 177,
+  "dentro": "101:21257"
+ },
+ "variabili": {
+  "raggio/md": 10,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "misura/riga": 32,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/fondo/riga-passaggio": "#ffffff0d",
+  "colore/icona/errore": "#ff6764",
+  "colore/testo/errore": "#ff6764",
+  "colore/bordo/normale": "#ffffff15",
+  "raggio/xl": 15,
+  "colore/fondo/elevato": "#2d2d2d",
+  "misura/menu": 260,
+  "misura/tratto": 1
+ },
+ "nodi": [
+  {
+   "id": "101:21348",
+   "nome": "menu cartella",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 260,
+    "h": 177
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/menu"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21349",
+   "nome": "voce",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 4,
+    "w": 252,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21350",
+   "nome": "icona finder",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 12,
+    "y": 12,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:21350;101:19921",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 12.666259765625,
+    "y": 13.33203125,
+    "w": 14.6669921875,
+    "h": 13.33397388458252
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21352",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 36,
+    "y": 11,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "101:21353",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 36,
+    "y": 11,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Mostra nel Finder",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:21354",
+   "nome": "voce",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 36,
+    "w": 252,
+    "h": 32
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21355",
+   "nome": "icona copia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 12,
+    "y": 44,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:21355;101:6940",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 12.666259765625,
+    "y": 44.666015625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21357",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 36,
+    "y": 43,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "101:21358",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 36,
+    "y": 43,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Copia percorso",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:21359",
+   "nome": "voce",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 68,
+    "w": 252,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21360",
+   "nome": "icona matita",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 12,
+    "y": 76,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:21360;101:7061",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 12.666748046875,
+    "y": 76.666015625,
+    "w": 14.666559219360352,
+    "h": 14.666609764099121
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21362",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 36,
+    "y": 75,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "101:21363",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 36,
+    "y": 75,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Rinomina etichetta…",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:21364",
+   "nome": "voce",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 100,
+    "w": 252,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21365",
+   "nome": "icona archivia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 12,
+    "y": 108,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:21365;101:19823",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 12.666259765625,
+    "y": 109.33203125,
+    "w": 14.6669921875,
+    "h": 13.333333969116211
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21367",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 36,
+    "y": 107,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "101:21368",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 36,
+    "y": 107,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Archivia tutte le sessioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:21369",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 132,
+    "w": 252,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21370",
+   "nome": "linea",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 12,
+    "y": 136,
+    "w": 236,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/normale",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21371",
+   "nome": "voce",
+   "tipo": "FRAME",
+   "box": {
+    "x": 4,
+    "y": 141,
+    "w": 252,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21372",
+   "nome": "icona nascondi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 12,
+    "y": 149,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:21372;101:19990",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 12.66650390625,
+    "y": 149.666015625,
+    "w": 14.666946411132812,
+    "h": 14.66680908203125
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:21374",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 36,
+    "y": 148,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "101:21375",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 36,
+    "y": 148,
+    "w": 212,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Nascondi cartella",
+   "font": "SF Pro Regular"
+  }
+ ]
+}

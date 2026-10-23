@@ -1,0 +1,250 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "101:23280",
+  "nome": "Finestra ricerca",
+  "w": 640,
+  "h": 198,
+  "dentro": "101:23248"
+ },
+ "variabili": {
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "spazio/0-5": 2,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/base": 14,
+  "testo/riga/base": 20,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "spazio/3": 12,
+  "colore/icona/terziaria": "#ffffff82",
+  "colore/bordo/leggero": "#ffffff0b",
+  "spazio/4": 16,
+  "misura/intestazione": 56,
+  "raggio/2xl": 20,
+  "colore/fondo/elevato": "#2d2d2d",
+  "misura/dialogo-ricerca": 640,
+  "testo/dimensione/lg": 16,
+  "testo/riga/lg": 24,
+  "spazio/8": 32
+ },
+ "nodi": [
+  {
+   "id": "101:23280",
+   "nome": "Finestra ricerca",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 198
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/2xl",
+    "width": "misura/dialogo-ricerca"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:23281",
+   "nome": "campo ricerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 56
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/leggero",
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "height": "misura/intestazione"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:23281;101:7540",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 19.5,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:23281;101:7540;101:6869",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 17.3330078125,
+    "y": 20.83203125,
+    "w": 13.333462715148926,
+    "h": 13.333462715148926
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:23281;101:7542",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 44,
+    "y": 15.5,
+    "w": 548,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "kubernetes",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:23281;101:7543",
+   "nome": "tasto",
+   "tipo": "TEXT",
+   "box": {
+    "x": 604,
+    "y": 19.5,
+    "w": 20,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "esc",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "101:23282",
+   "nome": "risultati",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 56,
+    "w": 640,
+    "h": 142
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:23470",
+   "nome": "vuoto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 8,
+    "y": 64,
+    "w": 624,
+    "h": 126
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "paddingTop": "spazio/8",
+    "paddingBottom": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:23471",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 312,
+    "y": 96,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:23471;101:6869",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 313.3330078125,
+    "y": 97.33203125,
+    "w": 13.333462715148926,
+    "h": 13.333462715148926
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "101:23473",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 202,
+    "y": 116,
+    "w": 236,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Nessun risultato per «kubernetes»",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "101:23474",
+   "nome": "corpo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 205,
+    "y": 140,
+    "w": 230,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Prova con altre parole o togli un filtro.",
+   "font": "SF Pro Regular"
+  }
+ ]
+}
