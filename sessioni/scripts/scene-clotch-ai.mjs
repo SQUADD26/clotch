@@ -85,7 +85,6 @@ const tutto = [...casella, ...decisioni, ...regole];
 // id del frame -> [vista, sezione, righe del registro]
 const SCENE = {
   "101-35494": ["casella", null, [...tutto, ...viva]],
-  // 101-36010 (caricamento) non ha scena: la scena risponde subito, il caricamento non si vede
   "101-35803": ["casella", null, [...decisioni, ...regole, ...viva]],
   "101-36225": ["casella", null, null],
   "101-37696": ["clotch-ai", "ferma-conferma", [...tutto, ...viva]],
@@ -138,4 +137,5 @@ for (const [id, [vista, sezione, righe]] of Object.entries(SCENE)) {
   fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify(scena, null, 1) + "\n");
   fs.rmSync(casa, { recursive: true });
 }
+fs.writeFileSync(path.join(dir, "101-36010.json"), JSON.stringify({ navigazione: { vista: "casella" }, registroLento: true }, null, 1) + "\n"); // il registro non arriva: si vede il caricamento
 console.log(`scene clotch AI: ${Object.keys(SCENE).length} in ${dir}`);

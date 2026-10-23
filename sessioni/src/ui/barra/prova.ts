@@ -126,6 +126,8 @@ for (const id of ["101-46268", "101-46701", "101-48368"]) FRAME[id] = CON("clotc
 for (const id of ["101-46308", "101-46741"]) FRAME[id] = CON("clotch-ai");
 FRAME["101-49067"] = CON("casella", { clotch: true, afk: 4 });
 FRAME["101-49194"] = CON("casella");
+FRAME["101-30172"] = () => ({ ...base(), registro: registro({ aspettano: 3 }) }); // popover Attività
+FRAME["101-36010"] = CON("casella"); // caricamento della Casella: la barra è già pronta
 FRAME["101-49592"] = CON("sessione", { clotch: true });
 FRAME["101-49632"] = CON("sessione");
 
@@ -180,6 +182,16 @@ FRAME["101-23003"] = () => ricerca("copia");
 FRAME["101-23248"] = () => ricerca("kubernetes");
 // allegati e immagini nel filo (#437): la barra di «Sessione aperta», come 101-8036
 for (const id of ["101-25845", "101-27294", "101-28041", "101-28232"]) FRAME[id] = () => base();
+// dialoghi, avvisi, casella e domande di clotch AI: la barra è quella della sessione aperta
+for (const id of ["101-22044", "101-24007", "101-25542", "101-28289", "101-48405"]) FRAME[id] = () => base();
+// domanda per te (101:47850 con Clotch, 101:47883 senza): «Sessioni: app Electron» aspetta ed è la sessione aperta
+const DOMANDA = (f: Parameters<typeof registro>[0]) => () => {
+  const b = base(), x = b.elenco.dati!.sessioni[1];
+  x.titolo = "Sessioni: app Electron"; x.stato = "aspetta";
+  return { ...b, scelta: x.id, registro: registro({ aspettano: 3, ...f }) };
+};
+FRAME["101-47850"] = DOMANDA({ clotch: true });
+FRAME["101-47883"] = DOMANDA({});
 
 // frame «Casella: …» (#437): la barra è quella di 101:8036
 for (const id of ["101-26745", "101-27018", "101-26140", "101-26427", "101-27528"]) FRAME[id] = FRAME["101-8036"];
@@ -187,6 +199,15 @@ for (const id of ["101-26745", "101-27018", "101-26140", "101-26427", "101-27528
 // i dialoghi (#437) stanno sopra la sessione aperta, con la barra di «Sessione aperta»
 FRAME["101-22137"] = FRAME["101-8036"];
 FRAME["101-22186"] = FRAME["101-8036"];
+
+// i frame «Barra laterale» (266×856) dentro un frame a tutta finestra (`dentro` nel suo JSON): la stessa barra di quel frame
+const BARRE: Record<string, string> = {
+  "101-12122": "101-12118", "101-16822": "101-16818", "101-21065": "101-21061", "101-21261": "101-21257", "101-21380": "101-21376", "101-24131": "101-24127",
+  "101-29403": "101-29399", "101-30176": "101-30172", "101-30242": "101-30238", "101-35113": "101-35109", "101-38901": "101-38897", "101-41838": "101-41834",
+  "101-42004": "101-42000", "101-42249": "101-42245", "101-49071": "101-49067", "101-49198": "101-49194", "101-8055": "101-8309", "101-8772": "101-8805",
+  "101-8824": "101-8912", "101-8931": "101-9090", "101-9109": "101-9340", "101-9359": "101-9628", "101-9860": "101-10017",
+};
+for (const [barra, finestra] of Object.entries(BARRE)) FRAME[barra] = FRAME[finestra] ?? (() => base());
 
 let una: Prova | null | undefined;
 /** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */

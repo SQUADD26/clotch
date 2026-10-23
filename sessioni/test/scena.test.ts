@@ -17,6 +17,8 @@ test("scena: elenco vuoto di base, messaggi a pagine dalla fine, canali che scri
   assert.equal(p1.haAltre, false);
   assert.equal(rispostaScena(s, "sessioni:azione", ["a", "copia-id"]), undefined);
   assert.ok(rispostaScena(s, "clotch-ai:registro", []));
+  // «Casella: caricamento» (101:36010): il registro non arriva mai, la promessa resta in sospeso
+  assert.ok(rispostaScena({ ...s, registroLento: true }, "clotch-ai:registro", []) instanceof Promise);
   assert.deepEqual([rispostaScena(s, "sessioni:cerca", ["x"]), rispostaScena(s, "sessioni:spazio", []), rispostaScena(s, "sessioni:impostazioni", [])],
     [[], { indice: 0, messaggi: 0, immagini: 0, altro: 0 }, {}]);
   assert.equal(rispostaScena(s, "sessioni:svuota", []), undefined);

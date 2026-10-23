@@ -39,6 +39,8 @@ export interface Scena {
   allegati?: FileAllegato[];
   immagini?: Record<string, string>;
   skill?: string[];
+  /** «Casella: caricamento» (101:36010): il registro non arriva mai, la vista resta sulle sagome. */
+  registroLento?: boolean;
   /** L'app sta dicendo un avviso a voce (frame 101-37055): `clotch-ai:voce`. */
   voce?: boolean;
 }
@@ -94,7 +96,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "casella:scegli": return [];
     case "casella:copia-immagine": case "casella:salva-immagine": return false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
-    case "clotch-ai:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
+    case "clotch-ai:registro": return s.registroLento ? new Promise(() => {}) : conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
     case "clotch-ai:voce": return s.voce === true;
     default: return undefined;
   }
