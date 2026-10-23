@@ -11,7 +11,7 @@ final class VoiceForeignWordsTests: XCTestCase {
     private func said(_ t: String, _ own: [String: String] = [:]) throws -> String { try XCTUnwrap(body(t, own)["text"] as? String) }
 
     func testWordAtStartAndEnd() throws {
-        XCTAssertEqual(try said("Friday ha finito il deploy"), "Fraidèi ha finito il diplòi")
+        XCTAssertEqual(try said("clotch AI ha finito il deploy"), "clocc ei ai ha finito il diplòi")
         XCTAssertEqual(try said("Ho fatto il merge"), "Ho fatto il mèrgi")
     }
 
@@ -19,8 +19,9 @@ final class VoiceForeignWordsTests: XCTestCase {
         XCTAssertEqual(try said("Il deploy merge è pronto, push branch fatto"), "Il diplòi mèrgi è pronto, pusc brànci fatto")
     }
 
-    func testOverseerBecomesFridaySpokenInEnglishSound() throws {
-        XCTAssertEqual(try said("Overseer non gira"), "Fraidèi non gira")
+    func testOverseerAndFridayBecomeClotchAISpokenInEnglishSound() throws {
+        XCTAssertEqual(try said("Overseer non gira"), "clocc ei ai non gira")
+        XCTAssertEqual(try said("Friday non gira"), "clocc ei ai non gira")
     }
 
     func testItalianNamesAndWordsDoNotChange() throws {
@@ -38,18 +39,18 @@ final class VoiceForeignWordsTests: XCTestCase {
     }
 
     func testLongLineKeepsAllWordsAndLanguageAndVoice() throws {
-        let line = String(repeating: "Il deploy di Friday è pronto. ", count: 12)
+        let line = String(repeating: "Il deploy di clotch AI è pronto. ", count: 12)
         let b = try body(VoiceTurn.cut(line, 320))
         let t = try XCTUnwrap(b["text"] as? String)
-        XCTAssertFalse(t.contains("deploy") || t.contains("Friday"), t)
+        XCTAssertFalse(t.contains("deploy") || t.contains("clotch AI"), t)
         XCTAssertEqual(b["language_code"] as? String, "it")
         XCTAssertEqual(b["model_id"] as? String, VoiceFiles.defaultModel)
     }
 
     /// The 5 sample lines for the audio check on the Mac: prints the whole request body.
     func testPrintSampleRequestBodies() throws {
-        for l in ["Friday ha aperto il branch giusto", "Ho fatto il deploy e poi il merge", "Overseer aspetta un tuo sì sul commit",
-                  "Il token è scaduto, serve un nuovo push", "Roberto, a Torino il build di Friday è pronto"] {
+        for l in ["clotch AI ha aperto il branch giusto", "Ho fatto il deploy e poi il merge", "Overseer aspetta un tuo sì sul commit",
+                  "Il token è scaduto, serve un nuovo push", "Roberto, a Torino il build di clotch AI è pronto"] {
             let r = VoiceTurn.speechRequest(text: l, config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation, foreign: VoiceTurn.foreignRespelling)
             var o = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
             o["voice_id"] = r.url?.lastPathComponent.components(separatedBy: "?").first

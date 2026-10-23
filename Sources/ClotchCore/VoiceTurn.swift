@@ -201,20 +201,20 @@ public enum VoiceTurn {
     }
 
     /// No word is forced to English (Roberto, #312: «ho chiesto che NON venga pronunciato in francese»): the voice reads Italian
-    /// and names as an Italian would. Only the old name becomes the new one, in titles and subjects too.
-    public static let builtInPronunciation: [String: String] = ["Overseer": "Friday"]
+    /// and names as an Italian would. Only the old names become the new one, in titles and subjects too.
+    public static let builtInPronunciation: [String: String] = ["Overseer": "clotch AI", "Friday": "clotch AI"]
 
     /// English words that the Italian voice reads with a French accent (#323). Respelled in Italian letters, so an Italian reads them
     /// as English and the line stays Italian: no phoneme tag (ElevenLabs allows it on English models only), no forced language.
-    /// Applied AFTER the pronunciation list, so Roberto's `pronuncia.json` has the last word and «Overseer» (already «Friday») is covered.
+    /// Applied AFTER the pronunciation list, so Roberto's `pronuncia.json` has the last word and «Overseer» and «Friday» (already «clotch AI») are covered.
     public static let foreignRespelling: [String: String] = [
-        "Friday": "Fraidèi", "deploy": "diplòi", "merge": "mèrgi", "branch": "brànci", "build": "bild", "push": "pusc",
+        "clotch AI": "clocc ei ai", "deploy": "diplòi", "merge": "mèrgi", "branch": "brànci", "build": "bild", "push": "pusc",
         "commit": "comìt", "issue": "ìsciu", "token": "tòuken", "bug": "bag", "worktree": "uòrktrì", "handoff": "hàndoff",
         "hook": "huk", "review": "riviù", "rollback": "ròulbak", "staging": "stèigin", "pull request": "pul request", "file": "fail",
     ]
 
     /// The voice's name: ONE place (#299), Roberto will pick another.
-    public static let voiceName = "Friday"
+    public static let voiceName = "clotch AI"
 
     /// Who speaks (#299): Roberto's right hand, not a loudspeaker for the sessions' sentences.
     static let role = "Sei \(voiceName), il braccio destro di Roberto: tieni in mano tutti i lavori e parli a lui in prima persona («ho sbloccato…», «mi serve un tuo sì su…»). Non leggi le frasi delle sessioni: le riassumi, decidi da solo ciò che puoi e gli porti solo le scelte sue, sempre col nome del lavoro. Dici solo ciò che serve a Roberto, in parole semplici: niente numeri di PR o di issue, sha, percorsi. Le parole tecniche vanno bene, se servono. Se non cambia niente per lui, taci. Una frase è una frase: mai una domanda a cui rispondi tu."

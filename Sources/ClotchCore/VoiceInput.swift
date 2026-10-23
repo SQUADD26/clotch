@@ -108,8 +108,9 @@ public enum VoiceInput {
     /// The system's names, as the engines mishear them in Italian (#242: «Allover Saird», «Oversayer», «Cloche»): the helper and
     /// the Overseer read the right word. Whole words only, so «game over» or «lover» stay as they are.
     static let names: [(pattern: String, name: String)] = [
-        (#"(?i)\b(?:(all|dell|nell)'?\s?)?(?:o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?|fr[ae]?i?d[ae]i?[iy]?)\b"#, "Friday"),
-        (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch)\b"#, "Clotch"),
+        (#"(?i)\b(?:(all|dell|nell)'?\s?)?(?:o\s?ver\s?s(?:a|e|i)y?[ei]?e?r[de]?|fr[ae]?i?d[ae]i?[iy]?)\b"#, "clotch AI"),
+        (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch|ck)\s+(?:ei\s?)?ai\b"#, "clotch AI"),  // the product is written in lowercase (#437)
+        (#"(?i)\bcl[ou](?:ch|ce|che|tch|tsch)\b(?!\s+ai\b)"#, "Clotch"),
         (#"(?i)\bap(?:i|ri)[\s-]+master\b"#, "apri-master"),  // «API Master», «apri master» (#271)
     ]
 
