@@ -3724,7 +3724,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Friday non riesce a leggere ~/.friday/registro.jsonl. Riprovo tra 10 s.",
+   "testo": "Friday non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s.",
    "font": "SF Pro Regular"
   },
   {
