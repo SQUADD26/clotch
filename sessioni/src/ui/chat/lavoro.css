@@ -1,0 +1,26 @@
+/* figma: 101-14396 — «Attività» 101:13368, «Aiutanti» 101:13419, righe di stato e avvisi nel filo (101:13475, 13480, 13494, 13532, 13541, 7316) */
+.riquadro-lavoro {
+  display: flex; flex-direction: column; gap: var(--spazio-2); padding: var(--spazio-4);
+  border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.testata-lavoro, .voce-lavoro, .riga-stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
+.testata-lavoro .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.testata-lavoro .dettaglio, .voce-lavoro .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.voce-lavoro .testo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voce-lavoro.attiva .testo { font-weight: 500; color: var(--colore-testo-primario); }
+.voce-lavoro .nome { flex: none; font-weight: 500; color: var(--colore-testo-primario); }
+
+.riga-stato { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.riga-stato .esito { flex: none; font-weight: 500; }
+.riga-stato .dettaglio { flex: 1; min-width: 0; }
+
+.riassunto { display: flex; align-items: center; gap: var(--spazio-3); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.riassunto .linea { flex: 1; height: var(--misura-tratto); background: var(--colore-bordo-normale); }
+
+.avviso-filo { display: flex; align-items: flex-start; gap: var(--spazio-3); padding: var(--spazio-3); border-radius: var(--raggio-lg); }
+.avviso-filo.attesa { background: var(--colore-fondo-attesa); }
+.avviso-filo.errore { background: var(--colore-fondo-errore); align-items: center; }
+.avviso-filo .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
+.avviso-filo .titolo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.avviso-filo .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }

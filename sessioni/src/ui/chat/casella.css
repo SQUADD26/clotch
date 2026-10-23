@@ -1,0 +1,51 @@
+/* figma: 101-43332 — «Casella di scrittura» 101:7407, chip 101:24779/24784, «Messaggio in coda» 101:13488, tasti della casella */
+.area-casella { display: flex; flex-direction: column; gap: var(--spazio-4); flex: none; }
+.casella {
+  display: flex; flex-direction: column; gap: var(--spazio-2);
+  padding: var(--spazio-3) var(--spazio-3) var(--spazio-2-5) var(--spazio-3);
+  background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-casella);
+}
+.casella:focus-within { border-color: var(--colore-bordo-fuoco); }
+.casella .area-testo { display: flex; padding-left: var(--spazio-1); }
+.casella textarea {
+  flex: 1; min-width: 0; resize: none; border: 0; outline: none; background: none; padding: 0; margin: 0;
+  font: inherit; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario);
+  user-select: text;
+}
+.casella textarea::placeholder { color: var(--colore-testo-secondario); }
+.casella .azioni { display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone-invio); }
+.casella .spinta { flex: 1; }
+.casella .chip {
+  display: inline-flex; align-items: center; gap: var(--spazio-1); height: var(--misura-bottone); padding: 0 var(--spazio-2);
+  border-radius: var(--raggio-pieno); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.casella .chip .modello { color: var(--colore-testo-primario); }
+.bottone-invia {
+  width: var(--misura-bottone-invio); height: var(--misura-bottone-invio); flex: none; border-radius: var(--raggio-pieno);
+  display: inline-flex; align-items: center; justify-content: center; background: var(--colore-fondo-accento);
+}
+.casella.vuota .bottone-invia, .casella.disabilitata .bottone-invia { background: var(--colore-fondo-bottone-secondario); }
+
+.coda { display: flex; flex-direction: column; gap: var(--spazio-1); }
+.messaggio-in-coda {
+  display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3);
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-md);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.messaggio-in-coda .etichetta { flex: none; font-weight: 500; color: var(--colore-testo-primario); }
+.messaggio-in-coda .testo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.messaggio-in-coda .azioni { display: flex; gap: var(--spazio-0-5); }
+
+.tasti-casella {
+  display: flex; align-items: center; justify-content: center; gap: var(--spazio-2); padding: 0 var(--spazio-2);
+  font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
+}
+.nota-casella { justify-content: center; }
+.tasto {
+  display: inline-flex; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs); background: var(--colore-fondo-bottone-secondario);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+
+/* suggerimento sopra il bottone, al passaggio (101:43945) */
+.con-suggerimento.sopra .suggerimento { display: none; top: auto; bottom: calc(100% + var(--spazio-1)); align-items: center; gap: var(--spazio-2); }
+.con-suggerimento.sopra:hover .suggerimento { display: inline-flex; }

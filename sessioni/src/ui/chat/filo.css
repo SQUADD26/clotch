@@ -1,0 +1,100 @@
+/* figma: 101-8036 — filo dei messaggi e blocchi (componenti 101:7210, 7213, 7216, 7238, 7278, 7315, 13464, 13525) */
+.filo {
+  flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--spazio-6);
+  padding: var(--spazio-4) 0; user-select: text;
+}
+.filo > :first-child { margin-top: auto; } /* i messaggi stanno in fondo, sopra la casella */
+.filo > * { flex: none; content-visibility: auto; contain-intrinsic-size: auto none; }
+.turno { display: flex; flex-direction: column; gap: var(--spazio-3); }
+
+.messaggio-roberto { display: flex; justify-content: flex-end; }
+.messaggio-roberto .bolla {
+  max-width: var(--misura-bolla-max); padding: var(--spazio-2-5) var(--spazio-4); border-radius: var(--raggio-2xl);
+  background: var(--colore-fondo-bolla); color: var(--colore-testo-bolla);
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+.risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.testo-risposta {
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); color: var(--colore-testo-primario);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.risposta .azioni { display: flex; gap: var(--spazio-0-5); }
+.cursore {
+  display: inline-block; width: var(--misura-cursore); height: var(--misura-icona); margin-left: var(--spazio-0-5);
+  vertical-align: text-bottom; background: var(--colore-testo-primario); animation: lampeggia 1s steps(1) infinite;
+}
+@keyframes lampeggia { 50% { opacity: 0; } }
+
+/* suggerimento sotto un bottone (frame 101:23727, «tooltip») */
+.con-suggerimento { position: relative; display: inline-flex; }
+.suggerimento {
+  position: absolute; top: calc(100% + var(--spazio-1-5)); left: 50%; transform: translateX(-50%); z-index: 2;
+  padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); white-space: nowrap;
+  background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
+  font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
+}
+
+/* testata comune di Pensiero, Chiamata strumento, Modifica file, Ricerca sul web */
+.strumento, .pensiero { display: flex; flex-direction: column; gap: var(--spazio-2); min-width: 0; }
+.filo .testata {
+  display: flex; align-items: center; gap: var(--spazio-2); width: 100%; min-width: 0; text-align: left;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
+.testata .tipo { font-weight: 500; flex: none; }
+.testata .tipo.errore { color: var(--colore-testo-errore); }
+.testata .dettaglio {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs);
+}
+.testata .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.testo-pensiero {
+  padding-left: var(--spazio-3); border-left: var(--misura-tratto) solid var(--colore-bordo-normale);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); white-space: pre-wrap;
+}
+
+.blocco-codice {
+  display: flex; flex-direction: column; gap: var(--spazio-1); padding: var(--spazio-3);
+  border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.blocco-codice .comando { color: var(--colore-testo-primario); }
+.blocco-codice .uscita { color: var(--colore-testo-secondario); }
+.blocco-codice .uscita.errore { color: var(--colore-testo-errore); }
+
+.aggiunte, .tolte { flex: none; font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
+.strumento .aggiunte, .strumento .tolte { font-family: var(--testo-famiglia-ui); line-height: var(--testo-riga-xs); }
+.aggiunte { color: var(--colore-testo-successo); }
+.tolte { color: var(--colore-testo-errore); }
+
+.differenze {
+  display: flex; flex-direction: column; padding: var(--spazio-2) 0; border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.differenze .riga { display: flex; gap: var(--spazio-3); padding: 0 var(--spazio-3); }
+.differenze .segno { flex: none; white-space: pre; }
+.differenze .codice { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.differenze .riga.tolta { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+.differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
+
+.file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
+.file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); }
+.file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
+.file-toccati .file {
+  display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);
+  border-top: var(--misura-tratto) solid var(--colore-bordo-leggero);
+}
+.file-toccati .percorso {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-secondario);
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
+}
+
+.fonti {
+  display: flex; flex-direction: column; padding: var(--spazio-1);
+  border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg);
+}
+.fonte { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); border-radius: var(--raggio-md); }
+.fonte .titolo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+.fonte .sito { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }

@@ -1,0 +1,155 @@
+// figma: 101-8036 — blocchi del filo: «Messaggio Roberto» 101:7210, «Risposta» 101:7216, «Blocco codice» 101:7213,
+// «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525.
+import { useState, type ReactNode } from "react";
+import { BottoneIcona } from "../base/Bottone";
+import { Icona, type NomeIcona } from "../base/Icona";
+import type { Blocco } from "./modello";
+import { durata, quanti } from "./testi";
+import "./filo.css";
+
+export function MessaggioRoberto({ testo }: { testo: string }) {
+  return <div className="messaggio-roberto"><div className="bolla">{testo}</div></div>;
+}
+
+/** Copia: al passaggio «Copia», dopo il clic «Copiato» (suggerimento del frame 101:23727). */
+export function Risposta({ testo, inScrittura }: { testo: string; inScrittura: boolean }) {
+  const [copiato, setCopiato] = useState(false);
+  const copia = () => navigator.clipboard.writeText(testo).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); });
+  return (
+    <div className="risposta">
+      <div className="testo-risposta">{testo}{inScrittura && <span className="cursore" />}</div>
+      {!inScrittura && (
+        <div className="azioni">
+          <span className="con-suggerimento">
+            <BottoneIcona icona="copia" etichetta="Copia" onClick={copia} />
+            {copiato && <span className="suggerimento">Copiato</span>}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Testata apribile: freccia a destra da chiusa, in giù da aperta (varianti Chiusa/Aperta del disegno). */
+function Testata({ icona, colore = "secondaria", aperta, onClick, children }: {
+  icona: NomeIcona; colore?: "secondaria" | "errore" | "accento"; aperta?: boolean; onClick?(): void; children: ReactNode;
+}) {
+  return (
+    <button type="button" className="testata" onClick={onClick} aria-expanded={onClick ? !!aperta : undefined} disabled={!onClick}>
+      <Icona nome={icona} colore={colore} />
+      {children}
+      {onClick && <Icona nome={aperta ? "giu" : "destra"} />}
+    </button>
+  );
+}
+
+export function Pensiero({ b }: { b: Extract<Blocco, { tipo: "pensiero" }> }) {
+  const [aperto, setAperto] = useState(false);
+  if (b.inCorso) return <div className="pensiero"><div className="testata"><span className="etichetta">Ragionando…</span></div></div>;
+  return (
+    <div className="pensiero">
+      <button type="button" className="testata" onClick={() => setAperto(!aperto)} aria-expanded={aperto}>
+        <span className="etichetta">Ragionato per {durata(b.durata ?? 0)}</span>
+        <Icona nome={aperto ? "giu" : "destra"} />
+      </button>
+      {aperto && <div className="testo-pensiero">{b.testo}</div>}
+    </div>
+  );
+}
+
+export function BloccoCodice({ comando, uscita, errore = false }: { comando?: string | null; uscita?: string; errore?: boolean }) {
+  return (
+    <div className="blocco-codice">
+      {comando && <div className="comando">{comando}</div>}
+      {uscita && <div className={errore ? "uscita errore" : "uscita"}>{uscita}</div>}
+    </div>
+  );
+}
+
+export function Strumento({ b }: { b: Extract<Blocco, { tipo: "strumento" }> }) {
+  const [aperta, setAperta] = useState(b.stato === "errore");
+  const apribile = b.stato !== "in-corso" && !!(b.comando || b.uscita);
+  return (
+    <div className="strumento">
+      <Testata icona={b.stato === "in-corso" ? "in-corso" : b.stato === "errore" ? "avviso" : b.icona} colore={b.stato === "errore" ? "errore" : "secondaria"}
+        aperta={aperta} onClick={apribile ? () => setAperta(!aperta) : undefined}>
+        <span className={b.stato === "errore" ? "tipo errore" : "tipo"}>{b.etichetta}</span>
+        <span className="dettaglio">{b.dettaglio}</span>
+        {b.durata != null && b.stato !== "in-corso" && <span className="durata">{durata(b.durata)}</span>}
+      </Testata>
+      {aperta && apribile && <BloccoCodice comando={b.comando} uscita={b.uscita} errore={b.stato === "errore"} />}
+    </div>
+  );
+}
+
+const Conti = ({ aggiunte, tolte }: { aggiunte: number; tolte: number }) => (
+  <><span className="aggiunte">+{aggiunte}</span><span className="tolte">−{tolte}</span></>
+);
+
+export function Modifica({ b, aperta: iniziale }: { b: Extract<Blocco, { tipo: "modifica" }>; aperta: boolean }) {
+  const [aperta, setAperta] = useState(iniziale);
+  return (
+    <div className="strumento modifica">
+      <Testata icona="matita" aperta={aperta} onClick={() => setAperta(!aperta)}>
+        <span className="tipo">Modificato</span>
+        <span className="dettaglio">{b.file}</span>
+        <Conti aggiunte={b.aggiunte} tolte={b.tolte} />
+      </Testata>
+      {aperta && (
+        <div className="differenze">
+          {b.righe.map((r, i) => (
+            <div key={i} className={r.segno === "+" ? "riga aggiunta" : r.segno === "-" ? "riga tolta" : "riga"}>
+              <span className="segno">{r.segno}</span><span className="codice">{r.codice}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FileToccati({ b }: { b: Extract<Blocco, { tipo: "file-toccati" }> }) {
+  const [aperto, setAperto] = useState(false);
+  const somma = b.file.reduce((s, f) => ({ aggiunte: s.aggiunte + f.aggiunte, tolte: s.tolte + f.tolte }), { aggiunte: 0, tolte: 0 });
+  return (
+    <div className="file-toccati">
+      <button type="button" className="testata" onClick={() => setAperto(!aperto)} aria-expanded={aperto}>
+        <Icona nome="matita" />
+        <span className="titolo">{quanti(b.file.length, "file modificato", "file modificati")}</span>
+        <Conti {...somma} />
+        <Icona nome={aperto ? "giu" : "destra"} />
+      </button>
+      {aperto && b.file.map((f) => (
+        <div key={f.file} className="file">
+          <Icona nome="file" />
+          <span className="percorso">{f.file}</span>
+          <Conti {...f} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function RicercaWeb({ b }: { b: Extract<Blocco, { tipo: "web" }> }) {
+  const [aperta, setAperta] = useState(true);
+  return (
+    <div className="strumento web">
+      <Testata icona="globo" aperta={aperta} onClick={b.fonti.length ? () => setAperta(!aperta) : undefined}>
+        <span className="tipo">Cercato sul web</span>
+        <span className="dettaglio">{b.query}</span>
+        {b.fonti.length > 0 && <span className="durata">{quanti(b.fonti.length, "fonte", "fonti")}</span>}
+      </Testata>
+      {aperta && b.fonti.length > 0 && (
+        <div className="fonti">
+          {b.fonti.map((f, i) => (
+            <div key={i} className="fonte">
+              <Icona nome="globo" colore="terziaria" />
+              <span className="titolo">{f.titolo}</span>
+              <span className="sito">{f.sito}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
