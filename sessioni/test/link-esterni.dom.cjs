@@ -6,6 +6,9 @@ const { apriFinestra } = require('../dist/src/finestra.js');
 const { urlWeb } = require('../dist/src/link-esterni.js');
 
 // Impedisce anche l'attivazione dell'app di prova sul Mac, prima di ready.
+process.env.CLOTCH_TEST_SILENT = '1';
+app.commandLine.appendSwitch('mute-audio');
+app.on('web-contents-created', (_event, contents) => contents.setAudioMuted(true));
 if (process.platform === 'darwin') app.setActivationPolicy('prohibited');
 let shown = 0;
 app.on('browser-window-created', (_event, window) => window.on('show', () => shown++));
@@ -24,6 +27,7 @@ app.whenReady().then(async () => {
     win = apriFinestra(undefined, { show: false });
     assert.ok(win, 'pagina applicazione costruita');
     assert.equal(win.isVisible(), false, 'factory nascosta dalla costruzione');
+    assert.equal(win.webContents.isAudioMuted(), true, 'audio di prova disattivato');
     win.webContents.on('did-create-window', () => children++);
     win.webContents.on('did-fail-load', (_e, code, description, url, main) => failedNavigations.push({ code, description, url, main }));
     await once(win.webContents, 'did-finish-load');
@@ -42,6 +46,7 @@ app.whenReady().then(async () => {
       assert.equal(children, 0, 'nessuna finestra figlia');
       assert.equal(BrowserWindow.getAllWindows().length, 1);
       assert.equal(win.isVisible(), false, 'app di prova sempre nascosta');
+      assert.equal(win.webContents.isAudioMuted(), true, 'audio di prova sempre disattivato');
       assert.equal(shown, 0, 'nessuna finestra di prova mostrata');
     };
 
@@ -110,6 +115,7 @@ app.whenReady().then(async () => {
     console.log('EXTERNAL_FAILURE: callback apertura rifiutata e dialogo intercettato OK');
     assert.equal(shown, 0);
     console.log('EXTERNAL_HIDDEN_WINDOWS_OK: factory e popup mai mostrati');
+    console.log('EXTERNAL_MUTED_AUDIO_OK: audio disattivato prima del caricamento');
     console.log('EXTERNAL_LINKS_OK'); app.exit(0);
   } catch (error) { console.error(error); win?.destroy(); app.exit(1); }
 });
