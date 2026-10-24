@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Contrasto WCAG 2.2 AA di ogni coppia testo/fondo, icona/fondo e fuoco/fondo, nei due modi di design/tokens.json (#1093).
-// Soglie: testo 4,5:1; icone, testo dentro i bottoni pieni grandi e bordo del fuoco 3:1. Un colore con alfa si compone sul suo fondo.
+// Soglie (sopra WCAG 2.2 AA, chiesto da Roberto): testo 4,8:1; icone e bordo del fuoco 3,3:1. Un colore con alfa si compone sul suo fondo.
 //   node scripts/contrasto.mjs   stampa le coppie dalla peggiore, esce 1 se una è sotto soglia (lo lancia npm test)
 // Un colore che non passa si corregge in Figma e si riesporta: mai qui.
 import { readFileSync } from 'node:fs';
@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { MODI, voci } from './token-css.mjs';
 
 const tokens = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'design/tokens.json'), 'utf8'));
+// soglie di Roberto («massima attenzione all'accessibilità dei colori»): margine sopra WCAG AA 4,5 e 3
+const SOGLIA_TESTO = 4.8, SOGLIA_GRANDE = 3.3;
 const ACCENTI = ['', '-blu', '-verde', '-viola', '-argento']; // Colore principale (aspetto.css)
 
 const rgba = (h) => { const x = h.replace('#', ''); return [0, 2, 4, 6].map((i) => (i < x.length ? parseInt(x.slice(i, i + 2), 16) : 255)).map((v, i) => (i === 3 ? v / 255 : v)); };
@@ -26,17 +28,17 @@ export function coppie() {
   const icone = ['icona-primaria', 'icona-secondaria', 'icona-terziaria', 'icona-successo', 'icona-errore', 'icona-lavoro', 'icona-viola'];
   const c = [];
   for (const [f, b] of neutri) {
-    for (const t of testi) c.push([t, f, b, 4.5]);
-    for (const i of [...icone, ...ACCENTI.map((a) => `icona-accento${a}`)]) c.push([i, f, b, 3]);
-    for (const a of ACCENTI) c.push([`bordo-fuoco${a}`, f, b, 3]);
+    for (const t of testi) c.push([t, f, b, SOGLIA_TESTO]);
+    for (const i of [...icone, ...ACCENTI.map((a) => `icona-accento${a}`)]) c.push([i, f, b, SOGLIA_GRANDE]);
+    for (const a of ACCENTI) c.push([`bordo-fuoco${a}`, f, b, SOGLIA_GRANDE]);
   }
   for (const a of ACCENTI) {
-    c.push([`testo-bolla${a}`, `fondo-bolla${a}`, 'fondo-superficie', 4.5]);
-    c.push(['icona-su-accento', `fondo-accento${a}`, 'fondo-superficie', 3]);
-    c.push(['testo-primario', `fondo-attesa${a}`, 'fondo-superficie', 4.5]);
+    c.push([`testo-bolla${a}`, `fondo-bolla${a}`, 'fondo-superficie', SOGLIA_TESTO]);
+    c.push(['icona-su-accento', `fondo-accento${a}`, 'fondo-superficie', SOGLIA_GRANDE]);
+    c.push(['testo-primario', `fondo-attesa${a}`, 'fondo-superficie', SOGLIA_TESTO]);
   }
-  c.push(['testo-su-primario', 'fondo-bottone-primario', 'fondo-superficie', 4.5], ['testo-errore', 'fondo-errore', 'fondo-superficie', 4.5],
-    ['icona-errore', 'fondo-errore', 'fondo-superficie', 3], ['testo-primario', 'fondo-errore', 'fondo-superficie', 4.5]);
+  c.push(['testo-su-primario', 'fondo-bottone-primario', 'fondo-superficie', SOGLIA_TESTO], ['testo-errore', 'fondo-errore', 'fondo-superficie', SOGLIA_TESTO],
+    ['icona-errore', 'fondo-errore', 'fondo-superficie', SOGLIA_GRANDE], ['testo-primario', 'fondo-errore', 'fondo-superficie', SOGLIA_TESTO]);
   return c;
 }
 

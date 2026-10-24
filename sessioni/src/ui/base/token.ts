@@ -11,6 +11,7 @@ export type Token =
   | "primitivo-bianco-a078"
   | "primitivo-bianco-a498"
   | "primitivo-bianco-a55"
+  | "primitivo-bianco-a576"
   | "primitivo-grigio-141414"
   | "primitivo-grigio-181818"
   | "primitivo-grigio-232323"
@@ -37,6 +38,7 @@ export type Token =
   | "primitivo-verde-f3fbf6"
   | "primitivo-verde-1a7f45"
   | "primitivo-verde-18733f"
+  | "primitivo-verde-176e3c"
   | "primitivo-rosso-ff6764"
   | "primitivo-rosso-fa423e-a16"
   | "primitivo-rosso-c8312d"
@@ -44,6 +46,8 @@ export type Token =
   | "primitivo-rosso-c5302c"
   | "primitivo-rosso-bc2e2a"
   | "primitivo-rosso-ff827f"
+  | "primitivo-rosso-b42c28"
+  | "primitivo-rosso-ff8b88"
   | "primitivo-semaforo-rosso"
   | "primitivo-semaforo-giallo"
   | "primitivo-semaforo-verde"
@@ -70,6 +74,8 @@ export type Token =
   | "primitivo-blu-0a65d4"
   | "primitivo-blu-0a60ca"
   | "primitivo-blu-56acff"
+  | "primitivo-blu-0a5cc2"
+  | "primitivo-blu-61b2ff"
   | "primitivo-viola-ad7bf9"
   | "primitivo-viola-ad7bf9-a16"
   | "primitivo-viola-9965e8"
@@ -84,10 +90,12 @@ export type Token =
   | "primitivo-argento-7a818d"
   | "primitivo-argento-50555c"
   | "primitivo-argento-f6f7f8"
+  | "primitivo-argento-737a86"
   | "primitivo-giallo-f2c14e"
   | "primitivo-giallo-fff1c2"
   | "primitivo-giallo-8a6100"
   | "primitivo-giallo-845d00"
+  | "primitivo-giallo-7f5900"
   | "colore-fondo-cornice"
   | "colore-fondo-superficie"
   | "colore-fondo-codice"
@@ -338,6 +346,7 @@ export const valori: Record<Token, string> = {
   "primitivo-bianco-a078": "#ffffff14",
   "primitivo-bianco-a498": "#ffffff7f",
   "primitivo-bianco-a55": "#ffffff8c",
+  "primitivo-bianco-a576": "#ffffff93",
   "primitivo-grigio-141414": "#141414",
   "primitivo-grigio-181818": "#181818",
   "primitivo-grigio-232323": "#232323",
@@ -364,6 +373,7 @@ export const valori: Record<Token, string> = {
   "primitivo-verde-f3fbf6": "#f3fbf6",
   "primitivo-verde-1a7f45": "#1a7f45",
   "primitivo-verde-18733f": "#18733f",
+  "primitivo-verde-176e3c": "#176e3c",
   "primitivo-rosso-ff6764": "#ff6764",
   "primitivo-rosso-fa423e-a16": "#fa423e29",
   "primitivo-rosso-c8312d": "#c8312d",
@@ -371,6 +381,8 @@ export const valori: Record<Token, string> = {
   "primitivo-rosso-c5302c": "#c5302c",
   "primitivo-rosso-bc2e2a": "#bc2e2a",
   "primitivo-rosso-ff827f": "#ff827f",
+  "primitivo-rosso-b42c28": "#b42c28",
+  "primitivo-rosso-ff8b88": "#ff8b88",
   "primitivo-semaforo-rosso": "#ff5f57",
   "primitivo-semaforo-giallo": "#febc2e",
   "primitivo-semaforo-verde": "#28c840",
@@ -397,6 +409,8 @@ export const valori: Record<Token, string> = {
   "primitivo-blu-0a65d4": "#0a65d4",
   "primitivo-blu-0a60ca": "#0a60ca",
   "primitivo-blu-56acff": "#56acff",
+  "primitivo-blu-0a5cc2": "#0a5cc2",
+  "primitivo-blu-61b2ff": "#61b2ff",
   "primitivo-viola-ad7bf9": "#ad7bf9",
   "primitivo-viola-ad7bf9-a16": "#ad7bf929",
   "primitivo-viola-9965e8": "#9965e8",
@@ -411,10 +425,12 @@ export const valori: Record<Token, string> = {
   "primitivo-argento-7a818d": "#7a818d",
   "primitivo-argento-50555c": "#50555c",
   "primitivo-argento-f6f7f8": "#f6f7f8",
+  "primitivo-argento-737a86": "#737a86",
   "primitivo-giallo-f2c14e": "#f2c14e",
   "primitivo-giallo-fff1c2": "#fff1c2",
   "primitivo-giallo-8a6100": "#8a6100",
   "primitivo-giallo-845d00": "#845d00",
+  "primitivo-giallo-7f5900": "#7f5900",
   "colore-fondo-cornice": "#232323",
   "colore-fondo-superficie": "#181818",
   "colore-fondo-codice": "#141414",
@@ -449,11 +465,11 @@ export const valori: Record<Token, string> = {
   "colore-testo-primario": "#ffffff",
   "colore-testo-secondario": "#ffffffb5",
   "colore-testo-su-primario": "#2d2d2d",
-  "colore-testo-errore": "#ff827f",
+  "colore-testo-errore": "#ff8b88",
   "colore-testo-successo": "#40c977",
   "colore-testo-bolla": "#fdf5f1",
-  "colore-testo-terziario": "#ffffff8c",
-  "colore-testo-link": "#56acff",
+  "colore-testo-terziario": "#ffffff93",
+  "colore-testo-link": "#61b2ff",
   "colore-testo-lavoro": "#f2c14e",
   "colore-testo-lavoro-luce": "#fff1c2",
   "colore-testo-bolla-blu": "#f0f7fe",
@@ -482,7 +498,7 @@ export const valori: Record<Token, string> = {
   "colore-bordo-fuoco-verde": "#40c977",
   "colore-bordo-fuoco-viola": "#ad7bf9",
   "colore-bordo-fuoco-argento": "#c4c8ce",
-  "colore-bordo-errore": "#ff827f",
+  "colore-bordo-errore": "#ff8b88",
   "colore-ombra-colore": "#00000030",
   "colore-semaforo-rosso": "#ff5f57",
   "colore-semaforo-giallo": "#febc2e",
