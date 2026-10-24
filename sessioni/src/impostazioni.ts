@@ -3,7 +3,7 @@
 // Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
 import * as os from "node:os";
 import * as path from "node:path";
-import { app, BrowserWindow, dialog, shell, type IpcMain } from "electron";
+import type { IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
@@ -28,7 +28,7 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
 }
 
 /** Archiviate di tutte le sorgenti, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»).
- *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di clotch AI (`fine` motivo `archiviata`, comando `archivia` riuscito).
+ *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di clotch AI (`fine` motivo `archiviata`, ultimo comando riuscito fra `archivia` e `ripristina`).
  *  La data è il momento dell'archiviazione se il registro lo dà, se no l'ultima attività. Se l'app dice che la sessione non è archiviata, vince l'app. */
 export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "comandi" | "esiti">, fuso?: string): Archiviata[] {
   const per = new Map<string, { titolo: string; progetto: string | null; quando: number | null }>();
@@ -37,9 +37,16 @@ export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "com
     per.set(id, { titolo: c?.titolo ?? id, progetto: c?.progetto ? nomeProgetto(c.progetto) : null, quando });
   };
   for (const [id, c] of reg.chat) if (c.fine === "archiviata") registro(id, c.fineT);
+  const ultimo = new Map<string, { cmd: string; t: number | null }>(); // vince l'ultimo archivia/ripristina riuscito
   for (const c of reg.comandi) {
     const id = c.args?.chat;
-    if (c.cmd === "archivia" && typeof id === "string" && reg.esiti.get(c.id)?.esito === "ok" && !per.has(id)) registro(id, c.t);
+    if ((c.cmd === "archivia" || c.cmd === "ripristina") && typeof id === "string" && reg.esiti.get(c.id)?.esito === "ok"
+      && (c.t ?? 0) >= (ultimo.get(id)?.t ?? -Infinity)) ultimo.set(id, { cmd: c.cmd, t: c.t });
+  }
+  for (const [id, u] of ultimo) {
+    const fine = reg.chat.get(id);
+    if (u.cmd === "archivia") { if (!per.has(id)) registro(id, u.t); }
+    else if (!(fine?.fine === "archiviata" && (fine.fineT ?? 0) > (u.t ?? 0))) per.delete(id);
   }
   for (const a of app) {
     if (!a.archiviata) { per.delete(a.cliId); continue; }
@@ -60,6 +67,8 @@ export function eliminaDati(indice: Pick<Indice, "svuota">, filePreferenze: stri
 
 /** Canali di `window.impostazioni` (preload.ts). Le risposte della prova di parità le dà la scena (scena.ts). */
 export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: Indice, invia: (canale: string, dati: unknown) => void, home = os.homedir()) {
+  // letto qui e non in testa: i test Node importano il file senza il binario Electron scaricato
+  const { app, BrowserWindow, dialog, shell } = require("electron") as typeof import("electron");
   ipc.handle("impostazioni:radici", () => trovaRadici(home).map((r) => accorcia(r.path, home)));
   ipc.handle("impostazioni:cartelle", (_e, percorsi: string[]) => cartelleAccount(percorsi.map(String), sessioni.elencoSessioni()));
   ipc.handle("impostazioni:scegli-cartella", async (e) => {

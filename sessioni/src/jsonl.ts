@@ -12,15 +12,13 @@ export function parseRiga(riga: string): any | null {
 }
 
 /** Legge i byte [da, a) del file come testo. */
-export const leggiBlocco = (file: string, da: number, a: number): string => leggiBytes(file, da, a).toString("utf8");
-
-export function leggiBytes(file: string, da: number, a: number): Buffer {
-  if (a <= da) return Buffer.alloc(0);
+export function leggiBlocco(file: string, da: number, a: number): string {
+  if (a <= da) return "";
   const fd = fs.openSync(file, "r");
   try {
     const buf = Buffer.alloc(a - da);
     const n = fs.readSync(fd, buf, 0, buf.length, da);
-    return buf.subarray(0, n);
+    return buf.toString("utf8", 0, n);
   } finally {
     fs.closeSync(fd);
   }

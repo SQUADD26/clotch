@@ -22,24 +22,36 @@ export function aMillisecondi(v: unknown): number | null {
   return null;
 }
 
+/** Ultimo contenuto letto per cartella: un file con la stessa firma non si rilegge; la mappa si rifà a ogni giro, quindi i file spariti escono. */
+const cacheCartelle = new Map<string, Map<string, { chiave: string; dati: any }>>();
+
 /** Legge tutti i `*.json` di una cartella; una cartella mancante non è un errore, una illeggibile sì. */
 function leggiCartella(dir: string, errori: ErroreLettura[]): { chiave: string; dati: any }[] {
   let nomi: string[];
   try {
     nomi = fs.readdirSync(dir);
   } catch (e: any) {
+    cacheCartelle.delete(dir);
     if (e.code !== "ENOENT") errori.push({ percorso: dir, messaggio: msgErrore(e) });
     return [];
   }
+  const prima = cacheCartelle.get(dir), nuova = new Map<string, { chiave: string; dati: any }>();
   const out: { chiave: string; dati: any }[] = [];
   for (const n of nomi) {
     if (!n.endsWith(".json")) continue;
+    const file = path.join(dir, n);
     try {
-      out.push({ chiave: n.slice(0, -5), dati: JSON.parse(fs.readFileSync(path.join(dir, n), "utf8")) });
+      const st = fs.statSync(file);
+      const firma = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: un file riscritto a pari mtime e misura si rilegge
+      let e = prima?.get(n);
+      if (!e || e.chiave !== firma) e = { chiave: firma, dati: JSON.parse(fs.readFileSync(file, "utf8")) };
+      nuova.set(n, e);
+      out.push({ chiave: n.slice(0, -5), dati: e.dati });
     } catch {
-      // file a metà scrittura o rotto: si salta quel registro
+      // file a metà scrittura o rotto: si salta quel registro (e non si tiene in cache: al giro dopo si riprova)
     }
   }
+  cacheCartelle.set(dir, nuova);
   return out;
 }
 

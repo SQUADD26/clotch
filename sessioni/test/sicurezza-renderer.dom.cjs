@@ -122,7 +122,7 @@ app.whenReady().then(async () => {
     }
     await wait(() => [...document.querySelectorAll('.riga-sessione .testo')].some((e) => e.textContent === 'Enorme rinominata'));
     assert.equal(await radiceViva(), true); scene.elenco.sessioni[1].titolo = 'Enorme';
-  }, { noto: 'UI-AGGIORNAMENTO-MALFORMATO' });
+  });
 
   await check('ERRORE_DEL_PROTOTIPO_NON_INQUINA', async () => {
     await carica({ vista: 'sessione', sessione: 's1' }); await wait(() => document.querySelectorAll('.riga-sessione').length === 2);
@@ -146,7 +146,7 @@ app.whenReady().then(async () => {
       if (!(await radiceViva())) bianche.push(JSON.stringify(m));
     }
     assert.equal(bianche.length, 0, 'app bianca con: ' + bianche.join(' ; '));
-  }, { noto: 'UI-MESSAGGIO-MALFORMATO' });
+  });
 
   await check('ELENCO_MALFORMATO_NON_ROMPE_L_APP', async () => {
     const bianche = [];
@@ -155,14 +155,14 @@ app.whenReady().then(async () => {
       if (!(await radiceViva())) bianche.push(nome);
     }
     assert.equal(bianche.length, 0, 'app bianca con: ' + bianche.join(' ; '));
-  }, { noto: 'UI-ELENCO-MALFORMATO' });
+  });
 
   for (const q of [{ vista: 'constructor' }, { vista: 'impostazioni', sezione: 'constructor' }, { vista: 'impostazioni', sezione: '__proto__' }, { vista: 'impostazioni', sezione: 'toString' },
     { vista: 'sessione', sessione: '<script>window.__x=1</script>' }, { vista: 'sessione', sessione: 's999' }, { vista: 'sessione', sessione: 'x'.repeat(8000) }]) {
     await check('QUERY_OSTILE_' + JSON.stringify(q).slice(1, 60), async () => {
       await carica(q); await attesa(500);
       assert.equal(await radiceViva(), true, 'app bianca'); assert.equal(await run(() => !!window.__x), false);
-    }, ['constructor', '__proto__'].includes(q.sezione) ? { noto: 'UI-SEZIONE-EREDITATA' } : {});
+    });
   }
 
   const spostano = [];
@@ -188,9 +188,9 @@ app.whenReady().then(async () => {
     } finally { const w = win; win = prima; w.destroy(); }
   });
 
-  await check('PAGINA_RESTA_DOVE_E_DOPO_URL_OSTILI', async () => assert.equal(spostano.length, 0, 'location.href porta la pagina a about:blank#blocked con: ' + JSON.stringify(spostano)), { noto: 'MAIN-NAVIGAZIONE-INTERNA' });
+  await check('PAGINA_RESTA_DOVE_E_DOPO_URL_OSTILI', async () => assert.equal(spostano.length, 0, 'location.href porta la pagina a about:blank#blocked con: ' + JSON.stringify(spostano)));
 
-  await check('ANTEPRIMA_SILENZIOSA_CHIAMATE_SHOW_E_FOCUS', async () => { // misura: CLOTCH_TEST_SILENT=1 da solo mostra l'anteprima con showInactive
+  await check('ANTEPRIMA_SILENZIOSA_CHIAMATE_SHOW_E_FOCUS', async () => { // CLOTCH_TEST_SILENT=1 da solo non chiama mai show/showInactive/focus; l'anteprima visibile vuole anche CLOTCH_TEST_ANTEPRIMA=1
     const chiamate = { show: 0, showInactive: 0, focus: 0 }, orig = {}, P = BrowserWindow.prototype;
     for (const k of Object.keys(chiamate)) { orig[k] = P[k]; P[k] = function () { chiamate[k]++; }; }
     const conta = async (opz) => {
@@ -199,11 +199,18 @@ app.whenReady().then(async () => {
       return Object.fromEntries(Object.keys(chiamate).map((k) => [k, chiamate[k] - prima[k]]));
     };
     try {
-      const predefinita = await conta(undefined), nascosta = await conta({ show: false });
-      console.log(`MISURA_SHOW_FOCUS predefinita=${JSON.stringify(predefinita)} show:false=${JSON.stringify(nascosta)}`);
-      assert.deepEqual(predefinita, { show: 0, showInactive: 1, focus: 0 }, 'SILENT da solo = una showInactive, mai show né focus');
-      assert.deepEqual(nascosta, { show: 0, showInactive: 0, focus: 0 }, 'show:false = nessuna chiamata');
-    } finally { for (const k of Object.keys(orig)) P[k] = orig[k]; }
+      const predefinita = await conta(undefined), nascosta = await conta({ show: false }), esplicita = await conta({ show: true });
+      process.env.CLOTCH_TEST_ANTEPRIMA = '1';
+      const anteprima = await conta(undefined), anteprimaNascosta = await conta({ show: false });
+      delete process.env.CLOTCH_TEST_ANTEPRIMA;
+      console.log(`MISURA_SHOW_FOCUS predefinita=${JSON.stringify(predefinita)} show:false=${JSON.stringify(nascosta)} show:true=${JSON.stringify(esplicita)} anteprima=${JSON.stringify(anteprima)} anteprima+show:false=${JSON.stringify(anteprimaNascosta)}`);
+      const zero = { show: 0, showInactive: 0, focus: 0 };
+      assert.deepEqual(predefinita, zero, 'SILENT da solo = nessuna show, showInactive né focus');
+      assert.deepEqual(nascosta, zero, 'show:false = nessuna chiamata');
+      assert.deepEqual(esplicita, zero, 'SILENT batte anche show:true');
+      assert.deepEqual(anteprima, { show: 0, showInactive: 1, focus: 0 }, 'anteprima esplicita = una showInactive, mai show né focus');
+      assert.deepEqual(anteprimaNascosta, zero, 'show:false vince anche sull\'anteprima');
+    } finally { delete process.env.CLOTCH_TEST_ANTEPRIMA; for (const k of Object.keys(orig)) P[k] = orig[k]; }
   });
 
   assert.equal(mostrate, 0, 'nessun evento show'); assert.equal(fuochi, 0, 'nessun evento focus');

@@ -48,6 +48,13 @@ export function proteggiLinkEsterni(finestra: BrowserWindow, pagina: string): vo
     evento.preventDefault();
     if (evento.isMainFrame) apri(evento.url);
   });
+  // view-source:, chrome://, devtools:// e about:blank non passano da will-frame-navigate: Chromium porta il frame a
+  // about:blank(#blocked) e la cronologia non ha più la pagina. L'app non ha pagine about:, quindi si ricarica l'ultima.
+  let ultima = "";
+  contenuto.on("did-navigate", (_e, url) => {
+    if (!url.startsWith("about:")) ultima = url;
+    else if (ultima) void contenuto.loadURL(ultima).catch(() => {});
+  });
   contenuto.on("will-attach-webview", (evento) => evento.preventDefault());
   // Gli schemi interni del browser (about:, chrome:, devtools:, view-source:) non emettono
   // will-navigate: se una pagina porta altrove, si torna subito al documento dell'app.

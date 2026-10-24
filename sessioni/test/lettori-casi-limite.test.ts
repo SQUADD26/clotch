@@ -62,7 +62,6 @@ test("riga da 3 MB in mezzo al file: si legge intera, le righe attorno non si pe
   assert.equal(t[1].length, 3 << 20);
 });
 
-// Difetto aperto in src/messaggi.ts (leggiBlocco/leggiPagina, fuori dai miei file): il resto della riga tagliata passa da stringa e un carattere a due byte a cavallo del blocco diventa U+FFFD.
 test("UTF-8 a cavallo del blocco da 1 MB: il testo resta identico", () => {
   for (const prefisso of ["", "a"]) {
     const file = path.join(tmp(), "s.jsonl");
@@ -160,4 +159,65 @@ test("app Claude desktop senza trascrizione: compare, e chiedere i messaggi (anc
   const legacy = api.messaggi(s.id, 0), v1 = api.messaggi(s.id, 0, { v: 1 });
   assert.deepEqual([legacy.messaggi, legacy.errore], [[], "trascrizione non trovata sul disco"]);
   assert.deepEqual([v1.messaggi, v1.erroreCronologia?.codice], [[], "non_letta"]);
+});
+
+// Cache del backend (#456): non rileggere ciò che non è cambiato, rileggere ciò che è cambiato anche a parità di mtime:size.
+const scrivi = (file: string, o: unknown) => fs.writeFileSync(file, JSON.stringify(o));
+/** Quante volte `f` legge un `.json` dei registri (obiettivi, stati). */
+function lettureJson(t: any, f: () => void) {
+  const spia = t.mock.method(require("node:fs"), "readFileSync");
+  try {
+    f();
+    return spia.mock.calls.filter((c: any) => /(obiettivi|sessioni-stato)\/[^/]+\.json$/.test(String(c.arguments[0]))).length;
+  } finally {
+    spia.mock.restore();
+  }
+}
+/** Home con la sessione `sess` e le cartelle dei registri. */
+function conRegistri() {
+  const { home } = claudeHome(J({ type: "user", cwd: "/x/a", message: { content: "ciao" } }));
+  const ob = path.join(home, ".claude", "obiettivi"), st = path.join(home, ".claude", "sessioni-stato");
+  fs.mkdirSync(ob);
+  fs.mkdirSync(st);
+  return { home, ob, st, testo: () => leggiElenco({ home, env: {} }).sessioni.find((x) => x.id === "sess")?.obiettivo?.testo };
+}
+
+test("registri: obiettivi e stati invariati non si rileggono; cambiati o nuovi sì; sparito esce dall'elenco", (t) => {
+  const { home, ob, st, testo } = conRegistri();
+  scrivi(path.join(ob, "sess.json"), { cli: "sess", obiettivo: "uno", stato: "in corso" });
+  scrivi(path.join(ob, "altro.json"), { cli: "altro", obiettivo: "due", stato: "in corso" });
+  scrivi(path.join(st, "sess.json"), { cli: "sess", stato: "lavora" });
+  const giro = () => leggiElenco({ home, env: {} });
+  assert.equal(lettureJson(t, giro), 3, "il primo giro legge i tre file");
+  assert.equal(lettureJson(t, giro), 0, "giro invariato: nessuna lettura di JSON");
+  scrivi(path.join(ob, "sess.json"), { cli: "sess", obiettivo: "tre", stato: "in corso" });
+  scrivi(path.join(ob, "nuovo.json"), { cli: "nuovo", obiettivo: "x", stato: "in corso" });
+  fs.unlinkSync(path.join(ob, "altro.json"));
+  assert.equal(lettureJson(t, giro), 2, "solo il file cambiato e quello nuovo");
+  assert.equal(testo(), "tre");
+});
+
+test("registri: stesso mtime e stessa misura ma contenuto diverso (file riscritto) = riletto", () => {
+  const { ob, testo } = conRegistri(), f = path.join(ob, "sess.json");
+  scrivi(f, { cli: "sess", obiettivo: "AAAA", stato: "in corso" });
+  assert.equal(testo(), "AAAA");
+  const m = fs.statSync(f).mtime;
+  scrivi(f, { cli: "sess", obiettivo: "BBBB", stato: "in corso" });
+  fs.utimesSync(f, m, m);
+  assert.equal(testo(), "BBBB");
+});
+
+test("Claude: file riscritto con stessa misura e stesso mtime = riletto; file sparito = via dall'elenco", () => {
+  const una = (cwd: string) => J({ type: "user", cwd, message: { content: "ciao" } });
+  const { home, file } = claudeHome(una("/x/aaaa"));
+  assert.equal(elenco(home).sessioni[0].cartella, "/x/aaaa");
+  const m = fs.statSync(file).mtime;
+  fs.writeFileSync(file, una("/x/bbbb"));
+  fs.utimesSync(file, m, m);
+  assert.equal(elenco(home).sessioni[0].cartella, "/x/bbbb");
+  fs.unlinkSync(file);
+  assert.deepEqual(elenco(home).sessioni, []);
+  fs.writeFileSync(file, una("/x/cccc"));
+  fs.utimesSync(file, m, m);
+  assert.equal(elenco(home).sessioni[0].cartella, "/x/cccc");
 });
