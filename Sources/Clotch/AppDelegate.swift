@@ -32,6 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
         VoiceSpeaker.shared.start()
+        if let line = UpdateNotice.line(build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "") {
+            Self.log.notice("update announced: \(line, privacy: .public)")
+            Task { await VoiceSpeaker.shared.sayAloud(line) }
+        }
         VoiceAsk.sessions = { [appState] in
             appState.sessions.sorted { $0.value.lastActivity > $1.value.lastActivity }.map { id, s in
                 VoiceRoute.sessionLine(title: s.displayTitle(sessionId: id), status: s.status, lastActivity: s.lastActivity)

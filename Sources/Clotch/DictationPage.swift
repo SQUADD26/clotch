@@ -98,7 +98,7 @@ struct DictationPage: View {
             }
             SettingsGroup {
                 CardRow(title: "Microfono", note: "Segue la scelta di Impostazioni di Sistema.") {
-                    CardMenu(label: "Microfono", selection: Binding(get: { config.microphone }, set: { config.microphone = $0; save() }),
+                    CardMenu(label: "Microfono", selection: Binding(get: { VoiceCapture.uid(config.microphone) }, set: { config.microphone = $0; save(); tellFriday($0) }),
                              options: microphoneOptions, width: T.impostazioniMisura200)
                 }
                 CardDivider()
@@ -116,7 +116,7 @@ struct DictationPage: View {
     /// A device that is gone stays listed, so the choice is not silently lost.
     private var microphoneOptions: [(String, String)] {
         var all = [("", "Quello del sistema")]
-        if !config.microphone.isEmpty, !inputs.contains(where: { $0.id == config.microphone }) { all.append((config.microphone, "Non collegato")) }
+        if !config.microphone.isEmpty, !inputs.contains(where: { $0.id == VoiceCapture.uid(config.microphone) }) { all.append((config.microphone, "Non collegato")) }
         return all + inputs.map { ($0.id, $0.name) }
     }
 
@@ -150,6 +150,14 @@ struct DictationPage: View {
             try files.updateConfig(Self.changes(config))
             note = nil
         } catch { note = "Impostazioni non salvate. Riprova." }
+    }
+
+    /// #1119: Friday's choice wins when read (`VoiceFiles.readConfig`), so the page's choice goes to Friday too, by the name macOS shows.
+    private func tellFriday(_ uid: String) {
+        let name = inputs.first { $0.id == uid }?.name ?? uid
+        guard let args = try? JSONSerialization.data(withJSONObject: ["chiave": "microfono", "valore": name]) else { return }
+        let friday = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude/bin/friday").path
+        Task.detached { _ = EngineCommand.run(friday, ["comando", "imposta", String(decoding: args, as: UTF8.self)]) }
     }
 
     /// What one change writes to config.json: every `ingresso_*` key plus the Friday's model (`overseer_modello`, clotch#286).

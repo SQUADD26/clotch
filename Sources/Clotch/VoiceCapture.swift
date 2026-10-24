@@ -41,8 +41,11 @@ class VoiceCapture: @unchecked Sendable {
             .devices.map { ($0.uniqueID, $0.localizedName) }
     }
 
+    /// #1119: Friday's `imposta microfono` writes the name macOS shows («Microfono MacBook Pro»), the page writes the uid; both work.
+    static func uid(_ choice: String) -> String { inputs().first { $0.name == choice }?.id ?? choice }
+
     private static func deviceID(uid: String) -> AudioDeviceID? {
-        var uidRef = uid as CFString
+        var uidRef = Self.uid(uid) as CFString
         var device = AudioDeviceID(0)
         var size = UInt32(MemoryLayout<AudioDeviceID>.size)
         var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyTranslateUIDToDevice,
