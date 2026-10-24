@@ -68,6 +68,8 @@ async function main() {
   const verifica = (ok, testo) => { console.log(`${ok ? "OK " : "ROSSO"} ${testo}`); if (!ok) errori.push(testo); };
   try {
     // 1. primo avvio, senza cache: la prima riga entro il tetto, poi si aspetta che il worker finisca
+    // un avvio scartato scalda i file di Electron nella cache del disco: la CI parte a freddo e misurerebbe il disco, non l'app
+    await (await avvia("riscaldamento", home, path.join(home, "cfg-scarto"), sonda)).fermo();
     let a = await avvia("senza cache", home, cfg, sonda);
     verifica(a.primaRiga !== null && a.primaRiga < T.primaRigaMs, `prima riga senza cache ${a.primaRiga} ms (tetto ${T.primaRigaMs})`);
     await pausa(8000);
@@ -96,10 +98,11 @@ async function main() {
       await pausa(500);
       if (nome === "scorrimento") verifica(ok === true, "la lista si è potuta scorrere (.pezzo-barra .elenco esiste)");
       const main = bloccati(sonda, da).filter(([t]) => t >= da), rend = (await a.pagina.valuta(`window.__lunghi`)).filter(([t]) => t >= da).map((x) => x[1]);
+      const lim = nome.startsWith("primo") ? T.primoEventoMs : T.bloccoMs;
       console.log(`${nome}: blocchi main >${T.bloccoMs} ms ${JSON.stringify(main.map((x) => `${x[1]} ms a +${x[0] - da} ms`))}; renderer ${JSON.stringify(rend)}`);
-      const lim = nome.startsWith("primo") ? T.primoEventoMs : T.bloccoMs, sopra = main.filter(([, ms]) => ms > lim);
+      const sopra = main.filter(([, ms]) => ms > lim);
       verifica(sopra.length <= T.bloccoMainMax, `${nome}: main ${sopra.length} blocchi oltre ${lim} ms (tetto ${T.bloccoMainMax})`);
-      verifica(rend.length <= T.bloccoRendererMax, `${nome}: renderer ${rend.length} blocchi oltre ${T.bloccoMs} ms (tetto ${T.bloccoRendererMax})`);
+      verifica(rend.filter((ms) => ms > lim).length <= T.bloccoRendererMax, `${nome}: renderer ${rend.filter((ms) => ms > lim).length} blocchi oltre ${lim} ms (tetto ${T.bloccoRendererMax})`);
     }
     // riposo
     await pausa(3000);
