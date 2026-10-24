@@ -73,7 +73,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
 
   return (
     <div className="account-barra">
-      <div ref={setPiede} className={`piede-account ${menu ? "aperto" : ""}`} onClick={() => (q || cor.motore === false) && setMenu(menu ? 0 : 1)}>
+      <div ref={setPiede} className={`piede-account ${menu ? "aperto" : ""}`} onClick={() => setMenu(menu ? 0 : 1)}>
         <div className="riga-account">
           <button type="button" className="apri" aria-haspopup="menu" aria-expanded={menu > 0}>
             <span className="avatar" style={colore(colori)}><span className="t-xs medio">{iniziali(titolo)}</span></span>
@@ -85,6 +85,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
           </button>
           <BottoneIcona icona="altro" etichetta="Impostazioni" onClick={(e) => { e.stopPropagation(); onAltro(e); }} />
         </div>
+        {!q && <span className="t-xs secondario">Uso non disponibile</span>}
         {q && (["5 ore", "7 giorni"] as const).map((e, i) => {
           const usato = i ? q.sette : q.cinque, resta = conto(i ? q.setteFine : q.cinqueFine, ora);
           return (
@@ -96,13 +97,15 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
         })}
       </div>
 
-      {menu > 0 && q && piede && (
+      {menu > 0 && piede && (
         <Sovrapposto ancora={piede} lato="sopra" scarto={numero("spazio-2")} className="menu-account" role="menu" rif={setPrimo} onChiudi={() => setMenu(0)}>
-          <div className="uso-attuale">
-            <Blocco etichetta="5 ore" usato={q.cinque} fine={q.cinqueFine} ora={ora} />
-            <Blocco etichetta="7 giorni" usato={q.sette} fine={q.setteFine} ora={ora} />
-            {avvisoLimite && <div className="avviso-limite"><Icona nome="avviso" /><span className="t-sm">{avvisoLimite}</span></div>}
-          </div>
+          {q
+            ? <div className="uso-attuale">
+                <Blocco etichetta="5 ore" usato={q.cinque} fine={q.cinqueFine} ora={ora} />
+                <Blocco etichetta="7 giorni" usato={q.sette} fine={q.setteFine} ora={ora} />
+                {avvisoLimite && <div className="avviso-limite"><Icona nome="avviso" /><span className="t-sm">{avvisoLimite}</span></div>}
+              </div>
+            : <div className="motivo"><Icona nome="info" /><span className="t-sm secondario">Non riesco a leggere l’uso di questo account. Riprova tra poco.</span></div>}
           <div className="linea" />
           {cor.motore === false
             ? <div className="motivo"><Icona nome="info" /><span className="t-sm secondario">Sessione avviata fuori da clotch: l’account non si cambia.</span></div>

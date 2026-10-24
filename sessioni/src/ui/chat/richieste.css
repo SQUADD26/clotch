@@ -10,9 +10,13 @@
 .pezzo-chat .carta-richiesta .bottoni { display: flex; gap: var(--spazio-2); }
 .pezzo-chat .domanda-blocco { display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-chat .testo-domanda { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); }
+.pezzo-chat .intestazione-domanda { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .opzione .descrizione { display: block; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .pezzo-chat .opzioni { display: flex; flex-direction: column; gap: var(--spazio-1); }
 .pezzo-chat .opzione { display: flex; align-items: center; gap: var(--spazio-3); padding: var(--spazio-2) var(--spazio-3); border-radius: var(--raggio-md); text-align: left; }
 .pezzo-chat .opzione:hover, .pezzo-chat .opzione.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .opzione.scelta:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .opzione:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
 .pezzo-chat .opzione .testo, .pezzo-chat .passo .testo { flex: 1; min-width: 0; color: var(--colore-testo-primario); }
 .pezzo-chat .carta-richiesta .numero { flex: none; }
 .pezzo-chat .carta-richiesta .altro {
@@ -20,7 +24,7 @@
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm);
 }
 .pezzo-chat .carta-richiesta .altro::placeholder { color: var(--colore-testo-secondario); }
-.pezzo-chat .passi { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-chat .passi { display: flex; flex-direction: column; gap: var(--spazio-2); max-height: calc(var(--misura-riga) * 8); overflow-y: auto; }
 .pezzo-chat .passo { display: flex; gap: var(--spazio-3); }
 
 .pezzo-chat .esito-richiesta { display: flex; align-items: center; gap: var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }

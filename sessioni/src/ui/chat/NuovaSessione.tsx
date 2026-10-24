@@ -163,7 +163,7 @@ export function NuovaSessione() {
               <Selettore icona="ramo" etichetta={ramo ?? "Nessun ramo"} aperto={menu === "ramo"} fisso={remoto} onClick={() => apri("ramo")}>
                 {menu === "ramo" && <MenuRamo rami={contesto.rami} ramo={ramo} inizio={provaDi(sezione, "cerca") ?? ""} onScegli={setRamo} onChiudi={chiudi} />}
               </Selettore>
-              <Selettore icona="strati" etichetta={worktree ? "Worktree" : "Senza worktree"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
+              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
             </>
           )}
         </div>

@@ -27,7 +27,7 @@ export const PROPRIETA: { chiave: Proprieta; etichetta: string; icona: NomeIcona
 export const STATI: { chiave: StatoSegno; voce: string; corta: string; icona: NomeIcona; colore: "accento" | "secondaria" | "successo" | "errore" }[] = [
   { chiave: "lavora", voce: "In corso", corta: "In corso", icona: "in-corso", colore: "accento" },
   { chiave: "aspetta", voce: "In attesa di te", corta: "In attesa", icona: "mano", colore: "accento" },
-  { chiave: "ferma", voce: "Ferma", corta: "Ferma", icona: "pausa", colore: "secondaria" },
+  { chiave: "ferma", voce: "In pausa", corta: "In pausa", icona: "pausa", colore: "secondaria" },
   { chiave: "finita", voce: "Finita", corta: "Finita", icona: "finita", colore: "successo" },
   { chiave: "errore", voce: "Errore", corta: "Errore", icona: "avviso", colore: "errore" },
 ];
@@ -48,7 +48,7 @@ export function giorno(t: number, ora: number) {
 export function valore(s: Sessione, p: Proprieta, ora: number): string {
   switch (p) {
     case "sorgente": return nomeSorgente(s.sorgente);
-    case "stato": return s.stato;
+    case "stato": return s.situazione?.adesso === "errore" ? "errore" : s.stato; // come il segno della riga (#636)
     case "attivita": return giorno(s.ultimaAttivita, ora);
     default: return s[p] ?? "";
   }

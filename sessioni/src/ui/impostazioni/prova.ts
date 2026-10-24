@@ -39,7 +39,7 @@ const PROVE: Record<string, Prova> = {
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
   "101-22095": { rimuovi: "~/.claude-clotch-ai" },
-  "119-56891": { aperta: "Cronologia" },
+  "119-56891": { aperta: "Sessioni finite" },
   "119-57106": { conferma: true },
   "119-57404": { aperta: "Versione" },
   "119-57552": { novita: true },

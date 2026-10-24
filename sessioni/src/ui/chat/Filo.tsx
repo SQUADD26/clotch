@@ -35,14 +35,16 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
     case "file-toccati": return <FileToccati b={b} aperto={aperto} />;
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
-    case "errore": return <AvvisoFilo tipo="errore" titolo={b.testo} />;
+    case "errore":
+      if (b.riprova) return <AvvisoFilo tipo="attesa" titolo="Riprovo" corpo={`Tentativo ${b.riprova.n} di ${b.riprova.di}`} />;
+      return /^API Error/.test(b.testo) ? <AvvisoFilo tipo="errore" titolo="Richiesta non riuscita" corpo={b.testo} /> : <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":
-      if (!b.aperta) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta ?? ""} />;
+      if (!b.aperta) return b.risposta ? <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta} /> : <Esito icona="persona" colore="secondaria" esito="Senza risposta" />;
       return <Domanda chat={chat} rid={richiesta("domanda")?.rid ?? null} domande={b.domande} da={da} />;
     case "piano":
       if (b.approvato) return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={quanti(passiPiano(b.testo).passi.length, "passo", "passi")} />;
-      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : null;
+      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : <Esito icona="chiudi" colore="errore" esito="Piano rifiutato" />;
   }
 }
 
@@ -138,7 +140,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
           </Fragment>
         );
       })}
-      {permessi.map((p) => <Permesso key={p.rid} chat={chat} r={p} da={da} />)}
+      {permessi.map((p, i) => <Permesso key={p.rid} chat={chat} r={p} da={da} prima={i === 0} />)}
       {inFondo}
     </div>
     {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}

@@ -7,5 +7,8 @@ import { flushSync } from "react-dom";
  *  La promessa si risolve quando il DOM nuovo c'è (per dare il fuoco a ciò che è appena comparso). */
 export function conTransizione(fai: () => void): Promise<void> {
   if (!document.startViewTransition || document.hidden || document.documentElement.classList.contains("parita")) { fai(); return Promise.resolve(); }
-  return document.startViewTransition(() => flushSync(fai)).updateCallbackDone;
+  const t = document.startViewTransition(() => flushSync(fai));
+  // una transizione interrotta da un'altra rifiuta ready e finished: già gestito, il DOM nuovo c'è comunque (#750)
+  t.ready.catch(() => {}); t.finished.catch(() => {});
+  return t.updateCallbackDone;
 }

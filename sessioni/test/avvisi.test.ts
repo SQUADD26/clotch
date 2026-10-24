@@ -12,7 +12,7 @@ const tutti = { silenzio: "Mai" };
 
 test("passaggi: attesa, finita, errore, limite, ognuno col suo testo disegnato e il titolo della sessione", () => {
   const lavora = sess("lavora", "lavora");
-  assert.deepEqual(daAvvisare(lavora, sess("aspetta", "lavora"), tutti, GIORNO), { titolo: "Backend: auth e RLS", corpo: "Aspetta un permesso", silenzioso: false, suono: "Glass" });
+  assert.deepEqual(daAvvisare(lavora, sess("aspetta", "lavora"), tutti, GIORNO), { titolo: "Backend: auth e RLS", corpo: "Permesso richiesto", silenzioso: false, suono: "Glass" });
   assert.equal(daAvvisare(lavora, sess("aspetta", "domanda"), tutti, GIORNO)?.corpo, "Domanda per te");
   assert.equal(daAvvisare(lavora, sess("aspetta", "piano"), tutti, GIORNO)?.corpo, "Piano da approvare");
   assert.equal(daAvvisare(lavora, sess("finita", "turno_finito"), tutti, GIORNO)?.corpo, "Finita");

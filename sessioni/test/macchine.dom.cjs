@@ -108,7 +108,7 @@ app.whenReady().then(async () => {
       await wait(() => document.querySelectorAll('.menu-ssh .riga-macchina').length === 3);
       await clicca('.menu-ssh .riga-macchina', 'rise');
       await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.trim() === 'rise'));
-      assert.deepEqual(await testi('.selettore'), ['rise', '/srv/clotch', 'dev', 'Worktree']);
+      assert.deepEqual(await testi('.selettore'), ['rise', '/srv/clotch', 'dev', 'Copia di lavoro']);
       await scrivi('Controlla i test');
       await invio();
       await attendi(() => comandi.some((c) => c.cmd === 'nuova_sessione'));
@@ -197,10 +197,10 @@ app.whenReady().then(async () => {
       assert.equal(await run(() => document.querySelector('.dialogo .codice-macchina').textContent), comando);
       assert.equal(await run(() => document.querySelector('.dialogo .titolo-comando').textContent), 'Accedi a Claude dal Terminale del Mac');
       assert.equal(await run(() => document.querySelector('.dialogo .passo.mano .dettaglio-passo').textContent), 'Da fare nel Terminale');
-      assert.deepEqual(await bottoni(), ['Chiudi', 'Ho fatto, riprova']);
+      assert.deepEqual(await bottoni(), ['Chiudi', 'Riprova']);
       await clicca('.dialogo .riga-comando button', 'Copia');
       await wait(() => [...document.querySelectorAll('.dialogo .riga-comando button')].some((b) => b.textContent === 'Copiato'));
-      await clicca('.dialogo .bottoni button', 'Ho fatto, riprova');
+      await clicca('.dialogo .bottoni button', 'Riprova');
       await attendi(() => comandi.length === 2);
       assert.deepEqual(comandi[1], comandi[0]);
     });

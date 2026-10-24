@@ -52,7 +52,7 @@ export function infoSessione(s: Sessione | undefined): InfoSessione {
     c.offset = offset;
     // le PR del file dell'app hanno lo stato: restano loro, la trascrizione aggiunge le altre
     const dellApp = s.app?.prs ?? [], prs = [...dellApp, ...[...c.prs.values()].filter((p) => !dellApp.some((a) => a.url === p.url))];
-    return { contesto: c.contesto, file: { quanti: c.file.size, aggiunte: c.aggiunte, tolte: c.tolte }, ...(prs.length ? { prs } : {}) };
+    return { contesto: c.contesto, file: { quanti: c.file.size, aggiunte: c.aggiunte, tolte: c.tolte, nomi: [...c.file].sort() }, ...(prs.length ? { prs } : {}) };
   } catch {
     return VUOTA; // file sparito o illeggibile: il pannello nasconde le due sezioni, non mostra numeri finti
   }
