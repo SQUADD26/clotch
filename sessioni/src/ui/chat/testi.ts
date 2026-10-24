@@ -40,11 +40,15 @@ export const MODELLI: Record<string, { id: string; dettaglio: string }> = {
 /** Id CLI di un'etichetta; undefined se non è un modello noto. */
 export const idModello = (etichetta: string) => MODELLI[etichetta]?.id;
 
-/** Argomenti di `manda`. `modello` con `subito`, se la preferenza è diversa dal modello della sessione (`attuale`, dalla trascrizione: può avere un suffisso di data) o se questo non si conosce; mai in coda: il motore lo rifiuta. */
-export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string, attuale: string | null) => {
-  const id = idModello(preferenza);
-  const modello = modo === "subito" && id && !attuale?.startsWith(id) ? id : undefined;
-  return { chat, testo, modo, ...(modello ? { modello } : {}) };
+/** Argomenti di `manda`. `modello`, `sforzo` e `rapida` solo con `subito`: in coda il motore li rifiuta. `modello` solo se la preferenza è diversa dal modello della sessione (`attuale`, dalla trascrizione: può avere un suffisso di data) o se questo non si conosce. `sforzo` e `rapida` solo se scelti (altrimenti vale il predefinito). */
+export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string, attuale: string | null, scelte?: { sforzo?: string; rapida?: boolean }) => {
+  const id = idModello(preferenza), subito = modo === "subito";
+  return {
+    chat, testo, modo,
+    ...(subito && id && !attuale?.startsWith(id) ? { modello: id } : {}),
+    ...(subito && scelte?.sforzo ? { sforzo: scelte.sforzo } : {}),
+    ...(subito && scelte?.rapida ? { rapida: true } : {}),
+  };
 };
 
 /** Testo dell'errore di un comando non riuscito: se il motore l'ha rifiutato, il suo testo. */

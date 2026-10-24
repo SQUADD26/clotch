@@ -35,6 +35,12 @@ test("manda: il modello va solo se diverso da quello della sessione, mai in coda
   assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5", null), { ...base, modello: "claude-opus-5-5" }); // modello della sessione sconosciuto
   assert.deepEqual(argsManda("c", "t", "coda", "Haiku 5.5", null), { ...base, modo: "coda" }); // coda: il motore lo rifiuterebbe
   assert.deepEqual(argsManda("c", "t", "subito", "Sconosciuto", null), base);
+  // impegno e modalità veloce (#467): partono solo se scelti e solo «subito»; il livello base non è mai una scelta
+  const scelte = { sforzo: "xhigh", rapida: true };
+  assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5", "claude-opus-5-5", scelte), { ...base, sforzo: "xhigh", rapida: true });
+  assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5", "claude-sonnet-5-5", scelte), { ...base, modello: "claude-opus-5-5", sforzo: "xhigh", rapida: true });
+  assert.deepEqual(argsManda("c", "t", "coda", "Opus 5.5", null, scelte), { ...base, modo: "coda" });
+  assert.deepEqual(argsManda("c", "t", "subito", "Opus 5.5", "claude-opus-5-5", { sforzo: undefined, rapida: false }), base);
   const ammessi = ["haiku", "sonnet", "opus", "fable", "claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5", "claude-fable-5-1"];
   for (const [et, m] of Object.entries(MODELLI)) { assert.ok(ammessi.includes(m.id), m.id); assert.equal(idModello(et), m.id); }
   assert.equal(idModello("Sconosciuto"), undefined);
