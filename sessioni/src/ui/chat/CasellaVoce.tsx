@@ -45,7 +45,7 @@ export function CasellaVoce({ voce }: { voce: NonNullable<Voce> }) {
       <div className={`casella-voce ${voce.cosa}`} >
         <span className="solo-lettore" role="status">{ascolta ? "Dettatura aperta" : ""}</span>
         <Icona nome={ascolta ? "microfono" : "scintille"} colore={ascolta ? "accento" : "secondaria"} />
-        <span className="testo" ref={riga}>{ascolta ? testo || "Parla…" : clotch ? "clotch AI parla dal notch" : "clotch AI sta parlando"}</span>
+        <span className="testo" ref={riga}>{ascolta ? testo || "In ascolto…" : clotch ? "clotch AI parla dal notch" : "clotch AI sta parlando"}</span>
         <span className={`onda ${voce.cosa}`} aria-hidden>{ALTEZZE.map((h, i) => <span key={i} className="barra" style={{ "--h": `${h}px`, "--i": i } as React.CSSProperties} />)}</span>
         {annullabile && <Bottone tipo="secondario" onClick={annullaDettatura}>Annulla</Bottone>}
         <Bottone tipo="secondario" onClick={() => void (ascolta ? (clotch ? fineDettaturaClotch() : fineDettatura()) : interrompiVoce(voce.chi))}>

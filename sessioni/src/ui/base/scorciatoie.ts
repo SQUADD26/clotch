@@ -33,7 +33,7 @@ export function useScorciatoie() {
       if (avvio || e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
       const tasti = tastiDi(e);
       const a = (tasti && FISSE[tasti]?.[0]) || azioneDi(tasti, scorciatoie); // i tasti fissi vincono: la pagina Scorciatoie non li concede (#686)
-      const navigazione: Record<string, () => void> = { nuova: () => n.apri("nuova-sessione"), clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni"),
+      const navigazione: Record<string, () => void> = { nuova: () => n.apri("nuova-sessione"), clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, indietro: n.indietro, avanti: n.avanti, impostazioni: () => n.apri("impostazioni"),
         prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
       const fai = a && (navigazione[a] ?? azioni.get(a));
       if (fai) { e.preventDefault(); fai(); }

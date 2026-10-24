@@ -60,7 +60,7 @@
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
 }
 .pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
-.pezzo-chat .testata .tipo { font-weight: 500; flex: none; }
+.pezzo-chat .testata .tipo { font-weight: 500; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .testata .dettaglio {
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

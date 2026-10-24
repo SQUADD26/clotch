@@ -19,7 +19,7 @@ export function Selettore({ icona, etichetta, aperto = false, stato, avviso = fa
   return (
     <span className="selettore-avvio">
       <button type="button" className={`selettore${aperto ? " aperto" : ""}${stato ? ` ${stato}` : ""}`} aria-haspopup={fisso ? undefined : "menu"} aria-expanded={fisso ? undefined : aperto} disabled={fisso} onClick={onClick}>
-        <Icona nome={icona} colore={colore} /><span className="etichetta">{etichetta}</span>
+        <Icona nome={icona} colore={colore} /><span className="etichetta" title={etichetta}>{etichetta}</span>
       </button>
       {children}
     </span>
@@ -37,7 +37,7 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, rif, onChiudi, childr
     el.querySelector("input")?.focus();
     const tasto = (e: KeyboardEvent) => {
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      const v = [...el.querySelectorAll<HTMLElement>("input, button.voce:not(:disabled)")], i = v.indexOf(document.activeElement as HTMLElement);
+      const v = [...el.querySelectorAll<HTMLElement>("input, button.voce:not(:disabled), [role=menuitemcheckbox]")], i = v.indexOf(document.activeElement as HTMLElement);
       v[(i + (e.key === "ArrowDown" ? 1 : v.length - 1)) % v.length]?.focus();
       e.preventDefault();
     };
@@ -56,14 +56,14 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, rif, onChiudi, childr
 const Separatore = () => <div className="separatore" role="separator"><div className="linea" /></div>;
 const Titolo = ({ children }: { children: string }) => <div className="titolo-gruppo">{children}</div>;
 
-function Riga({ icona, etichetta, valore, fine, scelta = false, attiva = false, disabled, onClick }: {
-  icona?: NomeIcona; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; attiva?: boolean; disabled?: boolean; onClick(): void;
+function Riga({ icona, etichetta, valore, titolo, fine, scelta = false, attiva = false, disabled, onClick }: {
+  icona?: NomeIcona; titolo?: string; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; attiva?: boolean; disabled?: boolean; onClick(): void;
 }) {
   return (
-    <button type="button" role="menuitem" className={`voce${attiva ? " scelta" : ""}`} disabled={disabled} onClick={onClick}>
+    <button type="button" role="menuitem" className={`voce${attiva ? " scelta" : ""}`} title={titolo ?? etichetta} disabled={disabled} onClick={onClick}>
       {icona && <Icona nome={icona} />}
       <span className="etichetta">{etichetta}</span>
-      {valore && <span className="valore">{valore}</span>}
+      {valore && <span className="valore" title={valore}>{valore}</span>}
       {fine === "spunta" ? scelta && <Icona nome="spunta" colore="primaria" /> : fine === "freccia" && <Icona nome="destra" />}
     </button>
   );
@@ -78,10 +78,11 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
   const voci: Ambiente[] = [{ tipo: "locale" }, { tipo: "cloud" }, { tipo: "remote_control" }, ...mac.macchine.filter((m) => !m.locale).map((m) => ({ tipo: "ssh" as const, host: m.nome }))];
+  const trovati = voci.filter((a) => trova(nomeAmbiente(a)));
   return (
     <>
       <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} rif={setMenu} onChiudi={onChiudi}>
-        {q ? voci.filter((a) => trova(nomeAmbiente(a))).map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />) : (
+        {q ? (trovati.length ? trovati.map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />) : <div className="vuoto">Nessun ambiente trovato</div>) : (
           <>
             <Titolo>Locale</Titolo>
             <Riga icona="computer" etichetta="Questo computer" fine="spunta" scelta={e({ tipo: "locale" })} onClick={() => scegli({ tipo: "locale" })} />
@@ -109,22 +110,24 @@ export function MenuCartella({ recenti, cartella, ctx, ramo, worktree, inizio = 
   onCartella(c: CartellaAvvio | null): void; onApri(): void; onRamo(): void; onWorktree(acceso: boolean): void; onChiudi(): void;
 }) {
   const [cerca, setCerca] = useState(inizio);
-  const q = cerca.trim().toLowerCase(), trovate = recenti.filter((c) => c.nome.toLowerCase().includes(q));
+  const q = cerca.trim().toLowerCase(), trovate = recenti.filter((c) => `${c.nome} ${c.percorso}`.toLowerCase().includes(q));
   const scegli = (c: CartellaAvvio | null) => { onCartella(c); onChiudi(); };
   return (
     <Menu segnaposto="Cerca cartelle…" cerca={cerca} onCerca={setCerca} onChiudi={onChiudi}>
       <Riga etichetta="Nessuna cartella" fine="spunta" scelta={!cartella} onClick={() => scegli(null)} />
       {!!trovate.length && <><Separatore /><Titolo>Recenti</Titolo></>}
-      {trovate.map((c) => <Riga key={c.percorso} etichetta={c.nome} fine="spunta" scelta={c.percorso === cartella?.percorso} onClick={() => scegli(c)} />)}
+      {trovate.map((c) => <Riga key={c.percorso} etichetta={c.nome} titolo={c.percorso} fine="spunta" scelta={c.percorso === cartella?.percorso} onClick={() => scegli(c)} />)}
+      {!!q && !trovate.length && <div className="vuoto">Nessuna cartella trovata</div>}
       <Separatore />
       <Riga etichetta="Apri cartella…" onClick={() => { onChiudi(); onApri(); }} />
       {cartella && ctx?.git && (
         <>
           <Separatore />
           <Riga etichetta="Ramo" valore={ramo ?? undefined} fine="freccia" onClick={() => { onChiudi(); onRamo(); }} />
-          <div className="voce" role="menuitemcheckbox" aria-checked={worktree} onClick={() => onWorktree(!worktree)}>
+          <div className="voce" role="menuitemcheckbox" tabIndex={-1} aria-checked={worktree} onClick={() => onWorktree(!worktree)}
+            onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); onWorktree(!worktree); } }}>
             <span className="etichetta">Copia di lavoro</span>
-            <span onClick={(e) => e.stopPropagation()}><Interruttore etichetta="Copia di lavoro" acceso={worktree} onCambia={onWorktree} /></span>
+            <span style={{ pointerEvents: "none" }}><Interruttore etichetta="Copia di lavoro" acceso={worktree} onCambia={onWorktree} /></span>
           </div>
         </>
       )}

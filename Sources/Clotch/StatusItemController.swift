@@ -7,7 +7,7 @@ extension UserDefaults {
 }
 
 @MainActor
-final class StatusItemController: NSObject {
+final class StatusItemController: NSObject, NSMenuDelegate {
     static let shared = StatusItemController()
 
     private var statusItem: NSStatusItem?
@@ -24,7 +24,8 @@ final class StatusItemController: NSObject {
     }
 
     private func syncVisibility() {
-        if SettingsManager.shared.hideWhenNoSession {
+        // con l'app clotch nel pacchetto il menu è la porta per aprirla (#465): resta visibile anche col notch sempre mostrato
+        if SettingsManager.shared.hideWhenNoSession || AppSessioni.url() != nil {
             showStatusItem()
         } else {
             hideStatusItem()
@@ -73,6 +74,16 @@ final class StatusItemController: NSObject {
 
     private func makeMenu() -> NSMenu {
         let menu = NSMenu()
+        menu.delegate = self
+
+        // figma: 151-70904 — «Apri clotch» / «Mostra clotch» (app già aperta), solo se l'app è dentro il pacchetto (#465)
+        if AppSessioni.url() != nil {
+            let appItem = NSMenuItem(title: L10n.shared["open_clotch_app"], action: #selector(apriApp), keyEquivalent: "")
+            appItem.target = self
+            appItem.tag = Self.tagApp
+            menu.addItem(appItem)
+            menu.addItem(.separator())
+        }
 
         let settingsItem = NSMenuItem(
             title: L10n.shared["settings_ellipsis"],
@@ -93,6 +104,17 @@ final class StatusItemController: NSObject {
         menu.addItem(quitItem)
 
         return menu
+    }
+
+    private static let tagApp = 465
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        let aperta = !NSRunningApplication.runningApplications(withBundleIdentifier: "com.squadd.clotch.sessioni").isEmpty
+        menu.item(withTag: Self.tagApp)?.title = L10n.shared[aperta ? "show_clotch_app" : "open_clotch_app"]
+    }
+
+    @objc private func apriApp() {
+        AppSessioni.apri()
     }
 
     @objc private func openSettings() {

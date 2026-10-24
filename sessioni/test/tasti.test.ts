@@ -33,5 +33,5 @@ test("tasti riservati: fissi dell'app e menu nativo non si assegnano (#686); ⇧
   assert.equal(riservatoDa(k("w", "KeyW")!), "Chiudi finestra");
   assert.equal(riservatoDa(k(":", "Semicolon", { shiftKey: true })!), "Copia ultimo blocco di codice");
   assert.equal(riservatoDa(k("k", "KeyK")!), undefined);
-  assert.equal(FISSE["⌘⇧P"][0], "piano"); // ⇧⇥ torna al browser (#684)
+  assert.equal(FISSE["⇧⌘P"][0], "piano"); // ⇧⇥ torna al browser (#684)
 });

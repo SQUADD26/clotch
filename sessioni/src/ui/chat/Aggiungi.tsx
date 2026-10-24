@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Menu, type VoceMenu } from "../base/Menu";
 import { numero } from "../base/token";
+import { NomeSopra } from "./Chip";
 import { casella } from "./percorsi";
 import type { SkillNome } from "../../tipi";
 
@@ -32,8 +33,10 @@ export function Aggiungi({ account, disabilitata, aperto, onApri, onChiudi, alle
   ];
   return (
     <span className="aggiungi">
-      <BottoneIcona icona="piu" etichetta="Aggiungi" disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
-        onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
+      <NomeSopra testo="Aggiungi">
+        <BottoneIcona icona="piu" etichetta="Aggiungi" title={undefined} disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
+          onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
+      </NomeSopra>
       {aperto && <Menu voci={voci} lato="sopra" scarto={numero("spazio-2")} classe="menu-aggiungi" onChiudi={onChiudi} />}
     </span>
   );

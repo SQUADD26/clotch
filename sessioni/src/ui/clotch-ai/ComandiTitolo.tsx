@@ -11,7 +11,7 @@ import { useAvvisoNotch } from "./avvisoNotch";
 import { useEscChiude } from "../base/layout";
 import { useNavigazione } from "../base/navigazione";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
-import { plurale } from "./Intestazione";
+import { plurale } from "../base/formato";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
 import { Sovrapposto } from "../base/Sovrapposto";
 

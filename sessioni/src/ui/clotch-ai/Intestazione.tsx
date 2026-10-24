@@ -1,6 +1,7 @@
 // figma: 101-35494 — «intestazione» delle viste clotch AI: icona e titolo, riga di stato (testi dai frame 101-35494, 35803,
 // 36010, 36225, 37696, 38897, 39266, 40267, 40473, 41628, 41834, 42000, 42245).
 import { Icona, type NomeIcona } from "../base/Icona";
+import { plurale } from "../base/formato";
 import { useNavigazione } from "../base/navigazione";
 import { useAvvio, useRegistro } from "./dati";
 import { useVoce as useStatoVoce } from "./Voce";
@@ -12,7 +13,6 @@ import { useVoce } from "./dettatura";
 type Colore = "secondaria" | "accento" | "successo" | "errore";
 interface Testa { icona: NomeIcona; accento?: boolean; titolo: string; segno?: [NomeIcona, Colore]; stato: string }
 
-export const plurale = (n: number, uno: string, tanti: string) => `${n} ${n === 1 ? uno : tanti}`;
 
 const SEGNO_CLOTCH_AI: Record<string, [NomeIcona, Colore]> = { attiva: ["microfono", "successo"], spenta: ["avviso", "errore"], pausa: ["luna", "secondaria"] };
 

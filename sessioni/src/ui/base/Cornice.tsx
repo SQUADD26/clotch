@@ -38,23 +38,23 @@ function Corpo() {
   useEscChiude(n.sovrapposta && n.barraAperta, n.alternaBarra);
   useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
   const attributi = { ref: corpo, inert: useAvvio() || undefined, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
-  if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
+  if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni" centro><Impostazioni /></Pezzo></div>;
   const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
   const fissa = n.barraAperta && !n.sovrapposta;
   return (
     <>
       <div className="corpo" {...attributi}>
-        {fissa && <nav className="barra-laterale"><Pezzo nome="barra"><Barra /></Pezzo></nav>}
+        {fissa && <nav className="barra-laterale"><Pezzo nome="barra" centro><Barra /></Pezzo></nav>}
         {fissa && <ManigliaBarra corpo={corpo} {...barra} />}
-        <main className="area-principale">
+        <main className="area-principale" tabIndex={-1}>
           <div className="superficie">
             {clotchAi ? <Pezzo nome="clotch-ai"><IntestazioneClotchAi /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
             <div className="contenuto" ref={contenuto}>
               <div className="colonna" ref={colonna}>
-                {clotchAi ? <Pezzo nome="clotch-ai"><ClotchAi /></Pezzo> : <Pezzo nome="chat"><Chat /></Pezzo>}
+                {clotchAi ? <Pezzo nome="clotch-ai" centro><ClotchAi /></Pezzo> : <Pezzo nome="chat" centro><Chat /></Pezzo>}
                 <AreaAvvisi />
               </div>
-              {!clotchAi && n.vista !== "nuova-sessione" && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
+              {!clotchAi && n.vista !== "nuova-sessione" && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello" centro><Pannello /></Pezzo></aside>}
             </div>
           </div>
         </main>
@@ -63,7 +63,7 @@ function Corpo() {
       {n.sovrapposta && n.barraAperta && (
         <>
           <div className="velo-barra" onClick={n.alternaBarra} />
-          <nav className="barra-laterale sopra"><Pezzo nome="barra"><Barra /></Pezzo></nav>
+          <nav className="barra-laterale sopra"><Pezzo nome="barra" centro><Barra /></Pezzo></nav>
         </>
       )}
     </>
@@ -87,5 +87,5 @@ export function Cornice() {
 
 /** Superficie con bordo, come «Superficie» del frame: per i pezzi che disegnano una pagina intera (impostazioni). */
 export function Superficie({ children }: { children: React.ReactNode }) {
-  return <div className="area-principale"><div className="superficie">{children}</div></div>;
+  return <div className="area-principale" tabIndex={-1}><div className="superficie">{children}</div></div>;
 }

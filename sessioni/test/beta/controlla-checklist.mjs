@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = fileURLToPath(new URL('./checklist/', import.meta.url));
-const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-testi': 'CTX', 'cerca-temi': 'CTE', 'cerca-modello-coda': 'CMC', 'cerca-markdown': 'CMD', 'cerca-casella': 'CCA', 'cerca-allegati': 'CAL', 'cerca-pannello': 'CPA', 'cerca-avvio-stati': 'CAS', 'cerca-filtri': 'CFI', 'cerca-ferma-tutto': 'CFT', 'cerca-menu-sessione': 'CMS' };
+const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-richieste': 'CRI', 'cerca-testi': 'CTX', 'cerca-temi': 'CTE', 'cerca-modello-coda': 'CMC', 'cerca-markdown': 'CMD', 'cerca-casella': 'CCA', 'cerca-allegati': 'CAL', 'cerca-pannello': 'CPA', 'cerca-avvio-stati': 'CAS', 'cerca-filtri': 'CFI', 'cerca-ferma-tutto': 'CFT', 'cerca-menu-sessione': 'CMS', 'cerca-nuova-sessione': 'CNS' };
 FAMIGLIE['cerca-intestazione'] = 'CIN';
 FAMIGLIE['cerca-dialoghi'] = 'CDI';
 FAMIGLIE['cerca-account'] = 'CAC';
@@ -15,6 +15,7 @@ const GRAVITA = ['bloccante', 'alta', 'media', 'bassa'], PROVA = ['auto', 'occhi
 FAMIGLIE['cerca-tastiera'] = 'CTS';
 FAMIGLIE['cerca-icona-viadalmac'] = 'CIV';
 FAMIGLIE['cerca-voce'] = 'CVO';
+FAMIGLIE['cerca-impostazioni-3'] = 'CI3';
 // parole di gusto: «vedi» dice un sì/no che si osserva, mai un giudizio
 const GUSTO = /\b(bell[oaie]|brutt[oaie]|piacevol\w*|adeguat\w*|sembr\w*|elegant\w*|curat\w*|fluid[oaie]|naturale|intuitiv\w*|ragionevol\w*|opportun\w*|buon[oaie])\b/i;
 const opt = (k) => (process.argv.includes(k) ? process.argv[process.argv.indexOf(k) + 1] : undefined);
