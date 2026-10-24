@@ -1,7 +1,7 @@
 /* figma: 101-24069 — «tooltip» 101:24123 e «tasto» 101:24125 */
 .con-tooltip { position: relative; display: inline-flex; }
 .tooltip {
-  position: absolute; top: calc(100% + var(--spazio-1-5)); left: calc(-1 * var(--spazio-2)); z-index: 20; pointer-events: none;
+  pointer-events: none;
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1) var(--spazio-2); white-space: nowrap;
   border-radius: var(--raggio-md); background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);

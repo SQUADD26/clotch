@@ -1,7 +1,9 @@
 // figma: 101-21010 — «menu sessione»: voci con icona, scorciatoia e separatori; testata del «menu profilo» 101-21498;
-// voce pericolo rossa con la sua icona (101-21348); voci con scelta fatta, spunta a sinistra (101-32999). Esc o clic fuori chiudono.
-import { useEffect, useRef, type CSSProperties } from "react";
+// voce pericolo rossa con la sua icona (101-21348); voci con scelta fatta, spunta a sinistra (101-32999). Galleggia con base/Sovrapposto:
+// sopra a tutto, accanto a chi lo apre, dentro la finestra; Esc o clic fuori chiudono e il fuoco torna al bottone.
+import { useEffect, useState } from "react";
 import { Icona, type NomeIcona } from "./Icona";
+import { Sovrapposto, type Ancora, type Lato } from "./Sovrapposto";
 import "./menu.css";
 
 export type VoceMenu =
@@ -16,31 +18,38 @@ interface Props {
   onChiudi(): void;
   /** «intestazione menu»: nome e dettaglio in cima, poi un separatore. */
   testata?: { titolo: string; dettaglio?: string };
-  style?: CSSProperties;
+  /** Assente: sotto il contenitore del bottone che lo apre (vedi Sovrapposto). */
+  ancora?: Ancora;
+  lato?: Lato;
+  /** Allineato a destra del bottone. */
+  fine?: boolean;
+  scarto?: number;
+  /** Classe in più per il CSS del pezzo che lo apre. */
+  classe?: string;
   /** Voce che ha il fuoco all'apertura, se nessuna è scelta (di serie la prima). Conta solo le voci, non i separatori. */
   inizio?: number;
 }
 
-export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
+export function Menu({ voci, onChiudi, testata, ancora, lato, fine, scarto, classe, inizio = 0 }: Props) {
   const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
-  const ref = useRef<HTMLDivElement>(null);
+  // il contenuto arriva al secondo giro (Sovrapposto aspetta di sapere dove sta): l'effetto parte quando c'è
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
+    if (!el) return;
+    (el.querySelector<HTMLButtonElement>("button.scelta") ?? el.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
     const tasto = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onChiudi();
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      const b = [...(ref.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Home" && e.key !== "End") return;
+      const b = [...el.querySelectorAll<HTMLButtonElement>("button")];
       const i = b.indexOf(document.activeElement as HTMLButtonElement);
-      b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
+      b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
-    const fuori = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) onChiudi(); };
-    addEventListener("keydown", tasto);
-    addEventListener("mousedown", fuori);
-    return () => { removeEventListener("keydown", tasto); removeEventListener("mousedown", fuori); };
-  }, [onChiudi]);
+    el.addEventListener("keydown", tasto);
+    return () => el.removeEventListener("keydown", tasto);
+  }, [el]);
   return (
-    <div ref={ref} className="menu" role="menu" style={style}>
+    <Sovrapposto ancora={ancora} lato={lato} fine={fine} scarto={scarto} className={classe ? `menu ${classe}` : "menu"} role="menu" onChiudi={onChiudi}>
+      <div ref={setEl} className="voci-menu">
       {testata && (
         <>
           <div className="testata">
@@ -62,6 +71,7 @@ export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
             {v.scorciatoia && <span className="t-sm secondario">{v.scorciatoia}</span>}
           </button>
         ))}
-    </div>
+      </div>
+    </Sovrapposto>
   );
 }

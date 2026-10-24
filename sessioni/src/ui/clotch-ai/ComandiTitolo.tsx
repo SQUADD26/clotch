@@ -12,6 +12,7 @@ import { useNavigazione } from "../base/navigazione";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
 import { plurale } from "./Intestazione";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
+import { Sovrapposto } from "../base/Sovrapposto";
 
 // Ore fisse del disegno: «Fino alle 18:00»; «Fino a domani mattina» = domani alle 8:00 (decisione della master, #352).
 const ORA_SERA = 18, ORA_MATTINA = 8;
@@ -56,7 +57,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
     ["nascondi", "Finché non lo tolgo", { fino: null }],
   ];
   return (
-    <div className="menu" role="menu">
+    <Sovrapposto fine className="menu" role="menu" onChiudi={onChiudi}>
       <div className="titolo-menu t-xs medio secondario">Non disturbare</div>
       {voci.map(([icona, etichetta, args]) => (
         <button key={etichetta} type="button" role="menuitem" className="voce" onClick={() => metti(args)}>
@@ -68,7 +69,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
       <div className="nota-menu t-sm secondario">
         {clotch ? "Vale anche per clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
       </div>
-    </div>
+    </Sovrapposto>
   );
 }
 

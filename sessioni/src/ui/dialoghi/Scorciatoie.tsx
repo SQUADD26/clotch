@@ -1,22 +1,18 @@
 // figma: 101-22186 — «Dialogo: scorciatoie da tastiera»: titolo con chiudi, ricerca, due colonne di gruppi con i tasti.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Campo } from "../base/Campo";
 import { chiudiDialogo } from "../base/dialoghi";
 import { Icona } from "../base/Icona";
+import { Velo } from "../base/Sovrapposto";
 import { useImpostazioni } from "../impostazioni/stato";
 import { filtra } from "./elenco";
 
 export function DialogoScorciatoie() {
   const [q, setQ] = useState("");
   const { scorciatoie } = useImpostazioni();
-  useEffect(() => {
-    const tasto = (e: KeyboardEvent) => { if (e.key === "Escape") chiudiDialogo(); };
-    addEventListener("keydown", tasto);
-    return () => removeEventListener("keydown", tasto);
-  }, []);
   const gruppi = filtra(scorciatoie, q);
   return (
-    <div className="velo alto" onMouseDown={(e) => { if (e.target === e.currentTarget) chiudiDialogo(); }}>
+    <Velo className="alto" onChiudi={chiudiDialogo}>
       <div className="dialogo largo" role="dialog" aria-modal="true" aria-label="Scorciatoie da tastiera">
         <div className="testata">
           <div className="t-lg medio">Scorciatoie da tastiera</div>
@@ -48,6 +44,6 @@ export function DialogoScorciatoie() {
           </div>
         )}
       </div>
-    </div>
+    </Velo>
   );
 }

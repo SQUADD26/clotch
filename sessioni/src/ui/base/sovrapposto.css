@@ -1,0 +1,29 @@
+/* figma: 101-20859 — livelli, posto e movimento comuni di menu, popover, tooltip, dialoghi e ricerca (base/Sovrapposto.tsx, #519) */
+/* shortcut: livelli e curve scritti qui finché il file Figma non ha `livello/*` e `curva/*` (chiesti a «🎨 Figma: Clotch movimento e livelli», #528);
+   quando arrivano in tokens.json e `npm run token` li mette in token.css, questo blocco si toglie. */
+:root {
+  --livello-sopra: 1; --livello-barra-sovrapposta: 10; --livello-velo: 20; --livello-menu: 30; --livello-tooltip: 40; --livello-avviso: 50;
+  --curva-entrata: cubic-bezier(0.2, 0, 0, 1); --curva-uscita: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.sovrapposto { position: fixed; z-index: var(--livello-menu); }
+.sovrapposto[role="tooltip"] { z-index: var(--livello-tooltip); }
+.velo { z-index: var(--livello-velo); }
+
+/* entrata dal lato del bottone, uscita più rapida; con «riduci movimento» solo dissolvenza */
+.sovrapposto, .velo > * { animation: sovrapposto-entra var(--tempo-normale) var(--curva-entrata) both; }
+.velo { animation: sovrapposto-dissolvi var(--tempo-normale) var(--curva-entrata) both; }
+.sovrapposto.esce, .velo.esce > * { animation: sovrapposto-entra var(--tempo-breve) var(--curva-uscita) reverse both; pointer-events: none; }
+.velo.esce { animation: sovrapposto-dissolvi var(--tempo-breve) var(--curva-uscita) reverse both; pointer-events: none; }
+.sovrapposto { --da-x: 0px; --da-y: calc(-1 * var(--spazio-1)); }
+.sovrapposto[data-lato="sopra"] { --da-y: var(--spazio-1); }
+.sovrapposto[data-lato="destra"] { --da-x: calc(-1 * var(--spazio-1)); --da-y: 0px; }
+.velo > * { --da-x: 0px; --da-y: var(--spazio-2); }
+@keyframes sovrapposto-entra { from { opacity: 0; transform: translate(var(--da-x), var(--da-y)); } }
+@keyframes sovrapposto-dissolvi { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .sovrapposto, .velo > *, .sovrapposto.esce, .velo.esce > * { animation-name: sovrapposto-dissolvi; }
+}
+/* la prova di parità fotografa lo stato fermo */
+.parita .sovrapposto, .parita .velo, .parita .velo > * { animation: none; }
+.parita .esce { display: none; }

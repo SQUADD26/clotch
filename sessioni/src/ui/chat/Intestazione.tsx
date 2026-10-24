@@ -45,7 +45,7 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
         {/* «menu sessione» sotto il «…» (101:20859): le stesse voci della riga nella barra */}
         <div className="con-menu">
           <BottoneIcona icona="altro" etichetta="Altro" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((x) => !x)} />
-          {menu && <Menu voci={vociMenuSessione(s, pref)} onChiudi={() => setMenu(false)} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }} />}
+          {menu && <Menu voci={vociMenuSessione(s, pref)} onChiudi={() => setMenu(false)} fine />}
         </div>
       </div>
     </div>

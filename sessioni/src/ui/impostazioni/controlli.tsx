@@ -57,7 +57,7 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
         <Icona nome="giu" />
       </button>
       {aperta && voci && (
-        <Menu onChiudi={chiudi} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }}
+        <Menu onChiudi={chiudi} fine classe="menu-scelta"
           voci={voci.map((v) => ({ etichetta: v, scorciatoia: dettagli?.[v], scelta: v === valore, fai: () => onScegli?.(v) }))} />
       )}
     </div>

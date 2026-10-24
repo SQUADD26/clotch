@@ -1,8 +1,10 @@
 // figma: 101-26140 — «chip permessi» 101:24819, «contesto» 101:24825 con «tooltip» 101:26425, «menu permessi» 101:26398;
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { PreferenzeSessione, Sessione } from "../../tipi";
 import { api } from "../base/dati";
 import { Icona } from "../base/Icona";
+import { Sovrapposto } from "../base/Sovrapposto";
+import { numero } from "../base/token";
 import { comanda } from "./clotch-ai";
 import { impostazioneMotore, PERMESSI, permessiDi, percentoContesto, type Scelta } from "./scelte";
 import "./scelte.css";
@@ -11,31 +13,31 @@ import "./scelte.css";
 export type Imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>, base?: string) => void;
 export type Dati = { s: Pick<Sessione, "modello" | "permessi" | "contesto">; p?: PreferenzeSessione };
 
-/** Un chip che apre il suo menu sopra di sé. Esc o un clic fuori lo chiudono; le frecce passano da una voce all'altra. */
+/** Un chip che apre il suo menu sopra di sé (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al chip); le frecce passano da una voce all'altra. */
 export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, children }: {
   aperto: boolean; onAperto(a: boolean): void; lato: "sinistra" | "destra"; etichetta: string; disabled?: boolean; chip: ReactNode; children: ReactNode;
 }) {
-  const ref = useRef<HTMLSpanElement>(null);
+  const [menu, setMenu] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (!aperto) return;
-    const voci = () => [...(ref.current?.querySelectorAll<HTMLButtonElement>(".menu-casella button") ?? [])];
+    if (!menu) return;
+    const voci = () => [...menu.querySelectorAll<HTMLButtonElement>("button")];
     (voci().find((b) => b.classList.contains("scelta")) ?? voci()[0])?.focus();
     const tasto = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onAperto(false); ref.current?.querySelector<HTMLButtonElement>("button.chip")?.focus(); }
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
       const b = voci(), i = b.indexOf(document.activeElement as HTMLButtonElement);
       b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
-    const fuori = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) onAperto(false); };
-    addEventListener("keydown", tasto);
-    addEventListener("mousedown", fuori);
-    return () => { removeEventListener("keydown", tasto); removeEventListener("mousedown", fuori); };
-  }, [aperto]);
+    menu.addEventListener("keydown", tasto);
+    return () => menu.removeEventListener("keydown", tasto);
+  }, [menu]);
   return (
-    <span ref={ref} className="chip-menu">
+    <span className="chip-menu">
       <button type="button" className="chip" aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
-      {aperto && <div className={`menu-casella flottante ${lato}`} role="menu">{children}</div>}
+      {aperto && (
+        <Sovrapposto lato="sopra" fine={lato === "destra"} scarto={numero(lato === "destra" ? "spazio-1" : "spazio-2")} className={`menu-casella flottante ${lato}`} role="menu"
+          rif={setMenu} onChiudi={() => onAperto(false)}>{children}</Sovrapposto>
+      )}
     </span>
   );
 }

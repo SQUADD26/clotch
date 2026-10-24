@@ -22,7 +22,7 @@
 
 /* comandi con «/» e file con «@»: sopra la casella, larghi quanto lei */
 .pezzo-chat .menu-casella.suggerimenti {
-  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: 3; overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
+  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: calc(var(--livello-sopra) + 1); overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
 }
 .pezzo-chat .suggerimenti .comando { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
 .pezzo-chat .suggerimenti .comando + .descrizione { margin-left: var(--spazio-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -34,9 +34,9 @@
 
 /* chip che apre un menu sopra di sé: permessi a sinistra del chip, modello a destra */
 .pezzo-chat .chip-menu { position: relative; display: inline-flex; }
-.pezzo-chat .menu-casella.flottante { position: absolute; bottom: calc(100% + var(--spazio-2)); z-index: 4; }
-.pezzo-chat .menu-casella.flottante.sinistra { left: 0; width: var(--misura-menu-permessi); }
-.pezzo-chat .menu-casella.flottante.destra { right: 0; bottom: calc(100% + var(--spazio-1)); width: var(--misura-menu-modello); }
+/* posto sopra il chip: base/Sovrapposto (permessi a sinistra, staccato spazio-2; modello a destra, staccato spazio-1) */
+.pezzo-chat .menu-casella.flottante.sinistra { width: var(--misura-menu-permessi); }
+.pezzo-chat .menu-casella.flottante.destra { width: var(--misura-menu-modello); }
 .pezzo-chat .casella button.chip:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
 
 /* contesto usato: il suggerimento sta sopra il chip, poco staccato dal bordo della casella */

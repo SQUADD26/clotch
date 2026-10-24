@@ -4,7 +4,7 @@ import type { PreferenzeSessione } from "../../tipi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { COLORI_SESSIONE as COLORI, IconaSessione } from "../base/IconaSessione";
-import { Sovrapposto, type Punto } from "./Sovrapposti";
+import { Sovrapposto, type Ancora } from "../base/Sovrapposto";
 import "./scelta-icona.css";
 
 const ICONE: NomeIcona[] = [
@@ -14,11 +14,11 @@ const ICONE: NomeIcona[] = [
 
 type Parte = { [K in keyof PreferenzeSessione]?: PreferenzeSessione[K] | null };
 
-export function SceltaIcona({ a, pref, onImposta, onChiudi }: { a: Punto; pref?: PreferenzeSessione; onImposta(p: Parte): void; onChiudi(): void }) {
+export function SceltaIcona({ a, pref, onImposta, onChiudi }: { a: Ancora; pref?: PreferenzeSessione; onImposta(p: Parte): void; onChiudi(): void }) {
   const [q, setQ] = useState("");
   const colore = pref?.colore ?? "grigio";
   return (
-    <Sovrapposto a={a} className="scelta-icona" onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="scelta-icona" onChiudi={onChiudi}>
       <label className="cerca-icone">
         <Icona nome="cerca" />
         <input placeholder="Cerca icone" value={q} autoFocus onChange={(e) => setQ(e.target.value)} />

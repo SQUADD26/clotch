@@ -32,7 +32,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
           <span className="con-menu al-passaggio">
             <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
             {menu && (
-              <Menu onChiudi={() => setMenu(false)} style={{ bottom: "100%", left: 0 }} voci={[
+              <Menu onChiudi={() => setMenu(false)} lato="sopra" scarto={0} voci={[
                 { icona: "copia", etichetta: "Copia testo", fai: () => copia(senzaMarkdown(testo)) },
                 { icona: "file", etichetta: "Copia come Markdown", fai: () => copia(testo) },
                 { icona: "microfono", etichetta: "Leggi con clotch AI", fai: leggi },
