@@ -61,7 +61,9 @@ export function Attivita() {
         <Sovrapposto ancora={punto()} className={n ? "popover-attivita con-sessioni" : "popover-attivita"} role="dialog" label="Attività" onChiudi={() => setAperto(false)}>
           <div className="testata">
             <span className="medio">Attività</span>
-            <BottoneIcona icona="chiudi" etichetta="Chiudi" className="chiudi-popover" onClick={() => setAperto(false)} />
+            <Suggerimento testo="Chiudi" lato="sopra" allinea="centro">{/* sopra il popover, mai sulla testata */}
+              <BottoneIcona icona="chiudi" etichetta="Chiudi" title={undefined} className="chiudi-popover" onClick={() => setAperto(false)} />
+            </Suggerimento>
           </div>
           {attesa === "carica" ? <div className="riga-stato t-sm secondario"><Icona nome="spinner" colore="secondaria" gira />Leggendo il registro…</div>
             : attesa === "errore" ? (
