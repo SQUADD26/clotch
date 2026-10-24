@@ -198,6 +198,28 @@ app.whenReady().then(async () => {
       await invio();
       await attendi(() => comandi.some((c) => c.cmd === 'macchina_aggiungi'));
     });
+    await check('TASTIERA_MENU_MAC_FRECCIA_DESTRA_SINISTRA_HOME_FINE_E_NOMI', async () => {
+      await load('vuota');
+      await clicca('.selettore', 'Questo computer');
+      await wait(() => !!document.querySelector('.menu-avvio'));
+      const tasto = (key) => run((key) => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })), key);
+      const fuoco = () => run(() => document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 30));
+      await run(() => [...document.querySelectorAll('.menu-avvio .voce')].find((e) => e.textContent.trim() === 'Cloud').focus());
+      await tasto('End');
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'SSH', 'Fine va all’ultima voce attiva (Crea ambiente è spenta)');
+      await tasto('Home');
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'Questo computer');
+      await run(() => [...document.querySelectorAll('.menu-avvio .voce')].find((e) => e.textContent.trim() === 'SSH').focus());
+      assert.equal(await run(() => document.activeElement.getAttribute('aria-expanded')), 'false');
+      await tasto('ArrowRight');
+      await wait(() => !!document.querySelector('.menu-ssh') && document.activeElement.closest('.menu-ssh'));
+      assert.equal(await fuoco(), 'rise, roberto@rise', 'il nome per VoiceOver è nome e utente, senza il suggerimento');
+      await tasto('ArrowDown');
+      assert.equal(await fuoco(), 'worker, roberto@worker');
+      await tasto('ArrowLeft');
+      await wait(() => !document.querySelector('.menu-ssh'));
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'SSH', '← chiude il pannello e il fuoco torna su SSH');
+    });
     await check('LOGIN_MANCANTE_COMANDO_DA_COPIARE_E_HO_FATTO_RIPROVA', async () => {
       await load('vuota');
       await apriMenuSsh();
