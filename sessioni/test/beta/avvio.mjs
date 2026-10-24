@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { _electron } from 'playwright';
-import { prendiPosto } from '../../scripts/posti.mjs';
+import { aspettaPosto } from '../../scripts/posti.mjs';
 
 export const RADICE = fileURLToPath(new URL('../../', import.meta.url));
 // sandbox senza GTK di sistema: le librerie estratte stanno qui (in CI ci sono già)
@@ -83,8 +83,8 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
 }
 
 const pausa = (ms) => new Promise((ok) => setTimeout(ok, ms));
-let libera = () => {};
-for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { libera(); process.exit(130); });
+// i posti presi si liberano all'uscita (scripts/posti.mjs)
+for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => process.exit(130));
 
 /** Senza DISPLAY (sandbox, CI) avvia un Xvfb proprio su un numero libero (-displayfd) e lo chiude all'uscita. */
 export async function schermo() {
@@ -99,7 +99,7 @@ export async function schermo() {
 /** Lancia l'app sulla scena; torna { app, pagina, chiudi }. `video`: cartella dove Playwright registra la finestra. */
 export async function avvia(fileScena, { video } = {}) {
   for (const f of ['dist/src/main.js', 'renderer/index.html']) if (!existsSync(join(RADICE, f))) throw new Error(`Manca ${f}: prima npm ci e npm run build.`);
-  libera = prendiPosto();
+  const libera = await aspettaPosto();
   const home = mkdtempSync(join(tmpdir(), 'clotch-beta-'));
   cpSync(join(RADICE, 'test/fixtures/home'), home, { recursive: true });
   try {

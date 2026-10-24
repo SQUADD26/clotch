@@ -145,27 +145,20 @@ async function giro(app, area, cfg, console_) {
 
 await schermo();
 mkdirSync(OUT, { recursive: true });
-const sommario = [];
-for (const area of aree) {
-  // un avvio per scena (dati, testo lungo); tema, misura e movimento ridotto cambiano sulla stessa finestra
-  const gruppi = Object.values(Object.groupBy(CONFIG, (c) => `${c.dati}-${c.lungo}`));
-  for (const g of gruppi) {
-    const scena = preparaScena(area, g[0], OUT);
-    const app = await avvia(scena, { video: VIDEO && join(OUT, area, 'video', `${g[0].dati}${g[0].lungo ? '-lungo' : ''}`) });
-    const console_ = [];
-    app.pagina.on('console', (m) => m.type() === 'error' && console_.push(m.text()));
-    app.pagina.on('pageerror', (e) => console_.push('pageerror: ' + e.message));
-    await app.pagina.addInitScript({ path: new URL('./sonde.js', import.meta.url).pathname });
-    try {
-      for (const cfg of g) {
-        const r = await giro(app, area, cfg, console_);
-        const per = {}; r.difetti.forEach((d) => (per[d.criterio] = (per[d.criterio] ?? 0) + 1));
-        sommario.push({ area, config: r.nome, cliccati: r.cliccati, foto: r.foto, difetti: per });
-        console.log(`${area} ${r.nome}: ${r.cliccati} elementi cliccati, ${r.foto} foto, difetti ${JSON.stringify(per)}`);
-      }
-    } finally { await app.chiudi(); }
-  }
-}
+// ogni (area, combinazione) con la sua app, tutte insieme: quante girano davvero lo decidono i posti (scripts/posti.mjs)
+const sommario = await Promise.all(aree.flatMap((area) => CONFIG.map(async (cfg) => {
+  const app = await avvia(preparaScena(area, cfg, OUT), { video: VIDEO && join(OUT, area, 'video', nome(cfg)) });
+  const console_ = [];
+  app.pagina.on('console', (m) => m.type() === 'error' && console_.push(m.text()));
+  app.pagina.on('pageerror', (e) => console_.push('pageerror: ' + e.message));
+  await app.pagina.addInitScript({ path: new URL('./sonde.js', import.meta.url).pathname });
+  try {
+    const r = await giro(app, area, cfg, console_);
+    const per = {}; r.difetti.forEach((d) => (per[d.criterio] = (per[d.criterio] ?? 0) + 1));
+    return { area, config: r.nome, cliccati: r.cliccati, foto: r.foto, difetti: per };
+  } finally { await app.chiudi(); }
+})));
+sommario.forEach((s) => console.log(`${s.area} ${s.config}: ${s.cliccati} elementi cliccati, ${s.foto} foto, difetti ${JSON.stringify(s.difetti)}`));
 const N = sommario.reduce((a, s) => a + s.cliccati, 0), M = sommario.reduce((a, s) => a + s.foto, 0);
 writeFileSync(join(OUT, 'sommario.json'), JSON.stringify({ cliccati: N, foto: M, giri: sommario }, null, 1));
 console.log(`${N} elementi cliccati, ${M} foto`);
