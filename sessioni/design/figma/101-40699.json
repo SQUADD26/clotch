@@ -4726,6 +4726,58 @@
    "senza": []
   },
   {
+   "id": "167:93084",
+   "nome": "bottone Rimuovi",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 594,
+    "y": 551,
+    "w": 85,
+    "h": 32
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/errore",
+    "cornerRadius": "raggio/pieno",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "height": "misura/bottone-invio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I167:93084;101:22041",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 610,
+    "y": 557,
+    "w": 53,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Rimuovi",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "167:93086",
+   "nome": "spazio",
+   "tipo": "FRAME",
+   "box": {
+    "x": 687,
+    "y": 551,
+    "w": 119,
+    "h": 1
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
    "id": "101:40928",
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",

@@ -4087,9 +4087,9 @@
    "nome": "corpo",
    "tipo": "TEXT",
    "box": {
-    "x": 717.5,
+    "x": 732,
     "y": 305,
-    "w": 391,
+    "w": 362,
     "h": 18
    },
    "variabili": {
@@ -4098,7 +4098,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare.",
+   "testo": "Le scelte di clotch AI compaiono qui e si possono revocare.",
    "font": "SF Pro Regular"
   },
   {

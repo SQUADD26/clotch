@@ -4130,7 +4130,7 @@
    "box": {
     "x": 577,
     "y": 233,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4181,9 +4181,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 235,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4201,9 +4201,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 241,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4212,7 +4212,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4273,7 +4273,7 @@
    "box": {
     "x": 577,
     "y": 289,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4324,9 +4324,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 291,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4344,9 +4344,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 297,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4355,7 +4355,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4416,7 +4416,7 @@
    "box": {
     "x": 577,
     "y": 345,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4467,9 +4467,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 347,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4487,9 +4487,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 353,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4498,7 +4498,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4559,7 +4559,7 @@
    "box": {
     "x": 577,
     "y": 401,
-    "w": 525,
+    "w": 528,
     "h": 36
    },
    "variabili": {
@@ -4610,9 +4610,9 @@
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
-    "x": 1114,
+    "x": 1117,
     "y": 410,
-    "w": 163,
+    "w": 160,
     "h": 18
    },
    "variabili": {
@@ -4621,7 +4621,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Già su main: non si annulla",
+   "testo": "Già su main: non si revoca",
    "font": "SF Pro Regular"
   },
   {
@@ -4740,7 +4740,7 @@
    "box": {
     "x": 577,
     "y": 513,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4791,9 +4791,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 515,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4811,9 +4811,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 521,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4822,7 +4822,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
