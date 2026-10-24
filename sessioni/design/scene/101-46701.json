@@ -25,14 +25,14 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792845701983,
+    "battito": 1792845943310,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845701983,
+    "visto": 1792845943310,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -46,7 +46,7 @@
   "avvisi": [
    {
     "id": "a0",
-    "t": 1792845151983,
+    "t": 1792845393310,
     "testo": "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti: vuole lanciare la migrazione su dev.",
     "livello": "info",
     "motivo": "risposta",
@@ -55,7 +55,7 @@
    },
    {
     "id": "a1",
-    "t": 1792845191983,
+    "t": 1792845433310,
     "testo": "Fatto. La migrazione è partita; ti avviso quando finisce.",
     "livello": "info",
     "motivo": "risposta",
@@ -74,7 +74,7 @@
   "comandi": [
    {
     "id": "c0",
-    "t": 1792845131983,
+    "t": 1792845373310,
     "cmd": "parla",
     "da": "app",
     "args": {
@@ -83,7 +83,7 @@
    },
    {
     "id": "c1",
-    "t": 1792845171983,
+    "t": 1792845413310,
     "cmd": "parla",
     "da": "app",
     "args": {

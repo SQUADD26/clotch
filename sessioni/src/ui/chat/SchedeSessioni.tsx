@@ -65,7 +65,7 @@ function Riferimento({ x }: { x: Citata }) {
     <span className="con-scheda" onMouseEnter={() => setSopra(true)} onMouseLeave={() => setSopra(false)}>
       <button type="button" className="riferimento-sessione" onClick={() => n.apri("sessione", x.s.id)}>
         <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-        <span className="titolo">{x.s.titolo}</span>
+        <span className="titolo" title={x.s.titolo}>{x.s.titolo}</span>
         <SegnoStato stato={x.s.stato} />
       </button>
       {sopra && <SchedaSessione x={x} sospesa />}
