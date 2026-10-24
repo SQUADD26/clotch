@@ -47,12 +47,12 @@ export class Sessioni {
   }
 
   /** Come osserva(), ma la prima lettura (lenta) gira in un worker: il main resta libero. Se il worker fallisce si legge nel main, come prima. */
-  async osservaInWorker(cb: (a: Aggiornamento) => void, fileCache?: string) {
+  async osservaInWorker(cb: (a: Aggiornamento) => void, fileCache?: string, suAnteprima?: (e: Elenco) => void) {
     const imp = this.imp;
     try {
       const r = await new Promise<{ stato: StatoIniziale; claude: [string, any][]; altre: Parameters<typeof caricaCache>[0] }>((ok, no) => {
         const w = new Worker(path.join(__dirname, "avvio-worker.js"), { workerData: { home: this.home, env: { ...process.env }, imp, cache: fileCache } });
-        w.once("message", ok); w.once("error", no);
+        w.on("message", (m) => (m?.anteprima ? suAnteprima?.(m.anteprima) : ok(m))); w.once("error", no);
         w.once("exit", (c) => no(new Error(`worker d'avvio uscito (${c})`)));
       });
       for (const [k, v] of r.claude) cacheClaude.set(k, v);

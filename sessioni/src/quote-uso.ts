@@ -102,9 +102,10 @@ async function vociDi(file: string, st: { ino: number; size: number }): Promise<
 }
 
 /** Le quote del feed con `giorni` per ogni account (zeri se non ha trascrizioni); senza nessun uso nel periodo la serie manca e la scheda resta vuota. */
-export async function quoteConGiorni(radici: Radice[], ora = Date.now()): Promise<QuotaUso[]> {
+/** `contaGiorni`: chi conta i giorni; l'app lo fa fare al worker dei lavori (impostazioni.ts), i test qui. */
+export async function quoteConGiorni(radici: Radice[], ora = Date.now(), contaGiorni: typeof usoAlGiorno = usoAlGiorno): Promise<QuotaUso[]> {
   if (!(giorniCache && ora - giorniCache.quando < CACHE_MS)) giorniCache = null;
-  const [quote, uso] = await Promise.all([quoteUso(ora), giorniCache?.dati ?? usoAlGiorno(radici, ora)]);
+  const [quote, uso] = await Promise.all([quoteUso(ora), giorniCache?.dati ?? contaGiorni(radici, ora)]);
   giorniCache ??= { quando: ora, dati: uso };
   const vuota = [...uso.values()][0]?.map((g) => ({ ...g, v: 0 }));
   if (![...uso.values()].some((g) => g.some((x) => x.v))) return quote;

@@ -143,7 +143,12 @@ app.whenReady().then(() => {
       if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
       avvisa(a);
     };
-    await sessioni.osservaInWorker(raccogli, fileCache);
+    // primo avvio senza cache: l'anteprima del worker (ultime 24 ore) va subito alla finestra
+    await sessioni.osservaInWorker(raccogli, fileCache, (e) => {
+      if (pronto || inCache) return;
+      inCache = e;
+      BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", { sessioni: e.sessioni.map((s) => s.id), nuoviMessaggi: [] }));
+    });
     // dopo l'osservatore: da qui l'elenco è il suo
     avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();

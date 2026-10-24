@@ -84,7 +84,8 @@ export const toccata = (sporchi: string[], x: string) => sporchi.some((f) => toc
 const copie = (u: Map<string, Cartella>) => [...u.values()].flatMap((c) => c.sessioni.map((s) => ({ ...s })));
 
 /** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dall'ultima lettura. */
-export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: string[]): Sessione[] {
+/** `soloDopo` (anteprima d'avvio): i file mai letti e fermi da prima si saltano; la lettura vera viene dopo. */
+export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: string[], soloDopo?: number): Sessione[] {
   const progetti = progettiDi(radice.path), firmaRadice = `${radice.account}\0${radice.email}`;
   const u = sporchi && ultimi.get(progetti)?.radice === firmaRadice ? ultimi.get(progetti)!.cartelle : undefined;
   if (u && !toccata(sporchi!, progetti)) return copie(u);
@@ -115,6 +116,7 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: s
         let e = cache.get(file);
         if (!e || !u || sporchi!.some((f) => tocca(f, file))) {
           const st = fs.statSync(file);
+          if (!e && soloDopo && st.mtimeMs < soloDopo) continue;
           const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
           if (!e || e.chiave !== chiave) cache.set(file, e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) });
         }
@@ -128,6 +130,6 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: s
   }
   if (u) { for (const [d, c] of u) if (!cartelle.has(d)) c.file.forEach((f) => cache.delete(f)); } // cartelle sparite
   else sfoltisci(progetti, new Set([...cartelle.values()].flatMap((c) => c.file)));
-  if (errori.length === erroriPrima) ultimi.set(progetti, { radice: firmaRadice, cartelle }); // con errori si riprova al prossimo giro
+  if (errori.length === erroriPrima && !soloDopo) ultimi.set(progetti, { radice: firmaRadice, cartelle }); // con errori si riprova al prossimo giro
   return copie(cartelle);
 }

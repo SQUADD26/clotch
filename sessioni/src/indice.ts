@@ -126,17 +126,41 @@ export class Indice {
   // cache/messaggi e cache/immagini non esistono ancora: le useranno i pezzi che terranno messaggi o immagini sul disco
   private readonly cache: string[];
 
-  constructor(private dir: string, private attesaScritturaMs = 2000) {
+  /** `subito` = legge l'indice dal disco ora; l'app passa false e chiama `carica()` dopo la prima finestra (#474: migliaia di file letti prima della finestra ne ritardavano l'avvio). */
+  constructor(private dir: string, private attesaScritturaMs = 2000, subito = true) {
     this.file = path.join(dir, "indice.json");
     this.cartella = path.join(dir, "indice");
     this.cache = [path.join(dir, "cache", "messaggi"), path.join(dir, "cache", "immagini")];
     this.dati = {};
+    if (subito) this.leggiOra();
+  }
+
+  private leggiOra() {
     let nomi: string[] | null = null;
     try { nomi = fs.readdirSync(this.cartella).filter((n) => n.endsWith(".json")); } catch { /* prima volta */ }
     for (const n of nomi ?? []) {
       try { this.dati[decodeURIComponent(n.slice(0, -5))] = JSON.parse(fs.readFileSync(path.join(this.cartella, n), "utf8")); } catch { /* voce rotta: si rilegge la trascrizione */ }
     }
     if (!nomi && fs.existsSync(this.file)) { this.dati = leggiIndice(this.file); Object.keys(this.dati).forEach((id) => this.sporche.add(id)); }
+  }
+
+  /** Come la lettura del costruttore, ma a pezzi e senza fermare il main; le voci già messe nel frattempo restano. */
+  async carica(): Promise<void> {
+    const letti: DatiIndice = {};
+    let nomi: string[] | null = null;
+    try { nomi = (await fs.promises.readdir(this.cartella)).filter((n) => n.endsWith(".json")); } catch { /* prima volta */ }
+    for (let i = 0; i < (nomi?.length ?? 0); i += 64) {
+      await Promise.all(nomi!.slice(i, i + 64).map(async (n) => {
+        try { letti[decodeURIComponent(n.slice(0, -5))] = JSON.parse(await fs.promises.readFile(path.join(this.cartella, n), "utf8")); } catch { /* voce rotta: si rilegge la trascrizione */ }
+      }));
+    }
+    if (!nomi) {
+      try {
+        const d = JSON.parse(await fs.promises.readFile(this.file, "utf8")); // shortcut: il vecchio indice.json unico (una volta sola) si analizza in un colpo
+        if (d && typeof d === "object" && !Array.isArray(d)) { Object.assign(letti, d); Object.keys(d).forEach((id) => this.sporche.add(id)); }
+      } catch { /* niente indice vecchio */ }
+    }
+    this.dati = { ...letti, ...this.dati };
   }
 
   /** Mette in coda le sessioni da controllare; `tutte` = sono tutte le sessioni, le altre escono dall'indice. Si risolve a coda vuota. */
@@ -151,12 +175,30 @@ export class Indice {
     return p;
   }
 
+  /** Rilettura delle trascrizioni cambiate fuori dal main (worker di lavori.ts); senza, qui come prima (test, elenco-cli). */
+  private fuori: ((s: DaIndicizzare, v: Voce | null) => Promise<{ cambiata: boolean; v: Voce | null }>) | null = null;
+  lavoraFuori(f: NonNullable<Indice["fuori"]>) { this.fuori = f; }
+
   private passo() {
     const s = this.coda.values().next().value;
     if (!s) { this.inGiro = false; this.attese.splice(0).forEach((ok) => ok()); return; }
     this.coda.delete(s.id);
+    if (this.fuori && !this.invariata(s)) {
+      this.fuori(s, this.dati[s.id] ?? null).then((r) => {
+        if (!r.cambiata) return;
+        if (r.v) this.dati[s.id] = r.v; else delete this.dati[s.id];
+        this.daScrivere(s.id);
+      }, () => { /* file illeggibile: resta la voce di prima */ }).finally(() => setImmediate(() => this.passo()));
+      return;
+    }
     try { if (aggiornaVoce(this.dati, s, this.memo)) this.daScrivere(s.id); } catch { /* file illeggibile: resta la voce di prima */ }
     setImmediate(() => this.passo());
+  }
+
+  /** Stessa misura e stesso mtime della voce (o file sparito): il lavoro è poco e si fa qui. */
+  private invariata(s: DaIndicizzare): boolean {
+    const v = this.dati[s.id];
+    try { const st = fs.statSync(s.file); return !!v && v.mtime === st.mtimeMs && v.size === st.size; } catch { return true; }
   }
 
   private daScrivere(id: string) {

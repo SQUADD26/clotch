@@ -21,6 +21,7 @@ import { prova } from "./prova";
 import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
+import { APezzi } from "./APezzi";
 import { accanto, type Punto } from "./Sovrapposti";
 
 export type Aperto =
@@ -97,8 +98,8 @@ export default function Barra() {
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
   const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
   // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
-  const vivi = useRef({ apriSessione, pref });
-  vivi.current = { apriSessione, pref };
+  const vivi = useRef({ apriSessione, pref, alterna });
+  vivi.current = { apriSessione, pref, alterna };
   const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
@@ -146,15 +147,15 @@ export default function Barra() {
           ))}
           {!!barra.fissate.length && <><TitoloSezione>Fissate</TitoloSezione>{righe(barra.fissate, true)}</>}
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
-          {barra.gruppi.map((g) => vista.raggruppa === "cartella" ? (
+          <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
-              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
+              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
                 onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
-              {aperta(g.chiave) && <div className="sessioni-gruppo">{righe(g.sessioni)}</div>}
+              {aperta(g.chiave) && <div className="sessioni-gruppo"><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>}
             </div>
           ) : (
-            <div key={g.chiave} className="gruppo"><TitoloSezione>{g.titolo}</TitoloSezione>{righe(g.sessioni)}</div>
-          ))}
+            <div key={g.chiave} className="gruppo"><TitoloSezione>{g.titolo}</TitoloSezione><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>
+          ))} />
         </div>
       )}
 

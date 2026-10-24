@@ -23,7 +23,8 @@ export function TitoloSezione({ children }: { children: ReactNode }) {
   return <div className="riga titolo-sezione"><span className="testo t-sm secondario">{children}</span></div>;
 }
 
-export function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nome: string; conteggio: number; aperta: boolean; onClick(): void; onMenu(e: MouseEvent): void }) {
+/** Memo come RigaSessione: le funzioni non contano (Barra le fa chiamare sempre l'ultima versione). */
+export const RigaCartella = memo(function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nome: string; conteggio: number; aperta: boolean; onClick(): void; onMenu(e: MouseEvent): void }) {
   return (
     <button type="button" className="riga" aria-expanded={aperta} onClick={onClick} onContextMenu={onMenu}>
       <Icona nome={aperta ? "cartella-aperta" : "cartella"} />
@@ -31,7 +32,7 @@ export function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nom
       <span className="lato t-sm secondario">{conteggio}</span>
     </button>
   );
-}
+}, (a, b) => a.nome === b.nome && a.conteggio === b.conteggio && a.aperta === b.aperta);
 
 /** Segno all'inizio del titolo → icona (tabella 120:58483; ★ = stella arancione); senza scelta né segno: la stella argento di serie (101:12491). */
 const SEGNI: Record<string, [string, string?]> = {
