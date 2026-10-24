@@ -167,8 +167,12 @@ app.whenReady().then(async () => {
     });
     await check('CONTESTO_TOOLTIP', async () => {
       await load();
-      assert.equal(await run(() => document.querySelector('.con-suggerimento.contesto .chip').textContent.trim()), '62%');
-      assert.equal(await run(() => document.querySelector('.con-suggerimento.contesto .suggerimento').textContent), 'Contesto usato: 62%');
+      const chip = '.con-tooltip .chip[aria-label="Contesto usato: 62%"]'; // il suggerimento è un sovrapposto comune (#519): compare al passaggio
+      assert.equal(await run((c) => document.querySelector(c).textContent.trim(), chip), '62%');
+      await run((c) => document.querySelector(c).dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: document.body })), chip);
+      let testo = null;
+      for (let i = 0; i < 100 && testo !== 'Contesto usato: 62%'; i++) { await new Promise((r) => setTimeout(r, 20)); testo = await run(() => document.querySelector('.suggerimento[role=tooltip]')?.textContent ?? null); }
+      assert.equal(testo, 'Contesto usato: 62%');
     });
     await check('SEND_CARRIES_CHAT_MODEL', async () => {
       comandi.length = 0; esito = 'ok';
