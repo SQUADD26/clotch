@@ -10,13 +10,14 @@ const LIMITE = 120;
 export function DialogoRinomina({ titolo, valore, nota, salva }: DatiDialoghi["rinomina"]) {
   const [testo, setTesto] = useState(valore);
   const vuoto = !testo.trim();
-  const fai = () => { if (!vuoto) { salva(testo.trim()); chiudiDialogo(); } };
+  const lungo = testo.trim().length > LIMITE;
+  const fai = () => { if (!vuoto && !lungo) { salva(testo.trim()); chiudiDialogo(); } };
   return (
     <Dialogo titolo={titolo} onChiudi={chiudiDialogo}
-      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={vuoto} onClick={fai}>Salva</Bottone></>}>
-      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus maxLength={LIMITE} title={testo.length > 40 ? testo : undefined} aria-invalid={vuoto || undefined} onFocus={(e) => e.currentTarget.select()}
+      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={vuoto || lungo} onClick={fai}>Salva</Bottone></>}>
+      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus title={testo.length > 40 ? testo : undefined} aria-invalid={vuoto || lungo || undefined} onFocus={(e) => e.currentTarget.select()}
         onChange={(e) => setTesto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) fai(); }} />
-      <div className={vuoto ? "t-sm errore-ore" : "t-sm secondario"} role={vuoto ? "alert" : undefined}>{vuoto ? "Scrivi un nome." : nota}</div>
+      <div className={vuoto || lungo ? "t-sm errore-ore" : "t-sm secondario"} role={vuoto || lungo ? "alert" : undefined}>{vuoto ? "Scrivi un nome." : lungo ? `Il nome ha ${testo.trim().length} caratteri: al massimo ${LIMITE}.` : nota}</div>
     </Dialogo>
   );
 }

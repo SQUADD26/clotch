@@ -5,6 +5,7 @@ import { Campo } from "../base/Campo";
 import { api } from "../base/dati";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { Velo } from "../base/Sovrapposto";
+import { nomeAccount } from "../chat/testi";
 import { giorno, nomeSorgente } from "./elenco";
 import { IconaRiga } from "./Righe";
 import "./ricerca.css";
@@ -27,8 +28,20 @@ export async function copiaUltimoBlocco(id: string) {
 }
 
 /** «clotch-ai-mac-v2 · Codex»: l'account solo se non è il nome della sorgente (101:10247). */
-const dettaglio = (s: Sessione) =>
-  [s.progetto, nomeSorgente(s.sorgente), s.account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : s.account].filter(Boolean).join(" · ");
+const dettaglio = (s: Sessione) => {
+  const account = nomeAccount(s.account);
+  return [s.progetto, nomeSorgente(s.sorgente), account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : account].filter(Boolean).join(" · ");
+};
+
+/** La parola cercata in evidenza dentro un testo (#865): peso medio e colore primario. */
+function Evidenzia({ testo, parole }: { testo: string; parole: string }) {
+  const i = parole ? testo.toLowerCase().indexOf(parole) : -1;
+  if (i < 0) return <>{testo}</>;
+  return <>{testo.slice(0, i)}<mark className="trovato medio">{testo.slice(i, i + parole.length)}</mark>{testo.slice(i + parole.length)}</>;
+}
+
+/** Voci che saltano PagSu e PagGiù. */
+const PAGINA = 5;
 
 type Voce = { tipo: "sessione"; s: Sessione } | { tipo: "messaggio"; s: Sessione; r: RisultatoRicerca } | { tipo: "azione"; a: (typeof AZIONI)[number] };
 
@@ -51,10 +64,14 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
   const parole = q.trim().toLowerCase();
   // «Messaggi»: le sessioni che il main trova solo nel testo; i titoli si cercano qui, senza aspettarlo
   const [dalMain, setDalMain] = useState<RisultatoRicerca[]>([]);
+  const [cercando, setCercando] = useState(false);
+  const [fallita, setFallita] = useState(false);
   useEffect(() => {
     let vivo = true;
-    setDalMain([]);
-    if (parole) cerca(parole).then((r) => { if (vivo) setDalMain(r); }, () => {});
+    if (!parole) { setDalMain([]); setCercando(false); setFallita(false); return; }
+    setCercando(true);
+    // i risultati di prima restano finché non arrivano quelli nuovi: il gruppo non sparisce a ogni lettera (#869)
+    cerca(parole).then((r) => { if (vivo) { setDalMain(r); setFallita(false); setCercando(false); } }, () => { if (vivo) { setFallita(true); setCercando(false); } });
     return () => { vivo = false; };
   }, [parole]);
   const voci = useMemo<Voce[]>(() => {
@@ -84,6 +101,9 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       setI((x) => (x + (e.key === "ArrowDown" ? 1 : voci.length - 1)) % Math.max(voci.length, 1));
+    } else if (e.key === "PageDown" || e.key === "PageUp") {
+      e.preventDefault();
+      setI((x) => Math.min(Math.max(x + (e.key === "PageDown" ? PAGINA : -PAGINA), 0), Math.max(voci.length - 1, 0)));
     } else if (e.key === "Enter" && voci[i]) scegli(voci[i]);
   };
   const azioni = voci.filter((v) => v.tipo === "azione");
@@ -96,16 +116,16 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
         <Campo grande tasto="esc" placeholder="Cerca sessioni" value={q} autoFocus onChange={(e) => setQ(e.target.value)}
           role="combobox" aria-expanded aria-controls="ricerca-risultati" aria-activedescendant={voci[i] ? `ricerca-voce-${i}` : undefined} />
         <div ref={lista} className="risultati" id="ricerca-risultati" role="listbox" aria-label="Risultati">
-          {!voci.length && (
+          {!voci.length && !cercando && (
             <div className="nessun-risultato">
               <Icona nome="cerca" colore="terziaria" />
-              <span className="medio">Nessun risultato per «{q.trim()}»</span>
-              <span className="t-sm secondario">Prova con altre parole o togli un filtro.</span>
+              {parole ? <span className="medio testo-lungo">Nessun risultato per «{q.trim()}»</span> : <span className="medio">Ancora nessuna sessione</span>}
+              <span className="t-sm secondario">{parole ? "Prova con altre parole." : "Le sessioni che avvii appaiono qui."}</span>
             </div>
           )}
           {!!azioni.length && <div className="titolo-gruppo t-xs medio secondario">Azioni</div>}
           {azioni.map((v) => v.tipo === "azione" && (
-            <button key={v.a.azione} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.a.azione} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <Icona nome={v.a.icona} />
               <span className="t-sm etichetta">{v.a.etichetta}</span>
               {v.a.scorciatoia && <span className="t-sm secondario">{v.a.scorciatoia}</span>}
@@ -113,22 +133,28 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           ))}
           {!!trovate.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Sessioni</span></div>}
           {trovate.map((v) => v.tipo === "sessione" && (
-            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
-                <span className="testo">{v.s.titolo}</span>
-                <span className="testo t-sm secondario">{dettaglio(v.s)}</span>
+                <span className="testo"><Evidenzia testo={v.s.titolo} parole={parole} /></span>
+                <span className="testo t-sm secondario"><Evidenzia testo={dettaglio(v.s)} parole={parole} /></span>
               </span>
               <span className="t-xs secondario">{giorno(v.s.ultimaAttivita, ora)}</span>
             </button>
           ))}
-          {!!messaggi.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Messaggi</span></div>}
+          {(!!messaggi.length || fallita || (cercando && !!parole)) && (
+            <div className="riga titolo-sezione">
+              <span className="testo t-sm secondario">Messaggi</span>
+              {cercando && <span className="t-xs secondario" role="status">Cerco nei messaggi…</span>}
+              {fallita && <span className="t-xs secondario" role="status">Ricerca nei messaggi non riuscita</span>}
+            </div>
+          )}
           {messaggi.map((v) => v.tipo === "messaggio" && (
-            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
-                <span className="testo">{v.s.titolo}</span>
-                <span className="testo t-sm secondario">{v.r.frammento.replace(/^…/, "… ").replace(/…$/, " …")}</span>
+                <span className="testo"><Evidenzia testo={v.s.titolo} parole={parole} /></span>
+                <span className="testo t-sm secondario"><Evidenzia testo={v.r.frammento.replace(/^…/, "… ").replace(/…$/, " …")} parole={parole} /></span>
               </span>
               <span className="t-xs secondario">{giorno(v.r.t ?? v.s.ultimaAttivita, ora)}</span>
             </button>

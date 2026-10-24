@@ -33,7 +33,7 @@ const wait = (fn, ...a) => win.webContents.executeJavaScript(`new Promise((ok, k
 const testo = (sel) => run((s) => document.querySelector(s)?.textContent ?? null, sel);
 const clicca = (sel, t) => run((sel, t) => { const el = [...document.querySelectorAll(sel)].find((e) => (e.textContent || '').includes(t)); if (!el) throw new Error('manca ' + sel + ' ' + t); el.click(); }, sel, t);
 // scenario: tipo di chat nel registro (null = nessuna chat), quote, sessione aperta o nuova
-const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno, quoteExtra = false }) => {
+const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno, quoteExtra = false, attesa = '.piede-account .uso-piede' }) => {
   scene.uso = quote(cinque);
   if (quoteExtra) scene.uso[3] = { ...scene.uso[3], cartelle: ['.claude'] }; // la quota di ~/.claude (il motore la chiama «default»)
   scene.registro = { ...scene.registro, chat: sorgente ? { s1: chat(sorgente, account) } : {} };
@@ -41,7 +41,8 @@ const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-acco
   scene.navigazione = nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' };
   comandi.length = 0;
   await win.loadFile(path.join(root, 'renderer/index.html'), { query: nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' } });
-  await wait(() => !!document.querySelector('.piede-account .uso-piede'));
+  // la funzione gira nella finestra: niente variabili di qui dentro
+  await (attesa === '.piede-account' ? wait(() => !!document.querySelector('.piede-account')) : wait(() => !!document.querySelector('.piede-account .uso-piede')));
 };
 const risultati = [];
 async function check(nome, fn) {
@@ -84,6 +85,14 @@ app.whenReady().then(async () => {
     await carica({ sorgente: 'motore', account: 'default', quoteExtra: true });
     const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
     assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
+  });
+
+  await check('#993 EMAIL INTERA: info@altro.ai non prende l\u2019uso di un altro «info»: il bottone dice che l\u2019uso non c\u2019è', async () => {
+    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-altro', email: 'dentalspace@altro.ai' } : x);
+    await carica({ sorgente: null, elenco: { ...elencoPieno, sessioni: app }, attesa: '.piede-account' });
+    await wait(() => document.querySelector('.piede-account')?.textContent.includes('Uso non disponibile'));
+    assert.equal(await run(() => document.querySelectorAll('.piede-account .uso-piede .testata').length), 0);
     await carica({ sorgente: 'motore' });
   });
 

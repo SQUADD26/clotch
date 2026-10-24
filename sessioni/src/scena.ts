@@ -82,7 +82,17 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "sessioni:preferenze": return s.preferenze ?? {};
     case "sessioni:info": return s.info?.[String(args[0])]; // senza `info` la scena non mostra file né contesto
     case "sessioni:impostazioni": return s.impostazioni ?? {};
-    case "sessioni:cerca": return [];
+    case "sessioni:cerca": { // la ricerca nel testo risponde coi messaggi della scena (#869)
+      const q = String(args[0] ?? "").toLowerCase();
+      return Object.entries(s.messaggi ?? {}).flatMap(([id, ms]) => {
+        const m = q ? ms.find((x) => "testo" in x && typeof x.testo === "string" && x.testo.toLowerCase().includes(q)) : undefined;
+        const testo = m && "testo" in m ? String(m.testo) : "";
+        const sessione = s.elenco?.sessioni.find((x) => x.id === id);
+        if (!m || !sessione) return [];
+        const i = testo.toLowerCase().indexOf(q);
+        return [{ id, titolo: sessione.titolo, frammento: `…${testo.slice(Math.max(0, i - 40), i + q.length + 40)}…`, t: sessione.ultimaAttivita, nelTitolo: false }];
+      });
+    }
     case "sessioni:comandi": return s.comandi ?? [];
     case "sessioni:modelli": return s.modelli ?? null;
     case "sessioni:file": return (s.file ?? []).filter((f) => f.toLowerCase().includes(String(args[1] ?? "").toLowerCase()));
