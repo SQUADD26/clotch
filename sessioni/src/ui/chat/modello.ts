@@ -87,16 +87,21 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
   messaggi.forEach((m, i) => {
     const fisica = identita?.[i]?.chiave;
     const chiave = fisica ? `fisico:${JSON.stringify([sessione, fisica])}` : `${i}-${m.t ?? ""}`;
-    const prima = new Set(turno?.blocchi);
+    // durante il giro i blocchi si aggiungono solo in coda e sono tutti nuovi di questa chiamata: si conta e si aggiunge sul posto,
+    // niente copie a ogni messaggio (con un turno di migliaia di tool call il filo costava O(n²) a ogni delta, #474)
+    const turnoPrima = turno, prima = turno?.blocchi.length ?? 0;
     elabora(m, i, chiave);
     if (!fisica || !turno) return;
-    turno.origini = [...(turno.origini ?? []), chiave];
-    for (const b of turno.blocchi) {
-      const aggregato = m.tipo === "strumento" && ((m.nome === "TodoWrite" && b.tipo === "attivita") ||
-        (["Agent", "Task"].includes(m.nome) && b.tipo === "aiutanti"));
-      if (!prima.has(b) || aggregato) {
+    (turno.origini ??= []).push(chiave);
+    // un TodoWrite o un aiutante si somma a un blocco già aperto: solo allora si guardano anche i blocchi vecchi
+    const somma = m.tipo === "strumento" && ["TodoWrite", "Agent", "Task"].includes(m.nome);
+    const blocchi = turno.blocchi;
+    for (let k = somma || turno !== turnoPrima ? 0 : prima; k < blocchi.length; k++) {
+      const b = blocchi[k];
+      const aggregato = somma && ((m.nome === "TodoWrite" && b.tipo === "attivita") || (m.nome !== "TodoWrite" && b.tipo === "aiutanti"));
+      if (k >= (turno === turnoPrima ? prima : 0) || aggregato) {
         b.chiave ??= `${chiave}:${b.tipo}`;
-        b.origini = [...(b.origini ?? []), chiave];
+        (b.origini ??= []).push(chiave);
       }
     }
   });

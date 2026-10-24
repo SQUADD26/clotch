@@ -1,6 +1,7 @@
 // Sessioni dell'app Claude desktop: ~/Library/Application Support/[Cc]laude*/claude-code-sessions/**/local_*.json
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { toccata } from "./claude-code";
 import { trovaFile } from "./jsonl";
 import { aMillisecondi } from "./registri";
 import { AppSessione, ErroreLettura, PrSessione } from "./tipi";
@@ -72,18 +73,30 @@ function daFile(file: string, profilo: string): SessioneApp | null | undefined {
   };
 }
 
-export function leggiApp(home: string, errori: ErroreLettura[]): SessioneApp[] {
+/** Ultima lettura per cartella di profilo: un giro che non la tocca la riusa senza cercare né controllare i file (#474). */
+let ultimiApp = new Map<string, { out: SessioneApp[]; voci: [string, { chiave: string; s: SessioneApp | null }][] }>();
+
+/** `sporchi` (fs.watch): senza, si rilegge tutto; con, solo le cartelle di profilo toccate. */
+export function leggiApp(home: string, errori: ErroreLettura[], sporchi?: string[]): SessioneApp[] {
   const support = path.join(home, "Library", "Application Support");
   let profili: string[] = [];
   try {
     profili = fs.readdirSync(support).filter((n) => /^[Cc]laude/.test(n)).sort();
   } catch {
     cache = new Map();
+    ultimiApp = new Map();
     return [];
   }
-  const out: SessioneApp[] = [], nuova: typeof cache = new Map();
+  const out: SessioneApp[] = [], nuova: typeof cache = new Map(), ultimi: typeof ultimiApp = new Map();
   for (const profilo of profili) {
-    const dir = path.join(support, profilo, "claude-code-sessions");
+    const dir = path.join(support, profilo, "claude-code-sessions"), u = ultimiApp.get(dir);
+    if (sporchi && u && !toccata(sporchi, dir)) {
+      for (const [f, e] of u.voci) nuova.set(f, e);
+      out.push(...u.out.map((s) => ({ ...s })));
+      ultimi.set(dir, u);
+      continue;
+    }
+    const prima = out.length, voci: [string, { chiave: string; s: SessioneApp | null }][] = [], erroriPrima = errori.length;
     for (const file of trovaFile(dir, (n) => /^local_.*\.json$/.test(n), errori)) {
       let st: fs.Stats;
       try {
@@ -95,9 +108,12 @@ export function leggiApp(home: string, errori: ErroreLettura[]): SessioneApp[] {
       const s = e && e.chiave === chiave ? e.s : daFile(file, profilo);
       if (s === undefined) continue;
       nuova.set(file, { chiave, s });
+      voci.push([file, { chiave, s }]);
       if (s) out.push({ ...s });
     }
+    if (errori.length === erroriPrima) ultimi.set(dir, { out: out.slice(prima).map((s) => ({ ...s })), voci }); // con errori si riprova al giro dopo
   }
   cache = nuova;
+  ultimiApp = ultimi;
   return out;
 }
