@@ -8,7 +8,7 @@ const vai = async (id, mod) => { H.daScena(id, mod); await caricaScena(); };
 H.avvia('requisiti-b', async () => {
   await req('B1', async () => {
     nuova(); await caricaChat();
-    assert.equal(await run(() => [...document.querySelectorAll('.barra-laterale button.riga')].find((b) => b.textContent.includes('Cerca sessioni')).querySelector('.lato')?.textContent), '⌘K');
+    assert.equal(await run(() => [...document.querySelectorAll('.barra-laterale button.riga')].find((b) => b.textContent.includes('Cerca sessioni')).querySelector('.tasto-chip')?.textContent), '⌘K');
     await riga('Cerca sessioni'); await wait(() => !!document.querySelector('.finestra-ricerca input'));
     assert.equal(await run(() => document.activeElement === document.querySelector('.finestra-ricerca input')), true, 'la ricerca si apre col cursore nel campo');
     await tasto('.finestra-ricerca', { key: 'Escape' }); await wait(() => !document.querySelector('.finestra-ricerca'));
