@@ -1,6 +1,6 @@
 // figma: 101-13650 — richieste a Roberto: «Richiesta permesso» 101:13247, «Domanda» 101:13280 (101:13896), «Piano» 101:13314 (101:14132).
 // Ogni risposta è un comando nella casella di clotch AI (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
@@ -79,6 +79,17 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
 
 const CONSIGLIATA = /\s*\((Recommended|Consigliata)\)\s*$/i;
 
+/** Frecce nel gruppo di opzioni (role radiogroup): scelgono la vicina e le portano il fuoco, in giro. */
+function frecceOpzioni(e: KeyboardEvent<HTMLDivElement>, n: number, scegli: (j: number) => void) {
+  const passo = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? n - 1 : 0;
+  if (!passo) return;
+  const bottoni = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")], i = bottoni.indexOf(document.activeElement as HTMLButtonElement);
+  if (i < 0) return;
+  e.preventDefault();
+  const j = (i + passo) % n;
+  scegli(j); bottoni[j].focus();
+}
+
 /** `rid` null: la domanda è aperta nella trascrizione ma clotch AI non la conosce, e non si può rispondere da qui. */
 export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: { domanda: string; opzioni: string[] }[]; da: string | null }) {
   // l'opzione consigliata parte scelta, come nel disegno
@@ -102,7 +113,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
         {domande.map((d, i) => (
           <div key={i} className="domanda-blocco">
             <div className="testo-domanda">{ris.testo(d.domanda)}</div>
-            <div className="opzioni" role="radiogroup">
+            <div className="opzioni" role="radiogroup" onKeyDown={(e) => frecceOpzioni(e, d.opzioni.length, (j) => setScelte(scelte.map((x, k) => (k === i ? j : x))))}>
               {d.opzioni.map((o, j) => (
                 <button key={j} type="button" role="radio" aria-checked={scelte[i] === j} className={scelte[i] === j ? "opzione scelta" : "opzione"}
                   onClick={() => setScelte(scelte.map((x, k) => (k === i ? j : x)))}>
