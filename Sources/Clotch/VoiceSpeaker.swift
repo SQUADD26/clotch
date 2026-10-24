@@ -25,6 +25,19 @@ final class VoiceSpeaker {
         VoiceAlertCenter.shared.start()
         watch()
         drain()
+        // claude-config#2572: the engine's `zitto` command posts this; one way for every caller to stop the voice and the listening.
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.interrompi-voce"), object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { VoiceInputController.shared.hush() }
+        }
+    }
+
+    /// Stops what is being said now: the audio, the light, the lowered audio of the other apps.
+    func hush() {
+        player?.stop()
+        player = nil
+        ducker?.end()
+        ducker = nil
+        writeStatus(id: UUID().uuidString, speaking: false, start: Date(), end: Date(), levels: [])
     }
 
     /// At quit: the hook and the mod see no live Clotch and stand aside. The hook entries stay, doing nothing.

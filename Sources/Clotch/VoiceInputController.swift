@@ -19,7 +19,7 @@ final class VoiceInputController: ObservableObject {
     /// Seconds an order can still be taken back, before it leaves.
     static let cancelSeconds = 2.0
 
-    @Published private(set) var phase: Phase = .idle
+    @Published private(set) var phase: Phase = .idle { didSet { if !Self.hears(phase) { clearLiveText() } } }
     /// The microphone's last levels (0…1), newest last: the bars of the pill.
     @Published private(set) var levels = [Double](repeating: 0, count: 8)
     @Published private(set) var sure = ""
