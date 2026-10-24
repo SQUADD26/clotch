@@ -138,7 +138,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
           </Fragment>
         );
       })}
-      {permessi.map((p) => <Permesso key={p.rid} chat={chat} r={p} da={da} />)}
+      {permessi.map((p, i) => <Permesso key={p.rid} chat={chat} r={p} da={da} prima={i === 0} />)}
       {inFondo}
     </div>
     {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}

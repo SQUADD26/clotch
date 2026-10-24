@@ -20,7 +20,7 @@ export type Blocco = (
   | { tipo: "web"; id: string; query: string; fonti: Fonte[] }
   | { tipo: "attivita"; passi: Passo[] }
   | { tipo: "aiutanti"; aiutanti: Aiutante[] }
-  | { tipo: "domanda"; id: string; domande: { domanda: string; opzioni: string[] }[]; risposta: string | null; aperta: boolean }
+  | { tipo: "domanda"; id: string; domande: DomandaTesto[]; risposta: string | null; aperta: boolean }
   | { tipo: "piano"; id: string; testo: string; approvato: boolean; aperto: boolean }
   | { tipo: "bloccato"; id: string; testo: string }
   | { tipo: "file-toccati"; file: FileToccato[] }
@@ -49,12 +49,19 @@ function stato(m: Strumento, vivo: boolean): StatoStrumento {
   return m.esito.errore ? "errore" : "chiusa";
 }
 
+/** `header`, `multi` e `descrizioni` (una per opzione, "" se manca) sono i campi di AskUserQuestion oltre al disegno. */
+export interface DomandaTesto { domanda: string; opzioni: string[]; header?: string; multi?: boolean; descrizioni?: string[] }
+
 /** Le opzioni del disegno sono testi; «(Recommended)» resta nel testo e il filo lo mostra come «Consigliata». */
+const opzioniDi = (d: unknown) => Array.isArray((d as { options?: unknown[] }).options) ? (d as { options: unknown[] }).options : [];
 const domandeDi = (ingresso: unknown) => {
   const q = (ingresso as { questions?: unknown[] })?.questions;
   return Array.isArray(q) ? q.map((d) => ({
     domanda: testoCampo(d, "question"),
-    opzioni: Array.isArray((d as { options?: unknown[] }).options) ? (d as { options: unknown[] }).options.map((o) => testoCampo(o, "label")) : [],
+    opzioni: opzioniDi(d).map((o) => testoCampo(o, "label")),
+    descrizioni: opzioniDi(d).map((o) => testoCampo(o, "description")),
+    header: testoCampo(d, "header"),
+    multi: (d as { multiSelect?: unknown }).multiSelect === true,
   })) : [];
 };
 
