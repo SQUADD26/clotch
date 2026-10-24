@@ -15,6 +15,9 @@ const VOCI: [Chiave, string, string][] = [
   ["clotchObiettivi", "Obiettivi anche nel notch", "Accetta e rifiuta dal notch o da qui"],
 ];
 
+/** Dove si scarica Clotch: il main apre i collegamenti web nel browser (link-esterni.ts). */
+const SCARICA = "https://github.com/SQUADD26/clotch/releases/latest";
+
 function useVersioneClotch(): string | null {
   const [v, setV] = useState<string | null>(null);
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function Clotch() {
                 : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
             </div>
           </div>
-          {!acceso && <Bottone tipo="secondario" disabled>Scarica clotch</Bottone>}
+          {!acceso && <Bottone tipo="secondario" onClick={() => window.open(SCARICA)}>Scarica clotch</Bottone>}
         </div>
         {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
           <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>

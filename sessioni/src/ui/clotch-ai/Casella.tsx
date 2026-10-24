@@ -1,13 +1,15 @@
 // figma: 101-35494 — «vista Casella»: obiettivi e chat in attesa per progetto. Stati: vuota 101-35803, caricamento 101-36010,
 // registro non leggibile 101-36225, obiettivo proposto 101-47170 (con Clotch) e 101-47297 (senza).
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Registro } from "../../clotch-ai";
 import { acceso as clotchAcceso } from "../pannello/clotch";
 import caricamento from "../../../design/figma/101-36010.json";
 import { avvisa } from "../base/Avvisi";
+import { messaggioErrore } from "../base/dati";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
+import { useImpostazioni } from "../impostazioni/stato";
 import { clotchAi, useRegistro } from "./dati";
 import { AvvisoRosso, Vuoto } from "./Pezzi";
 import { casella, type Progetto } from "./vista";
@@ -17,8 +19,14 @@ const PASSO: Record<string, [NomeIcona, "successo" | "accento" | "secondaria"]> 
   completed: ["spunta", "successo"], in_progress: ["in-corso", "accento"], pending: ["orologio", "secondaria"],
 };
 
-function SchedaProgetto({ p }: { p: Progetto }) {
+/** Le sessioni di `progetto` finite oggi: la stessa regola di `fattoOggi` in vista.ts, ma coi titoli. */
+const fatteOggi = (r: Registro, progetto: string) => [...r.chat.values()]
+  .filter((c) => c.progetto === progetto && c.stato === "finito" && c.visto !== null && new Date(c.visto).toDateString() === new Date().toDateString())
+  .map((c) => c.titolo ?? c.chat);
+
+function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
   const n = useNavigazione();
+  const [aperto, setAperto] = useState(false);
   const dettaglio = p.aspettano.length ? (p.aspettano.length === 1 ? "1 aspetta te" : `${p.aspettano.length} aspettano te`) : "al lavoro";
   const o = p.obiettivo;
   // nel disegno (101-35494) i passi si vedono solo per il progetto la cui sessione madre è al lavoro
@@ -65,11 +73,21 @@ function SchedaProgetto({ p }: { p: Progetto }) {
           ))}
         </div>
       )}
-      {/* shortcut: il disegno non ha la Casella con «Fatto oggi» aperto; la riga resta chiusa finché Figma non lo disegna */}
-      <div className="riga-f">
-        <Icona nome="destra" />
-        <span className="t-sm secondario">Fatto oggi: {p.fattoOggi}</span>
-      </div>
+      {/* manca-disegno: Figma non ha «Fatto oggi» aperto; l'elenco usa le righe dei passi (spunta + titolo) finché non c'è */}
+      <button type="button" className="riga-f" aria-expanded={aperto} disabled={!fatte.length} onClick={() => setAperto(!aperto)}>
+        <Icona nome={aperto ? "giu" : "destra"} />
+        <span className="t-sm secondario">Fatto oggi: {fatte.length}</span>
+      </button>
+      {aperto && fatte.length > 0 && (
+        <div className="colonna-f gap-1">
+          {fatte.map((t, i) => (
+            <div key={i} className="riga-f">
+              <Icona nome="spunta" colore="successo" gira={false} />
+              <span className="riempi t-sm secondario">{t}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -120,6 +138,7 @@ function Sagome() {
 export function Casella() {
   const n = useNavigazione();
   const s = useRegistro();
+  const obiettiviNotch = useImpostazioni().clotchObiettivi;
   const rotto = s.stato === "errore" || (!!s.dati && s.dati.errori.length > 0);
   // «Riprovo tra 10 s.» (101-36225): con il registro rotto si rilegge ogni 10 secondi
   useEffect(() => { if (!rotto) return; const t = setInterval(s.riprova, RIPROVA_MS); return () => clearInterval(t); }, [rotto]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,8 +149,8 @@ export function Casella() {
         <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s." />
         <div className="riga-f">
           <Bottone tipo="secondario" onClick={s.riprova}>Riprova ora</Bottone>
-          {/* shortcut: aprire il registro nel Finder serve un canale del main; il bottone arriva con quello */}
-          <Bottone tipo="secondario" disabled>Apri il registro</Bottone>
+          {/* shortcut: il percorso è quello di serie; con FRIDAY_REGISTRO diverso (solo prove) apre comunque ~/.claude/registro */}
+          <Bottone tipo="secondario" onClick={() => window.impostazioni.apri("~/.claude/registro").catch((e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }))}>Apri il registro</Bottone>
         </div>
       </div>
     );
@@ -148,8 +167,8 @@ export function Casella() {
   }
   return (
     <div className="vista-clotch-ai">
-      {c.proposti.map((o) => <ObiettivoProposto key={o.chat} o={o} clotch={clotchAcceso(s.dati!, Date.now())} />)}
-      {c.progetti.map((p) => <SchedaProgetto key={p.nome} p={p} />)}
+      {c.proposti.map((o) => <ObiettivoProposto key={o.chat} o={o} clotch={obiettiviNotch && clotchAcceso(s.dati!, Date.now())} />)}
+      {c.progetti.map((p) => <SchedaProgetto key={p.nome} p={p} fatte={fatteOggi(s.dati as Registro, p.nome)} />)}
     </div>
   );
 }
