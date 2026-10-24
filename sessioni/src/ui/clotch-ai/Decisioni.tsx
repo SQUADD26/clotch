@@ -1,6 +1,7 @@
 // figma: 101-39266 — «vista Decisioni»: le scelte di clotch AI per giorno, con Annulla. Stati: conferma 101-39512, annullata
 // 101-39767, annullo non riuscito 101-40016, vuoto 101-40267.
 import { useState } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { Registro } from "../../clotch-ai";
 import { aggiornaAvviso, avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -24,7 +25,7 @@ const ICONA: Record<string, [NomeIcona, "successo" | "secondaria"]> = {
 function dettaglio(r: Registro, d: Decisione) {
   const c = d.chat ? r.chat.get(d.chat) : undefined;
   const chi = (d.genere === "promozione" || d.genere === "archivio" ? c?.progetto : c?.titolo) ?? c?.titolo ?? "";
-  return [chi, d.t !== null ? orario(d.t) : ""].filter(Boolean).join(", ");
+  return [chi, d.t !== null ? orario(d.t) : ""].filter(Boolean);
 }
 
 /** Esito dell'annullo: i testi li scrive clotch AI in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
@@ -63,7 +64,7 @@ export function Decisioni() {
                 <Icona nome={icona} colore={colore} />
                 <div className="testi">
                   <span className={`t-sm ${d.annullata ? "secondario" : ""}`}>{d.cosa}</span>
-                  <span className="t-xs secondario">{dettaglio(r!, d)}</span>
+                  <span className="t-xs secondario"><Pezzi parti={dettaglio(r!, d)} /></span>
                 </div>
                 {d.annullata ? <span className="t-sm secondario">Revocata</span>
                   : d.annullabile ? <Bottone tipo="secondario" onClick={() => setConferma(d)}>Revoca</Bottone>

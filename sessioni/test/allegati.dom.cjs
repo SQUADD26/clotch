@@ -52,10 +52,10 @@ app.whenReady().then(async () => {
     // visore: dalla miniatura, «1 di 2», frecce, Esc
     await run(() => document.querySelector('.miniatura').click());
     await ready('.visore');
-    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'notch-sopra-il-titolo.png, 1 di 2');
+    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'notch-sopra-il-titolo.png 1 di 2');
     await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })));
     await new Promise((r) => setTimeout(r, 100));
-    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'schermata-notch.png, 2 di 2');
+    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'schermata-notch.png 2 di 2');
     await ready('.visore img');
     await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })));
     await new Promise((r) => setTimeout(r, 100));

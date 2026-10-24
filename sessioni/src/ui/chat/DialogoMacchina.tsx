@@ -72,7 +72,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
   }
   const github = righe.find((r) => r.stato === "corso" && r.codice);
   const titolo = pronta ? "Macchina pronta" : github ? "Collega GitHub" : "Preparazione";
-  const corpo = pronta ? `${v.nome} è pronta per le sessioni.` : `${v.nome}, ${v.utente ? `${v.utente}@` : ""}${v.host}:${v.porta || 22}`;
+  const corpo = pronta ? `${v.nome} è pronta per le sessioni.` : `${v.nome} ${v.utente ? `${v.utente}@` : ""}${v.host}:${v.porta || 22}`;
   const ripreso = corsa?.ripreso ? righe.find((r) => r.passo === corsa.ripreso?.passo)?.etichetta : null;
   const guasto = !lavora && !pronta && !fermo && esito ? motivoGuasto(esito) : null;
   const ripartiDa = fermo?.passo ?? null;

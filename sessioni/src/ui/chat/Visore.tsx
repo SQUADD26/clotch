@@ -64,7 +64,7 @@ export function Visore({ galleria, indice, onIndice, onChiudi }: { galleria: Voc
       {n > 1 && <button type="button" className="freccia" onClick={() => vai(-1)} aria-label="Immagine precedente"><Icona nome="indietro" colore="primaria" /></button>}
       <div className="visore" role="dialog" aria-modal="true" aria-label={v.nome}>
         <div className="barra-visore">
-          <span className="nome t-sm">{v.nome}, {indice + 1} di {n}</span>
+          <span className="nome t-sm">{v.nome} {indice + 1} di {n}</span>
           <Bottone tipo="secondario" disabled={copiando} onClick={copia}>Copia</Bottone>
           <Bottone tipo="secondario" onClick={salva}>Salva con nome…</Bottone>
           <button type="button" className="chiudi" autoFocus onClick={onChiudi} aria-label="Chiudi"><Icona nome="chiudi" colore="primaria" /></button>

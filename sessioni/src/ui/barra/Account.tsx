@@ -1,6 +1,7 @@
 // figma: 148-62026 — bottone account in fondo alla barra (#478): account in uso con le quote 5 ore e 7 giorni; primo menu 148:62191
 // (uso attuale + «Cambia account»), secondo menu 148:62379 (gli altri account), 90 % 148:62621, cambio non disponibile 148:62813.
 import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { Registro } from "../../clotch-ai";
 import type { QuotaUso } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
@@ -91,7 +92,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
             <span className="avatar" style={colore(colori)}><span className="t-xs medio">{iniziali(titolo)}</span></span>
             <span className="testi">
               <span className="t-base">{titolo}</span>
-              <span className="t-xs secondario">{[utente, conta || quote.length ? `${quote.length || conta} account` : ""].filter(Boolean).join(", ")}</span>
+              <span className="t-xs secondario"><Pezzi parti={[utente, conta || quote.length ? `${quote.length || conta} account` : ""]} /></span>
             </span>
             {cambia && <span className="cambia"><Icona nome="giu" /></span>}
           </button>
