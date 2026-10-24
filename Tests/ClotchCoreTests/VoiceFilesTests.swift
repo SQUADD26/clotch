@@ -22,6 +22,17 @@ final class VoiceFilesTests: XCTestCase {
         try text.write(to: url, atomically: true, encoding: .utf8)
     }
 
+    /// #1119: the microphone Friday set (`friday comando imposta`) wins when read, and a page save never copies it into config.json.
+    func testFridayMicrophoneWins() throws {
+        try put(#"{"ingresso_microfono": "BuiltInMicrophoneDevice"}"#, files.configURL)
+        XCTAssertEqual(try files.readConfig()["ingresso_microfono"] as? String, "BuiltInMicrophoneDevice")
+        try put(#"{"microfono": "Microfono MacBook Pro"}"#, files.fridaySettingsURL)
+        XCTAssertEqual(try files.readConfig()["ingresso_microfono"] as? String, "Microfono MacBook Pro")
+        try files.updateConfig(["speed": 1.3])
+        let saved = try JSONSerialization.jsonObject(with: Data(contentsOf: files.configURL)) as? [String: Any]
+        XCTAssertEqual(saved?["ingresso_microfono"] as? String, "BuiltInMicrophoneDevice")
+    }
+
     func testUpdateKeepsUnknownFields() throws {
         try put(#"{"voice_id": "abc123", "silenzio": [1, 2], "futuro": {"x": true}}"#, files.configURL)
         try files.updateConfig(["speed": 1.3, "voice_id": "nuovo99"])
@@ -119,4 +130,31 @@ final class VoiceFilesTests: XCTestCase {
 private extension Dictionary where Key == String, Value == String {
     /// #299: the built-in English words sit in every list; these tests are about the files.
     var withoutBuiltIn: [String: String] { filter { VoiceTurn.builtInPronunciation[$0.key] == nil } }
+}
+
+/// clotch#1130: «usa questa voce» from Friday.
+final class VoiceSetTests: XCTestCase {
+    private let voices = [(name: "Giulia Rossi", id: "abc111"), (name: "Marco", id: "xyz222")]
+    private var files: VoiceFiles!
+
+    override func setUp() {
+        files = VoiceFiles(home: FileManager.default.temporaryDirectory.appendingPathComponent("voce-\(UUID().uuidString)"))
+    }
+
+    func testIdNameAndPrefixWriteTheId() async throws {
+        for (ask, want) in [("xyz222", "xyz222"), ("marco", "xyz222"), ("giu", "abc111")] {
+            let o = await VoiceSet.apply(ask, files: files) { self.voices }
+            XCTAssertEqual(o, .set(want))
+            XCTAssertEqual(try files.readConfig()["voice_id"] as? String, want)
+        }
+    }
+
+    func testUnknownNameAndBadAskWriteNothing() async throws {
+        try files.updateConfig(["voice_id": "vecchia"])
+        for ask in ["Sconosciuta", "", String(repeating: "a", count: 101)] {
+            let o = await VoiceSet.apply(ask, files: files) { self.voices }
+            guard case .rejected = o else { return XCTFail("\(ask)") }
+        }
+        XCTAssertEqual(try files.readConfig()["voice_id"] as? String, "vecchia")
+    }
 }

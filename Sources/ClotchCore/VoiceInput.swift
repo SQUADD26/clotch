@@ -166,6 +166,8 @@ public enum VoiceInput {
         case nothingHeard
         /// #314: ElevenLabs answered with an error of its own (rate_limited, transcriber_error, …), or refused the audio (input_error).
         case service, audio
+        /// #1120: the voice is not Roberto's, or not sure; no print yet; the Mac is locked.
+        case notYou, unsure, noVoiceprint, locked
 
         public var title: String {
             switch self {
@@ -180,6 +182,10 @@ public enum VoiceInput {
             case .nothingHeard: return "Non ho sentito niente"
             case .service: return "ElevenLabs non trascrive"
             case .audio: return "ElevenLabs rifiuta l'audio"
+            case .notYou: return "Non è la voce di Roberto"
+            case .unsure: return "Non sono sicura che sei tu"
+            case .noVoiceprint: return "Manca l'impronta della tua voce"
+            case .locked: return "Mac bloccato"
             }
         }
 
@@ -196,6 +202,10 @@ public enum VoiceInput {
             case .nothingHeard: return "Il microfono non mi ha dato voce. Riprova, o scegli un altro microfono."
             case .service: return "Riprova tra poco, o usa il modello locale."
             case .audio: return "Riprova, o scegli un altro microfono."
+            case .notYou: return "Non faccio niente. Se sei tu, registra di nuovo la voce nelle impostazioni."
+            case .unsure: return "Non faccio niente. Ripeti più vicino al microfono."
+            case .noVoiceprint: return "Senza la tua voce non eseguo ordini. Registrala una volta nelle impostazioni."
+            case .locked: return "Sblocca il Mac per dare ordini a voce."
             }
         }
 
@@ -208,7 +218,9 @@ public enum VoiceInput {
             case .network, .service: return [.retry, .useLocal]
             case .local, .doNotDisturb: return [.retry]
             case .off, .shortcut: return [.openDictation]
-            case .nothingHeard, .audio: return [.retry, .openDictation]
+            case .nothingHeard, .audio, .unsure: return [.retry, .openDictation]
+            case .notYou, .noVoiceprint: return [.openDictation]
+            case .locked: return [.retry]
             }
         }
     }

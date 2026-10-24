@@ -6,6 +6,7 @@ bash "$(dirname "$0")/check-hover.sh"
 bash "$(dirname "$0")/check-windows.sh"
 bash "$(dirname "$0")/check-focus.sh"
 bash "$(dirname "$0")/test-controlla-motore.sh"  # installa.sh never overwrites a newer engine (clotch#260)
+bash "$(dirname "$0")/test-aggiorna.sh"  # the app updates itself only forward (clotch#1119)
 node "$(dirname "$0")/token-swift.mjs" --check  # FigmaTokens.swift = design/tokens.json (claude-config#1942)
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg="$root/.build/goals-linux"

@@ -23,7 +23,7 @@ final class ScribeLiveTests: XCTestCase {
 
         let buffers = try VoiceInputCaptureTests.recorded("Buongiorno, questa è una prova di dettatura.")
         let voice = RecordedVoice(buffers)
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.makeCapture = { _ in voice }
         var asked: String?
         c.ask = { q, _ in asked = q; return .success("ok") }

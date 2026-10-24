@@ -37,7 +37,7 @@ jobs:
 
   clicca:
     runs-on: ${{ github.event.pull_request.head.repo.full_name != github.repository && github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","clotch-ci"]') }}
-    timeout-minutes: 30
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:

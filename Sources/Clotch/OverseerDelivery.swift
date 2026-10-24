@@ -8,12 +8,12 @@ import ClotchCore
 enum OverseerDelivery {
     enum Outcome { case sent, queued, copied, notDelivered }  // notDelivered: no proof from the engine, text on the clipboard
 
-    static func send(_ text: String, files: VoiceFiles = VoiceFiles(), grace: TimeInterval = VoiceRoute.inboxGrace) async -> Outcome {
+    static func send(_ text: String, files: VoiceFiles = VoiceFiles(), voice: [String: Any]? = nil, grace: TimeInterval = VoiceRoute.inboxGrace) async -> Outcome {
         let now = Date()
         let id = String(UUID().uuidString.prefix(8)).lowercased()
         let url = files.inboxURL.appendingPathComponent(VoiceRoute.inboxName(id: id, at: now))
         let heard = (try? FileManager.default.attributesOfItem(atPath: files.inboxListenerURL.path)[.modificationDate]) as? Date
-        guard VoiceRoute.listenerIsFresh(modified: heard), (try? files.write(VoiceRoute.inboxPayload(id: id, text: text, at: now), to: url)) != nil
+        guard VoiceRoute.listenerIsFresh(modified: heard), (try? files.write(VoiceRoute.inboxPayload(id: id, text: text, at: now, voice: voice), to: url)) != nil
         else { return fallback(text) }
         let deadline = now.addingTimeInterval(grace)
         while Date() < deadline {

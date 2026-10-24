@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { _electron } from 'playwright';
-import { prendiPosto } from '../../scripts/posti.mjs';
+import { aspettaPosto } from '../../scripts/posti.mjs';
 
 export const RADICE = fileURLToPath(new URL('../../', import.meta.url));
 // sandbox senza GTK di sistema: le librerie estratte stanno qui (in CI ci sono già)
@@ -50,6 +50,17 @@ function lungo(x, chiave) {
   return x;
 }
 
+// Barra ricca (#1081): 21 righe in 5 cartelle, con e senza cartella e idApp, una fissata, una non letta, tutti gli stati;
+// così i menu della riga e della cartella hanno ogni voce accesa e «Archivia tutte» ha più righe.
+const PROGETTI = ['clotch', 'squadd-v2', 'dentalspace', 'claude-config', 'rise'], STATI = ['lavora', 'aspetta', 'ferma', 'finita'];
+function ricca(s) {
+  const base = s.elenco.sessioni[0], ora = Date.now();
+  const altre = Array.from({ length: 20 }, (_, k) => ({ ...base, id: `b${k + 1}`, titolo: `Sessione di prova ${k + 1} di ${PROGETTI[k % 5]}`, progetto: PROGETTI[k % 5],
+    cartella: k % 3 ? `/Users/roberto/progetti/${PROGETTI[k % 5]}` : '', idApp: k % 2 ? `local_prova${k}` : null, stato: STATI[k % 4], ultimaAttivita: ora - (k + 1) * 7 * 60_000, obiettivo: null, situazione: null }));
+  return { ...s, elenco: { ...s.elenco, sessioni: [{ ...base, cartella: base.cartella || '/Users/roberto/progetti/clotch', idApp: base.idApp ?? 'local_prova0' }, ...altre] },
+    preferenze: { ...s.preferenze, b1: { ...s.preferenze?.b1, fissa: true }, b2: { ...s.preferenze?.b2, nonLetta: true } } };
+}
+
 /** Scrive la scena del giro: `dati` con|senza, `lungo` sì/no. Senza dati = elenco e messaggi vuoti, nessuna sessione aperta. */
 export function preparaScena(area, { dati, lungo: lun }, cartella) {
   let s = JSON.parse(readFileSync(join(RADICE, 'design/scene', `${AREE[area].scena}.json`), 'utf8'));
@@ -64,6 +75,7 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
     { account: 'secondo', email: 'secondo@example.com', usato: 100, ripartenza: '', cinque: 100, cinqueFine: ora + h, sette: 64, setteFine: ora + 40 * h },
     { account: 'terzo', email: 'terzo@example.com', usato: 95, ripartenza: '', cinque: 71, cinqueFine: ora + 4 * h, sette: 95, setteFine: ora + 100 * h }, // quasi finito: giallo
   ];
+  if (area === 'barra' && dati !== 'senza' && s.elenco?.sessioni?.length) s = ricca(s);
   if (lun) { const nav = s.navigazione; s = lungo(s); s.navigazione = nav; }
   const f = join(cartella, `scena-${area}-${dati}${lun ? '-lungo' : ''}.json`);
   writeFileSync(f, JSON.stringify(s));
@@ -71,8 +83,8 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
 }
 
 const pausa = (ms) => new Promise((ok) => setTimeout(ok, ms));
-let libera = () => {};
-for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { libera(); process.exit(130); });
+// i posti presi si liberano all'uscita (scripts/posti.mjs)
+for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => process.exit(130));
 
 /** Senza DISPLAY (sandbox, CI) avvia un Xvfb proprio su un numero libero (-displayfd) e lo chiude all'uscita. */
 export async function schermo() {
@@ -87,7 +99,7 @@ export async function schermo() {
 /** Lancia l'app sulla scena; torna { app, pagina, chiudi }. `video`: cartella dove Playwright registra la finestra. */
 export async function avvia(fileScena, { video } = {}) {
   for (const f of ['dist/src/main.js', 'renderer/index.html']) if (!existsSync(join(RADICE, f))) throw new Error(`Manca ${f}: prima npm ci e npm run build.`);
-  libera = prendiPosto();
+  const libera = await aspettaPosto();
   const home = mkdtempSync(join(tmpdir(), 'clotch-beta-'));
   cpSync(join(RADICE, 'test/fixtures/home'), home, { recursive: true });
   try {

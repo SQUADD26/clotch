@@ -138,6 +138,18 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "impostazioni:novita", "impostazioni:aggiornamenti",
   "nuova:cartelle", "nuova:contesto", "nuova:scegli-chiave", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:mostra", "casella:skill"];
 
-export function collegaScena(ipc: IpcMain, s: Scena) {
-  for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));
+const senzaNull = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== undefined));
+
+/** `invia` (finestra cliccabile del beta tester, #1081): le scritture di preferenze e impostazioni cambiano la scena e lo dicono alla finestra,
+ *  come il main, così un giro vede l'effetto di Fissa, Segna come non letta, Rinomina, Nascondi cartella. Senza `invia` (parità) non scrive. */
+export function collegaScena(ipc: IpcMain, s: Scena, invia?: (canale: string, dati: unknown) => void) {
+  for (const c of CANALI) ipc.handle(c, (_e, ...args) => {
+    if (invia && c === "sessioni:imposta-preferenze") {
+      const id = String(args[0]), p = { ...s.preferenze }, una = senzaNull({ ...p[id], ...(args[1] as object) });
+      if (Object.keys(una).length) p[id] = una as PreferenzeSessione; else delete p[id];
+      invia("sessioni:preferenze", s.preferenze = p);
+    }
+    if (invia && c === "sessioni:imposta-impostazioni") invia("sessioni:impostazioni", s.impostazioni = senzaNull({ ...s.impostazioni, ...(args[0] as object) }));
+    return rispostaScena(s, c, args);
+  });
 }
