@@ -4,8 +4,7 @@
   "id": "101:23280",
   "nome": "Finestra ricerca",
   "w": 640,
-  "h": 198,
-  "dentro": "101:23248"
+  "h": 198
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
@@ -20,18 +19,18 @@
   "colore/testo/primario": "#ffffff",
   "testo/dimensione/lg": 16,
   "testo/riga/lg": 24,
-  "colore/testo/secondario": "#ffffffb5",
-  "testo/dimensione/xs": 12,
-  "testo/riga/xs": 16,
-  "spazio/0-5": 2,
+  "colore/fondo/bottone-secondario": "#ffffff0d",
+  "raggio/xs": 5,
   "spazio/2": 8,
+  "spazio/0-5": 2,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
   "spazio/1": 4,
   "spazio/8": 32,
   "colore/icona/terziaria": "#ffffff82",
   "testo/dimensione/base": 14,
-  "testo/riga/base": 20,
-  "testo/dimensione/sm": 13,
-  "testo/riga/sm": 18
+  "testo/riga/base": 20
  },
  "nodi": [
   {
@@ -108,7 +107,7 @@
    "box": {
     "x": 44,
     "y": 15.5,
-    "w": 548,
+    "w": 530,
     "h": 24
    },
    "variabili": {
@@ -121,19 +120,39 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:23281;101:7543",
+   "id": "I101:23281;154:71338",
    "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 586,
+    "y": 16.5,
+    "w": 38,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:23281;154:71338;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 604,
-    "y": 19.5,
-    "w": 20,
-    "h": 16
+    "x": 594,
+    "y": 18.5,
+    "w": 22,
+    "h": 18
    },
    "variabili": {
     "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
    },
    "senza": [],
    "testo": "esc",
