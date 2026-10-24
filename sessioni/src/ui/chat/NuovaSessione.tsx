@@ -101,7 +101,7 @@ export function NuovaSessione() {
 
   const imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>) => setP((x) => ({ ...x, ...parte }) as PreferenzeSessione);
   const modello = modelloDi({ modello: idModello(globale) ?? null }, p) ?? "";
-  const pronto = !!testo.trim() && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
+  const pronto = !!testo.trim() && !!dati && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
   const manda = async () => {
     if (!pronto || !dati) return;
     setAttesa(true);
