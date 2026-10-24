@@ -65,11 +65,13 @@ export function difettiInterruzione(c, dove) {
     let salto;
     if (gesto == null) salto = Math.max(0, ...op.slice(1).map((v, i) => Math.abs(v - op[i]))) / (hi - lo);
     else {
-      // salto = cambio tra l'ultimo fotogramma prima del gesto e il primo dopo, oltre il passo più lungo del moto di prima
+      // salto = cambio tra l'ultimo fotogramma prima del gesto e il primo dopo, oltre il passo più lungo del moto intorno
       // (un'entrata veloce e decisa fa passi grandi da sé, specie a pochi fotogrammi al secondo: quelli non sono salti)
       const i = s.findIndex((x) => x[0] > gesto);
       if (i < 1) continue;
-      const prima = op.slice(0, i), passo = Math.max(0, ...prima.slice(1).map((v, j) => Math.abs(v - prima[j])));
+      // il passo di riferimento guarda anche il fotogramma dopo: un moto che accelera (uscita ease-in) non è un salto
+      const prima = op.slice(0, i), dopo = op[i + 1] != null ? Math.abs(op[i + 1] - op[i]) : 0;
+      const passo = Math.max(dopo, ...prima.slice(1).map((v, j) => Math.abs(v - prima[j])));
       const cambio = Math.abs(op[i] - op[i - 1]);
       salto = cambio > 1.5 * passo ? cambio / (hi - lo) : 0;
     }

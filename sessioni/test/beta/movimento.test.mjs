@@ -50,4 +50,13 @@ test('M5: conta il primo cambio dopo il gesto, non le conseguenze', () => {
   const x = [anim({ serie: sposta(10) }), anim({ dove: 'button.altro', serie: sposta(300) })];
   assert.deepEqual(criteri(difettiMovimento({ evento: 100, eventi: [100], T: x[0].serie.map((s) => s[0]), animazioni: x })), []);
 });
+test('M3: ease-in-out simmetrica non è lineare; lineare sì', () => {
+  const io = (p) => (p < 0.5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2);
+  assert.deepEqual(criteri(difettiMovimento(giro([anim({ serie: serie(200, io) })]))), []);
+  assert.ok(criteri(difettiMovimento(giro([anim({ serie: serie(200, (p) => p) })]))).includes('M3'));
+});
+test('M10: un\'uscita che accelera dopo il gesto non è un salto', () => {
+  const esce = anim({ dove: 'div.sovrapposto.tooltip.esce', serie: [[0, 1, 0, 0, 1], [33, 0.95, 0, 0, 1], [66, 0.8, 0, 0, 1], [100, 0.5, 0, 0, 1], [133, 0.15, 0, 0, 1], [166, 0, 0, 0, 1]] });
+  assert.deepEqual(criteri(difettiInterruzione({ eventi: [80], animazioni: [esce] })), []);
+});
 test('interruzione con salto', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 0, 0, 0, 1], [16, 0.2, 0, 0, 1], [32, 1, 0, 0, 1]] })] })), ['M10']));
