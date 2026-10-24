@@ -1,4 +1,5 @@
 // L'API vera, nel processo main: elenco, messaggi a pagine, evento di aggiornamento.
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { Worker } from "node:worker_threads";
@@ -40,13 +41,18 @@ export class Sessioni {
     this.oss.avvia();
   }
 
+  /** L'elenco salvato dal worker all'avvio di prima (avvio-worker.ts): da mostrare finché quello vero non è letto. null se manca o è rotto. */
+  elencoInCache(fileCache: string): Elenco | null {
+    try { const e = JSON.parse(fs.readFileSync(fileCache, "utf8")).elenco; return e && Array.isArray(e.sessioni) ? e : null; } catch { return null; }
+  }
+
   /** Come osserva(), ma la prima lettura (lenta) gira in un worker: il main resta libero. Se il worker fallisce si legge nel main, come prima. */
-  async osservaInWorker(cb: (a: Aggiornamento) => void) {
+  async osservaInWorker(cb: (a: Aggiornamento) => void, fileCache?: string, suAnteprima?: (e: Elenco) => void) {
     const imp = this.imp;
     try {
       const r = await new Promise<{ stato: StatoIniziale; claude: [string, any][]; altre: Parameters<typeof caricaCache>[0] }>((ok, no) => {
-        const w = new Worker(path.join(__dirname, "avvio-worker.js"), { workerData: { home: this.home, env: { ...process.env }, imp } });
-        w.once("message", ok); w.once("error", no);
+        const w = new Worker(path.join(__dirname, "avvio-worker.js"), { workerData: { home: this.home, env: { ...process.env }, imp, cache: fileCache } });
+        w.on("message", (m) => (m?.anteprima ? suAnteprima?.(m.anteprima) : ok(m))); w.once("error", no);
         w.once("exit", (c) => no(new Error(`worker d'avvio uscito (${c})`)));
       });
       for (const [k, v] of r.claude) cacheClaude.set(k, v);

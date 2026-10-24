@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 import type { Registro } from "../../clotch-ai";
 import type { ClotchAiApi } from "../../tipi";
 import { messaggioErrore } from "../base/dati";
-import { daPiano } from "./registro";
+import { applicaParziale, daPiano } from "./registro";
 
 declare global {
   interface Window { clotchAi: ClotchAiApi }
@@ -18,6 +18,7 @@ export function negozio<T>(iniziale: T) {
     get: () => v,
     metti: (n: T) => { v = n; ascolta.forEach((f) => f()); },
     usa: () => useSyncExternalStore((f) => { ascolta.add(f); return () => { ascolta.delete(f); }; }, () => v),
+    segui: (f: () => void) => { ascolta.add(f); return () => { ascolta.delete(f); }; },
   };
 }
 
@@ -29,14 +30,31 @@ const leggi = () => clotchAi().registro().then(
   (e) => registro.metti({ stato: "errore", dati: registro.get().dati, errore: messaggioErrore(e) }),
 );
 
+function collega() {
+  if (collegato) return;
+  collegato = true;
+  leggi();
+  // il main manda solo le parti cambiate (#474); senza un registro di partenza si rilegge intero
+  clotchAi().onRegistro((p: any) => {
+    const prima = registro.get().dati;
+    if (!p?.parziale) registro.metti({ stato: "pronto", dati: daPiano(p) });
+    else if (prima) registro.metti({ stato: "pronto", dati: applicaParziale(prima, p) });
+    else leggi();
+  });
+}
+
 /** Il registro, uno solo per tutta l'app: letto una volta, poi aggiornato da ogni `clotch-ai:registro` del main. */
 export function useRegistro() {
-  if (!collegato) {
-    collegato = true;
-    leggi();
-    clotchAi().onRegistro((p) => registro.metti({ stato: "pronto", dati: daPiano(p) }));
-  }
+  collega();
   return { ...registro.usa(), riprova: () => { registro.metti({ stato: "carica" }); leggi(); } };
+}
+
+/** Per chi non è un componente: `cb` col registro ora (se c'è) e a ogni cambio; torna la funzione per staccarsi. */
+export function seguiRegistro(cb: (r: Registro) => void): () => void {
+  collega();
+  const d = registro.get().dati;
+  if (d) cb(d);
+  return registro.segui(() => { const r = registro.get().dati; if (r) cb(r); });
 }
 
 /** Stato che il registro non ha: l'app sta avviando clotch AI («Avvio…», «Riavvio…»). */

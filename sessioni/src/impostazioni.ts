@@ -15,6 +15,7 @@ import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { creaAggiornamenti } from "./aggiornamento";
 import { provaSilenziosa } from "./modalita-prova";
 import { quoteConGiorni } from "./quote-uso";
+import { lavoro } from "./lavori";
 import { accorcia, espandi, trovaRadici } from "./radici";
 import type { Archiviata, CartellaAccount, Elenco, Profilo } from "./tipi";
 
@@ -113,7 +114,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
   // shortcut: gli account sono quelli trovati nella home (non conta accountAggiunti/accountTolti); le trascrizioni si leggono qui, nel main
-  ipc.handle("impostazioni:uso", () => quoteConGiorni(trovaRadici(home)));
+  ipc.handle("impostazioni:uso", () => quoteConGiorni(trovaRadici(home), Date.now(), (radici, ora) => lavoro({ tipo: "uso", radici, ora })));
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
