@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   prestazioni:
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || fromJSON('["self-hosted","clotch-ci"]') }}
+    runs-on: ${{ github.event.pull_request.head.repo.full_name != github.repository && github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","clotch-ci"]') }}
     timeout-minutes: 5
     defaults:
       run:
