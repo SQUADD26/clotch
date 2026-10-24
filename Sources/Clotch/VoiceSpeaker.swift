@@ -106,6 +106,11 @@ final class VoiceSpeaker {
     /// One piece of news the engine let through. The rules of the moment it is said: switch, key, muted session, daily caps.
     func say(_ event: VoiceEvent) async {
         guard !AfkFiles().isOn, !DoNotDisturb().isOn else { return }  // AFK (#106) or non-disturbare (#266): silent, no Haiku call, no daily count
+        if let after = event.speakAfter, after > Date() { try? await Task.sleep(nanoseconds: UInt64(after.timeIntervalSinceNow * 1e9)) }
+        // claude-config#2777: Roberto spoke over Friday after this phrase was written; the engine marks it in `parla.json`, and it is not said any more.
+        if let turns = (try? JSONSerialization.jsonObject(with: Data(contentsOf: FridayDoor().turnsURL))) as? [String: Any],
+           let cut = turns["interrotto"] as? Double, event.at.timeIntervalSince1970 <= cut { return }
+        guard !AfkFiles().isOn, !DoNotDisturb().isOn else { return }  // the wait above may have crossed a silence
         let config = VoiceTurn.Config((try? files.readConfig()) ?? [:])
         var day = VoiceTurn.Day.load(try? Data(contentsOf: files.dayURL), now: Date())
         // No canonical prompt from the config (#84): silent, never a copy of it.

@@ -4,8 +4,8 @@ import os.log
 import ClotchCore
 
 /// Voice in (#110): one shortcut, press to speak, press again to finish. Microphone → Scribe v2 Realtime or Parakeet on the Mac
-/// (`VoiceInput.Config`, from the «Voce» page) → text on the pill while Roberto speaks → `VoiceRoute.classify`: a question is answered
-/// aloud by a read-only model (`VoiceAsk`), an order waits `cancelSeconds` for an «Annulla» and goes to the Friday (`OverseerDelivery`).
+/// (`VoiceInput.Config`, from the «Voce» page) → text on the pill while Roberto speaks → it waits `cancelSeconds` for an «Annulla»
+/// and goes to Friday's one door (`FridayDelivery`, clotch#1110): she decides, and her answer is said here.
 /// The pill follows the Figma design of #110 (`VoiceInputPill`, light on the outline: `VoiceInputLight`).
 @MainActor
 final class VoiceInputController: ObservableObject {
@@ -67,8 +67,8 @@ final class VoiceInputController: ObservableObject {
     var makeCapture: (String) -> VoiceCapture = { VoiceCapture(microphone: $0) }
     /// Says an answer aloud; the pilot's test hands in a recorder instead of the speaker.
     var speak: (String) async -> Void = { _ = await VoiceSpeaker.shared.speakAnswer($0) }
-    /// Asks `claude -p` (question, helper prompt or nil); the tests hand in a fake that records the call and launches nothing (#270).
-    var ask: (String, String?) async -> Result<String, ClaudeLogin.Failure> = { await VoiceAsk.run($0, helper: $1) }
+    /// Sends the words to Friday's one door; the tests hand in a fake that writes nothing.
+    var deliver: (String) async -> FridayDelivery.Outcome = { await FridayDelivery.send($0) }
     /// The error pill's buttons: the click test (#314) records the action instead of opening Privacy or Settings.
     var act: ((VoiceInput.Action) -> Void)?
     /// The local engine's end and the most it may take (#197): the tests hand in a slow one.
@@ -122,6 +122,7 @@ final class VoiceInputController: ObservableObject {
             run += 1
             phase = .ready
             VoiceSpeaker.shared.hush()
+            try? FridayDoor().send("roberto_parla")  // claude-config#2777: the engine drops every phrase not yet begun
             let me = run
             Task { if me == run { await begin() } }
         case .ready, .listening: finish()
@@ -258,52 +259,20 @@ final class VoiceInputController: ObservableObject {
         if VoiceInput.heardNothing(seconds: listened, words: said.split(separator: " ").count, peak: peak) { return fail(.nothingHeard, run: me) }
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
-        // A short confirmation («va bene», «sì vai») may answer the Friday: only a question is kept out of its chat.
-        let isQuestion = VoiceRoute.classify(said) == .question
-        let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
-        Self.log.notice("route: \(isQuestion ? "question" : "order", privacy: .public), helper \(helper != nil, privacy: .public)")
-        if isQuestion {
-            phase = .thinking
-            let reply = await ask(said, helper)
-            guard me == run else { return }
-            guard case .success(let answer) = reply else {
-                if case .failure(let why) = reply { show(why.message, seconds: 5) }
-                return
-            }
-            return answered(answer)
-        }
         sendingSince = Date()
         phase = .sending
         try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
-        if let helper {
-            phase = .thinking
-            let started = Date()
-            let reply = await ask(said, helper)
-            guard me == run else { return }
-            // #262: the helper's words are not the outcome of an order; the engine's `.esiti` is
-            if case .success = reply {
-                let outcome = await OverseerDelivery.afterHelper(said, since: started, files: files)
-                guard me == run else { return }
-                Self.log.notice("order: helper, \(String(describing: outcome), privacy: .public)")
-                return show(Self.sentence(outcome))
-            }
-            // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
-            Self.log.notice("order: helper failed, inbox as before")
-        }
-        let outcome = await OverseerDelivery.send(said, files: files)
+        phase = .thinking
+        let outcome = await deliver(said)
         guard me == run else { return }
-        Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
-        show(Self.sentence(outcome))
-    }
-
-    private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
+        Self.log.notice("parla: \(String(describing: outcome), privacy: .public)")
         switch outcome {
-        case .sent: return "Inviato a clotch AI"
-        case .queued: return "In coda per clotch AI"
-        case .copied: return "Testo copiato. Incolla con ⌘V"
-        case .notDelivered: return "Non risulta consegnato a clotch AI. Testo copiato. Incolla con ⌘V"
+        case .answered(let answer): answered(answer)
+        case .passed: show("Passato a Friday")
+        case .refused(let why): show(why, seconds: 5)
+        case .notReached: show("Friday non risponde. Il comando resta in coda e parte quando riparte", seconds: 5)
         }
     }
 

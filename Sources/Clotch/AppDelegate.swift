@@ -32,11 +32,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AccountsInUseFeed.shared.start()
         VoiceStore.shared.start()
         VoiceSpeaker.shared.start()
-        VoiceAsk.sessions = { [appState] in
-            appState.sessions.sorted { $0.value.lastActivity > $1.value.lastActivity }.map { id, s in
-                VoiceRoute.sessionLine(title: s.displayTitle(sessionId: id), status: s.status, lastActivity: s.lastActivity)
-            }
-        }
         VoiceInputController.shared.prewarm()
         AfkStore.shared.start()
         MacBridge.shared.start()
