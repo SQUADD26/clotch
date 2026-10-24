@@ -174,7 +174,7 @@ export default function Barra() {
           {!!sessioni.length && !barra.totale && (
             <div className="vuoto-filtri">
               <span className="t-sm secondario">Nessuna sessione con questi filtri</span>
-              <Bottone tipo="secondario" onClick={() => setVista({ ...vista, filtri: [] })}>Togli i filtri</Bottone>
+              <Bottone tipo="secondario" onClick={() => setVista({ ...vista, filtri: [] })}>Rimuovi filtri</Bottone>
             </div>
           )}
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
