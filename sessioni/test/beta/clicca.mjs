@@ -84,7 +84,7 @@ async function giro(app, area, cfg, console_) {
     if (ok && !disab && tipo !== 'campo' && uguali(riposo, sopra) && aRiposo === aSopra) manca('HOVER', 'nessun cambio visivo col mouse sopra');
     const campione = VIDEO ? pagina.evaluate(() => window.__bt.campiona(700)).catch(() => null) : null;
     if (ok) {
-      await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pagina.evaluate(() => dispatchEvent(new Event('bt-gesto'))).catch(() => {}); await pausa(80);
+      await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pausa(80);
       const premuto = await pezzo(), aPremuto = await asp(); el.foto.push(await foto(`el${i}-premuto`));
       await pagina.mouse.up(); await forza(i, []);
       if (!disab && tipo !== 'campo' && !cfg.ridotto && uguali(sopra, premuto) && aSopra === aPremuto) manca('PREMUTO', 'nessuno stato premuto');

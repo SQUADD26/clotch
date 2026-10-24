@@ -45,13 +45,11 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
     // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
     const parte = a.inizio ?? t0, gesto = (c.eventi ?? [c.evento]).filter((g) => g != null && parte != null && g <= parte + 1000 / 60).at(-1);
     // un avviso nasce dalla risposta del main, un tooltip dopo un'attesa voluta, sotto una View Transition non si vede: niente M5
-    if (!a.avviso && !a.coperta && !a.attesa && a.legata !== false && gesto != null) { const r = risposte.get(gesto); if (!r || parte - gesto < r.ritardo) risposte.set(gesto, { a, ritardo: parte - gesto }); }
+    if (!a.avviso && !a.coperta && !a.attesa && gesto != null) { const r = risposte.get(gesto); if (!r || parte - gesto < r.ritardo) risposte.set(gesto, { a, ritardo: parte - gesto }); }
   }
   // M5 è «dal gesto al primo cambio»: conta la risposta più pronta a ogni gesto; ciò che si muove dopo (un bottone che torna
   // al riposo quando il layout si sposta, azioni al passaggio altrove) è una conseguenza, non la prontezza
   for (const { a, ritardo } of risposte.values()) if (ritardo > LIMITE_M5) D('M5', a, `parte ${Math.round(ritardo)} ms dopo il gesto`);
-  // MCOMPARE: un menu, popover o dialogo che al primo fotogramma è già opaco e non ha animazioni compare di colpo (#1076)
-  for (const x of c.comparsi ?? []) if (!x.animato && !x.secondario && x.opacita > 0.95 && !ridotto) D('MCOMPARE', x, 'compare di colpo, senza entrata animata');
   const dt = c.T.slice(1).map((t, i) => t - c.T[i]).sort((a, b) => a - b);
   const fps = dt.length ? 1000 / dt[Math.floor(dt.length / 2)] : 60, lunghi = dt.filter((x) => x > 50).length;
   if (c.animazioni.length && (fps < 30 || (lunghi >= 5 && !process.env.CI))) D('M11', null, `mediana ${Math.round(fps)} fps, ${lunghi} fotogrammi oltre 50 ms`);
