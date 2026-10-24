@@ -27,6 +27,7 @@ import { accanto } from "./Sovrapposti";
 import { archivia } from "./esiti";
 import { Sovrapposto, type Ancora, type Punto } from "../base/Sovrapposto";
 import { conTransizione } from "../base/movimento";
+import { nonRisponde } from "../chat/clotch-ai";
 
 export type Aperto =
   | { tipo: "opzioni"; i: number; a: Ancora } | { tipo: "proprieta"; a: Ancora } | { tipo: "raggruppa"; a: Ancora }
@@ -145,9 +146,11 @@ export default function Barra() {
   // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
   const vivi = useRef({ apriSessione, pref, alterna });
   vivi.current = { apriSessione, pref, alterna };
+  // un registro che cambia ridisegna solo le righe il cui «non risponde» cambia (le righe sono memo, #1017 in raffica)
+  const muta = (id: string) => { const c = registroVivo?.chat.get(id); return !!c && nonRisponde(c, Date.now()); };
   const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
-      key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
+      key={s.id} s={s} muta={muta(s.id)} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
       figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
       onApri={() => { vivi.current.apriSessione(s.id); if (vivi.current.pref[s.id]?.nonLetta) void api().impostaPreferenze(s.id, { nonLetta: null }); }}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}

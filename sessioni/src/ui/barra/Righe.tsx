@@ -5,8 +5,6 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { SegnoStato } from "../base/SegnoStato";
-import { useRegistro } from "../clotch-ai/dati";
-import { nonRisponde } from "../chat/clotch-ai";
 import { STATI } from "./elenco";
 import { IndicatorePr } from "./Pr";
 import "./barra.css";
@@ -57,6 +55,8 @@ export function IconaRiga({ titolo, pref }: { titolo: string; pref?: PreferenzeS
 
 interface PropsSessione {
   s: Sessione;
+  /** La sessione non risponde (chat/clotch-ai `nonRisponde`): la calcola la barra, così una riga si ridisegna solo se cambia. */
+  muta?: boolean;
   pref?: PreferenzeSessione;
   scelta: boolean;
   /** Nella sezione «Fissate» (101:21065): a destra lo spillo al posto dello stato. */
@@ -79,11 +79,10 @@ interface PropsSessione {
 /** Memo: una riga si ridisegna solo se cambiano i suoi dati; le funzioni no (Barra le fa chiamare sempre l'ultima versione). */
 const stessiDati = (a: PropsSessione, b: PropsSessione) =>
   (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
-export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+export const RigaSessione = memo(function RigaSessione({ s, muta, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: { currentTarget: HTMLElement }) => suggerisci(e.currentTarget, s.titolo, onTroncato);
-  const c = useRegistro().dati?.chat.get(s.id);
   // stessa regola della testata e del filo: una sessione che non risponde ha lo stesso segno ovunque
-  const stato = s.situazione?.adesso === "errore" || (!!c && nonRisponde(c, Date.now())) ? "errore" : s.stato;
+  const stato = s.situazione?.adesso === "errore" || muta ? "errore" : s.stato;
   return (
     <div
       role="button" tabIndex={0} aria-current={scelta || undefined} data-figlia={figlia || undefined}
