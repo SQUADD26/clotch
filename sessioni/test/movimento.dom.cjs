@@ -79,6 +79,10 @@ app.whenReady().then(async () => {
     // passaggio tra viste: «Nuova sessione», poi di nuovo la sessione
     await misura('MOV-06', 'vista nuova sessione', `() => [...document.querySelectorAll('.pezzo-barra .riga')].find((r) => r.textContent.startsWith('Nuova sessione')).click()`, [['::view-transition-new(superficie)', ...E], ['::view-transition-old(superficie)', ...E]]);
     await misura('MOV-06', 'vista sessione', `() => document.querySelector('.riga-sessione').click()`, [['::view-transition-new(superficie)', ...E]]);
+    // blocchi del filo (strumenti, pensiero, modifiche): si aprono e si chiudono con dissolvenza della superficie
+    await wait(() => !!document.querySelector('.pezzo-chat .testata[aria-expanded="false"]'));
+    await misura('MOV-17', 'blocco del filo aperto', clic('.pezzo-chat .testata[aria-expanded="false"]'), [['::view-transition-new(superficie)', ...E], ['::view-transition-old(superficie)', ...E]]);
+    await misura('MOV-17', 'blocco del filo chiuso', clic('.pezzo-chat .testata[aria-expanded="true"]'), [['::view-transition-new(superficie)', ...E]]);
     // avviso: «Nascondi cartella» dal menu della cartella, poi chiuso dalla sua X
     await run(() => document.querySelector('.pezzo-barra button.riga[aria-expanded]').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 40, clientY: 200 })));
     await wait(() => [...document.querySelectorAll('[role="menuitem"], .voce')].some((v) => v.textContent.includes('Nascondi cartella')));
