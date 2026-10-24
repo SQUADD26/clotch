@@ -4,7 +4,7 @@
 .parita .velo { inset: var(--spazio-16); border-radius: var(--raggio-md); }
 .dialogo {
   width: var(--misura-dialogo); padding: var(--spazio-5); gap: var(--spazio-4);
-  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .velo.centrato { padding-bottom: 0; }

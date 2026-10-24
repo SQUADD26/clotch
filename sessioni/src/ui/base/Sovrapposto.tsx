@@ -1,5 +1,5 @@
 // figma: 101-20859 — un solo modo per tutto ciò che galleggia (menu, popover, tooltip, dialoghi, ricerca, #519): reso in fondo al body (mai tagliato
-// da un contenitore), posto accanto a chi lo apre e tenuto dentro la finestra con margine `spazio-2`, livello da `--livello-*`.
+// da un contenitore), posto accanto a chi lo apre e tenuto dentro la finestra con margine `misura-margine-finestra`, livello da `--livello-*`.
 // Esc e clic fuori chiudono solo quello in cima; alla chiusura il fuoco torna a chi lo aveva; i dialoghi tengono il Tab dentro.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
@@ -87,22 +87,36 @@ function useLuogo() {
   return { segno: <span ref={segno} hidden />, luogo };
 }
 
-/** Alla chiusura una copia inerte esce con l'animazione d'uscita, qualunque sia la via (Esc, clic, stato del chiamante). */
+/** Fogli di stile della pagina, una volta, per la copia che esce (vive in un'ombra, fuori dalle ricerche nel documento). */
+let stili: CSSStyleSheet | null = null;
+const foglio = () => {
+  if (!stili) {
+    stili = new CSSStyleSheet();
+    stili.replaceSync([...document.styleSheets].flatMap((f) => { try { return [...f.cssRules].map((r) => r.cssText); } catch { return []; } }).join("\n"));
+  }
+  return stili;
+};
+
+/** Alla chiusura una copia muta esce con l'animazione d'uscita, qualunque sia la via (Esc, clic, stato del chiamante).
+ *  Sta in un'ombra: `querySelector` e il testo della pagina non la vedono, così chi riapre trova solo il nuovo. */
 function useUscita(ref: RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
     const el = ref.current, pezzo = el?.parentElement?.className ?? "";
     return () => {
-      if (!el) return;
-      const c = el.cloneNode(true) as HTMLElement, w = document.createElement("div");
+      if (!el || document.documentElement.classList.contains("parita")) return;
+      const ospite = document.createElement("div"), ombra = ospite.attachShadow({ mode: "open" }), w = document.createElement("div");
+      ombra.adoptedStyleSheets = [foglio()];
+      const c = el.cloneNode(true) as HTMLElement;
       c.classList.add("esce");
-      c.removeAttribute("role");
-      c.setAttribute("aria-hidden", "true");
+      c.inert = true;
       w.className = pezzo;
       w.appendChild(c);
-      document.body.appendChild(w);
-      const via = () => w.remove();
+      ombra.appendChild(w);
+      ospite.setAttribute("aria-hidden", "true");
+      document.body.appendChild(ospite);
+      const via = () => ospite.remove();
       c.addEventListener("animationend", via);
-      setTimeout(via, numero("tempo-normale")); // senza animazione (riduci movimento, parità) non arriva animationend
+      setTimeout(via, numero("tempo-uscita")); // senza animazione (riduci movimento) non arriva animationend
     };
   }, []);
 }
@@ -118,7 +132,7 @@ function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, scarto, passiv
   const metti = () => {
     const el = ref.current;
     if (!el) return;
-    const n = posiziona(rett(ancora), el.offsetWidth, el.offsetHeight, lato, fine, scarto ?? (ancora instanceof Element ? numero("spazio-1-5") : 0), numero("spazio-2"), innerWidth, innerHeight);
+    const n = posiziona(rett(ancora), el.offsetWidth, el.offsetHeight, lato, fine, scarto ?? (ancora instanceof Element ? numero("spazio-1-5") : 0), numero("misura-margine-finestra"), innerWidth, innerHeight);
     setPos((v) => (v && v.x === n.x && v.y === n.y && v.lato === n.lato ? v : n));
   };
   // un punto arriva nuovo a ogni render: conta dove sta, non l'oggetto

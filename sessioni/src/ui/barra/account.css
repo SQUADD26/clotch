@@ -31,7 +31,7 @@
 .pezzo-barra .menu-account {
   width: var(--misura-menu-modello); padding: var(--spazio-1);
   display: flex; flex-direction: column;
-  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pezzo-barra .menu-account .linea { height: var(--misura-tratto); background: var(--colore-bordo-leggero); }

@@ -1,7 +1,7 @@
 /* figma: 101-26745 — «menu comandi» 101:27015; 101-27018 — «menu file» 101:27276; 101-26140 — «menu permessi» 101:26398 e «tooltip» 101:26425;
    148-28674 — «menu modello» (148-28740, 148-28806); 101-27528 — «errore invio» 101:27798 e la casella con il bordo d'errore */
 .pezzo-chat .menu-casella {
-  display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-xl); background: var(--colore-fondo-elevato);
+  display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-sovrapposto); background: var(--colore-fondo-elevato);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pezzo-chat .menu-casella .titolo-gruppo {
@@ -22,7 +22,7 @@
 
 /* comandi con «/» e file con «@»: sopra la casella, larghi quanto lei */
 .pezzo-chat .menu-casella.suggerimenti {
-  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: calc(var(--livello-sopra) + 1); overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
+  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: var(--livello-menu); overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
 }
 .pezzo-chat .suggerimenti .comando { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
 .pezzo-chat .suggerimenti .comando + .descrizione { margin-left: var(--spazio-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

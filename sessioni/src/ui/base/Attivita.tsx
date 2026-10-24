@@ -1,10 +1,11 @@
 // figma: 101-30172 — «Bottone attività» 121:58595 (Senza numero, Con numero, Aperto) e «Popover attività» 121:58601
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Registro } from "../../clotch-ai";
 import { useRegistro } from "../clotch-ai/dati";
 import { casella } from "../clotch-ai/vista";
 import { BottoneIcona } from "./Bottone";
 import { Icona } from "./Icona";
+import { useNavigazione } from "./navigazione";
 import { Sovrapposto, type Punto } from "./Sovrapposto";
 import { numero } from "./token";
 import "./attivita.css";
@@ -15,11 +16,14 @@ function punto(): Punto {
   return { x: s.left + numero("spazio-2"), y: s.top + numero("misura-intestazione") + numero("spazio-2") };
 }
 
-/** Campana nella barra del titolo: il numero è quello di «Casella» (sessioni che aspettano te); il clic apre e chiude il popover; la X ed Esc lo chiudono. */
+/** Campana nella barra del titolo: il numero è quello di «Casella» (sessioni che aspettano te); il clic apre e chiude il popover; la X, Esc e un clic fuori lo chiudono. */
 export function Attivita() {
   const r = useRegistro();
   // nella prova di parità del frame 101-30172 il popover parte aperto, come nel disegno
   const [aperto, setAperto] = useState(() => new URLSearchParams(location.search).get("parita") === "101-30172");
+  // la barra che si apre o si chiude (⌘\) sposta il punto in cui sta: si chiude (#544)
+  const { barraAperta } = useNavigazione(), barraPrima = useRef(barraAperta);
+  useEffect(() => { if (barraPrima.current !== barraAperta) { barraPrima.current = barraAperta; setAperto(false); } }, [barraAperta]);
   const n = r.dati ? casella(r.dati as Registro, Date.now()).aspettano : 0;
   return (
     <>
