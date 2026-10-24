@@ -2,6 +2,8 @@
 // campionatore delle animazioni a ogni fotogramma. Ogni difetto: { criterio, dove, valore }. Criteri in sessioni/test/beta/LEGGIMI.md.
 (() => {
   const SOPRA = '[role=menu],[role=listbox],[role=dialog],[role=tooltip],.menu,.tooltip,.popover-attivita,.dialogo,[popover]:popover-open,dialog[open],.avviso-comparsa';
+  // tooltip e avvisi: nascono dal passaggio o dalla risposta del main, non si chiudono con Esc e non misurano la prontezza del gesto
+  const SECONDARI = '.avviso-comparsa,[role=status],[role=tooltip],.tooltip,.suggerimento';
   const CLIC = 'button,a,[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[role=tab],[role=option],input,textarea,[tabindex]:not([tabindex="-1"])';
   const LAYOUT = /^(width|height|top|left|right|bottom|inset|margin|padding|max-|min-|flex-basis|grid-template)/;
   const num = (s) => (String(s).match(/-?[\d.]+/g) || []).map(Number);
@@ -12,6 +14,8 @@
     const t = testo(e);
     return e.tagName.toLowerCase() + c + (t ? ` «${t}»` : '');
   };
+  // aspetto calcolato di un pezzo e dei suoi figli: seconda prova degli stati, accanto ai pixel della foto
+  const aspetto = (x) => [x, ...x.querySelectorAll('*')].map((y) => { const z = getComputedStyle(y); return z.color + z.backgroundColor + z.opacity + z.borderTopColor + z.boxShadow + z.transform + z.fill + z.stroke; }).join();
   const vis = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0; };
   const proprio = (e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
   const dentro = (a, b, m = 1) => a.left >= b.left - m && a.top >= b.top - m && a.right <= b.right + m && a.bottom <= b.bottom + m;
@@ -55,7 +59,6 @@
       let scorre = false;
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflow)) { scorre = true; break; }
       if (e.disabled || e.getAttribute('aria-disabled') === 'true') {
-        const aspetto = (x) => [x, ...x.querySelectorAll('*')].map((y) => { const z = getComputedStyle(y); return z.color + z.backgroundColor + z.opacity + z.borderTopColor + z.fill + z.stroke; }).join();
         const gemello = [...document.querySelectorAll(`${radice} :is(${CLIC})`)].find((o) => o !== e && o.className === e.className && !o.disabled && o.getAttribute('aria-disabled') !== 'true' && vis(o));
         if (gemello && aspetto(gemello) === aspetto(e)) una('STATO', e, `disabilitato uguale all'attivo ${sel(gemello)}`);
       }
@@ -112,7 +115,7 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest(SECONDARI) || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
               // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
               coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
               // il tooltip compare dopo un'attesa voluta (base/Suggerimento.tsx), non subito al gesto
@@ -133,7 +136,7 @@
   }
 
   window.__bt = {
-    SOPRA, LAYOUT: LAYOUT.source, sel, statiche, anello, campiona,
+    SOPRA, LAYOUT: LAYOUT.source, sel, aspetto, statiche, anello, campiona,
     cliccabili(radice) {
       const visti = new Set();
       return [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).filter((e) => !e.closest(SOPRA)).filter((e) => {
@@ -142,7 +145,8 @@
     },
     sopra,
     // menu, popover e dialoghi aperti da un gesto: tooltip e avvisi a comparsa non si chiudono con Esc né prendono il fuoco
-    menuAperti: () => sopra().filter((e) => !e.matches('.avviso-comparsa,[role=tooltip],.tooltip,[role=status]')).length,
+    menuAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).length,
+    nomiAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).map(sel).join(', '),
     firma: (radice) => [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).length + '|' + sopra().length + '|' + location.search,
   };
 })();
