@@ -7,6 +7,7 @@
   "h": 256
  },
  "variabili": {
+  "colore/fondo/superficie": "#181818",
   "spazio/4": 16,
   "spazio/1": 4,
   "misura/colonna": 760,
@@ -38,6 +39,7 @@
     "h": 256
    },
    "variabili": {
+    "fills[0]": "colore/fondo/superficie",
     "itemSpacing": "spazio/4",
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
