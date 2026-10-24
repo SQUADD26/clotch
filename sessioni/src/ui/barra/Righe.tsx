@@ -83,7 +83,10 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>{s.titolo}</span>
+      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>
+        {s.titolo}
+        {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia">{s.titolo}</span></span></span>}
+      </span>
       {figlie > 0 && (
         <button type="button" className="freccia-figlie" aria-expanded={figlieAperte} aria-label={figlieAperte ? "Nascondi le figlie" : "Mostra le figlie"}
           onClick={(e) => { e.stopPropagation(); onFiglie?.(); }}>

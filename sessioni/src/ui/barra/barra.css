@@ -27,15 +27,27 @@
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
 
-/* shimmer sul nome di una sessione al lavoro (101:35045): banda chiara che scorre, ciclo 1,8 s */
-.pezzo-barra .lavoro {
-  background: linear-gradient(90deg, var(--colore-testo-lavoro) 40%, var(--colore-testo-lavoro-luce) 50%, var(--colore-testo-lavoro) 60%);
-  background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+/* shimmer sul nome di una sessione al lavoro (101:35045): banda chiara larga 0,6 del titolo che scorre da sinistra a destra, ciclo 1,8 s.
+   Solo transform (#474): una finestra sfumata scorre e dentro la copia chiara del titolo scorre al contrario, così resta ferma sulle lettere;
+   con colori pieni la sfumatura della finestra dà la stessa miscela del gradiente di prima (background-size 300%, banda 40-60%),
+   ma gira nel compositore invece di ricalcolare lo stile a ogni frame. */
+.pezzo-barra .lavoro { position: relative; color: var(--colore-testo-lavoro); }
+.pezzo-barra .lavoro .luccica-area { position: absolute; inset: 0; overflow: hidden; pointer-events: none; user-select: none; }
+.pezzo-barra .lavoro .luccica-finestra {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 60%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 50%, transparent); mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
   animation: luccica 1.8s linear infinite;
 }
-@keyframes luccica { from { background-position: 100% 0; } to { background-position: 0 0; } }
-/* parità: il fotogramma a 0 ms del disegno, banda sulle lettere 4-10 */
-.parita .pezzo-barra .lavoro { animation: none; background-position: 72% 0; }
+.pezzo-barra .lavoro .luccica-copia {
+  position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% / 0.6);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--colore-testo-lavoro-luce);
+  animation: luccica-copia 1.8s linear infinite;
+}
+@keyframes luccica { from { transform: translateX(-133.333%); } to { transform: translateX(200%); } }
+@keyframes luccica-copia { from { transform: translateX(80%); } to { transform: translateX(-120%); } }
+/* parità: il fotogramma a 0 ms del disegno, banda sulle lettere 4-10 (come background-position 72%) */
+.parita .pezzo-barra .lavoro .luccica-finestra { animation: none; transform: translateX(-40%); }
+.parita .pezzo-barra .lavoro .luccica-copia { animation: none; transform: translateX(24%); }
 
 .pezzo-barra .piede {
   padding: var(--spazio-2); gap: var(--spazio-2); flex: none;
