@@ -81,6 +81,19 @@ export default function Barra() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [n.sessione]);
+  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
+  useEffect(() => {
+    const frecce = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
+      const t = e.target as HTMLElement;
+      if (!t.matches?.(".pezzo-barra .riga:not(.titolo-sezione)")) return;
+      const righe = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .riga:not(.titolo-sezione)")].filter((x) => x.getClientRects().length);
+      const dopo = righe[righe.indexOf(t) + (e.key === "ArrowDown" ? 1 : -1)];
+      if (dopo) { e.preventDefault(); dopo.focus(); }
+    };
+    addEventListener("keydown", frecce);
+    return () => removeEventListener("keydown", frecce);
+  }, []);
   useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
   const chiudi = () => setAperto(null);
