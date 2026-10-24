@@ -17,9 +17,9 @@ const H = 3_600_000, M = 60_000, S = 1000;
 const quota = (account, cinque, cf, sette, sf) => ({ account, email: `${account}@example.com`, usato: sette, ripartenza: '', cinque, cinqueFine: Date.now() + cf, sette, setteFine: Date.now() + sf });
 const quote = (cinque = 38) => [
   quota('accountmanager', cinque, 2 * H + 14 * M + 8 * S + 900, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S),
-  quota('squadd', 72, 3 * H, 40, 2 * 24 * H), quota('friday', 100, 47 * M + 30 * S, 88, 24 * H), quota('dentalspace', 12, 4 * H, 20, 5 * 24 * H),
+  quota('squadd', 72, 3 * H, 40, 2 * 24 * H), quota('friday', 100, 47 * M + 30 * S, 88, 24 * H), { ...quota('dentalspace', 12, 4 * H, 20, 5 * 24 * H), cartelle: ['.claude-terminal-dentalspace'] },
 ];
-const chat = (sorgente) => ({ chat: 's1', titolo: null, madre: null, progetto: null, account: '.claude-accountmanager', sorgente, stato: null, richieste: [], coda: [], passi: [], aiutanti: {} });
+const chat = (sorgente, account) => ({ chat: 's1', titolo: null, madre: null, progetto: null, account, sorgente, stato: null, richieste: [], coda: [], passi: [], aiutanti: {} });
 const elencoPieno = scene.elenco;
 const comandi = [];
 let win, mostrate = 0, fuochi = 0;
@@ -33,10 +33,11 @@ const wait = (fn, ...a) => win.webContents.executeJavaScript(`new Promise((ok, k
 const testo = (sel) => run((s) => document.querySelector(s)?.textContent ?? null, sel);
 const clicca = (sel, t) => run((sel, t) => { const el = [...document.querySelectorAll(sel)].find((e) => (e.textContent || '').includes(t)); if (!el) throw new Error('manca ' + sel + ' ' + t); el.click(); }, sel, t);
 // scenario: tipo di chat nel registro (null = nessuna chat), quote, sessione aperta o nuova
-const carica = async ({ sorgente, cinque, nuova = false }) => {
+const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno, quoteExtra = false }) => {
   scene.uso = quote(cinque);
-  scene.registro = { ...scene.registro, chat: sorgente ? { s1: chat(sorgente) } : {} };
-  scene.elenco = elencoPieno;
+  if (quoteExtra) scene.uso[3] = { ...scene.uso[3], cartelle: ['.claude'] }; // la quota di ~/.claude (il motore la chiama «default»)
+  scene.registro = { ...scene.registro, chat: sorgente ? { s1: chat(sorgente, account) } : {} };
+  scene.elenco = elenco;
   scene.navigazione = nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' };
   comandi.length = 0;
   await win.loadFile(path.join(root, 'renderer/index.html'), { query: nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' } });
@@ -69,6 +70,37 @@ app.whenReady().then(async () => {
     await new Promise((r) => setTimeout(r, 1300));
     const dopo = await run(() => document.querySelector('.piede-account .uso-piede .testata').lastChild.textContent);
     assert.notEqual(dopo, t[0][1], 'il conto non scorre');
+  });
+
+  await check('#993 CARTELLA: la sessione porta la cartella (.claude-terminal-dentalspace), non l\u2019email: il bottone mostra l\u2019uso di dentalspace', async () => {
+    await carica({ sorgente: 'motore', account: '.claude-terminal-dentalspace' });
+    assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
+    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
+  });
+
+  await check('#993 DEFAULT: il motore chiama «default» la cartella ~/.claude: il bottone trova l\u2019uso di quella cartella', async () => {
+    await carica({ sorgente: 'motore', account: 'default', quoteExtra: true });
+    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
+  });
+
+  await check('#993 NOME DEL MOTORE: la sessione porta «terminal-dentalspace» (la cartella senza punto e senza claude-): il bottone trova lo stesso uso', async () => {
+    await carica({ sorgente: 'motore', account: 'terminal-dentalspace' });
+    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
+  });
+
+  await check('#996 APP CLAUDE: sessione senza registro, account = profilo (Claude-dentalspace) ma con l’email del suo uuid: il bottone mostra l’uso di dentalspace', async () => {
+    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-dentalspace', email: 'dentalspace@example.com' } : x);
+    await carica({ sorgente: null, elenco: { ...elencoPieno, sessioni: app } });
+    assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
+    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
   });
 
   await check('CAMBIO: sessione del motore -> menu uso, «Cambia account», clic su squadd manda riprendi_altrove', async () => {

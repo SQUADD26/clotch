@@ -259,6 +259,15 @@ app.whenReady().then(async () => {
     await wait((t) => document.querySelector('.messaggio-roberto .bolla')?.textContent === t, 'Messaggio A uno');
   }, { consenti: /elenco rotto|Error occurred in handler/ });
 
+  await check('TRASCRIZIONE_SU_ALTRO_COMPUTER_DICE_DOVE_E', async () => { // #996: sessione dell'app Claude via ssh, senza copia sul Mac
+    const remota = { ...scene.elenco, sessioni: scene.elenco.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', file: '/x/local_1.json', app: { padre: null, prs: [], connettori: [], strumentiMcp: 0, cli: null, ospite: 'sandbox-app@10.0.0.1', remoto: false } } : x) };
+    finto.elenco = () => remota;
+    finto.messaggi = (_id, r) => ({ ...r, messaggi: [], errore: 'trascrizione non trovata sul disco', cronologia: undefined });
+    await carica({ vista: 'sessione', sessione: 's1' });
+    await wait(() => /Messaggi non letti/.test(document.body.innerText));
+    assert.match(await run(() => document.querySelector('.messaggio-al-centro').innerText), /la trascrizione è su sandbox-app@10\.0\.0\.1, non su questo Mac/);
+  }, { consenti: /Error occurred in handler/ });
+
   await check('AGGIORNAMENTO_DAL_VIVO_CURSORE_E_BOZZA', async () => {
     await caricaChat(); await run(() => document.querySelector('textarea').focus()); await scrivi('textarea', 'abcdefghij');
     await run(() => { const t = document.querySelector('textarea'); t.focus(); t.setSelectionRange(3, 6); });

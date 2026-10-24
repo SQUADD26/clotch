@@ -31,7 +31,7 @@ const TESTI = ["Leggere i token dal disegno", "Scrivere la barra laterale", "Scr
 const passi = (...stati: Passo["stato"][]): Passo[] => TESTI.map((testo, i) => ({ testo, stato: stati[i] }));
 const aiutanti = (finito: boolean): Aiutante[] => [
   ["Lettore", "Legge sessioni/src/lettore.ts", "Ha letto 4 file", 12], ["Controllo tipi", "Lancia npm run typecheck", "Nessun errore", 8], ["Prove", "Disegna 14 stati a scala 1", "14 stati pari al disegno", 41],
-].map(([nome, lavora, fatto, s], i) => ({ id: `a${i}`, nome: String(nome), azione: String(finito ? fatto : lavora), durata: Number(s) * 1000, finito }));
+].map(([nome, lavora, fatto, s], i) => ({ id: `a${i}`, nome: String(nome), azione: String(finito ? fatto : lavora), durata: Number(s) * 1000, finito, errore: false, rapporto: String(fatto) }));
 const modifica = {
   tipo: "modifica" as const, id: "m1", file: "sessioni/src/BarraLaterale.tsx", aggiunte: 4, tolte: 2, durata: null,
   righe: [

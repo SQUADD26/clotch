@@ -34,9 +34,12 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
+  const radici = radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti);
+  // l'account di una sessione dell'app è l'uuid nel suo percorso, non la cartella dove il CLI scrive: l'email la dà il `.claude.json` con quell'uuid (#996)
+  const emailApp = new Map(radici.filter((r) => r.uuid && r.email).map((r) => [r.uuid!, r.email!]));
   // stessa cartella vera sotto più account: la legge il primo (come prima, a pari attività vinceva il primo)
   const progetti = new Set<string>(), lette = new Set<string>();
-  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) {
+  for (const r of radici) {
     lette.add(progettiDi(r.path));
     const p = chiaveCartella(progettiDi(r.path));
     if (progetti.has(p)) continue;
@@ -50,6 +53,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     if (!a) continue;
     s.sorgente = "claude-desktop";
     s.idApp = a.idApp;
+    s.email = emailApp.get(a.uuid ?? "") ?? s.email;
     s.app = a.app;
     s.titolo = a.titolo || s.titolo;
     s.cartella = a.cartella ?? s.cartella;
@@ -62,7 +66,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     if (viste.has(a.cliId)) continue;
     const cartella = a.cartella ?? "";
     tutte.push({
-      id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: null, idApp: a.idApp, titolo: a.titolo,
+      id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: (a.uuid && emailApp.get(a.uuid)) || null, idApp: a.idApp, titolo: a.titolo,
       progetto: "", cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
       ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file, app: a.app,
     });

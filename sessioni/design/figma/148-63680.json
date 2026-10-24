@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2141,7 +2142,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -5239,11 +5240,47 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "163:91941",
+   "nome": "titolo menu Vai",
+   "tipo": "FRAME",
+   "box": {
+    "x": 242,
+    "y": 3,
+    "w": 35,
+    "h": 22
+   },
+   "variabili": {
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91942",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 6,
+    "w": 19,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario"
+   },
+   "senza": [
+    "fontSize 13"
+   ],
+   "testo": "Vai",
+   "font": "SF Pro Regular"
+  },
+  {
    "id": "148:64259",
    "nome": "titolo menu Finestra",
    "tipo": "FRAME",
    "box": {
-    "x": 242,
+    "x": 281,
     "y": 3,
     "w": 66,
     "h": 22
@@ -5260,7 +5297,7 @@
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
-    "x": 250,
+    "x": 289,
     "y": 6,
     "w": 50,
     "h": 16
@@ -5272,6 +5309,42 @@
     "fontSize 13"
    ],
    "testo": "Finestra",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:91943",
+   "nome": "titolo menu Aiuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 351,
+    "y": 3,
+    "w": 48,
+    "h": 22
+   },
+   "variabili": {
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91944",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 359,
+    "y": 6,
+    "w": 32,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario"
+   },
+   "senza": [
+    "fontSize 13"
+   ],
+   "testo": "Aiuto",
    "font": "SF Pro Regular"
   },
   {

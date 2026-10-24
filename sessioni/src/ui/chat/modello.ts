@@ -10,7 +10,7 @@ import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
 
 export interface FileToccato { file: string; aggiunte: number; tolte: number }
-export interface Aiutante { id: string; nome: string; azione: string; durata: number | null; finito: boolean }
+export interface Aiutante { id: string; nome: string; azione: string; durata: number | null; finito: boolean; errore: boolean; rapporto: string }
 export interface Passo { testo: string; stato: "fatto" | "in-corso" | "da-fare" }
 
 export type Blocco = (
@@ -167,6 +167,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       const a: Aiutante = {
         id: identita?.[i]?.chiave ? `aiutante:${JSON.stringify([sessione, identita[i].chiave])}` : m.id, nome: testoCampo(m.ingresso, "description") || testoCampo(m.ingresso, "subagent_type"),
         azione: esito.split("\n")[0], durata: durata(i), finito: !!m.esito && !/^Async agent launched/.test(esito),
+        errore: !!m.esito?.errore, rapporto: esito,
       };
       const b = tu.blocchi.find((x) => x.tipo === "aiutanti");
       if (b && b.tipo === "aiutanti") b.aiutanti.push(a); else tu.blocchi.push({ tipo: "aiutanti", aiutanti: [a] });
@@ -193,7 +194,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
     const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
     const stRiga = bloccato ? "chiusa" : st;
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella, esito) });
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 

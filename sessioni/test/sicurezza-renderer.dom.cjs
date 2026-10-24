@@ -84,8 +84,8 @@ app.whenReady().then(async () => {
   await check('MESSAGGI_OSTILI_SONO_SOLO_TESTO', async () => {
     await carica({ vista: 'sessione', sessione: 's1' });
     await wait(() => document.querySelector('.messaggio-roberto .bolla')?.textContent.includes('<script>window.__pwn=1</script>'));
-    await run(() => document.querySelectorAll('.filo button.testata').forEach((b) => b.getAttribute('aria-expanded') === 'false' && b.click()));
-    await attesa(300);
+    // tutto aperto: gruppi, righe e ragionamento del filo compatto (#876) si aprono a strati
+    for (let i = 0; i < 3; i++) { await run(() => document.querySelectorAll('.filo button[aria-expanded="false"]').forEach((b) => b.click())); await attesa(300); }
     const r = await run(() => { const f = document.querySelector('.filo');
       // gli indirizzi web scritti da Roberto diventano link (#787): solo https/http, scritti per intero, in una scheda a parte e senza opener; ogni altro elemento è ostile
       const sicuro = (e) => e.tagName === 'A' && /^https?:\/\//.test(e.getAttribute('href')) && e.getAttribute('href') === e.textContent && e.target === '_blank' && /noopener/.test(e.rel) && e.attributes.length <= 4;
@@ -111,7 +111,7 @@ app.whenReady().then(async () => {
       fn: (() => { try { return window.sessioni.elencoSessioni.constructor('return typeof process')(); } catch (e) { return 'bloccato'; } })() }));
     assert.deepEqual(r.nodo, ['undefined', 'undefined', 'undefined', 'undefined', 'undefined']);
     assert.notEqual(r.fn, 'object', 'il costruttore di Function non raggiunge Node');
-    assert.deepEqual(r.k, ['azione', 'cerca', 'comandi', 'elencoSessioni', 'file', 'impostaImpostazioni', 'impostaPreferenze', 'impostazioni', 'info', 'menuBarra', 'messaggi', 'modelli', 'onAggiornamento', 'onImpostazioni', 'onMenu', 'onPreferenze', 'preferenze', 'ricostruisci', 'spazio', 'svuota']);
+    assert.deepEqual(r.k, ['azione', 'cerca', 'comandi', 'elencoSessioni', 'file', 'impostaImpostazioni', 'impostaPreferenze', 'impostazioni', 'info', 'messaggi', 'modelli', 'onAggiornamento', 'onImpostazioni', 'onPreferenze', 'preferenze', 'ricostruisci', 'spazio', 'svuota']);
     assert.deepEqual(r.f, ['avvia', 'comando', 'dettatura', 'onDettatura', 'onRegistro', 'onVoce', 'registro', 'voce']);
     assert.deepEqual(r.i, ['apri', 'archiviate', 'aggiornamenti', 'avvio', 'cartelle', 'eliminaDati', 'novita', 'profilo', 'radici', 'scegliCartella', 'uso', 'versione'].sort());
   }, { consenti: /unsafe-eval|script-src/ });

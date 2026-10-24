@@ -157,10 +157,6 @@ export interface SessioniApi {
   impostazioni(): Promise<Record<string, unknown>>;
   impostaImpostazioni(parte: Record<string, unknown>): Promise<void>;
   onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
-  /** La barra laterale della finestra davanti è aperta: la voce del menu dice «Nascondi» o «Mostra» (#867). */
-  menuBarra(aperta: boolean): void;
-  /** Voce del menu del Mac scelta (#867): il nome dell'azione, come nelle scorciatoie. */
-  onMenu(cb: (azione: string) => void): () => void;
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
   cerca(testo: string): Promise<RisultatoRicerca[]>;
   /** Comandi con «/» che la sessione conosce (suoi, dell'account e del progetto). */
@@ -283,6 +279,8 @@ export interface QuotaUso {
   /** Per finestra (#478): percentuale usata (null senza dato) e quando riparte, in ms; `usato` resta quello del 7 giorni (100 se le 5 ore sono finite). */
   /** Email dell'account: è quella che chiedono `nuova_sessione` e `riprendi_altrove`. */
   email?: string;
+  /** Cartelle dell'account sul Mac (`.claude-x`) con quell'email: la sessione porta il nome della cartella (#993). */
+  cartelle?: string[];
   cinque?: number | null; cinqueFine?: number | null; sette?: number | null; setteFine?: number | null; giorni?: { giorno: string; v: number }[] }
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }
