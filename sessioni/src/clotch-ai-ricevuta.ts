@@ -4,7 +4,7 @@ import * as path from "node:path";
 import { createHash } from "node:crypto";
 
 /** json.dumps(sort_keys=True, ensure_ascii=False), sul dominio delle decisioni (v/n interi, dati stringhe/argv). */
-function canonico(v: unknown): string {
+export function canonico(v: unknown): string {
   if (v === null || typeof v === "boolean" || typeof v === "string") return JSON.stringify(v);
   if (typeof v === "number" && Number.isSafeInteger(v) && !Object.is(v, -0)) return String(v);
   if (Array.isArray(v)) return `[${v.map(canonico).join(", ")}]`;

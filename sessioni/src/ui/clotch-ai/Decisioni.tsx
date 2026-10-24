@@ -9,8 +9,10 @@ import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { clotchAi, useRegistro } from "./dati";
+import { mentreInCorso, useInCorso } from "./inCorso";
 import { orario } from "./formato";
 import { Vuoto } from "./Pezzi";
+import { AttesaRegistro, inAttesa } from "./StatoRegistro";
 import { decisioniPerGiorno } from "./vista";
 
 type Decisione = ReturnType<typeof decisioniPerGiorno>[number]["voci"][number];
@@ -38,17 +40,20 @@ export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () =>
 // «Revocando…» subito: la risposta di clotch AI può arrivare dopo secondi
 async function annulla(d: Decisione) {
   const id = avvisa({ tipo: "caricamento", messaggio: "Revocando…" });
-  const e = await clotchAi().comando("annulla", { decisione: d.id }).catch(() => ({ esito: "errore", testo: "" }));
+  const e = await mentreInCorso(d.id, () => clotchAi().comando("annulla", { decisione: d.id }).catch(() => ({ esito: "errore", testo: "" })));
   esitoAnnulla(e, () => annulla(d), id);
 }
 
 export function Decisioni() {
-  const { dati: r } = useRegistro();
+  const stato = useRegistro();
+  const r = stato.dati;
   const n = useNavigazione();
+  const inCorso = useInCorso();
   // scena di prova 101-39512: sezione «annulla:<id decisione>» apre la conferma
   const [scelta, setConferma] = useState<Decisione | string | null>(() => n.sezione?.match(/^annulla:(.+)$/)?.[1] ?? null);
   const gruppi = r ? decisioniPerGiorno(r, Date.now()) : [];
   const conferma = typeof scelta === "string" ? gruppi.flatMap((g) => g.voci).find((d) => d.id === scelta) ?? null : scelta;
+  if (inAttesa(stato)) return <div className="vista-clotch-ai"><AttesaRegistro s={stato} /></div>;
   if (r && !gruppi.length) {
     return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="Nessuna decisione" corpo="Le scelte di clotch AI compaiono qui e si possono revocare." /></div>;
   }
@@ -67,7 +72,7 @@ export function Decisioni() {
                   <span className="t-xs secondario"><Pezzi parti={dettaglio(r!, d)} /></span>
                 </div>
                 {d.annullata ? <span className="t-sm secondario">Revocata</span>
-                  : d.annullabile ? <Bottone tipo="secondario" onClick={() => setConferma(d)}>Revoca</Bottone>
+                  : d.annullabile ? <Bottone tipo="secondario" caricamento={inCorso.has(d.id)} onClick={() => setConferma(d)}>Revoca</Bottone>
                   : d.nonAnnullabile && <span className="t-sm secondario">{d.nonAnnullabile}</span>}
               </div>
             );
@@ -75,7 +80,7 @@ export function Decisioni() {
         </section>
       ))}
       {conferma && (
-        <Dialogo titolo="Revocare la decisione?" corpo={conferma.effettoAnnullo ?? conferma.perche} onChiudi={() => setConferma(null)}
+        <Dialogo titolo="Revocare la decisione?" corpo={conferma.effettoAnnullo || conferma.perche || `Torna tutto come prima di «${conferma.cosa}».`} onChiudi={() => setConferma(null)}
           bottoni={<>
             <Bottone tipo="secondario" onClick={() => setConferma(null)}>Annulla</Bottone>
             <Bottone tipo="pericolo" onClick={() => { setConferma(null); annulla(conferma); }}>Revoca decisione</Bottone>

@@ -58,9 +58,9 @@ export function casella(r: Registro, ora: number) {
   };
 }
 
-/** Decisioni dalla più nuova, a gruppi per giorno («Oggi», «Ieri» o la data). */
+/** Decisioni dalla più nuova, a gruppi per giorno («Oggi», «Ieri» o la data; senza ora «Senza data»). */
 export function decisioniPerGiorno(r: Registro, ora: number) {
-  const giorno = (t: number | null) => t === null ? "" : giornoRelativo(t, ora);
+  const giorno = (t: number | null) => t === null ? "Senza data" : giornoRelativo(t, ora);
   const annullate = new Set(r.decisioni.filter((d) => d.cosa.startsWith("annullata ")).map((d) => d.cosa.slice(10)));
   const gruppi = new Map<string, Registro["decisioni"]>();
   for (const d of [...r.decisioni].reverse()) {

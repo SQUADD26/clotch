@@ -7,7 +7,8 @@ import { ChatClotchAi } from "./ChatClotchAi";
 import { avvisoInCorso, esitoFermo, fermo, menuQuiete } from "./ComandiTitolo";
 import { avviaScena, fineAvvio, useRegistro } from "./dati";
 import { Decisioni, esitoAnnulla } from "./Decisioni";
-import { avvisoSalvataggio, esitoSalvataggio, Regole } from "./Regole";
+import { avvisoSalvataggio, esitoSalvataggio } from "./comandiRegola";
+import { Regole } from "./Regole";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
 import "./clotch-ai.css";
 
