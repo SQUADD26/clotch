@@ -29,6 +29,7 @@ export class Osservatore {
   private avviato = false;
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
+  private controllo = 0; // ultimo controllo di tutti i file (giro())
 
   /** `partenza`: lo stato già letto altrove (worker); senza, si legge qui. */
   constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia(), private partenza?: StatoIniziale) {
@@ -96,9 +97,13 @@ export class Osservatore {
     const file = [...this.dirty];
     this.dirty.clear();
     if (this.avviato) this.guarda();
-    // un evento perso non deve perdere messaggi: un file noto cambiato senza evento conta come evento (solo uno stat per file, niente readdir)
+    // un evento perso non deve perdere messaggi: un file noto cambiato senza evento conta come evento (uno stat per file, niente readdir).
+    // shortcut: il controllo di tutti i file gira al più ogni 5 s (con migliaia di sessioni costa decine di ms): un evento perso arriva entro il giro dopo i 5 s; se serve prima, abbassare CONTROLLO_MS.
     const attuali = new Map<string, string>();
-    for (const [f, v] of this.firme) { const a = firma(f); attuali.set(f, a); if (a !== v) file.push(f); }
+    if (Date.now() - this.controllo >= CONTROLLO_MS) {
+      this.controllo = Date.now();
+      for (const [f, v] of this.firme) { const a = firma(f); attuali.set(f, a); if (a !== v) file.push(f); }
+    }
     const prima = this.firmeSessioni;
     this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.(), sporchi: file });
     this.firmeSessioni = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
@@ -118,6 +123,8 @@ export class Osservatore {
   }
 
 }
+
+const CONTROLLO_MS = 5000;
 
 const firma = (file: string) => {
   try { return firmaFile(file); }
