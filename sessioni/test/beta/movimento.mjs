@@ -23,7 +23,8 @@ function progresso(serie) {
 export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
   const d = [], D = (criterio, a, valore) => d.push({ criterio, dove: a?.dove ?? dove, valore });
   for (const a of c.animazioni) {
-    const lay = a.proprieta.filter((p) => LAYOUT.test(p));
+    // il gruppo di una View Transition (base/movimento.css, #520) cambia misura alla foto, fuori dalla pagina: nessun ricalcolo del layout
+    const lay = /::view-transition-group\(/.test(a.dove) ? [] : a.proprieta.filter((p) => LAYOUT.test(p));
     if (lay.length) D('MLAYOUT', a, `anima ${lay.join(', ')}`);
     if (ridotto && (a.infinita || a.proprieta.some((p) => MOSSA.test(p)))) {
       const s = a.serie, mosso = s.some((x) => Math.hypot(x[2] - s[0][2], x[3] - s[0][3]) > 0.5 || Math.abs(x[4] - s[0][4]) > 0.005);
