@@ -80,7 +80,7 @@ const MOTORE_FERMO_S = 20 * 60; // global/hooks/friday_triage.py:15 FERMO_S; CON
 const MOTORE_COMANDI = [ // global/hooks/friday_comandi.py:25-36, chiavi di FORMA
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena", "obiettivo",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi", "riprendi_altrove",
-  "archivia", "spegni", "imposta", "rinomina",
+  "archivia", "spegni", "imposta", "rinomina", "zitto", // zitto: claude-config#2572
 ];
 
 test("contratto col motore: stessa soglia «Non risponde» in src e in src/ui, uguale a friday_triage.FERMO_S", () => {
