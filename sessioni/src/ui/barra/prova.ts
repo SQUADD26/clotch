@@ -150,6 +150,21 @@ function filtrata(aperto?: Aperto): Prova {
 FRAME["101-10017"] = () => filtrata({ tipo: "opzioni", i: 1, a: { x: 334, y: 250 } });
 FRAME["101-16818"] = () => filtrata({ tipo: "proprieta", a: { x: 334, y: 250 } });
 
+// bottone account (#478: 148-62026 normale, 148-62191 primo menu, 148-62379 secondo menu, 148-62621 al 90 %, 148-62813 sessione fuori dal motore):
+// la sessione aperta è del motore (account `.claude-accountmanager`), tranne l'ultimo frame; l'ora è ferma, i conti alla rovescia sono quelli del disegno.
+const H = 3_600_000, M = 60_000, S = 1000;
+const quota = (account: string, cinque: number, cf: number, sette: number, sf: number): QuotaUso =>
+  ({ account, email: `${account}@example.com`, usato: sette, ripartenza: "", cinque, cinqueFine: ORA + cf, sette, setteFine: ORA + sf });
+const QUOTE = (a: [number, number, number, number] = [38, 2 * H + 14 * M + 8 * S, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S]): QuotaUso[] => [
+  quota("accountmanager", ...a), quota("squadd", 72, 3 * H, 40, 2 * 24 * H), quota("friday", 100, 47 * M + 30 * S, 88, 24 * H), quota("dentalspace", 12, 4 * H, 20, 5 * 24 * H),
+];
+const CON_ACCOUNT = (menu: 0 | 1 | 2, o: { motore?: boolean; novanta?: boolean; passaggio?: string; altri?: number } = {}, da: () => Prova = base) => (): Prova => {
+  const b = da(), id = b.scelta!;
+  if (o.motore !== false) (b.registro!.chat as Map<string, unknown>).set(id, { chat: id, account: ".claude-accountmanager", sorgente: "motore", visto: ORA, richieste: [], passi: [], aiutanti: new Map() });
+  const quote = QUOTE(o.novanta ? [90, 21 * M + 36 * S, 74, 2 * 24 * H + 8 * H + 40 * M + 12 * S] : undefined);
+  for (let i = 0; i < (o.altri ?? 0); i++) quote.push(quota(`altro-${i + 1}`, 10, 4 * H, 10, 5 * 24 * H)); // il disegno di 101:9340 ha 6 account
+  return { ...b, account: { ora: ORA, quote, previsto: null, menu, passaggio: o.passaggio } };
+};
 // 200 sessioni (101:9340): le dodici visibili di clotch con le loro icone, le altre cartelle chiuse
 const TANTE: [string, string, Stato][] = [
   ["Notch: luce bianca ed errore", "lampadina", "finita"], ["Voce: Scribe e microfono", "microfono", "finita"],
@@ -159,13 +174,13 @@ const TANTE: [string, string, Stato][] = [
   ["Release 2.4: note", "libro", "lavora"], ["Quote: uso degli account", "grafico", "ferma"],
   ["Cowork: lavagna 71", "tavolozza", "finita"], ["ESP32: stato via Bluetooth", "globo", "finita"],
 ];
-FRAME["101-9340"] = () => {
+FRAME["101-9340"] = CON_ACCOUNT(0, { altri: 2 }, () => {
   const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
   for (const x of lista) if (/^(Hook|ESP32):/.test(x.titolo)) x.situazione = { adesso: "errore", strumento: null, inCoda: 0, segni: [] }; // 101:9109: segno rosso
   const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
   const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("clotch-ai-mac-v2", 27, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro({ aspettano: 3 }), scelta: lista[3].id };
-};
+}); // il piede ha il bottone account con le quote, come nel disegno
 
 /** Ricerca: «Lettura dei log di Codex» nel titolo; tre sessioni trovate solo nei messaggi, coi frammenti di 101:10247. */
 function ricerca(testo: string): Prova {
@@ -220,20 +235,6 @@ const BARRE: Record<string, string> = {
 };
 for (const [barra, finestra] of Object.entries(BARRE)) FRAME[barra] = FRAME[finestra] ?? (() => base());
 
-// bottone account (#478: 148-62026 normale, 148-62191 primo menu, 148-62379 secondo menu, 148-62621 al 90 %, 148-62813 sessione fuori dal motore):
-// la sessione aperta è del motore (account `.claude-accountmanager`), tranne l'ultimo frame; l'ora è ferma, i conti alla rovescia sono quelli del disegno.
-const H = 3_600_000, M = 60_000, S = 1000;
-const quota = (account: string, cinque: number, cf: number, sette: number, sf: number): QuotaUso =>
-  ({ account, email: `${account}@example.com`, usato: sette, ripartenza: "", cinque, cinqueFine: ORA + cf, sette, setteFine: ORA + sf });
-const QUOTE = (a: [number, number, number, number] = [38, 2 * H + 14 * M + 8 * S, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S]): QuotaUso[] => [
-  quota("accountmanager", ...a), quota("squadd", 72, 3 * H, 40, 2 * 24 * H), quota("friday", 100, 47 * M + 30 * S, 88, 24 * H), quota("dentalspace", 12, 4 * H, 20, 5 * 24 * H),
-];
-const CON_ACCOUNT = (menu: 0 | 1 | 2, o: { motore?: boolean; novanta?: boolean; passaggio?: string } = {}) => (): Prova => {
-  const b = base(), id = b.scelta!;
-  if (o.motore !== false) (b.registro!.chat as Map<string, unknown>).set(id, { chat: id, account: ".claude-accountmanager", sorgente: "motore", visto: ORA, richieste: [], passi: [], aiutanti: new Map() });
-  const quote = QUOTE(o.novanta ? [90, 21 * M + 36 * S, 74, 2 * 24 * H + 8 * H + 40 * M + 12 * S] : undefined);
-  return { ...b, account: { ora: ORA, quote, previsto: null, menu, passaggio: o.passaggio } };
-};
 FRAME["148-62026"] = CON_ACCOUNT(0);
 FRAME["148-62191"] = CON_ACCOUNT(1);
 FRAME["148-62379"] = CON_ACCOUNT(2, { passaggio: "squadd" });
