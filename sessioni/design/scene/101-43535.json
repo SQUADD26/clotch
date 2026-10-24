@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792844469006,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,8 +44,7 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": "",
-    "contesto": 124000
+    "file": ""
    }
   ],
   "errori": []
@@ -55,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Aggiungi lo stato con 200 sessioni.",
-    "t": 1792844464006
+    "t": 1792793044531
    },
    {
     "tipo": "strumento",
@@ -67,23 +66,23 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792844465006,
+    "t": 1792793045531,
     "id": "t0"
    },
    {
     "tipo": "utente",
     "testo": "[Request interrupted by user]",
-    "t": 1792844466006
+    "t": 1792793046531
    },
    {
     "tipo": "utente",
     "testo": "Prima di continuare, controlla anche i titoli lunghi.",
-    "t": 1792844467006
+    "t": 1792793047531
    },
    {
     "tipo": "pensiero",
     "testo": "…",
-    "t": 1792844468006
+    "t": 1792793048531
    }
   ]
  },
@@ -93,16 +92,7 @@
   }
  },
  "registro": {
-  "chat": {
-   "s1": {
-    "chat": "s1",
-    "coda": [],
-    "richieste": [],
-    "aiutanti": {},
-    "passi": [],
-    "contestoMax": 200000
-   }
-  },
+  "chat": {},
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
