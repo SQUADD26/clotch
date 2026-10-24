@@ -15,8 +15,8 @@ export type Imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: Prefere
 export type Dati = { s: Pick<Sessione, "modello" | "permessi" | "contesto">; p?: PreferenzeSessione };
 
 /** Il nome di un controllo della casella, appoggiato sopra come «Contesto usato» (101:26425): lo stesso suggerimento per tutti, al posto del `title` del sistema. */
-export function NomeSopra({ testo, children }: { testo: string; children: ReactNode }) {
-  return <Suggerimento testo={testo} classe="suggerimento" lato="sopra" allinea="centro" scarto={numero("spazio-3") + numero("spazio-0-5")}>{children}</Suggerimento>;
+export function NomeSopra({ testo, nascosto, children }: { testo: string; nascosto?: boolean; children: ReactNode }) {
+  return <Suggerimento testo={testo} nascosto={nascosto} classe="suggerimento" lato="sopra" allinea="centro" scarto={numero("spazio-3") + numero("spazio-0-5")}>{children}</Suggerimento>;
 }
 
 /** Un chip che apre il suo menu sopra di sé (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al chip); le frecce passano da una voce all'altra. */
@@ -40,7 +40,7 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
   }, [menu]);
   return (
     <span className="chip-menu">
-      <NomeSopra testo={etichetta}>
+      <NomeSopra testo={etichetta} nascosto={aperto}>
         <button type="button" className="chip" aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
       </NomeSopra>
       {aperto && (

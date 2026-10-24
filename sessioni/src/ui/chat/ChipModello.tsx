@@ -31,10 +31,10 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
   // senza posto accanto al menu (finestra stretta) «Impegno» non si appoggia sopra: sta nel menu, sotto i modelli
   const [stretto, setStretto] = useState(false);
   useLayoutEffect(() => {
-    const m = aperto ? document.querySelector(".menu-casella.flottante.destra")?.getBoundingClientRect() : null;
+    const m = aperto ? document.querySelector('button.chip[aria-label="Modello e impegno"]')?.getBoundingClientRect() : null; // il menu sta a destra del chip: stessa riga destra
     if (!m) return;
     const serve = misura("misura-menu-impegno") + misura("spazio-1") + misura("misura-margine-finestra");
-    setStretto(innerWidth - m.right < serve && m.left < serve);
+    setStretto(innerWidth - m.right < serve && m.right - misura("misura-menu-modello") < serve);
   }, [aperto]);
   const apri = (a: boolean) => { setImpegno(false); setAnteprima(null); setAltriAperti(false); onAperto(a); };
   const scegliModello = (id: string) => { setImpegno(true); setAnteprima(id); imposta({ modello: id }); };
