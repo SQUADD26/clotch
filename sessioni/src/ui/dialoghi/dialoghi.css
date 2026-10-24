@@ -28,8 +28,8 @@
 .pezzo-dialoghi .selettore-ora.fuoco { border-color: var(--colore-bordo-fuoco); }
 .pezzo-dialoghi .segmento { padding: var(--spazio-0-5) var(--spazio-1); border-radius: var(--raggio-xs); outline: none; cursor: default; }
 .pezzo-dialoghi .segmento.scelto { background: var(--colore-fondo-riga-scelta); }
-.pezzo-dialoghi .frecce { display: flex; flex-direction: column; padding-left: var(--spazio-1); }
-.pezzo-dialoghi .freccia { width: var(--spazio-6); height: var(--spazio-3); display: flex; align-items: center; justify-content: center; }
+.pezzo-dialoghi .frecce { display: flex; padding-left: var(--spazio-1); }
+.pezzo-dialoghi .freccia { width: var(--spazio-6); height: var(--spazio-6); display: flex; align-items: center; justify-content: center; }
 .pezzo-dialoghi .freccia .icona { width: var(--spazio-3); height: var(--spazio-3); }
 .pezzo-dialoghi .freccia.su .icona { transform: rotate(180deg); }
 .pezzo-dialoghi .errore-ore { color: var(--colore-testo-errore); }
