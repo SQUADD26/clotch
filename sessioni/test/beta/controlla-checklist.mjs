@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const dir = fileURLToPath(new URL('./checklist/', import.meta.url));
 // Il prefisso di una famiglia è quello del primo id del suo file (BAR, SOV, CMD…): un file nuovo non tocca questo script; due file con lo stesso prefisso = errore.
+const FAMIGLIE = {}; // non serve più: resta perché le righe `FAMIGLIE[...] = ...` di rami ancora aperti non rompano lo script
 const GRAVITA = ['bloccante', 'alta', 'media', 'bassa'], PROVA = ['auto', 'occhio', 'fotogrammi'];
 // parole di gusto: «vedi» dice un sì/no che si osserva, mai un giudizio
 const GUSTO = /\b(bell[oaie]|brutt[oaie]|piacevol\w*|adeguat\w*|sembr\w*|elegant\w*|curat\w*|fluid[oaie]|naturale|intuitiv\w*|ragionevol\w*|opportun\w*|buon[oaie])\b/i;
