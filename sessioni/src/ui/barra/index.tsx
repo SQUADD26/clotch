@@ -117,7 +117,7 @@ export default function Barra() {
 
   const filtri = vista.filtri;
   // una pillola rimasta senza valori non filtra niente: alla chiusura del menu si toglie da sola
-  const chiudi = () => { setAperto(null); if (filtri.some((f) => !f.valori.length)) setVista({ ...vista, filtri: filtri.filter((f) => f.valori.length) }); };
+  const chiudi = () => { setAperto(null); setVistaSubito((v) => (v.filtri.some((f) => !f.valori.length) ? { ...v, filtri: v.filtri.filter((f) => f.valori.length) } : v)); }; // sull'ultimo stato: la transizione di setVista arriva dopo
   const aggiungiFiltro = (prop: Proprieta) => {
     const i = filtri.findIndex((f) => f.proprieta === prop);
     // subito, senza transizione: il filtro è vuoto (le righe non cambiano) e il suo menu delle opzioni lo legge ora
@@ -129,6 +129,14 @@ export default function Barra() {
     const r = el.getBoundingClientRect();
     setSuggerimento({ testo, a: { x: r.left - numero("spazio-2"), y: r.bottom + numero("spazio-3") } });
   };
+  // tolto un filtro il fuoco passa alla pillola vicina, poi a «+ Filtro», poi a «Filtra»: la tastiera non perde il posto (#930)
+  const tolto = useRef<number | null>(null);
+  useEffect(() => {
+    if (tolto.current === null) return;
+    const x = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .pillole .togli")];
+    (x[Math.min(tolto.current, x.length - 1)] ?? document.querySelector<HTMLElement>(".pezzo-barra .pillole .aggiungi") ?? document.querySelector<HTMLElement>('.pezzo-barra [data-comando="Filtra"]'))?.focus();
+    tolto.current = null;
+  }, [filtri]);
   const attivi = filtri.filter((f) => f.valori.length).length;
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
@@ -158,7 +166,7 @@ export default function Barra() {
       <RigheClotchAi r={registro} adesso={adesso} pagina={pagina} />
       <Pillole filtri={filtri} onApri={(i, e) => setAperto({ tipo: "opzioni", i, a: accanto(e.currentTarget, numero("spazio-1")) })}
         onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })}
-        onTogli={(i) => setVista({ ...vista, filtri: filtri.filter((_, k) => k !== i) })} />
+        onTogli={(i) => { tolto.current = i; setVista({ ...vista, filtri: filtri.filter((_, k) => k !== i) }); }} />
 
       {elenco.stato === "carica" && !elenco.dati ? (
         <div className="elenco" aria-busy="true">
@@ -188,7 +196,7 @@ export default function Barra() {
           {!!sessioni.length && !barra.totale && (
             <div className="vuoto-filtri">
               <span className="t-sm secondario">Nessuna sessione con questi filtri</span>
-              <Bottone tipo="secondario" onClick={() => setVista({ ...vista, filtri: [] })}>Rimuovi filtri</Bottone>
+              <Bottone tipo="secondario" onClick={() => { tolto.current = -1; setVista({ ...vista, filtri: [] }); }}>Rimuovi filtri</Bottone>
             </div>
           )}
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (

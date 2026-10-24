@@ -20,7 +20,7 @@ const suggerisci = (riga: HTMLElement, titolo: string, onTroncato: (titolo: stri
 /** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
 export function RigaComando({ icona, etichetta, lato, tasto, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; tasto?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
   return (
-    <button type="button" className={`riga ${scelta ? "scelta" : ""}`} onClick={onClick}>
+    <button type="button" className={`riga ${scelta ? "scelta" : ""}`} data-comando={etichetta} onClick={onClick}>
       <Icona nome={icona} />
       <span className="testo">{etichetta}</span>
       {lato && <span className="lato t-sm secondario">{lato}</span>}

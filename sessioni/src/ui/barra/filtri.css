@@ -1,5 +1,7 @@
 /* figma: 101-9860 — pillole 101:9860, menu filtro 101:16778 / 101:17031, raggruppa e ordina 101:30304 */
-.pezzo-barra .pillole { padding: var(--spazio-2) var(--spazio-2) 0; gap: var(--spazio-1); display: flex; flex-wrap: wrap; flex: none; }
+/* al massimo due righe di pillole, poi scorrono: l'elenco sotto non si riduce a una riga (#931) */
+.pezzo-barra .pillole { padding: var(--spazio-2) var(--spazio-2) 0; gap: var(--spazio-1); display: flex; flex-wrap: wrap; flex: none;
+  max-height: calc(var(--spazio-2) + 2 * var(--misura-bottone) + var(--spazio-1)); overflow-y: auto; }
 .pezzo-barra .pillola-filtro {
   height: var(--misura-bottone); padding: 0 var(--spazio-3); gap: var(--spazio-1); border-radius: var(--raggio-pieno);
   display: inline-flex; align-items: center; max-width: 100%; white-space: nowrap; background: var(--colore-fondo-riga-scelta);
@@ -14,7 +16,7 @@
 
 /* «Menu filtro»: padding e gap spazio-2/1, raggio lg (il «menu» della base ha spazio-1 e raggio xl) */
 .pezzo-barra .menu.menu-filtro { padding: var(--spazio-2); gap: var(--spazio-1); }
-.pezzo-barra .menu-filtro .testata { height: var(--testo-riga-sm); box-sizing: content-box; padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-1); display: flex; align-items: center; }
+.pezzo-barra .menu-filtro .testata { height: var(--testo-riga-sm); box-sizing: content-box; padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-1); display: flex; flex-direction: row; align-items: center; }
 .pezzo-barra .campo-menu {
   height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);
   display: flex; align-items: center; border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
@@ -29,3 +31,7 @@
 .pezzo-barra .menu-filtro .linea { flex: none; }
 .pezzo-barra .menu-raggruppa .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
 .pezzo-barra .menu-raggruppa .spunta.nascosta { visibility: hidden; }
+/* menu lungo: testata e campo restano in alto, «Rimuovi filtro» in fondo, scorre solo la lista (#932) */
+.sovrapposto.menu-filtro { overflow: hidden; }
+.pezzo-barra .menu-filtro .lista-menu { display: flex; flex-direction: column; gap: var(--spazio-1); min-height: 0; overflow-y: auto; }
+.pezzo-barra .menu-filtro .campo-menu { flex: none; }
