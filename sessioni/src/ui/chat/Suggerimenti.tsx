@@ -7,6 +7,7 @@ import { Icona } from "../base/Icona";
 import { filtraComandi, type Cerca } from "./cerca-casella";
 import "./scelte.css";
 
+export const ID_MENU = "menu-suggerimenti", idVoce = (i: number) => `suggerimento-${i}`;
 export type Voce = VoceComando | { nome: string };
 
 const comandi = new Map<string, { t: number; p: Promise<VoceComando[]> }>();
@@ -48,14 +49,14 @@ export function Suggerimenti({ tipo, voci, stato, scelta, onScelta, onScegli }: 
   }
   const gruppi = tipo === "file" ? [["File", voci]] as const : (["Comandi", "Skill"] as const).map((g) => [g, voci.filter((v) => "gruppo" in v && v.gruppo === g)] as const);
   return (
-    <div className="menu-casella suggerimenti" role="listbox" onMouseDown={(e) => e.preventDefault()}>
+    <div id={ID_MENU} className="menu-casella suggerimenti" role="listbox" onMouseDown={(e) => e.preventDefault()}>
       {gruppi.filter(([, v]) => v.length).map(([titolo, v]) => (
         <div key={titolo} role="group" aria-label={titolo}>
           <div className="titolo-gruppo">{titolo}</div>
           {v.map((x) => {
             const i = voci.indexOf(x);
             return (
-              <button key={x.nome} ref={i === scelta ? scelto : undefined} type="button" role="option" title={x.nome} aria-selected={i === scelta} className={i === scelta ? "voce scelta" : "voce"}
+              <button key={x.nome} id={idVoce(i)} ref={i === scelta ? scelto : undefined} type="button" role="option" title={x.nome} aria-selected={i === scelta} className={i === scelta ? "voce scelta" : "voce"}
                 onMouseEnter={() => onScelta(i)} onClick={() => onScegli(x.nome)}>
                 {tipo === "file" ? <Icona nome="file" /> : <span className="comando codice">{x.nome}</span>}
                 {tipo === "file" ? <span className="etichetta"><span className="cartella">{x.nome.slice(0, x.nome.lastIndexOf("/") + 1)}</span><span className="nome">{x.nome.slice(x.nome.lastIndexOf("/") + 1)}</span></span> : <span className="descrizione">{"descrizione" in x ? x.descrizione : ""}</span>}

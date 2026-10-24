@@ -71,6 +71,8 @@
 .pezzo-chat .casella.trascina {
   background: linear-gradient(var(--colore-fondo-attesa), var(--colore-fondo-attesa)), var(--colore-fondo-casella);
   border: var(--misura-tratto-forte) dashed var(--colore-bordo-fuoco);
+  /* il bordo è più spesso: il padding cala della differenza, il contenuto non si muove */
+  padding: calc(var(--spazio-3) - var(--misura-tratto-forte) + var(--misura-tratto)) calc(var(--spazio-3) - var(--misura-tratto-forte) + var(--misura-tratto)) calc(var(--spazio-2-5) - var(--misura-tratto-forte) + var(--misura-tratto));
 }
 /* l'avviso sotto la casella (148:43700): un file oltre il limite non parte */
 .pezzo-chat .avviso-allegato { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); }

@@ -3,8 +3,7 @@ import { useState } from "react";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { api, messaggioErrore, useChiamata } from "../base/dati";
-import { Icona } from "../base/Icona";
-import { Gruppo, Pagina, Riga } from "./controlli";
+import { Carica, ErroreLista, Gruppo, Pagina, Riga } from "./controlli";
 
 // voci della legenda nell'ordine del frame, con la chiave di `api().spazio()`
 const PARTI = [
@@ -18,10 +17,10 @@ const mb = (byte: number) => `${Math.round(byte / 1e6)} MB`;
 
 export default function Archiviazione() {
   const spazio = useChiamata(() => api().spazio(), []);
-  const [occupato, setOccupato] = useState(false);
+  const [occupato, setOccupato] = useState<string | null>(null); // l'azione che gira: il suo bottone ha lo spinner, l'altro aspetta
   const fai = (azione: () => Promise<void>, fatto: string) => {
-    setOccupato(true);
-    azione().then(() => { spazio.ricarica(); avvisa({ tipo: "info", messaggio: fatto }); }, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })).finally(() => setOccupato(false));
+    setOccupato(fatto);
+    azione().then(() => { spazio.ricarica(); avvisa({ tipo: "info", messaggio: fatto }); }, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })).finally(() => setOccupato(null));
   };
   const totale = PARTI.reduce((t, p) => t + (spazio.dati?.[p.chiave] ?? 0), 0);
   return (
@@ -44,17 +43,13 @@ export default function Archiviazione() {
       )}
       <Gruppo>
         <Riga etichetta="Indice delle sessioni" descrizione="Ricostruiscilo se l’elenco non torna" azione>
-          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().ricostruisci, "Indice ricostruito")}>Ricostruisci</Bottone>
+          <Bottone tipo="secondario" disabled={!!occupato} caricamento={occupato === "Indice ricostruito"} onClick={() => fai(api().ricostruisci, "Indice ricostruito")}>Ricostruisci</Bottone>
         </Riga>
         <Riga etichetta="Cache dei messaggi" descrizione="Si riempie da sola quando apri una sessione" azione>
-          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().svuota, "Cache svuotata")}>Svuota</Bottone>
+          <Bottone tipo="secondario" disabled={!!occupato} caricamento={occupato === "Cache svuotata"} onClick={() => fai(api().svuota, "Cache svuotata")}>Svuota</Bottone>
         </Riga>
-        {spazio.stato === "carica" && (
-          <div className="riga calcolo">
-            <Icona nome="spinner" gira />
-            <span className="t-sm secondario">Calcolando lo spazio delle immagini…</span>
-          </div>
-        )}
+        {spazio.stato === "carica" && <Carica testo="Calcolando lo spazio delle immagini…" />}
+        {spazio.stato === "errore" && <ErroreLista titolo="Spazio non calcolato" errore={spazio.errore} riprova={spazio.riprova} />}
       </Gruppo>
     </Pagina>
   );
