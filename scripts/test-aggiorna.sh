@@ -16,7 +16,10 @@ echo "$b x" > "$sup/installata.txt"; gira >/dev/null; ok "$(cat "$HOME/installat
 echo "$a x" > "$sup/installata.txt"; echo '{"parla": true}' > "$HOME/.config/voce/stato.json"
 gira | grep -q "Clotch parla" || { echo "FALLITO: mentre parla"; exit 1; }; ok "$(cat "$HOME/installato" 2>/dev/null || true)" "" "mentre parla: niente"
 rm "$HOME/.config/voce/stato.json"; gira >/dev/null; ok "$(cat "$HOME/installato")" "$b" "più nuova: installa"
-git checkout -q -b altro "$a"; g commit -q --allow-empty -m C; c=$(git rev-parse --short HEAD); rm "$HOME/installato"
+git checkout -q -b altro "$a"; echo c > c.txt; git add c.txt; g commit -qm C; c=$(git rev-parse --short HEAD); rm "$HOME/installato"
 echo "$c x" > "$sup/installata.txt"; gira | grep -q "non aggiorno" || { echo "FALLITO: indietro"; exit 1; }
 ok "$(cat "$HOME/installato" 2>/dev/null || true)" "" "fuori dal canale: niente"
-echo "test-aggiorna: 4 casi ok"
+git checkout -q canale 2>/dev/null || git checkout -q -b canale origin/canale; echo c > c.txt; git add c.txt; g commit -qm "C con squash"
+g commit -q --allow-empty -m D; git push -q origin HEAD:canale; d=$(git rev-parse --short HEAD)
+gira >/dev/null; ok "$(cat "$HOME/installato")" "$d" "installata fusa con squash: installa"
+echo "test-aggiorna: 5 casi ok"
