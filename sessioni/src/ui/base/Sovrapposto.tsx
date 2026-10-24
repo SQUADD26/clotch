@@ -26,7 +26,8 @@ export function useStrato(ref: RefObject<HTMLElement | null>, onChiudi: () => vo
     const cima = () => pila[pila.length - 1] === io;
     const tasto = (e: KeyboardEvent) => {
       if (!cima()) return;
-      if (e.key === "Escape") { e.stopPropagation(); chiudi.current(); return; }
+      // il fuoco torna prima di chiudere: il bottone può sparire quando il sovrapposto non c'è più (azioni al passaggio)
+      if (e.key === "Escape") { e.stopPropagation(); if (prima?.isConnected) prima.focus(); chiudi.current(); return; }
       if (e.key !== "Tab" || !trappola || !ref.current) return;
       const f = [...ref.current.querySelectorAll<HTMLElement>(FOCALIZZABILI)];
       if (!f.length) return;
