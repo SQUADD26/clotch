@@ -43,8 +43,8 @@ const registro = (c) => ({ chat: c ? { s1: c } : {}, fermoTutto: false, avvisi: 
   regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] });
 
 function scena(id, s, msg, { c = null, sezione, info } = {}) {
-  const dati = { navigazione: { vista: "sessione", sessione: "s1", ...(sezione ? { sezione } : {}) }, elenco: { sessioni: [sessione(s)], errori: [] },
-    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c), ...(info ? { info: { s1: info } } : {}) };
+  const dati = { navigazione: { vista: "sessione", sessione: "s1", ...(sezione ? { sezione } : {}) }, elenco: { sessioni: [sessione({ contesto: 124000, ...s })], errori: [] }, // 62% di 200 000: il chip «Contesto usato» è in ogni frame
+    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c ? { ...c, contestoMax: 200_000 } : { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 }), ...(info ? { info: { s1: info } } : {}) };
   writeFileSync(new URL(`../design/scene/101-${id}.json`, import.meta.url), JSON.stringify(dati, null, 1) + "\n");
 }
 
@@ -60,7 +60,7 @@ const TURNO_8036 = [
   a("Errore corretto. Il controllo del file torna vuoto. Manca solo il tuo sì sul disegno."),
 ];
 const FINITO = { situazione: { adesso: "turno_finito", strumento: null, inCoda: 0, segni: [] } };
-scena("8036", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036));
+scena("8036", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { info: { contesto: null, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }); // «File toccati» del pannello, come nel frame
 scena("23727", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-risposta" });
 scena("20859", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-sessione" });
 

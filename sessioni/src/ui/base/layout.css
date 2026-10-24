@@ -26,7 +26,7 @@
 /* pannello obiettivo sopra la colonna, quando la finestra non ha posto per metterlo accanto (si apre dal bottone dell'intestazione) */
 .contenuto { position: relative; }
 .pannello.sopra {
-  position: absolute; z-index: var(--livello-barra-sovrapposta); top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); border-radius: var(--raggio-xl);
+  position: absolute; z-index: var(--livello-barra-sovrapposta); top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); max-height: calc(100% - var(--spazio-4)); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pannello.sopra .pannello-obiettivo { width: 100%; }

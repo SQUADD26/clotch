@@ -1,12 +1,13 @@
 // figma: 101-13650 — richieste a Roberto: «Richiesta permesso» 101:13247, «Domanda» 101:13280 (101:13896), «Piano» 101:13314 (101:14132).
 // Ogni risposta è un comando nella casella di clotch AI (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
 import { comanda } from "./clotch-ai";
+import { useInCorso } from "./inCorso";
 import { useRiserva } from "./riserva";
 import { testoCampo } from "./strumenti";
 import { quanti } from "./testi";
@@ -46,10 +47,11 @@ type Scelta = "consenti" | "consenti_sempre" | "nega";
 /** `titolo`: nella chat di clotch AI la carta dice di quale sessione è (101-37492). */
 export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat: string; r: Richiesta; da: string | null; titolo?: string }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
+  const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
   const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
   const mostra = cmd ? `$ ${cmd}` : r.strumento;
-  const rispondi = async (s: Scelta) => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); };
+  const rispondi = (s: Scelta) => fai(async () => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); });
   // finché aspetta la risposta, le scorciatoie salvate «Consenti» e «Nega» rispondono a questo permesso
   useEffect(() => {
     if (scelta) return;
@@ -67,9 +69,9 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
       {mostra && <BloccoCodice comando={mostra} />}
       {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}
       <div className="bottoni">
-        <Bottone onClick={() => rispondi("consenti")}>Consenti</Bottone>
-        <Bottone tipo="secondario" onClick={() => rispondi("consenti_sempre")}>Consenti sempre</Bottone>
-        <Bottone tipo="secondario" onClick={() => rispondi("nega")}>Nega</Bottone>
+        <Bottone disabled={inCorso} onClick={() => rispondi("consenti")}>Consenti</Bottone>
+        <Bottone tipo="secondario" disabled={inCorso} onClick={() => rispondi("consenti_sempre")}>Consenti sempre</Bottone>
+        <Bottone tipo="secondario" disabled={inCorso} onClick={() => rispondi("nega")}>Nega</Bottone>
       </div>
     </Carta>
   );
@@ -77,12 +79,24 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
 
 const CONSIGLIATA = /\s*\((Recommended|Consigliata)\)\s*$/i;
 
+/** Frecce nel gruppo di opzioni (role radiogroup): scelgono la vicina e le portano il fuoco, in giro. */
+function frecceOpzioni(e: KeyboardEvent<HTMLDivElement>, n: number, scegli: (j: number) => void) {
+  const passo = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? n - 1 : 0;
+  if (!passo) return;
+  const bottoni = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")], i = bottoni.indexOf(document.activeElement as HTMLButtonElement);
+  if (i < 0) return;
+  e.preventDefault();
+  const j = (i + passo) % n;
+  scegli(j); bottoni[j].focus();
+}
+
 /** `rid` null: la domanda è aperta nella trascrizione ma clotch AI non la conosce, e non si può rispondere da qui. */
 export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: { domanda: string; opzioni: string[] }[]; da: string | null }) {
   // l'opzione consigliata parte scelta, come nel disegno
   const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));
   const [altro, setAltro] = useState("");
   const [fatta, setFatta] = useState<string | null>(null);
+  const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
   if (fatta !== null) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={fatta} />;
   const risposte = domande.map((d, i) => {
@@ -90,18 +104,16 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
     const scelta = o == null ? "" : d.opzioni[o].replace(CONSIGLIATA, "");
     return { domanda: d.domanda, scelta, testo: i === domande.length - 1 ? altro.trim() : "" };
   });
-  const pronta = !!rid && risposte.every((r) => r.scelta || r.testo);
-  const rispondi = async () => {
-    if (pronta && await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta(risposte.map((r) => r.testo || r.scelta).join(" · "));
-  };
-  const salta = async () => { if (rid && await comanda("salta_domanda", { chat, rid })) setFatta(""); };
+  const pronta = !!rid && !inCorso && risposte.every((r) => r.scelta || r.testo);
+  const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta(risposte.map((r) => r.testo || r.scelta).join(" · ")); }) : undefined;
+  const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta(""); }) : undefined;
   return (
     <>
       <Carta icona="persona" titolo="Domanda per te" dettaglio={da}>
         {domande.map((d, i) => (
           <div key={i} className="domanda-blocco">
             <div className="testo-domanda">{ris.testo(d.domanda)}</div>
-            <div className="opzioni" role="radiogroup">
+            <div className="opzioni" role="radiogroup" onKeyDown={(e) => frecceOpzioni(e, d.opzioni.length, (j) => setScelte(scelte.map((x, k) => (k === i ? j : x))))}>
               {d.opzioni.map((o, j) => (
                 <button key={j} type="button" role="radio" aria-checked={scelte[i] === j} className={scelte[i] === j ? "opzione scelta" : "opzione"}
                   onClick={() => setScelte(scelte.map((x, k) => (k === i ? j : x)))}>
@@ -117,7 +129,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
           onKeyDown={(e) => { if (e.key === "Enter") void rispondi(); }} />
         <div className="bottoni">
           <Bottone onClick={rispondi} disabled={!pronta}>Rispondi</Bottone>
-          <Bottone tipo="secondario" onClick={salta} disabled={!rid}>Salta</Bottone>
+          <Bottone tipo="secondario" onClick={salta} disabled={!rid || inCorso}>Salta</Bottone>
         </div>
       </Carta>
       <NotaVoce acceso="Rispondi anche a voce dal notch: ⌥Spazio" spento="Rispondi qui o a voce con ⌥Spazio" />
@@ -143,11 +155,12 @@ export function passiPiano(testo: string) {
 
 export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; testo: string }) {
   const [esito, setEsito] = useState<"approva" | "modifica" | null>(null);
+  const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
   const { intro, passi } = passiPiano(testo);
   const nPassi = quanti(passi.length, "passo", "passi");
   if (esito === "approva") return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={nPassi} />;
-  const decidi = async (e: "approva" | "modifica") => { if (rid && await comanda("piano", { chat, rid, esito: e })) setEsito(e); };
+  const decidi = (e: "approva" | "modifica") => fai(async () => { if (rid && await comanda("piano", { chat, rid, esito: e })) setEsito(e); });
   return (
     <Carta icona="libro" titolo="Piano da approvare" dettaglio={nPassi}>
       {intro && <div className="motivo">{ris.testo(intro)}</div>}
@@ -156,8 +169,8 @@ export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; 
       </div>
       {esito !== "modifica" && (
         <div className="bottoni">
-          <Bottone onClick={() => decidi("approva")} disabled={!rid}>Approva</Bottone>
-          <Bottone tipo="secondario" onClick={() => decidi("modifica")} disabled={!rid}>Modifica</Bottone>
+          <Bottone onClick={() => decidi("approva")} disabled={!rid || inCorso}>Approva</Bottone>
+          <Bottone tipo="secondario" onClick={() => decidi("modifica")} disabled={!rid || inCorso}>Modifica</Bottone>
         </div>
       )}
     </Carta>
