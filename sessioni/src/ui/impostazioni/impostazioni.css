@@ -26,6 +26,8 @@
 .pezzo-impostazioni .contenuto-impostazioni > * { align-self: stretch; }
 .pezzo-impostazioni .contenuto-impostazioni > .bottone { align-self: flex-start; }
 .pezzo-impostazioni .titolo-pagina { margin: 0; font-weight: 400; }
+/* un testo senza spazi (percorso, nome, ricerca da 200 caratteri) va a capo invece di uscire dalla colonna (#838, #955) */
+.pezzo-impostazioni .contenuto-impostazioni, .pezzo-impostazioni .nav-impostazioni { overflow-wrap: anywhere; }
 .pezzo-impostazioni .contenuto-impostazioni .errore { color: var(--colore-testo-errore); }
 
 .pezzo-impostazioni .gruppo { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl); }
