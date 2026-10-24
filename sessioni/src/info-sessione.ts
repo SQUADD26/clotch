@@ -2,9 +2,9 @@
 // Si legge una volta tutto il file, poi solo le righe nuove (offset per file).
 import * as fs from "node:fs";
 import { parseRiga, righeNuove } from "./jsonl";
-import type { InfoSessione, Sessione } from "./tipi";
+import type { InfoSessione, PrInfo, Sessione } from "./tipi";
 
-interface Conto { offset: number; contesto: number | null; file: Set<string>; aggiunte: number; tolte: number }
+interface Conto { offset: number; contesto: number | null; file: Set<string>; aggiunte: number; tolte: number; prs: Map<string, PrInfo> }
 const conti = new Map<string, Conto>();
 
 const righe = (v: unknown) => (typeof v === "string" && v ? v.replace(/\n$/, "").split("\n") : []);
@@ -18,6 +18,11 @@ function differenza(vecchio: unknown, nuovo: unknown): [number, number] {
 }
 
 function leggiRiga(c: Conto, riga: string) {
+  if (riga.includes('"pr-link"')) { // Claude Code scrive una riga per ogni PR collegata alla sessione: numero e link, non lo stato
+    const o = parseRiga(riga);
+    if (o?.type === "pr-link" && Number.isInteger(o.prNumber) && typeof o.prUrl === "string" && o.prUrl) c.prs.set(o.prUrl, { numero: o.prNumber, url: o.prUrl, stato: null, verso: null });
+    return;
+  }
   if (!riga.includes('"assistant"')) return; // la sola riga che porta conteggio e strumenti
   const o = parseRiga(riga);
   if (o?.type !== "assistant" || o.isSidechain || !o.message) return;
@@ -41,11 +46,13 @@ export function infoSessione(s: Sessione | undefined): InfoSessione {
   if (!s || !s.file.endsWith(".jsonl") || (s.sorgente !== "claude-code" && s.sorgente !== "claude-desktop")) return VUOTA;
   try {
     let c = conti.get(s.file);
-    if (!c || fs.statSync(s.file).size < c.offset) conti.set(s.file, c = { offset: 0, contesto: null, file: new Set(), aggiunte: 0, tolte: 0 });
+    if (!c || fs.statSync(s.file).size < c.offset) conti.set(s.file, c = { offset: 0, contesto: null, file: new Set(), aggiunte: 0, tolte: 0, prs: new Map() });
     const { righe: nuove, offset } = righeNuove(s.file, c.offset);
     for (const r of nuove) leggiRiga(c, r);
     c.offset = offset;
-    return { contesto: c.contesto, file: { quanti: c.file.size, aggiunte: c.aggiunte, tolte: c.tolte } };
+    // le PR del file dell'app hanno lo stato: restano loro, la trascrizione aggiunge le altre
+    const dellApp = s.app?.prs ?? [], prs = [...dellApp, ...[...c.prs.values()].filter((p) => !dellApp.some((a) => a.url === p.url))];
+    return { contesto: c.contesto, file: { quanti: c.file.size, aggiunte: c.aggiunte, tolte: c.tolte }, ...(prs.length ? { prs } : {}) };
   } catch {
     return VUOTA; // file sparito o illeggibile: il pannello nasconde le due sezioni, non mostra numeri finti
   }
