@@ -70,7 +70,7 @@ private struct AccountCard: View {
                 if inUse { Image(systemName: "laptopcomputer").font(.system(size: 14)).foregroundStyle(GoalInk.off) }
             }
             if stale {
-                Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato")
+                Text(account.at.map { "Nessun dato da " + GoalRow.elapsed(from: $0, to: now) } ?? "Nessun dato ancora")
                     .font(NotchType.label)
                     .foregroundStyle(GoalInk.secondary)
             } else {
