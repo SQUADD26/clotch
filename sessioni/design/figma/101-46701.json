@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2138,7 +2139,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2185,7 +2186,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2194,7 +2195,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2635,7 +2636,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2709,7 +2710,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 488,
+    "x": 472,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2725,7 +2726,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
+    "x": 473.3330078125,
     "y": 141.3359375,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2740,7 +2741,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 508,
+    "x": 492,
     "y": 140,
     "w": 181,
     "h": 16
@@ -3184,9 +3185,9 @@
    "nome": "nota clotch",
    "tipo": "FRAME",
    "box": {
-    "x": 774.5,
+    "x": 774,
     "y": 849,
-    "w": 277,
+    "w": 278,
     "h": 16
    },
    "variabili": {
@@ -3201,7 +3202,7 @@
    "nome": "icona microfono",
    "tipo": "INSTANCE",
    "box": {
-    "x": 782.5,
+    "x": 782,
     "y": 849,
     "w": 16,
     "h": 16
@@ -3217,7 +3218,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 785.16650390625,
+    "x": 784.66650390625,
     "y": 849.6640625,
     "w": 10.6669921875,
     "h": 14.667318344116211
@@ -3232,9 +3233,9 @@
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
-    "x": 806.5,
+    "x": 806,
     "y": 849,
-    "w": 237,
+    "w": 238,
     "h": 16
    },
    "variabili": {
@@ -3243,7 +3244,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Ti ascolta il microfono di clotch · ⌥Spazio",
+   "testo": "Ti ascolta il microfono di clotch ⌥Spazio",
    "font": "SF Pro Regular"
   },
   {

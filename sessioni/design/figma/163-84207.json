@@ -1057,7 +1057,7 @@
    "box": {
     "x": 111,
     "y": 286,
-    "w": 54,
+    "w": 47,
     "h": 18
    },
    "variabili": {
@@ -1066,7 +1066,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· uscita 1",
+   "testo": "uscita 1",
    "font": "SF Pro Regular"
   },
   {
