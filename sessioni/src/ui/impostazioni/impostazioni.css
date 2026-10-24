@@ -110,3 +110,6 @@
 .pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) { flex-wrap: wrap; }
 .pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) .testi { flex-basis: 100%; }
 .pezzo-impostazioni .impostazioni.stretta .campo-testo { flex: 1; max-width: none; }
+
+.pezzo-impostazioni .scelta-sezione .valore { padding: 0 var(--spazio-2); margin: 0 calc(-1 * var(--spazio-2)); border-radius: var(--raggio-md); }
+.pezzo-impostazioni .scelta-sezione .valore:hover { background: var(--colore-fondo-riga-passaggio); }

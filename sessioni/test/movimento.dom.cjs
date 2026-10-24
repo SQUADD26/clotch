@@ -130,9 +130,12 @@ app.whenReady().then(async () => {
     const rr = await run(`window.registra(${clic('button[aria-label="Barra laterale"]')}, 400)`);
     const gruppi = rr.animazioni.filter((a) => a.pseudo.startsWith('::view-transition-group'));
     const infinite = await run(() => document.getAnimations().filter((a) => a.effect.getTiming().iterations === Infinity).length);
-    const scivola = await run(() => getComputedStyle(document.documentElement).getPropertyValue('--scivola-barra').trim());
+    // ogni spostamento e scala delle keyframes di movimento.css passa da queste variabili: con movimento ridotto sono neutre
+    const fermi = await run(() => Object.fromEntries(['--scivola-barra', '--scivola-pannello', '--sposta-entrata', '--scala-entrata', '--scala-premuto']
+      .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue(n).trim()])));
+    const scivola = fermi['--scivola-barra'];
     console.log(`MOV ridotto infinite_prima=${giri} gruppi=${gruppi.length} infinite=${infinite} scivola=${scivola} animazioni=${rr.animazioni.map((a) => a.pseudo || a.nome).join(',')}`);
-    assert.equal(gruppi.length, 0); assert.equal(infinite, 0); assert.equal(scivola, '0%');
+    assert.equal(gruppi.length, 0); assert.equal(infinite, 0); assert.deepEqual(fermi, { '--scivola-barra': '0%', '--scivola-pannello': '0%', '--sposta-entrata': '0px', '--scala-entrata': '1', '--scala-premuto': '1' }, JSON.stringify(fermi));
     console.log('MOVIMENTO_OK');
   } catch (e) { console.error(e); process.exitCode = 1; }
   app.quit();

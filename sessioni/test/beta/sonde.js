@@ -107,7 +107,10 @@
               durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
-          anim.get(a).serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
+          const e = anim.get(a);
+          // inizio vero dalla linea del tempo: il primo campione può arrivare tardi se uno screenshot ferma i fotogrammi
+          if (e.inizio == null && a.startTime != null) e.inizio = a.startTime;
+          e.serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
         if (t - t0 < ms) return requestAnimationFrame(passo);
         GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));
