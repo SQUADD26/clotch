@@ -159,7 +159,7 @@ export function Casella() {
   if (!c.progetti.length && !c.proposti.length) {
     return (
       <div className="vista-clotch-ai">
-        <Vuoto icona="posta" titolo="Niente aspetta te" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
+        <Vuoto icona="posta" titolo="Nessuna richiesta" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
           <Bottone tipo="secondario" onClick={() => n.apri("clotch-ai")}>Scrivi a clotch AI</Bottone>
         </Vuoto>
       </div>

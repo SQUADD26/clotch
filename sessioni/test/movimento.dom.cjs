@@ -68,7 +68,7 @@ app.whenReady().then(async () => {
     await misura('MOV-002', 'barra aperta', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E]]);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
     // pannello: il bottone gira obiettivo -> info -> chiuso
-    const pannello = clic('button[aria-label="Pannello"]');
+    const pannello = clic('button[aria-label="Mostra pannello"]');
     const statoPannello = () => run(() => !!document.querySelector('.pannello'));
     while (!(await statoPannello())) await run(`(${pannello})()`), await new Promise((r) => setTimeout(r, 300));
     await misura('MOV-003', 'pannello info', pannello, [['::view-transition-group(pannello)', ...S]]);

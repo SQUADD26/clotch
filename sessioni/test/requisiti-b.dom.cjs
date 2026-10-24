@@ -92,9 +92,9 @@ H.avvia('requisiti-b', async () => {
     const apriConferma = (cosa) => run((cosa) => [...document.querySelectorAll('.voce-f')].find((v) => v.textContent.includes(cosa)).querySelector('button').click(), cosa);
     await apriConferma('migrazione 0042'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.match(await run(() => document.querySelector('[role=dialog]').innerText), /migrazione inversa/);
-    await clicca('[role=dialog] button', 'Lascia così'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
+    await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
     rispondi['clotch-ai:comando'] = () => ({ esito: 'errore', testo: 'Migrazione inversa non riuscita: niente è cambiato.' });
-    await apriConferma('migrazione 0042'); await clicca('[role=dialog] button', 'Annulla la decisione');
+    await apriConferma('migrazione 0042'); await clicca('[role=dialog] button', 'Revoca decisione');
     await wait(() => /Migrazione inversa non riuscita/.test(document.querySelector('.area-avvisi')?.innerText || '')); assert.deepEqual(fatte('clotch-ai:comando'), [['annulla', { decisione: H.scena.registro.decisioni.find((d) => d.cosa.includes('0042')).id }]]);
     rispondi['clotch-ai:comando'] = () => ({ esito: 'ok', testo: 'Decisione annullata. La sessione aspetta te.' });
     await clicca('.area-avvisi button', 'Riprova'); await wait(() => /Decisione annullata/.test(document.querySelector('.area-avvisi').innerText));

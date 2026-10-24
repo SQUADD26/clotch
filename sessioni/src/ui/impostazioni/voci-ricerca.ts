@@ -2,6 +2,7 @@
 // shortcut: i testi sono copiati dalle sezioni (non c'è un elenco unico), se una sezione cambia un'etichetta qui va rifatta a mano;
 // mancano le voci che nascono dai dati (cartelle degli account, quote d'uso, sessioni archiviate).
 import type { Sezione } from "./sezioni";
+import { AZIONI } from "./tasti";
 
 export interface Voce { sezione: Sezione; etichetta: string; descrizione?: string }
 
@@ -33,8 +34,7 @@ export const VOCI: Voce[] = [
   v("clotch-ai", "Account", "Quello che usa per lavorare"),
   v("clotch-ai", "Può dare i permessi", "Consente i comandi alle sessioni quando glielo chiedi"),
   v("clotch-ai", "Legge le risposte ad alta voce", "Solo quando le parli"),
-  ...["Cerca sessioni", "Scrivi a clotch AI", "Prossima sessione in attesa", "Consenti", "Nega", "Ferma la sessione",
-    "Mostra o nascondi barra laterale", "Apri impostazioni", "Interrompi e invia", "Metti in coda", "Cerca nella sessione"].map((e) => v("scorciatoie", e)),
+  ...AZIONI.map(([, e]) => v("scorciatoie", e)),
   v("sorgenti", "Claude Code", "Sessioni da terminale, da tutte le cartelle degli account"),
   v("sorgenti", "Claude", "Sessioni dell’app Claude per Mac"),
   v("sorgenti", "Codex", "Sessioni di Codex su questo computer"),

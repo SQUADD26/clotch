@@ -16,7 +16,7 @@ export function durata(ms: number) {
 export const daQuanto = (da: number, ora: number) => `da ${durata(Math.max(60_000, Math.floor((ora - da) / 60_000) * 60_000))}`;
 
 /** «1 messaggio in coda», «3 aiutanti»: singolare per 1. */
-export const quanti = (n: number, uno: string, tanti: string) => `${n.toLocaleString("it-IT")} ${n === 1 ? uno : tanti}`;
+export { plurale as quanti } from "../base/formato";
 
 export const SORGENTE: Record<Sessione["sorgente"], string> = {
   "claude-code": "Claude Code", "claude-desktop": "Claude", codex: "Codex", cursor: "Cursor",
@@ -25,7 +25,7 @@ export const SORGENTE: Record<Sessione["sorgente"], string> = {
 /** Nome dell'account dalla cartella radice: «.claude-accountmanager» -> «accountmanager». */
 export const nomeAccount = (account: string) => account.replace(/^\./, "").replace(/^claude-/, "");
 
-export const ora = (ms: number) => new Date(ms).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+export { orario as ora } from "../base/formato";
 
 /** Stato di una scena di prova: `sezione` = «chiave:valore|chiave»; null se la chiave non c'è, "" se non ha valore. */
 export const provaDi = (prova: string | null | undefined, chiave: string) => {

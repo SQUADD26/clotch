@@ -153,7 +153,7 @@ export default function Barra() {
           {sagome.map((w, i) => <div key={i} className="riga"><div className="sagoma" style={{ width: w }} /></div>)}
         </div>
       ) : !sessioni.length && !elenco.errore ? (
-        <div className="elenco vuoto t-sm secondario">Le sessioni appaiono qui</div>
+        <div className="elenco vuoto t-sm secondario">Nessuna sessione</div>
       ) : (
         <div className="elenco" onScroll={() => setSuggerimento(null)}>
           {elenco.errore && !elenco.dati && (

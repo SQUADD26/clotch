@@ -42,7 +42,7 @@ export function PannelloObiettivo({ dati }: { dati: DatiPannello }) {
       <div className="divisore" />
       <div className="sezione prove">
         <div className="t-base medio">Prove</div>
-        {prove.length === 0 && <div className="t-sm secondario">Nessuna prova ancora</div>}
+        {prove.length === 0 && <div className="t-sm secondario">Nessuna prova</div>}
         {prove.map((p, i) => (
           <div key={i} className="prova">
             <Icona nome={PROVA[p.stato].icona} colore={PROVA[p.stato].colore} gira={p.stato === "in-corso"} />

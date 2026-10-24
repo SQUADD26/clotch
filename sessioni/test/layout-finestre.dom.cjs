@@ -62,10 +62,10 @@ app.whenReady().then(async () => {
     await wait(() => !document.querySelector('.velo-barra') && !document.querySelector('.barra-laterale'));
     console.log('LAYOUT_BARRA_SOPRA_OK');
 
-    await click('button[aria-label="Pannello"]'); // il bottone non resta muto: il pannello si apre sopra la colonna
+    await click('button[aria-label="Mostra pannello"]'); // il bottone non resta muto: il pannello si apre sopra la colonna
     await wait(() => !!document.querySelector('.pannello.sopra'));
-    await click('button[aria-label="Pannello"]'); // il bottone gira (#437): obiettivo -> Info sessione -> chiuso
-    await click('button[aria-label="Pannello"]');
+    await click('button[aria-label="Mostra pannello"]'); // il bottone gira (#437): obiettivo -> Info sessione -> chiuso
+    await click('button[aria-label="Mostra pannello"]');
     await wait(() => !document.querySelector('.pannello'));
     console.log('LAYOUT_PANNELLO_SOPRA_OK');
 
