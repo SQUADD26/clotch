@@ -32,6 +32,6 @@
 .pezzo-barra .menu-raggruppa .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
 .pezzo-barra .menu-raggruppa .spunta.nascosta { visibility: hidden; }
 /* menu lungo: testata e campo restano in alto, «Rimuovi filtro» in fondo, scorre solo la lista (#932) */
-.sovrapposto.menu-filtro { overflow: hidden; }
+.pezzo-barra .sovrapposto.menu-filtro { overflow: hidden; }
 .pezzo-barra .menu-filtro .lista-menu { display: flex; flex-direction: column; gap: var(--spazio-1); min-height: 0; overflow-y: auto; }
 .pezzo-barra .menu-filtro .campo-menu { flex: none; }
