@@ -51,6 +51,11 @@
         const r = e.getBoundingClientRect(), q = p.getBoundingClientRect(), fuori = Math.max(q.left - r.left, q.top - r.top, r.right - q.right, r.bottom - q.bottom);
         if (fuori > 1) una('SPORGE', e, `esce di ${Math.round(fuori)} px da ${sel(p)}`);
       }
+      // fascia piatta: fondo a tutta larghezza, senza raggio, dentro un contenitore arrotondato (tinta di passaggio che non segue la forma, #1144)
+      if (p && p !== document.body && s.backgroundColor !== 'rgba(0, 0, 0, 0)' && s.backgroundColor !== ps.backgroundColor && !+parseFloat(s.borderTopLeftRadius) && parseFloat(ps.borderTopLeftRadius) > 0) {
+        const r = e.getBoundingClientRect(), q = p.getBoundingClientRect();
+        if (r.height > 8 && r.width >= q.width - 2 * parseFloat(ps.paddingLeft) - 2) una('FASCIA', e, `fondo ${s.backgroundColor} a tutta larghezza senza raggio in ${sel(p)} (raggio ${ps.borderTopLeftRadius})`);
+      }
       if (proprio(e) && e.scrollWidth > e.clientWidth + 1 && /hidden|clip/.test(s.overflowX) && s.textOverflow !== 'ellipsis' && s.webkitLineClamp === 'none') una('TESTO', e, `${e.scrollWidth}>${e.clientWidth} senza ellissi`);
     }
     for (const e of document.querySelectorAll(`${radice} :is(${CLIC})`)) {

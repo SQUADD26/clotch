@@ -6,13 +6,15 @@ import { numero } from "./token";
 
 /** Applica `fai` (setState) dentro una View Transition; senza supporto, o se nessuno guarda la finestra (non ha il fuoco:
  *  nascosta, in secondo piano, prove), lo applica subito. La promessa si risolve quando il DOM nuovo c'è (per il fuoco). */
+let inCorso = false; // una transizione sta girando: il clic dopo cambia subito, senza attendere la foto (#1144, risposta < 50 ms anche a clic rapidi)
 export function conTransizione(fai: () => void): Promise<void> {
-  if (!document.startViewTransition || document.hidden || !document.hasFocus() || document.documentElement.classList.contains("parita")) { fai(); return Promise.resolve(); }
+  if (inCorso || !document.startViewTransition || document.hidden || !document.hasFocus() || document.documentElement.classList.contains("parita")) { flushSync(fai); return Promise.resolve(); }
+  inCorso = true;
   // una finestra che non disegna (nascosta, prove) non dà mai il fotogramma della foto: senza questo lo stato non cambierebbe
   let scappa = 0;
   const t = document.startViewTransition(() => { clearTimeout(scappa); flushSync(fai); });
   scappa = window.setTimeout(() => t.skipTransition(), numero("tempo-uscita"));
   // saltata (un'altra transizione l'ha interrotta o la finestra non disegna): lo stato cambia lo stesso, niente errore
-  t.ready.catch(() => {}); t.finished.catch(() => {});
+  t.ready.catch(() => {}); t.finished.catch(() => {}).finally(() => { inCorso = false; });
   return t.updateCallbackDone.catch(() => {});
 }

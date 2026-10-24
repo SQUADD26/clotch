@@ -45,6 +45,7 @@
 @keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
 @keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
 @keyframes compare { from { opacity: 0; transform: translateY(var(--sposta-entrata)) scale(var(--scala-entrata)); } }
+.pannello { animation: scivola-pannello var(--tempo-entrata) var(--curva-entrata); } /* entra senza transizione di vista: il clic non aspetta la foto */
 @keyframes dissolve { from { opacity: 0; } }
 ::view-transition-new(barra):only-child { animation-name: scivola-barra; }
 ::view-transition-old(barra):only-child { animation-name: scivola-barra; animation-direction: reverse; }

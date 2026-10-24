@@ -26,6 +26,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 | ESC, FUOCO-RITORNO | Esc non chiude il sovrapposto; dopo Esc il fuoco non torna al pulsante che l'ha aperto |
 | HOVER, PREMUTO | col mouse sopra, o premuto, l'elemento non cambia né un pixel né l'aspetto calcolato (non per i campi di testo; PREMUTO non col movimento ridotto) (foto `-hover`, `-premuto`; il fuoco da tastiera è nelle foto `tab<N>`) |
 | STATO | un elemento disabilitato ha lo stesso aspetto di uno attivo della stessa classe |
+| FASCIA | un elemento con fondo, senza raggio, largo quanto il contenuto di un contenitore arrotondato: tinta a fascia piatta che non segue raggi e margini |
 | SPORGE | un elemento esce dal riquadro visibile (fondo o bordo) del genitore |
 | CONSOLE | errore in console o eccezione della pagina |
 | M2, M3, M5, M8, M10, M11, MLAYOUT, MCOMPARE | movimento, solo con `--video` (`movimento.mjs`): menu, popover o dialogo che compare di colpo (opaco al primo fotogramma, nessuna animazione), durata fuori dai token tempo/*, curva lineare, parte oltre 50 ms, si muove con movimento ridotto, salto se interrotta, fotogrammi persi, anima una proprietà di layout |
