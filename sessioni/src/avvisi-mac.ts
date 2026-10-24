@@ -1,6 +1,8 @@
 // Invia gli avvisi di sistema del Mac (#407) a ogni aggiornamento dal vivo: confronta ogni sessione col suo stato di prima.
 import { Notification } from "electron";
-import { daAvvisare, type ImpostazioniAvvisi } from "./avvisi";
+import { daAvvisare, inSilenzio, type ImpostazioniAvvisi } from "./avvisi";
+import { PARTENZA } from "./partenza";
+import { quoteUso, sogliePassate } from "./quote-uso";
 import type { Aggiornamento, Sessione } from "./tipi";
 import { provaSilenziosa } from "./modalita-prova";
 
@@ -8,7 +10,15 @@ import { provaSilenziosa } from "./modalita-prova";
 export function collegaAvvisi(elenco: () => Sessione[], impostazioni: () => ImpostazioniAvvisi, ora = () => new Date()) {
   if (provaSilenziosa()) return (_a: Aggiornamento) => {};
   let viste = new Map(elenco().map((s) => [s.id, s]));
+  const soglie = new Map<string, number>();
+  // 80% e 90% della quota (CL7): si controllano a ogni aggiornamento dal vivo (il feed ha la sua cache di 60 s); rete giù = niente avviso
+  const controllaQuote = () => quoteUso().then((quote) => {
+    const imp = impostazioni(), nuove = sogliePassate(quote, soglie); // le soglie si registrano anche in silenzio: non si recuperano dopo
+    if (imp.avvisoLimite === false || inSilenzio(imp.silenzio ?? PARTENZA.silenzio, ora()) || !Notification.isSupported()) return;
+    for (const n of nuove) new Notification({ title: n.account, body: `Quota usata: ${n.soglia}%`, silent: true }).show();
+  }, () => {});
   return (a: Aggiornamento) => {
+    void controllaQuote();
     const adesso = elenco();
     const cambiate = new Set(a.sessioni);
     const imp = impostazioni();

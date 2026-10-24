@@ -235,4 +235,27 @@ H.avvia('requisiti-b', async () => {
     await clicca('button[role=switch]', 'Aggiornamenti automatici'); await attesa(60); assert.deepEqual(imposta(), [{ aggiornamentiAutomatici: false }]);
   });
 
+  await req('H3', async () => {
+    await imp('101-17363');
+    const apri = async () => { await run(() => document.querySelector('.scelta [aria-label^="Silenzio"]').click()); await clicca('.scelta .menu .voce', 'Scegli le ore…'); await wait(() => !!document.querySelector('[role=dialog] input')); };
+    await apri(); assert.match(await run(() => document.querySelector('[role=dialog]').innerText), /Scegli le ore[\s\S]*22:00–8:00/);
+    await scrivi('[role=dialog] input', 'domani'); await clicca('[role=dialog] button', 'Salva'); await wait(() => /Ore non valide/.test(document.querySelector('.area-avvisi')?.innerText || ''));
+    assert.deepEqual(imposta(), [], 'ore non valide: niente salvato');
+    await apri(); await scrivi('[role=dialog] input', '21-6.30'); await clicca('[role=dialog] button', 'Salva'); await wait(() => !document.querySelector('[role=dialog]'));
+    await attesa(60); assert.deepEqual(imposta(), [{ silenzio: '21:00–6:30' }]);
+    await wait(() => !!document.querySelector('.scelta [aria-label="Silenzio: 21:00–6:30"]'));
+  });
+
+  await req('H37', async () => { // H17: la scheda Andamento disegna l'uso al giorno che il main manda
+    await imp('119-57613');
+    await wait(() => document.querySelectorAll('.tab-uso').length === 2 && document.querySelectorAll('.barra-uso').length === 4);
+    assert.equal(await run(() => !document.querySelector('.andamento')), true, 'si parte da Panoramica');
+    await clicca('.tab-uso', 'Andamento'); await wait(() => !!document.querySelector('.andamento'));
+    const giorni = H.scena.uso[0].giorni.length;
+    assert.equal(await run(() => document.querySelectorAll('.andamento .giorno').length), giorni);
+    assert.deepEqual(await testo('.andamento .voce-legenda'), H.scena.uso.map((u) => u.account));
+    assert.match(await run(() => document.querySelector('.andamento .testata').innerText), new RegExp(`Ultimi ${giorni} giorni`));
+    await clicca('.tab-uso', 'Panoramica'); await wait(() => !document.querySelector('.andamento') && document.querySelectorAll('.barra-uso').length === 4);
+  });
+
 });
