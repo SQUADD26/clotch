@@ -12,7 +12,7 @@ export function ViaDalMac({ r, adesso, aspettano, inCasella }: { r: Registro | n
   if (!r) return null;
   if (clotchAcceso(r, adesso)) {
     if (!r.afk) return null;
-    const n = r.afk.avvisi, ms = adesso - r.afk.da; // minuti interi: l'orologio non batte al secondo (#968)
+    const n = r.afk.avvisi, ms = adesso - r.afk.da; // minuti interi: l'orologio non batte al secondo
     return (
       <div className="banda via" role="status">
         <div className="riga-banda">
