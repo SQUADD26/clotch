@@ -2,11 +2,12 @@
 import type { EsitoComando } from "../../comandi";
 import type { Sessione } from "../../tipi";
 
-/** Durata in ms -> «1 s», «41 s», «4 min 12 s», «2 h 5 min». */
+/** Durata in ms -> «1 s», «41 s», «4 min 12 s», «2 h 5 min», «3 g 5 h». */
 export function durata(ms: number) {
   const s = Math.max(0, Math.round(ms / 1000));
   if (s < 60) return `${s} s`;
   const m = Math.floor(s / 60);
+  if (m >= 1440) return m % 1440 >= 60 ? `${Math.floor(m / 1440)} g ${Math.floor((m % 1440) / 60)} h` : `${Math.floor(m / 1440)} g`;
   if (m < 60) return s % 60 ? `${m} min ${s % 60} s` : `${m} min`;
   return m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${Math.floor(m / 60)} h`;
 }
