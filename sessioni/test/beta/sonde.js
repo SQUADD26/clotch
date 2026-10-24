@@ -32,6 +32,11 @@
       for (const p of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft']) {
         const v = Math.abs(parseFloat(s[p])); if (v && !tok.spazi.includes(v)) una('SPAZIO', e, `${p} ${s[p]}`);
       }
+      const p = e.parentElement, ps = p && getComputedStyle(p);
+      if (p && p !== document.body && ps.overflow === 'visible' && (ps.backgroundColor !== 'rgba(0, 0, 0, 0)' || parseFloat(ps.borderTopWidth) > 0)) {
+        const r = e.getBoundingClientRect(), q = p.getBoundingClientRect(), fuori = Math.max(q.left - r.left, q.top - r.top, r.right - q.right, r.bottom - q.bottom);
+        if (fuori > 1) una('SPORGE', e, `esce di ${Math.round(fuori)} px da ${sel(p)}`);
+      }
       if (proprio(e) && e.scrollWidth > e.clientWidth + 1 && /hidden|clip/.test(s.overflowX) && s.textOverflow !== 'ellipsis' && s.webkitLineClamp === 'none') una('TESTO', e, `${e.scrollWidth}>${e.clientWidth} senza ellissi`);
     }
     for (const e of document.querySelectorAll(`${radice} :is(${CLIC})`)) {
@@ -39,6 +44,11 @@
       const r = e.getBoundingClientRect();
       let scorre = false;
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflow)) { scorre = true; break; }
+      if (e.disabled || e.getAttribute('aria-disabled') === 'true') {
+        const aspetto = (x) => { const z = getComputedStyle(x); return z.color + z.backgroundColor + z.opacity + z.borderTopColor; };
+        const gemello = [...document.querySelectorAll(`${radice} :is(${CLIC})`)].find((o) => o !== e && o.className === e.className && !o.disabled && o.getAttribute('aria-disabled') !== 'true' && vis(o));
+        if (gemello && aspetto(gemello) === aspetto(e)) una('STATO', e, `disabilitato uguale all'attivo ${sel(gemello)}`);
+      }
       if (!scorre && !dentro(r, finestra)) una('FUORI', e, `${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}×${Math.round(r.height)} in ${innerWidth}×${innerHeight}`);
     }
     for (const e of sopra()) {
