@@ -9,7 +9,9 @@ const path = require("node:path");
 const { coppia, creaRegistro, creaSessioni, rigaRegistro } = require("../dist/test/budget/dati-finti");
 
 const T = { primaRigaMs: 1000, bloccoMs: 50, primoEventoMs: 150, bloccoMainMax: 0, bloccoRendererMax: 0, cpuRiposoPct: 5 };
-const N = Number(process.env.BUDGET_SESSIONI || 3000), PER_GIRO = Number(process.env.BUDGET_PER_GIRO || 2), PORTA = 9400 + (process.pid % 500);
+const N = Number(process.env.BUDGET_SESSIONI || 3000), PER_GIRO = Number(process.env.BUDGET_PER_GIRO || 2);
+// porta libera chiesta al sistema: sui runner condivisi altri job girano sulla stessa macchina (claude-config#2657)
+const portaLibera = () => new Promise((ok, no) => { const s = require("node:net").createServer(); s.on("error", no); s.listen(0, "127.0.0.1", () => { const p = s.address().port; s.close(() => ok(p)); }); });
 const pausa = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const radice = path.join(__dirname, "..");
 
@@ -45,16 +47,21 @@ const cpuAlbero = (radicePid) => {
 };
 
 async function avvia(etichetta, home, cfg, sonda) {
-  const t0 = Date.now();
+  const PORTA = await portaLibera(), t0 = Date.now();
+  // detached: gruppo di processi proprio, cosi' fermo() chiude anche i figli di Electron (un figlio vivo tiene la cartella e il secondo avvio non apre la finestra)
   const proc = spawn(require("electron"), ["--no-sandbox", `--remote-debugging-port=${PORTA}`, "-r", path.join(__dirname, "..", "test", "budget", "sonda-main.cjs"), radice],
-    { env: { ...process.env, HOME: home, XDG_CONFIG_HOME: cfg, CLOTCH_TEST_SILENT: "1", CLOTCH_TEST_ANTEPRIMA: "1", SONDA_FILE: sonda }, stdio: "ignore" });
+    { env: { ...process.env, HOME: home, XDG_CONFIG_HOME: cfg, CLOTCH_TEST_SILENT: "1", CLOTCH_TEST_ANTEPRIMA: "1", SONDA_FILE: sonda }, stdio: "ignore", detached: true });
   const pagina = await cdp(PORTA);
   let primaRiga = null;
   while (primaRiga === null && Date.now() - t0 < 30000) {
     if (await pagina.valuta(`!!document.querySelector(".riga-sessione")`)) primaRiga = Date.now() - t0; else await pausa(10);
   }
   console.log(`[${etichetta}] prima riga: ${primaRiga} ms`);
-  return { proc, pagina, primaRiga, fermo: async () => { pagina.chiudi(); proc.kill("SIGTERM"); await pausa(300); proc.kill("SIGKILL"); } };
+  return { proc, pagina, primaRiga, fermo: async () => {
+    const gruppo = (sig) => { try { process.kill(-proc.pid, sig); return true; } catch { return false; } }; // false = nessun processo del gruppo
+    pagina.chiudi(); gruppo("SIGTERM"); await pausa(300); gruppo("SIGKILL");
+    for (const fine = Date.now() + 10000; gruppo(0) && Date.now() < fine;) await pausa(50);
+  } };
 }
 
 const bloccati = (sonda, da) => fs.readFileSync(sonda, "utf8").split("\n").filter(Boolean).map((r) => r.split(" ").map(Number)).filter(([t]) => t >= da);
