@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792852151044,
+    "ultimaAttivita": 1792852143522,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -56,12 +56,12 @@
    {
     "tipo": "utente",
     "testo": "Perché la voce «Assistenza» non si vede nella barra?",
-    "t": 1792852206544
+    "t": 1792852198746
    },
    {
     "tipo": "pensiero",
     "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
-    "t": 1792852207544
+    "t": 1792852199746
    },
    {
     "tipo": "strumento",
@@ -74,7 +74,7 @@
      "testo": "Found 4 files\na\nb\nc\nd",
      "errore": false
     },
-    "t": 1792852221544,
+    "t": 1792852213746,
     "id": "t0"
    },
    {
@@ -87,7 +87,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852221744,
+    "t": 1792852213946,
     "id": "t1"
    },
    {
@@ -100,7 +100,7 @@
      "testo": "",
      "errore": false
     },
-    "t": 1792852222044,
+    "t": 1792852214246,
     "id": "t2"
    },
    {
@@ -113,7 +113,7 @@
      "testo": "Exit code 1",
      "errore": true
     },
-    "t": 1792852225044,
+    "t": 1792852217246,
     "id": "t3"
    },
    {
@@ -126,7 +126,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792852230044,
+    "t": 1792852222246,
     "id": "t4"
    },
    {
@@ -139,7 +139,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852253044,
+    "t": 1792852245246,
     "id": "t5"
    },
    {
@@ -152,7 +152,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852253444,
+    "t": 1792852245646,
     "id": "t6"
    },
    {
@@ -165,7 +165,7 @@
      "testo": "src/a.ts:1:x",
      "errore": false
     },
-    "t": 1792852253744,
+    "t": 1792852245946,
     "id": "t7"
    },
    {
@@ -178,7 +178,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852253944,
+    "t": 1792852246146,
     "id": "t8"
    },
    {
@@ -191,7 +191,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852254244,
+    "t": 1792852246446,
     "id": "t9"
    },
    {
@@ -204,7 +204,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792852254744,
+    "t": 1792852246946,
     "id": "t10"
    },
    {
@@ -217,7 +217,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852263744,
+    "t": 1792852255946,
     "id": "t11"
    },
    {
@@ -230,7 +230,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852269344,
+    "t": 1792852261546,
     "id": "t12"
    },
    {
@@ -243,7 +243,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852270344,
+    "t": 1792852262546,
     "id": "t13"
    },
    {
@@ -253,7 +253,7 @@
      "file_path": "sessioni/src/ui/chat/Filo.tsx"
     },
     "esito": null,
-    "t": 1792852271344,
+    "t": 1792852263546,
     "id": "t14"
    }
   ]

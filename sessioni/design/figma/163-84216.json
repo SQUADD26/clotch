@@ -68,7 +68,7 @@
    "box": {
     "x": 24,
     "y": 20,
-    "w": 96,
+    "w": 91,
     "h": 18
    },
    "variabili": {
@@ -76,7 +76,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo Filo.tsx…",
+   "testo": "Lettura Filo.tsx",
    "font": "SF Pro Regular"
   },
   {
@@ -84,7 +84,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 126,
+    "x": 121,
     "y": 20,
     "w": 78,
     "h": 18
@@ -156,7 +156,7 @@
    "box": {
     "x": 46,
     "y": 62,
-    "w": 96,
+    "w": 91,
     "h": 18
    },
    "variabili": {
@@ -165,7 +165,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo Filo.tsx…",
+   "testo": "Lettura Filo.tsx",
    "font": "SF Pro Regular"
   },
   {
@@ -173,7 +173,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 148,
+    "x": 143,
     "y": 62,
     "w": 78,
     "h": 18

@@ -148,7 +148,7 @@
    "box": {
     "x": 48,
     "y": 20,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -157,7 +157,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -165,7 +165,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 91,
+    "x": 96,
     "y": 20,
     "w": 68,
     "h": 18
@@ -288,7 +288,7 @@
    "box": {
     "x": 48,
     "y": 62,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -297,7 +297,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -305,7 +305,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 91,
+    "x": 96,
     "y": 62,
     "w": 68,
     "h": 18
@@ -324,7 +324,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 163,
+    "x": 168,
     "y": 63,
     "w": 16,
     "h": 16
@@ -340,7 +340,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 168.33203125,
+    "x": 173.33203125,
     "y": 66.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -459,7 +459,7 @@
    "box": {
     "x": 48,
     "y": 104,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -468,7 +468,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -476,7 +476,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 91,
+    "x": 96,
     "y": 104,
     "w": 68,
     "h": 18
@@ -495,7 +495,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 163,
+    "x": 168,
     "y": 105,
     "w": 16,
     "h": 16
@@ -511,7 +511,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 168.33203125,
+    "x": 173.33203125,
     "y": 108.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -631,7 +631,7 @@
    "box": {
     "x": 50,
     "y": 148,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -640,7 +640,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -648,7 +648,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 93,
+    "x": 98,
     "y": 148,
     "w": 68,
     "h": 18
@@ -667,7 +667,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 165,
+    "x": 170,
     "y": 149,
     "w": 16,
     "h": 16
@@ -683,7 +683,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 170.33203125,
+    "x": 175.33203125,
     "y": 152.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -801,7 +801,7 @@
    "box": {
     "x": 48,
     "y": 192,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -810,7 +810,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -818,7 +818,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 177,
+    "x": 111,
     "y": 193,
     "w": 16,
     "h": 16
@@ -834,7 +834,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 180.33203125,
+    "x": 114.33203125,
     "y": 198.33306884765625,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -1038,7 +1038,7 @@
    "box": {
     "x": 48,
     "y": 286,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -1047,7 +1047,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -1055,7 +1055,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 177,
+    "x": 111,
     "y": 286,
     "w": 54,
     "h": 18
@@ -1177,7 +1177,7 @@
    "box": {
     "x": 48,
     "y": 335,
-    "w": 60,
+    "w": 28,
     "h": 18
    },
    "variabili": {
@@ -1186,7 +1186,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Fotografo",
+   "testo": "Foto",
    "font": "SF Pro Regular"
   },
   {
@@ -1194,9 +1194,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 80,
     "y": 335,
-    "w": 126,
+    "w": 112,
     "h": 18
    },
    "variabili": {
@@ -1205,7 +1205,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "la pagina Dashboard",
+   "testo": "pagina Dashboard",
    "font": "SF Pro Regular"
   },
   {

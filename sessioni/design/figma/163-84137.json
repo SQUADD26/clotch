@@ -78,7 +78,7 @@
    "box": {
     "x": 24,
     "y": 20,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -87,7 +87,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -95,7 +95,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 165,
+    "x": 106,
     "y": 20,
     "w": 35,
     "h": 18
@@ -114,7 +114,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 206,
+    "x": 147,
     "y": 21,
     "w": 16,
     "h": 16
@@ -130,7 +130,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 211.33203125,
+    "x": 152.33203125,
     "y": 24.33306121826172,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -169,7 +169,7 @@
    "box": {
     "x": 24,
     "y": 62,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -178,7 +178,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -186,7 +186,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 165,
+    "x": 106,
     "y": 62,
     "w": 35,
     "h": 18
@@ -205,7 +205,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 206,
+    "x": 147,
     "y": 63,
     "w": 16,
     "h": 16
@@ -221,7 +221,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 211.33203125,
+    "x": 152.33203125,
     "y": 66.33305358886719,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -260,7 +260,7 @@
    "box": {
     "x": 24,
     "y": 104,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -269,7 +269,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -277,7 +277,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 165,
+    "x": 106,
     "y": 104,
     "w": 35,
     "h": 18
@@ -296,7 +296,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 206,
+    "x": 147,
     "y": 105,
     "w": 16,
     "h": 16
@@ -312,7 +312,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 211.33203125,
+    "x": 152.33203125,
     "y": 108.33305358886719,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -352,7 +352,7 @@
    "box": {
     "x": 26,
     "y": 148,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -361,7 +361,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -369,7 +369,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 167,
+    "x": 108,
     "y": 148,
     "w": 35,
     "h": 18
@@ -388,7 +388,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 208,
+    "x": 149,
     "y": 149,
     "w": 16,
     "h": 16
@@ -404,7 +404,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 213.33203125,
+    "x": 154.33203125,
     "y": 152.3330535888672,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -442,7 +442,7 @@
    "box": {
     "x": 24,
     "y": 192,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -451,7 +451,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -459,7 +459,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 165,
+    "x": 106,
     "y": 192,
     "w": 35,
     "h": 18
@@ -478,7 +478,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 206,
+    "x": 147,
     "y": 193,
     "w": 16,
     "h": 16
@@ -494,7 +494,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 209.33203125,
+    "x": 150.33203125,
     "y": 198.33306884765625,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -532,7 +532,7 @@
    "box": {
     "x": 24,
     "y": 234,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -541,7 +541,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -549,7 +549,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 165,
+    "x": 106,
     "y": 234,
     "w": 35,
     "h": 18
@@ -568,7 +568,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 206,
+    "x": 147,
     "y": 235,
     "w": 16,
     "h": 16
@@ -584,7 +584,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 206.66796875,
+    "x": 147.66796875,
     "y": 235.66635131835938,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -599,7 +599,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 228,
+    "x": 169,
     "y": 234,
     "w": 47,
     "h": 18
@@ -618,7 +618,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 281,
+    "x": 222,
     "y": 235,
     "w": 16,
     "h": 16
@@ -634,7 +634,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 286.33203125,
+    "x": 227.33203125,
     "y": 238.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461

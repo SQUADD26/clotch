@@ -38,7 +38,7 @@ const Rientrato = ({ testo }: { testo: string }) => <div className="rientrato"><
 export function Ragionamento({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "pensiero" }>; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
   const r = useRiserva();
-  if (b.inCorso) return <div className="compatto pensiero"><div className="riga-compatta in-corso"><Luccica testo="Ragionamento…" /></div></div>;
+  if (b.inCorso) return <div className="compatto pensiero"><div className="riga-compatta in-corso"><Luccica testo="Ragionamento" /></div></div>;
   return (
     <div className="compatto pensiero">
       <button type="button" className="riga-compatta" aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
@@ -99,7 +99,7 @@ export function RigaStrumento({ b, aperta: iniziale = false }: { b: BloccoStrume
   );
 }
 
-/** «12 strumenti», durata a destra «48 s», chiuso. Mentre una chiamata gira, la testata è la riga in corso: «Lettura Filo.tsx… 3 strumenti». */
+/** «12 strumenti», durata a destra «48 s», chiuso. Mentre una chiamata gira, la testata è la riga in corso: «Lettura Filo.tsx 3 strumenti» (il riflesso dice già che gira: niente puntini). */
 /** `riga`: nelle scene di prova, la riga che parte aperta (163:87853). */
 export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; aperto?: boolean; riga?: number }) {
   const [aperto, setAperto] = useState(iniziale);
@@ -109,7 +109,7 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
     <div className="compatto gruppo-strumenti">
       <button type="button" className={ora ? "riga-compatta in-corso" : "riga-compatta"} aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
         {ora ? (
-          <Luccica testo={`${r.testo([ora.verbo, ora.oggetto].filter(Boolean).join(" "))}…`}>
+          <Luccica testo={r.testo([ora.verbo, ora.oggetto].filter(Boolean).join(" "))}>
             {n > 1 && <>{" "}<span className="conto">{quanti(n, "strumento", "strumenti")}</span></>}
           </Luccica>
         ) : (
@@ -130,14 +130,14 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
   );
 }
 
-/** Un aiutante in una riga: «Aiutante Controlla i tipi nessun errore», aperto col suo rapporto. */
+/** Un aiutante in una riga: «Aiutante · Controlla i tipi · nessun errore», aperto col suo rapporto. */
 function RigaAiutante({ a, aperto: iniziale = false }: { a: Aiutante; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
   const r = useRiserva();
   if (!a.finito) return (
     <div className="riga-strumento"><div className="riga in-corso">
       <span className="segno-aiutante"><Icona nome="figlia" colore="terziaria" /></span>
-      <span className="azione"><span className="verbo">Aiutante</span>{" "}<Luccica testo={`${r.testo(a.nome)}…`} /></span>
+      <span className="azione"><span className="verbo">Aiutante</span>{" "}<Luccica testo={r.testo(a.nome)} /></span>
       {a.durata != null && <span className="durata">{tempo(a.durata)}</span>}
     </div></div>
   );
