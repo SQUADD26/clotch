@@ -1,5 +1,6 @@
 // Un solo ledger per snapshot e live: le identità nascono dai byte del file, mai dal contenuto.
 import { createHmac, randomUUID } from "node:crypto";
+import * as fs from "node:fs";
 import { parseRiga, msgErrore } from "./jsonl";
 import { DIM_PAGINA, firmaFile, lettoreCronologia, versioneFile, type Campione } from "./messaggi";
 import type { DeltaCronologia, ErroreCronologia, OpzioniCronologia, RigaCronologia, SnapshotPagina } from "./cronologia-tipi";
@@ -14,6 +15,7 @@ interface Stato {
 type Ancora = Omit<Stato, "righe" | "chiavi" | "leggi" | "byte" | "invalido"> & { revisioni: Float64Array };
 interface Snapshot { dati: SnapshotPagina; righe: RigaCronologia[]; scade: number; byte: number }
 export interface LimitiCronologia { statoByte?: number; snapshotByte?: number; snapshotNumero?: number; ttlMs?: number; fileByte?: number }
+const inode = (file: string) => { const x = fs.statSync(file, { bigint: true }); return `${x.dev}:${x.ino}`; }; // stesso formato di versioneFile
 const copia = <T>(v: T): T => structuredClone(v);
 
 export class Cronologia {
@@ -42,11 +44,12 @@ export class Cronologia {
     const precedente = this.stati.get(s.id), sospeso = this.sospesi.get(s.id), ancora = precedente ?? sospeso;
     let parsing = false; // un errore prima del parser lascia il ledger intatto: non va invalidato
     try {
-      if (precedente && !precedente.invalido && precedente.file === s.file && precedente.sorgente === s.sorgente && precedente.firma === firmaFile(s.file)) {
+      if (precedente && !precedente.invalido && precedente.sorgente === s.sorgente && precedente.firma === firmaFile(s.file)) {
         this.stati.delete(s.id); this.stati.set(s.id, precedente);
         return precedente;
       }
-      const stessa = !!ancora && ancora.file === s.file && ancora.sorgente === s.sorgente;
+      // Due percorsi dello stesso file (account con `projects` in link simbolico) non sono una rotazione: conta l'inode.
+      const stessa = !!ancora && ancora.sorgente === s.sorgente && (ancora.file === s.file || ancora.identita === inode(s.file));
       // Con un ledger vivo legge solo la coda (più i campioni del prefisso); da zero se serve riscaldare il parser.
       const v = versioneFile(s.file, this.limiti.fileByte, stessa ? { identita: ancora!.identita, offset: ancora!.offset,
         campioni: precedente?.invalido ? null : ancora!.campioni } : undefined, !precedente);

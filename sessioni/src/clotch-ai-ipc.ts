@@ -18,7 +18,7 @@ const completo = (r: Registro, home: string, env: NodeJS.ProcessEnv) => ({ ...pi
 
 export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unknown) => void, home: string, env: NodeJS.ProcessEnv = process.env) {
   ipc.handle("clotch-ai:comando", (_e, cmd: Comando | ComandoApp, args: Record<string, unknown>) =>
-    eComandoApp(cmd) ? eseguiComandoApp(cmd, args ?? {}) : inviaComando(home, cmd, args ?? {}, { env, ...(cmd === "nuova_sessione" ? { scadenzaMs: 90_000 } : {}) })); // il motore risponde a sessione nata: pochi secondi, fino a ~1 minuto se sceglie l'account
+    eComandoApp(cmd) ? eseguiComandoApp(cmd, args ?? {}) : inviaComando(home, cmd, args ?? {}, { env, ...(cmd === "nuova_sessione" ? { scadenzaMs: 90_000 } : cmd === "macchina_aggiungi" ? { scadenzaMs: 240_000 } : {}) })); // nuova_sessione: pochi secondi, fino a ~1 minuto se sceglie l'account; macchina_aggiungi: fino a ~3 minuti (installer)
   const leggiRegistro = lettoreRegistro(home, env); // un lettore solo: ogni lettura applica solo le righe nuove
   ipc.handle("clotch-ai:registro", () => completo(leggiRegistro(), home, env));
   // Voce dell'app (Clotch assente): lo stato «sta parlando» e «Interrompi» del frame 101-37055.

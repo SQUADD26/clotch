@@ -5,16 +5,19 @@ import type { CartellaAvvio, ContestoCartella } from "../../tipi";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { numero } from "../base/token";
 import { Interruttore } from "../impostazioni/controlli";
+import type { Macchina, Proposta } from "../../macchine-tipi";
 import { gruppiRami, nomeAmbiente, type Ambiente } from "./avvio";
+import type { ElencoMacchine } from "./usaMacchine";
+import { PannelloSsh } from "./MenuMacchine";
 import "./nuova-sessione.css";
 
-export function Selettore({ icona, etichetta, aperto = false, stato, onClick, children }: {
-  icona: NomeIcona; etichetta: string; aperto?: boolean; stato?: "spento" | "errore"; onClick(): void; children?: ReactNode;
+export function Selettore({ icona, etichetta, aperto = false, stato, avviso = false, fisso = false, onClick, children }: {
+  icona: NomeIcona; etichetta: string; aperto?: boolean; stato?: "spento" | "errore"; /** Icona gialla: la macchina non è pronta. */ avviso?: boolean; /** Si legge soltanto (ramo di una macchina SSH): senza menu. */ fisso?: boolean; onClick(): void; children?: ReactNode;
 }) {
-  const colore = stato === "errore" ? "errore" : stato === "spento" ? "terziaria" : "secondaria";
+  const colore = stato === "errore" ? "errore" : avviso ? "lavoro" : stato === "spento" ? "terziaria" : "secondaria";
   return (
     <span className="selettore-avvio">
-      <button type="button" className={`selettore${aperto ? " aperto" : ""}${stato ? ` ${stato}` : ""}`} aria-haspopup="menu" aria-expanded={aperto} onClick={onClick}>
+      <button type="button" className={`selettore${aperto ? " aperto" : ""}${stato ? ` ${stato}` : ""}`} aria-haspopup={fisso ? undefined : "menu"} aria-expanded={fisso ? undefined : aperto} disabled={fisso} onClick={onClick}>
         <Icona nome={icona} colore={colore} /><span className="etichetta">{etichetta}</span>
       </button>
       {children}
@@ -53,11 +56,11 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, onChiudi, children }:
 const Separatore = () => <div className="separatore" role="separator"><div className="linea" /></div>;
 const Titolo = ({ children }: { children: string }) => <div className="titolo-gruppo">{children}</div>;
 
-function Riga({ icona, etichetta, valore, fine, scelta = false, disabled, onClick }: {
-  icona?: NomeIcona; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; disabled?: boolean; onClick(): void;
+function Riga({ icona, etichetta, valore, fine, scelta = false, attiva = false, disabled, onClick }: {
+  icona?: NomeIcona; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; attiva?: boolean; disabled?: boolean; onClick(): void;
 }) {
   return (
-    <button type="button" role="menuitem" className="voce" disabled={disabled} onClick={onClick}>
+    <button type="button" role="menuitem" className={`voce${attiva ? " scelta" : ""}`} disabled={disabled} onClick={onClick}>
       {icona && <Icona nome={icona} />}
       <span className="etichetta">{etichetta}</span>
       {valore && <span className="valore">{valore}</span>}
@@ -66,35 +69,34 @@ function Riga({ icona, etichetta, valore, fine, scelta = false, disabled, onClic
   );
 }
 
-export function MenuAmbiente({ ambiente, ssh, onScegli, onChiudi }: { ambiente: Ambiente; ssh: string[]; onScegli(a: Ambiente): void; onChiudi(): void }) {
-  const [cerca, setCerca] = useState(""), [host, setHost] = useState(false);
+export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli, onAggiungi, onTogli, onChiudi }: {
+  ambiente: Ambiente; mac: ElencoMacchine; ssh?: boolean; mostraBase?: string | null;
+  onScegli(a: Ambiente): void; onAggiungi(p?: Proposta): void; onTogli(m: Macchina): void; onChiudi(): void;
+}) {
+  const [cerca, setCerca] = useState(""), [host, setHost] = useState(ssh);
   const q = cerca.trim().toLowerCase(), trova = (t: string) => t.toLowerCase().includes(q);
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
-  const voci: Ambiente[] = [{ tipo: "locale" }, { tipo: "cloud" }, { tipo: "remote_control" }, ...ssh.map((h) => ({ tipo: "ssh" as const, host: h }))];
+  const voci: Ambiente[] = [{ tipo: "locale" }, { tipo: "cloud" }, { tipo: "remote_control" }, ...mac.macchine.filter((m) => !m.locale).map((m) => ({ tipo: "ssh" as const, host: m.nome }))];
   return (
-    <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} onChiudi={onChiudi}>
-      {q ? voci.filter((a) => trova(nomeAmbiente(a))).map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />)
-        : host ? (
-          <>
-            <Titolo>SSH</Titolo>
-            {ssh.length ? ssh.map((h) => <Riga key={h} etichetta={h} fine="spunta" scelta={e({ tipo: "ssh", host: h })} onClick={() => scegli({ tipo: "ssh", host: h })} />)
-              : <div className="vuoto">Nessun host in ~/.ssh/config</div>}
-          </>
-        ) : (
+    <div className="menu-doppio">
+      <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} onChiudi={onChiudi}>
+        {q ? voci.filter((a) => trova(nomeAmbiente(a))).map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />) : (
           <>
             <Titolo>Locale</Titolo>
             <Riga icona="computer" etichetta="Questo computer" fine="spunta" scelta={e({ tipo: "locale" })} onClick={() => scegli({ tipo: "locale" })} />
             <Separatore />
             <Riga etichetta="Cloud" fine="freccia" onClick={() => scegli({ tipo: "cloud" })} />
             <Riga etichetta="Remote Control" fine="freccia" onClick={() => scegli({ tipo: "remote_control" })} />
-            <Riga etichetta="SSH" fine="freccia" onClick={() => setHost(true)} />
+            <Riga etichetta="SSH" fine="freccia" attiva={host} onClick={() => setHost(!host)} />
             <Separatore />
-            {/* shortcut: gli ambienti nuovi si aggiungono come `Host` in ~/.ssh/config; il disegno non dice altro, la voce resta spenta */}
+            {/* shortcut: gli ambienti nuovi sono le macchine SSH («Aggiungi macchina…»); il disegno non dice altro, la voce resta spenta */}
             <Riga icona="piu" etichetta="Nuovo ambiente" disabled onClick={() => {}} />
           </>
         )}
-    </Menu>
+      </Menu>
+      {host && !q && <PannelloSsh mac={mac} ambiente={ambiente} mostraBase={mostraBase} onScegli={scegli} onAggiungi={(p) => { onChiudi(); onAggiungi(p); }} onTogli={(m) => { onChiudi(); onTogli(m); }} />}
+    </div>
   );
 }
 

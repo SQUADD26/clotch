@@ -7,12 +7,14 @@ import { parseRiga, msgErrore } from "./jsonl";
 import { aMillisecondi } from "./registri";
 import { ErroreLettura } from "./tipi";
 import { ricevutaLocale } from "./clotch-ai-ricevuta";
+import type { PassoMacchina } from "./macchine-tipi";
 
 export const STATI_CLOTCH_AI = ["lavora", "aspetta", "finito", "serve_roberto", "serve_madre", "bloccato", "ferma_limite"] as const;
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
   "riprendi_altrove", "account_previsto", "archivia", "ripristina", "obiettivo", "spegni", "imposta", "zitto", "sessione_imposta", "nuova_sessione",
+  "macchine", "macchina_aggiungi", "macchina_togli",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 20 minuti», come friday_triage.FERMO_S (la copia della UI è in ui/chat/clotch-ai.ts). Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 1_200_000;
@@ -83,6 +85,8 @@ export interface Registro {
   /** Ultimo evento `impostazioni`, con i campi del contratto (attiva, microfono, voce, account, puo_dare_permessi, legge_ad_alta_voce, microfoni_disponibili, voci_disponibili). */
   impostazioni: Record<string, unknown> | null;
   esiti: Map<string, { esito: string; testo: string }>;
+  /** Eventi `macchina_passo` (gli ultimi 200): avanzamento dal vivo di `macchina_aggiungi`. */
+  passiMacchina?: PassoMacchina[];
   errori: ErroreLettura[];
   /** Solo nel registro che l'app manda alle viste (clotch-ai-ipc.ts), mai letti dal disco qui: schermo occupato da uno script,
    *  AFK acceso con gli avvisi tenuti, e se l'app sta dicendo un avviso a voce (Clotch spento). */
@@ -103,12 +107,9 @@ const STATO_PASSO = new Map([["fatto", "completed"], ["in_corso", "in_progress"]
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
 const statoVuoto = () => ({
-  r: { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [] } as Registro,
-  ultimoN: new Map<string, number>(),
-  annullate: new Set<string>(),
+  r: { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [], passiMacchina: [] } as Registro,
+  ultimoN: new Map<string, number>(), annullate: new Set<string>(), versioniObiettivo: new Map<string, number>(), comandi: new Map<string, any>(),
   nonRiprovabili: new Set<string>(), // annulla rifiutata dal motore per sempre: inutile riproporla
-  versioniObiettivo: new Map<string, number>(),
-  comandi: new Map<string, any>(),
   pos: new Map<string, { ino: number; fine: number }>(), // mese -> file e byte già applicati
 });
 
@@ -153,6 +154,7 @@ export function lettoreRegistro(home: string, env: NodeJS.ProcessEnv = {}): () =
       }
       applica(st, testo, home, env);
     }
+    st.r.passiMacchina = st.r.passiMacchina!.slice(-200); // tetto anche tra una lettura e l'altra
     for (const d of st.r.decisioni) {
       if (st.annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
       else if (st.nonRiprovabili.has(d.id)) d.annullabile = false;
@@ -257,6 +259,7 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string, home: string,
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
           break;
+        case "macchina_passo": if (t !== null && s(d.nome) && s(d.passo)) r.passiMacchina!.push({ nome: s(d.nome)!, passo: s(d.passo)!, ok: typeof d.ok === "boolean" ? d.ok : null, testo: s(d.testo), comando: s(d.comando), url: s(d.url), codice: s(d.codice), t }); break;
         case "non_disturbare": r.nonDisturbare = d.acceso === true ? { fino: aMillisecondi(d.fino), tenuti: Number(d.tenuti) || 0 } : null; break;
         case "impostazioni": r.impostazioni = d; break;
         case "friday": if (t !== null) r.clotchAi = { evento: String(d.evento ?? ""), t }; break; // nome del protocollo del motore

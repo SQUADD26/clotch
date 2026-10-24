@@ -1,5 +1,5 @@
-// «Nuova sessione» (#468), lato processo principale: cartelle recenti, rami git e host SSH, tutto in sola lettura.
-// La sessione la apre clotch AI (comando `nuova_sessione`).
+// «Nuova sessione» (#468), lato processo principale: cartelle recenti e rami git in sola lettura, più il dialogo per scegliere il file della chiave SSH.
+// La sessione la apre clotch AI (comando `nuova_sessione`); le macchine SSH le dà il motore (comando `macchine`).
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -19,12 +19,6 @@ export function cartelleRecenti(sessioni: Pick<Sessione, "cartella" | "ultimaAtt
   }).slice(0, limite);
 }
 
-/** Gli `Host` di un ~/.ssh/config: i nomi veri, mai quelli con `*`, `?` o `!`. */
-export function hostSsh(config: string): string[] {
-  const host = config.split("\n").flatMap((r) => r.match(/^\s*Host\s+(.+?)\s*$/i)?.[1].split(/\s+/) ?? []);
-  return [...new Set(host.filter((h) => !/[*?!]/.test(h)))];
-}
-
 const git = (cartella: string, ...args: string[]) => new Promise<string | null>((ok) =>
   execFile("git", ["-C", cartella, ...args], { timeout: 5000, env: { ...process.env, GIT_OPTIONAL_LOCKS: "0" } }, (e, out) => ok(e ? null : out.trim())));
 
@@ -41,7 +35,13 @@ export function collegaNuovaSessione(ipc: IpcMain, elenco: () => Pick<Sessione, 
   const { BrowserWindow, dialog } = require("electron") as typeof import("electron"); // i test Node importano il file senza il binario Electron
   ipc.handle("nuova:cartelle", () => ({ recenti: cartelleRecenti(elenco()), casa: home }));
   ipc.handle("nuova:contesto", (_e, cartella: unknown) => contestoGit(typeof cartella === "string" ? cartella : ""));
-  ipc.handle("nuova:ssh", () => { try { return hostSsh(fs.readFileSync(path.join(home, ".ssh", "config"), "utf8")); } catch { return []; } });
+  // della chiave serve solo il percorso: il file non si legge mai
+  ipc.handle("nuova:scegli-chiave", async (e): Promise<string | null> => {
+    const opzioni: Electron.OpenDialogOptions = { properties: ["openFile", "showHiddenFiles"], defaultPath: path.join(home, ".ssh") };
+    const padre = BrowserWindow.fromWebContents(e.sender);
+    const r = await (padre ? dialog.showOpenDialog(padre, opzioni) : dialog.showOpenDialog(opzioni));
+    return r.canceled || !r.filePaths[0] ? null : r.filePaths[0];
+  });
   ipc.handle("nuova:scegli-cartella", async (e): Promise<CartellaAvvio | null> => {
     const opzioni: Electron.OpenDialogOptions = { properties: ["openDirectory"], defaultPath: home };
     const padre = BrowserWindow.fromWebContents(e.sender);

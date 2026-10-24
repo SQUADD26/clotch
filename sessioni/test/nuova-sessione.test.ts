@@ -6,7 +6,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { test } from "node:test";
 import { COMANDI } from "../src/clotch-ai";
-import { cartelleRecenti, contestoGit, hostSsh } from "../src/nuova-sessione";
+import { cartelleRecenti, contestoGit } from "../src/nuova-sessione";
 import { argsNuovaSessione, gruppiRami, LOCALE, notaAvvio } from "../src/ui/chat/avvio";
 
 test("nuova_sessione è un comando del motore", () => assert.ok((COMANDI as readonly string[]).includes("nuova_sessione")));
@@ -16,10 +16,6 @@ test("cartelle recenti: dalla più recente, senza doppioni né vuote", () => {
     { cartella: "/r/vecchia", ultimaAttivita: 1 }, { cartella: "", ultimaAttivita: 9 }, { cartella: "/r/nuova", ultimaAttivita: 5 }, { cartella: "/r/vecchia", ultimaAttivita: 7 },
   ]);
   assert.deepEqual(r, [{ percorso: "/r/vecchia", nome: "vecchia" }, { percorso: "/r/nuova", nome: "nuova" }]);
-});
-
-test("host SSH: i nomi veri, senza jolly", () => {
-  assert.deepEqual(hostSsh("Host *\n  User x\nHost rise worker\n  HostName 1.2.3.4\nhost  app\nHost !skip *.lan\n"), ["rise", "worker", "app"]);
 });
 
 test("rami di un repo: dev di partenza; una cartella senza git non ha rami", async () => {
