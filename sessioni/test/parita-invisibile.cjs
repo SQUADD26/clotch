@@ -92,6 +92,7 @@ async function run(args, scene, initialEnv = {}) {
     './allegati-ipc': { collegaAllegati: record('casella-live') },
     './api': { Sessioni: class {
       elencoSessioni() { calls.push('elenco-letto'); return { sessioni: [], errori: [] }; }
+      elencoInCache() { return null; }
       osservaInWorker() { calls.push("osserva"); }
     } },
     './avvisi-mac': { collegaAvvisi: record('avvisi-live') },
