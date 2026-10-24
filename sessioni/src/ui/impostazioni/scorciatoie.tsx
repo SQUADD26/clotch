@@ -57,7 +57,7 @@ export default function Scorciatoie() {
                   <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>
                 </div>
               )}
-              {ascolta === azione ? <span className="tasto t-sm in-ascolto">Premi i tasti…</span>
+              {ascolta === azione ? <span className="tasto-chip in-ascolto">Premi i tasti…</span>
                 : c ? <Tasto tasti={c.tasti} errore />
                 : t ? <button type="button" aria-label={`Cambia ${etichetta}`} onClick={() => registra(azione)}><Tasto tasti={t} /></button>
                 : (

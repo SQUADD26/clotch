@@ -47,11 +47,6 @@
 .pezzo-impostazioni .scelta { position: relative; flex: none; }
 .pezzo-impostazioni .scelta .valore { display: flex; align-items: center; gap: var(--spazio-1); }
 
-.pezzo-impostazioni .tasto {
-  flex: none; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
-  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
-}
-.pezzo-impostazioni .tasto.errore { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
 
 .pezzo-impostazioni .campo-testo {
   max-width: var(--misura-pannello); min-width: 0; flex: 0 1 auto; height: var(--misura-bottone-invio); padding: 0 var(--spazio-3);
@@ -68,7 +63,7 @@
 .pezzo-impostazioni .bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
 
 /* Scorciatoie: tasti in ascolto e tasti già usati (101-33015) */
-.pezzo-impostazioni .tasto.in-ascolto { border: var(--misura-tratto-forte) solid var(--colore-bordo-fuoco); }
+.pezzo-impostazioni .tasto-chip.in-ascolto { box-shadow: inset 0 0 0 var(--misura-tratto-forte) var(--colore-bordo-fuoco); }
 .pezzo-impostazioni .conflitto { display: flex; align-items: center; gap: var(--spazio-2); }
 
 /* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */

@@ -19,7 +19,7 @@ export function Suggerimento({ testo, scorciatoia, forzato = false, children }: 
       {(visibile || forzato) && (
         <span className="tooltip" role="tooltip">
           <span>{testo}</span>
-          {scorciatoia && <span className="tasto-tooltip">{scorciatoia}</span>}
+          {scorciatoia && <span className="tasto-chip">{scorciatoia}</span>}
         </span>
       )}
     </span>

@@ -42,7 +42,6 @@
   border-bottom: var(--misura-tratto) solid var(--colore-bordo-leggero);
 }
 .campo.grande input { font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); }
-.campo.grande .tasto { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .campo.piccolo {
   height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);
   border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
