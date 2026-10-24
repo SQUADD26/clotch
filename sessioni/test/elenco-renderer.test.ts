@@ -21,5 +21,5 @@ test("registro: una chat non cambiata resta lo stesso oggetto", () => {
   const r1 = daPiano(p), r2 = daPiano({ ...p, chat: { ...p.chat, b: { ...p.chat.b, titolo: "w" } } });
   assert.equal(r2.chat.get("a"), r1.chat.get("a"));
   assert.notEqual(r2.chat.get("b"), r1.chat.get("b"));
-  assert.equal(r2.chat.get("b")!.aiutanti.get("z").tipo, "t");
+  assert.equal(r2.chat.get("b")!.aiutanti.get("z")?.tipo, "t");
 });

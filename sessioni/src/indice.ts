@@ -1,4 +1,4 @@
-// Indice di ricerca delle sessioni (#368): uno solo, nel main, con la sua cache in userData/indice.json. Per sessione
+// Indice di ricerca delle sessioni (#368): uno solo, nel main, con la sua cache in userData/indice/ (un file per sessione, #474). Per sessione
 // il testo di utente e assistente con il suo tempo (niente strumenti, niente pensieri) e il numero dei messaggi.
 // Si rilegge solo il file che ha cambiato mtime o dimensione, una sessione per giro del ciclo: la finestra non si blocca.
 import * as fs from "node:fs";
@@ -120,21 +120,30 @@ export class Indice {
   private memo: MemoIndice = new Map();
   private inGiro = false;
   private scrittura: NodeJS.Timeout | null = null;
-  readonly file: string;
+  private sporche = new Set<string>(); // sessioni da riscrivere (o togliere) al prossimo `scrivi`
+  readonly file: string; // indice.json di prima di #474: si legge una volta, poi diventa la cartella
+  readonly cartella: string;
   // cache/messaggi e cache/immagini non esistono ancora: le useranno i pezzi che terranno messaggi o immagini sul disco
   private readonly cache: string[];
 
   constructor(private dir: string, private attesaScritturaMs = 2000) {
     this.file = path.join(dir, "indice.json");
+    this.cartella = path.join(dir, "indice");
     this.cache = [path.join(dir, "cache", "messaggi"), path.join(dir, "cache", "immagini")];
-    this.dati = leggiIndice(this.file);
+    this.dati = {};
+    let nomi: string[] | null = null;
+    try { nomi = fs.readdirSync(this.cartella).filter((n) => n.endsWith(".json")); } catch { /* prima volta */ }
+    for (const n of nomi ?? []) {
+      try { this.dati[decodeURIComponent(n.slice(0, -5))] = JSON.parse(fs.readFileSync(path.join(this.cartella, n), "utf8")); } catch { /* voce rotta: si rilegge la trascrizione */ }
+    }
+    if (!nomi && fs.existsSync(this.file)) { this.dati = leggiIndice(this.file); Object.keys(this.dati).forEach((id) => this.sporche.add(id)); }
   }
 
   /** Mette in coda le sessioni da controllare; `tutte` = sono tutte le sessioni, le altre escono dall'indice. Si risolve a coda vuota. */
   metti(sessioni: DaIndicizzare[], tutte = false): Promise<void> {
     if (tutte) {
       const ids = new Set(sessioni.map((s) => s.id));
-      for (const id of Object.keys(this.dati)) if (!ids.has(id)) { delete this.dati[id]; this.memo.delete(id); this.daScrivere(); }
+      for (const id of Object.keys(this.dati)) if (!ids.has(id)) { delete this.dati[id]; this.memo.delete(id); this.daScrivere(id); }
     }
     for (const s of sessioni) this.coda.set(s.id, s);
     const p = new Promise<void>((ok) => this.attese.push(ok));
@@ -146,23 +155,31 @@ export class Indice {
     const s = this.coda.values().next().value;
     if (!s) { this.inGiro = false; this.attese.splice(0).forEach((ok) => ok()); return; }
     this.coda.delete(s.id);
-    try { if (aggiornaVoce(this.dati, s, this.memo)) this.daScrivere(); } catch { /* file illeggibile: resta la voce di prima */ }
+    try { if (aggiornaVoce(this.dati, s, this.memo)) this.daScrivere(s.id); } catch { /* file illeggibile: resta la voce di prima */ }
     setImmediate(() => this.passo());
   }
 
-  private daScrivere() {
+  private daScrivere(id: string) {
+    this.sporche.add(id);
     this.scrittura ??= setTimeout(() => { this.scrittura = null; this.scrivi(); }, this.attesaScritturaMs);
     this.scrittura.unref?.();
   }
 
-  /** Scrittura atomica (.tmp poi rename), come le preferenze. */
+  /** Solo le sessioni cambiate, ognuna nel suo file (.tmp poi rename): riscrivere tutto l'indice (95 MB) bloccava il main ~0,7 s ogni 2 s (#474). */
   scrivi() {
-    fs.mkdirSync(this.dir, { recursive: true });
-    fs.writeFileSync(`${this.file}.tmp`, JSON.stringify(this.dati));
-    fs.renameSync(`${this.file}.tmp`, this.file);
+    fs.mkdirSync(this.cartella, { recursive: true });
+    for (const id of this.sporche) {
+      const f = path.join(this.cartella, `${encodeURIComponent(id)}.json`), v = this.dati[id];
+      if (!v) { fs.rmSync(f, { force: true }); continue; }
+      fs.writeFileSync(`${f}.tmp`, JSON.stringify(v));
+      fs.renameSync(`${f}.tmp`, f);
+    }
+    this.sporche.clear();
+    fs.rmSync(this.file, { force: true }); // il vecchio file unico, se c'era: ora è tutto nella cartella
   }
 
   ricostruisci(sessioni: DaIndicizzare[]): Promise<void> {
+    Object.keys(this.dati).forEach((id) => this.sporche.add(id)); // i file delle voci vecchie si tolgono alla prossima scrittura
     this.dati = {};
     this.memo.clear();
     this.coda.clear();
@@ -175,15 +192,16 @@ export class Indice {
     if (this.scrittura) clearTimeout(this.scrittura);
     this.scrittura = null;
     this.dati = {};
+    this.sporche.clear();
     this.memo.clear();
-    for (const p of [this.file, ...this.cache]) fs.rmSync(p, { recursive: true, force: true });
+    for (const p of [this.file, this.cartella, ...this.cache]) fs.rmSync(p, { recursive: true, force: true });
   }
 
   cerca(testo: string) { return cerca(this.dati, testo); }
 
   /** Byte su disco: l'indice, le due cartelle di cache (0 se mancano) e `altro`, il resto della cartella dell'app. */
   spazio() {
-    const indice = dimensione(this.file), messaggi = dimensione(this.cache[0]), immagini = dimensione(this.cache[1]);
+    const indice = dimensione(this.file) + dimensione(this.cartella), messaggi = dimensione(this.cache[0]), immagini = dimensione(this.cache[1]);
     return { indice, messaggi, immagini, altro: Math.max(0, dimensione(this.dir) - indice - messaggi - immagini) };
   }
 
