@@ -38,7 +38,7 @@ const Tasto = ({ t }: { t: string }) => <span className="tasto-chip">{t}</span>;
 /** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945),
  *  «menu-aggiungi» (101:25845), «rilascio» (101:27294), «menu:permessi» / «menu:modello» e «impegno» (101:26140, 148:28674, 148:28740), «tooltip» del contesto (101:26140), «errore:<perché>» (101:27528).
  *  `account`: la cartella dell'account della sessione, per le sue skill. */
-export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false, account = "" }: {
+export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Chiedi alla sessione", prova = null, appenaMandato = false, account = "" }: {
   chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; permessi?: string | null; contesto?: number | null; disabilitata: boolean; segnaposto?: string; prova?: string | null; account?: string;
   /** Roberto ha appena interrotto e mandato (101:43535): i tasti restano sotto la casella. */
   appenaMandato?: boolean;

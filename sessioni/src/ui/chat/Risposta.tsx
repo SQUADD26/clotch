@@ -33,7 +33,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
           {/* shortcut: legge la voce dell'app (`say`), non quella di Clotch: il motore non ha un comando che legga un testo (proposta: `leggi {testo}`) */}
           <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" onClick={leggi} />
           <span className="con-menu al-passaggio">
-            <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
+            <BottoneIcona icona="altro" etichetta="Altre azioni" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
             {menu && (
               <Menu onChiudi={chiudiMenu} lato="sopra" scarto={0} voci={[
                 { icona: "copia", etichetta: "Copia testo", fai: () => copia(senzaMarkdown(testo)) },

@@ -42,7 +42,7 @@ const corpoVuoto = (stato: string, adesso?: string) =>
   : adesso === "interrotta" ? "La sessione è stata interrotta prima di scrivere."
   : stato === "lavora" ? "La sessione sta lavorando: i messaggi arrivano tra poco."
   : stato === "finita" ? "La sessione è finita senza messaggi da mostrare."
-  : "La sessione è aperta ma non ha ancora messaggi.";
+  : "Scrivi per iniziare.";
 
 export function Intestazione() {
   const { s } = useSessione();

@@ -135,7 +135,7 @@ export function NuovaSessione() {
           <div className={`casella ${!testo ? "vuota" : bloccata ? "disabilitata" : "scritta"}${menu === "permessi" || menu === "modello" ? " fuoco" : ""}`}>
             <div className="area-testo">
               <textarea ref={area} rows={1} value={testo} disabled={!!attesa} autoFocus={!sezione} onChange={(e) => setTesto(e.target.value)} onKeyDown={tasti}
-                placeholder="Scrivi il primo messaggio" aria-label="Scrivi il primo messaggio" />
+                placeholder="Descrivi il lavoro" aria-label="Descrivi il lavoro" />
             </div>
             <div className="azioni">
               <BottoneIcona icona="piu" etichetta="Allega" disabled />
