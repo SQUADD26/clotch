@@ -108,7 +108,7 @@ const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null)
 
 const statoVuoto = () => ({
   r: { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [], passiMacchina: [] } as Registro,
-  ultimoN: new Map<string, number>(), annullate: new Set<string>(), versioniObiettivo: new Map<string, number>(), comandi: new Map<string, any>(),
+  ultimoN: new Map<string, number>(), annullate: new Set<string>(), versioniObiettivo: new Map<string, number>(), comandi: new Map<string, any>(), attese: [] as [any, () => void][],
   nonRiprovabili: new Set<string>(), // annulla rifiutata dal motore per sempre: inutile riproporla
   pos: new Map<string, { ino: number; fine: number }>(), // mese -> file e byte già applicati
 });
@@ -152,19 +152,18 @@ export function lettoreRegistro(home: string, env: NodeJS.ProcessEnv = {}): () =
         st.r.errori.push({ percorso: file, messaggio: msgErrore(e) });
         continue;
       }
-      applica(st, testo, home, env);
+      applica(st, testo);
     }
     st.r.passiMacchina = st.r.passiMacchina!.slice(-200); // tetto anche tra una lettura e l'altra
-    for (const d of st.r.decisioni) {
-      if (st.annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
-      else if (st.nonRiprovabili.has(d.id)) d.annullabile = false;
-    }
+    // il motore scrive la ricevuta dopo la riga (friday_annulla.decidi): finché manca si riguarda a ogni lettura, come faceva la lettura da capo
+    st.attese = st.attese.filter(([o, fatto]) => !(ricevutaLocale(o, home, env) && (fatto(), true)));
+    for (const d of st.r.decisioni) if (st.annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true }); else if (st.nonRiprovabili.has(d.id)) d.annullabile = false;
     return st.r;
   };
   return leggi;
 }
 
-function applica(st: ReturnType<typeof statoVuoto>, testo: string, home: string, env: NodeJS.ProcessEnv) {
+function applica(st: ReturnType<typeof statoVuoto>, testo: string) {
   const { r, ultimoN, annullate, nonRiprovabili, versioniObiettivo, comandi } = st;
   {
     for (const riga of testo.split("\n")) {
@@ -251,10 +250,11 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string, home: string,
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
           // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
           sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
-        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false });
+        case "decisione": { const x = { id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: false, annullata: false };
+          r.decisioni.push(x); if (Array.isArray(d.inverso)) st.attese.push([o, () => { x.annullabile = true; }]); // annullabile con la ricevuta (lettoreRegistro)
           // annullata dal terminale: nessun comando dell'app, solo la decisione «annullata <id>» che il motore firma con la sua ricevuta
-          if (String(d.cosa).startsWith("annullata ") && ricevutaLocale(o, home, env)) annullate.add(String(d.cosa).slice(10));
-          break;
+          if (String(d.cosa).startsWith("annullata ")) st.attese.push([o, () => annullate.add(String(d.cosa).slice(10))]);
+          break; }
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
