@@ -72,6 +72,13 @@ async function mainModule(relative) {
       assert.ok(node.arguments.length === 1 && ts.isStringLiteral(node.arguments[0]), `require dinamico non ammesso: ${relative}`);
       imports.push(node.arguments[0].text);
     }
+    // new Worker(path.join(__dirname, "x.js")): il worker si carica per percorso, fuori dal grafo require.
+    if (ts.isNewExpression(node) && /(^|\.)Worker$/.test(node.expression.getText())) {
+      const nomi = [];
+      (function cerca(n) { if (ts.isStringLiteral(n) && n.text.endsWith('.js')) nomi.push(n.text); ts.forEachChild(n, cerca); })(node.arguments?.[0] ?? node);
+      assert.equal(nomi.length, 1, `Worker senza un percorso .js letterale: ${relative}`);
+      imports.push(`./${nomi[0]}`);
+    }
     ts.forEachChild(node, visit);
   }
   visit(tree);
