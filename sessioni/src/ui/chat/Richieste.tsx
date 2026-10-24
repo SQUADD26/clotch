@@ -14,9 +14,16 @@ import { testoCampo } from "./strumenti";
 import { quanti } from "./testi";
 import "./richieste.css";
 
-function Carta({ icona, titolo, dettaglio, children }: { icona: NomeIcona; titolo: string; dettaglio?: string | null; children: ReactNode }) {
+/** `onEsc`: la scelta che annulla (Nega, Salta), come Esc in un alert del Mac. */
+function Carta({ icona, titolo, dettaglio, onEsc, children }: { icona: NomeIcona; titolo: string; dettaglio?: string | null; onEsc?: () => void; children: ReactNode }) {
+  // risposta data: la carta diventa esito e il bottone premuto sparisce; il fuoco torna alla casella invece di cadere sulla pagina
+  useEffect(() => () => { requestAnimationFrame(() => { if (document.activeElement === document.body) document.querySelector<HTMLTextAreaElement>(".area-casella textarea")?.focus(); }); }, []);
+  const esc = (e: KeyboardEvent<HTMLDivElement>) => {
+    const scritto = e.target instanceof HTMLInputElement && e.target.value; // Esc in un campo con testo non butta la risposta
+    if (e.key === "Escape" && onEsc && !scritto) { e.stopPropagation(); onEsc(); }
+  };
   return (
-    <div className="carta-richiesta">
+    <div className="carta-richiesta" onKeyDown={esc}>
       <div className="testata-carta">
         <Icona nome={icona} colore="accento" />
         <span className="titolo">{titolo}</span>
@@ -71,7 +78,7 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto", prima = t
       : <Esito icona="spunta" colore="successo" esito={scelta === "consenti_sempre" ? "Consentito sempre" : "Consentito da te"} dettaglio={cosa} codice />;
   }
   return (
-    <Carta icona="mano" titolo={titolo} dettaglio={da}>
+    <Carta icona="mano" titolo={titolo} dettaglio={da} onEsc={() => { if (!inCorso) void rispondi("nega"); }}>
       {mostra && <div className="domanda">{cmd ? "Eseguire questo comando?" : "Usare questo strumento?"}</div>}
       {mostra && <BloccoCodice comando={mostra} />}
       {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}
@@ -119,7 +126,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
   const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta({ testo: "", saltata: true }); }) : undefined;
   return (
     <>
-      <Carta icona="persona" titolo="Domanda per te" dettaglio={da}>
+      <Carta icona="persona" titolo="Domanda per te" dettaglio={da} onEsc={() => void salta()}>
         {domande.map((d, i) => (
           <div key={i} className="domanda-blocco">
             {d.header && <div className="intestazione-domanda">{ris.testo(d.header)}</div>}
@@ -136,7 +143,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
               ))}
             </div>
             <input className="altro" placeholder="Scrivi un’altra risposta" value={altro[i]} aria-label={`Un’altra risposta a: ${d.domanda}`}
-              onChange={(e) => setAltro(altro.map((x, k) => (k === i ? e.target.value : x)))} onKeyDown={(e) => { if (e.key === "Enter") void rispondi(); }} />
+              onChange={(e) => setAltro(altro.map((x, k) => (k === i ? e.target.value : x)))} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) void rispondi(); }} />
           </div>
         ))}
         <div className="bottoni">

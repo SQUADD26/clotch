@@ -3,6 +3,7 @@
 export const FISSE: Record<string, [azione: string, nome: string]> = {
   "⌘N": ["nuova", "Nuova sessione"], "⇧⌘A": ["archivia", "Archivia"], "⇧⌘;": ["copiaBlocco", "Copia ultimo blocco di codice"],
   "⌘U": ["allega", "Allega file"], "⇧⌘P": ["piano", "Modalità piano"],
+  "⌘G": ["trovaSuccessivo", "Trova successivo"], "⇧⌘G": ["trovaPrecedente", "Trova precedente"],
 };
 const ALTRI: Record<string, string> = {
   "⌘/": "Mostra scorciatoie", "⌃↑": "Sessione precedente", "⌃↓": "Sessione successiva",

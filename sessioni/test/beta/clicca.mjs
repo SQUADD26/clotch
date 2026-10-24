@@ -45,6 +45,10 @@ async function giro(app, area, cfg, console_) {
     await cdp.send('DOM.enable'); await cdp.send('CSS.enable');
     const { root } = await cdp.send('DOM.getDocument', { depth: 0 }), { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `[data-bt="${i}"]` });
     if (nodeId) await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: stati });
+    // il mouse vero tiene `:hover` anche sugli antenati (una riga che mostra le sue azioni solo al passaggio): si forzano insieme
+    await pagina.evaluate((i) => { document.querySelectorAll('[data-bt-anc]').forEach((e) => e.removeAttribute('data-bt-anc')); if (!document.querySelector('[data-bt-anc]')) for (let e = document.querySelector(`[data-bt="${i}"]`)?.parentElement; e; e = e.parentElement) e.setAttribute('data-bt-anc', ''); }, i);
+    const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector: '[data-bt-anc]' });
+    for (const id of nodeIds) await cdp.send('CSS.forcePseudoState', { nodeId: id, forcedPseudoClasses: stati.filter((s) => s === 'hover') });
   } catch { /* pezzo sparito */ } };
   await pulito();
   const f0 = await foto('iniziale');

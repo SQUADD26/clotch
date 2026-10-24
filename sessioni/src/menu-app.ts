@@ -1,5 +1,5 @@
 // Menu dell'app nella barra del Mac (#885, HIG «The menu bar»): voci standard e comandi dell'app con la loro scorciatoia.
-// Frame Figma 148:63680 (clotch), 148:63718 (File), 148:63756 (Modifica), 148:63794 (Vista), 148:63832 (Finestra); Vai e Aiuto si aggiungono.
+// Frame Figma 148:63680 (clotch), 148:63718 (File), 148:63756 (Modifica), 148:63794 (Vista), 148:63832 (Finestra), 163:91961 (Vai), 163:92309 (Aiuto).
 // Una voce dell'app non fa l'azione da sé: manda i suoi tasti alla finestra (preload, «menu:tasti»), che li tratta come premuti.
 // Così modali, pagina Scorciatoie che registra e campi di testo valgono uguali col mouse e con la tastiera.
 import { BrowserWindow, Menu, type MenuItemConstructorOptions } from "electron";
