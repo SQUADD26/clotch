@@ -39,10 +39,12 @@ function useSessione() {
 }
 
 /** Perché il filo è vuoto, secondo lo stato della sessione (la barra laterale dice già lo stesso con l'icona). */
-const corpoVuoto = (stato: string, adesso?: string) =>
-  adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
+const corpoVuoto = (stato: string, adesso?: string, limite = false) =>
+  limite ? "La sessione ha raggiunto il limite di uso e non ha scritto nulla."
+  : adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
   : adesso === "interrotta" ? "La sessione è stata interrotta prima di scrivere."
   : stato === "lavora" ? "La sessione sta lavorando: i messaggi arrivano tra poco."
+  : stato === "aspetta" ? "La sessione aspetta una tua risposta."
   : stato === "finita" ? "La sessione è finita senza messaggi da mostrare."
   : "Scrivi per iniziare.";
 
@@ -97,10 +99,11 @@ function ChatSessione() {
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
-  const ripartenza = c?.limite?.ripartenza != null ? orario(c.limite.ripartenza) : null;
+  const ripartenzaMs = c?.limite?.ripartenza ?? null;
+  const ripartenza = ripartenzaMs != null && ripartenzaMs > adesso ? orario(ripartenzaMs) : null; // già passato: niente «Riparte alle» vecchio
   const inFondo = muta
     ? <NonRisponde da={daQuanto(c.battito ?? 0, adesso)} terminale={() => void api().azione(s.id, "apri-terminale")} />
-    : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
+    : limite ? <Limite chat={s.id} chiave={c?.limite?.account ?? s.account} ripartenza={ripartenzaMs} adesso={adesso} /> : null;
   const casella = (
     <ContestoMax.Provider value={c?.contestoMax ?? null}><Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} permessi={s.permessi} contesto={s.contesto} prova={sezione} account={s.account}
       appenaMandato={dopoInterruzione(voci)}
@@ -110,7 +113,7 @@ function ChatSessione() {
   if (!m.messaggi.length) {
     return (
       <>
-        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso)} />{inFondo}</div>
+        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso, limite)} />{inFondo}</div>
         {casella}
         <Trova iniziale={provaDi(sezione, "trova")} />
       </>

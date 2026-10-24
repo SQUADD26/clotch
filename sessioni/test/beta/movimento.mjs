@@ -34,8 +34,9 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
     if (!TEMPI.some((t) => Math.abs(a.durata - t) <= Math.max(25, t * 0.15))) D('M2', a, `${Math.round(a.durata)} ms, token ${TEMPI.join('/')} ms (${a.nome})`);
     const p = a.serie.length >= 6 ? progresso(a.serie) : null, t0 = a.serie[0]?.[0];
     if (p) {
-      const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata / 2), meta = i >= 0 ? p[i] : null;
-      if (a.durata > 100 && meta != null && Math.abs(meta - 0.5) < 0.08) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
+      // lineare = il progresso segue il tempo a un quarto, a metà e a tre quarti; una curva simmetrica (ease-in-out) vale 0,50 solo a metà
+      const a_ = [0.25, 0.5, 0.75].map((f) => { const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata * f); return i >= 0 ? p[i] : null; }), meta = a_[1];
+      if (a.durata > 100 && meta != null && a_.every((v, k) => v != null && Math.abs(v - [0.25, 0.5, 0.75][k]) < 0.08)) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
     } else if (a.durata > 100 && a.curva === 'linear') D('M3', a, `curva dichiarata lineare (${a.nome})`);
     // M5 dal gesto che l'ha fatta partire: l'ultimo prima del suo primo fotogramma (premuto, clic o tasto). Il tempo di un fotogramma
     // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
@@ -61,18 +62,21 @@ export function difettiInterruzione(c, dove) {
   for (const [k, serie] of gruppi) {
     const s = serie.slice().sort((x, y) => x[0] - y[0]), op = s.map((x) => x[1]), lo = Math.min(...op), hi = Math.max(...op);
     if (hi - lo < 0.05 || op.length <= 2) continue;
-    let salto;
-    if (gesto == null) salto = Math.max(0, ...op.slice(1).map((v, i) => Math.abs(v - op[i]))) / (hi - lo);
+    let salto, assoluto;
+    if (gesto == null) { assoluto = Math.max(0, ...op.slice(1).map((v, i) => Math.abs(v - op[i]))); salto = assoluto / (hi - lo); }
     else {
-      // salto = cambio tra l'ultimo fotogramma prima del gesto e il primo dopo, oltre il passo più lungo del moto di prima
+      // salto = cambio tra l'ultimo fotogramma prima del gesto e il primo dopo, oltre il passo più lungo del moto intorno
       // (un'entrata veloce e decisa fa passi grandi da sé, specie a pochi fotogrammi al secondo: quelli non sono salti)
       const i = s.findIndex((x) => x[0] > gesto);
       if (i < 1) continue;
-      const prima = op.slice(0, i), passo = Math.max(0, ...prima.slice(1).map((v, j) => Math.abs(v - prima[j])));
-      const cambio = Math.abs(op[i] - op[i - 1]);
+      // il passo di riferimento guarda anche il fotogramma dopo: un moto che accelera (uscita ease-in) non è un salto
+      const prima = op.slice(0, i), dopo = op[i + 1] != null ? Math.abs(op[i + 1] - op[i]) : 0;
+      const passo = Math.max(dopo, ...prima.slice(1).map((v, j) => Math.abs(v - prima[j])));
+      const cambio = assoluto = Math.abs(op[i] - op[i - 1]);
       salto = cambio > 1.5 * passo ? cambio / (hi - lo) : 0;
     }
-    if (salto > 0.25) d.push({ criterio: 'M10', dove: k, valore: `salto del ${Math.round(salto * 100)}% tra due fotogrammi` });
+    // un salto di meno di un decimo di opacità non si vede (il bottone che torna al riposo dopo il premuto: 0,89 -> 0,95 è «57%» di un'escursione di 0,11)
+    if (salto > 0.25 && assoluto > 0.1) d.push({ criterio: 'M10', dove: k, valore: `salto del ${Math.round(salto * 100)}% tra due fotogrammi` });
   }
   return d;
 }

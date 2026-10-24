@@ -33,6 +33,10 @@
 .pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
 /* icona e freccia sono 16 px: l'area del clic cresce di 2 px per lato, 20×20 (minimo HIG macOS), l'aspetto non cambia (#962) */
 .pezzo-barra .riga-sessione > button:not(.bottone-icona) { position: relative; }
+/* il bottone dell'icona apre un pannello, non la sessione: ha il suo passaggio e il suo premuto sopra quello della riga (#977) */
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"] { border-radius: var(--raggio-md); }
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"]:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"]:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-bottone-secondario); }
 .pezzo-barra .riga-sessione > button:not(.bottone-icona)::before { content: ""; position: absolute; inset: calc(-1 * var(--spazio-0-5)); }
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */

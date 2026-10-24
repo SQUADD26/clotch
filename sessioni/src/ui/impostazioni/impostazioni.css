@@ -26,6 +26,8 @@
 .pezzo-impostazioni .contenuto-impostazioni > * { align-self: stretch; }
 .pezzo-impostazioni .contenuto-impostazioni > .bottone { align-self: flex-start; }
 .pezzo-impostazioni .titolo-pagina { margin: 0; font-weight: 400; }
+/* un testo senza spazi (percorso, nome, ricerca da 200 caratteri) va a capo invece di uscire dalla colonna (#838, #955) */
+.pezzo-impostazioni .contenuto-impostazioni, .pezzo-impostazioni .nav-impostazioni { overflow-wrap: anywhere; }
 .pezzo-impostazioni .contenuto-impostazioni .errore { color: var(--colore-testo-errore); }
 
 .pezzo-impostazioni .gruppo { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl); }
@@ -48,7 +50,7 @@
 
 /* Riga scelta: valore e freccia, con la tendina sotto a destra */
 .pezzo-impostazioni .scelta { position: relative; flex: none; }
-.pezzo-impostazioni .scelta .valore { display: flex; align-items: center; gap: var(--spazio-1); }
+.pezzo-impostazioni .scelta .valore { border-radius: var(--raggio-md); display: flex; align-items: center; gap: var(--spazio-1); }
 
 
 .pezzo-impostazioni .campo-testo {
@@ -88,7 +90,7 @@
 .pezzo-impostazioni .riga.calcolo { gap: var(--spazio-2); }
 
 /* Dati, Info, Clotch (101:17893, 101:33235, 101:18054, 101:45956) */
-.pezzo-impostazioni .valore-scelta { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
+.pezzo-impostazioni .valore-scelta { border-radius: var(--raggio-md); display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 .pezzo-impostazioni .indietro { display: flex; align-items: center; gap: var(--spazio-1); align-self: flex-start !important; }
 .pezzo-impostazioni .bottone.pericolo { font-weight: 400; }
 .pezzo-impostazioni .riga.stato-clotch { gap: var(--spazio-3); }

@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2145,7 +2146,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -6063,7 +6064,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Strumenti MCP",
+   "testo": "Strumenti dei connettori",
    "font": "SF Pro Regular"
   },
   {

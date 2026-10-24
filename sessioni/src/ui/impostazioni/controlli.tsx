@@ -1,5 +1,6 @@
 // figma: 101-17193 — «Gruppo», «Riga impostazione» 101:7584, «Riga scelta» 101:17077, «Interruttore» 101:7467, «tasto», «Campo testo» 101:22042.
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { Menu } from "../base/Menu";
 import { SEZIONI, type Sezione } from "./sezioni";
@@ -92,12 +93,22 @@ export const Tasto = ({ tasti, errore = false }: { tasti: string; errore?: boole
 export const CampoTesto = ({ valore }: { valore: string }) => <div className="campo-testo t-base" title={valore}>{valore}</div>;
 
 /** «vuoto lista»: titolo e corpo al centro del gruppo. */
-export function VuotoLista({ titolo, corpo, children }: { titolo: string; corpo: string; children?: ReactNode }) {
+export function VuotoLista({ titolo, corpo, allarme, children }: { titolo: string; corpo: string; allarme?: boolean; children?: ReactNode }) {
   return (
-    <div className={`vuoto-lista ${children ? "con-bottone" : ""}`}>
+    <div className={`vuoto-lista ${children ? "con-bottone" : ""}`} role={allarme ? "alert" : undefined}>
       <div className="t-base">{titolo}</div>
       <div className="t-sm secondario">{corpo}</div>
       {children}
     </div>
   );
 }
+
+/** Lettura in corso, al posto delle righe: lo spinner del «Calcolando…» di Archiviazione (101-32155). */
+export const Carica = ({ testo }: { testo: string }) => (
+  <div className="riga calcolo" role="status"><Icona nome="spinner" gira /><span className="t-sm secondario">{testo}</span></div>
+);
+
+/** Lettura fallita, al posto delle righe: cosa non si è letto, il perché e «Riprova» (come StatoErrore, 101-9090). */
+export const ErroreLista = ({ titolo, errore, riprova }: { titolo: string; errore: string; riprova(): void }) => (
+  <VuotoLista titolo={titolo} corpo={errore} allarme><Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone></VuotoLista>
+);

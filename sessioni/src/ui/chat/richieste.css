@@ -26,6 +26,7 @@
 .pezzo-chat .carta-richiesta .altro::placeholder { color: var(--colore-testo-secondario); }
 .pezzo-chat .passi { display: flex; flex-direction: column; gap: var(--spazio-2); max-height: calc(var(--misura-riga) * 8); overflow-y: auto; }
 .pezzo-chat .passo { display: flex; gap: var(--spazio-3); }
+.pezzo-chat .passo .testo { white-space: pre-line; } /* le sotto-voci del passo vanno a capo */
 
 .pezzo-chat .esito-richiesta { display: flex; align-items: center; gap: var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .esito-richiesta .esito { flex: none; font-weight: 500; }

@@ -35,3 +35,12 @@ node test/beta/giudica.mjs /tmp/beta-barra
 - `accettati.json`: `{ "voce": <criterio>, "area": <area o "*">, "dove"?: <pezzo del selettore>, "issue": N }`. Vale solo finché l'issue `beta-tester` N è aperta; chiusa, il difetto torna rosso.
 - `checklist/<famiglia>.jsonl`: una voce per riga (`node test/beta/controlla-checklist.mjs`, `--prossimo SOV` per il prossimo id). Una PR che chiude un'issue `beta-tester` aggiunge una voce con `"origine":"bug #N"` (`voce-checklist.mjs`, in CI).
 - CI: `.github/workflows/beta-tester.yml`, un job per area, artifact `beta-tester-<area>` con foto, video e registri.
+
+## Font nella sandbox (#810)
+
+Il disegno è in SF Pro; in una sandbox Linux manca e Chromium ricade su DejaVu Sans, che ha altre larghezze: i testi vanno a capo in punti diversi e la parità dei pezzi sopra la soglia dell'8% è in gran parte questo. Prima di fidarsi di una parità fatta in sandbox:
+
+1. `design/app/<genitore>.png` si rifà ogni volta (`node scripts/parita-tutti.mjs <genitori>`, con `PATH=$PWD/node_modules/.bin:$PATH`): i PNG committati sono disegnati sul Mac e il ritaglio di un pezzo li legge.
+2. Si mette Inter al posto di SF Pro (OFL, misure più vicine): `mkdir -p ~/.cache/clotch-font`, `Inter-Regular/Medium/SemiBold/Bold.ttf` da https://github.com/rsms/inter/releases (cartella `extras/ttf`), poi `FONTCONFIG_FILE=$PWD/scripts/fontconfig-sf-pro.conf`.
+
+Misura (10 pezzi della barra, dev `54d3fec6`): con DejaVu e PNG vecchi 10 su 10 sopra soglia; con i PNG rifatti 5 su 10; con anche Inter 7 su 10 (da 5,9% a 7,5%). Liberation Sans è peggio di DejaVu. Restano sopra soglia 101-49566 (9,0%), 101-9109 (9,5%) e 101-21380 (9,3%), che dentro hanno testi a capo e iniziali dell'avatar («AM» nel disegno, «AC» per «accountmanager»).

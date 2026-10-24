@@ -25,7 +25,8 @@ export const nome = (x: string) => nomeAccount(x.split("@")[0]);
 /** Stesso account scritto in modi diversi: «.claude-terminal-r-bondici», «terminal-r-bondici», «r-bondici» (il motore usa l'ultimo). */
 const chiave = (x: string) => { const n = nome(x).replace(/^terminal-/, ""); return n === "default" ? "claude" : n; }; // il motore chiama «default» la cartella ~/.claude
 export const trova = (quote: QuotaUso[], x: string | null | undefined) =>
-  (x ? quote.find((q) => q.email === x || q.account === nome(x) || q.cartelle?.some((c) => c === x || chiave(c) === chiave(x))) : undefined);
+  // un'email si confronta intera: «info@dentalspace.ai» non è «info@squaddcrm.com» anche se il nome corto è uguale
+  (!x ? undefined : x.includes("@") ? quote.find((q) => q.email === x) : quote.find((q) => q.account === nome(x) || q.cartelle?.some((c) => c === x || chiave(c) === chiave(x))));
 /** Due lettere per l'avatar. */
 export const iniziali = (x: string) => x.slice(0, 2).toUpperCase();
 
