@@ -19,9 +19,9 @@ const mb = (byte: number) => `${Math.round(byte / 1e6)} MB`;
 export default function Archiviazione() {
   const spazio = useChiamata(() => api().spazio(), []);
   const [occupato, setOccupato] = useState(false);
-  const fai = (azione: () => Promise<void>) => {
+  const fai = (azione: () => Promise<void>, fatto: string) => {
     setOccupato(true);
-    azione().then(spazio.ricarica, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })).finally(() => setOccupato(false));
+    azione().then(() => { spazio.ricarica(); avvisa({ tipo: "info", messaggio: fatto }); }, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })).finally(() => setOccupato(false));
   };
   const totale = PARTI.reduce((t, p) => t + (spazio.dati?.[p.chiave] ?? 0), 0);
   return (
@@ -44,10 +44,10 @@ export default function Archiviazione() {
       )}
       <Gruppo>
         <Riga etichetta="Indice delle sessioni" descrizione="Ricostruiscilo se l’elenco non torna" azione>
-          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().ricostruisci)}>Ricostruisci</Bottone>
+          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().ricostruisci, "Indice ricostruito")}>Ricostruisci</Bottone>
         </Riga>
         <Riga etichetta="Cache dei messaggi" descrizione="Si riempie da sola quando apri una sessione" azione>
-          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().svuota)}>Svuota</Bottone>
+          <Bottone tipo="secondario" disabled={occupato} onClick={() => fai(api().svuota, "Cache svuotata")}>Svuota</Bottone>
         </Riga>
         {spazio.stato === "carica" && (
           <div className="riga calcolo">

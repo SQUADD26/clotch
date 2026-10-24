@@ -3,17 +3,18 @@ import { useEffect, useState } from "react";
 import type { Archiviata } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
+import { messaggioErrore } from "../base/dati";
 import { Campo } from "../base/Campo";
 import { testoEsito } from "./clotch-ai";
 import { Gruppo, Pagina, Riga, VuotoLista } from "./controlli";
 
 export default function Archiviate() {
   const [tutte, setTutte] = useState<Archiviata[]>([]);
-  useEffect(() => { window.impostazioni.archiviate().then(setTutte, () => {}); }, []);
+  useEffect(() => { window.impostazioni.archiviate().then(setTutte, (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) })); }, []);
   const [cerca, setCerca] = useState("");
   const ripristina = async (id: string) => {
     const e = await window.clotchAi.comando("ripristina", { chat: id }).catch(() => null);
-    if (e?.esito === "ok") return setTutte((t) => t.filter((s) => s.id !== id));
+    if (e?.esito === "ok") { setTutte((t) => t.filter((s) => s.id !== id)); return void avvisa({ tipo: "info", messaggio: "Sessione ripristinata" }); }
     // il contratto v1 non elenca i comandi del motore: uno vecchio risponde «comando sconosciuto», che qui diventa una frase da leggere
     const vecchio = e?.esito === "rifiutato" && /sconosciuto/i.test(e.testo);
     avvisa({ tipo: "errore", messaggio: vecchio ? "Ripristino non disponibile: aggiorna clotch AI" : e ? testoEsito(e) : "Comando non riuscito" });
@@ -28,6 +29,8 @@ export default function Archiviate() {
       <Gruppo>
         {tutte.length === 0
           ? <VuotoLista titolo="Nessuna sessione archiviata" corpo="Archivia una sessione dal suo menu «…»: la ritrovi qui." />
+          : viste.length === 0
+          ? <VuotoLista titolo="Nessun risultato" corpo="Prova con altre parole." />
           : viste.map((s) => (
             <Riga key={s.id} etichetta={s.titolo} descrizione={s.dove} azione>
               <Bottone tipo="secondario" onClick={() => ripristina(s.id)}>Ripristina</Bottone>
