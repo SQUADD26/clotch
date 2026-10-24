@@ -41,6 +41,14 @@
 .pannello { view-transition-name: pannello; }
 .velo-barra { view-transition-name: velo; }
 .avviso-comparsa { view-transition-class: avviso; }
+/* i sovrapposti (menu, popover, dialoghi) hanno un gruppo loro: senza, restano nella foto di sfondo e per la durata della transizione
+   le colonne con nome (superficie, barra, pannello) li coprono (filtro Ramo sotto la colonna dopo un clic su una casella, #1144).
+   Restano al loro posto e cambiano subito: niente dissolvenza tra due foto dello stesso menu. Il tooltip no: con match-element
+   fa cadere il processo di disegno di Chromium (Electron 45) se la transizione parte mentre è acceso. */
+.sovrapposto:not(.esce, [role="tooltip"]), .velo:not(.esce) { view-transition-name: match-element; view-transition-class: sovr; }
+::view-transition-group(*.sovr) { animation: none; }
+::view-transition-old(*.sovr):not(:only-child) { display: none; }
+::view-transition-new(*.sovr):not(:only-child) { animation: none; }
 
 @keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
 @keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
