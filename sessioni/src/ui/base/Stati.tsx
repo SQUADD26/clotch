@@ -38,12 +38,21 @@ export function NessunaSessione({ aggiungi, impostazioni }: { aggiungi(): void; 
 
 const IMPOSTAZIONI_DI_SISTEMA = "/System/Applications/System Settings.app"; // shortcut: apre l'app, non il pannello «Accesso completo al disco»; da cambiare se serve il pannello
 
-/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l'accesso completo al disco del Mac. */
-export function CartellaNonLeggibile({ errore, riprova }: { errore: ErroreLettura; riprova(): void }) {
-  const permesso = errore.messaggio === "permesso negato";
+/** Il messaggio del main (jsonl.ts `msgErrore`) in parole semplici: gli errori di sistema, in inglese e con percorsi, non si mostrano. */
+export const motivoErrore = (m: string) => m === "permesso negato" ? "permesso negato" : m === "file sparito" ? "non c’è più" : "non si apre";
+
+const MAX_CARTELLE = 3;
+
+/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l’accesso completo al disco del Mac.
+ *  Con più cartelle le nomina tutte (le prime tre, poi «e altre N»). */
+export function CartellaNonLeggibile({ errori, riprova }: { errori: ErroreLettura[]; riprova(): void }) {
+  const permesso = errori.some((e) => e.messaggio === "permesso negato");
+  const uno = errori.length === 1;
+  const lista = errori.slice(0, MAX_CARTELLE).map((e) => `${e.percorso}: ${motivoErrore(e.messaggio)}`).join("\n");
+  const altre = errori.length > MAX_CARTELLE ? `\ne altre ${errori.length - MAX_CARTELLE}` : "";
   return (
-    <MessaggioAlCentro titolo="Cartella non leggibile"
-      corpo={`clotch non può leggere ${errore.percorso}: ${errore.messaggio}.${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
+    <MessaggioAlCentro titolo={uno ? "Cartella non leggibile" : "Cartelle non leggibili"}
+      corpo={`${uno ? `clotch non può leggere ${lista}.` : `clotch non può leggere ${errori.length} cartelle:\n${lista}${altre}`}${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
       {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
