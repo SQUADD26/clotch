@@ -1,15 +1,27 @@
 // Testi che l'harness di Claude Code scrive come messaggi `user` ma che Roberto non ha scritto (#484).
-// Marcatori contati su ~/.claude/projects: task-notification 95760, system-reminder 50686, command-name 5200,
-// local-command-caveat 5160, command-message 2710, local-command-stdout 1550, fork-boilerplate 1200, scheduled-task 480,
-// wake 280, relay 150, ci-monitor-event 140, cross-session-message (solo coda). Restano di Roberto: pasted_content, bash-input.
-const NASCOSTI = "system-reminder|command-name|command-message|command-args|local-command-stdout|local-command-stderr|local-command-caveat|scheduled-task|wake|relay|cross-session-message|ci-monitor-event|fork-boilerplate";
-// un blocco non chiuso (riga troncata) si porta via il resto: è comunque dell'harness
-const RE_NASCOSTI = new RegExp(`<(${NASCOSTI})\\b[^>]*>[\\s\\S]*?(?:</\\1>|$)`, "g");
+// Nessun campo della riga li separa dai prompt veri (provato su ~/.claude/projects: origin assente nelle trascrizioni vecchie e
+// «human» anche su system-reminder; turnOrigin/promptSource «sdk» anche sui prompt di dispatch; permissionMode presente su tutti),
+// quindi la regola è strutturale: un blocco chiuso `<nome-con-trattini>…</nome-con-trattini>` in testa o in coda al testo è dell'harness,
+// qualunque sia il nome (anche mai visto). Un nome di una parola sola (`<wake reason=…>`, `<relay from=…>`) conta solo se ha attributi, così `<div>` resta di Roberto.
+// Restano di Roberto `<pasted_content>` e `<bash-input>`; `<task-notification>` lo legge `notifiche`.
+const NOME = "[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*";
+const DI_ROBERTO = new Set(["pasted_content", "bash-input", "task-notification"]);
+const IN_TESTA = new RegExp(`^\\s*<(${NOME})(?:\\s[^>]*)?>[\\s\\S]*?</\\1>\\s*`);
+const IN_CODA = new RegExp(`\\s*<(${NOME})(?:\\s[^>]*)?>[\\s\\S]*?</\\1>\\s*$`);
 const RE_NOTIFICA = /<task-notification>([\s\S]*?)(?:<\/task-notification>|$)/g;
 
-/** Toglie i blocchi che l'harness mette nei messaggi dell'utente; se non ne trova ridà il testo identico. */
+const dellHarness = (m: RegExpExecArray) => !DI_ROBERTO.has(m[1]) && (/[-_]/.test(m[1]) || /^\s*<\S+\s/.test(m[0].trimStart()));
+
+/** Toglie i blocchi che l'harness mette in testa o in coda ai messaggi dell'utente; se non ne trova ridà il testo identico. */
 export function senzaSistema(testo: string): string {
-  const r = testo.replace(RE_NASCOSTI, "");
+  let r = testo;
+  for (;;) {
+    const a = IN_TESTA.exec(r);
+    if (a && dellHarness(a)) { r = r.slice(a[0].length); continue; }
+    const b = r.trimEnd().endsWith(">") ? IN_CODA.exec(r) : null;
+    if (b && dellHarness(b)) { r = r.slice(0, b.index); continue; }
+    break;
+  }
   return r === testo ? testo : r.trim();
 }
 

@@ -39,6 +39,28 @@ test("#484 task-notification: una riga evento breve, mai una bolla di Roberto", 
   assert.deepEqual(testi("qualcosa di nuovo"), ["Comando in background finito"]);
 });
 
+test("#484 side-sessions-event e un tag mai visto: nascosti dalla regola, senza elenco", () => {
+  const r = "<system-reminder>\nLinked sessions now\n</system-reminder>\n\n<side-sessions-event>None of the sessions is working now.</side-sessions-event>";
+  assert.deepEqual(utente(r), []);
+  assert.deepEqual(utente("<nuovo-evento-x>qualcosa\ndi nuovo</nuovo-evento-x>"), []);
+  assert.deepEqual(utente('<altro_evento k="1">a</altro_evento>\n<nuovo-evento-x>b</nuovo-evento-x>'), []);
+  assert.deepEqual(utente([{ type: "text", text: "<nuovo-evento-x>b</nuovo-evento-x>" }]), []);
+  assert.deepEqual(utente('<wake reason="mention" current-time="x">\n  <project id="p"/>\n</wake>'), []);
+});
+
+test("#484 testo vero con un tag mai visto in coda o in testa: resta il testo vero", () => {
+  const vero = [{ tipo: "utente", testo: "Fai il commit", t: null }];
+  assert.deepEqual(utente("Fai il commit\n<nuovo-evento-x>b</nuovo-evento-x>"), vero);
+  assert.deepEqual(utente("<nuovo-evento-x>b</nuovo-evento-x>\nFai il commit"), vero);
+});
+
+test("#484 di Roberto restano: pasted_content, bash-input, tag in mezzo al discorso, tag non chiuso", () => {
+  for (const t of ['<pasted_content id="1">\nlog lungo\n</pasted_content>', "<bash-input>ls</bash-input>", "<div>x</div>", "Il componente <mio-tag>x</mio-tag> non va", "<mio-tag>aperto e mai chiuso"])
+    assert.deepEqual(utente(t), [{ tipo: "utente", testo: t, t: null }]);
+  const m = utente("<system-reminder>n</system-reminder>\n<pasted_content>log</pasted_content>");
+  assert.deepEqual(m.map((x) => (x as any).testo), ["<pasted_content>log</pasted_content>"]);
+});
+
 test("#484 notifica più testo vero: evento e bolla, nell'ordine", () => {
   const v = voci([{ tipo: "utente", testo: `${notifica("completed", 'Agent "A" finished')}\n\nOra il test`, t: 1 }], false);
   assert.deepEqual(v.map((x) => x.tipo === "evento" ? x.testo : x.tipo === "roberto" ? `roberto:${x.testo}` : x.tipo), ['Agente "A" finito', "roberto:Ora il test"]);
