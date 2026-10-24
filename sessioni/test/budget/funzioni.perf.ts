@@ -1,6 +1,6 @@
 // Tetti di tempo e di memoria per le funzioni pesanti del processo principale (#486, contro il lag di #474).
 // Dati finti grandi creati qui. Lanciare con `node --expose-gc` (npm run prestazioni:funzioni): senza, la memoria non si misura.
-// Come sono scelti i tetti: ~4× la mediana misurata sul codice buono (Linux, 1 core libero), per assorbire un runner CI lento; il codice
+// Come sono scelti i tetti: ~4× la mediana misurata sul codice buono, ma in CI (runner circa 3,5× più lento del mio Linux), per assorbire un runner CI lento; il codice
 // prima di #474 sta da 10× a 100× sopra, quindi il margine non nasconde il difetto.
 // Le funzioni sono prese dal modulo come `any`: prima di #474 alcune API (lettoreRegistro, sporchi) non c'erano e la prova deve girare lo stesso.
 import test from "node:test";
@@ -16,8 +16,8 @@ import { trovaRadici } from "../../src/radici";
 import { usoAlGiorno } from "../../src/quote-uso";
 import { casa, coppia, creaRegistro, creaSessioni, heapMB, mediana, rigaRegistro, tempo, tempoAsync, transcriptGrande, U } from "./dati-finti";
 
-const T = { giroMs: 40, raffica200Ms: 500, elencoFermoMs: 30, voce50MbMs: 40, voceMB: 50, indiceScriviMs: 25, usoMs: 400, registroMs: 10, registroMB: 60,
-  cronoPrimaMs: 800, cronoRaffica500Ms: 100, cronoMB: 150 };
+const T = { giroMs: 60, raffica200Ms: 1000, elencoFermoMs: 40, voce50MbMs: 40, voceMB: 50, indiceScriviMs: 25, usoMs: 1000, registroMs: 10, registroMB: 60,
+  cronoPrimaMs: 1500, cronoRaffica500Ms: 100, cronoMB: 150 };
 const N = 6000; // sessioni del Mac di Roberto: migliaia, in 3 account che linkano la stessa cartella
 const nuovo = (h: string) => fs.rmSync(h, { recursive: true, force: true });
 const tocca = (f: string, n: number) => fs.appendFileSync(f, coppia(path.basename(f, ".jsonl"), 10_000 + n));
