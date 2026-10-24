@@ -3194,7 +3194,7 @@
    "box": {
     "x": 373,
     "y": 453,
-    "w": 132,
+    "w": 124,
     "h": 18
    },
    "variabili": {
@@ -3203,7 +3203,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho ragionato per 14 s",
+   "testo": "Ragionamento · 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3211,7 +3211,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 511,
+    "x": 503,
     "y": 454,
     "w": 16,
     "h": 16
@@ -3227,7 +3227,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 514.33203125,
+    "x": 506.33203125,
     "y": 459.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3331,7 +3331,7 @@
    "box": {
     "x": 373,
     "y": 529,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -3340,7 +3340,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3348,7 +3348,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 514,
+    "x": 455,
     "y": 529,
     "w": 35,
     "h": 18
@@ -3367,7 +3367,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 555,
+    "x": 496,
     "y": 530,
     "w": 16,
     "h": 16
@@ -3383,7 +3383,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 558.33203125,
+    "x": 499.33203125,
     "y": 535.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3513,7 +3513,7 @@
    "box": {
     "x": 414,
     "y": 557,
-    "w": 37,
+    "w": 46,
     "h": 18
    },
    "variabili": {
@@ -3522,7 +3522,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerco",
+   "testo": "Ricerca",
    "font": "SF Pro Regular"
   },
   {
@@ -3530,9 +3530,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 455,
+    "x": 464,
     "y": 557,
-    "w": 128,
+    "w": 121,
     "h": 18
    },
    "variabili": {
@@ -3541,7 +3541,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"canAccess\" in 4 file",
+   "testo": "\"canAccess\" · 4 file",
    "font": "SF Pro Regular"
   },
   {
@@ -3651,7 +3651,7 @@
    "box": {
     "x": 414,
     "y": 585,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -3660,7 +3660,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -3668,7 +3668,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 462,
     "y": 585,
     "w": 108,
     "h": 18
@@ -3789,7 +3789,7 @@
    "box": {
     "x": 414,
     "y": 613,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -3798,7 +3798,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -3806,7 +3806,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 543,
+    "x": 477,
     "y": 614,
     "w": 16,
     "h": 16
@@ -3822,7 +3822,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 546.33203125,
+    "x": 480.33203125,
     "y": 619.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -4025,7 +4025,7 @@
    "box": {
     "x": 414,
     "y": 693,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -4034,7 +4034,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -4042,7 +4042,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 543,
+    "x": 477,
     "y": 693,
     "w": 54,
     "h": 18
@@ -4163,7 +4163,7 @@
    "box": {
     "x": 414,
     "y": 728,
-    "w": 60,
+    "w": 28,
     "h": 18
    },
    "variabili": {
@@ -4172,7 +4172,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Fotografo",
+   "testo": "Foto",
    "font": "SF Pro Regular"
   },
   {
@@ -4180,9 +4180,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 478,
+    "x": 446,
     "y": 728,
-    "w": 126,
+    "w": 112,
     "h": 18
    },
    "variabili": {
@@ -4191,7 +4191,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "la pagina Dashboard",
+   "testo": "pagina Dashboard",
    "font": "SF Pro Regular"
   },
   {

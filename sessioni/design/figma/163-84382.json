@@ -137,7 +137,7 @@
    "box": {
     "x": 48,
     "y": 20,
-    "w": 60,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -146,7 +146,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "L’aiutante",
+   "testo": "Aiutante ·",
    "font": "SF Pro Regular"
   },
   {
@@ -154,9 +154,9 @@
    "nome": "testo con riflesso",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 111,
     "y": 20,
-    "w": 94,
+    "w": 79,
     "h": 18
    },
    "variabili": {
@@ -164,7 +164,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "controlla i tipi…",
+   "testo": "Controllo tipi",
    "font": "SF Pro Regular"
   },
   {
@@ -275,7 +275,7 @@
    "box": {
     "x": 48,
     "y": 62,
-    "w": 60,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -284,7 +284,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "L’aiutante",
+   "testo": "Aiutante ·",
    "font": "SF Pro Regular"
   },
   {
@@ -292,9 +292,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 111,
     "y": 62,
-    "w": 94,
+    "w": 79,
     "h": 18
    },
    "variabili": {
@@ -303,7 +303,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "controlla i tipi…",
+   "testo": "Controllo tipi",
    "font": "SF Pro Regular"
   },
   {
@@ -414,7 +414,7 @@
    "box": {
     "x": 48,
     "y": 104,
-    "w": 60,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -423,7 +423,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "L’aiutante",
+   "testo": "Aiutante ·",
    "font": "SF Pro Regular"
   },
   {
@@ -431,9 +431,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 111,
     "y": 104,
-    "w": 84,
+    "w": 79,
     "h": 18
    },
    "variabili": {
@@ -442,7 +442,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "controlla i tipi",
+   "testo": "Controllo tipi",
    "font": "SF Pro Regular"
   },
   {
@@ -450,7 +450,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 200,
+    "x": 194,
     "y": 104,
     "w": 92,
     "h": 18
@@ -469,7 +469,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 296,
+    "x": 290,
     "y": 105,
     "w": 16,
     "h": 16
@@ -485,7 +485,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 301.33203125,
+    "x": 295.33203125,
     "y": 108.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -603,7 +603,7 @@
    "box": {
     "x": 48,
     "y": 146,
-    "w": 60,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -612,7 +612,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "L’aiutante",
+   "testo": "Aiutante ·",
    "font": "SF Pro Regular"
   },
   {
@@ -620,9 +620,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 111,
     "y": 146,
-    "w": 84,
+    "w": 79,
     "h": 18
    },
    "variabili": {
@@ -631,7 +631,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "controlla i tipi",
+   "testo": "Controllo tipi",
    "font": "SF Pro Regular"
   },
   {
@@ -639,7 +639,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 200,
+    "x": 194,
     "y": 146,
     "w": 92,
     "h": 18
@@ -658,7 +658,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 296,
+    "x": 290,
     "y": 147,
     "w": 16,
     "h": 16
@@ -674,7 +674,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 299.33203125,
+    "x": 293.33203125,
     "y": 152.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -844,7 +844,7 @@
    "box": {
     "x": 48,
     "y": 218,
-    "w": 60,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -853,7 +853,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "L’aiutante",
+   "testo": "Aiutante ·",
    "font": "SF Pro Regular"
   },
   {
@@ -861,9 +861,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 112,
+    "x": 111,
     "y": 218,
-    "w": 89,
+    "w": 35,
     "h": 18
    },
    "variabili": {
@@ -872,7 +872,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "lancia le prove",
+   "testo": "Prove",
    "font": "SF Pro Regular"
   },
   {
@@ -880,7 +880,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 205,
+    "x": 150,
     "y": 218,
     "w": 55,
     "h": 18
@@ -899,7 +899,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 264,
+    "x": 209,
     "y": 219,
     "w": 16,
     "h": 16
@@ -915,7 +915,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 269.33203125,
+    "x": 214.33203125,
     "y": 222.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
