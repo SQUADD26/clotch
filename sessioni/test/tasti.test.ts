@@ -30,6 +30,8 @@ test("tasti riservati: fissi dell'app e menu nativo non si assegnano (#686); ⇧
   const { riservatoDa, FISSE } = await import("../src/ui/impostazioni/riservati");
   const k = (key: string, code: string, m = {}) => tastiDi({ key, code, metaKey: true, shiftKey: false, altKey: false, ctrlKey: false, ...m });
   assert.equal(riservatoDa(k("n", "KeyN")!), "Nuova sessione");
+  assert.equal(FISSE[k("g", "KeyG")!][0], "trovaSuccessivo"); // ⌘G e ⇧⌘G come nel menu Trova del Mac (#857)
+  assert.equal(FISSE[k("G", "KeyG", { shiftKey: true })!][0], "trovaPrecedente");
   assert.equal(riservatoDa(k("w", "KeyW")!), "Chiudi finestra");
   assert.equal(riservatoDa(k(":", "Semicolon", { shiftKey: true })!), "Copia ultimo blocco di codice");
   assert.equal(riservatoDa(k("k", "KeyK")!), undefined);
