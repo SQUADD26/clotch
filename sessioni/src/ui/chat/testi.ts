@@ -41,12 +41,15 @@ export const MODELLI: Record<string, { id: string; dettaglio: string }> = {
 /** Id CLI di un'etichetta; undefined se non è un modello noto. */
 export const idModello = (etichetta: string) => MODELLI[etichetta]?.id;
 
+/** `uso` è il modello `id`: lo stesso id, o con il suffisso di data (`-20251101`) o di contesto (`[1m]`); `opus-4` non è `opus-4-1`. */
+export const èModello = (uso: string | null | undefined, id: string) => !!uso && uso.startsWith(id) && /^(-\d{8})?(\[\w+\])?$/.test(uso.slice(id.length));
+
 /** Argomenti di `manda`. `modello`, `sforzo` e `rapida` solo con `subito`: in coda il motore li rifiuta. `modello` solo se la preferenza è diversa dal modello della sessione (`attuale`, dalla trascrizione: può avere un suffisso di data) o se questo non si conosce. `sforzo` e `rapida` solo se scelti (altrimenti vale il predefinito). */
 export const argsManda = (chat: string, testo: string, modo: "subito" | "coda", preferenza: string, attuale: string | null, scelte?: { sforzo?: string; rapida?: boolean }) => {
   const id = idModello(preferenza), subito = modo === "subito";
   return {
     chat, testo, modo,
-    ...(subito && id && !attuale?.startsWith(id) ? { modello: id } : {}),
+    ...(subito && id && !èModello(attuale, id) ? { modello: id } : {}),
     ...(subito && scelte?.sforzo ? { sforzo: scelte.sforzo } : {}),
     ...(subito && scelte?.rapida ? { rapida: true } : {}),
   };

@@ -30,9 +30,9 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
     (voci().find((b) => b.classList.contains("scelta")) ?? voci()[0])?.focus();
     const tasto = (e: KeyboardEvent) => {
       if (e.key === "Tab") { onAperto(false); e.preventDefault(); return; } // il menu si chiude e il fuoco torna al chip
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
       const b = voci(), i = b.indexOf(document.activeElement as HTMLButtonElement);
-      b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
+      b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
     menu.addEventListener("keydown", tasto);
