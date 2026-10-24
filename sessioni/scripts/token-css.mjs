@@ -31,15 +31,19 @@ export function voci(tokens) {
     };
     giu(modi[modo], []);
   }
+  // una curva in Figma sono quattro numeri (curva/<nome>/x1…y2): il CSS ne vuole una sola, --curva-<nome>: cubic-bezier(…)
+  for (const n of [...out.keys()].filter((k) => /^curva-.+-x1$/.test(k))) {
+    const base = n.slice(0, -3), p = ['x1', 'y1', 'x2', 'y2'].map((c) => out.get(`${base}-${c}`)?.valore);
+    if (p.every((x) => typeof x === 'number')) out.set(base, { tipo: 'cubicBezier', valore: `cubic-bezier(${p.join(', ')})` });
+  }
   return out;
 }
 
 export function genera(tokens) {
   const v = voci(tokens);
   const testa = '/* Generato da scripts/token-css.mjs da design/tokens.json: non si modifica a mano. */\n';
-  // le curve (gruppo «curva», STRING in Figma) sono funzioni CSS: vanno senza virgolette
   const css = testa + ':root {\n' + [...v].map(([n, { tipo, valore }]) =>
-    `  --${n}: ${tipo === 'string' && !n.startsWith('curva-') ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
+    `  --${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
   const ts = testa.replace('/*', '//').replace(' */', '') +
     `export type Token =\n${[...v.keys()].map((n) => `  | "${n}"`).join('\n')};\n\n` +
     '/** `var(--nome)` da usare negli stili in linea. */\nexport const t = (n: Token) => `var(--${n})`;\n\n' +

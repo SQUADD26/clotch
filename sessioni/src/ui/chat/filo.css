@@ -24,7 +24,7 @@
 .pezzo-chat .risposta .azioni { display: flex; gap: var(--spazio-0-5); }
 .pezzo-chat .cursore {
   display: inline-block; width: var(--misura-cursore); height: var(--misura-icona); margin-left: var(--spazio-0-5);
-  vertical-align: text-bottom; background: var(--colore-testo-primario); animation: lampeggia var(--tempo-cursore) var(--curva-scatto) infinite;
+  vertical-align: text-bottom; background: var(--colore-testo-primario); animation: lampeggia var(--tempo-cursore) steps(1) infinite;
 }
 @keyframes lampeggia { 50% { opacity: 0; } }
 

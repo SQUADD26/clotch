@@ -1,7 +1,7 @@
 // figma: 101-24007 — «Avviso a comparsa» 101-10457 (Info, Successo, Errore, Caricamento), impilati sopra la casella.
 // Un solo sistema per tutta l'app: `avvisa()` da qualunque pezzo, `<AreaAvvisi/>` lo disegna (la cornice lo monta).
 // Entrata, uscita e pila con le View Transition di base/movimento (#520); Info e Successo si chiudono da soli dopo
-// attesa/avviso. Errore e Caricamento restano finché li chiudi o li aggiorni.
+// tempo/avviso. Errore e Caricamento restano finché li chiudi o li aggiorni.
 import { useSyncExternalStore } from "react";
 import { Icona, type NomeIcona } from "./Icona";
 import { conTransizione } from "./movimento";
@@ -25,7 +25,7 @@ let prossimo = 1;
 const ascolta = new Set<() => void>();
 // lo stato cambia subito (aggiornaAvviso subito dopo avvisa lo trova); solo il ridisegno passa dalla transizione
 const cambia = (nuovi: Avviso[]) => { avvisi = nuovi; conTransizione(() => ascolta.forEach((f) => f())); };
-const timer = (a: Avviso) => { if (a.tipo === "info" || a.tipo === "successo") setTimeout(() => chiudiAvviso(a.id), numero("attesa-avviso")); };
+const timer = (a: Avviso) => { if (a.tipo === "info" || a.tipo === "successo") setTimeout(() => chiudiAvviso(a.id), numero("tempo-avviso")); };
 
 /** Mostra un avviso; torna l'id per aggiornarlo (Caricamento -> Successo) o chiuderlo. */
 export function avvisa(a: Omit<Avviso, "id">): number {

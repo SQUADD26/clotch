@@ -17,9 +17,9 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 /* View Transition (base/movimento.ts): ogni gruppo con nome si sposta e ridimensiona, il resto dissolve */
 :root { --scivola-barra: -100%; --scivola-pannello: 100%; }
 :root::view-transition { pointer-events: none; } /* i clic passano: la transizione si interrompe con il clic dopo */
-::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
-  animation-duration: var(--tempo-entrata); animation-timing-function: var(--curva-entrata);
-}
+::view-transition-old(*), ::view-transition-new(*) { animation-duration: var(--tempo-entrata); animation-timing-function: var(--curva-entrata); }
+/* un gruppo che cambia posto o misura (superficie, pannello, avvisi della pila) si sposta con tempo-spostamento */
+::view-transition-group(*) { animation-duration: var(--tempo-spostamento); animation-timing-function: var(--curva-spostamento); }
 ::view-transition-old(*):only-child { animation-duration: var(--tempo-uscita); animation-timing-function: var(--curva-uscita); }
 /* la superficie cambia larghezza quando la barra o il pannello entrano: le foto si tagliano, non si stirano */
 ::view-transition-old(superficie), ::view-transition-new(superficie) { height: 100%; object-fit: none; object-position: left top; }
