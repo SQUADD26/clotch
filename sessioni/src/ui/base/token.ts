@@ -227,7 +227,6 @@ export type Token =
   | "misura-visore-alto"
   | "misura-barra-scorrimento"
   | "misura-scorrimento-alto"
-  | "misura-casella-testo-max"
   | "misura-logo"
   | "misura-logo-icona"
   | "misura-barra-uso"
@@ -242,6 +241,7 @@ export type Token =
   | "misura-menu-modello"
   | "misura-onda-barra"
   | "misura-menu-permessi"
+  | "misura-casella-testo-max"
   | "misura-menu-impegno"
   | "misura-allegato-lato"
   | "misura-allegato-x"
@@ -436,16 +436,16 @@ export const valori: Record<Token, string> = {
   "testo-dimensione-base": "14px",
   "testo-dimensione-lg": "16px",
   "testo-dimensione-xl": "28px",
-  "testo-dimensione-titolo-1": "24",
-  "testo-dimensione-titolo-2": "20",
+  "testo-dimensione-titolo-1": "24px",
+  "testo-dimensione-titolo-2": "20px",
   "testo-riga-xs": "16px",
   "testo-riga-sm": "18px",
   "testo-riga-base": "20px",
   "testo-riga-messaggio": "21px",
   "testo-riga-lg": "24px",
   "testo-riga-xl": "36px",
-  "testo-riga-titolo-1": "32",
-  "testo-riga-titolo-2": "28",
+  "testo-riga-titolo-1": "32px",
+  "testo-riga-titolo-2": "28px",
   "testo-famiglia-ui": "SF Pro",
   "testo-famiglia-codice": "Menlo",
   "testo-famiglia-arrotondato": "SF Pro Rounded",
@@ -487,27 +487,27 @@ export const valori: Record<Token, string> = {
   "misura-visore-alto": "600px",
   "misura-barra-scorrimento": "6px",
   "misura-scorrimento-alto": "120px",
-  "misura-casella-testo-max": "240px",
   "misura-logo": "48px",
   "misura-logo-icona": "24px",
   "misura-barra-uso": "6px",
   "misura-legenda": "8px",
   "misura-riferimento": "24px",
   "misura-riga-compatta": "28px",
-  "misura-tabella-colonna-numero": "104",
-  "misura-tabella-colonna-testo": "200",
-  "misura-tabella-colonna-larga": "232",
-  "misura-tabella-altezza-max": "392",
-  "misura-tabella-riga": "40",
+  "misura-tabella-colonna-numero": "104px",
+  "misura-tabella-colonna-testo": "200px",
+  "misura-tabella-colonna-larga": "232px",
+  "misura-tabella-altezza-max": "392px",
+  "misura-tabella-riga": "40px",
   "misura-menu-modello": "320px",
   "misura-onda-barra": "3px",
   "misura-menu-permessi": "336px",
-  "misura-menu-impegno": "200",
+  "misura-casella-testo-max": "240px",
+  "misura-menu-impegno": "200px",
   "misura-allegato-lato": "120px",
   "misura-allegato-x": "20px",
-  "misura-finestra-stretta": "480",
+  "misura-finestra-stretta": "480px",
   "misura-allegato-avviso-largo": "734px",
-  "misura-menu-avvio-largo": "320",
+  "misura-menu-avvio-largo": "320px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",

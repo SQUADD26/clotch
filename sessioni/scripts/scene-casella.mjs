@@ -24,7 +24,7 @@ function scena(id, sezione, extra = {}) {
   const dati = structuredClone(id.startsWith("148-") ? baseSelettore() : base);
   dati.navigazione.sezione = sezione;
   Object.assign(dati.elenco.sessioni.find((s) => s.id === "s1"),{ permessi: "default", contesto: 124000 }); // 62% di 200 000
-  dati.registro.chat.s1 = { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 }; // la finestra la dà il motore (contesto_max, #475)
+  dati.registro.chat.s1 = { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], ...dati.registro.chat.s1, contestoMax: 200_000 }; // la finestra la dà il motore (contesto_max, #475)
   writeFileSync(new URL(`${id.includes("-") ? id : `101-${id}`}.json`, cartella), JSON.stringify({ ...dati, ...extra, preferenze: { ...dati.preferenze, ...extra.preferenze } }, null, 1) + "\n");
 }
 

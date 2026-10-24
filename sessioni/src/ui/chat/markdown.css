@@ -1,11 +1,11 @@
 /* figma: 131-59690 — risposta formattata, scuro (chiaro 140-60134): titoli, paragrafi, elenchi, codice, citazione, linea, tabella.
    figma: 140-60491 — tabella larga e lunga, scuro (chiaro 140-62309): colonna e intestazione fisse, barre di scorrimento.
-   I numeri sono variabili di Figma (token.css). titolo-1/2 e le misure della tabella arrivano senza unità: si moltiplicano per --misura-tratto. */
+   I numeri sono variabili di Figma (token.css). */
 .pezzo-chat .markdown { display: flex; flex-direction: column; gap: var(--spazio-3); min-width: 0; }
 .pezzo-chat .markdown > * { margin: 0; }
 .pezzo-chat .markdown :is(h1,h2,h3,h4,h5,h6) { color: var(--colore-testo-primario); }
-.pezzo-chat .markdown h1 { font-size: calc(var(--testo-dimensione-titolo-1) * var(--misura-tratto)); line-height: calc(var(--testo-riga-titolo-1) * var(--misura-tratto)); font-weight: 600; }
-.pezzo-chat .markdown h2 { padding-top: var(--spazio-3); font-size: calc(var(--testo-dimensione-titolo-2) * var(--misura-tratto)); line-height: calc(var(--testo-riga-titolo-2) * var(--misura-tratto)); font-weight: 600; }
+.pezzo-chat .markdown h1 { font-size: var(--testo-dimensione-titolo-1); line-height: var(--testo-riga-titolo-1); font-weight: 600; }
+.pezzo-chat .markdown h2 { padding-top: var(--spazio-3); font-size: var(--testo-dimensione-titolo-2); line-height: var(--testo-riga-titolo-2); font-weight: 600; }
 .pezzo-chat .markdown :is(h3,h4,h5,h6) { padding-top: var(--spazio-2); font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); font-weight: 500; }
 .pezzo-chat .markdown a { color: var(--colore-testo-link); text-decoration: none; }
 .pezzo-chat .markdown a:hover { text-decoration: underline; }
@@ -52,7 +52,7 @@
 
 /* tabella: scorre in tutti e due i versi, intestazione e prima colonna restano ferme */
 .pezzo-chat .tabella-markdown {
-  overflow: auto; max-height: calc(var(--misura-tabella-altezza-max) * var(--misura-tratto));
+  overflow: auto; max-height: var(--misura-tabella-altezza-max);
   border: var(--misura-tratto) solid var(--colore-bordo-leggero); border-radius: var(--raggio-lg);
 }
 .pezzo-chat .tabella-markdown::-webkit-scrollbar { width: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); height: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); }
@@ -62,13 +62,13 @@
 .pezzo-chat .tabella-markdown::-webkit-scrollbar-corner { background: transparent; }
 .pezzo-chat .tabella-markdown table { width: 100%; min-width: max-content; border-collapse: separate; border-spacing: 0; }
 .pezzo-chat .tabella-markdown :is(th,td) {
-  min-width: calc(var(--misura-tabella-colonna-testo) * var(--misura-tratto)); padding: var(--spazio-2-5) var(--spazio-4); text-align: start; white-space: nowrap;
+  min-width: var(--misura-tabella-colonna-testo); padding: var(--spazio-2-5) var(--spazio-4); text-align: start; white-space: nowrap;
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); border-bottom: var(--misura-tratto) solid var(--colore-bordo-leggero);
 }
-.pezzo-chat .tabella-markdown :is(th,td):not(:first-child) { width: calc(var(--misura-tabella-colonna-testo) * var(--misura-tratto)); }
-.pezzo-chat .tabella-markdown :is(th,td).larga { min-width: calc(var(--misura-tabella-colonna-larga) * var(--misura-tratto)); }
-.pezzo-chat .tabella-markdown :is(th,td):not(:first-child).larga { width: calc(var(--misura-tabella-colonna-larga) * var(--misura-tratto)); }
-.pezzo-chat .tabella-markdown :is(th,td).numero { width: calc(var(--misura-tabella-colonna-numero) * var(--misura-tratto)); min-width: calc(var(--misura-tabella-colonna-numero) * var(--misura-tratto)); text-align: right; }
+.pezzo-chat .tabella-markdown :is(th,td):not(:first-child) { width: var(--misura-tabella-colonna-testo); }
+.pezzo-chat .tabella-markdown :is(th,td).larga { min-width: var(--misura-tabella-colonna-larga); }
+.pezzo-chat .tabella-markdown :is(th,td):not(:first-child).larga { width: var(--misura-tabella-colonna-larga); }
+.pezzo-chat .tabella-markdown :is(th,td).numero { width: var(--misura-tabella-colonna-numero); min-width: var(--misura-tabella-colonna-numero); text-align: right; }
 .pezzo-chat .tabella-markdown tr:last-child > td { border-bottom: 0; }
 .pezzo-chat .tabella-markdown th {
   position: sticky; top: 0; z-index: 2; color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500;

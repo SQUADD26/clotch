@@ -1,7 +1,7 @@
 // Le scelte della casella (#437): permessi 101:26398, modello e sforzo 101:26707 e 148:28674, contesto usato 101:26425, messaggio non inviato 101:27798.
 // Le scelte per chat stanno nelle preferenze della sessione (`modello` è l'id CLI che #457 manda al motore).
 import type { EsitoComando } from "../../comandi";
-import type { PreferenzeSessione, Sessione } from "../../tipi";
+import type { ModelloMotore, PreferenzeSessione, Sessione } from "../../tipi";
 import { MODELLI } from "./testi";
 
 /** «claude-opus-5-5» -> «Opus 5.5», come «chip modello» e l'intestazione. */
@@ -46,13 +46,32 @@ export const modelloDi = (s: Pick<Sessione, "modello">, p?: PreferenzeSessione) 
 /** Etichetta dell'id CLI (`claude-opus-5-5` → «Opus 5.5»); undefined se non è un modello noto. */
 export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => m.id === id)?.etichetta;
 
-export const sforzoDi = (p?: PreferenzeSessione) => SFORZI.find((x) => x.id === p?.sforzo) ?? SFORZI.find((x) => x.id === SFORZO_BASE)!;
+/** Impegno in uso: la scelta fatta qui, altrimenti il predefinito del modello (`base`, di solito «medio»). */
+export const sforzoDi = (p?: PreferenzeSessione, base = SFORZO_BASE) =>
+  SFORZI.find((x) => x.id === p?.sforzo) ?? SFORZI.find((x) => x.id === base) ?? SFORZI.find((x) => x.id === SFORZO_BASE)!;
 
-/** Dalle preferenze cambiate ai campi di `sessione_imposta`: solo modello, impegno e modalità veloce; `null` = tornato al predefinito (impegno «medium», veloce spenta). undefined se non ne cambia nessuno. */
-export function impostazioneMotore(parte: Partial<Record<keyof PreferenzeSessione, unknown>>) {
+/** La voce del catalogo del motore per un id CLI (può avere un suffisso di data). */
+export const voceCatalogo = (cat: ModelloMotore[] | null, id: string | null | undefined) => (id ? cat?.find((m) => id.startsWith(m.modello)) : undefined);
+/** Modelli del menu: i quattro principali e, dal catalogo, gli altri («Altri modelli»). Senza catalogo la lista fissa di sopra. */
+export function modelliMenu(cat: ModelloMotore[] | null): { principali: Scelta[]; altri: Scelta[] } {
+  if (!cat) return { principali: MODELLI_MENU, altri: [] };
+  const tutti = cat.map((m) => ({ id: m.modello, etichetta: etichettaModello(m.modello) ?? nomeModello(m.modello) ?? m.modello })).sort((x, y) => posto(x.id) - posto(y.id));
+  const noti = tutti.filter((x) => ORDINE_MENU.includes(x.id)), principali = noti.length ? noti : tutti.slice(0, 4);
+  return { principali, altri: tutti.filter((x) => !principali.includes(x)) };
+}
+/** Gli impegni del modello: quelli del catalogo (`[]` = nessuno, niente «Impegno»); senza catalogo o senza il campo, i cinque livelli. */
+export const sforziDi = (cat: ModelloMotore[] | null, id: string | null | undefined): Scelta[] => {
+  const e = voceCatalogo(cat, id)?.sforzi;
+  return e ? e.map((x) => SFORZI.find((s) => s.id === x) ?? { id: x, etichetta: x }) : SFORZI;
+};
+/** L'interruttore veloce c'è se il catalogo dice `rapida` per il modello; senza catalogo c'è sempre. */
+export const haRapida = (cat: ModelloMotore[] | null, id: string | null | undefined) => !cat || voceCatalogo(cat, id)?.rapida === true;
+
+/** Dalle preferenze cambiate ai campi di `sessione_imposta`: solo modello, impegno e modalità veloce; `null` = tornato al predefinito (impegno predefinito `base`, veloce spenta). undefined se non ne cambia nessuno. */
+export function impostazioneMotore(parte: Partial<Record<keyof PreferenzeSessione, unknown>>, base = SFORZO_BASE) {
   const o: { modello?: string; sforzo?: string; rapida?: boolean } = {};
   if (typeof parte.modello === "string") o.modello = parte.modello;
-  if ("sforzo" in parte) o.sforzo = (parte.sforzo as string | null) ?? SFORZO_BASE;
+  if ("sforzo" in parte) o.sforzo = (parte.sforzo as string | null) ?? base;
   if ("rapida" in parte) o.rapida = parte.rapida === true;
   return Object.keys(o).length ? o : undefined;
 }

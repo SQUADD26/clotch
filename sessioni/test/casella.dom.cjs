@@ -123,19 +123,47 @@ app.whenReady().then(async () => {
       await clicca('.menu-casella button[role="switch"]'); // la modalità veloce è accesa in questa scena: spegnerla torna al predefinito
       assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { rapida: null } });
       await clicca('.menu-casella.impegno .voce', 'Massimo'); // l'impegno chiude il menu
-      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { sforzo: 'max' } });
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: 'claude-haiku-5-5', sforzo: 'max' } }); // un giro solo: modello e impegno
       await wait(() => !document.querySelector('.menu-casella'));
       await clicca('.chip-menu button.chip[aria-label="Modello e impegno"]');
       await wait(() => !!document.querySelector('.menu-casella'));
       await clicca('.menu-casella .voce', 'Opus 5.5');
       await clicca('.menu-casella.impegno .voce', 'Medio');
-      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { sforzo: null } }); // il livello base si cancella dalle preferenze
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: 'claude-opus-5-5', sforzo: null } }); // il livello base si cancella dalle preferenze
       // ogni scelta va subito anche al motore (`sessione_imposta`), col livello base scritto per intero
       assert.deepEqual(comandi.map((c) => [c.cmd, c.args]), [
         ['sessione_imposta', { chat: 's1', modello: 'claude-sonnet-5-5' }], ['sessione_imposta', { chat: 's1', modello: 'claude-haiku-5-5' }],
-        ['sessione_imposta', { chat: 's1', rapida: false }], ['sessione_imposta', { chat: 's1', sforzo: 'max' }],
-        ['sessione_imposta', { chat: 's1', modello: 'claude-opus-5-5' }], ['sessione_imposta', { chat: 's1', sforzo: 'medium' }],
+        ['sessione_imposta', { chat: 's1', rapida: false }], ['sessione_imposta', { chat: 's1', modello: 'claude-haiku-5-5', sforzo: 'max' }],
+        ['sessione_imposta', { chat: 's1', modello: 'claude-opus-5-5' }], ['sessione_imposta', { chat: 's1', modello: 'claude-opus-5-5', sforzo: 'medium' }],
       ]);
+    });
+    await check('MODELLI_DAL_MOTORE', async () => {
+      // il catalogo del motore (modelli.json finto) al posto della lista fissa
+      scene.modelli = [
+        { modello: 'claude-opus-5-5', sforzi: ['low', 'high', 'max'], rapida: true, sforzo_default: 'high' },
+        { modello: 'claude-fable-5-1', sforzi: ['medium'], rapida: true },
+        { modello: 'claude-sonnet-5-5' }, { modello: 'claude-haiku-5-5', sforzi: [], rapida: false },
+        { modello: 'claude-opus-4-1', sforzi: [], rapida: false },
+      ];
+      comandi.length = 0;
+      try {
+        await load();
+        await clicca('.chip-menu button.chip[aria-label="Modello e impegno"]');
+        await wait(() => document.querySelectorAll('.menu-casella .voce').length === 5); // quattro principali e «Altri modelli»
+        assert.deepEqual(await testi('.menu-casella .voce .etichetta'), ['Opus 5.5', 'Fable 5.1', 'Sonnet 5.5', 'Haiku 5.5', 'Altri modelli']);
+        await clicca('.menu-casella .voce', 'Altri modelli');
+        assert.deepEqual(await testi('.menu-casella [aria-label="Altri modelli"] .etichetta'), ['Opus 4.1']);
+        assert.deepEqual(await testi('.menu-casella .titolo-gruppo'), ['Modalità veloce']); // il modello in uso (Fable) ha la modalità veloce
+        const passa = (n) => run((n) => document.querySelectorAll('.menu-casella [aria-label="Modello"] .voce')[n].dispatchEvent(new MouseEvent('mouseover', { bubbles: true })), n);
+        await passa(3); // Haiku: nessun impegno
+        assert.equal(await run(() => !!document.querySelector('.menu-casella.impegno')), false);
+        await passa(0); // Opus: i suoi tre impegni, quello predefinito è «Alto»
+        await wait(() => !!document.querySelector('.menu-casella.impegno'));
+        assert.deepEqual(await testi('.menu-casella.impegno .voce'), ['Basso', 'Alto', 'Massimo']);
+        await clicca('.menu-casella.impegno .voce', 'Alto'); // il predefinito di Opus: nelle preferenze si cancella, al motore va per intero
+        assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: 'claude-opus-5-5', sforzo: null } });
+        assert.deepEqual(comandi.map((c) => c.args), [{ chat: 's1', modello: 'claude-opus-5-5', sforzo: 'high' }]);
+      } finally { delete scene.modelli; comandi.length = 0; }
     });
     await check('CONTESTO_TOOLTIP', async () => {
       await load();

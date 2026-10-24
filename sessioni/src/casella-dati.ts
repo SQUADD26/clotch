@@ -2,7 +2,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFile } from "node:child_process";
-import type { VoceComando } from "./tipi";
+import type { ModelloMotore, VoceComando } from "./tipi";
 
 /** I comandi di Claude Code che ci sono sempre, con la descrizione nella lingua dell'app. */
 export const COMANDI_BASE: VoceComando[] = ([
@@ -83,4 +83,23 @@ export async function cercaFile(cartella: string, testo: string, limite = 8): Pr
   const voti = (f: string) => { const n = path.basename(f).toLowerCase(); return n.startsWith(t) ? 0 : n.includes(t) ? 1 : 2; };
   return (await tutti(cartella)).filter((f) => f.toLowerCase().includes(t))
     .sort((a, b) => voti(a) - voti(b) || path.basename(a).length - path.basename(b).length || a.length - b.length || a.localeCompare(b)).slice(0, limite);
+}
+
+/** Il catalogo dei modelli del motore (`<home>/.claude/hooks/friday/modelli.json`): una lista, o `{modelli: [...]}`. Scarta le voci senza `modello`; null se manca, non si legge o è vuoto. */
+export function leggiModelli(home: string): ModelloMotore[] | null {
+  const testo = leggi(path.join(home, ".claude", "hooks", "friday", "modelli.json"));
+  if (testo === null) return null;
+  let j: unknown;
+  try { j = JSON.parse(testo); } catch { return null; }
+  const lista = Array.isArray(j) ? j : (j as { modelli?: unknown } | null)?.modelli;
+  if (!Array.isArray(lista)) return null;
+  const out = lista.flatMap((x: Record<string, unknown>): ModelloMotore[] => {
+    if (!x || typeof x.modello !== "string" || !x.modello) return [];
+    return [{ modello: x.modello,
+      ...(Array.isArray(x.sforzi) ? { sforzi: x.sforzi.filter((e): e is string => typeof e === "string") } : {}),
+      ...(typeof x.rapida === "boolean" ? { rapida: x.rapida } : {}),
+      ...(typeof x.contesto_max === "number" ? { contesto_max: x.contesto_max } : {}),
+      ...(typeof x.sforzo_default === "string" ? { sforzo_default: x.sforzo_default } : {}) }];
+  });
+  return out.length ? out : null;
 }

@@ -55,8 +55,7 @@
 .pezzo-chat .menu-casella .riga-veloce { display: flex; align-items: center; gap: var(--spazio-2); min-height: var(--spazio-10); padding: 0 var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
 .pezzo-chat .menu-casella .riga-veloce .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pezzo-chat .menu-casella .riga-veloce .descrizione { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
-/* shortcut: la variabile Figma misura/menu-impegno è senza unità (manca l'ambito larghezza); per il tratto la rende in pixel, da togliere quando la variabile avrà l'ambito */
-.pezzo-chat .menu-casella.impegno { position: absolute; top: 0; left: calc(100% + var(--spazio-1)); width: calc(var(--misura-menu-impegno) * var(--misura-tratto)); }
+.pezzo-chat .menu-casella.impegno { position: absolute; top: 0; left: calc(100% + var(--spazio-1)); width: var(--misura-menu-impegno); }
 .pezzo-chat .interruttore {
   width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
   padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);

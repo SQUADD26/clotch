@@ -5,10 +5,10 @@ import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { cercaFile, comandiDi, COMANDI_BASE, descrizioneDi } from "../src/casella-dati";
+import { cercaFile, comandiDi, COMANDI_BASE, descrizioneDi, leggiModelli } from "../src/casella-dati";
 import { leggiElenco } from "../src/elenco";
 import { cercaDi, conScelta, filtraComandi } from "../src/ui/chat/cerca-casella";
-import { etichettaModello, modelloDi, motivoNonInviato, percentoContesto, permessiDi, sforzoDi } from "../src/ui/chat/scelte";
+import { etichettaModello, haRapida, modelliMenu, modelloDi, motivoNonInviato, percentoContesto, permessiDi, sforziDi, sforzoDi } from "../src/ui/chat/scelte";
 
 const cartella = () => fs.mkdtempSync(path.join(os.tmpdir(), "casella-"));
 const scrivi = (f: string, t: string) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, t); };
@@ -117,4 +117,36 @@ test("trascrizione Claude Code: permissionMode e token del contesto arrivano nel
   assert.equal(s.permessi, "acceptEdits");
   assert.equal(s.contesto, 124_002);
   assert.equal(percentoContesto(s.contesto, 200_000), 62);
+});
+
+test("modelli del motore: si legge modelli.json (lista o {modelli}), le voci storte si scartano, senza file null", () => {
+  const home = cartella(), file = path.join(home, ".claude", "hooks", "friday", "modelli.json");
+  assert.equal(leggiModelli(home), null);
+  scrivi(file, "non è json");
+  assert.equal(leggiModelli(home), null);
+  const voci = [{ modello: "claude-opus-5-5", sforzi: ["low", "max", 3], rapida: true, contesto_max: 1_000_000, sforzo_default: "high" }, { modello: "claude-haiku-5-5", sforzi: [] }, { sforzi: ["low"] }, "x"];
+  const attese = [{ modello: "claude-opus-5-5", sforzi: ["low", "max"], rapida: true, contesto_max: 1_000_000, sforzo_default: "high" }, { modello: "claude-haiku-5-5", sforzi: [] }];
+  scrivi(file, JSON.stringify(voci));
+  assert.deepEqual(leggiModelli(home), attese);
+  scrivi(file, JSON.stringify({ modelli: voci }));
+  assert.deepEqual(leggiModelli(home), attese);
+  scrivi(file, "[]");
+  assert.equal(leggiModelli(home), null);
+});
+
+test("modelli del menu: senza catalogo la lista fissa; col catalogo i principali in ordine e gli altri a parte; impegni e veloce per modello", () => {
+  assert.deepEqual(modelliMenu(null).principali.map((m) => m.etichetta), ["Opus 5.5", "Fable 5.1", "Sonnet 5.5", "Haiku 5.5"]);
+  assert.deepEqual(modelliMenu(null).altri, []);
+  assert.equal(sforziDi(null, "claude-opus-5-5").length, 5);
+  assert.equal(haRapida(null, "claude-opus-5-5"), true);
+  const cat = [{ modello: "claude-opus-4-1", sforzi: [] }, { modello: "claude-sonnet-5-5" }, { modello: "claude-opus-5-5", sforzi: ["low", "max"], rapida: true }];
+  const m = modelliMenu(cat);
+  assert.deepEqual(m.principali.map((x) => x.etichetta), ["Opus 5.5", "Sonnet 5.5"]);
+  assert.deepEqual(m.altri.map((x) => x.etichetta), ["Opus 4.1"]);
+  assert.deepEqual(sforziDi(cat, "claude-opus-5-5").map((x) => x.etichetta), ["Basso", "Massimo"]);
+  assert.equal(sforziDi(cat, "claude-sonnet-5-5").length, 5); // il catalogo non dice gli sforzi: i cinque livelli
+  assert.deepEqual(sforziDi(cat, "claude-opus-4-1"), []); // nessuno sforzo: niente «Impegno»
+  assert.deepEqual([haRapida(cat, "claude-opus-5-5"), haRapida(cat, "claude-sonnet-5-5"), haRapida(cat, "claude-opus-5-5-20261001")], [true, false, true]);
+  assert.equal(sforzoDi(undefined, "high").id, "high"); // il predefinito del modello
+  assert.equal(sforzoDi({ sforzo: "max" }, "high").id, "max");
 });
