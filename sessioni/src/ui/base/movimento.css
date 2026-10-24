@@ -9,7 +9,8 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 }
 :is(.bottone, .bottone-icona, .pillola, .pillola-filtro, .chip):active:not(:disabled) { transform: scale(var(--scala-premuto)); }
 
-/* comparsa di un sovrapposto (menu, popup, tooltip, popover, dialogo): class="entra-sovrapposto" sul suo contenitore */
+/* comparsa di un sovrapposto (menu, popup, tooltip, popover, dialogo): class="entra-sovrapposto" sul suo contenitore;
+   chiusura: view-transition-name unico + view-transition-class: sovrapposto, e lo smontaggio dentro conTransizione() */
 @keyframes entra-sovrapposto { from { opacity: 0; transform: translateY(var(--spostamento-entrata)) scale(var(--scala-entrata)); } }
 .entra-sovrapposto { animation: entra-sovrapposto var(--tempo-entrata) var(--curva-entrata); }
 
@@ -38,6 +39,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 ::view-transition-old(pannello):only-child { animation-name: scivola-pannello; animation-direction: reverse; }
 ::view-transition-new(*.avviso):only-child { animation-name: compare; }
 ::view-transition-old(*.avviso):only-child { animation-name: compare; animation-direction: reverse; }
+::view-transition-old(*.sovrapposto):only-child { animation-name: compare; animation-direction: reverse; } /* chiusura dei sovrapposti (#519) */
 ::view-transition-new(velo):only-child { animation-name: dissolve; }
 ::view-transition-old(velo):only-child { animation-name: dissolve; animation-direction: reverse; }
 
