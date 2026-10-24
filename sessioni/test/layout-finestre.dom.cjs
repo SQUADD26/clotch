@@ -76,15 +76,15 @@ app.whenReady().then(async () => {
     assert.equal(stretti['.chip .etichetta'], false, '«Chiedi approvazione» nascosto nella casella compatta');
     assert.equal(stretti['.chip .livello'], false, '«Medio» nascosto nella casella compatta');
     assert.notEqual(stretti['.contesto'], true, 'il contesto non si vede nella casella compatta');
-    // 101:29770 e 101:29971: il testo dei dati si taglia dove finisce il suo posto, mai sotto i bottoni
+    // 101:29770 e 101:29971: i dati finiscono prima dei bottoni, mai sotto
     const dati = () => run(() => { const d = document.querySelector('.intestazione .dati'), a = document.querySelector('.intestazione .azioni');
-      return { fine: d.getBoundingClientRect().right, bottoni: a.getBoundingClientRect().left, tagliato: d.scrollWidth > d.clientWidth, sotto: [...d.children].every((c) => c.getBoundingClientRect().left < d.getBoundingClientRect().right) }; });
+      return { fine: d.getBoundingClientRect().right, bottoni: a.getBoundingClientRect().left, sotto: [...d.children].every((c) => c.getBoundingClientRect().left < d.getBoundingClientRect().right) }; });
     for (const larghezza of [600, 480]) {
       win.setSize(larghezza, 1000);
       await wait(`() => Math.abs(window.innerWidth - ${larghezza}) < 2 && !!document.querySelector('.intestazione .dati')`);
       const m = await dati();
       assert.ok(m.fine <= m.bottoni, `${larghezza}: i dati finiscono prima dei bottoni (${m.fine} > ${m.bottoni})`);
-      assert.ok(m.tagliato, `${larghezza}: il testo dei dati è più lungo del suo posto e si taglia`);
+      // dal #576 i dati stanno su una riga senza tagli a metà parola: si tolgono pezzi interi, non si taglia il testo
     }
     win.setSize(600, 1000);
     win.setSize(768, 1000);
