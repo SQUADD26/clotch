@@ -7,6 +7,7 @@
   "h": 2051
  },
  "variabili": {
+  "colore/fondo/superficie": "#181818",
   "spazio/12": 48,
   "colore/fondo/elevato": "#2d2d2d",
   "colore/bordo/fuoco": "#ee7c37",
@@ -82,6 +83,7 @@
     "h": 2051
    },
    "variabili": {
+    "fills[0]": "colore/fondo/superficie",
     "itemSpacing": "spazio/12",
     "counterAxisSpacing": "spazio/12"
    },
