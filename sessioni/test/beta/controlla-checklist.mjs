@@ -16,6 +16,7 @@ FAMIGLIE['cerca-tastiera'] = 'CTS';
 FAMIGLIE['cerca-icona-viadalmac'] = 'CIV';
 FAMIGLIE['cerca-voce'] = 'CVO';
 FAMIGLIE['cerca-impostazioni-3'] = 'CI3';
+FAMIGLIE['cerca-impostazioni-2'] = 'CI2';
 FAMIGLIE['cerca-ricerca'] = 'CRS';
 // parole di gusto: «vedi» dice un sì/no che si osserva, mai un giudizio
 const GUSTO = /\b(bell[oaie]|brutt[oaie]|piacevol\w*|adeguat\w*|sembr\w*|elegant\w*|curat\w*|fluid[oaie]|naturale|intuitiv\w*|ragionevol\w*|opportun\w*|buon[oaie])\b/i;
