@@ -82,6 +82,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "impostazioni:radici": return (s.cartelle ?? []).map((c) => c.percorso);
     case "impostazioni:cartelle": return (s.cartelle ?? []).filter((c) => (args[0] as string[]).includes(c.percorso));
     case "impostazioni:versione": return s.versione ?? "";
+    case "impostazioni:profilo": return { nome: "Roberto Bondici", iniziali: "RB" }; // il nome dei frame del disegno
     case "impostazioni:uso": return s.uso ?? null;
     case "impostazioni:archiviate": return s.archiviate ?? [];
     case "impostazioni:novita": return s.novita ?? null;
@@ -105,7 +106,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
   "clotch-ai:registro", "clotch-ai:comando", "clotch-ai:avvia", "clotch-ai:voce", "clotch-ai:dettatura", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
-  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
+  "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
   "casella:scegli", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];

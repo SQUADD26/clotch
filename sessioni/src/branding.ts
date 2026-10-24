@@ -40,8 +40,19 @@ export function impostaIdentita() {
   const icona = iconaApp();
   if (icona.isEmpty()) throw new Error("Icona di clotch non leggibile");
   app.dock?.setIcon(icona);
-  Menu.setApplicationMenu(Menu.buildFromTemplate([
-    ...(process.platform === "darwin" ? [{ role: "appMenu" as const, label: NOME_APP }] : []),
-    { role: "fileMenu" }, { role: "editMenu" }, { role: "viewMenu" }, { role: "windowMenu" },
-  ]));
+  app.setAboutPanelOptions({ applicationName: NOME_APP, applicationVersion: app.getVersion() });
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp()));
+}
+
+/** Menu di un'app macOS: il primo è quello dell'app, con «Informazioni su clotch» (il pannello di sistema: nome, versione, icona). */
+export function menuApp(): Electron.MenuItemConstructorOptions[] {
+  return [
+    ...(process.platform === "darwin" ? [{ label: NOME_APP, submenu: [
+      { role: "about" as const, label: `Informazioni su ${NOME_APP}` }, { type: "separator" as const },
+      { role: "services" as const, label: "Servizi" }, { type: "separator" as const },
+      { role: "hide" as const, label: `Nascondi ${NOME_APP}` }, { role: "hideOthers" as const, label: "Nascondi altre" }, { role: "unhide" as const, label: "Mostra tutto" },
+      { type: "separator" as const }, { role: "quit" as const, label: `Esci da ${NOME_APP}` },
+    ] }] : []),
+    { role: "fileMenu" }, { role: "editMenu", label: "Modifica" }, { role: "viewMenu", label: "Vista" }, { role: "windowMenu", label: "Finestra" },
+  ];
 }

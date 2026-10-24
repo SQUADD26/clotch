@@ -64,6 +64,7 @@ const impostazioni: ImpostazioniApi = {
   scegliCartella: () => ipcRenderer.invoke("impostazioni:scegli-cartella"),
   apri: (percorso) => ipcRenderer.invoke("impostazioni:apri", percorso),
   versione: () => ipcRenderer.invoke("impostazioni:versione"),
+  profilo: () => ipcRenderer.invoke("impostazioni:profilo"),
   avvio: (acceso) => ipcRenderer.invoke("impostazioni:avvio", acceso),
   uso: () => ipcRenderer.invoke("impostazioni:uso"),
   archiviate: () => ipcRenderer.invoke("impostazioni:archiviate"),
