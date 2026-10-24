@@ -16,7 +16,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
 import { ALLEGATI_PROVA, AllegatiCasella, type AllegatoCasella } from "./Allegati";
-import { ChipContesto, ChipPermessi, impostaDi } from "./Chip";
+import { ChipContesto, ChipPermessi, impostaDi, NomeSopra } from "./Chip";
 import { ChipModello } from "./ChipModello";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
@@ -95,7 +95,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const [caret, setCaret] = useState<number | null>(null), [chiuso, setChiuso] = useState(false), [scelta, setScelta] = useState(0);
   const poi = useRef<number | null>(null);
   const cerca = chiuso || disabilitata ? null : cercaDi(testo, Math.min(caret ?? testo.length, testo.length));
-  const voci = useVoci(chat, cerca);
+  const { voci, stato: statoVoci } = useVoci(chat, cerca);
 
   // scelta fatta in un menu dei chip: il fuoco torna al testo, se è caduto sul fondo della pagina
   const eraAperto = useRef(false);
@@ -223,7 +223,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const spento = stato === "vuota" || stato === "disabilitata" || invio; // il messaggio aspetta il motore: il bottone sembra spento, come quando non si può inviare
   return (
     <div className="area-casella con-menu" ref={areaCasella}>
-      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
+      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} stato={statoVoci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
       {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello} preferenza={preferenza} pref={pref} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
@@ -243,12 +243,14 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <span className="spinta" />
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} predefinito={idModello(globale)} impegnoAperto={provaDi(prova, "impegno") !== null} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
-          <BottoneIcona icona="microfono" etichetta="Detta" disabled />
+          <NomeSopra testo="Detta"><BottoneIcona icona="microfono" etichetta="Detta" title={undefined} disabled /></NomeSopra>
+          <NomeSopra testo={ferma ? "Interrompi" : "Invia"}>
           <button type="button" className={invio ? "bottone-invia spento" : "bottone-invia"} aria-busy={invio} disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
-            aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
+            aria-label={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
             <Icona nome={ferma ? "stop" : "invia"} colore={spento ? "terziaria" : "su-accento"} />
           </button>
+          </NomeSopra>
         </div>
       </div>
       {grandi.length > 0 && (

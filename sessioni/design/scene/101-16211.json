@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "ferma",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792845622383,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,7 +44,8 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": ""
+    "file": "",
+    "contesto": 124000
    }
   ],
   "errori": []
@@ -54,13 +55,13 @@
    {
     "tipo": "utente",
     "testo": "Continua con le schermate degli stati.",
-    "t": 1792793047531
+    "t": 1792845620383
    },
    {
     "tipo": "assistente",
     "testo": "Ho finito 9 schermate su 14.",
     "modello": "claude-opus-5-5",
-    "t": 1792793048531
+    "t": 1792845621383
    }
   ]
  },
@@ -85,24 +86,25 @@
     "domanda": null,
     "limite": {
      "account": ".claude-accountmanager",
-     "ripartenza": 1792854000000
+     "ripartenza": 1792864800000
     },
     "richieste": [],
-    "battito": 1792793149531,
+    "battito": 1792845722383,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792793169531,
+    "visto": 1792845742383,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
     "quarantena": null,
     "errore": null,
     "rifiuto": null,
-    "persi": 0
+    "persi": 0,
+    "contestoMax": 200000
    }
   },
   "fermoTutto": false,
