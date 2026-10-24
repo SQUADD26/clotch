@@ -45,6 +45,6 @@ export async function apriNovita() {
 export async function verificaAggiornamenti() {
   try {
     if (await window.impostazioni.aggiornamenti(true)) return apriDialogo("aggiornamento");
-    avvisa({ tipo: "info", messaggio: `Già aggiornato · versione ${await window.impostazioni.versione()}` });
+    avvisa({ tipo: "info", messaggio: `Già aggiornato, versione ${await window.impostazioni.versione()}` });
   } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
 }

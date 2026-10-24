@@ -24,7 +24,7 @@ function stato({ s, c }: Citata, ora: number) {
   if (r || s.stato === "aspetta") return `Ti ha fatto una domanda ${durata(Math.max(60_000, Math.floor((ora - s.ultimaAttivita) / 60_000) * 60_000))} fa`;
   const passi = c?.passi ?? [];
   // shortcut: il registro non dice da quando lavora; «da 2 ore» del frame torna quando un evento porta l'inizio
-  return passi.length ? `Al lavoro · ${passi.filter((p) => p.stato === "completed").length} di ${passi.length} passi` : "Al lavoro";
+  return passi.length ? `Al lavoro, ${passi.filter((p) => p.stato === "completed").length} di ${passi.length} passi` : "Al lavoro";
 }
 
 export function SchedaSessione({ x, sospesa = false }: { x: Citata; sospesa?: boolean }) {
@@ -44,7 +44,7 @@ export function SchedaSessione({ x, sospesa = false }: { x: Citata; sospesa?: bo
         <SegnoStato stato={s.stato} />
       </div>
       <div className="stato"><Icona nome="mano" colore="accento" /><span>{stato(x, ora)}</span></div>
-      <div className="dettagli">{[s.progetto, s.ramo, SORGENTE[s.sorgente]].filter(Boolean).join(" · ")}</div>
+      <div className="dettagli">{[s.progetto, s.ramo, SORGENTE[s.sorgente]].filter(Boolean).join(", ")}</div>
       {ultimo && <div className="ultimo">Ultimo: «{ris.testo(ultimo)}»</div>}
       <div className="bottoni">
         <Bottone onClick={apri}>Apri sessione</Bottone>

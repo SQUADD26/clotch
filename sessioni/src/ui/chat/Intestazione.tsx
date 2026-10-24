@@ -22,7 +22,7 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
   // la scena di prova «menu-sessione» parte col menu aperto (101:20859)
   const [menu, setMenu] = useState(provaDi(n.sezione, "menu-sessione") !== null);
   const stato: StatoSegno = nonRisponde ? "errore" : s.stato;
-  const dati = [s.progetto, s.ramo, nomeModello(s.modello), `${SORGENTE[s.sorgente]} · ${nomeAccount(s.account)}`];
+  const dati = [s.progetto, s.ramo, nomeModello(s.modello), `${SORGENTE[s.sorgente]}, ${nomeAccount(s.account)}`];
   return (
     <div className="intestazione">
       <div className="testi">
@@ -30,11 +30,10 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
           <IconaSessione icona={pref?.icona} colore={pref?.colore} />
           <span className="titolo" title={s.titolo}>{s.titolo || "Senza titolo"}</span>
         </div>
-        <div className="dati" title={dati.filter(Boolean).join(" · ")}>
+        <div className="dati" title={dati.filter(Boolean).join(", ")}>
           <span className="stato"><SegnoStato stato={stato} />{STATO[stato]}</span>
           {dati.map((d, i) => d && (
             <span key={i} className="dato">
-              <span className="separatore">·</span>
               {i === 1 ? <span className="ramo"><Icona nome="ramo" /><span className="codice">{d}</span></span> : <span className="testo-dato">{d}</span>}
             </span>
           ))}

@@ -91,7 +91,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
             <span className="avatar" style={colore(colori)}><span className="t-xs medio">{iniziali(titolo)}</span></span>
             <span className="testi">
               <span className="t-base">{titolo}</span>
-              <span className="t-xs secondario">{[utente, conta || quote.length ? `${quote.length || conta} account` : ""].filter(Boolean).join(" · ")}</span>
+              <span className="t-xs secondario">{[utente, conta || quote.length ? `${quote.length || conta} account` : ""].filter(Boolean).join(", ")}</span>
             </span>
             {cambia && <span className="cambia"><Icona nome="giu" /></span>}
           </button>

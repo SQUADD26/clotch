@@ -49,7 +49,7 @@ export function frase(nome: string, ingresso: unknown, uscita = ""): Frase {
     case "Read": return f("Lettura", file);
     case "Grep": case "Glob": {
       const cosa = `"${campo(ingresso, "pattern")}"`, n = uscita ? fileTrovati(uscita) : 0;
-      const dove = n ? ` · ${n} file` : nome === "Grep" && campo(ingresso, "path") ? ` · ${file}` : "";
+      const dove = n ? `, ${n} file` : nome === "Grep" && campo(ingresso, "path") ? `, ${file}` : "";
       return f(nome === "Glob" ? "Ricerca file" : "Ricerca", cosa + dove);
     }
     case "Write": return f("Creazione", file);

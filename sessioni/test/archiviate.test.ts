@@ -14,15 +14,15 @@ const reg = (o: { chat?: Record<string, object>; comandi?: { id: string; cmd: st
   esiti: new Map((o.comandi ?? []).filter((c) => c.esito).map((c) => [c.id, { esito: c.esito!, testo: "" }])),
 });
 
-test("archiviate: solo le archiviate, la più recente prima, «dove» = «<progetto> · <data e ora>»", () => {
+test("archiviate: solo le archiviate, la più recente prima, «dove» = «<progetto> <data e ora>»", () => {
   const r = archiviate([
     app({ cliId: "vecchia", titolo: "Vecchia", cartella: "/Users/x/squadd-v2", ultimaAttivita: Date.UTC(2026, 9, 19, 9, 15) }),
     app({ cliId: "viva", archiviata: false }),
     app({ cliId: "nuova", titolo: "Nuova" }),
   ], reg(), "UTC");
   assert.deepEqual(r, [
-    { id: "nuova", titolo: "Nuova", dove: "clotch · 22 ott 2026, 18:40" },
-    { id: "vecchia", titolo: "Vecchia", dove: "squadd-v2 · 19 ott 2026, 09:15" },
+    { id: "nuova", titolo: "Nuova", dove: "clotch 22 ott 2026, 18:40" },
+    { id: "vecchia", titolo: "Vecchia", dove: "squadd-v2 19 ott 2026, 09:15" },
   ]);
 });
 
@@ -49,8 +49,8 @@ test("archiviate: registro di clotch AI (fine archiviata, comando archivia riusc
       ],
     }), "UTC");
   assert.deepEqual(r, [
-    { id: "c1", titolo: "Dall'app", dove: "clotch · 25 ott 2026, 12:00" },
-    { id: "c2", titolo: "Solo registro", dove: "clotch-ai · 24 ott 2026, 12:00" },
+    { id: "c1", titolo: "Dall'app", dove: "clotch 25 ott 2026, 12:00" },
+    { id: "c2", titolo: "Solo registro", dove: "clotch-ai 24 ott 2026, 12:00" },
     { id: "c3", titolo: "Da comando", dove: "23 ott 2026, 12:00" },
   ]);
 });

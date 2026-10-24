@@ -31,7 +31,7 @@ const Riga = ({ icona, colore, children, lato }: { icona: NomeIcona; colore?: "s
 const doveSta = (s: Sessione) => {
   const cartella = s.cartella.replace(/\/+$/, "");
   const dir = cartella.replace(/\/[^/]*$/, "").replace(/^\/(Users|home)\/[^/]+/, "~");
-  return cartella ? `${cartella.replace(/^.*\//, "")} · ${dir}` : s.progetto;
+  return cartella ? `${cartella.replace(/^.*\//, "")}, ${dir}` : s.progetto;
 };
 
 export function Ambiente({ s }: { s: Sessione }) {

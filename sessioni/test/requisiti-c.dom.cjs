@@ -48,7 +48,7 @@ H.avvia('requisiti-c', async () => {
     assert.equal(await run(() => document.querySelector('.pannello-obiettivo .prova:nth-child(3) span.errore')?.textContent), 'Prova rossa', 'la prova fallita ha il suo stato');
     assert.equal(await run(() => document.querySelectorAll('.pannello-obiettivo .prova span.errore').length), 1, 'solo quella fallita');
     await wait(() => document.querySelectorAll('.apri-pr').length === 3);
-    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1 · unita in dev', 'PR #2', 'PR #3 · aperta verso dev']);
+    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1, unita in dev', 'PR #2', 'PR #3, aperta verso dev']);
     assert.deepEqual(await run(() => [...document.querySelectorAll('.apri-pr')].map((a) => a.getAttribute('href'))), [1, 2, 3].map((n) => `https://example.test/pull/${n}`));
   });
 

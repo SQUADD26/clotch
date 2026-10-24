@@ -87,7 +87,7 @@ export function FineTurno({ ms, strumenti, file, aiutanti }: { ms: number | null
     strumenti && quanti(strumenti, "strumento", "strumenti"),
     file && quanti(file, "file", "file"),
     aiutanti && quanti(aiutanti, "aiutante", "aiutanti"),
-  ].filter(Boolean).join(" · ");
+  ].filter(Boolean).join(", ");
   return <RigaStato icona="finita" colore="successo" esito={ms != null ? `Finita in ${durata(ms)}` : "Finita"} dettaglio={parti} />;
 }
 

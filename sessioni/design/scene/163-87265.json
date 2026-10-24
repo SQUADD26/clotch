@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792851944981,
+    "ultimaAttivita": 1792852151044,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -55,12 +55,12 @@
    {
     "tipo": "utente",
     "testo": "Perché la voce «Assistenza» non si vede nella barra?",
-    "t": 1792851975206
+    "t": 1792852181544
    },
    {
     "tipo": "pensiero",
     "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
-    "t": 1792851976206
+    "t": 1792852182544
    },
    {
     "tipo": "strumento",
@@ -73,7 +73,7 @@
      "testo": "Found 4 files\na\nb\nc\nd",
      "errore": false
     },
-    "t": 1792851990206,
+    "t": 1792852196544,
     "id": "t0"
    },
    {
@@ -86,7 +86,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851990406,
+    "t": 1792852196744,
     "id": "t1"
    },
    {
@@ -99,7 +99,7 @@
      "testo": "",
      "errore": false
     },
-    "t": 1792851990706,
+    "t": 1792852197044,
     "id": "t2"
    },
    {
@@ -112,7 +112,7 @@
      "testo": "Exit code 1",
      "errore": true
     },
-    "t": 1792851993706,
+    "t": 1792852200044,
     "id": "t3"
    },
    {
@@ -125,7 +125,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792851998706,
+    "t": 1792852205044,
     "id": "t4"
    },
    {
@@ -138,7 +138,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852021706,
+    "t": 1792852228044,
     "id": "t5"
    },
    {
@@ -151,7 +151,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852022106,
+    "t": 1792852228444,
     "id": "t6"
    },
    {
@@ -164,7 +164,7 @@
      "testo": "src/a.ts:1:x",
      "errore": false
     },
-    "t": 1792852022406,
+    "t": 1792852228744,
     "id": "t7"
    },
    {
@@ -177,7 +177,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852022606,
+    "t": 1792852228944,
     "id": "t8"
    },
    {
@@ -190,7 +190,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852022906,
+    "t": 1792852229244,
     "id": "t9"
    },
    {
@@ -203,7 +203,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792852023406,
+    "t": 1792852229744,
     "id": "t10"
    },
    {
@@ -216,7 +216,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852032406,
+    "t": 1792852238744,
     "id": "t11"
    },
    {
@@ -227,7 +227,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792852038006,
+    "t": 1792852244344,
     "id": "t12"
    },
    {
@@ -238,7 +238,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792852050006,
+    "t": 1792852256344,
     "id": "t13"
    },
    {
@@ -252,7 +252,7 @@
      "testo": "Ho trovato 3 ruoli: admin, supporto, ospite.",
      "errore": false
     },
-    "t": 1792852059006,
+    "t": 1792852265344,
     "id": "t14"
    },
    {
@@ -265,7 +265,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852063006,
+    "t": 1792852269344,
     "id": "t15"
    },
    {
@@ -278,7 +278,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792852064006,
+    "t": 1792852270344,
     "id": "t16"
    },
    {
@@ -288,7 +288,7 @@
      "file_path": "sessioni/src/ui/chat/Filo.tsx"
     },
     "esito": null,
-    "t": 1792852065006,
+    "t": 1792852271344,
     "id": "t17"
    }
   ]

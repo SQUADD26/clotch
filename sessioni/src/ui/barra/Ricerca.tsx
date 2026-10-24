@@ -30,7 +30,7 @@ export async function copiaUltimoBlocco(id: string) {
 /** «clotch-ai-mac-v2 · Codex»: l'account solo se non è il nome della sorgente (101:10247). */
 const dettaglio = (s: Sessione) => {
   const account = nomeAccount(s.account);
-  return [s.progetto, nomeSorgente(s.sorgente), account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : account].filter(Boolean).join(" · ");
+  return [s.progetto, nomeSorgente(s.sorgente), account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : account].filter(Boolean).join(", ");
 };
 
 /** La parola cercata in evidenza dentro un testo (#865): peso medio e colore primario. */

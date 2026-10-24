@@ -19,14 +19,14 @@
     "limite": null,
     "richieste": [],
     "contestoMax": null,
-    "battito": 1792846174419,
+    "battito": 1792852241136,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792851120000,
+    "visto": 1792852241136,
     "fine": null,
     "fineT": null,
     "chatNuova": null,
@@ -80,7 +80,7 @@
     "annullata": false
    },
    {
-    "id": "r-000000000007",
+    "id": "r-000000000006",
     "t": 1792849200000,
     "cosa": "Fermata la sessione «Notch: avviso schermo»",
     "perche": "",
@@ -92,7 +92,7 @@
     "annullata": false
    },
    {
-    "id": "r-000000000008",
+    "id": "r-000000000007",
     "t": 1792851120000,
     "cosa": "Consentita la migrazione 0042 su dev",
     "perche": "",

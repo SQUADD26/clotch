@@ -43,5 +43,5 @@ export const fraseDi = (b: BloccoStrumento): Frase =>
   b.tipo === "strumento" ? b.frase : frase(/^https?:\/\//.test(b.query) ? "WebFetch" : "WebSearch", { url: b.query, query: b.query });
 
 /** «· uscita 1» di un comando non riuscito («Exit code 1» nell'esito); senza codice, «· non riuscito». */
-export const esitoErrore = (uscita: string) => { const c = uscita.match(/exit code (\d+)/i); return c ? `· uscita ${c[1]}` : "· non riuscito"; };
+export const esitoErrore = (uscita: string) => { const c = uscita.match(/exit code (\d+)/i); return c ? `uscita ${c[1]}` : "non riuscito"; };
 
