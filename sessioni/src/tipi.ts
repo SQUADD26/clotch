@@ -8,6 +8,8 @@ export type Stato = "lavora" | "aspetta" | "ferma" | "finita";
 export interface Prova {
   testo: string;
   fatta: boolean;
+  /** Non fatta e l'ultimo tentativo del registro è rosso (`nota`). «In corso» il registro non lo scrive: non si mostra. */
+  fallita?: boolean;
 }
 
 export interface Obiettivo {
@@ -68,11 +70,16 @@ export interface AppSessione {
   remoto: boolean;
 }
 
+/** Una PR della sessione; `stato` null = la trascrizione dà solo il link (`pr-link`), non lo stato. */
+export interface PrInfo { numero: number; url: string; stato: PrSessione["stato"] | null; verso: string | null }
+
 /** Numeri che la trascrizione dà (`info-sessione.ts`): pannello «Info sessione». */
 export interface InfoSessione {
   /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
   contesto: number | null;
   file: { quanti: number; aggiunte: number; tolte: number };
+  /** Tutte le PR della sessione (file dell'app + `pr-link` della trascrizione); assente = nessuna. */
+  prs?: PrInfo[];
 }
 
 export interface ErroreLettura {

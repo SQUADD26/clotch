@@ -306,4 +306,19 @@ H.avvia('requisiti-a', async () => {
     H.azzera(); await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Leggi con clotch AI'); await attesa(50);
     assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
   });
+
+  await req('C7', async () => { // prova «fallita» dal registro; tutte le PR (con stato o solo col link), non solo l'ultima
+    const pr = (n, stato, verso) => ({ numero: n, url: `https://example.test/pull/${n}`, stato, verso });
+    nuova((s) => {
+      s.elenco.sessioni[0].obiettivo = { testo: 'Obiettivo di prova', stato: 'aperto', valido: true, prove: [{ testo: 'Prova verde', fatta: true }, { testo: 'Prova rossa', fatta: false, fallita: true }, { testo: 'Prova da fare', fatta: false }] };
+      s.info = { s1: { contesto: 1000, file: { quanti: 0, aggiunte: 0, tolte: 0 }, prs: [pr(1, 'unita', 'dev'), pr(2, null, null), pr(3, 'aperta', 'dev')] } };
+    });
+    await caricaChat(); await clicca('button', 'Pannello'); await wait(() => document.querySelectorAll('.pannello-info .scheda').length > 0);
+    assert.equal(await run(() => document.querySelector('.pannello-obiettivo .prova:nth-child(3) span.errore')?.textContent), 'Prova rossa', 'la prova fallita ha il suo stato');
+    assert.equal(await run(() => document.querySelectorAll('.pannello-obiettivo .prova span.errore').length), 1, 'solo quella fallita');
+    await wait(() => document.querySelectorAll('.apri-pr').length === 3);
+    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1 · unita in dev', 'PR #2', 'PR #3 · aperta verso dev']);
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.apri-pr')].map((a) => a.getAttribute('href'))), [1, 2, 3].map((n) => `https://example.test/pull/${n}`));
+  });
+
 });

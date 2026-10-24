@@ -1,7 +1,7 @@
 // figma: 101-33775 — schede del pannello «Info sessione» (componente «Pannello info» 101:33614): Ambiente, Contesto, Connettori, Modifiche.
 // Contesto: le categorie (messaggi, file di memoria, strumenti…) le dà solo il comando /context di Claude Code e non stanno nei file: qui il totale usato.
-import { useState, type ReactNode } from "react";
-import type { InfoSessione, PrSessione, Sessione } from "../../tipi";
+import { Fragment, useState, type ReactNode } from "react";
+import type { InfoSessione, PrInfo, Sessione } from "../../tipi";
 import { ICONA_PR } from "../barra/Pr";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { nomeAccount } from "../chat/testi";
@@ -83,16 +83,20 @@ export function Connettori({ nomi }: { nomi: string[] }) {
   );
 }
 
-// shortcut: la scheda mostra l'ultima PR della sessione (le altre stanno su GitHub); lo stato «bozza» non è nei file dell'app
-export function Modifiche({ file, pr }: { file: InfoSessione["file"]; pr: PrSessione | undefined }) {
+// shortcut: lo stato «bozza» non è nei file dell'app; di una PR della sola trascrizione (stato null) si sa il numero: icona neutra «link», niente stato
+export function Modifiche({ file, prs }: { file: InfoSessione["file"]; prs: PrInfo[] }) {
   const [aperta, setAperta] = useState(true);
   return (
     <Scheda titolo="Modifiche" aperta={aperta} onAlterna={() => setAperta(!aperta)}>
       {file.quanti > 0 && (
         <Riga icona="file" lato={<span className="t-sm secondario">+{file.aggiunte} −{file.tolte}</span>}>{file.quanti} file</Riga>
       )}
-      {pr && <Riga icona={ICONA_PR[pr.stato][0]} colore={ICONA_PR[pr.stato][1]}>{testoPr(pr)}</Riga>}
-      {pr && <a className="bottone secondario apri-pr" href={pr.url} target="_blank" rel="noreferrer noopener">Apri la PR</a>}
+      {prs.map((pr) => (
+        <Fragment key={pr.url}>
+          {pr.stato ? <Riga icona={ICONA_PR[pr.stato][0]} colore={ICONA_PR[pr.stato][1]}>{testoPr({ ...pr, stato: pr.stato })}</Riga> : <Riga icona="link">PR #{pr.numero}</Riga>}
+          <a className="bottone secondario apri-pr" href={pr.url} target="_blank" rel="noreferrer noopener" aria-label={`Apri la PR #${pr.numero}`}>Apri la PR</a>
+        </Fragment>
+      ))}
     </Scheda>
   );
 }
