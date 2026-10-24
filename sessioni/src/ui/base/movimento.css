@@ -8,6 +8,9 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
     opacity var(--tempo-pressione) var(--curva-entrata), transform var(--tempo-pressione) var(--curva-entrata);
 }
 :is(.bottone, .bottone-icona, .pillola, .pillola-filtro, .chip):active:not(:disabled) { transform: scale(var(--scala-premuto)); }
+/* bottoni pieni (primario, invio): al passaggio e premuti schiariscono con opacita-passaggio e opacita-premuto */
+:is(.bottone.primario, .bottone-invia):hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+:is(.bottone.primario, .bottone-invia):active:not(:disabled) { opacity: var(--opacita-premuto); }
 
 /* fine dell'avvio (101-30345): il corpo compare con dissolvenza quando arriva l'elenco */
 .cornice .corpo { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
@@ -30,7 +33,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 
 @keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
 @keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
-@keyframes compare { from { opacity: 0; transform: translateY(var(--spazio-1)) scale(var(--scala-entrata, 1)); } }
+@keyframes compare { from { opacity: 0; transform: translateY(var(--spazio-1)) scale(var(--scala-entrata)); } }
 @keyframes dissolve { from { opacity: 0; } }
 ::view-transition-new(barra):only-child { animation-name: scivola-barra; }
 ::view-transition-old(barra):only-child { animation-name: scivola-barra; animation-direction: reverse; }
