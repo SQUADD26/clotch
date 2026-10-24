@@ -69,7 +69,7 @@ app.whenReady().then(async () => {
     await misura('MOV-002', 'barra aperta', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E]]);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
     // pannello: il bottone gira obiettivo -> info -> chiuso
-    const pannello = clic('button[aria-label="Mostra pannello"]');
+    const pannello = clic('.intestazione button[aria-expanded]:is([aria-label="Mostra il pannello"], [aria-label="Chiudi il pannello"], [aria-label="Mostra Info sessione"])');
     const statoPannello = () => run(() => !!document.querySelector('.pannello'));
     while (!(await statoPannello())) await run(`(${pannello})()`), await new Promise((r) => setTimeout(r, 300));
     await misura('MOV-003', 'pannello info', pannello, [['::view-transition-group(pannello)', ...S]]);
@@ -85,10 +85,10 @@ app.whenReady().then(async () => {
     await wait(() => !!document.querySelector('.pezzo-chat .testata[aria-expanded="false"]'));
     await misura('MOV-017', 'blocco del filo aperto', clic('.pezzo-chat .testata[aria-expanded="false"]'), [['::view-transition-new(superficie)', ...E], ['::view-transition-old(superficie)', ...E]]);
     await misura('MOV-017', 'blocco del filo chiuso', clic('.pezzo-chat .testata[aria-expanded="true"]'), [['::view-transition-new(superficie)', ...E]]);
-    // avviso: «Nascondi cartella» dal menu della cartella, poi chiuso dalla sua X
-    await run(() => document.querySelector('.pezzo-barra button.riga[aria-expanded]').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 40, clientY: 200 })));
-    await wait(() => [...document.querySelectorAll('[role="menuitem"], .voce')].some((v) => v.textContent.includes('Nascondi cartella')));
-    const r = await misura('MOV-009', 'avviso entra', `() => [...document.querySelectorAll('[role="menuitem"], .voce')].find((v) => v.textContent.includes('Nascondi cartella')).click()`, [], 400);
+    // avviso: «Copia ID sessione» dal menu della riga (avviso di esito, barra/esiti.ts), poi chiuso dalla sua X
+    await run(() => document.querySelector('.riga-sessione').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 40, clientY: 200 })));
+    await wait(() => [...document.querySelectorAll('[role="menuitem"], .voce')].some((v) => v.textContent.includes('Copia ID sessione')));
+    const r = await misura('MOV-009', 'avviso entra', `() => [...document.querySelectorAll('[role="menuitem"], .voce')].find((v) => v.textContent.includes('Copia ID sessione')).click()`, [], 400);
     const avviso = r.animazioni.find((a) => /view-transition-new\(avviso-\d+\)/.test(a.pseudo));
     assert.ok(avviso, 'MOV-009: l\'avviso entra con la sua transizione');
     console.log(`MOV MOV-009 avviso entra ${avviso.pseudo} durata=${avviso.durata}ms curva=${curva(avviso.curva)}`);
@@ -101,7 +101,7 @@ app.whenReady().then(async () => {
     await run(() => [...document.querySelectorAll('.avviso-comparsa button')].find((b) => b.textContent === 'Annulla')?.click());
 
     // sovrapposto chiuso a metà apertura (M10): l'uscita parte dall'opacità raggiunta, non da 1
-    await run(`(${clic('button[aria-label="Altro"]')})()`);
+    await run(`(${clic('.intestazione button[aria-haspopup="menu"]')})()`);
     await new Promise((r) => setTimeout(r, 50));
     const aperto = await run(() => Number(getComputedStyle(document.querySelector('.sovrapposto')).opacity));
     const uscita = await run(`window.registra(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), 300)`);
