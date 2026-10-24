@@ -1,5 +1,5 @@
-/* figma: 131-59690 — risposta formattata, scuro (chiaro 140-60134): titoli, paragrafi, elenchi, codice, citazione, linea, tabella.
-   figma: 140-60491 — tabella larga e lunga, scuro (chiaro 140-62309): colonna e intestazione fisse, barre di scorrimento.
+/* figma: 131-59690 — risposta formattata, scuro: titoli, paragrafi, elenchi, codice, citazione, linea, tabella.
+   figma: 140-60491 — tabella larga e lunga, scuro: colonna e intestazione fisse, barre di scorrimento.
    I numeri sono variabili di Figma (token.css). */
 .pezzo-chat .markdown { display: flex; flex-direction: column; gap: var(--spazio-3); min-width: 0; }
 .pezzo-chat .markdown > * { margin: 0; }
