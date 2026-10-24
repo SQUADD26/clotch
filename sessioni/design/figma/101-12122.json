@@ -4,8 +4,7 @@
   "id": "101:12122",
   "nome": "Barra laterale",
   "w": 266,
-  "h": 856,
-  "dentro": "101:12118"
+  "h": 856
  },
  "variabili": {
   "spazio/0-5": 2,
@@ -18,6 +17,8 @@
   "colore/testo/primario": "#ffffff",
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
+  "colore/fondo/bottone-secondario": "#ffffff0d",
+  "raggio/xs": 5,
   "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
@@ -32,7 +33,6 @@
   "colore/sessione/grigio": "#c4c8ce",
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
-  "colore/fondo/bottone-secondario": "#ffffff0d",
   "raggio/pieno": 9999,
   "misura/bottone": 28
  },
@@ -128,7 +128,7 @@
    "box": {
     "x": 40,
     "y": 6,
-    "w": 181,
+    "w": 165,
     "h": 20
    },
    "variabili": {
@@ -141,11 +141,31 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I117:51603;117:51476;101:7175",
-   "nome": "scorciatoia",
+   "id": "I117:51603;117:51476;154:71334",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 213,
+    "y": 5,
+    "w": 37,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51603;117:51476;154:71334;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 229,
+    "x": 221,
     "y": 7,
     "w": 21,
     "h": 18
@@ -216,7 +236,7 @@
    "box": {
     "x": 40,
     "y": 40,
-    "w": 202,
+    "w": 210,
     "h": 20
    },
    "variabili": {
@@ -229,13 +249,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I117:51603;117:51481;101:7175",
-   "nome": "scorciatoia",
+   "id": "I117:51603;117:51481;154:71334;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 250,
+    "x": 221,
     "y": 41,
-    "w": 0,
+    "w": 21,
     "h": 18
    },
    "variabili": {
@@ -244,7 +264,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "",
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
@@ -405,7 +425,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I117:51603;117:51495;101:7175",
+   "id": "I117:51603;117:51495;154:73440",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -421,6 +441,25 @@
    },
    "senza": [],
    "testo": "3",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51603;117:51495;154:71334;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 221,
+    "y": 109,
+    "w": 21,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
@@ -480,7 +519,7 @@
    "box": {
     "x": 40,
     "y": 142,
-    "w": 202,
+    "w": 210,
     "h": 20
    },
    "variabili": {
@@ -493,13 +532,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I117:51603;117:51500;101:7175",
-   "nome": "scorciatoia",
+   "id": "I117:51603;117:51500;154:71334;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 250,
+    "x": 221,
     "y": 143,
-    "w": 0,
+    "w": 21,
     "h": 18
    },
    "variabili": {
@@ -508,7 +547,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "",
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
@@ -568,7 +607,7 @@
    "box": {
     "x": 40,
     "y": 176,
-    "w": 202,
+    "w": 210,
     "h": 20
    },
    "variabili": {
@@ -581,13 +620,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I117:51603;117:51505;101:7175",
-   "nome": "scorciatoia",
+   "id": "I117:51603;117:51505;154:71334;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 250,
+    "x": 221,
     "y": 177,
-    "w": 0,
+    "w": 21,
     "h": 18
    },
    "variabili": {
@@ -596,7 +635,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "",
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
