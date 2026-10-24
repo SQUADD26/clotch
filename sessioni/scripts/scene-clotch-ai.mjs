@@ -5,12 +5,14 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 
 const radice = path.join(path.dirname(new URL(import.meta.url).pathname), "..");
 const require = createRequire(import.meta.url);
 const { leggiRegistro } = require(path.join(radice, "dist/src/clotch-ai.js"));
 const { piano } = require(path.join(radice, "dist/src/clotch-ai-ipc.js"));
+const { canonico } = require(path.join(radice, "dist/src/clotch-ai-ricevuta.js"));
 const MOTORE = "friday"; // nome del protocollo del motore
 
 const ora = Date.now();
@@ -124,10 +126,17 @@ for (const [id, [vista, sezione, righe]] of Object.entries(SCENE)) {
   if (righe) {
     const ordinate = [...righe].sort((a, b) => a[0].localeCompare(b[0]));
     const n = new Map();
-    const testo = ordinate.map(([t, c, tipo, dati], i) => {
+    const eventi = ordinate.map(([t, c, tipo, dati], i) => {
       n.set(c, (n.get(c) ?? 0) + 1);
-      return JSON.stringify({ v: 1, id: `r-${String(i).padStart(12, "0")}`, t, n: n.get(c), chat: c, macchina: "mac", hook_v: "scena", tipo, dati });
-    }).join("\n") + "\n";
+      return { v: 1, id: `r-${String(i).padStart(12, "0")}`, t, n: n.get(c), chat: c, macchina: "mac", hook_v: "scena", tipo, dati };
+    });
+    const testo = eventi.map((e) => JSON.stringify(e)).join("\n") + "\n";
+    // «Revoca» c'è solo con la ricevuta locale del motore (#1043): la scena la scrive per ogni decisione con `inverso`
+    const ricevute = path.join(casa, ".claude", "friday", "eventi-locali", "decisione");
+    for (const e of eventi.filter((e) => e.tipo === "decisione" && e.chat === MOTORE && Array.isArray(e.dati.inverso))) {
+      fs.mkdirSync(ricevute, { recursive: true });
+      fs.writeFileSync(path.join(ricevute, e.id), createHash("sha256").update(canonico(e), "utf8").digest("hex"));
+    }
     fs.writeFileSync(path.join(reg, `${new Date(ora).toISOString().slice(0, 7)}.jsonl`), testo);
   } else fs.writeFileSync(path.join(reg, "2026-10.jsonl"), "", { mode: 0 }); // registro non leggibile: il lettore lo mette in `errori`
   let registro = piano(leggiRegistro(casa));

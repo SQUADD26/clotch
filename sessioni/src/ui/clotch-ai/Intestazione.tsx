@@ -9,10 +9,13 @@ import type { StatoVoce } from "./statoVoce";
 import { orario } from "./formato";
 import { casella, decisioniPerGiorno, statoClotchAi } from "./vista";
 import { useVoce } from "./dettatura";
+import { inAttesa } from "./StatoRegistro";
 
 type Colore = "secondaria" | "accento" | "successo" | "errore";
 interface Testa { icona: NomeIcona; accento?: boolean; titolo: string; segno?: [NomeIcona, Colore]; stato: string }
 
+
+const VISTE_REGISTRO: Record<string, [NomeIcona, string]> = { casella: ["posta", "Casella"], decisioni: ["libro", "Decisioni"], regole: ["scudo", "Regole"] };
 
 const SEGNO_CLOTCH_AI: Record<string, [NomeIcona, Colore]> = { attiva: ["microfono", "successo"], spenta: ["avviso", "errore"], pausa: ["luna", "secondaria"] };
 
@@ -23,19 +26,24 @@ const STATO_VOCE: Record<StatoVoce, [NomeIcona, Colore, string]> = {
 
 function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" | "riavvio" | null, voce: StatoVoce | null): Testa {
   const r = s.dati;
+  const lista = VISTE_REGISTRO[vista];
+  if (lista) {
+    const [icona, titolo] = lista, attesa = inAttesa(s);
+    // finché il registro non si legge non si sa se è vuoto (#1044)
+    if (attesa) return { icona, titolo, segno: attesa === "carica" ? ["spinner", "secondaria"] : ["avviso", "errore"], stato: attesa === "carica" ? "Leggendo il registro…" : "Registro non leggibile" };
+  }
   if (vista === "decisioni") {
-    const g = r ? decisioniPerGiorno(r, Date.now()) : [];
+    const g = decisioniPerGiorno(r!, Date.now());
+    const tot = g.reduce((a, x) => a + x.voci.length, 0);
     const n = g.filter((x) => x.titolo === "Oggi" || x.titolo === "Ieri").reduce((a, x) => a + x.voci.length, 0);
-    return { icona: "libro", titolo: "Decisioni", stato: g.length ? `${plurale(n, "decisione", "decisioni")} tra oggi e ieri` : "Nessuna decisione" };
+    return { icona: "libro", titolo: "Decisioni", stato: !tot ? "Nessuna decisione" : n === tot ? `${plurale(n, "decisione", "decisioni")} tra oggi e ieri` : plurale(tot, "decisione", "decisioni") };
   }
   if (vista === "regole") {
-    const n = r?.regole.length ?? 0;
+    const n = r!.regole.length;
     return { icona: "scudo", titolo: "Regole", stato: n ? plurale(n, "regola", "regole") : "Nessuna regola" };
   }
   if (vista === "casella") {
-    if (s.stato === "carica") return { icona: "posta", titolo: "Casella", segno: ["spinner", "secondaria"], stato: "Leggendo il registro…" };
-    if (!r || s.stato === "errore" || r.errori.length) return { icona: "posta", titolo: "Casella", segno: ["avviso", "errore"], stato: "Registro non leggibile" };
-    const c = casella(r, Date.now());
+    const c = casella(r!, Date.now());
     if (!c.aspettano) return { icona: "posta", titolo: "Casella", segno: ["finita", "successo"], stato: "Niente in attesa" };
     return { icona: "posta", titolo: "Casella", segno: ["mano", "accento"], stato: `${c.aspettano === 1 ? "1 aspetta te" : `${c.aspettano} aspettano te`} ${c.alLavoro} al lavoro` };
   }
