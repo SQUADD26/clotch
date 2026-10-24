@@ -164,7 +164,7 @@ app.whenReady().then(async () => {
     await run(() => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     assert.deepEqual(await sidebar(), ['Beta due'], 'solo Codex');
     assert.match(await run(() => document.querySelector('.pillola-filtro')?.textContent || ''), /Sorgente:\s*Codex/);
-    await clicca('.pillola-filtro', 'Sorgente:Codex'); await clicca('.menu-filtro .voce .etichetta', 'Codex'); // tolta la spunta: nessun filtro
+    await clicca('.pillola-filtro .apri', 'Sorgente:Codex'); await clicca('.menu-filtro .voce .etichetta', 'Codex'); // tolta la spunta: nessun filtro
     await run(() => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     assert.deepEqual(await sidebar(), ['Beta due', 'Gamma tre', 'Alfa uno'], 'ordine per ultima attività');
     await clicca('.barra-laterale .riga .testo', 'Filtra'); await clicca('.menu .voce .etichetta', 'Nome');

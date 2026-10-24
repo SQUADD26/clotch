@@ -17,7 +17,7 @@ let giorniCache: { quando: number; dati: Awaited<ReturnType<typeof usoAlGiorno>>
 export async function quoteUso(ora = Date.now(), leggi: () => Promise<unknown> = leggiFeed): Promise<QuotaUso[]> {
   if (cache && ora - cache.quando < CACHE_MS) return cache.dati;
   inVolo ??= leggi().then((json) => {
-    const dati = quoteDalFeed(json, Date.now());
+    const dati = quoteDalFeed(json, ora); // `ora` passato, non l'orologio: la prova con ora fissa non scade
     if (!dati) throw new Error("risposta del feed non valida");
     cache = { quando: Date.now(), dati };
     return dati;

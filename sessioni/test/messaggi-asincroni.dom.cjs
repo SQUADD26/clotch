@@ -189,7 +189,7 @@ app.whenReady().then(async () => {
 
     const invalid = await fetch('NoProtocol', [user('Non accettare legacy')]);
     await settle(invalid, { messaggi: [user('Non accettare legacy')], pagina: 0, haAltre: false, totale: 1, errore: null });
-    assert.equal(await run('probe.stato'), 'errore'); assert.match(await run('probe.errore'), /Protocollo cronologia/);
+    assert.equal(await run('probe.stato'), 'errore'); assert.match(await run('probe.errore'), /Messaggi non leggibili/);
     assert.equal(await run('probe.messaggi.length'), 0); console.log('ASYNC_V1_MISSING_METADATA_REJECTED');
     console.log('ASYNC_CHAT_ISOLATION_OK');
 

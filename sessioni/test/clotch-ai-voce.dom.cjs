@@ -84,11 +84,11 @@ app.whenReady().then(async () => {
       ipcMain.removeHandler('clotch-ai:comando');
       ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
     });
-    await check('TESTO_DI_CLOTCH_DAL_VIVO', async () => { // il parziale del registro finisce nella stessa vista della dettatura; senza testo torna «Parla…»
+    await check('TESTO_DI_CLOTCH_DAL_VIVO', async () => { // il parziale del registro finisce nella stessa vista della dettatura; senza testo torna «In ascolto…» (#812)
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA, testo: 'apri il notch' } }));
       await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'apri il notch');
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA } }));
-      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'Parla…');
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'In ascolto…');
     });
     await check('STA_PARLANDO_APP_INTERROMPI', async () => {
       await carica(registro({ voceApp: true }), { voce: true });
