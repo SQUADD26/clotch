@@ -22,6 +22,11 @@ extension VoiceInputController {
             ("6b-errore-crediti", fail(.credits)),
             ("6c-errore-rete", fail(.network)),
             ("6d-errore-locale", fail(.local)),
+            ("7-tocco", { let c = VoiceInputController.still(.sending, sure: "Fai il deploy in produzione adesso", elapsed: 0.5); c.awaitingTouch = true; return c }()),
+            ("8-non-e-la-voce", fail(.notYou)),
+            ("8b-voce-incerta", fail(.unsure)),
+            ("8c-manca-impronta", fail(.noVoiceprint)),
+            ("8d-mac-bloccato", fail(.locked)),
         ]
     }
 }

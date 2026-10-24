@@ -22,7 +22,7 @@ final class VoiceHelperFakeTests: XCTestCase {
     private var realPrompt: String? { try? String(contentsOf: VoiceFiles().helperPromptURL, encoding: .utf8) }
 
     private func controller() -> (VoiceInputController, Calls) {
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         let calls = Calls()
         c.ask = { q, h in calls.list.append((q, h)); return .success("Risposta finta") }
         c.speak = { _ in }
