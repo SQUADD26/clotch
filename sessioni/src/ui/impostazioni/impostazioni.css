@@ -101,3 +101,11 @@
 .pezzo-impostazioni .indietro:hover { color: var(--colore-testo-primario); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"] { border-radius: var(--raggio-xs); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"]:hover { background: var(--colore-fondo-riga-passaggio); }
+
+/* finestra stretta (155:74691): navigazione nascosta, titolo = selettore della sezione, «Cartella del registro» a capo */
+.pezzo-impostazioni .impostazioni.stretta .nav-impostazioni { display: none; }
+.pezzo-impostazioni .scelta-sezione { position: relative; align-self: flex-start; }
+.pezzo-impostazioni .scelta-sezione .valore { display: flex; align-items: center; gap: var(--spazio-1); font: inherit; }
+.pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) { flex-wrap: wrap; }
+.pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) .testi { flex-basis: 100%; }
+.pezzo-impostazioni .impostazioni.stretta .campo-testo { flex: 1; max-width: none; }

@@ -8,6 +8,7 @@ import * as pannello from "./pannello";
 import "./base/token.css";
 import "./base/stile.css";
 import "./base/fuoco.css";
+import "./base/movimento.css";
 import { Cornice } from "./base/Cornice";
 import { Pezzo } from "./base/Pezzo";
 

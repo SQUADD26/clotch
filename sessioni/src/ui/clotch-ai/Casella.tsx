@@ -13,6 +13,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { clotchAi, useRegistro } from "./dati";
 import { AvvisoRosso, Vuoto } from "./Pezzi";
 import { casella, type Progetto } from "./vista";
+import { conTransizione } from "../base/movimento";
 
 const RIPROVA_MS = 10_000; // «Riprovo tra 10 s.» del frame 101-36225
 const PASSO: Record<string, [NomeIcona, "successo" | "accento" | "secondaria"]> = {
@@ -73,7 +74,7 @@ function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
           ))}
         </div>
       )}
-      <button type="button" className="riga-f" aria-expanded={aperto} disabled={!fatte.length} onClick={() => setAperto(!aperto)}>
+      <button type="button" className="riga-f" aria-expanded={aperto} disabled={!fatte.length} onClick={() => conTransizione(() => setAperto(!aperto))}>
         <Icona nome={aperto ? "giu" : "destra"} />
         <span className="t-sm secondario">Fatto oggi: {fatte.length}</span>
       </button>

@@ -23,7 +23,8 @@ function progresso(serie) {
 export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
   const d = [], D = (criterio, a, valore) => d.push({ criterio, dove: a?.dove ?? dove, valore });
   for (const a of c.animazioni) {
-    const lay = a.proprieta.filter((p) => LAYOUT.test(p));
+    // il gruppo di una View Transition (base/movimento.css, #520) cambia misura alla foto, fuori dalla pagina: nessun ricalcolo del layout
+    const lay = /::view-transition-group\(/.test(a.dove) ? [] : a.proprieta.filter((p) => LAYOUT.test(p));
     if (lay.length) D('MLAYOUT', a, `anima ${lay.join(', ')}`);
     if (ridotto && (a.infinita || a.proprieta.some((p) => MOSSA.test(p)))) {
       const s = a.serie, mosso = s.some((x) => Math.hypot(x[2] - s[0][2], x[3] - s[0][3]) > 0.5 || Math.abs(x[4] - s[0][4]) > 0.005);
@@ -36,8 +37,11 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
       const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata / 2), meta = i >= 0 ? p[i] : null;
       if (a.durata > 100 && meta != null && Math.abs(meta - 0.5) < 0.08) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
     } else if (a.durata > 100 && a.curva === 'linear') D('M3', a, `curva dichiarata lineare (${a.nome})`);
+    // M5 dal gesto che l'ha fatta partire: l'ultimo prima del suo primo fotogramma (premuto, clic o tasto). Il tempo di un fotogramma
+    // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
+    const gesto = (c.eventi ?? [c.evento]).filter((g) => g != null && t0 != null && g <= t0 + 1000 / 60).at(-1);
     // un avviso a comparsa nasce dalla risposta del main, non dal gesto: la sua partenza non misura la prontezza
-    if (!a.avviso && c.evento != null && t0 != null && t0 - c.evento > 50) D('M5', a, `parte ${Math.round(t0 - c.evento)} ms dopo il gesto`);
+    if (!a.avviso && gesto != null && t0 - gesto > 50) D('M5', a, `parte ${Math.round(t0 - gesto)} ms dopo il gesto`);
   }
   const dt = c.T.slice(1).map((t, i) => t - c.T[i]).sort((a, b) => a - b);
   const fps = dt.length ? 1000 / dt[Math.floor(dt.length / 2)] : 60, lunghi = dt.filter((x) => x > 50).length;

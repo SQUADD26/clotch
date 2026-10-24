@@ -90,8 +90,9 @@
 
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
-    let ev = null; const l = () => (ev ??= performance.now());
-    addEventListener('pointerdown', l, { capture: true, once: true }); addEventListener('keydown', l, { capture: true, once: true });
+    // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
+    let ev = null; const eventi = [], l = () => { const t = performance.now(); ev ??= t; eventi.push(t); }, GESTI = ['pointerdown', 'pointerup', 'keydown'];
+    GESTI.forEach((g) => addEventListener(g, l, { capture: true }));
     const prima = new Set(document.getAnimations()), anim = new Map(), T = [];
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
@@ -101,12 +102,14 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]'), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
           anim.get(a).serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
-        t - t0 < ms ? requestAnimationFrame(passo) : ok({ evento: ev, T, animazioni: [...anim.values()] });
+        if (t - t0 < ms) return requestAnimationFrame(passo);
+        GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));
+        ok({ evento: ev, eventi, T, animazioni: [...anim.values()] });
       };
       requestAnimationFrame(passo);
     });

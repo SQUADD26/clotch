@@ -4,7 +4,8 @@
   "id": "101:16778",
   "nome": "menu filtro",
   "w": 260,
-  "h": 295
+  "h": 295,
+  "dentro": "101:10017"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",

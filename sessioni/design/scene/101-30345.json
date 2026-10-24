@@ -5,16 +5,7 @@
  },
  "avvio": true,
  "registro": {
-  "chat": {
-   "s1": {
-    "chat": "s1",
-    "coda": [],
-    "richieste": [],
-    "aiutanti": {},
-    "passi": [],
-    "contestoMax": 200000
-   }
-  },
+  "chat": {},
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

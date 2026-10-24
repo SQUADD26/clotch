@@ -5,6 +5,7 @@ import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import "../base/evidenza.css";
 import "./trova.css";
+import { conTransizione } from "../base/movimento";
 
 const RADICE = ".contenuto";
 
@@ -59,9 +60,7 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
 
   // il tasto lo sceglie l'utente (Impostazioni · Scorciatoie, azione «trova»); lo ascolta il gestore dei tasti dell'app
   useEffect(() => registraAzione("trova", () => {
-    setAperta(true);
-    campo.current?.focus();
-    campo.current?.select();
+    void conTransizione(() => setAperta(true)).then(() => { campo.current?.focus(); campo.current?.select(); });
   }), []);
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
   }, [r, i]);
 
   if (!aperta) return null;
-  const chiudi = () => { setAperta(false); document.querySelector<HTMLTextAreaElement>(".area-casella textarea")?.focus(); }; // il fuoco torna alla casella, non cade sulla pagina
+  const chiudi = () => void conTransizione(() => setAperta(false)).then(() => document.querySelector<HTMLTextAreaElement>(".area-casella textarea")?.focus()); // il fuoco torna alla casella, non cade sulla pagina
   const vai = (passo: number) => { if (r.length) { scorrere.current = true; setK((i + passo + r.length) % r.length); } };
   return (
     <div className="trova" role="search">

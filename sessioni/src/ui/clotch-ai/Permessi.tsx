@@ -15,7 +15,7 @@ export function usePermessi() {
   return [...(r?.chat.values() ?? [])].filter((c) => !c.fine && c.chat !== "friday" && c.chat !== "terminale").flatMap((c) => { // nome del protocollo del motore
     const s = elenco.find((x) => x.id === c.chat);
     return c.richieste.filter((q) => q.genere === "permesso").map((q) => ({
-      chat: c.chat, r: q, titolo: `${c.titolo ?? s?.titolo ?? c.chat} chiede un permesso`, da: s ? daQuanto(s.ultimaAttivita, ora) : null,
+      chat: c.chat, r: q, titolo: `${c.titolo ?? s?.titolo ?? c.chat} chiede un permesso`, da: (q.t ?? s?.ultimaAttivita) ? daQuanto((q.t ?? s?.ultimaAttivita)!, ora) : null,
     }));
   });
 }

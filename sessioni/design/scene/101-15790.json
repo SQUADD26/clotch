@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792844308690,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,8 +44,7 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": "",
-    "contesto": 124000
+    "file": ""
    }
   ],
   "errori": []
@@ -55,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Spedisci tutto in produzione.",
-    "t": 1792844306290
+    "t": 1792793047131
    },
    {
     "tipo": "strumento",
@@ -67,14 +66,14 @@
      "testo": "PreToolUse:Bash git push su main non è permesso. La sessione prova un’altra strada.",
      "errore": true
     },
-    "t": 1792844307290,
+    "t": 1792793048131,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Apro la PR verso dev: la promozione a main parte da lì.",
     "modello": "claude-opus-5-5",
-    "t": 1792844307690
+    "t": 1792793048531
    }
   ]
  },
@@ -84,16 +83,7 @@
   }
  },
  "registro": {
-  "chat": {
-   "s1": {
-    "chat": "s1",
-    "coda": [],
-    "richieste": [],
-    "aiutanti": {},
-    "passi": [],
-    "contestoMax": 200000
-   }
-  },
+  "chat": {},
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

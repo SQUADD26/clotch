@@ -18,11 +18,10 @@
     "modello": "claude-opus-5-5",
     "stato": "ferma",
     "perche": null,
-    "ultimaAttivita": 1792844308690,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": null,
     "situazione": null,
     "file": "",
-    "contesto": 124000,
     "icona": "microfono"
    }
   ],
@@ -37,16 +36,7 @@
   }
  },
  "registro": {
-  "chat": {
-   "s1": {
-    "chat": "s1",
-    "coda": [],
-    "richieste": [],
-    "aiutanti": {},
-    "passi": [],
-    "contestoMax": 200000
-   }
-  },
+  "chat": {},
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

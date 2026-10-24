@@ -4,7 +4,7 @@
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left; width: 100%;
 }
 .pezzo-barra .riga:hover, .pezzo-barra .riga.passaggio { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-barra .riga.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .riga.scelta, .pezzo-barra .riga-sessione:active { background: var(--colore-fondo-riga-scelta); } /* la riga sessione è un div: il :active dei bottoni non la copre */
 .pezzo-barra .riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pezzo-barra .riga .lato { flex: none; white-space: nowrap; }
 .pezzo-barra .riga.titolo-sezione, .pezzo-barra .riga.titolo-sezione:hover { background: none; }
@@ -21,7 +21,9 @@
 .pezzo-barra .sessioni-gruppo { display: flex; flex-direction: column; gap: var(--spazio-0-5); padding-left: var(--spazio-6); }
 .pezzo-barra .riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
 .pezzo-barra .riga-sessione:hover .azioni, .pezzo-barra .riga-sessione.passaggio .azioni { display: flex; }
-.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno { display: none; }
+/* al passaggio le azioni prendono il posto di stato e PR: senza, il titolo di una riga con freccia e PR si riduceva a una lettera (#522) */
+.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno,
+.pezzo-barra .riga-sessione:hover .indicatore-pr, .pezzo-barra .riga-sessione.passaggio .indicatore-pr { display: none; }
 /* madri, figlie e PR (101:34605): freccia dopo il titolo, indicatore PR a destra */
 .pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
@@ -36,12 +38,12 @@
 .pezzo-barra .lavoro .luccica-finestra {
   position: absolute; top: 0; bottom: 0; left: 0; width: 60%;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 50%, transparent); mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
-  animation: luccica 1.8s linear infinite;
+  animation: luccica var(--tempo-luccica) linear infinite;
 }
 .pezzo-barra .lavoro .luccica-copia {
   position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% / 0.6);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--colore-testo-lavoro-luce);
-  animation: luccica-copia 1.8s linear infinite;
+  animation: luccica-copia var(--tempo-luccica) linear infinite;
 }
 .pezzo-barra .lavoro .luccica-copia::after { content: attr(data-titolo); } /* la copia è solo CSS: nel DOM il titolo c'è una volta */
 @keyframes luccica { from { transform: translateX(-133.333%); } to { transform: translateX(200%); } }
