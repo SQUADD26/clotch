@@ -88,13 +88,27 @@ export default function Barra() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [n.sessione]);
-  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
+  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni).
+  // → e ← come un albero del Mac (#836): aprono e chiudono cartella o figlie; ← su una riga chiusa sale al genitore.
   useEffect(() => {
     const frecce = (e: KeyboardEvent) => {
-      if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
+      if (!e.key.startsWith("Arrow") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
       const t = e.target as HTMLElement;
       if (!t.matches?.(".pezzo-barra .riga:not(.titolo-sezione)")) return;
       const righe = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .riga:not(.titolo-sezione)")].filter((x) => x.getClientRects().length);
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        const apre = e.key === "ArrowRight";
+        const leva = t.hasAttribute("aria-expanded") ? t : t.querySelector<HTMLElement>(":scope > .freccia-figlie");
+        const genitore = t.dataset.figlia
+          ? righe.slice(0, righe.indexOf(t)).reverse().find((x) => x.querySelector(":scope > .freccia-figlie"))
+          : t.closest(".gruppo")?.querySelector<HTMLElement>(":scope > .riga[aria-expanded]");
+        if (leva && (leva.getAttribute("aria-expanded") === "true") !== apre) leva.click();
+        else if (!apre && genitore && genitore !== t) genitore.focus();
+        else if (apre && leva) righe[righe.indexOf(t) + 1]?.focus();
+        else return;
+        e.preventDefault();
+        return;
+      }
       const dopo = righe[righe.indexOf(t) + (e.key === "ArrowDown" ? 1 : -1)];
       if (dopo) { e.preventDefault(); dopo.focus(); }
     };
