@@ -4,9 +4,17 @@
 .parita .velo { inset: var(--spazio-16); border-radius: var(--raggio-md); }
 .dialogo {
   width: var(--misura-dialogo); padding: var(--spazio-5); gap: var(--spazio-4);
-  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
+  display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .velo.centrato { padding-bottom: 0; }
 .dialogo.largo { width: var(--misura-dialogo-largo); }
 .dialogo .bottoni { display: flex; justify-content: flex-end; gap: var(--spazio-2); }
+/* titolo e bottoni restano fermi, il corpo scorre (finestra bassa, testo lungo) */
+.dialogo .dialogo-corpo { display: flex; flex-direction: column; gap: var(--spazio-4); min-height: 0; overflow-y: auto; }
+.dialogo > * { flex: none; }
+.dialogo > .dialogo-corpo { flex: 0 1 auto; }
+.dialogo .testata-dialogo { display: flex; align-items: center; justify-content: space-between; gap: var(--spazio-4); }
+.dialogo .chiudi { width: var(--misura-icona); height: var(--misura-icona); display: flex; flex: none; border-radius: var(--raggio-xs); }
+.dialogo .chiudi:hover { background: var(--colore-fondo-riga-passaggio); }
+.velo.alto { align-items: flex-start; padding: calc(2 * var(--spazio-16)) 0 0; }

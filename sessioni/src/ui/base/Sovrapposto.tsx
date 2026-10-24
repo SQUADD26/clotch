@@ -28,6 +28,8 @@ export function useStrato(ref: RefObject<HTMLElement | null>, onChiudi: () => vo
       if (!cima()) return;
       // il fuoco torna prima di chiudere: il bottone può sparire quando il sovrapposto non c'è più (azioni al passaggio)
       if (e.key === "Escape") { e.stopPropagation(); if (prima?.isConnected) prima.focus(); chiudi.current(); return; }
+      // un dialogo è modale: le scorciatoie dell'app dietro il velo non partono (restano copia, incolla, annulla, seleziona tutto e ⌘/ che lo chiude)
+      if (trappola && (e.metaKey || e.ctrlKey) && ref.current?.querySelector(".dialogo") && !(e.metaKey && !e.altKey && /^[cvxazy/]$/i.test(e.key))) { e.stopPropagation(); if (e.key.startsWith("Arrow")) e.preventDefault(); return; }
       if (e.key !== "Tab" || !trappola || !ref.current) return;
       const f = [...ref.current.querySelectorAll<HTMLElement>(FOCALIZZABILI)];
       if (!f.length) return;
