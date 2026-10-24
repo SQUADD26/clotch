@@ -1,11 +1,9 @@
 // figma: 101-38901 — righe di clotch AI nella barra: «Riga clotch AI» (Attiva 101:7728,
 // In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di clotch AI (src/ui/clotch-ai).
-import { useEffect, useState } from "react";
 import type { Registro } from "../../clotch-ai";
-import { useChiamata } from "../base/dati";
+import { useRegistro as useRegistroUnico } from "../clotch-ai/dati";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
-import { daPiano } from "../clotch-ai/registro";
 import { casella, statoClotchAi, type StatoClotchAi } from "../clotch-ai/vista";
 import { RigaComando } from "./Righe";
 import { ViaDalMac } from "./ViaDalMac";
@@ -22,10 +20,7 @@ const STATO: Record<StatoClotchAi, { testo: string; classe: string }> = {
 
 /** Registro di clotch AI, aggiornato dal vivo; null finché non arriva o se non si legge. */
 export function useRegistro(): Registro | null {
-  const c = useChiamata(async () => daPiano(await window.clotchAi.registro()), []);
-  const [vivo, setVivo] = useState<Registro | null>(null);
-  useEffect(() => window.clotchAi.onRegistro((r) => setVivo(daPiano(r))), []);
-  return vivo ?? c.dati ?? null;
+  return useRegistroUnico().dati ?? null; // lo stesso negozio delle viste di clotch AI: un evento si legge una volta sola
 }
 
 const ora = (t: number) => new Date(t).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });

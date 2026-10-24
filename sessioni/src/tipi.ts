@@ -132,6 +132,8 @@ export interface Aggiornamento {
   nuoviMessaggi: { id: string; messaggi: Messaggio[] }[];
   /** Con v1 è questa la fonte della chat; nuoviMessaggi resta per i consumatori legacy. */
   cronologia?: DeltaCronologia[];
+  /** Le sessioni di `sessioni` come sono ora nell'elenco (`tolte`: non ci sono più): il renderer corregge il suo elenco senza rileggerlo (#474). */
+  elenco?: { cambiate: Sessione[]; tolte: string[] };
 }
 
 export interface SessioniApi {

@@ -1,6 +1,6 @@
 // figma: 101-7728 — barra laterale (#348): comandi, clotch AI, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
 // caricamento 101:8824, errore cartella 101:8931, 200 sessioni 101:9109, titolo lunghissimo 101:9359.
-import { useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import caricamento from "../../../design/figma/101-8824.json";
 import { Bottone } from "../base/Bottone";
 import { api, useElenco, usePreferenze } from "../base/dati";
@@ -9,6 +9,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { registraAzione } from "../base/scorciatoie";
 import { useNavigazione } from "../base/navigazione";
 import { numero } from "../base/token";
+import { useOra } from "../chat/clotch-ai";
 import { useApriSessione } from "./apri";
 import { conFiglie } from "./figlie";
 import { componi, dettaglioProfilo, opzioni, type Proprieta, type Vista } from "./elenco";
@@ -44,7 +45,9 @@ export default function Barra() {
   const elenco = p?.elenco ?? vivo;
   const pref = p?.pref ?? prefVive.dati;
   const registro = p ? p.registro : registroVivo;
-  const adesso = p?.ora ?? Date.now();
+  // ora che scorre ogni 30 s, non a ogni render: con Date.now() `componi` si rifaceva a ogni passaggio del mouse (#474)
+  const ora = useOra();
+  const adesso = p?.ora ?? ora;
   const sessioni = elenco.dati?.sessioni ?? [];
 
   const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
@@ -92,13 +95,16 @@ export default function Barra() {
 
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
   const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
+  // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
+  const vivi = useRef({ apriSessione, pref });
+  vivi.current = { apriSessione, pref };
   const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
       figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
-      onApri={() => apriSessione(s.id)}
+      onApri={() => vivi.current.apriSessione(s.id)}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
-      onFissa={() => void api().impostaPreferenze(s.id, { fissa: pref[s.id]?.fissa ? null : true })}
+      onFissa={() => void api().impostaPreferenze(s.id, { fissa: vivi.current.pref[s.id]?.fissa ? null : true })}
       onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "riga", id: s.id, a: punto(e) }); }}
       onTroncato={suTroncato}
     />

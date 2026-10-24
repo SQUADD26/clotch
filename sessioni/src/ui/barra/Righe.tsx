@@ -1,5 +1,5 @@
 // figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta), «Piede barra laterale».
-import type { MouseEvent, ReactNode } from "react";
+import { memo, type MouseEvent, type ReactNode } from "react";
 import type { PreferenzeSessione, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
@@ -64,7 +64,10 @@ interface PropsSessione {
   onTroncato(titolo: string | null, el?: HTMLElement): void;
 }
 
-export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+/** Memo: una riga si ridisegna solo se cambiano i suoi dati; le funzioni no (Barra le fa chiamare sempre l'ultima versione). */
+const stessiDati = (a: PropsSessione, b: PropsSessione) =>
+  (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
+export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: MouseEvent<HTMLElement>) => {
     const t = e.currentTarget.querySelector<HTMLElement>(".testo");
     onTroncato(t && t.scrollWidth > t.clientWidth ? s.titolo : null, t ?? undefined);
@@ -95,7 +98,7 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figl
       </span>
     </div>
   );
-}
+}, stessiDati);
 
 export function Piede({ dettaglio, onMenu, onImpostazioni }: { dettaglio: string; onMenu(e: MouseEvent): void; onImpostazioni(): void }) {
   return (

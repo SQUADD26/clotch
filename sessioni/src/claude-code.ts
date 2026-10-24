@@ -62,21 +62,40 @@ function sfoltisci(progetti: string, viste: Set<string>) {
   for (const k of cache.keys()) if (k.startsWith(progetti + path.sep) && !viste.has(k)) cache.delete(k);
 }
 
-export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[] {
-  const progetti = path.join(radice.path, "projects");
+/** `f` (un percorso cambiato secondo fs.watch) tocca `x`: è x, o una cartella che lo contiene. */
+/** Ultimo risultato per cartella `projects` (sessioni della cache, mai modificate): un giro che non la tocca lo riusa senza ciclo sui file. */
+const ultimi = new Map<string, { radice: string; sessioni: Sessione[] }>();
+
+export const tocca = (f: string, x: string) => f === x || x.startsWith(f + path.sep);
+
+/** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dalla cache, senza readdir né stat. */
+export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: string[]): Sessione[] {
+  const progetti = path.join(radice.path, "projects"), firmaRadice = `${radice.account}\0${radice.email}`;
+  const u = sporchi && ultimi.get(progetti);
+  if (u && u.radice === firmaRadice && !sporchi.some((f) => tocca(f, progetti) || f.startsWith(progetti + path.sep))) return u.sessioni.map((s) => ({ ...s }));
+  ultimi.delete(progetti);
   let cartelle: string[];
   try {
     cartelle = fs.readdirSync(progetti);
   } catch (e: any) {
     sfoltisci(progetti, new Set());
     if (e.code !== "ENOENT") errori.push({ percorso: progetti, messaggio: msgErrore(e) });
+    else ultimi.set(progetti, { radice: firmaRadice, sessioni: [] }); // radice senza progetti: il giro dopo non riscorre la cache
     return [];
   }
-  const viste = new Set<string>(), out: Sessione[] = [];
+  const viste = new Set<string>(), base: Sessione[] = [], erroriPrima = errori.length;
+  const noti = new Map<string, string[]>(); // cartella -> nomi dei file già in cache
+  if (sporchi) for (const k of cache.keys()) if (k.startsWith(progetti + path.sep)) {
+    const d = path.dirname(k), l = noti.get(d);
+    if (l) l.push(path.basename(k)); else noti.set(d, [path.basename(k)]);
+  }
   for (const c of cartelle) {
+    const dir = path.join(progetti, c);
     let files: string[];
     try {
-      files = fs.readdirSync(path.join(progetti, c)).filter((n) => n.endsWith(".jsonl"));
+      const n = noti.get(dir);
+      files = n && !sporchi!.some((f) => tocca(f, dir) || f.startsWith(dir + path.sep)) ? n
+        : fs.readdirSync(dir).filter((n) => n.endsWith(".jsonl"));
     } catch (e: any) {
       errori.push({ percorso: path.join(progetti, c), messaggio: msgErrore(e) });
       continue;
@@ -84,6 +103,12 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[]
     for (const n of files) {
       const file = path.join(progetti, c, n);
       try {
+        const nota = sporchi && cache.get(file);
+        if (nota && !sporchi.some((f) => tocca(f, file))) {
+          viste.add(file);
+          if (nota.s) base.push(nota.s);
+          continue;
+        }
         const st = fs.statSync(file);
         const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
         let e = cache.get(file);
@@ -92,12 +117,13 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[]
           cache.set(file, e);
         }
         viste.add(file);
-        if (e.s) out.push({ ...e.s });
+        if (e.s) base.push(e.s);
       } catch (err: any) {
         errori.push({ percorso: file, messaggio: msgErrore(err) });
       }
     }
   }
   sfoltisci(progetti, viste);
-  return out;
+  if (errori.length === erroriPrima) ultimi.set(progetti, { radice: firmaRadice, sessioni: base }); // con errori si riprova al prossimo giro
+  return base.map((s) => ({ ...s }));
 }

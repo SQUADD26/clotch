@@ -1,6 +1,7 @@
 // Aggiornamento dal vivo: fs.watch sulle cartelle, legge solo la coda nuova dei file JSONL.
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { tocca } from "./claude-code";
 import { leggiElenco } from "./elenco";
 import { firmaFile } from "./messaggi";
 import { Cronologia } from "./cronologia";
@@ -72,7 +73,7 @@ export class Osservatore {
     this.avviato = true;
     this.guarda();
     // macOS (FSEvents) comincia a mandare eventi qualche istante dopo fs.watch: quello che si scrive prima non arriva.
-    // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; ogni giro poi raccoglie ogni file cresciuto (giro()).
+    // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; poi ogni giro rilegge solo ciò che è cambiato (giro()).
     // shortcut: con lo stato letto da un worker niente giro subito (costa ~2,5 s di main con migliaia di sessioni): ciò che è cambiato nel frattempo si riconcilia al primo evento, quando si abbassa il costo del giro si rimette.
     if (!this.partenza) this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
@@ -89,21 +90,24 @@ export class Osservatore {
     this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
 
-  /** Un giro: rilegge l'elenco (costa un stat per file), conta chi è cambiato, legge le code nuove. */
+  /** Un giro: rilegge l'elenco solo dove è cambiato qualcosa (evento o firma del file: rileggere tutto con migliaia di sessioni blocca il main per secondi, #474),
+   * conta chi è cambiato, legge le code nuove. Un errore del watcher sporca la sua cartella intera: quel giro rilegge tutto lì. */
   giro() {
     const file = [...this.dirty];
     this.dirty.clear();
     if (this.avviato) this.guarda();
+    // un evento perso non deve perdere messaggi: un file noto cambiato senza evento conta come evento (solo uno stat per file, niente readdir)
+    const attuali = new Map<string, string>();
+    for (const [f, v] of this.firme) { const a = firma(f); attuali.set(f, a); if (a !== v) file.push(f); }
     const prima = this.firmeSessioni;
-    this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.() });
+    this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.(), sporchi: file });
     this.firmeSessioni = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
     // anche quelle sparite (spenta una sorgente, cartella esclusa): il renderer deve rileggere l'elenco
     const cambiate = [...this.firmeSessioni.keys()].filter((id) => prima.get(id) !== this.firmeSessioni.get(id)).concat([...prima.keys()].filter((id) => !this.firmeSessioni.has(id)));
     for (const s of this.elenco.sessioni) {
       if (!s.file.endsWith(".jsonl")) continue;
-      const attuale = firma(s.file);
-      // La riconciliazione parte solo da avvio/evento; include rename, riscritture e crescita senza evento nominato.
-      if (attuale === this.firme.get(s.file) && !file.some((f) => s.file === f || s.file.startsWith(`${f}${path.sep}`))) continue;
+      if (this.firme.has(s.file) && !file.some((f) => tocca(f, s.file))) continue;
+      const attuale = attuali.get(s.file) ?? firma(s.file);
       this.cronologia.aggiorna(s, fineCompletaFinoA(s.file, this.iniziali.get(s.file) ?? 0));
       this.iniziali.delete(s.file);
       this.firme.set(s.file, attuale);

@@ -2,9 +2,10 @@
 // Schema dal vault (Research/App/ChatGPT): rete-e-api.md § «Dal vivo»: il renderer non fa rete, chiede al main via IPC e
 // riceve gli eventi; esperienza-uso.md § «Stati»: i nuovi tentativi stanno nel main, il renderer offre solo «Riprova».
 // Un aggiornamento dal vivo ricarica in silenzio: i dati vecchi restano a schermo finché arrivano i nuovi.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Aggiornamento, Elenco, Messaggio, PreferenzeSessione, SessioniApi } from "../../tipi";
 
+import { applicaElenco } from "./elenco";
 import { applicaDelta, applicaPagina, fallita, nuovaCronologia, righeOrdinate, type CronologiaStato } from "./cronologia-stato";
 
 declare global {
@@ -59,10 +60,39 @@ export function useAggiornamenti(cb: (a: Aggiornamento) => void) {
   useEffect(() => api().onAggiornamento((a) => { if (oggetto(a)) ultimo.current(a); }), []);
 }
 
-/** Elenco delle sessioni, ricaricato in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
+// L'elenco è uno per finestra (base/elenco.ts): una richiesta in volo alla volta, gli aggiornamenti lo correggono sul posto.
+let elenco: Stato<Elenco> = { stato: "carica" };
+const chiElenco = new Set<() => void>();
+let giroElenco = 0, inVolo = false, collegato = false;
+const pubblicaElenco = (s: Stato<Elenco>) => { elenco = s; chiElenco.forEach((f) => f()); };
+function caricaElenco(silenzioso: boolean) {
+  const mio = ++giroElenco;
+  inVolo = true;
+  if (!silenzioso) pubblicaElenco({ stato: "carica" });
+  api().elencoSessioni().then(elencoValido).then(
+    (dati) => mio === giroElenco && pubblicaElenco({ stato: "pronto", dati }),
+    (e) => mio === giroElenco && pubblicaElenco({ stato: "errore", dati: elenco.dati, errore: messaggioErrore(e) }),
+  ).finally(() => { if (mio === giroElenco) inVolo = false; });
+}
+function iscriviElenco(f: () => void) {
+  chiElenco.add(f);
+  if (!collegato) {
+    collegato = true;
+    api().onAggiornamento((a) => {
+      if (!oggetto(a) || !Array.isArray(a.sessioni) || !a.sessioni.length) return;
+      // con una richiesta in volo la correzione potrebbe arrivare prima della risposta vecchia: si rilegge
+      const e = inVolo ? null : applicaElenco(elenco.dati, a.elenco, sessioneValida);
+      if (!e) caricaElenco(true); else if (e !== elenco.dati) pubblicaElenco({ stato: "pronto", dati: e });
+    });
+    caricaElenco(false);
+  }
+  return () => { chiElenco.delete(f); };
+}
+const ricaricaElenco = () => caricaElenco(true), riprovaElenco = () => caricaElenco(false);
+
+/** Elenco delle sessioni, corretto in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
 export function useElenco() {
-  const c = useChiamata<Elenco>(() => api().elencoSessioni().then(elencoValido), []);
-  useAggiornamenti((a) => { if (Array.isArray(a.sessioni) && a.sessioni.length) c.ricarica(); });
+  const c = { ...useSyncExternalStore(iscriviElenco, () => elenco), ricarica: ricaricaElenco, riprova: riprovaElenco };
   const pref = usePreferenze().dati;
   // «Rinomina…» (#460): il nome dato in clotch prende il posto del titolo ovunque l'app lo mostra; il file della sessione non cambia
   const dati = useMemo(() => c.dati && { ...c.dati, sessioni: c.dati.sessioni.map((s) => (pref[s.id]?.nome ? { ...s, titolo: pref[s.id].nome! } : s)) }, [c.dati, pref]);

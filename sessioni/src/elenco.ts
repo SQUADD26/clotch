@@ -22,7 +22,7 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
 export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
 
 /** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
-export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown> }): Elenco {
+export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown>; sporchi?: string[] }): Elenco {
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
   const imp = opz.impostazioni && conPartenza(opz.impostazioni);
@@ -33,7 +33,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
-  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) tutte.push(...leggiRadice(r, errori));
+  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) tutte.push(...leggiRadice(r, errori, opz.sporchi));
   const viste = new Set(tutte.map((s) => s.id));
   for (const s of tutte) {
     const a = perCli.get(s.id);
