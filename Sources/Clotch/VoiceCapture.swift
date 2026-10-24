@@ -2,6 +2,7 @@ import AVFoundation
 import AudioToolbox
 import CoreAudio
 import ClotchCore
+import os.log
 
 /// The microphone as 16 kHz mono (#110): every tap buffer is converted once and handed over both as the buffer (the local
 /// model takes it as is) and as 16-bit PCM (Scribe's socket and the level meter). `onAudio` runs on the audio thread.
@@ -73,6 +74,7 @@ class VoiceCapture: @unchecked Sendable {
         let input = engine.inputNode
         if !microphone.isEmpty, var device = Self.deviceID(uid: microphone), let unit = input.audioUnit {
             AudioUnitSetProperty(unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &device, UInt32(MemoryLayout<AudioDeviceID>.size))
+            Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput").notice("microphone: \(self.microphone, privacy: .public) = device \(device)")
         }
         engine.prepare()
     }
