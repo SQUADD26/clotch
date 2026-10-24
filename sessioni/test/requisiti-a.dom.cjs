@@ -10,7 +10,7 @@ H.avvia('requisiti-a', async () => {
   await req('A1', async () => {
     nuova(); await caricaChat();
     const m = await run(() => { const b = document.querySelector('.barra-titolo'), q = (a) => document.querySelector(`button[aria-label="${a}"]`);
-      return { h: b.getBoundingClientRect().height, drag: getComputedStyle(b).getPropertyValue('-webkit-app-region'), i: q('Indietro').disabled, a: q('Avanti').disabled, barra: !!q('Barra laterale'), att: !!q('Attività') }; });
+      return { h: b.getBoundingClientRect().height, drag: getComputedStyle(b).getPropertyValue('-webkit-app-region'), i: q('Indietro').disabled, a: q('Avanti').disabled, barra: !!q('Barra laterale'), att: !!q('Mostra attività') }; });
     assert.deepEqual(m, { h: 44, drag: 'drag', i: true, a: true, barra: true, att: true });
     await clicca('.barra-laterale .riga .testo', 'beta-app'); await clicca('.riga-sessione .testo', 'Beta due'); await wait(() => !document.querySelector('button[aria-label="Indietro"]').disabled);
     await clicca('button', 'Indietro'); await wait(() => document.querySelector('.riga-sessione.scelta .testo')?.textContent === 'Alfa uno');
