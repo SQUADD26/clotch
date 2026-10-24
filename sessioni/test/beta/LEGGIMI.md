@@ -28,7 +28,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 | STATO | un elemento disabilitato ha lo stesso aspetto di uno attivo della stessa classe |
 | SPORGE | un elemento esce dal riquadro visibile (fondo o bordo) del genitore |
 | CONSOLE | errore in console o eccezione della pagina |
-| M2, M3, M5, M8, M10, M11, MLAYOUT | movimento, solo con `--video` (`movimento.mjs`): durata fuori dai token tempo/*, curva lineare, parte oltre 50 ms, si muove con movimento ridotto, salto se interrotta, fotogrammi persi, anima una proprietà di layout |
+| M2, M3, M5, M8, M10, M11, MLAYOUT, MCOMPARE | movimento, solo con `--video` (`movimento.mjs`): menu, popover o dialogo che compare di colpo (opaco al primo fotogramma, nessuna animazione), durata fuori dai token tempo/*, curva lineare, parte oltre 50 ms, si muove con movimento ridotto, salto se interrotta, fotogrammi persi, anima una proprietà di layout |
 
 ## Difetti noti e checklist
 
