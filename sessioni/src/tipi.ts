@@ -77,7 +77,7 @@ export interface PrInfo { numero: number; url: string; stato: PrSessione["stato"
 export interface InfoSessione {
   /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
   contesto: number | null;
-  file: { quanti: number; aggiunte: number; tolte: number };
+  file: { quanti: number; aggiunte: number; tolte: number; nomi?: string[] };
   /** Tutte le PR della sessione (file dell'app + `pr-link` della trascrizione); assente = nessuna. */
   prs?: PrInfo[];
 }

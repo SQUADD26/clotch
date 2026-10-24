@@ -95,6 +95,7 @@ export function Modifiche({ file, prs }: { file: InfoSessione["file"]; prs: PrIn
       {file.quanti > 0 && (
         <Riga icona="file" lato={<span className="t-sm secondario">+{file.aggiunte} −{file.tolte}</span>}>{file.quanti} file</Riga>
       )}
+      {!!file.nomi?.length && <div className="elenco-file">{file.nomi.map((n) => <div key={n} className="riga-info" title={n}><Icona nome="file" /><span className="t-sm testo">{n.replace(/^.*\//, "")}</span></div>)}</div>}
       {prs.map((pr) => (
         <Fragment key={pr.url}>
           {pr.stato ? <Riga icona={ICONA_PR[pr.stato][0]} colore={ICONA_PR[pr.stato][1]}>{testoPr({ ...pr, stato: pr.stato })}</Riga> : <Riga icona="link">PR #{pr.numero}</Riga>}
