@@ -8,8 +8,8 @@
 }
 .pezzo-chat .compatto .riga-compatta { gap: var(--spazio-1-5); align-self: flex-start; max-width: calc(100% + 2 * var(--spazio-2)); }
 .pezzo-chat .compatto .riga { gap: var(--spazio-2); }
-.pezzo-chat .compatto :is(button.riga-compatta, .riga:has(> .apri:not(:disabled))):hover { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-chat .compatto :is(button.riga-compatta, .riga:has(> .apri:not(:disabled))):active { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .compatto button.riga-compatta:hover, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .compatto button.riga-compatta:active, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-chat .compatto button.riga-compatta:hover .titolo,
 .pezzo-chat .compatto .riga:has(> .apri:not(:disabled):hover) .verbo { color: var(--colore-testo-primario); }
 /* il fuoco da tastiera segue la riga intera, non solo la parte che apre */
@@ -20,8 +20,8 @@
 .pezzo-chat .compatto .apri { display: flex; align-items: center; gap: var(--spazio-2); flex: 1; min-width: 0; text-align: left; color: inherit; }
 .pezzo-chat .compatto .apri:disabled { cursor: default; }
 .pezzo-chat .compatto .titolo, .pezzo-chat .compatto .verbo, .pezzo-chat .compatto .oggetto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pezzo-chat .compatto .verbo { flex: none; max-width: 100%; }
-.pezzo-chat .compatto .oggetto { flex: 0 1 auto; color: var(--colore-testo-primario); }
+.pezzo-chat .compatto .verbo { flex: 0 1 auto; } /* si stringe per ultimo: prima si taglia l'oggetto */
+.pezzo-chat .compatto .oggetto { flex: 0 100 auto; color: var(--colore-testo-primario); }
 .pezzo-chat .compatto .azione { display: flex; align-items: center; gap: var(--spazio-1); flex: 0 1 auto; min-width: 0; }
 .pezzo-chat .compatto :is(.conto, .esito) { flex: none; color: var(--colore-testo-terziario); white-space: nowrap; }
 .pezzo-chat .compatto :is(.errori, .esito.errore) { flex: none; color: var(--colore-testo-errore); white-space: nowrap; }
