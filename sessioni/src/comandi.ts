@@ -11,7 +11,7 @@ export interface AccountPrevisto { email: string; config_dir: string | null; uso
 
 export type EsitoComando =
   /** clotch AI ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto;
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto; /** trascrizione_remota: la copia sul Mac, la sua dimensione e da dove viene. */ percorso?: string; byte?: number; fonte?: string;
       /** `macchine`: il registro e le connessioni di Claude Desktop da aggiungere. `macchina_aggiungi`: la voce (`voce`) e i passi fatti. */ macchine?: Macchina[]; proposte?: Proposta[]; voce?: Macchina; passi?: EsitoPasso[] }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
@@ -71,6 +71,7 @@ async function invia(home: string, cmd: Comando, args: Record<string, unknown>, 
       const fatto: EsitoComando = { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
       if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da clotch AI
       if (typeof r.dati.sessione === "string") fatto.sessione = r.dati.sessione; // nuova_sessione
+      if (typeof r.dati.percorso === "string") { fatto.percorso = r.dati.percorso; fatto.fonte = String(r.dati.fonte ?? ""); if (Number.isInteger(r.dati.byte)) fatto.byte = r.dati.byte; } // trascrizione_remota
       if (typeof r.dati.macchina === "string") fatto.macchina = r.dati.macchina;
       else if (r.dati.macchina && typeof r.dati.macchina === "object") fatto.voce = r.dati.macchina; // macchina_aggiungi
       if (Array.isArray(r.dati.macchine)) fatto.macchine = r.dati.macchine;

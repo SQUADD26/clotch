@@ -19,6 +19,9 @@
   "misura/icona": 16,
   "colore/icona/terziaria": "#ffffff82",
   "colore/testo/secondario": "#ffffffb5",
+  "colore/testo/terziario": "#ffffff8c",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
   "colore/bordo/normale": "#ffffff15"
  },
  "nodi": [
@@ -85,7 +88,7 @@
    "box": {
     "x": 24,
     "y": 20,
-    "w": 104,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -93,7 +96,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Sta ragionando…",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -170,7 +173,7 @@
    "box": {
     "x": 46,
     "y": 62,
-    "w": 104,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -179,7 +182,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Sta ragionando…",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -219,13 +222,28 @@
    "senza": []
   },
   {
+   "id": "167:92868",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 104,
+    "w": 715,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "163:84318",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
     "x": 24,
     "y": 104,
-    "w": 115,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -234,7 +252,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -242,7 +260,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 145,
+    "x": 118,
     "y": 105,
     "w": 16,
     "h": 16
@@ -258,7 +276,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 150.33203125,
+    "x": 123.33203125,
     "y": 108.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -267,6 +285,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "167:92867",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 745,
+    "y": 105,
+    "w": 23,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "14 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84321",
@@ -305,13 +342,28 @@
    "senza": []
   },
   {
+   "id": "167:92870",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 146,
+    "w": 715,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "163:84323",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
     "x": 24,
     "y": 146,
-    "w": 115,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -320,7 +372,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -328,7 +380,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 145,
+    "x": 118,
     "y": 147,
     "w": 16,
     "h": 16
@@ -344,7 +396,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 148.33203125,
+    "x": 121.33203125,
     "y": 152.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -353,6 +405,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "167:92869",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 745,
+    "y": 147,
+    "w": 23,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "14 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84326",

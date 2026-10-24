@@ -23,4 +23,4 @@ export const percento = (parte: number, dec = 1) => `${num(parte * 100, dec)}%`;
 
 /** «PR #336 · aperta verso dev», «PR #334 · unita in dev». */
 export const testoPr = (p: PrSessione) =>
-  `PR #${p.numero} · ${p.stato === "aperta" ? `aperta verso ${p.verso ?? "il ramo di base"}` : p.stato === "unita" ? `unita${p.verso ? ` in ${p.verso}` : ""}` : "chiusa senza unire"}`;
+  `PR #${p.numero}, ${p.stato === "aperta" ? `aperta verso ${p.verso ?? "il ramo di base"}` : p.stato === "unita" ? `unita${p.verso ? ` in ${p.verso}` : ""}` : "chiusa senza unire"}`;

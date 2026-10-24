@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2138,7 +2139,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2185,7 +2186,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2194,7 +2195,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2635,7 +2636,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2693,7 +2694,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 488,
+    "x": 472,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2709,7 +2710,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
+    "x": 473.3330078125,
     "y": 141.33203125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2724,7 +2725,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 508,
+    "x": 492,
     "y": 140,
     "w": 181,
     "h": 16
@@ -4060,7 +4061,7 @@
    "box": {
     "x": 541,
     "y": 231,
-    "w": 156,
+    "w": 157,
     "h": 24
    },
    "variabili": {
@@ -4078,7 +4079,7 @@
    "box": {
     "x": 549,
     "y": 235,
-    "w": 140,
+    "w": 141,
     "h": 16
    },
    "variabili": {
@@ -4087,7 +4088,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Generali · claude-config",
+   "testo": "Generali claude-config",
    "font": "SF Pro Medium"
   },
   {
@@ -4151,7 +4152,7 @@
    "box": {
     "x": 549,
     "y": 287,
-    "w": 152,
+    "w": 154,
     "h": 16
    },
    "variabili": {
@@ -4160,7 +4161,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "global/CLAUDE.md · 23 ott",
+   "testo": "global/CLAUDE.md 23 ott",
    "font": "SF Pro Regular"
   },
   {
@@ -4263,7 +4264,7 @@
    "box": {
     "x": 549,
     "y": 343,
-    "w": 151,
+    "w": 152,
     "h": 16
    },
    "variabili": {
@@ -4272,7 +4273,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "global/CLAUDE.md · 18 ott",
+   "testo": "global/CLAUDE.md 18 ott",
    "font": "SF Pro Regular"
   },
   {
@@ -4342,7 +4343,7 @@
    "box": {
     "x": 541,
     "y": 399,
-    "w": 113,
+    "w": 115,
     "h": 24
    },
    "variabili": {
@@ -4360,7 +4361,7 @@
    "box": {
     "x": 549,
     "y": 403,
-    "w": 97,
+    "w": 99,
     "h": 16
    },
    "variabili": {
@@ -4369,7 +4370,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Progetto · clotch",
+   "testo": "Progetto clotch",
    "font": "SF Pro Medium"
   },
   {
@@ -4433,7 +4434,7 @@
    "box": {
     "x": 549,
     "y": 455,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -4442,7 +4443,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "CLAUDE.md · 21 ott",
+   "testo": "CLAUDE.md 21 ott",
    "font": "SF Pro Regular"
   },
   {

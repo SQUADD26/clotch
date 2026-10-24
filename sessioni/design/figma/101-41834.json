@@ -45,6 +45,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2136,7 +2137,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2183,7 +2184,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2192,7 +2193,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2633,7 +2634,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2707,7 +2708,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 488,
+    "x": 472,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2723,7 +2724,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
+    "x": 473.3330078125,
     "y": 141.33203125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2738,7 +2739,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 508,
+    "x": 492,
     "y": 140,
     "w": 181,
     "h": 16

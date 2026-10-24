@@ -2171,7 +2171,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2180,7 +2180,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2621,7 +2621,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2704,30 +2704,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:90665;101:7420",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 155,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:90665;101:7421",
    "nome": "progetto",
    "tipo": "TEXT",
    "box": {
-    "x": 167,
+    "x": 159,
     "y": 140,
     "w": 35,
     "h": 16
@@ -2742,30 +2723,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:90665;101:7422",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 210,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:90665;101:7416",
    "nome": "ramo",
    "tipo": "FRAME",
    "box": {
-    "x": 222,
+    "x": 206,
     "y": 140,
     "w": 201,
     "h": 16
@@ -2780,7 +2742,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 222,
+    "x": 206,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2796,7 +2758,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 223.33203125,
+    "x": 207.33203125,
     "y": 141.3330078125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2811,7 +2773,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 242,
+    "x": 226,
     "y": 140,
     "w": 181,
     "h": 16
@@ -3089,13 +3051,28 @@
    "senza": []
   },
   {
+   "id": "I163:90897;167:92868",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 89,
+    "y": 608,
+    "w": 393,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:90897;163:84318",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
     "x": 89,
     "y": 608,
-    "w": 115,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -3104,7 +3081,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -3112,7 +3089,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 210,
+    "x": 183,
     "y": 609,
     "w": 16,
     "h": 16
@@ -3128,7 +3105,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 215.33203125,
+    "x": 188.33203125,
     "y": 612.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3137,6 +3114,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:90897;167:92867",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 488,
+    "y": 609,
+    "w": 23,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "14 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:90902",
@@ -3174,13 +3170,28 @@
    "senza": []
   },
   {
+   "id": "I163:90902;163:84445;167:92866",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 89,
+    "y": 636,
+    "w": 390,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:90902;163:84445;163:84130",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
     "x": 89,
     "y": 636,
-    "w": 134,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -3189,26 +3200,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "I163:90902;163:84445;163:84131",
-   "nome": "durata",
-   "tipo": "TEXT",
-   "box": {
-    "x": 229,
-    "y": 636,
-    "w": 35,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "· 48 s",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3216,7 +3208,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 270,
+    "x": 171,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3232,7 +3224,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 270.66796875,
+    "x": 171.66796875,
     "y": 637.666015625,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -3247,7 +3239,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 292,
+    "x": 193,
     "y": 636,
     "w": 47,
     "h": 18
@@ -3266,7 +3258,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 345,
+    "x": 246,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3282,7 +3274,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 350.33203125,
+    "x": 251.33203125,
     "y": 640.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3291,6 +3283,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:90902;163:84445;163:84131",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 485,
+    "y": 637,
+    "w": 26,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "48 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:90911",
@@ -3380,7 +3391,7 @@
    "box": {
     "x": 113,
     "y": 664,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -3389,7 +3400,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3397,9 +3408,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 176,
+    "x": 169,
     "y": 664,
-    "w": 156,
+    "w": 159,
     "h": 18
    },
    "variabili": {
@@ -3408,7 +3419,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerca i ruoli nel database",
+   "testo": "Ricerca ruoli nel database",
    "font": "SF Pro Regular"
   },
   {
@@ -3416,9 +3427,9 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 336,
+    "x": 332,
     "y": 664,
-    "w": 92,
+    "w": 85,
     "h": 18
    },
    "variabili": {
@@ -3427,7 +3438,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· nessun errore",
+   "testo": "nessun errore",
    "font": "SF Pro Regular"
   },
   {
@@ -3435,7 +3446,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 432,
+    "x": 421,
     "y": 665,
     "w": 16,
     "h": 16
@@ -3451,7 +3462,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 437.33203125,
+    "x": 426.33203125,
     "y": 668.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3551,13 +3562,28 @@
    "senza": []
   },
   {
+   "id": "I163:90924;167:92871",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 89,
+    "y": 801,
+    "w": 351,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:90924;163:84209",
    "nome": "testo con riflesso",
    "tipo": "TEXT",
    "box": {
     "x": 89,
     "y": 801,
-    "w": 96,
+    "w": 91,
     "h": 18
    },
    "variabili": {
@@ -3565,7 +3591,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge Filo.tsx…",
+   "testo": "Lettura Filo.tsx",
    "font": "SF Pro Regular"
   },
   {
@@ -3573,18 +3599,18 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 191,
-    "y": 801,
-    "w": 78,
-    "h": 18
+    "x": 446,
+    "y": 802,
+    "w": 65,
+    "h": 16
    },
    "variabili": {
     "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "· 3 strumenti",
+   "testo": "3 strumenti",
    "font": "SF Pro Regular"
   },
   {

@@ -1,5 +1,5 @@
 // Voci della «Navigazione impostazioni» (101:17197), nell'ordine e con le icone del frame.
-import type { NomeIcona } from "../base/Icona";
+import type { NomeIcona } from "../base/icone"; // il .ts, non il componente: i test di Node leggono le sezioni senza JSX
 
 export const SEZIONI = [
   ["generale", "Generale", "impostazioni"],

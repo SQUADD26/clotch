@@ -1,4 +1,4 @@
-// Il filo compatto (#876): le chiamate di fila di un turno diventano un gruppo «Ha usato 6 strumenti · 41 s», chiuso da solo.
+// Il filo compatto (#876): le chiamate di fila di un turno diventano un gruppo «6 strumenti · 41 s», chiuso da solo.
 // Puro: niente DOM. Il gruppo tiene i blocchi com'erano, con chiave e stato; il filo decide come mostrarli.
 import type { Blocco } from "./modello";
 import { frase, type Frase } from "./strumenti";
@@ -43,4 +43,5 @@ export const fraseDi = (b: BloccoStrumento): Frase =>
   b.tipo === "strumento" ? b.frase : frase(/^https?:\/\//.test(b.query) ? "WebFetch" : "WebSearch", { url: b.query, query: b.query });
 
 /** «· uscita 1» di un comando non riuscito («Exit code 1» nell'esito); senza codice, «· non riuscito». */
-export const esitoErrore = (uscita: string) => { const c = uscita.match(/exit code (\d+)/i); return c ? `· uscita ${c[1]}` : "· non riuscito"; };
+export const esitoErrore = (uscita: string) => { const c = uscita.match(/exit code (\d+)/i); return c ? `uscita ${c[1]}` : "non riuscito"; };
+

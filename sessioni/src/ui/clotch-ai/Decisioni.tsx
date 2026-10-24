@@ -24,7 +24,7 @@ const ICONA: Record<string, [NomeIcona, "successo" | "secondaria"]> = {
 function dettaglio(r: Registro, d: Decisione) {
   const c = d.chat ? r.chat.get(d.chat) : undefined;
   const chi = (d.genere === "promozione" || d.genere === "archivio" ? c?.progetto : c?.titolo) ?? c?.titolo ?? "";
-  return [chi, d.t !== null ? orario(d.t) : ""].filter(Boolean).join(" · ");
+  return [chi, d.t !== null ? orario(d.t) : ""].filter(Boolean).join(", ");
 }
 
 /** Esito dell'annullo: i testi li scrive clotch AI in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */

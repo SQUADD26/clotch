@@ -29,6 +29,12 @@ export class Sessioni {
     this.oss?.giro();
   }
 
+  /** Il motore ha scritto (o allungato) la copia di una trascrizione remota: l'elenco la vede subito, senza aspettare l'evento del disco. */
+  copiaRemota(file: string) {
+    this.oss?.tocca(file);
+    this.oss?.giro();
+  }
+
   messaggi(id: string, pagina: number, opzioni?: OpzioniCronologia): PaginaMessaggi {
     const s = this.elencoSessioni().sessioni.find((x) => x.id === id);
     if (s) return opzioni ? this.cronologia.pagina(s, pagina, opzioni) : leggiPagina(s, pagina);

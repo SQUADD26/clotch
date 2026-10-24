@@ -47,6 +47,7 @@
   "colore/icona/terziaria": "#ffffff82",
   "colore/icona/errore": "#ff6764",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -3171,7 +3172,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -3218,7 +3219,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -3227,7 +3228,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -3668,7 +3669,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -3751,30 +3752,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7420",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 411,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7421",
    "nome": "progetto",
    "tipo": "TEXT",
    "box": {
-    "x": 423,
+    "x": 415,
     "y": 140,
     "w": 35,
     "h": 16
@@ -3789,30 +3771,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7422",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 466,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7416",
    "nome": "ramo",
    "tipo": "FRAME",
    "box": {
-    "x": 478,
+    "x": 462,
     "y": 140,
     "w": 143,
     "h": 16
@@ -3827,7 +3790,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 478,
+    "x": 462,
     "y": 140,
     "w": 16,
     "h": 16
@@ -3843,7 +3806,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 479.3330078125,
+    "x": 463.3330078125,
     "y": 141.3330078125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -3858,7 +3821,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 498,
+    "x": 482,
     "y": 140,
     "w": 123,
     "h": 16
@@ -3873,30 +3836,11 @@
    "font": "Menlo Regular"
   },
   {
-   "id": "I101:9236;101:7423",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 629,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7424",
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 641,
+    "x": 617,
     "y": 140,
     "w": 51,
     "h": 16
@@ -3911,32 +3855,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7425",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 700,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7426",
    "nome": "sorgente",
    "tipo": "TEXT",
    "box": {
-    "x": 712,
+    "x": 680,
     "y": 140,
-    "w": 179,
+    "w": 180,
     "h": 16
    },
    "variabili": {
@@ -3945,7 +3870,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Claude Code · accountmanager",
+   "testo": "Claude Code accountmanager",
    "font": "SF Pro Regular"
   },
   {

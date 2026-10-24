@@ -33,7 +33,7 @@ export default function Clotch() {
             <div className="t-base medio">{acceso ? "clotch è collegato" : "clotch non è installato"}</div>
             <div className="t-sm secondario">
               {acceso
-                ? `${versione ? `Versione ${versione} · v` : "V"}oce, dettatura e avvisi passano dal notch`
+                ? `${versione ? `Versione ${versione}. V` : "V"}oce, dettatura e avvisi passano dal notch`
                 : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
             </div>
           </div>

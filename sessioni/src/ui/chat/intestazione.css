@@ -6,9 +6,9 @@
 .pezzo-chat .intestazione .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .pezzo-chat .intestazione .dati, .pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .dato, .pezzo-chat .intestazione .ramo { display: flex; align-items: center; white-space: nowrap; }
 /* al massimo due righe: i dati che non ci stanno vanno a capo per intero, uno troppo lungo si accorcia con i puntini; il testo intero sta nel suggerimento */
-.pezzo-chat .intestazione .dati { flex-wrap: wrap; max-height: calc(2 * var(--testo-riga-xs)); overflow: hidden; column-gap: var(--spazio-2); min-width: 0; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .intestazione .dati { flex-wrap: wrap; max-height: calc(2 * var(--testo-riga-xs)); overflow: hidden; column-gap: var(--spazio-3); min-width: 0; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .pezzo-chat .intestazione .dato { gap: var(--spazio-2); flex: 0 1 auto; min-width: 0; max-width: 100%; }
-.pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .separatore { flex: none; }
+.pezzo-chat .intestazione .stato { flex: none; }
 .pezzo-chat .intestazione .stato, .pezzo-chat .intestazione .ramo { gap: var(--spazio-1); }
 .pezzo-chat .intestazione .ramo { min-width: 0; }
 .pezzo-chat .intestazione .testo-dato, .pezzo-chat .intestazione .codice { min-width: 0; overflow: hidden; text-overflow: ellipsis; }

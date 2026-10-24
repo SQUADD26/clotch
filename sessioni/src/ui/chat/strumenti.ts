@@ -40,25 +40,25 @@ function fileTrovati(uscita: string) {
 
 export interface Frase { verbo: string; oggetto: string }
 
-/** Verbo in grigio e oggetto in chiaro, come «Riga strumento» (163:84207): «Legge» «Ricerca.tsx». */
+/** Nome in grigio e oggetto in chiaro, come «Riga strumento» (163:84207): «Lettura» «Ricerca.tsx». Stile nominale e asciutto, senza verbi (#876). */
 export function frase(nome: string, ingresso: unknown, uscita = ""): Frase {
   const file = base(campo(ingresso, "file_path") || campo(ingresso, "path") || campo(ingresso, "notebook_path"));
   const f = (verbo: string, oggetto = "") => ({ verbo, oggetto });
   switch (nome) {
-    case "Bash": return f(campo(ingresso, "description") || "Esegue un comando");
-    case "Read": return f("Legge", file);
+    case "Bash": return f("Comando", campo(ingresso, "description")); // la descrizione la scrive il modello: si cita com'è
+    case "Read": return f("Lettura", file);
     case "Grep": case "Glob": {
       const cosa = `"${campo(ingresso, "pattern")}"`, n = uscita ? fileTrovati(uscita) : 0;
-      if (nome === "Glob") return f("Trova", n ? `${n} file ${cosa}` : `file ${cosa}`);
-      return f("Cerca", n ? `${cosa} in ${n} file` : campo(ingresso, "path") ? `${cosa} in ${file}` : cosa);
+      const dove = n ? `, ${n} file` : nome === "Grep" && campo(ingresso, "path") ? `, ${file}` : "";
+      return f(nome === "Glob" ? "Ricerca file" : "Ricerca", cosa + dove);
     }
-    case "Write": return f("Scrive", file);
+    case "Write": return f("Creazione", file);
     case "Edit": case "MultiEdit": case "NotebookEdit": return f("Modifica", file);
-    case "WebSearch": return f("Cerca sul web", `"${campo(ingresso, "query")}"`);
-    case "WebFetch": { const u = campo(ingresso, "url"); try { return f("Apre", new URL(u).hostname.replace(/^www\./, "")); } catch { return f("Apre una pagina web"); } }
+    case "WebSearch": return f("Ricerca web", `"${campo(ingresso, "query")}"`);
+    case "WebFetch": { const u = campo(ingresso, "url"); try { return f("Pagina web", new URL(u).hostname.replace(/^www\./, "")); } catch { return f("Pagina web"); } }
     default:
-      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return f("Fotografa", campo(ingresso, "name") || "lo schermo");
-      return f("Usa", nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " "));
+      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return f("Foto", campo(ingresso, "name") || "schermo");
+      return f(nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " "));
   }
 }
 

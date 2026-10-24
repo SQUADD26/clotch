@@ -147,18 +147,18 @@ H.avvia('requisiti-a', async () => {
 
   await req('D8', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000)]; }); await caricaChat();
-    await wait(() => document.querySelector('.pensiero .luccica')?.textContent === 'Sta ragionando…');
+    await wait(() => document.querySelector('.pensiero .luccica')?.textContent === 'Ragionamento');
     assert.equal(await run(() => document.querySelector('.pensiero button')), null, 'in corso non si apre');
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000), AS('ecco', 5000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
-    await wait(() => /^Ragionato per/.test(document.querySelector('.pensiero .titolo')?.textContent || ''));
-    assert.equal(await run(() => !!document.querySelector('.pensiero .rientrato')), false); await clicca('.pensiero button', 'Ragionato per 4 s');
+    await wait(() => /^Ragionamento/.test(document.querySelector('.pensiero button')?.textContent || ''));
+    assert.equal(await run(() => !!document.querySelector('.pensiero .rientrato')), false); await clicca('.pensiero button', 'Ragionamento 4 s');
     assert.deepEqual(await testo('.pensiero .rientrato .testo'), ['ragiono sul problema']);
   });
 
   await req('D9', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('p', 1000), AS('prima', 65000), PE('q', 66000), AS('ecco', 3_726_000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
-    await wait(() => document.querySelectorAll('.pensiero .titolo').length === 2);
-    assert.deepEqual(await testo('.pensiero .titolo'), ['Ragionato per 1 min 4 s', 'Ragionato per 1 h 1 min']);
+    await wait(() => document.querySelectorAll('.pensiero .durata').length === 2);
+    assert.deepEqual(await testo('.pensiero .durata'), ['1 min 4 s', '1 h 1 min']);
     await wait(() => /^Finita/.test(document.querySelector('.riga-stato .esito')?.textContent || ''));
     assert.match(await run(() => document.querySelector('.riga-stato .esito').textContent), /^Finita in \d/);
   });

@@ -38,7 +38,7 @@ H.avvia('requisiti-b', async () => {
     assert.deepEqual(await testo('.finestra-ricerca .titolo-gruppo, .finestra-ricerca .titolo-sezione .testo'), ['Azioni', 'Sessioni', 'Messaggi']);
     assert.deepEqual(await testo('.voce-azione .etichetta'), ['Copia link alla sessione', 'Copia cartella di lavoro', 'Copia ID sessione', 'Copia ultimo blocco di codice']);
     const r = await run(() => [...document.querySelectorAll('.risultato')].map((b) => [...b.querySelectorAll('.testo, .t-xs')].map((e) => e.textContent)));
-    assert.equal(r.length, 2); assert.deepEqual([r[0][0], r[0][2], r[1]], ['Beta copia', 'Oggi', ['Gamma tre', '… ha detto copia davvero …', 'Ieri']]); assert.match(r[0][1], /^beta-app · Codex/);
+    assert.equal(r.length, 2); assert.deepEqual([r[0][0], r[0][2], r[1]], ['Beta copia', 'Oggi', ['Gamma tre', '… ha detto copia davvero …', 'Ieri']]); assert.match(r[0][1], /^beta-app, Codex/);
     await clicca('.voce-azione', 'Copia ID sessione'); await wait(() => !document.querySelector('.finestra-ricerca')); assert.deepEqual(fatte('sessioni:azione'), [['s1', 'copia-id']]);
   });
 
@@ -163,7 +163,7 @@ H.avvia('requisiti-b', async () => {
     await wait(() => document.querySelectorAll('.riga.azione').length === 4); assert.deepEqual(imposta(), [{ accountTolti: ['~/.claude-squadd'] }]);
     await wait(() => /Cartella rimossa/.test(document.querySelector('.area-avvisi').innerText)); await clicca('.area-avvisi button', 'Annulla');
     await wait(() => document.querySelectorAll('.riga.azione').length === 5); assert.deepEqual(imposta().at(-1), { accountTolti: [] });
-    rispondi['impostazioni:scegli-cartella'] = () => '~/.claude-nuovo'; rispondi['impostazioni:cartelle'] = (p) => p.map((x) => ({ percorso: x, dettaglio: '0 sessioni · letta ora', errore: false }));
+    rispondi['impostazioni:scegli-cartella'] = () => '~/.claude-nuovo'; rispondi['impostazioni:cartelle'] = (p) => p.map((x) => ({ percorso: x, dettaglio: '0 sessioni, letta ora', errore: false }));
     await clicca('button', 'Aggiungi cartella'); await wait(() => document.querySelectorAll('.riga.azione').length === 6);
     assert.deepEqual(imposta().at(-1), { accountAggiunti: ['~/.claude-nuovo'] }); assert.ok((await righe()).includes('~/.claude-nuovo'));
   });

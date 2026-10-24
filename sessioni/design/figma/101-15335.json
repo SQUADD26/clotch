@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2138,7 +2139,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2185,7 +2186,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2194,7 +2195,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2635,7 +2636,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2705,30 +2706,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:15357;101:7420",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 406,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:15357;101:7421",
    "nome": "progetto",
    "tipo": "TEXT",
    "box": {
-    "x": 418,
+    "x": 410,
     "y": 140,
     "w": 35,
     "h": 16
@@ -2743,30 +2725,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:15357;101:7422",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 461,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:15357;101:7416",
    "nome": "ramo",
    "tipo": "FRAME",
    "box": {
-    "x": 473,
+    "x": 457,
     "y": 140,
     "w": 201,
     "h": 16
@@ -2781,7 +2744,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 473,
+    "x": 457,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2797,7 +2760,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 474.3330078125,
+    "x": 458.3330078125,
     "y": 141.33203125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2812,7 +2775,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 493,
+    "x": 477,
     "y": 140,
     "w": 181,
     "h": 16
@@ -2827,30 +2790,11 @@
    "font": "Menlo Regular"
   },
   {
-   "id": "I101:15357;101:7423",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 682,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:15357;101:7424",
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 694,
+    "x": 670,
     "y": 140,
     "w": 51,
     "h": 16
@@ -2865,32 +2809,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:15357;101:7425",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 753,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:15357;101:7426",
    "nome": "sorgente",
    "tipo": "TEXT",
    "box": {
-    "x": 765,
+    "x": 733,
     "y": 140,
-    "w": 179,
+    "w": 180,
     "h": 16
    },
    "variabili": {
@@ -2899,7 +2824,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Claude Code · accountmanager",
+   "testo": "Claude Code accountmanager",
    "font": "SF Pro Regular"
   },
   {
@@ -4360,7 +4285,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "18 strumenti · 3 file · 2 aiutanti",
+   "testo": "18 strumenti 3 file 2 aiutanti",
    "font": "SF Pro Regular"
   },
   {
