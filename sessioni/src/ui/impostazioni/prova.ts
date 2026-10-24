@@ -42,6 +42,7 @@ const PROVE: Record<string, Prova> = {
   "119-57404": { aperta: "Versione" },
   "119-57552": { novita: true },
   "119-57613": { scheda: "andamento" },
+  "155-74479": { scheda: "andamento" },
   "119-57161": { cerca: "voce" },
   "119-57301": { cerca: "tema" },
 };

@@ -1,6 +1,6 @@
-// figma: 101-48825 — Impostazioni · Uso (Panoramica) con Clotch (dati dal notch); senza Clotch: 101-48888; scheda Andamento: 119-57613.
+// figma: 101-48825 — Impostazioni · Uso (Panoramica) con Clotch (dati dal notch); senza Clotch: 101-48888; scheda Andamento: 119-57613, vuota: 155-74479.
 // Dati veri dal feed di Clotch (quote-uso.ts, #374). Errore del feed: nessun numero (nessun testo di errore disegnato).
-// shortcut: il feed non dà l'uso al giorno, quindi la scheda Andamento resta vuota; quando la fonte ha la serie (`giorni`), si disegna da sola.
+// shortcut: il feed non dà l'uso al giorno, quindi la scheda Andamento mostra «Nessun uso registrato» (155-74479); quando la fonte ha la serie (`giorni`), si disegna da sola.
 import { useEffect, useState } from "react";
 import type { QuotaUso } from "../../tipi";
 import { fa } from "../../uso-testi";
@@ -43,16 +43,19 @@ function Panoramica({ quote }: { quote: QuotaUso[] }) {
 
 function Andamento({ quote }: { quote: QuotaUso[] }) {
   const giorni = quote[0]?.giorni ?? [];
-  if (!giorni.length) return <Gruppo><VuotoLista titolo="Nessun dato per l’andamento" corpo="L’uso al giorno non è ancora disponibile." /></Gruppo>;
   const totale = giorni.map((_, i) => quote.reduce((s, q) => s + (q.giorni?.[i]?.v ?? 0), 0));
   const massimo = Math.max(...totale, 1);
+  const testata = (
+    <div className="testata">
+      <span className="t-base medio">Ultimi {giorni.length || 14} giorni</span>
+      <span className="t-sm secondario">Uso al giorno per account</span>
+    </div>
+  );
+  if (!giorni.length) return <Gruppo><div className="andamento">{testata}<VuotoLista titolo="Nessun uso registrato" corpo="L’andamento compare quando un account lavora in una sessione." /></div></Gruppo>;
   return (
     <Gruppo>
       <div className="andamento">
-        <div className="testata">
-          <span className="t-base medio">Ultimi {giorni.length} giorni</span>
-          <span className="t-sm secondario">Uso al giorno per account</span>
-        </div>
+        {testata}
         <div className="grafico">
           {giorni.map((g, i) => (
             <div key={g.giorno} className="giorno">
