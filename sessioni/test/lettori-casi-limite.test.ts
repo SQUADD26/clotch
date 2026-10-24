@@ -63,7 +63,7 @@ test("riga da 3 MB in mezzo al file: si legge intera, le righe attorno non si pe
 });
 
 // Difetto aperto in src/messaggi.ts (leggiBlocco/leggiPagina, fuori dai miei file): il resto della riga tagliata passa da stringa e un carattere a due byte a cavallo del blocco diventa U+FFFD.
-test("UTF-8 a cavallo del blocco da 1 MB: il testo resta identico", { todo: "aperto: src/messaggi.ts:37-38, resto decodificato prima del join" }, () => {
+test("UTF-8 a cavallo del blocco da 1 MB: il testo resta identico", () => {
   for (const prefisso of ["", "a"]) {
     const file = path.join(tmp(), "s.jsonl");
     fs.writeFileSync(file, sorgenti["claude-code"](prefisso + "è".repeat(600000)) + sorgenti["claude-code"]("fine"));

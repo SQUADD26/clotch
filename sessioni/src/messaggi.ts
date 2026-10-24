@@ -1,7 +1,7 @@
 // Messaggi di una sessione, a pagine dalla fine del file: un file di molti MB non si carica intero.
 import { createHash } from "node:crypto";
 import * as fs from "node:fs";
-import { parseRiga, leggiBlocco, msgErrore } from "./jsonl";
+import { parseRiga, leggiBytes, msgErrore } from "./jsonl";
 import { Convertitore } from "./messaggi-claude";
 import { ConvertitoreCodex, ConvertitoreCursor } from "./messaggi-altri";
 import { Messaggio, PaginaMessaggi, Sessione } from "./tipi";
@@ -30,14 +30,16 @@ export function leggiPagina(s: Pick<Sessione, "file" | "sorgente">, pagina: numb
   }
   try {
     const servono = (pagina + 1) * dim + 1;
-    let da = size, righe: string[] = [], resto = "", blocco = 1 << 20;
+    let da = size, righe: string[] = [], resto = Buffer.alloc(0), blocco = 1 << 20;
     let messaggi: Messaggio[] = [];
     while (da > 0 && messaggi.length < servono) {
       const fine = da;
       da = Math.max(0, fine - blocco);
-      const parti = (leggiBlocco(s.file, da, fine) + resto).split("\n");
-      resto = da > 0 ? parti.shift()! : ""; // la prima riga è tagliata: tocca al blocco prima, che la chiude
-      righe = parti.concat(righe);
+      // byte, non testo: un carattere UTF-8 a cavallo di due blocchi si decodifica solo a riga intera
+      const buf = Buffer.concat([leggiBytes(s.file, da, fine), resto]);
+      const taglio = da > 0 ? buf.indexOf(10) + 1 : 0; // la prima riga è tagliata: tocca al blocco prima, che la chiude
+      resto = da > 0 ? buf.subarray(0, taglio ? taglio - 1 : buf.length) : Buffer.alloc(0);
+      if (da === 0 || taglio) righe = buf.subarray(taglio).toString("utf8").split("\n").concat(righe);
       messaggi = converti(righe, s);
       blocco *= 2; // doppio ogni giro: una pagina profonda non rilegge il file mille volte
     }
