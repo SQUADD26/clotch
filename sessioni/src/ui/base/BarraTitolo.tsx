@@ -28,8 +28,8 @@ export function BarraTitolo() {
         <span className="luce rosso" /><span className="luce giallo" /><span className="luce verde" />
       </div>
       <div className="navigazione">
-        {/* nelle impostazioni la navigazione ha solo indietro e avanti (101-17193) */}
-        {n.vista !== "impostazioni" && (
+        {/* nelle impostazioni, a finestra larga, la navigazione ha solo indietro e avanti (101-17193); a finestra stretta il bottone apre la loro navigazione sopra la pagina (#531) */}
+        {(n.vista !== "impostazioni" || n.sovrapposta) && (
           <Suggerimento testo={n.barraAperta ? "Nascondi barra laterale" : "Mostra barra laterale"} scorciatoia={scorciatoie.barra} forzato={n.sezione === "suggerimento-barra"}>
             <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} {...nuda} />
           </Suggerimento>

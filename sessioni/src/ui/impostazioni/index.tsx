@@ -40,7 +40,7 @@ export default function Impostazioni() {
   const Pagina = PAGINE[sezione];
   return (
     <div className="impostazioni">
-      <nav className="nav-impostazioni" aria-label="Impostazioni">
+      {(!n.sovrapposta || n.barraAperta) && <nav className={`nav-impostazioni${n.sovrapposta ? " sopra" : ""}`} aria-label="Impostazioni">
         <div className="titolo t-lg">Impostazioni</div>
         <Ricerca testo={cerca} onTesto={setCerca} sezione={sezione} />
         {!cerca.trim() && SEZIONI.map(([id, nome, icona]) => (
@@ -49,7 +49,7 @@ export default function Impostazioni() {
             <Icona nome={icona} /><span>{nome}</span>
           </button>
         ))}
-      </nav>
+      </nav>}
       <Superficie>
         <div className="scorre-impostazioni"><Pagina key={n.sezione} sotto={sotto} /></div>
         <AreaAvvisi />

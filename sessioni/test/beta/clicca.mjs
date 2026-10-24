@@ -36,7 +36,7 @@ async function giro(app, area, cfg, console_) {
   const difetti = async (dove, f) => (await pagina.evaluate(([r, t]) => window.__bt.statiche(r, t, []), [radice, TOK])).forEach((x) => reg.difetti.push({ ...x, quando: dove, foto: f }));
   const segna = () => pagina.evaluate((r) => window.__bt.cliccabili(r).map((e, i) => (e.setAttribute('data-bt', i), window.__bt.sel(e))), radice);
   const pulito = async () => { await pagina.reload(); await pagina.waitForSelector('.cornice:not(.in-avvio)', { timeout: 15000 }).catch(() => {}); await configura(app, cfg); await pausa(300);
-    if (AREE[area].apri && !(await pagina.locator(radice).first().isVisible())) { await pagina.locator(AREE[area].apri).first().click({ timeout: 2000 }).catch(() => {}); await pausa(400); }
+    if (AREE[area].apri && !(await pagina.locator(AREE[area].ancora ?? radice).first().isVisible())) { await pagina.locator(AREE[area].apri).first().click({ timeout: 2000 }).catch(() => {}); await pausa(400); }
   };
 
   await pulito();

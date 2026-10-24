@@ -38,7 +38,13 @@ function Corpo() {
   useEscChiude(n.sovrapposta && n.barraAperta, n.alternaBarra);
   useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
   const attributi = { ref: corpo, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
-  if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
+  // finestra stretta: la navigazione delle impostazioni sta sopra la pagina, con lo stesso velo della barra laterale (#531)
+  if (impostazioni) return (
+    <>
+      <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>
+      {n.sovrapposta && n.barraAperta && <div className="velo-barra" onClick={n.alternaBarra} />}
+    </>
+  );
   const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
   const fissa = n.barraAperta && !n.sovrapposta;
   return (

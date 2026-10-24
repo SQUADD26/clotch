@@ -20,7 +20,7 @@ export const AREE = {
   chat: { scena: '101-8036', radice: '.pezzo-chat' },
   nuova: { scena: '148-51982', radice: '.nuova-sessione' },
   friday: { scena: '101-16432', radice: '.pezzo-clotch-ai' },
-  impostazioni: { scena: '101-17193', radice: '.pezzo-impostazioni' },
+  impostazioni: { scena: '101-17193', radice: '.pezzo-impostazioni', ancora: '.nav-impostazioni', apri: '.barra-titolo [aria-label="Barra laterale"]' }, // a finestra stretta la navigazione si apre sopra
   cornice: { scena: '101-8036', radice: '.barra-titolo' },
 };
 
