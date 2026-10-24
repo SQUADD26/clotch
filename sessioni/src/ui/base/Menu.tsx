@@ -8,7 +8,7 @@ import "./menu.css";
 
 export type VoceMenu =
   /** `scelta`: se una voce la ha, tutte tengono il posto della spunta; si vede solo su quella scelta. */
-  | { icona?: NomeIcona; etichetta: string; scorciatoia?: string; pericolo?: boolean; scelta?: boolean; fai(): void }
+  | { icona?: NomeIcona; etichetta: string; scorciatoia?: string; pericolo?: boolean; scelta?: boolean; /** Spenta: grigia, saltata dalle frecce; `perche` è il suo tooltip. */ disabilitata?: boolean; perche?: string; fai(): void }
   /** Titolo di un gruppo di voci («Skill», 101-25845). */
   | { gruppo: string }
   | "separatore";
@@ -36,10 +36,23 @@ export function Menu({ voci, onChiudi, testata, ancora, lato, fine, scarto, clas
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!el) return;
-    (el.querySelector<HTMLButtonElement>("button.scelta") ?? el.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
+    (el.querySelector<HTMLButtonElement>("button.scelta") ?? el.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")[inizio])?.focus();
+    let cerca = "", quando = 0;
     const tasto = (e: KeyboardEvent) => {
+      const b = [...el.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")];
+      // Tab chiude il menu (come un menu di sistema); il fuoco torna a chi lo ha aperto
+      if (e.key === "Tab") { e.preventDefault(); onChiudi(); return; }
+      if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey && e.key !== " ") {
+        // scrivere salta alla voce che comincia così; la stessa lettera ripetuta passa alla successiva
+        cerca = Date.now() - quando > 700 ? e.key.toLowerCase() : cerca + e.key.toLowerCase();
+        quando = Date.now();
+        const dopo = [...b.slice(b.indexOf(document.activeElement as HTMLButtonElement) + 1), ...b];
+        const ripetuta = [...cerca].every((c) => c === cerca[0]);
+        (dopo.find((x) => x.textContent?.trim().toLowerCase().startsWith(ripetuta ? cerca[0] : cerca) ?? false))?.focus();
+        e.preventDefault();
+        return;
+      }
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Home" && e.key !== "End") return;
-      const b = [...el.querySelectorAll<HTMLButtonElement>("button")];
       const i = b.indexOf(document.activeElement as HTMLButtonElement);
       b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
@@ -65,9 +78,9 @@ export function Menu({ voci, onChiudi, testata, ancora, lato, fine, scarto, clas
         : "gruppo" in v ? <div key={i} className="titolo-gruppo t-xs secondario">{v.gruppo}</div>
         : (
           <button key={i} type="button" role={conScelta ? "menuitemradio" : "menuitem"} aria-checked={conScelta ? !!v.scelta : undefined}
-            className={v.scelta ? "voce scelta" : "voce"} onMouseEnter={(e) => e.currentTarget.focus()} onClick={() => { onChiudi(); v.fai(); }}>
+            className={v.scelta ? "voce scelta" : "voce"} disabled={v.disabilitata} title={v.disabilitata ? v.perche : undefined} onMouseMove={(e) => { if (!v.disabilitata && document.activeElement !== e.currentTarget) e.currentTarget.focus(); }} onClick={() => { onChiudi(); v.fai(); }}>
             {conScelta && <span className={v.scelta ? "spunta" : "spunta nascosta"}><Icona nome="spunta" colore="primaria" /></span>}
-            {v.icona && <Icona nome={v.icona} colore={v.pericolo ? "errore" : "secondaria"} />}
+            {v.icona && <Icona nome={v.icona} colore={v.disabilitata ? "terziaria" : v.pericolo ? "errore" : "secondaria"} />}
             <span className={`etichetta t-sm ${v.pericolo ? "pericolo" : ""}`}>{v.etichetta}</span>
             {v.scorciatoia && <span className="t-sm secondario">{v.scorciatoia}</span>}
           </button>

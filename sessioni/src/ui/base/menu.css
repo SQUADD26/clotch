@@ -10,7 +10,7 @@
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
 /* la voce col fuoco è evidenziata anche se il menu si apre col mouse (101:28635); il passaggio sposta il fuoco, così ce n'è una sola */
-.menu .voce:hover, .menu .voce:focus { background: var(--colore-fondo-riga-passaggio); outline: none; }
+.menu .voce:hover:not(:disabled), .menu .voce:focus { background: var(--colore-fondo-riga-passaggio); outline: none; }
 .menu .etichetta { flex: 1; min-width: 0; color: var(--colore-testo-primario); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .menu .etichetta.pericolo { color: var(--colore-testo-errore); }
 .menu .separatore { padding: var(--spazio-1) var(--spazio-2); }
@@ -20,3 +20,6 @@
 .menu .spunta.nascosta { visibility: hidden; }
 .menu .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
 .menu .voci-menu { display: flex; flex-direction: column; }
+/* voce spenta: testo e icona terziari, nessun passaggio, nessun fuoco (saltata dalle frecce) */
+.menu .voce:disabled { cursor: default; }
+.menu .voce:disabled .etichetta { color: var(--colore-testo-terziario); }

@@ -149,6 +149,14 @@ function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, centro = false
     addEventListener("resize", metti);
     return () => { o.disconnect(); removeEventListener("resize", metti); };
   }, [dove, lato, fine, centro, scarto]);
+  // l'ancora si muove con lo scorrimento di un antenato (elenco, pannello): il sovrapposto non la segue, quindi si chiude (#740)
+  useEffect(() => {
+    const scorre = (e: Event) => { if (!ref.current?.contains(e.target as Node)) onChiudiRif.current?.(); };
+    addEventListener("scroll", scorre, true);
+    return () => removeEventListener("scroll", scorre, true);
+  }, []);
+  const onChiudiRif = useRef(onChiudi);
+  onChiudiRif.current = onChiudi;
   if (!passivo) useStrato(ref, () => onChiudi?.(), { ancora }); // passivo non cambia nella vita del componente
   useUscita(ref);
   useLayoutEffect(() => { rif?.(ref.current); return () => rif?.(null); }, []);
