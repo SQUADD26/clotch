@@ -56,10 +56,11 @@
 .pezzo-chat .filo .testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-chat .filo .testata:not(:disabled):active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-chat .filo :is(.strumento, .pensiero) > .testata {
-  box-sizing: content-box; width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
+  width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
 }
-.pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
+.pezzo-chat .pensiero .testata { gap: var(--spazio-1); align-self: flex-start; }
+.pezzo-chat .filo .pensiero > .testata { width: auto; } /* «Ragionato per…» è larga quanto il suo testo: il fondo del passaggio le sta attorno */
 .pezzo-chat .testata .tipo { font-weight: 500; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .testata .dettaglio {
@@ -99,7 +100,7 @@
 .pezzo-chat .differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
 
 .pezzo-chat .file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
-.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: calc(var(--raggio-lg) - var(--misura-tratto)); } /* il fuoco segue la forma dentro il bordo */
+.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: var(--raggio-lg); } /* il fuoco segue la forma del contenitore */
 .pezzo-chat .file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .file-toccati .file {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);
