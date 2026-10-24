@@ -2,7 +2,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFile } from "node:child_process";
-import { app, clipboard, shell, type IpcMain } from "electron";
+import { app, clipboard, nativeTheme, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import { apriFinestra } from "./finestra";
 import { impostaImpostazioni, impostaPreferenze, leggiImpostazioni, leggiPreferenze } from "./preferenze";
@@ -15,12 +15,15 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
   ipc.handle("sessioni:preferenze", () => leggiPreferenze(file));
   ipc.handle("sessioni:imposta-preferenze", (_e, id: string, parte) => { invia("sessioni:preferenze", impostaPreferenze(file, String(id), parte ?? {})); });
   ipc.handle("sessioni:impostazioni", () => leggiImpostazioni(file));
-  try { sessioni.impostazioni(leggiImpostazioni(file)); } catch { /* file rotto: elenco senza filtro, il file non si tocca */ }
+  // «Tema» di Aspetto (#1093): menu nativi e controlli del motore lo seguono; Automatico = come il Mac
+  const tema = (v: { tema?: unknown }) => { if (nativeTheme) nativeTheme.themeSource = v.tema === "Chiaro" ? "light" : v.tema === "Scuro" ? "dark" : "system"; };
+  try { const v = leggiImpostazioni(file); sessioni.impostazioni(v); tema(v); } catch { /* file rotto: elenco senza filtro, il file non si tocca */ }
   ipc.handle("sessioni:imposta-impostazioni", (_e, parte) => {
     const salvate = impostaImpostazioni(file, parte ?? {});
     if (!provaSilenziosa()) applicaMotore(parte ?? {}); // voce e dettatura del notch: i file che il notch legge (#534)
     invia("sessioni:impostazioni", salvate);
     sessioni.impostazioni(salvate); // l'elenco segue le impostazioni (#404)
+    tema(salvate);
   });
   ipc.handle("sessioni:azione", (_e, id: string, azione: AzioneSessione) => {
     const s = sessioni.elencoSessioni().sessioni.find((x) => x.id === id);

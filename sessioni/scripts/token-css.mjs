@@ -14,13 +14,18 @@ const CSS = join(root, 'src/ui/base/token.css'), TS = join(root, 'src/ui/base/to
 const FAMIGLIA = { 'SF Pro': '"SF Pro", -apple-system, system-ui', Menlo: 'Menlo, monospace',
   'SF Pro Rounded': 'ui-rounded, "SF Pro Rounded", -apple-system, system-ui', 'SF Mono': 'ui-monospace, "SF Mono", Menlo, monospace' };
 
-export function voci(tokens) {
+// I modi di Figma: «Scuro» è la base (:root), «Chiaro» ridefinisce solo ciò che cambia (#1093).
+export const MODI = ['Scuro', 'Chiaro'];
+
+/** Le variabili di un modo; una collezione senza quel modo dà quelle del suo primo modo (misure, tempi: uguali nei due temi). */
+export function voci(tokens, voluto = MODI[0]) {
   const out = new Map(); // nome CSS -> {tipo, valore}
   for (const [col, modi] of Object.entries(tokens)) {
     if (col.startsWith('$')) continue;
     const modi_ = Object.keys(modi).filter((m) => !m.startsWith('$'));
-    if (modi_.length !== 1) throw new Error(`tokens.json: «${col}» ha ${modi_.length} modi (${modi_.join(', ')}); l'app è solo scura, ne serve uno`);
-    const modo = modi_[0];
+    const ignoti = modi_.filter((m) => !MODI.includes(m));
+    if (ignoti.length) throw new Error(`tokens.json: «${col}» ha modi sconosciuti (${ignoti.join(', ')}); l'app conosce ${MODI.join(' e ')}`);
+    const modo = modi_.includes(voluto) ? voluto : modi_[0];
     const giu = (nodo, via) => {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
@@ -44,8 +49,12 @@ export function voci(tokens) {
 export function genera(tokens) {
   const v = voci(tokens);
   const testa = '/* Generato da scripts/token-css.mjs da design/tokens.json: non si modifica a mano. */\n';
-  const css = testa + ':root {\n' + [...v].map(([n, { tipo, valore }]) =>
-    `  --${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
+  const riga = ([n, { tipo, valore }]) => `--${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`;
+  // tema chiaro: scelto («chiaro») o dal Mac («automatico» con prefers-color-scheme: light); solo ciò che cambia
+  const chiaro = [...voci(tokens, MODI[1])].filter(([n, x]) => v.get(n)?.valore !== x.valore).map(riga);
+  const css = testa + ':root {\n' + [...v].map((x) => `  ${riga(x)}`).join('\n') + '\n}\n' + (chiaro.length
+    ? `:root[data-tema="chiaro"] {\n${chiaro.map((x) => `  ${x}`).join('\n')}\n}\n@media (prefers-color-scheme: light) {\n  :root[data-tema="automatico"] {\n${chiaro.map((x) => `    ${x}`).join('\n')}\n  }\n}\n`
+    : '');
   const ts = testa.replace('/*', '//').replace(' */', '') +
     `export type Token =\n${[...v.keys()].map((n) => `  | "${n}"`).join('\n')};\n\n` +
     '/** `var(--nome)` da usare negli stili in linea. */\nexport const t = (n: Token) => `var(--${n})`;\n\n' +
@@ -55,12 +64,15 @@ export function genera(tokens) {
   return { css, ts };
 }
 
-const { css, ts } = genera(JSON.parse(readFileSync(IN, 'utf8')));
-if (process.argv.includes('--check')) {
-  const vecchi = [CSS, TS].filter((f, i) => { try { return readFileSync(f, 'utf8') !== [css, ts][i]; } catch { return true; } });
-  if (vecchi.length) { console.error(`token non aggiornati: ${vecchi.join(', ')}. Lancia: node scripts/token-css.mjs`); process.exit(1); }
-  console.log('token: ok');
-} else {
-  writeFileSync(CSS, css); writeFileSync(TS, ts);
-  console.log(`token: ${CSS}, ${TS}`);
+// da riga di comando; importato (scripts/contrasto.mjs) dà solo voci() e MODI
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const { css, ts } = genera(JSON.parse(readFileSync(IN, 'utf8')));
+  if (process.argv.includes('--check')) {
+    const vecchi = [CSS, TS].filter((f, i) => { try { return readFileSync(f, 'utf8') !== [css, ts][i]; } catch { return true; } });
+    if (vecchi.length) { console.error(`token non aggiornati: ${vecchi.join(', ')}. Lancia: node scripts/token-css.mjs`); process.exit(1); }
+    console.log('token: ok');
+  } else {
+    writeFileSync(CSS, css); writeFileSync(TS, ts);
+    console.log(`token: ${CSS}, ${TS}`);
+  }
 }
