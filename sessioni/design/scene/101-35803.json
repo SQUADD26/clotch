@@ -19,7 +19,7 @@
     "limite": null,
     "richieste": [],
     "contestoMax": null,
-    "battito": 1792841329378,
+    "battito": 1792842478407,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
@@ -56,7 +56,7 @@
     "annullata": false
    },
    {
-    "id": "r-000000000005",
+    "id": "r-000000000004",
     "t": 1792841400000,
     "cosa": "Promosso dev a main",
     "perche": "",
