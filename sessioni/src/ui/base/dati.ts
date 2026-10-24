@@ -161,10 +161,12 @@ export function useMessaggi(id: string | null) {
       }
     }
   };
-  const s = dati.sessione === id ? dati : nuovaCronologia(id);
-  const righe = righeOrdinate(s).filter((r) => messaggioValido(r.messaggio));
+  const s = useMemo(() => (dati.sessione === id ? dati : nuovaCronologia(id)), [dati, id]);
+  // stessi array finché la cronologia non cambia: chi li ha nelle dipendenze (il filo) non si rifà a ogni render (#474)
+  const righe = useMemo(() => righeOrdinate(s).filter((r) => messaggioValido(r.messaggio)), [s]);
+  const messaggi = useMemo(() => righe.map((r) => r.messaggio), [righe]);
   return { stato: s.errore ? "errore" : carica || dati.sessione !== id ? "carica" : "pronto",
-    errore: s.errore, riprova, messaggi: righe.map((r) => r.messaggio), identita: righe,
+    errore: s.errore, riprova, messaggi, identita: righe,
     pagina: s.pagina, haAltre: !!s.cursore && !s.invalida, totale: s.totale,
     altri, altriCarica, altriErrore, riprovaAltri: s.invalida ? riprova : altri };
 }
