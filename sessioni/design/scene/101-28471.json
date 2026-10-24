@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792844273322,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -46,6 +46,7 @@
      "segni": []
     },
     "file": "",
+    "contesto": 124000,
     "icona": "stella"
    }
   ],
@@ -56,13 +57,13 @@
    {
     "tipo": "utente",
     "testo": "Cosa succede con una cartella che non si legge?",
-    "t": 1792789800000
+    "t": 1792800600000
    },
    {
     "tipo": "assistente",
     "testo": "Il lettore salta le cartelle senza permesso e lo scrive nel registro.",
     "modello": "claude-opus-5-5",
-    "t": 1792789860000
+    "t": 1792800660000
    }
   ]
  },
@@ -72,7 +73,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
@@ -84,5 +94,15 @@
   "impostazioni": null,
   "esiti": {},
   "errori": []
+ },
+ "info": {
+  "s1": {
+   "contesto": null,
+   "file": {
+    "quanti": 3,
+    "aggiunte": 214,
+    "tolte": 12
+   }
+  }
  }
 }
