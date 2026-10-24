@@ -37,8 +37,9 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
       const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata / 2), meta = i >= 0 ? p[i] : null;
       if (a.durata > 100 && meta != null && Math.abs(meta - 0.5) < 0.08) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
     } else if (a.durata > 100 && a.curva === 'linear') D('M3', a, `curva dichiarata lineare (${a.nome})`);
-    // M5 dal gesto che l'ha fatta partire: l'ultimo prima del suo primo fotogramma (premuto, clic o tasto)
-    const gesto = (c.eventi ?? [c.evento]).filter((g) => g != null && t0 != null && g <= t0).at(-1);
+    // M5 dal gesto che l'ha fatta partire: l'ultimo prima del suo primo fotogramma (premuto, clic o tasto). Il tempo di un fotogramma
+    // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
+    const gesto = (c.eventi ?? [c.evento]).filter((g) => g != null && t0 != null && g <= t0 + 1000 / 60).at(-1);
     // un avviso a comparsa nasce dalla risposta del main, non dal gesto: la sua partenza non misura la prontezza
     if (!a.avviso && gesto != null && t0 - gesto > 50) D('M5', a, `parte ${Math.round(t0 - gesto)} ms dopo il gesto`);
   }

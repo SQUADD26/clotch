@@ -17,6 +17,10 @@ test('M5 dal clic, non dal premuto: parte subito dopo il rilascio', () => {
   assert.deepEqual(criteri(difettiMovimento({ evento: 0, eventi: [0, 330], T: a[0].serie.map((s) => s[0]), animazioni: a })), []);
   assert.deepEqual(criteri(difettiMovimento({ evento: 0, eventi: [0], T: a[0].serie.map((s) => s[0]), animazioni: a })), ['M5']);
 });
+test('M5: il rilascio arriva dopo l\'inizio del fotogramma che lo disegna', () => {
+  const a = [anim({ serie: serie(200, (p) => 1 - (1 - p) ** 3).map((s) => [s[0] + 88, ...s.slice(1)]) })];
+  assert.deepEqual(criteri(difettiMovimento({ evento: 100, eventi: [100, 195], T: a[0].serie.map((s) => s[0]), animazioni: a })), []);
+});
 test('gruppo di una View Transition: la misura della foto non è layout', () => assert.deepEqual(criteri(difettiMovimento(giro([anim({ dove: 'html::view-transition-group(superficie)', proprieta: ['width', 'height', 'transform'], serie: serie(200, (p) => 1 - (1 - p) ** 3) })]))), []));
 test('movimento ridotto: si sposta', () =>
   assert.deepEqual(criteri(difettiMovimento(giro([anim({ proprieta: ['transform'], serie: serie(200, () => 1, (p) => 8 * p) })]), { ridotto: true })), ['M8']));
