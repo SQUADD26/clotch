@@ -69,6 +69,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.prova-voce"), object: nil, queue: .main) { _ in
             Task { _ = await VoiceSpeaker.shared.test() }
         }
+        // claude-config#2572 «zitto»: the engine's command to silence the voice and the listening.
+        VoiceInputController.shared.listenForHush()
         for (name, run) in [("voci-italiane", VoiceDiagnostics.listItalianVoices), ("verifica-voce", VoiceDiagnostics.verifyLanguage)] {
             DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.\(name)"), object: nil, queue: .main) { _ in
                 Task { await run() }
