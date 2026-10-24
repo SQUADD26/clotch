@@ -1,5 +1,5 @@
 /* figma: 101-26745 — «menu comandi» 101:27015; 101-27018 — «menu file» 101:27276; 101-26140 — «menu permessi» 101:26398 e «tooltip» 101:26425;
-   101-26427 — «menu modello» 101:26707; 101-27528 — «errore invio» 101:27798 e la casella con il bordo d'errore */
+   148-28674 — «menu modello» (148-28740, 148-28806); 101-27528 — «errore invio» 101:27798 e la casella con il bordo d'errore */
 .pezzo-chat .menu-casella {
   display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-xl); background: var(--colore-fondo-elevato);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
@@ -36,20 +36,27 @@
 .pezzo-chat .chip-menu { position: relative; display: inline-flex; }
 .pezzo-chat .menu-casella.flottante { position: absolute; bottom: calc(100% + var(--spazio-2)); z-index: 4; }
 .pezzo-chat .menu-casella.flottante.sinistra { left: 0; width: var(--misura-menu-permessi); }
-.pezzo-chat .menu-casella.flottante.destra { right: 0; width: var(--misura-menu-modello); }
+.pezzo-chat .menu-casella.flottante.destra { right: 0; bottom: calc(100% + var(--spazio-1)); width: var(--misura-menu-modello); }
 .pezzo-chat .casella button.chip:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
 
 /* contesto usato: il suggerimento sta sopra il chip, poco staccato dal bordo della casella */
 .pezzo-chat .con-suggerimento.sopra.contesto .suggerimento { bottom: calc(100% + var(--spazio-3) + var(--spazio-0-5)); }
 
-/* sforzo a 5 tacche: la barra si accende fino al livello scelto */
-.pezzo-chat .menu-casella .sforzo { display: flex; gap: var(--spazio-0-5); padding: var(--spazio-1) var(--spazio-2) var(--spazio-2); }
-.pezzo-chat .menu-casella .tacca { flex: 1; display: flex; flex-direction: column; align-items: center; gap: var(--spazio-1); min-width: 0; }
-.pezzo-chat .menu-casella .tacca .barra { align-self: stretch; height: var(--misura-tratto-forte); background: var(--colore-bordo-forte); }
-.pezzo-chat .menu-casella .tacca .barra.piena { background: var(--colore-icona-accento); }
-.pezzo-chat .menu-casella .tacca .livello { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); white-space: nowrap; }
-.pezzo-chat .menu-casella .tacca.scelta .livello { font-weight: 500; color: var(--colore-testo-primario); }
-.pezzo-chat .menu-casella .riga-rapida { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1) var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+/* modello (148:28674): nome, «Predefinito» e il numero della scorciatoia o la spunta; «Impegno» si apre a destra, in cima (148:28740); in fondo «Modalità veloce» (148:28806) */
+.pezzo-chat .menu-casella.flottante.destra .titolo-gruppo, .pezzo-chat .menu-casella.impegno .titolo-gruppo { padding: var(--spazio-1-5) var(--spazio-2) var(--spazio-1); }
+.pezzo-chat .menu-casella .voce .testa { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-chat .menu-casella .voce .testa .etichetta { flex: none; }
+.pezzo-chat .menu-casella .predefinito {
+  padding: var(--spazio-0-5) var(--spazio-2); border: var(--misura-tratto) solid var(--colore-bordo-forte); border-radius: var(--raggio-pieno);
+  font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
+}
+.pezzo-chat .menu-casella .numero { width: var(--misura-icona); text-align: center; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .menu-casella .linea-menu { height: var(--misura-tratto); flex: none; background: var(--colore-bordo-leggero); }
+.pezzo-chat .menu-casella .riga-veloce { display: flex; align-items: center; gap: var(--spazio-2); min-height: var(--spazio-10); padding: 0 var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+.pezzo-chat .menu-casella .riga-veloce .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pezzo-chat .menu-casella .riga-veloce .descrizione { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+/* shortcut: la variabile Figma misura/menu-impegno è senza unità (manca l'ambito larghezza); per il tratto la rende in pixel, da togliere quando la variabile avrà l'ambito */
+.pezzo-chat .menu-casella.impegno { position: absolute; top: 0; left: calc(100% + var(--spazio-1)); width: calc(var(--misura-menu-impegno) * var(--misura-tratto)); }
 .pezzo-chat .interruttore {
   width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
   padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
