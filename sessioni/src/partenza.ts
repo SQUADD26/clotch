@@ -14,6 +14,6 @@ export const PARTENZA: ImpostazioniApp = {
   clotchVoce: true, clotchDettatura: true, clotchAvvisi: true, clotchObiettivi: true,
   scorciatoie: {
     cerca: "⌘K", clotchAi: "⌘⇧F", prossima: "⌘J", consenti: "⌘Y", nega: "⌘⌫", ferma: "⌘.",
-    barra: "⌘\\", impostazioni: "⌘,", inviaInterrompi: "↵", coda: "⌘↵", trova: "⌘F",
+    barra: "⌘\\", indietro: "⌘[", avanti: "⌘]", impostazioni: "⌘,", inviaInterrompi: "↵", coda: "⌘↵", trova: "⌘F",
   },
 };
