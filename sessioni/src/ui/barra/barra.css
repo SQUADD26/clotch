@@ -43,6 +43,7 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--colore-testo-lavoro-luce);
   animation: luccica-copia 1.8s linear infinite;
 }
+.pezzo-barra .lavoro .luccica-copia::after { content: attr(data-titolo); } /* la copia è solo CSS: nel DOM il titolo c'è una volta */
 @keyframes luccica { from { transform: translateX(-133.333%); } to { transform: translateX(200%); } }
 @keyframes luccica-copia { from { transform: translateX(80%); } to { transform: translateX(-120%); } }
 /* parità: il fotogramma a 0 ms del disegno, banda sulle lettere 4-10 (come background-position 72%) */

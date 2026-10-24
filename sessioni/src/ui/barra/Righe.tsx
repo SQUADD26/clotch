@@ -86,7 +86,7 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
       </button>
       <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>
         {s.titolo}
-        {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia">{s.titolo}</span></span></span>}
+        {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia" data-titolo={s.titolo} /></span></span>}
       </span>
       {figlie > 0 && (
         <button type="button" className="freccia-figlie" aria-expanded={figlieAperte} aria-label={figlieAperte ? "Nascondi le figlie" : "Mostra le figlie"}
