@@ -1,7 +1,7 @@
 // Aggiornamento dal vivo: fs.watch sulle cartelle, legge solo la coda nuova dei file JSONL.
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { tocca } from "./claude-code";
+import { chiaveCartella, progettiDi, tocca } from "./claude-code";
 import { leggiElenco } from "./elenco";
 import { firmaFile } from "./messaggi";
 import { Cronologia } from "./cronologia";
@@ -47,7 +47,7 @@ export class Osservatore {
     let profili: string[] = [];
     try { profili = fs.readdirSync(support).filter((n) => /^[Cc]laude/.test(n)); } catch { /* niente app */ }
     return [
-      ...radici.map((r) => path.join(h, r, "projects")),
+      ...new Map(radici.map((r) => progettiDi(path.join(h, r))).reverse().map((p) => [chiaveCartella(p), p])).values(), // una cartella vera, un osservatore (col nome del primo account)
       ...profili.map((p) => path.join(support, p, "claude-code-sessions")),
       path.join(h, ".claude", "obiettivi"), path.join(h, ".claude", "sessioni-stato"),
       path.join(h, ".codex", "sessions"), path.join(h, ".cursor", "projects"),

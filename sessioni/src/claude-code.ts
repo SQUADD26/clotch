@@ -66,11 +66,20 @@ function sfoltisci(progetti: string, viste: Set<string>) {
 /** Ultimo risultato per cartella `projects` (sessioni della cache, mai modificate): un giro che non la tocca lo riusa senza ciclo sui file. */
 const ultimi = new Map<string, { radice: string; sessioni: Sessione[] }>();
 
+/** `<radice>/projects`, o la cartella vera se è un link: più account con `projects` linkata alla stessa cartella la leggono e la guardano una volta (#474). */
+export function progettiDi(radice: string): string {
+  const p = path.join(radice, "projects");
+  try { return fs.lstatSync(p).isSymbolicLink() ? fs.realpathSync(p) : p; } catch { return p; }
+}
+
+/** Chi è davvero una cartella (realpath): due nomi della stessa cartella danno la stessa chiave. */
+export const chiaveCartella = (p: string) => { try { return fs.realpathSync(p); } catch { return p; } };
+
 export const tocca = (f: string, x: string) => f === x || x.startsWith(f + path.sep);
 
 /** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dalla cache, senza readdir né stat. */
 export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: string[]): Sessione[] {
-  const progetti = path.join(radice.path, "projects"), firmaRadice = `${radice.account}\0${radice.email}`;
+  const progetti = progettiDi(radice.path), firmaRadice = `${radice.account}\0${radice.email}`;
   const u = sporchi && ultimi.get(progetti);
   if (u && u.radice === firmaRadice && !sporchi.some((f) => tocca(f, progetti) || f.startsWith(progetti + path.sep))) return u.sessioni.map((s) => ({ ...s }));
   ultimi.delete(progetti);
