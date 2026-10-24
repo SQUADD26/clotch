@@ -47,8 +47,8 @@ test("le scratch di Claude Desktop sono un gruppo solo", () => {
 test("le prove automatiche: cartelle temporanee e titoli di prova", () => {
   for (const c of [os.tmpdir(), path.join(os.tmpdir(), "x", "y"), "/tmp/a", "/private/tmp/claude-501/pg/lavoro", "/private/var/folders/y_/T/z"])
     assert.equal(eProva({ cartella: c, titolo: "lavoro" }), true, c);
-  assert.equal(eProva({ cartella: "/Users/x/app", titolo: "★ PROVA-2203 caso B2" }), true);
-  assert.equal(eProva({ cartella: "/Users/x/app", titolo: "CLOTCH_TEST giro" }), true);
+  assert.equal(eProva({ cartella: "/Users/x/app", titolo: "★ PROVA-2203 caso B2" }), false, "il titolo non decide");
+  assert.equal(eProva({ cartella: "/Users/x/app", titolo: "CLOTCH_TEST giro" }), false);
   assert.equal(eProva({ cartella: "/Users/x/app", titolo: "Prova apertura #2355" }), false);
   assert.equal(eProva({ cartella: "/Users/x/tmp-app", titolo: "lavoro" }), false);
   assert.equal(eProva({ cartella: `${SCRATCH}scratch-2026-10-24-df0d92`, titolo: "PROVA-1 ma è una chat vera" }), false);
@@ -65,7 +65,7 @@ test("nell'elenco: worktree nel repo, prove fuori, scratch in uno, cartella vera
   ]);
   const e = leggiElenco({ home: h });
   assert.deepEqual(e.sessioni.map((s) => [s.titolo, s.progetto]).sort(), [
-    ["chat due", SENZA_CARTELLA], ["chat uno", SENZA_CARTELLA], ["vera", "app"], ["worktree", "app"],
+    ["PROVA-7 caso", "app"], ["chat due", SENZA_CARTELLA], ["chat uno", SENZA_CARTELLA], ["vera", "app"], ["worktree", "app"],
   ]);
   assert.equal(leggiElenco({ home: h, conProve: true }).sessioni.length, 6); // le prove di collegamento le vedono
   assert.equal(e.sessioni.find((s) => s.titolo === "worktree")!.cartella, "/Users/x/Repos/app/.claude/worktrees/agent-1"); // la cartella vera della sessione non cambia
