@@ -23,7 +23,8 @@ function frame(id: string) {
 }
 
 /** `sessione`: la finestra si apre già su quella sessione («Apri in una nuova finestra»). */
-export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}): BrowserWindow | null {
+/** `query`: vista di partenza di una scena di prova (`--scena`, beta tester #518). */
+export function apriFinestra(sessione?: string, opzioni: { show?: boolean; query?: Record<string, string | undefined> } = {}): BrowserWindow | null {
   if (!fs.existsSync(pagina)) return null; // renderer non costruito: npm run build
   const grande = frame("101-8036").finestra, piccola = frame("101-29971").finestra; // la più piccola: «Finestra 480»
   // SILENT da solo non mostra mai: la finestra visibile in prova è un'altra scelta, esplicita (CLOTCH_TEST_ANTEPRIMA=1)
@@ -54,7 +55,8 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean } = {}
     w.showInactive();
     console.log(`PREVIEW_READY internal=${screen.getDisplayMatching(w.getBounds()).internal} visible=${w.isVisible()} focused=${w.isFocused()} audioMuted=${w.webContents.isAudioMuted()}`);
   });
-  w.loadFile(pagina, sessione ? { query: { sessione } } : undefined);
+  const query = Object.fromEntries(Object.entries({ ...opzioni.query, ...(sessione && { sessione }) }).filter(([, v]) => v)) as Record<string, string>;
+  w.loadFile(pagina, Object.keys(query).length ? { query } : undefined);
   return w;
 }
 

@@ -23,7 +23,7 @@ export function Suggerimento({ testo, scorciatoia, forzato = false, children }: 
         <Sovrapposto passivo ancora={{ x: el.getBoundingClientRect().left - numero("spazio-2"), y: el.getBoundingClientRect().bottom + numero("spazio-1-5") }}
           className="tooltip" role="tooltip">
           <span>{testo}</span>
-          {scorciatoia && <span className="tasto-tooltip">{scorciatoia}</span>}
+          {scorciatoia && <span className="tasto-chip">{scorciatoia}</span>}
         </Sovrapposto>
       )}
     </span>

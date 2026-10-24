@@ -6,7 +6,3 @@
   border-radius: var(--raggio-md); background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
 }
-.tooltip .tasto-tooltip {
-  padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs); background: var(--colore-fondo-bottone-secondario);
-  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
-}

@@ -31,7 +31,7 @@ export interface VoceCoda { voce: string; testo: string }
 
 export { nomeModello } from "./scelte";
 
-const Tasto = ({ t }: { t: string }) => <span className="tasto">{t}</span>;
+const Tasto = ({ t }: { t: string }) => <span className="tasto-chip">{t}</span>;
 
 function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, preferenza, pref }: {
   voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean; attuale: string | null; preferenza: string; pref?: PreferenzeSessione;

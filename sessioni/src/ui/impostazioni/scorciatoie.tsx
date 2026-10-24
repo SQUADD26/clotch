@@ -35,8 +35,10 @@ export default function Scorciatoie() {
       if (con) setConflitto({ azione: ascolta, tasti: t, con });
       else { setConflitto(null); imposta("scorciatoie", { ...v.scorciatoie, [ascolta]: t }); }
     };
+    const fuori = (e: MouseEvent) => { if (!(e.target as HTMLElement).closest(".in-ascolto")) setAscolta(null); }; // un clic altrove annulla l'ascolto
     addEventListener("keydown", premi, true); // prima delle scorciatoie dell'app
-    return () => removeEventListener("keydown", premi, true);
+    addEventListener("mousedown", fuori, true);
+    return () => { removeEventListener("keydown", premi, true); removeEventListener("mousedown", fuori, true); };
   }, [ascolta, v.scorciatoie]);
 
   const registra = (azione: string) => { setConflitto(null); setAscolta(azione); };
@@ -57,7 +59,7 @@ export default function Scorciatoie() {
                   <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>
                 </div>
               )}
-              {ascolta === azione ? <span className="tasto t-sm in-ascolto">Premi i tasti…</span>
+              {ascolta === azione ? <span className="tasto-chip in-ascolto">Premi i tasti…</span>
                 : c ? <Tasto tasti={c.tasti} errore />
                 : t ? <button type="button" aria-label={`Cambia ${etichetta}`} onClick={() => registra(azione)}><Tasto tasti={t} /></button>
                 : (

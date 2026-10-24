@@ -1,0 +1,29 @@
+/* campi e focus (#521): un campo non disegna mai il suo bordo di focus; lo disegna il contenitore, con il suo raggio, dentro il suo bordo.
+   Esclusi apposta: il campo grande del dialogo (101:10247, il dialogo è il campo), «Cerca» delle impostazioni (101:119-57161, si tinge) e le caselle che cambiano già bordo. */
+input:focus-visible, textarea:focus-visible { outline: none; }
+.campo.piccolo:has(> input:focus-visible), .campo-menu:has(> input:focus-visible), .cerca-icone:has(> input:focus-visible),
+.ricerca-avvio:has(> input:focus-visible), .trova:has(> input:focus-visible), .carta-richiesta .altro:focus-visible {
+  outline: var(--misura-tratto) solid var(--colore-bordo-fuoco); outline-offset: calc(-1 * var(--misura-tratto));
+}
+
+/* chip dei tasti («esc», «⌘K», «⌘↵»): una sola forma ovunque, al centro della riga */
+.tasto-chip {
+  display: inline-flex; align-items: center; flex: none; align-self: center; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
+  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario); white-space: nowrap;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm);
+}
+.tasto-chip.errore { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); }
+
+/* stati: disabilitato e sola lettura per ogni campo e bottone; errore per ogni campo con aria-invalid */
+button:disabled, input:disabled, textarea:disabled { opacity: var(--opacita-spento); }
+input:read-only, textarea:read-only { cursor: default; }
+:is(input, textarea)[aria-invalid="true"] { color: var(--colore-testo-errore); }
+
+/* hover di Bottone e Pillola (riposo/hover/premuto/focus/disabilitato). Il disegno non ha ancora la variabile del primario: `opacity` provvisoria, vedi #521 */
+.bottone.secondario:hover:not(:disabled), .pillola:not(.attiva):hover { background: var(--colore-fondo-riga-scelta); }
+.bottone.pericolo:hover:not(:disabled) { box-shadow: inset 0 0 0 999px var(--colore-fondo-riga-passaggio); }
+.bottone.primario:hover:not(:disabled), .pillola.attiva:hover { opacity: 0.9; }
+
+/* anello di focus sempre dentro il bordo dell'elemento: dentro una lista che scorre o un contenitore con overflow non si taglia mai */
+:focus-visible { outline-offset: calc(-1 * var(--misura-tratto)); }
+.testata:focus-visible { border-radius: var(--raggio-md); } /* testata di un blocco che si apre: il bottone è a spigolo vivo, l'anello no */

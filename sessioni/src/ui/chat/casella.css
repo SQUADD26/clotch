@@ -42,10 +42,6 @@
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
 }
 .pezzo-chat .nota-casella { justify-content: center; }
-.pezzo-chat .tasto {
-  display: inline-flex; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs); background: var(--colore-fondo-bottone-secondario);
-  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
-}
 
 /* suggerimento sopra il bottone, al passaggio (101:43945) */
 .pezzo-chat .con-suggerimento.sopra .suggerimento { display: none; top: auto; bottom: calc(100% + var(--spazio-1)); align-items: center; gap: var(--spazio-2); }

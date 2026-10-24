@@ -6,12 +6,8 @@
 .pezzo-dialoghi .colonne-tasti { display: flex; gap: var(--spazio-6); }
 .pezzo-dialoghi .colonna-tasti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-5); }
 .pezzo-dialoghi .gruppo-tasti { display: flex; flex-direction: column; gap: var(--spazio-1); }
-.pezzo-dialoghi .riga-tasto { height: var(--misura-riga); gap: var(--spazio-2); display: flex; align-items: center; justify-content: space-between; }
-.pezzo-dialoghi .riga-tasto .azione { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pezzo-dialoghi .tasto-chip {
-  flex: none; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
-  background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
-}
+.pezzo-dialoghi .riga-tasto { min-height: var(--misura-riga); gap: var(--spazio-2); display: flex; align-items: center; justify-content: space-between; }
+.pezzo-dialoghi .riga-tasto .azione { flex: 1; min-width: 0; }
 .pezzo-dialoghi .nessuna { padding: var(--spazio-8) var(--spazio-4); gap: var(--spazio-1); display: flex; flex-direction: column; align-items: center; text-align: center; }
 /* figma: 101-22044 — «campo nome»: fondo casella, bordo di fuoco, 32 di altezza */
 .pezzo-dialoghi .campo-nome {
@@ -41,3 +37,9 @@
 .pezzo-dialoghi .freccia.su .icona { transform: rotate(180deg); }
 .pezzo-dialoghi .errore-ore { color: var(--colore-testo-errore); }
 .pezzo-dialoghi .bottone:disabled { opacity: var(--opacita-spento); }
+
+.pezzo-dialoghi .chiudi { border-radius: var(--raggio-xs); }
+.pezzo-dialoghi .chiudi:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-dialoghi .segmento:hover:not(.scelto) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-dialoghi .freccia { border-radius: var(--raggio-xs); }
+.pezzo-dialoghi .freccia:hover { background: var(--colore-fondo-riga-passaggio); }
