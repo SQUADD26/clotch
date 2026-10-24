@@ -5,14 +5,10 @@ import { Icona } from "../base/Icona";
 import { Gruppo, Pagina, Tasto } from "./controlli";
 import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
-import { tastiDi } from "./tasti";
+import { riservatoDa } from "./riservati";
+import { AZIONI, nomeAzione, normalizza, tastiDi } from "./tasti";
 
-const AZIONI: [string, string][] = [
-  ["cerca", "Cerca sessioni"], ["clotchAi", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
-  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["impostazioni", "Apri impostazioni"],
-  ["inviaInterrompi", "Interrompi e invia"], ["coda", "Metti in coda"], ["trova", "Cerca nella sessione"],
-];
-const nome = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
+const nome = nomeAzione;
 
 interface Conflitto { azione: string; tasti: string; con: string }
 
@@ -31,7 +27,7 @@ export default function Scorciatoie() {
       const t = tastiDi(e);
       if (!t) return;
       setAscolta(null);
-      const con = Object.entries(v.scorciatoie).find(([a, x]) => x === t && a !== ascolta)?.[0];
+      const con = Object.entries(v.scorciatoie).find(([a, x]) => normalizza(x) === t && a !== ascolta)?.[0] ?? riservatoDa(t); // `nome()` lascia com'è ciò che non è un'azione modificabile
       if (con) setConflitto({ azione: ascolta, tasti: t, con });
       else { setConflitto(null); imposta("scorciatoie", { ...v.scorciatoie, [ascolta]: t }); }
     };
@@ -49,14 +45,14 @@ export default function Scorciatoie() {
       <Gruppo>
         {AZIONI.map(([azione, etichetta]) => {
           const c = conflitto?.azione === azione ? conflitto : null;
-          const t = tasti[azione];
+          const t = normalizza(tasti[azione]);
           return (
             <div key={azione} className="riga">
               <div className="testi"><div className="t-base">{etichetta}</div></div>
               {c && (
                 <div className="conflitto">
                   <span className="t-sm errore">Già usata da «{nome(c.con)}»</span>
-                  <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>
+                  {AZIONI.some(([a]) => a === c.con) && <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>}
                 </div>
               )}
               {ascolta === azione ? <span className="tasto-chip in-ascolto">Premi i tasti…</span>

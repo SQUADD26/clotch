@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792845823022,
+    "ultimaAttivita": 1792846084306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -55,7 +55,7 @@
    {
     "tipo": "utente",
     "testo": "Togli i gruppi per data dalla barra laterale.",
-    "t": 1792845819022
+    "t": 1792846080306
    },
    {
     "tipo": "strumento",
@@ -68,7 +68,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792845820022,
+    "t": 1792846081306,
     "id": "t0"
    },
    {
@@ -83,14 +83,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792845821022,
+    "t": 1792846082306,
     "id": "t1"
    },
    {
     "tipo": "assistente",
     "testo": "Ho tolto i gruppi per data: ora la barra laterale mostra solo le cartelle dei progetti, con clotch AI fissa in alto. Adesso controllo che i titoli lunghi si taglino bene",
     "modello": "claude-opus-5-5",
-    "t": 1792845822022
+    "t": 1792846083306
    }
   ]
  },

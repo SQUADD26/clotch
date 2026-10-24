@@ -1,6 +1,6 @@
 // Movimento (#520): ogni cosa animata, misurata fotogramma per fotogramma con document.getAnimations() e requestAnimationFrame.
 // Durata e curva devono essere quelle dei token (tempo/*, curva/*); con «riduci movimento» niente spostamenti né infinite.
-// Finestra visibile sotto xvfb (una finestra nascosta salta le View Transition), muta. Stampa una riga «MOV …» per misura.
+// Finestra visibile sotto xvfb con il fuoco (senza fuoco le View Transition non partono), muta. Stampa una riga «MOV …» per misura.
 const { app, BrowserWindow, ipcMain } = require('electron');
 process.env.CLOTCH_TEST_SILENT = '1';
 app.commandLine.appendSwitch('mute-audio');
@@ -31,13 +31,14 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
-  const win = new BrowserWindow({ show: true, focusable: false, width: 1440, height: 900,
+  const win = new BrowserWindow({ show: true, width: 1440, height: 900,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true, backgroundThrottling: false } });
   const run = (fn) => win.webContents.executeJavaScript(typeof fn === 'string' ? fn : `(${fn})()`);
   const wait = async (test, ms = 8000) => { const fine = Date.now() + ms; while (!(await run(test))) { if (Date.now() > fine) throw new Error('Condizione UI non raggiunta: ' + test); await new Promise((r) => setTimeout(r, 20)); } };
   try {
     await win.loadFile(path.join(root, 'renderer/index.html'));
-    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden);
+    win.focus(); win.webContents.focus(); // le transizioni partono solo nella finestra che ha il fuoco
+    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden && document.hasFocus());
     await run(REGISTRA + ";0");
     const tok = await run(() => Object.fromEntries(['tempo-entrata', 'tempo-uscita', 'tempo-pressione', 'tempo-spostamento', 'curva-entrata', 'curva-uscita', 'curva-spostamento', 'scala-premuto']
       .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim()])));
@@ -68,7 +69,7 @@ app.whenReady().then(async () => {
     await misura('MOV-002', 'barra aperta', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E]]);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
     // pannello: il bottone gira obiettivo -> info -> chiuso
-    const pannello = clic('button[aria-label="Pannello"]');
+    const pannello = clic('button[aria-label="Mostra pannello"]');
     const statoPannello = () => run(() => !!document.querySelector('.pannello'));
     while (!(await statoPannello())) await run(`(${pannello})()`), await new Promise((r) => setTimeout(r, 300));
     await misura('MOV-003', 'pannello info', pannello, [['::view-transition-group(pannello)', ...S]]);
@@ -131,6 +132,13 @@ app.whenReady().then(async () => {
     if (await run(() => !!document.querySelector('.velo-barra'))) await run(`(${clic('.velo-barra')})()`), await wait(() => !document.querySelector('.velo-barra'));
     await misura('MOV-012', 'barra sopra apre', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E], ['::view-transition-new(velo)', ...E]]);
     await misura('MOV-013', 'barra sopra chiude', clic('.velo-barra'), [['::view-transition-old(barra)', ...U], ['::view-transition-old(velo)', ...U]]);
+
+    // due cambi di struttura nello stesso fotogramma: la prima transizione è saltata, niente errore non gestito (#750)
+    const rifiuti = await run(`new Promise((fine) => { const r = []; const f = (e) => r.push(String(e.reason)); addEventListener('unhandledrejection', f);
+      const b = document.querySelector('button[aria-label="Barra laterale"]'); b.click(); b.click();
+      setTimeout(() => { removeEventListener('unhandledrejection', f); fine(r); }, 400); })`);
+    assert.deepEqual(rifiuti, [], '#750: promesse di View Transition rifiutate senza gestore');
+    console.log('MOV-023 due transizioni nello stesso fotogramma: 0 errori');
 
     // riduci movimento: niente gruppi che si spostano, niente scale né infinite
     // controllo positivo: uno spinner gira (infinito, tempo-giro) finché il movimento non è ridotto

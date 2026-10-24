@@ -27,7 +27,12 @@ let prossimo = 1;
 const ascolta = new Set<() => void>();
 // lo stato cambia subito (aggiornaAvviso subito dopo avvisa lo trova); solo il ridisegno passa dalla transizione
 const cambia = (nuovi: Avviso[]) => { avvisi = nuovi; conTransizione(() => ascolta.forEach((f) => f())); };
-const timer = (a: Avviso) => { if (a.tipo === "info" || a.tipo === "successo") setTimeout(() => chiudiAvviso(a.id), numero("tempo-avviso")); };
+// col mouse o il fuoco sopra l'avviso resta: chi legge o cerca il bottone non lo vede sparire
+const timer = (a: Avviso) => {
+  if (a.tipo !== "info" && a.tipo !== "successo") return;
+  const scade = () => document.querySelector(`[data-avviso="${a.id}"]:is(:hover, :focus-within)`) ? setTimeout(scade, 1000) : chiudiAvviso(a.id);
+  setTimeout(scade, numero("tempo-avviso"));
+};
 
 /** Mostra un avviso; torna l'id per aggiornarlo (Caricamento -> Successo) o chiuderlo. */
 export function avvisa(a: Omit<Avviso, "id">): number {
@@ -63,7 +68,7 @@ export function AreaAvvisi() {
   return (
     <div className="area-avvisi" role="status" aria-live="polite">
       {lista.map((a) => (
-        <div key={a.id} className="avviso-comparsa" style={{ viewTransitionName: `avviso-${a.id}` }} role={a.tipo === "errore" ? "alert" : undefined}>
+        <div key={a.id} data-avviso={a.id} className="avviso-comparsa" style={{ viewTransitionName: `avviso-${a.id}` }} role={a.tipo === "errore" ? "alert" : undefined}>
           <Icona nome={SEGNO[a.tipo][0]} colore={SEGNO[a.tipo][1]} gira={a.tipo === "caricamento"} />
           <span className="messaggio t-sm">{a.messaggio}</span>
           {a.azione && <button type="button" className="t-sm medio" onClick={() => { a.azione!.fai(); chiudiAvviso(a.id); }}>{a.azione.etichetta}</button>}

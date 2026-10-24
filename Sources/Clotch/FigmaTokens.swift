@@ -38,6 +38,7 @@ enum FigmaToken {
         static let notchTesto30: CGFloat = 30  // notch/testo/30
         static let notchRaggio2: CGFloat = 2  // notch/raggio/2
         static let notchRaggio3: CGFloat = 3  // notch/raggio/3
+        static let notchRaggio5: CGFloat = 5  // notch/raggio/5
         static let notchRaggio6: CGFloat = 6  // notch/raggio/6
         static let notchRaggio7: CGFloat = 7  // notch/raggio/7
         static let notchRaggio10: CGFloat = 10  // notch/raggio/10
@@ -132,6 +133,7 @@ enum FigmaToken {
         static let notchSpazio26: CGFloat = 26  // notch/spazio/26
         static let notchSpazio35: CGFloat = 35  // notch/spazio/35
         static let notchSpazio42: CGFloat = 42  // notch/spazio/42
+        static let notchSpazio64: CGFloat = 64  // notch/spazio/64
         static let notchSpazio16_5: CGFloat = 16.5  // notch/spazio/16_5
         static let notchBiancoA95: Color = Color(nsColor: rgb(0xffffff, 0.949))  // notch/bianco-a95
         static let notchBiancoA80: Color = Color(nsColor: rgb(0xffffff, 0.8))  // notch/bianco-a80
