@@ -64,6 +64,17 @@ export function riparteTra(reset: number, ora: number): string {
   return `Riparte tra ${parti.join(" e ")}`;
 }
 
+/** Percentuale intera ora (0 se la finestra è ripartita) e fine in ms (null se già ripartita); null senza dato: i numeri della barra account (#478). */
+const pct = (f: Finestra, ora: number) => (f.usato === null ? null : Math.round(usatoOra(f, ora) ?? 0));
+const fine = (f: Finestra, ora: number) => (f.reset !== null && f.reset > ora ? f.reset * 1000 : null);
+
+/** Conto alla rovescia vivo di 101:48825-style: «2 h 14 m 08 s»; da un giorno in su «3 g 05 h 12 m 40 s» (frame 148:62191). */
+export function contoAllaRovescia(ms: number): string {
+  const t = Math.max(0, Math.floor(ms / 1000)), due = (n: number) => String(n).padStart(2, "0");
+  const g = Math.floor(t / 86_400), h = Math.floor((t % 86_400) / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+  return g ? `${g} g ${due(h)} h ${due(m)} m ${due(s)} s` : `${h} h ${due(m)} m ${due(s)} s`;
+}
+
 /** Il feed -> una riga per account. Tempi in secondi come li dà il feed, `ora` in ms. Null se il feed non si capisce. */
 export function quoteDalFeed(json: unknown, oraMs: number): QuotaUso[] | null {
   const radice = json as { rows?: unknown; real?: unknown } | null;
@@ -74,12 +85,13 @@ export function quoteDalFeed(json: unknown, oraMs: number): QuotaUso[] | null {
   for (const a of ordina(unisci(come(radice.real), come(radice.rows), ora), ora)) {
     if (vecchio(a, ora) || a.sette.usato === null) continue;
     const account = a.email.split("@")[0], letto = a.ts! * 1000;
+    const finestre = { email: a.email, cinque: pct(a.cinque, ora), cinqueFine: fine(a.cinque, ora), sette: pct(a.sette, ora), setteFine: fine(a.sette, ora) };
     if ((usatoOra(a.cinque, ora) ?? 0) >= 100) {
-      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto · riparte alle ${orario(a.cinque.reset! * 1000)}`, letto });
+      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto · riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });
       continue;
     }
     const sette = usatoOra(a.sette, ora);
-    uso.push({ account, usato: Math.round(sette ?? 0), ripartenza: sette === null ? "" : riparteTra(a.sette.reset ?? ora, ora), letto });
+    uso.push({ account, usato: Math.round(sette ?? 0), ripartenza: sette === null ? "" : riparteTra(a.sette.reset ?? ora, ora), letto, ...finestre });
   }
   return uso;
 }

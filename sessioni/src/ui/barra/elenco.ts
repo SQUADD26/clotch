@@ -94,9 +94,12 @@ export function componi(sessioni: Sessione[], v: Vista, pref: Preferenze, ora: n
 }
 
 /** Riga sotto il nome nel piede: «6 account · 4 sorgenti» (101:7728), «Nessuna sessione» (101:8772). */
+/** Account distinti nell'elenco (per sorgente): «Roberto · 6 account» nel bottone account della barra. */
+export const numeroAccount = (sessioni: Sessione[]) => new Set(sessioni.map((s) => `${s.sorgente}:${s.account}`)).size;
+
 export function dettaglioProfilo(sessioni: Sessione[]) {
   if (!sessioni.length) return "Nessuna sessione";
-  const account = new Set(sessioni.map((s) => `${s.sorgente}:${s.account}`)).size;
+  const account = numeroAccount(sessioni);
   const sorgenti = new Set(sessioni.map((s) => s.sorgente)).size;
   return `${account} account · ${sorgenti} sorgenti`;
 }

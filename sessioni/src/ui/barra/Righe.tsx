@@ -1,4 +1,4 @@
-// figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta), «Piede barra laterale».
+// figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta).
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import type { PreferenzeSessione, Profilo, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
@@ -106,18 +106,4 @@ export function useProfilo(): Profilo {
     letto.then(setP, () => { letto = undefined; });
   }, []);
   return p;
-}
-
-export function Piede({ dettaglio, onMenu, onImpostazioni }: { dettaglio: string; onMenu(e: MouseEvent): void; onImpostazioni(): void }) {
-  const { nome, iniziali } = useProfilo();
-  return (
-    <div className="piede">
-      <button type="button" className="avatar" onClick={onMenu}><span className="t-xs medio">{iniziali}</span></button>
-      <button type="button" className="testi" onClick={onMenu}>
-        <span>{nome}</span>
-        <span className="t-xs secondario">{dettaglio}</span>
-      </button>
-      <BottoneIcona icona="impostazioni" etichetta="Impostazioni" onClick={onImpostazioni} />
-    </div>
-  );
 }

@@ -1,9 +1,10 @@
 // figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
 // Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
 import type { Registro } from "../../clotch-ai";
-import type { Elenco, PreferenzeSessione, PrSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
+import type { Elenco, PreferenzeSessione, PrSessione, QuotaUso, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
 import type { Stato as StatoChiamata } from "../base/dati";
 import type { Vista } from "./elenco";
+import type { ProvaAccount } from "./Account";
 import type { Aperto } from "./index";
 
 const ORA = new Date(2026, 9, 22, 15, 0).getTime();
@@ -58,6 +59,8 @@ interface Prova {
   ricerca?: string;
   cercati?: RisultatoRicerca[];
   suggerimento?: { testo: string; a: { x: number; y: number } };
+  /** Bottone account in fondo (#478): quote, account previsto e menu aperto. */
+  account?: ProvaAccount;
 }
 
 const pronto = (sessioni: Sessione[], errori: Elenco["errori"] = []) => ({ stato: "pronto" as const, dati: { sessioni, errori }, riprova() {} });
@@ -214,6 +217,26 @@ const BARRE: Record<string, string> = {
   "101-8824": "101-8912", "101-8931": "101-9090", "101-9109": "101-9340", "101-9359": "101-9628", "101-9860": "101-10017",
 };
 for (const [barra, finestra] of Object.entries(BARRE)) FRAME[barra] = FRAME[finestra] ?? (() => base());
+
+// bottone account (#478: 148-62026 normale, 148-62191 primo menu, 148-62379 secondo menu, 148-62621 al 90 %, 148-62813 sessione fuori dal motore):
+// la sessione aperta è del motore (account `.claude-accountmanager`), tranne l'ultimo frame; l'ora è ferma, i conti alla rovescia sono quelli del disegno.
+const H = 3_600_000, M = 60_000, S = 1000;
+const quota = (account: string, cinque: number, cf: number, sette: number, sf: number): QuotaUso =>
+  ({ account, email: `${account}@example.com`, usato: sette, ripartenza: "", cinque, cinqueFine: ORA + cf, sette, setteFine: ORA + sf });
+const QUOTE = (a: [number, number, number, number] = [38, 2 * H + 14 * M + 8 * S, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S]): QuotaUso[] => [
+  quota("accountmanager", ...a), quota("squadd", 72, 3 * H, 40, 2 * 24 * H), quota("friday", 100, 47 * M + 30 * S, 88, 24 * H), quota("dentalspace", 12, 4 * H, 20, 5 * 24 * H),
+];
+const CON_ACCOUNT = (menu: 0 | 1 | 2, o: { motore?: boolean; novanta?: boolean; passaggio?: string } = {}) => (): Prova => {
+  const b = base(), id = b.scelta!;
+  if (o.motore !== false) (b.registro!.chat as Map<string, unknown>).set(id, { chat: id, account: ".claude-accountmanager", sorgente: "motore", visto: ORA, richieste: [], passi: [], aiutanti: new Map() });
+  const quote = QUOTE(o.novanta ? [90, 21 * M + 36 * S, 74, 2 * 24 * H + 8 * H + 40 * M + 12 * S] : undefined);
+  return { ...b, account: { ora: ORA, quote, previsto: null, menu, passaggio: o.passaggio } };
+};
+FRAME["148-62026"] = CON_ACCOUNT(0);
+FRAME["148-62191"] = CON_ACCOUNT(1);
+FRAME["148-62379"] = CON_ACCOUNT(2, { passaggio: "squadd" });
+FRAME["148-62621"] = CON_ACCOUNT(1, { novanta: true });
+FRAME["148-62813"] = CON_ACCOUNT(1, { motore: false });
 
 let una: Prova | null | undefined;
 /** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */

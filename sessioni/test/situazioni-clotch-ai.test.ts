@@ -81,6 +81,7 @@ const MOTORE_COMANDI = [ // global/hooks/friday_comandi.py:25-36, chiavi di FORM
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena", "obiettivo",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi", "riprendi_altrove",
   "archivia", "spegni", "imposta", "rinomina", "zitto", // zitto: claude-config#2572
+  "account_previsto", // sola lettura, claude-config#2599 (42ab42c9): l'account con cui partirebbe una sessione nuova
   "sessione_imposta", // modello, sforzo, rapida di una chat ferma: claude-config#2568/#2571 (annunciato dal coordinatore, non ancora nel motore a 089cf3b)
   "nuova_sessione", // claude-config#2577
 ];

@@ -5,9 +5,12 @@ import * as path from "node:path";
 import { msgErrore, parseRiga, righeNuove } from "./jsonl";
 import { cartellaRegistro, Comando, mandaComando } from "./clotch-ai";
 
+/** `account_previsto` (contratto 3, #2599): con quale account partirebbe una sessione nuova; uso in %, reset ISO. */
+export interface AccountPrevisto { email: string; config_dir: string | null; uso_5h: number | null; uso_7g: number | null; reset_5h: string | null; reset_7g: string | null; scelto: boolean; motivo: string }
+
 export type EsitoComando =
   /** clotch AI ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string }
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
   /** Nessuna risposta in tempo. `preso: false` = clotch AI non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
@@ -68,6 +71,7 @@ async function invia(home: string, cmd: Comando, args: Record<string, unknown>, 
       if (typeof r.dati.sessione === "string") fatto.sessione = r.dati.sessione; // nuova_sessione
       if (typeof r.dati.macchina === "string") fatto.macchina = r.dati.macchina;
       if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
+      if (r.dati.account && typeof r.dati.account === "object") fatto.account = r.dati.account; // account_previsto
       return fatto;
     }
     if (Date.now() >= limite) return { id, esito: "scaduto", testo: "", preso: !ritira(home, id) };

@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { quoteUso, svuotaCache } from "../src/quote-uso";
-import { fa, quoteDalFeed, riparteTra } from "../src/uso-testi";
+import { contoAllaRovescia, fa, quoteDalFeed, riparteTra } from "../src/uso-testi";
 
 const ORA = Date.UTC(2026, 9, 23, 12, 0, 0), S = ORA / 1000, H = 3600, G = 86_400;
 const riga = (email: string, ts: number, cinque: [number | null, number | null], sette: [number | null, number | null]) =>
@@ -60,4 +60,21 @@ test("quoteUso: cache di 60 s nel main; errore del feed lancia", async () => {
   assert.equal(n, 2);
   svuotaCache();
   await assert.rejects(quoteUso(Date.now(), async () => { throw new Error("rete"); }), /rete/);
+});
+
+test("contoAllaRovescia: «2 h 14 m 08 s» e «3 g 05 h 12 m 40 s» (frame 148:62191)", () => {
+  assert.equal(contoAllaRovescia((2 * 3600 + 14 * 60 + 8) * 1000), "2 h 14 m 08 s");
+  assert.equal(contoAllaRovescia((3 * G + 5 * H + 12 * 60 + 40) * 1000), "3 g 05 h 12 m 40 s");
+  assert.equal(contoAllaRovescia(47 * 60_000 + 30_000), "0 h 47 m 30 s");
+});
+
+test("quoteDalFeed: per finestra percentuale e fine (#478); finestra ripartita = 0 % senza fine", () => {
+  const feed = { rows: [
+    riga("accountmanager@x.it", S - 60, [90, S + 21 * 60], [61, S + 3 * G]),
+    riga("ripartito@x.it", S - 60, [40, S - 10], [20, S + G]),
+  ] };
+  const per = (n: string) => quoteDalFeed(feed, ORA)!.find((x) => x.account === n)!;
+  const a = per("accountmanager");
+  assert.deepEqual([a.email, a.cinque, a.cinqueFine, a.sette, a.setteFine], ["accountmanager@x.it", 90, (S + 21 * 60) * 1000, 61, (S + 3 * G) * 1000]);
+  assert.deepEqual([per("ripartito").cinque, per("ripartito").cinqueFine], [0, null]);
 });

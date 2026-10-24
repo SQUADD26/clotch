@@ -11,13 +11,14 @@ import { useNavigazione } from "../base/navigazione";
 import { numero } from "../base/token";
 import { useApriSessione } from "./apri";
 import { conFiglie } from "./figlie";
-import { componi, dettaglioProfilo, opzioni, type Proprieta, type Vista } from "./elenco";
+import { componi, dettaglioProfilo, numeroAccount, opzioni, type Proprieta, type Vista } from "./elenco";
 import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
 import { RigheClotchAi, useRegistro } from "./ClotchAi";
+import { AccountBarra } from "./Account";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
 import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
-import { Piede, RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
+import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { accanto, type Punto } from "./Sovrapposti";
 
@@ -151,8 +152,9 @@ export default function Barra() {
         </div>
       )}
 
-      <Piede dettaglio={dettaglioProfilo(sessioni)} onImpostazioni={() => n.apri("impostazioni")}
-        onMenu={(e) => setAperto({ tipo: "profilo", a: { x: e.currentTarget.closest(".piede")!.getBoundingClientRect().left, y: e.currentTarget.closest(".piede")!.getBoundingClientRect().top } })} />
+      <AccountBarra conta={numeroAccount(sessioni)} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
+        daDisco={sessione(p ? p.scelta ?? "" : n.sessione ?? "")?.account}
+        onAltro={(e) => { const r = e.currentTarget.closest(".piede-account")!.getBoundingClientRect(); setAperto({ tipo: "profilo", a: { x: r.left, y: r.top } }); }} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
