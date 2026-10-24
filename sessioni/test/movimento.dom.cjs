@@ -58,6 +58,9 @@ app.whenReady().then(async () => {
     const clic = (sel) => `() => document.querySelector('${sel}').click()`;
     const E = ['tempo-entrata', 'curva-entrata'], U = ['tempo-uscita', 'curva-uscita'], S = ['tempo-spostamento', 'curva-spostamento'];
 
+    // riferimento: la stessa finestra ferma, per separare i fotogrammi lenti di xvfb da quelli delle animazioni
+    const fermo = await run('window.registra(() => {}, 400)');
+    console.log(`MOV riposo fotogrammi=${fermo.passi.length} persi=${fermo.passi.filter((p) => p > 25).length}`);
     // barra laterale accanto alla colonna: chiudi (uscita) e apri (entrata), la superficie si allarga senza scatto
     await misura('MOV-01', 'barra chiusa', clic('button[aria-label="Barra laterale"]'), [['::view-transition-old(barra)', ...U], ['::view-transition-group(superficie)', ...S]]);
     await wait(() => !document.querySelector('.barra-laterale'));
@@ -101,11 +104,14 @@ app.whenReady().then(async () => {
     console.log(`MOV MOV-11 pressione bottone transform=${premuto} transizione=${transizione}`);
     const s = parseFloat(tok["scala-premuto"]); assert.equal(premuto, `matrix(${s}, 0, 0, ${s}, 0, 0)`);
     assert.ok(transizione.split(',').every((d) => parseFloat(d) * 1000 === ms(tok['tempo-pressione'])), 'pressione in tempo-pressione');
+    await new Promise((r) => setTimeout(r, 400)); // il clic vero ha chiuso la barra: la si riapre
+    if (!(await run(() => !!document.querySelector('.barra-laterale')))) await run(`(${clic('button[aria-label="Barra laterale"]')})()`);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
 
     // finestra stretta: barra sopra con il velo
     win.setSize(700, 900);
-    await wait(() => !document.querySelector('.barra-laterale') || !!document.querySelector('.barra-laterale.sopra'));
+    await wait(() => innerWidth === 700 && (!document.querySelector('.barra-laterale') || !!document.querySelector('.barra-laterale.sopra')));
+    await new Promise((r) => setTimeout(r, 400));
     if (await run(() => !!document.querySelector('.velo-barra'))) await run(`(${clic('.velo-barra')})()`), await wait(() => !document.querySelector('.velo-barra'));
     await misura('MOV-12', 'barra sopra apre', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E], ['::view-transition-new(velo)', ...E]]);
     await misura('MOV-13', 'barra sopra chiude', clic('.velo-barra'), [['::view-transition-old(barra)', ...U], ['::view-transition-old(velo)', ...U]]);
