@@ -17,7 +17,7 @@ function scena(id, sezione) {
   dati.elenco.sessioni.forEach((x) => { x.ultimaAttivita += sposta; });
   Object.values(dati.registro.chat).forEach((c) => { for (const k of ["visto", "battito"]) if (c[k]) c[k] += sposta; });
   dati.navigazione = { vista: "nuova-sessione", sezione };
-  dati.nuova = { recenti, casa: "/Users/roberto", contesti, ssh: ["rise", "worker"] };
+  dati.nuova = { recenti, casa: "/Users/roberto", contesti };
   writeFileSync(new URL(`148-${id}.json`, cartella), JSON.stringify(dati, null, 1) + "\n");
 }
 

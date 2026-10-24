@@ -6,6 +6,7 @@ import type { IpcMain } from "electron";
 import { leggiRegistro } from "./clotch-ai";
 import { piano } from "./clotch-ai-ipc";
 import type { CartellaAvvio, ContestoCartella, Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, ModelloMotore, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
+import type { Macchina, Proposta } from "./macchine-tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -34,7 +35,9 @@ export interface Scena {
   comandi?: VoceComando[];
   file?: string[];
   /** «Nuova sessione» (#468): cartelle recenti, rami per percorso e host SSH come li darebbe il main. */
-  nuova?: { recenti: CartellaAvvio[]; casa?: string; contesti: Record<string, ContestoCartella>; ssh?: string[] };
+  nuova?: { recenti: CartellaAvvio[]; casa?: string; contesti: Record<string, ContestoCartella> };
+  /** Le macchine SSH come le darebbe il comando `macchine` (#479). */
+  macchine?: { macchine: Macchina[]; proposte: Proposta[] };
   /** Catalogo dei modelli del motore come lo dà `sessioni:modelli` (assente = il file non c'è). */
   modelli?: ModelloMotore[];
   /** Registro di clotch AI come lo dà `clotch-ai:registro`. */
@@ -100,7 +103,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     }
     case "nuova:cartelle": return { recenti: s.nuova?.recenti ?? [], casa: s.nuova?.casa ?? "/Users/roberto" };
     case "nuova:contesto": return s.nuova?.contesti[String(args[0])] ?? { git: false, rami: [], predefinito: null };
-    case "nuova:ssh": return s.nuova?.ssh ?? [];
+    case "nuova:scegli-chiave": return null;
+    case "clotch-ai:comando": return args[0] === "macchine" ? { id: "c-scena", esito: "ok", testo: "", ...s.macchine } : undefined;
     case "nuova:scegli-cartella": return null;
     case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
     case "casella:scegli": return [];
@@ -120,7 +124,7 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
-  "nuova:cartelle", "nuova:contesto", "nuova:ssh", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
+  "nuova:cartelle", "nuova:contesto", "nuova:scegli-chiave", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

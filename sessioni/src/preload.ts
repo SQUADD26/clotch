@@ -91,7 +91,7 @@ contextBridge.exposeInMainWorld("casella", casella);
 const nuovaSessione: NuovaSessioneApi = {
   cartelle: () => ipcRenderer.invoke("nuova:cartelle"),
   contesto: (cartella) => ipcRenderer.invoke("nuova:contesto", cartella),
-  ssh: () => ipcRenderer.invoke("nuova:ssh"),
+  scegliChiave: () => ipcRenderer.invoke("nuova:scegli-chiave"),
   scegliCartella: () => ipcRenderer.invoke("nuova:scegli-cartella"),
 };
 contextBridge.exposeInMainWorld("nuovaSessione", nuovaSessione);
