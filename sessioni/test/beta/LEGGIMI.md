@@ -21,7 +21,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 | TAGLIATO | un sovrapposto (menu, popover, tooltip, dialogo, avviso) è tagliato da un antenato con overflow |
 | COPERTO | uno dei 5 punti del sovrapposto dà un altro elemento a `elementFromPoint` |
 | TESTO | testo tagliato (overflow hidden o clip) senza ellissi voluta |
-| COLORE, RAGGIO, SPAZIO | colore, raggio o padding/margin/gap che non è un valore di `src/ui/base/token.css` |
+| COLORE, RAGGIO, SPAZIO | colore, raggio o padding/margin/gap che non è un valore di `src/ui/base/token.css` (uno spazio scritto con `var(--…)` o `auto` nel CSS vale) |
 | FOCUS | con Tab: nessun anello del fuoco, o anello con un raggio diverso dalla forma che si vede |
 | ESC, FUOCO-RITORNO | Esc non chiude il sovrapposto; dopo Esc il fuoco non torna al pulsante che l'ha aperto |
 | HOVER, PREMUTO | col mouse sopra, o premuto, l'elemento non cambia di un pixel (foto `-hover`, `-premuto`; il fuoco da tastiera è nelle foto `tab<N>`) |

@@ -17,11 +17,13 @@
   const dentro = (a, b, m = 1) => a.left >= b.left - m && a.top >= b.top - m && a.right <= b.right + m && a.bottom <= b.bottom + m;
   const sopra = () => [...document.querySelectorAll(SOPRA)].filter(vis).filter((e, _, t) => !t.some((o) => o !== e && o.contains(e)));
 
-  // margine nato da `auto` (il valore calcolato non è scritto a mano): lo dicono le regole CSS che toccano l'elemento
+  // spazio scritto con un token (`var(--spazio-*)`, anche dentro calc) o nato da `auto`: il numero calcolato non è a mano.
+  // Lo dicono le regole del CSS costruito che toccano l'elemento (da file:// la pagina non legge i suoi fogli).
   const regole = (css) => (window.__regole ??= (function giu(l) { return [...l].flatMap((r) => (r.selectorText ? [r] : []).concat(r.cssRules ? giu(r.cssRules) : [])); })((() => { const f = new CSSStyleSheet(); f.replaceSync(css); return f.cssRules; })()));
-  function auto(e, p, css) {
-    const k = p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
-    const vale = (st) => st.getPropertyValue(k) === 'auto'; // il CSSOM espande `margin: 0 auto` nei quattro lati
+  const CORTA = { margin: 'margin', padding: 'padding', row: 'gap', column: 'gap' };
+  function scritto(e, p, css) {
+    const k = p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), corta = CORTA[k.split('-')[0]];
+    const vale = (st) => { const v = st.getPropertyValue(k); return v === 'auto' || v.includes('var(--') || (!v && /var\(--|auto/.test(st.getPropertyValue(corta))); };
     return vale(e.style) || regole(css).some((r) => { try { return e.matches(r.selectorText) && vale(r.style); } catch { return false; } });
   }
 
@@ -38,7 +40,7 @@
         const v = parseFloat(r); if (v && !r.includes('%') && v < 999 && !tok.raggi.includes(v)) una('RAGGIO', e, r);
       }
       for (const p of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft']) {
-        const v = Math.abs(parseFloat(s[p])); if (v && !tok.spazi.includes(v) && !(p.startsWith('margin') && auto(e, p, tok.css))) una('SPAZIO', e, `${p} ${s[p]}`);
+        const v = Math.abs(parseFloat(s[p])); if (v && !tok.spazi.includes(v) && !scritto(e, p, tok.css)) una('SPAZIO', e, `${p} ${s[p]}`);
       }
       const p = e.parentElement, ps = p && getComputedStyle(p);
       if (p && p !== document.body && ps.overflow === 'visible' && (ps.backgroundColor !== 'rgba(0, 0, 0, 0)' || parseFloat(ps.borderTopWidth) > 0)) {
