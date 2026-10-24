@@ -1,0 +1,7378 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "173:70878",
+  "nome": "Varianti piede account – Chiaro",
+  "w": 2928,
+  "h": 1144
+ },
+ "variabili": {
+  "colore/fondo/superficie": "#ffffff",
+  "raggio/2xl": 20,
+  "spazio/6": 24,
+  "spazio/16": 64,
+  "colore/testo/secondario": "#000000b5",
+  "testo/dimensione/base": 14,
+  "testo/riga/base": 20,
+  "spazio/4": 16,
+  "colore/testo/primario": "#0d0d0d",
+  "testo/dimensione/lg": 16,
+  "testo/riga/lg": 24,
+  "spazio/8": 32,
+  "spazio/2": 8,
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "spazio/1": 4,
+  "raggio/md": 10,
+  "colore/sessione/blu": "#339cff",
+  "raggio/pieno": 9999,
+  "misura/bottone": 28,
+  "colore/testo/su-avatar": "#141414",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#000000b5",
+  "colore/fondo/riga-passaggio": "#0000000d",
+  "colore/fondo/riga-scelta": "#00000014",
+  "colore/bordo/fuoco": "#c15625",
+  "misura/tratto-forte": 2,
+  "colore/icona/lavoro": "#8a6100",
+  "colore/fondo/elevato": "#ffffff",
+  "raggio/sm": 7.5,
+  "spazio/1-5": 6,
+  "misura/riga-menu-larga": 312,
+  "colore/sessione/viola": "#ad7bf9",
+  "colore/icona/primaria": "#000000e7",
+  "colore/testo/errore": "#b42c28",
+  "colore/icona/errore": "#c8312d",
+  "raggio/xl": 15,
+  "misura/menu-modello": 320,
+  "spazio/3": 12,
+  "colore/fondo/sagoma": "#00000014",
+  "misura/barra-uso": 6,
+  "colore/bordo/leggero": "#00000014",
+  "misura/tratto": 1,
+  "spazio/0-5": 2,
+  "misura/riga": 32
+ },
+ "nodi": [
+  {
+   "id": "173:70878",
+   "nome": "Varianti piede account – Chiaro",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 2928,
+    "h": 1144
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/superficie",
+    "cornerRadius": "raggio/2xl",
+    "itemSpacing": "spazio/6",
+    "paddingLeft": "spazio/16",
+    "paddingRight": "spazio/16",
+    "paddingTop": "spazio/16",
+    "paddingBottom": "spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70879",
+   "nome": "nota",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 64,
+    "w": 2800,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Piede: solo avatar e nome. Al passaggio del mouse si apre il popover con l’uso e",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70880",
+   "nome": "Piede account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 108,
+    "w": 2800,
+    "h": 106
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70881",
+   "nome": "titolo gruppo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 108,
+    "w": 110,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "Piede account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70882",
+   "nome": "celle",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 2800,
+    "h": 66
+   },
+   "variabili": {
+    "itemSpacing": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70883",
+   "nome": "Riposo, uso Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70884",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 130,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Riposo, uso Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70885",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70885;173:64720",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70885;173:64718",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70885;173:64717",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 73.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70885;173:64719",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 104,
+    "y": 182,
+    "w": 170,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70885;173:64721",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 286,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70885;173:64721;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 292,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70885;173:64721;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 293.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70886",
+   "nome": "Passaggio, uso Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 346,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70887",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 346,
+    "y": 148,
+    "w": 151,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Passaggio, uso Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70888",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 346,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70888;173:64730",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 346,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70888;173:64728",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 350,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70888;173:64727",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 355.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70888;173:64729",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 386,
+    "y": 182,
+    "w": 170,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70888;173:64731",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 568,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70888;173:64731;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 574,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70888;173:64731;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 575.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70889",
+   "nome": "Premuto, uso Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 628,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70890",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 628,
+    "y": 148,
+    "w": 140,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Premuto, uso Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70891",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 628,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70891;173:64740",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 628,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70891;173:64738",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 632,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70891;173:64737",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 637.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70891;173:64739",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 668,
+    "y": 182,
+    "w": 170,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70891;173:64741",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 850,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70891;173:64741;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 856,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70891;173:64741;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 857.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70892",
+   "nome": "Fuoco, uso Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 910,
+    "y": 148,
+    "w": 250,
+    "h": 66
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70893",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 910,
+    "y": 148,
+    "w": 126,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Fuoco, uso Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70894",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 910,
+    "y": 174,
+    "w": 250,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70894;173:64750",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 910,
+    "y": 174,
+    "w": 218,
+    "h": 40
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "strokeWeight": "misura/tratto-forte"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70894;173:64748",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 916,
+    "y": 180,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70894;173:64747",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 921.5,
+    "y": 186,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70894;173:64749",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 952,
+    "y": 184,
+    "w": 166,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70894;173:64751",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1132,
+    "y": 180,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70894;173:64751;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1138,
+    "y": 186,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70894;173:64751;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1139.3203125,
+    "y": 186.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70895",
+   "nome": "Aperto, uso Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1192,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70896",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1192,
+    "y": 148,
+    "w": 130,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Aperto, uso Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70897",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1192,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70897;173:64760",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1192,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70897;173:64758",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1196,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70897;173:64757",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1201.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70897;173:64759",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1232,
+    "y": 182,
+    "w": 170,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70897;173:64761",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1414,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70897;173:64761;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1420,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70897;173:64761;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1421.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70898",
+   "nome": "Riposo, uso Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1474,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70899",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1474,
+    "y": 148,
+    "w": 148,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Riposo, uso Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70900",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1474,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64772",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1474,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64768",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1478,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64767",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1483.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70900;173:64769",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1514,
+    "y": 182,
+    "w": 146,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70900;173:64770",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1668,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64770;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1668.66796875,
+    "y": 184.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64773",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1696,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64773;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1702,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70900;173:64773;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1703.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70901",
+   "nome": "Passaggio, uso Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1756,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70902",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1756,
+    "y": 148,
+    "w": 170,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Passaggio, uso Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70903",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1756,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64784",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1756,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64780",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1760,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64779",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1765.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70903;173:64781",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1796,
+    "y": 182,
+    "w": 146,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70903;173:64782",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1950,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64782;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1950.66796875,
+    "y": 184.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64785",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1978,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64785;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1984,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70903;173:64785;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1985.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70904",
+   "nome": "Premuto, uso Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2038,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70905",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2038,
+    "y": 148,
+    "w": 159,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Premuto, uso Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70906",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2038,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64796",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2038,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64792",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2042,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64791",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2047.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70906;173:64793",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2078,
+    "y": 182,
+    "w": 146,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70906;173:64794",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2232,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64794;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2232.66796875,
+    "y": 184.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64797",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2260,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64797;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2266,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70906;173:64797;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2267.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70907",
+   "nome": "Fuoco, uso Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2320,
+    "y": 148,
+    "w": 250,
+    "h": 66
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70908",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2320,
+    "y": 148,
+    "w": 144,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Fuoco, uso Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70909",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2320,
+    "y": 174,
+    "w": 250,
+    "h": 40
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64808",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2320,
+    "y": 174,
+    "w": 218,
+    "h": 40
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "strokeWeight": "misura/tratto-forte"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64804",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2326,
+    "y": 180,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64803",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2331.5,
+    "y": 186,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70909;173:64805",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2362,
+    "y": 184,
+    "w": 142,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70909;173:64806",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2512,
+    "y": 186,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64806;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2512.66796875,
+    "y": 186.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64809",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2542,
+    "y": 180,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64809;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2548,
+    "y": 186,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70909;173:64809;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2549.3203125,
+    "y": 186.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70910",
+   "nome": "Aperto, uso Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2602,
+    "y": 148,
+    "w": 250,
+    "h": 62
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70911",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2602,
+    "y": 148,
+    "w": 148,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Aperto, uso Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70912",
+   "nome": "Piede account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2602,
+    "y": 174,
+    "w": 250,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64820",
+   "nome": "account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2602,
+    "y": 174,
+    "w": 218,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64816",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 2606,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64815",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2611.5,
+    "y": 184,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70912;173:64817",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2642,
+    "y": 182,
+    "w": 146,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70912;173:64818",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2796,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64818;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2796.66796875,
+    "y": 184.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64821",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2824,
+    "y": 178,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64821;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2830,
+    "y": 184,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70912;173:64821;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2831.3203125,
+    "y": 184.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70913",
+   "nome": "Bottone impostazioni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 238,
+    "w": 2800,
+    "h": 122
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70914",
+   "nome": "titolo gruppo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 238,
+    "w": 164,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "Bottone impostazioni",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70915",
+   "nome": "celle",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 278,
+    "w": 2800,
+    "h": 82
+   },
+   "variabili": {
+    "itemSpacing": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70916",
+   "nome": "Riposo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 278,
+    "w": 43,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70917",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 278,
+    "w": 43,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Riposo",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70918",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 304,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70918;101:7139",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 70,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70918;101:7139;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 71.3203125,
+    "y": 310.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70919",
+   "nome": "Passaggio",
+   "tipo": "FRAME",
+   "box": {
+    "x": 139,
+    "y": 278,
+    "w": 111,
+    "h": 82
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70920",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 139,
+    "y": 278,
+    "w": 65,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Passaggio",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70921",
+   "nome": "con suggerimento",
+   "tipo": "FRAME",
+   "box": {
+    "x": 139,
+    "y": 304,
+    "w": 111,
+    "h": 56
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70922",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 139,
+    "y": 304,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70922;101:7142",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 145,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70922;101:7142;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 146.3203125,
+    "y": 310.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70923",
+   "nome": "suggerimento",
+   "tipo": "FRAME",
+   "box": {
+    "x": 139,
+    "y": 336,
+    "w": 111,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70924",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 147,
+    "y": 340,
+    "w": 72,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Impostazioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70925",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 227,
+    "y": 340,
+    "w": 15,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "⌘,",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70926",
+   "nome": "Premuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 282,
+    "y": 278,
+    "w": 54,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70927",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 282,
+    "y": 278,
+    "w": 54,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Premuto",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70928",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 304,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70928;153:71026",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 288,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70928;153:71026;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 289.3203125,
+    "y": 310.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70929",
+   "nome": "Fuoco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 368,
+    "y": 278,
+    "w": 39,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70930",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 368,
+    "y": 278,
+    "w": 39,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Fuoco",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70931",
+   "nome": "bottone impostazioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 368,
+    "y": 304,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "strokeWeight": "misura/tratto-forte",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70931;153:71028",
+   "nome": "icona altro",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 374,
+    "y": 310,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70931;153:71028;101:6880",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 375.3203125,
+    "y": 310.66650390625,
+    "w": 13.356658935546875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70932",
+   "nome": "Riga account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 384,
+    "w": 2800,
+    "h": 116
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70933",
+   "nome": "titolo gruppo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 384,
+    "w": 101,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "Riga account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70934",
+   "nome": "celle",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 424,
+    "w": 2800,
+    "h": 76
+   },
+   "variabili": {
+    "itemSpacing": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70935",
+   "nome": "Riposo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 424,
+    "w": 312,
+    "h": 72
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70936",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 424,
+    "w": 43,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Riposo",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70937",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 450,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70937;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 72,
+    "y": 459,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70937;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 79.5,
+    "y": 465,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70937;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 108,
+    "y": 456,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70937;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 108,
+    "y": 456,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70937;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 108,
+    "y": 474,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70938",
+   "nome": "Passaggio",
+   "tipo": "FRAME",
+   "box": {
+    "x": 408,
+    "y": 424,
+    "w": 312,
+    "h": 72
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70939",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 408,
+    "y": 424,
+    "w": 65,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Passaggio",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70940",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 408,
+    "y": 450,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70940;173:64681",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 416,
+    "y": 459,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70940;173:64680",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 423.5,
+    "y": 465,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70940;173:64679",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 452,
+    "y": 456,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70940;173:64677",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 452,
+    "y": 456,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70940;173:64678",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 452,
+    "y": 474,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70941",
+   "nome": "Premuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 752,
+    "y": 424,
+    "w": 312,
+    "h": 72
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70942",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 752,
+    "y": 424,
+    "w": 54,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Premuto",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70943",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 752,
+    "y": 450,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70943;173:64688",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 760,
+    "y": 459,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70943;173:64687",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 767.5,
+    "y": 465,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70943;173:64686",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 796,
+    "y": 456,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70943;173:64684",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 796,
+    "y": 456,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70943;173:64685",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 796,
+    "y": 474,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70944",
+   "nome": "Fuoco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1096,
+    "y": 424,
+    "w": 312,
+    "h": 76
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70945",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1096,
+    "y": 424,
+    "w": 39,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Fuoco",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70946",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1096,
+    "y": 450,
+    "w": 312,
+    "h": 50
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "strokeWeight": "misura/tratto-forte",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70946;173:64695",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1106,
+    "y": 461,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70946;173:64694",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1113.5,
+    "y": 467,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70946;173:64693",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1142,
+    "y": 458,
+    "w": 256,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70946;173:64691",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1142,
+    "y": 458,
+    "w": 256,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70946;173:64692",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1142,
+    "y": 476,
+    "w": 256,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70947",
+   "nome": "Attuale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1440,
+    "y": 424,
+    "w": 312,
+    "h": 72
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70948",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1440,
+    "y": 424,
+    "w": 45,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Attuale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70949",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1440,
+    "y": 450,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70949;173:64702",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1448,
+    "y": 459,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70949;173:64701",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1453.5,
+    "y": 465,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70949;173:64700",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1484,
+    "y": 456,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70949;173:64698",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1484,
+    "y": 456,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70949;173:64699",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1484,
+    "y": 474,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 0%, 7 giorni 43%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70949;173:64703",
+   "nome": "icona spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1728,
+    "y": 465,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70949;173:64703;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1730,
+    "y": 468.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70950",
+   "nome": "Pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1784,
+    "y": 424,
+    "w": 312,
+    "h": 72
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70951",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1784,
+    "y": 424,
+    "w": 36,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Pieno",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70952",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1784,
+    "y": 450,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70952;173:64711",
+   "nome": "avatar AM",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1792,
+    "y": 459,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70952;173:64710",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1796.5,
+    "y": 465,
+    "w": 19,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "AM",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70952;173:64709",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1828,
+    "y": 456,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70952;173:64707",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1828,
+    "y": 456,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "amministrazione",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70952;173:64708",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1828,
+    "y": 474,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "7 giorni pieno, riparte tra 2 g 16 h",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70952;173:64712",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2072,
+    "y": 465,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70952;173:64712;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2072.66796875,
+    "y": 465.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70953",
+   "nome": "Popover account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 524,
+    "w": 2800,
+    "h": 556
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70954",
+   "nome": "titolo gruppo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 524,
+    "w": 130,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "Popover account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70955",
+   "nome": "celle",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 564,
+    "w": 2800,
+    "h": 516
+   },
+   "variabili": {
+    "itemSpacing": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70956",
+   "nome": "Normale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 564,
+    "w": 320,
+    "h": 468
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70957",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 564,
+    "w": 53,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Normale",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70958",
+   "nome": "Popover account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 590,
+    "w": 320,
+    "h": 442
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/menu-modello"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64833",
+   "nome": "account attuale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 594,
+    "w": 312,
+    "h": 50
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64829",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 605,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64828",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 81.5,
+    "y": 611,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64832",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 112,
+    "y": 602,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64830",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 602,
+    "w": 55,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64831",
+   "nome": "email",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 620,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "r.bondici@squaddcrm.com",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64850",
+   "nome": "uso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 644,
+    "w": 312,
+    "h": 120
+   },
+   "variabili": {
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64841",
+   "nome": "uso 5 ore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 648,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64837",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 648,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64834",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 76,
+    "y": 648,
+    "w": 32,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "5 ore",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64836",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 314,
+    "y": 648,
+    "w": 58,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "0% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64838",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 670,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64839",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 670,
+    "w": 6,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64840",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 76,
+    "y": 680,
+    "w": 114,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 4 h 38 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64849",
+   "nome": "uso 7 giorni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 708,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64845",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 708,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64842",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 76,
+    "y": 708,
+    "w": 46,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "7 giorni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64844",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 305,
+    "y": 708,
+    "w": 67,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "43% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64846",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 730,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64847",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 730,
+    "w": 124,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64848",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 76,
+    "y": 740,
+    "w": 135,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 6 g 0 h 38 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64888",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 764,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64887",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 768,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64852",
+   "nome": "titolo gruppo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 773,
+    "w": 312,
+    "h": 24
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64851",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 76,
+    "y": 777,
+    "w": 94,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Cambia account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64881",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 797,
+    "w": 312,
+    "h": 190
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64853",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 68,
+    "y": 797,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64853;173:64702",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 806,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64853;173:64701",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 81.5,
+    "y": 812,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64853;173:64700",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 112,
+    "y": 803,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64853;173:64698",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 803,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64853;173:64699",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 821,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 0%, 7 giorni 43%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64853;173:64703",
+   "nome": "icona spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 356,
+    "y": 812,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64853;173:64703;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 358,
+    "y": 815.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64861",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 68,
+    "y": 845,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64861;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 854,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64861;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 83.5,
+    "y": 860,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64861;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 112,
+    "y": 851,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64861;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 851,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64861;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 869,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64867",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 68,
+    "y": 893,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64867;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 902,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64867;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 81.5,
+    "y": 908,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "DS",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64867;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 112,
+    "y": 899,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64867;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 899,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "dentalspace",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64867;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 917,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 12%, 7 giorni 58%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64873",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 68,
+    "y": 941,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64873;173:64711",
+   "nome": "avatar AM",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 950,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64873;173:64710",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 80.5,
+    "y": 956,
+    "w": 19,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "AM",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70958;173:64873;173:64709",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 112,
+    "y": 947,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64873;173:64707",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 947,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "amministrazione",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64873;173:64708",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 112,
+    "y": 965,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "7 giorni pieno, riparte tra 2 g 16 h",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70958;173:64873;173:64712",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 356,
+    "y": 956,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64873;173:64712;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 356.66796875,
+    "y": 956.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64890",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 987,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:64889",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 76,
+    "y": 991,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:65058",
+   "nome": "gestisci account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 68,
+    "y": 996,
+    "w": 312,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:65055",
+   "nome": "icona persona",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 76,
+    "y": 1004,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:65055;101:7120",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 76.66796875,
+    "y": 1004.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70958;173:65057",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 100,
+    "y": 1003,
+    "w": 103,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Gestisci account",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70959",
+   "nome": "Quasi finito",
+   "tipo": "FRAME",
+   "box": {
+    "x": 416,
+    "y": 564,
+    "w": 320,
+    "h": 516
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70960",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 416,
+    "y": 564,
+    "w": 72,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Quasi finito",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70961",
+   "nome": "Popover account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 416,
+    "y": 590,
+    "w": 320,
+    "h": 490
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/menu-modello"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64898",
+   "nome": "account attuale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 594,
+    "w": 312,
+    "h": 50
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64894",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 605,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64893",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 433.5,
+    "y": 611,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64897",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 602,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64895",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 602,
+    "w": 55,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64896",
+   "nome": "email",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 620,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "r.bondici@squaddcrm.com",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64919",
+   "nome": "uso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 644,
+    "w": 312,
+    "h": 168
+   },
+   "variabili": {
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64906",
+   "nome": "uso 5 ore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 648,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64902",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 648,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64899",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 648,
+    "w": 32,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "5 ore",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64901",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 666,
+    "y": 648,
+    "w": 58,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "0% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64903",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 670,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64904",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 670,
+    "w": 6,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64905",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 680,
+    "w": 114,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 4 h 38 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64914",
+   "nome": "uso 7 giorni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 708,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64910",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 708,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64907",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 708,
+    "w": 46,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "7 giorni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64909",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 657,
+    "y": 708,
+    "w": 67,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "99% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64911",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 730,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64912",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 730,
+    "w": 285,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64913",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 740,
+    "w": 140,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 2 g 13 h 30 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64918",
+   "nome": "avviso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 768,
+    "w": 296,
+    "h": 36
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64915",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 428,
+    "y": 778,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64915;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 428.66796875,
+    "y": 778.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/lavoro"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64917",
+   "nome": "messaggio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 452,
+    "y": 768,
+    "w": 272,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "7 giorni quasi finiti. Passa a un altro account.",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64957",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 812,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64956",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 816,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64921",
+   "nome": "titolo gruppo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 821,
+    "w": 312,
+    "h": 24
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64920",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 428,
+    "y": 825,
+    "w": 94,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Cambia account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64950",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 845,
+    "w": 312,
+    "h": 190
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64922",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 420,
+    "y": 845,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64922;173:64702",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 854,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64922;173:64701",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 433.5,
+    "y": 860,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64922;173:64700",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 851,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64922;173:64698",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 851,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64922;173:64699",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 869,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 0%, 7 giorni 43%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64922;173:64703",
+   "nome": "icona spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 708,
+    "y": 860,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64922;173:64703;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 710,
+    "y": 863.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64930",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 420,
+    "y": 893,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64930;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 902,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64930;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 435.5,
+    "y": 908,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64930;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 899,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64930;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 899,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64930;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 917,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64936",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 420,
+    "y": 941,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64936;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 950,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64936;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 433.5,
+    "y": 956,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "DS",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64936;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 947,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64936;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 947,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "dentalspace",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64936;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 965,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 12%, 7 giorni 58%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64942",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 420,
+    "y": 989,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64942;173:64711",
+   "nome": "avatar AM",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 998,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64942;173:64710",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 432.5,
+    "y": 1004,
+    "w": 19,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "AM",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70961;173:64942;173:64709",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 464,
+    "y": 995,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64942;173:64707",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 995,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "amministrazione",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64942;173:64708",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 464,
+    "y": 1013,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "7 giorni pieno, riparte tra 2 g 16 h",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70961;173:64942;173:64712",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 708,
+    "y": 1004,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64942;173:64712;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 708.66796875,
+    "y": 1004.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64959",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 1035,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:64958",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 428,
+    "y": 1039,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:65062",
+   "nome": "gestisci account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 420,
+    "y": 1044,
+    "w": 312,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:65059",
+   "nome": "icona persona",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 428,
+    "y": 1052,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:65059;101:7120",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 428.66796875,
+    "y": 1052.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70961;173:65061",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 452,
+    "y": 1051,
+    "w": 103,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Gestisci account",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70962",
+   "nome": "Uso non disponibile",
+   "tipo": "FRAME",
+   "box": {
+    "x": 768,
+    "y": 564,
+    "w": 320,
+    "h": 378
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70963",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 768,
+    "y": 564,
+    "w": 124,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Uso non disponibile",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70964",
+   "nome": "Popover account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 768,
+    "y": 590,
+    "w": 320,
+    "h": 352
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/menu-modello"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64967",
+   "nome": "account attuale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 594,
+    "w": 312,
+    "h": 50
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64963",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 605,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64962",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 785.5,
+    "y": 611,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64966",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 816,
+    "y": 602,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64964",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 602,
+    "w": 55,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64965",
+   "nome": "email",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 620,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "r.bondici@squaddcrm.com",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64971",
+   "nome": "uso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 644,
+    "w": 312,
+    "h": 30
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64968",
+   "nome": "icona info",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 780,
+    "y": 648,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64968;101:18272",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 780.66796875,
+    "y": 648.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64970",
+   "nome": "messaggio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 804,
+    "y": 648,
+    "w": 272,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Uso non disponibile. Riprova tra poco.",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:65009",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 674,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65008",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 678,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64973",
+   "nome": "titolo gruppo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 683,
+    "w": 312,
+    "h": 24
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64972",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 780,
+    "y": 687,
+    "w": 94,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Cambia account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:65002",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 707,
+    "w": 312,
+    "h": 190
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64974",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 772,
+    "y": 707,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64974;173:64702",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 716,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64974;173:64701",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 785.5,
+    "y": 722,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64974;173:64700",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 816,
+    "y": 713,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64974;173:64698",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 713,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64974;173:64699",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 731,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 0%, 7 giorni 43%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64974;173:64703",
+   "nome": "icona spunta",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1060,
+    "y": 722,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64974;173:64703;101:6902",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1062,
+    "y": 725.33349609375,
+    "w": 11.999899864196777,
+    "h": 8.666566848754883
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64982",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 772,
+    "y": 755,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64982;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 764,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64982;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 787.5,
+    "y": 770,
+    "w": 13,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "IN",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64982;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 816,
+    "y": 761,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64982;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 761,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "info",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64982;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 779,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 4%, 7 giorni 37%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64988",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 772,
+    "y": 803,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64988;173:64674",
+   "nome": "avatar IN",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 812,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64988;173:64673",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 785.5,
+    "y": 818,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "DS",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64988;173:64672",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 816,
+    "y": 809,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64988;173:64670",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 809,
+    "w": 260,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "dentalspace",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64988;173:64671",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 827,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "5 ore 12%, 7 giorni 58%",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64994",
+   "nome": "Riga account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 772,
+    "y": 851,
+    "w": 312,
+    "h": 46
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1-5",
+    "paddingBottom": "spazio/1-5",
+    "width": "misura/riga-menu-larga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64994;173:64711",
+   "nome": "avatar AM",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 860,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/viola",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64994;173:64710",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 784.5,
+    "y": 866,
+    "w": 19,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "AM",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70964;173:64994;173:64709",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 816,
+    "y": 857,
+    "w": 236,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64994;173:64707",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 857,
+    "w": 236,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "amministrazione",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64994;173:64708",
+   "nome": "uso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 816,
+    "y": 875,
+    "w": 236,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "7 giorni pieno, riparte tra 2 g 16 h",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70964;173:64994;173:64712",
+   "nome": "icona avviso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1060,
+    "y": 866,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:64994;173:64712;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1060.66796875,
+    "y": 866.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65011",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 897,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65010",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 780,
+    "y": 901,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65066",
+   "nome": "gestisci account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 772,
+    "y": 906,
+    "w": 312,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65063",
+   "nome": "icona persona",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 780,
+    "y": 914,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65063;101:7120",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 780.66796875,
+    "y": 914.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70964;173:65065",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 804,
+    "y": 913,
+    "w": 103,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Gestisci account",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:70965",
+   "nome": "Cambio non disponibile",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1120,
+    "y": 564,
+    "w": 320,
+    "h": 326
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:70966",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1120,
+    "y": 564,
+    "w": 147,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Cambio non disponibile",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:70967",
+   "nome": "Popover account",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1120,
+    "y": 590,
+    "w": 320,
+    "h": 300
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/elevato",
+    "cornerRadius": "raggio/xl",
+    "paddingLeft": "spazio/1",
+    "paddingRight": "spazio/1",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/menu-modello"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65019",
+   "nome": "account attuale",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 594,
+    "w": 312,
+    "h": 50
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/2",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65015",
+   "nome": "avatar RB",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 605,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/blu",
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65014",
+   "nome": "iniziali",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1137.5,
+    "y": 611,
+    "w": 17,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-avatar",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "RB",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70967;173:65018",
+   "nome": "testi",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1168,
+    "y": 602,
+    "w": 260,
+    "h": 34
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65016",
+   "nome": "nome",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1168,
+    "y": 602,
+    "w": 55,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "r.bondici",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70967;173:65017",
+   "nome": "email",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1168,
+    "y": 620,
+    "w": 260,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "r.bondici@squaddcrm.com",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65036",
+   "nome": "uso",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 644,
+    "w": 312,
+    "h": 120
+   },
+   "variabili": {
+    "itemSpacing": "spazio/3",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65027",
+   "nome": "uso 5 ore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 648,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65023",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 648,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65020",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1132,
+    "y": 648,
+    "w": 32,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "5 ore",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65022",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1370,
+    "y": 648,
+    "w": 58,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "0% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65024",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 670,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65025",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 670,
+    "w": 6,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65026",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1132,
+    "y": 680,
+    "w": 114,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 4 h 38 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65035",
+   "nome": "uso 7 giorni",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 708,
+    "w": 296,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65031",
+   "nome": "testata",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 708,
+    "w": 296,
+    "h": 18
+   },
+   "variabili": {},
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65028",
+   "nome": "periodo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1132,
+    "y": 708,
+    "w": 46,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "7 giorni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65030",
+   "nome": "percentuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1361,
+    "y": 708,
+    "w": 67,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "43% usato",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65032",
+   "nome": "barra",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 730,
+    "w": 296,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/sagoma",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65033",
+   "nome": "pieno",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 730,
+    "w": 124,
+    "h": 6
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "cornerRadius": "raggio/pieno",
+    "height": "misura/barra-uso"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65034",
+   "nome": "riparte",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1132,
+    "y": 740,
+    "w": 135,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Riparte tra 6 g 0 h 38 m",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65049",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 764,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65048",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 768,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65038",
+   "nome": "titolo gruppo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 773,
+    "w": 312,
+    "h": 24
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65037",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1132,
+    "y": 777,
+    "w": 94,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "Cambia account",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "I173:70967;173:65042",
+   "nome": "elenco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 797,
+    "w": 312,
+    "h": 48
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65039",
+   "nome": "icona info",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1132,
+    "y": 801,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65039;101:18272",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1132.66796875,
+    "y": 801.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65041",
+   "nome": "messaggio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1156,
+    "y": 801,
+    "w": 272,
+    "h": 36
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sessione avviata fuori da clotch: l’account non si cambia.",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I173:70967;173:65051",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 845,
+    "w": 312,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65050",
+   "nome": "linea",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1132,
+    "y": 849,
+    "w": 296,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/leggero",
+    "height": "misura/tratto"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65070",
+   "nome": "gestisci account",
+   "tipo": "FRAME",
+   "box": {
+    "x": 1124,
+    "y": 854,
+    "w": 312,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65067",
+   "nome": "icona persona",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 1132,
+    "y": 862,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65067;101:7120",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 1132.66796875,
+    "y": 862.66650390625,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:70967;173:65069",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1156,
+    "y": 861,
+    "w": 103,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Gestisci account",
+   "font": "SF Pro Regular"
+  }
+ ]
+}
