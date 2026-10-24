@@ -32,8 +32,8 @@ function Campo({ etichetta, valore, segnaposto, errore = false, messaggio, largh
   );
 }
 
-export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChiave }: {
-  v: ValoriMacchina; proposte: Proposta[]; provato: boolean; onCambia(p: Partial<ValoriMacchina>): void; onProposta(p: Proposta): void; onChiave(): void;
+export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChiave, onInvio }: {
+  v: ValoriMacchina; proposte: Proposta[]; provato: boolean; onCambia(p: Partial<ValoriMacchina>): void; onProposta(p: Proposta): void; onChiave(): void; onInvio(): void;
 }) {
   const m = mancano(v);
   const nomeErrore = v.nome ? m.nome : provato && m.nome;
@@ -47,16 +47,16 @@ export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChi
               const scelta = v.desktopId === p.desktop_id;
               return (
                 <button key={p.desktop_id} type="button" className={`chip-proposta${scelta ? " scelta" : ""}`} aria-pressed={scelta} onClick={() => onProposta(p)}>
-                  <Icona nome={scelta ? "spunta" : "finestra"} />{p.nome}
+                  <Icona nome={scelta ? "spunta" : "finestra"} /><span className="nome-chip" title={p.nome}>{p.nome}</span>
                 </button>
               );
             })}
           </div>
         </div>
       )}
-      <div className="campi-macchina">
+      <div className="campi-macchina" onKeyDown={(e) => { if (e.key === "Enter" && e.target instanceof HTMLInputElement && !e.nativeEvent.isComposing) { e.preventDefault(); onInvio(); } }}>
         <div className="riga-campi">
-          <div className="campo-largo"><Campo etichetta="Indirizzo" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} onCambia={(host) => onCambia({ host })} /></div>
+          <div className="campo-largo"><Campo etichetta="Indirizzo" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} messaggio={provato && m.host ? "Serve l’indirizzo della macchina." : undefined} onCambia={(host) => onCambia({ host })} /></div>
           <Campo etichetta="Porta" valore={v.porta} segnaposto="22" larghezza={numero("misura-campo-porta")} onCambia={(porta) => onCambia({ porta: porta.replace(/\D/g, "").slice(0, 5) })} />
         </div>
         <Campo etichetta="Utente" valore={v.utente} segnaposto="utente" onCambia={(utente) => onCambia({ utente })} />
@@ -66,7 +66,7 @@ export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChi
         </div>
         <div className="riga-campi">
           <div className="campo-largo"><Campo etichetta="Nome" valore={v.nome} segnaposto="nome-macchina" errore={nomeErrore} messaggio={nomeErrore ? "Usa minuscole, numeri e trattini (massimo 32)." : undefined} onCambia={(nome) => onCambia({ nome })} /></div>
-          <div className="campo-largo"><Campo etichetta="Cartella" valore={v.cartella} segnaposto="/home/utente/progetti" errore={provato && m.cartella} onCambia={(cartella) => onCambia({ cartella })} /></div>
+          <div className="campo-largo"><Campo etichetta="Cartella" valore={v.cartella} segnaposto="/home/utente/progetti" errore={provato && m.cartella} messaggio={provato && m.cartella ? "Serve un percorso che parte da «/»." : undefined} onCambia={(cartella) => onCambia({ cartella })} /></div>
         </div>
       </div>
     </>

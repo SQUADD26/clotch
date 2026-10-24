@@ -17,6 +17,7 @@ const api: SessioniApi = {
     return () => ipcRenderer.removeListener("sessioni:preferenze", f);
   },
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
+  menuBarra: (aperta) => ipcRenderer.invoke("sessioni:menu-barra", aperta),
   onMenu: (cb) => {
     const f = (_e: unknown, a: string) => cb(a);
     ipcRenderer.on("sessioni:menu", f);

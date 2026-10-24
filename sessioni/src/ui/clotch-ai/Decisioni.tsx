@@ -2,7 +2,7 @@
 // 101-39767, annullo non riuscito 101-40016, vuoto 101-40267.
 import { useState } from "react";
 import type { Registro } from "../../clotch-ai";
-import { avvisa } from "../base/Avvisi";
+import { aggiornaAvviso, avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
@@ -28,13 +28,17 @@ function dettaglio(r: Registro, d: Decisione) {
 }
 
 /** Esito dell'annullo: i testi li scrive clotch AI in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
-export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () => void) {
-  if (e.esito === "ok") avvisa({ tipo: "info", messaggio: e.testo || "Decisione revocata. La sessione aspetta te." });
-  else avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde", azione: { etichetta: "Riprova", fai: riprova } });
+export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () => void, id?: number) {
+  const mostra = (a: Parameters<typeof avvisa>[0]) => (id === undefined ? avvisa(a) : aggiornaAvviso(id, a));
+  if (e.esito === "ok") mostra({ tipo: "info", messaggio: e.testo || "Decisione revocata. La sessione aspetta te." });
+  else mostra({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde", azione: { etichetta: "Riprova", fai: riprova } });
 }
 
+// «Revocando…» subito: la risposta di clotch AI può arrivare dopo secondi
 async function annulla(d: Decisione) {
-  esitoAnnulla(await clotchAi().comando("annulla", { decisione: d.id }), () => annulla(d));
+  const id = avvisa({ tipo: "caricamento", messaggio: "Revocando…" });
+  const e = await clotchAi().comando("annulla", { decisione: d.id }).catch(() => ({ esito: "errore", testo: "" }));
+  esitoAnnulla(e, () => annulla(d), id);
 }
 
 export function Decisioni() {
@@ -61,7 +65,7 @@ export function Decisioni() {
                   <span className={`t-sm ${d.annullata ? "secondario" : ""}`}>{d.cosa}</span>
                   <span className="t-xs secondario">{dettaglio(r!, d)}</span>
                 </div>
-                {d.annullata ? <span className="t-sm secondario">Annullata</span>
+                {d.annullata ? <span className="t-sm secondario">Revocata</span>
                   : d.annullabile ? <Bottone tipo="secondario" onClick={() => setConferma(d)}>Revoca</Bottone>
                   : d.nonAnnullabile && <span className="t-sm secondario">{d.nonAnnullabile}</span>}
               </div>

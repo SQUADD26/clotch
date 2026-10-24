@@ -52,7 +52,7 @@
   "testo/riga/xl": 36,
   "colore/bordo/normale": "#ffffff15",
   "raggio/xl": 15,
-  "colore/fondo/accento": "#d25e28",
+  "colore/fondo/accento": "#c15625",
   "misura/interruttore-largo": 32,
   "misura/interruttore-alto": 20,
   "colore/fondo/manopola": "#ffffff",
@@ -62,7 +62,7 @@
   "colore/fondo/casella": "#363636",
   "spazio/1-5": 6,
   "colore/bordo/fuoco": "#ee7c37",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "misura/bottone-invio": 32,
   "colore/fondo/bottone-primario": "#ffffff",
   "opacita/spento": 40

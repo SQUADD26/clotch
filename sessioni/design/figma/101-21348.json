@@ -4,8 +4,7 @@
   "id": "101:21348",
   "nome": "menu cartella",
   "w": 260,
-  "h": 177,
-  "dentro": "101:21257"
+  "h": 177
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
@@ -24,7 +23,7 @@
   "colore/bordo/normale": "#ffffff15",
   "misura/tratto": 1,
   "colore/icona/errore": "#ff6764",
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff7673"
  },
  "nodi": [
   {

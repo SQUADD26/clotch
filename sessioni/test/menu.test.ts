@@ -9,7 +9,7 @@ const FRAME: Record<string, string[]> = {
   clotch: ["Informazioni su clotch", "—", "Impostazioni… ⌘,", "—", "Servizi", "—", "Nascondi clotch ⌘H", "Nascondi altre ⌥⌘H", "Mostra tutto", "—", "Esci da clotch ⌘Q"],
   File: ["Chiudi finestra ⌘W"],
   Modifica: ["Annulla ⌘Z", "Ripeti ⇧⌘Z", "—", "Taglia ⌘X", "Copia ⌘C", "Incolla ⌘V", "Incolla e adatta stile ⌥⇧⌘V", "Elimina", "Seleziona tutto ⌘A", "—", "Voce ›"],
-  Vista: ["Mostra/nascondi barra laterale ⌘\\", "—", "Indietro ⌘[", "Avanti ⌘]", "—", "Ricarica ⌘R", "Forza ricarica ⇧⌘R", "Attiva/disattiva strumenti sviluppatore ⌥⌘I", "—", "Dimensione reale ⌘0", "Ingrandisci ⌘+", "Riduci ⌘-", "—", "Attiva/disattiva schermo intero ⌃⌘F"],
+  Vista: ["Nascondi barra laterale ⌘\\", "—", "Indietro ⌘[", "Avanti ⌘]", "—", "Ricarica ⌘R", "Forza ricarica ⇧⌘R", "Attiva/disattiva strumenti sviluppatore ⌥⌘I", "—", "Dimensione reale ⌘0", "Ingrandisci ⌘+", "Riduci ⌘-", "—", "Attiva/disattiva schermo intero ⌃⌘F"],
   Finestra: ["Riduci a icona ⌘M", "Zoom", "—", "Porta tutto in primo piano"],
 };
 const TASTI: Record<string, string> = { Control: "⌃", Alt: "⌥", Shift: "⇧", Command: "⌘", CommandOrControl: "⌘", Plus: "+" };
@@ -27,7 +27,8 @@ test("menu dell'app: le voci delle azioni mostrano la scorciatoia salvata e non 
   const voci = menuApp({ impostazioni: "⌥⌘P", barra: null, indietro: "⌘⌫", avanti: "⌘]" }).flatMap((m) => m.submenu as Electron.MenuItemConstructorOptions[]);
   const di = (l: string) => voci.find((v) => v.label === l)!;
   if (process.platform === "darwin") assert.equal(riga(di("Impostazioni…")), "Impostazioni… ⌥⌘P"); // il menu «clotch» c'è solo sul Mac
-  assert.equal(riga(di("Mostra/nascondi barra laterale")), "Mostra/nascondi barra laterale");
+  assert.equal(riga(di("Nascondi barra laterale")), "Nascondi barra laterale");
+  assert.ok(menuApp({}, false).flatMap((m) => m.submenu as Electron.MenuItemConstructorOptions[]).some((v) => v.label === "Mostra barra laterale"));
   assert.equal(di("Indietro").accelerator, "Command+Backspace");
   assert.equal(di("Avanti").registerAccelerator, false);
 });

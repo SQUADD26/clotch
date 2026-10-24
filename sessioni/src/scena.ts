@@ -104,7 +104,9 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "nuova:cartelle": return { recenti: s.nuova?.recenti ?? [], casa: s.nuova?.casa ?? "/Users/roberto" };
     case "nuova:contesto": return s.nuova?.contesti[String(args[0])] ?? { git: false, rami: [], predefinito: null };
     case "nuova:scegli-chiave": return null;
-    case "clotch-ai:comando": return args[0] === "macchine" ? { id: "c-scena", esito: "ok", testo: "", ...s.macchine } : undefined;
+    // come il main: ogni comando e `avvia` rispondono sempre con un esito, mai undefined
+    case "clotch-ai:comando": return { id: "c-scena", esito: "ok", testo: "", ...(args[0] === "macchine" ? s.macchine : {}) };
+    case "clotch-ai:avvia": return { ok: true, testo: "" };
     case "nuova:scegli-cartella": return null;
     case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
     case "casella:scegli": return [];

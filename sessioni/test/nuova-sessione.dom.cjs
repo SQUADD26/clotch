@@ -71,7 +71,7 @@ app.whenReady().then(async () => {
     await check('WORKTREE_SPENTO_E_RAMO_SCELTO', async () => {
       await load('vuota');
       await clicca('.selettore', 'Copia di lavoro');
-      await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.includes('Senza worktree')));
+      await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.includes('Senza copia di lavoro')));
       assert.equal(await run(() => document.querySelector('.nota-avvio').textContent), 'Lavora su dev direttamente dentro goal-notch.');
       await clicca('.selettore', 'dev');
       await wait(() => !!document.querySelector('.menu-avvio input'));

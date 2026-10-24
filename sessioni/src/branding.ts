@@ -62,12 +62,17 @@ const azione = (label: string, nome: string, tasti: Record<string, string | null
   return { label, ...(accelerator && !accelerator.endsWith("+") && { accelerator, registerAccelerator: false }), click: (_v, w) => (w as Electron.BrowserWindow | undefined)?.webContents.send("sessioni:menu", nome) };
 };
 
-/** Il menu con le scorciatoie dell'app (il main le unisce a quelle di partenza; branding non importa altro, è caricato prima del profilo). */
-export const aggiornaMenu = (tasti: Record<string, string | null> = {}) => Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp(tasti)));
+let statoMenu = { tasti: {} as Record<string, string | null>, barra: true };
+/** Il menu con le scorciatoie dell'app (il main le unisce a quelle di partenza; branding non importa altro, è caricato prima del profilo)
+ *  e la barra laterale della finestra davanti (la voce dice «Nascondi» o «Mostra», 148:63794). */
+export const aggiornaMenu = (parte: Partial<typeof statoMenu> = {}) => {
+  statoMenu = { ...statoMenu, ...parte };
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp(statoMenu.tasti, statoMenu.barra)));
+};
 
 /** Menu di un'app macOS, voci e scorciatoie dei frame Figma 148:63680 (clotch), 148:63718 (File), 148:63756 (Modifica), 148:63794 (Vista), 148:63832 (Finestra).
  *  Electron scrive i ruoli in inglese: ogni voce porta etichetta e scorciatoia sue, così il template si verifica (test/menu.test.ts). */
-export function menuApp(tasti: Record<string, string | null> = {}): Electron.MenuItemConstructorOptions[] {
+export function menuApp(tasti: Record<string, string | null> = {}, barra = true): Electron.MenuItemConstructorOptions[] {
   return [
     ...(process.platform === "darwin" ? [{ label: NOME_APP, submenu: [
       voce("about", `Informazioni su ${NOME_APP}`), sep, azione("Impostazioni…", "impostazioni", tasti), sep, voce("services", "Servizi"), sep,
@@ -82,7 +87,7 @@ export function menuApp(tasti: Record<string, string | null> = {}): Electron.Men
       { label: "Voce", submenu: [voce("startSpeaking", "Inizia a parlare"), voce("stopSpeaking", "Interrompi")] },
     ] },
     { label: "Vista", submenu: [
-      azione("Mostra/nascondi barra laterale", "barra", tasti), sep, azione("Indietro", "indietro", tasti), azione("Avanti", "avanti", tasti), sep,
+      azione(barra ? "Nascondi barra laterale" : "Mostra barra laterale", "barra", tasti), sep, azione("Indietro", "indietro", tasti), azione("Avanti", "avanti", tasti), sep,
       voce("reload", "Ricarica", "CommandOrControl+R"), voce("forceReload", "Forza ricarica", "Shift+CommandOrControl+R"),
       voce("toggleDevTools", "Attiva/disattiva strumenti sviluppatore", "Alt+CommandOrControl+I"), sep,
       voce("resetZoom", "Dimensione reale", "CommandOrControl+0"), voce("zoomIn", "Ingrandisci", "CommandOrControl+Plus"), voce("zoomOut", "Riduci", "CommandOrControl+-"), sep,

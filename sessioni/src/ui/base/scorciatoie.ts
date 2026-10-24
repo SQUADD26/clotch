@@ -2,6 +2,7 @@
 // (consenti, nega, ferma) il pezzo le registra con `registraAzione`; quelle di navigazione le fa il gestore.
 import { useEffect } from "react";
 import { useImpostazioni } from "../impostazioni/stato";
+import { FISSE } from "../impostazioni/riservati";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { useApriSessione } from "../barra/apri";
 import { useAvvio } from "./Avvio";
@@ -27,14 +28,14 @@ export function useScorciatoie() {
   const avvio = useAvvio();
   const sessioni = useElenco().dati?.sessioni;
   useEffect(() => {
-    const navigazione: Record<string, () => void> = { clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, indietro: n.indietro, avanti: n.avanti, impostazioni: () => n.apri("impostazioni"),
+    const navigazione: Record<string, () => void> = { nuova: () => n.apri("nuova-sessione"), clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, indietro: n.indietro, avanti: n.avanti, impostazioni: () => n.apri("impostazioni"),
       prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
     const azioneDiNome = (a: string | null) => a ? navigazione[a] ?? azioni.get(a) : undefined;
     const premi = (e: KeyboardEvent) => {
       // già gestito (la pagina Scorciatoie che registra, la casella); nei campi di testo solo le combinazioni con ⌘
       if (avvio || e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
-      if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey && e.key.toLowerCase() === "n") { e.preventDefault(); n.apri("nuova-sessione"); return; } // «Nuova sessione» ⌘N, fisso
-      const fai = azioneDiNome(azioneDi(tastiDi(e), scorciatoie));
+      const tasti = tastiDi(e);
+      const fai = azioneDiNome((tasti && FISSE[tasti]?.[0]) || azioneDi(tasti, scorciatoie)); // i tasti fissi vincono: la pagina Scorciatoie non li concede (#686)
       if (fai) { e.preventDefault(); fai(); }
     };
     addEventListener("keydown", premi);
@@ -42,4 +43,12 @@ export function useScorciatoie() {
     const togli = api().onMenu((a) => { if (!avvio) azioneDiNome(a)?.(); });
     return () => { removeEventListener("keydown", premi); togli(); };
   }, [n, scorciatoie, sessioni, apriSessione, avvio]);
+  // la voce «Nascondi/Mostra barra laterale» del menu segue la barra della finestra davanti
+  const { barraAperta } = n;
+  useEffect(() => {
+    const manda = () => void api().menuBarra(barraAperta).catch(() => {});
+    manda();
+    addEventListener("focus", manda);
+    return () => removeEventListener("focus", manda);
+  }, [barraAperta]);
 }

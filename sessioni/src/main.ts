@@ -77,6 +77,7 @@ app.whenReady().then(() => {
     return;
   }
   impostaIdentita();
+  ipcMain.handle("sessioni:menu-barra", (_e, aperta: unknown) => aggiornaMenu({ barra: aperta === true })); // anche nelle scene: la voce segue la barra (#867)
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
@@ -118,7 +119,7 @@ app.whenReady().then(() => {
   });
   collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
-  const menuSalvato = () => aggiornaMenu({ ...PARTENZA.scorciatoie, ...(impostazioniApp().scorciatoie as Record<string, string | null> | undefined) });
+  const menuSalvato = () => aggiornaMenu({ tasti: { ...PARTENZA.scorciatoie, ...(impostazioniApp().scorciatoie as Record<string, string | null> | undefined) } });
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
     if (c === "sessioni:impostazioni") { barraMenu(); menuSalvato(); }
