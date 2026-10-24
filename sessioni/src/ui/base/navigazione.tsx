@@ -22,9 +22,7 @@ export interface Navigazione extends Passo {
   barraAperta: boolean;
   alternaBarra(): void;
   pannelloAperto: boolean;
-  /** Pannello destro esteso a «Info sessione» (101-33775): il bottone «Pannello» è premuto. */
-  pannelloInfo: boolean;
-  /** Il bottone «Pannello» gira: obiettivo -> Info sessione -> chiuso -> obiettivo. */
+  /** Il bottone «Pannello» apre e chiude: un clic, un cambio. */
   alternaPannello(): void;
   /** Chiude il pannello da qualunque stato (Esc quando sta sopra la colonna). */
   chiudiPannello(): void;
@@ -60,8 +58,6 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
   const [barraStretta, setBarraStretta] = useState(() => prova("barra-sopra"));
   const [pannelloLargo, setPannelloLargo] = useState(true);
   const [pannelloStretto, setPannelloStretto] = useState(false);
-  // le scene di prova aprono Info sessione con `sezione` = «info|…»
-  const [pannelloInfo, setInfo] = useState(() => chiaveDi("info"));
   // «Pannello obiettivo» (Aspetto): vale a ogni sessione che si apre e appena cambia, non solo all'avvio (#1097); mancante = aperto
   const { pannelloAperto: pannelloScelto } = useImpostazioni(), sessioneAperta = storia.passi[storia.i].sessione;
   useEffect(() => setPannelloLargo(pannelloScelto !== false), [pannelloScelto, sessioneAperta]);
@@ -86,16 +82,12 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
     puoAvanti: storia.i < storia.passi.length - 1,
     barraAperta: misura.stretta ? barraStretta : barraLarga,
     alternaBarra: () => conTransizione(() => (misura.stretta ? setBarraStretta : setBarraLarga)((x) => !x)),
-    pannelloAperto, pannelloInfo,
-    alternaPannello: () => conTransizione(() => {
-      const imposta = misura.largo ? setPannelloLargo : setPannelloStretto;
-      if (!pannelloAperto) imposta(true);
-      else if (!pannelloInfo) setInfo(true);
-      else { setInfo(false); imposta(false); }
-    }),
-    chiudiPannello: () => { setInfo(false); (misura.largo ? setPannelloLargo : setPannelloStretto)(false); },
+    pannelloAperto,
+    // niente foto della transizione: il clic cambia lo stato subito (#1144, < 50 ms); l'entrata è un keyframe in movimento.css
+    alternaPannello: () => (misura.largo ? setPannelloLargo : setPannelloStretto)((x) => !x),
+    chiudiPannello: () => (misura.largo ? setPannelloLargo : setPannelloStretto)(false),
     sovrapposta: misura.stretta, adatta,
-  }), [storia, apri, misura, adatta, barraLarga, barraStretta, pannelloAperto, pannelloInfo]);
+  }), [storia, apri, misura, adatta, barraLarga, barraStretta, pannelloAperto]);
   return <Contesto.Provider value={nav}>{children}</Contesto.Provider>;
 }
 

@@ -20,8 +20,8 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
   };
 }
 
-/** `esteso`: il bottone «Pannello» è premuto e sotto l'obiettivo ci sono le schede di Info sessione. */
-export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
+/** Obiettivo e, sotto, le schede di Info sessione: il pannello è aperto o chiuso, senza stati in mezzo. */
+export function PannelloInfo({ s }: { s: Sessione }) {
   const { info, errore, riprova } = useInfo(s.id);
   const max = useChatClotchAi(s.id)?.contestoMax ?? null;
   const prs = info?.prs ?? s.app?.prs ?? [];
@@ -32,14 +32,14 @@ export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
   return (
     <div className="pannello-info" ref={colonna}>
       <PannelloObiettivo dati={datiPannello(s, info)} />
-      {esteso && <>
+      <>
         <Ambiente s={s} />
         {errore && !info && <div className="scheda errore-info" role="alert"><span className="t-sm errore">Non riesco a leggere contesto e modifiche.</span><button type="button" className="bottone secondario" onClick={riprova}>Riprova</button></div>}
         {!errore && !info && <div className="scheda scheletro" aria-busy="true" aria-label="Carico contesto e modifiche"><span className="riga-sagoma" /><span className="riga-sagoma corta" /></div>}
         {info?.contesto != null && <Contesto usati={info.contesto} max={max} mcp={s.app?.strumentiMcp ?? 0} />}
         {!!s.app?.connettori.length && <Connettori nomi={s.app.connettori} />}
         {info && (info.file.quanti > 0 || prs.length > 0) && <Modifiche file={info.file} prs={prs} />}
-      </>}
+      </>
     </div>
   );
 }

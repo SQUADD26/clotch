@@ -11,9 +11,9 @@ export { CentroTitolo } from "./Schermo";
 export { scene };
 
 export default function Pannello() {
-  const { sessione, pannelloInfo } = useNavigazione();
+  const { sessione } = useNavigazione();
   const elenco = useElenco();
   const s = elenco.dati?.sessioni.find((x) => x.id === sessione);
   // caricamento ed errore dell'elenco li mostra la chat; senza sessione il pannello non ha niente da dire
-  return s ? <PannelloInfo s={s} esteso={pannelloInfo} /> : null;
+  return s ? <PannelloInfo s={s} /> : null;
 }

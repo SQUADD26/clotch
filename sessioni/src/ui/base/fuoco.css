@@ -26,8 +26,9 @@ input:read-only, textarea:read-only { cursor: default; }
 
 /* anello di focus sempre dentro il bordo dell'elemento: dentro una lista che scorre o un contenitore con overflow non si taglia mai */
 :focus-visible { outline-offset: calc(-1 * var(--misura-tratto)); }
-.testata:focus-visible { border-radius: var(--raggio-md); } /* testata di un blocco che si apre: il bottone è a spigolo vivo, l'anello no */
+button.testata { border-radius: var(--raggio-md); } /* testata di un blocco che si apre: bottone, fondo e anello seguono lo stesso raggio */
 
 /* hover dei campi e delle testate dei blocchi: i campi prendono il bordo forte (come l'allegato), la testata la tinta di riga */
 .casella:hover:not(:focus-within):not(.errore), .casella-macchina:hover:not(:focus-visible):not(.errore) { border-color: var(--colore-bordo-forte); }
-.testata:hover { background: var(--colore-fondo-riga-passaggio); }
+/* solo il bottone: un `div.testata` è un titolo, non reagisce (fascia grigia piatta, #1144) */
+button.testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
