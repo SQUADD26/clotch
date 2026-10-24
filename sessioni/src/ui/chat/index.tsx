@@ -91,7 +91,7 @@ function ChatSessione() {
     );
     return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
   }
-  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "")}.`} riprova={m.riprova} />;
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "", s.app?.ospite)}.`} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;

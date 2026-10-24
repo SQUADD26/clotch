@@ -40,7 +40,8 @@ export function NessunaSessione({ aggiungi, impostazioni }: { aggiungi(): void; 
 const IMPOSTAZIONI_DI_SISTEMA = "/System/Applications/System Settings.app"; // shortcut: apre l'app, non il pannello «Accesso completo al disco»; da cambiare se serve il pannello
 
 /** Il messaggio del main (jsonl.ts `msgErrore`) in parole semplici: gli errori di sistema, in inglese e con percorsi, non si mostrano. */
-export const motivoErrore = (m: string) => m === "permesso negato" ? "permesso negato" : m === "file sparito" ? "non c’è più" : "non si apre";
+export const motivoErrore = (m: string, ospite?: string | null) => m === "permesso negato" ? "permesso negato" : m === "file sparito" ? "non c’è più"
+  : /non trovata sul disco/i.test(m) ? (ospite ? `la trascrizione è su ${ospite}, non su questo Mac` : "la trascrizione non è sul disco") : "non si apre";
 
 const MAX_CARTELLE = 3;
 
