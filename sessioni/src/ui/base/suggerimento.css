@@ -6,3 +6,5 @@
   border-radius: var(--raggio-md); background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
 }
+/* un bottone spento non manda il clic: lo riceve il contenitore, e il suggerimento si chiude come con un bottone attivo (#1070) */
+.con-tooltip > :disabled { pointer-events: none; }

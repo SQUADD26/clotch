@@ -4,13 +4,16 @@ import type { Registro } from "../../clotch-ai";
 import { useApriSessione } from "../barra/apri";
 import { durata } from "../chat/testi";
 import { useRegistro } from "../clotch-ai/dati";
+import { inAttesa } from "../clotch-ai/StatoRegistro";
 import { casella } from "../clotch-ai/vista";
-import { BottoneIcona } from "./Bottone";
-import { usePreferenze } from "./dati";
+import { Bottone, BottoneIcona } from "./Bottone";
 import { Icona } from "./Icona";
+import { usePreferenze } from "./dati";
 import { IconaSessione } from "./IconaSessione";
 import { useNavigazione } from "./navigazione";
 import { Sovrapposto, type Punto } from "./Sovrapposto";
+import { Suggerimento } from "./Suggerimento";
+import { plurale } from "./formato";
 import { numero } from "./token";
 import "./attivita.css";
 
@@ -39,20 +42,34 @@ export function Attivita() {
   const pref = usePreferenze().dati, apriSessione = useApriSessione();
   useEffect(() => { if (barraPrima.current !== barraAperta) { barraPrima.current = barraAperta; setAperto(false); } }, [barraAperta]);
   const attese = r.dati ? casella(r.dati as Registro, Date.now()).progetti.flatMap((p) => p.aspettano) : [];
-  const n = attese.length;
+  const n = attese.length, attesa = inAttesa(r);
+  // aperto con la tastiera il fuoco entra nel popover (sulla prima riga, se no sulla X) e con Esc torna alla campana (useStrato)
+  useEffect(() => {
+    if (!aperto) return;
+    const f = requestAnimationFrame(() => document.querySelector<HTMLElement>(".popover-attivita .riga-attesa, .popover-attivita .chiudi-popover")?.focus());
+    return () => cancelAnimationFrame(f);
+  }, [aperto]);
   return (
     <>
       <div className="bottone-attivita">
-        <BottoneIcona icona="campana" etichetta={n > 0 ? `Mostra attività, ${n} in attesa` : "Mostra attività"} aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
+        <Suggerimento testo={n > 0 ? plurale(n, "sessione aspetta te", "sessioni aspettano te") : "Attività"} nascosto={aperto}>
+          <BottoneIcona icona="campana" etichetta={n > 0 ? `Mostra attività, ${n} in attesa` : "Mostra attività"} title={undefined} aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
+        </Suggerimento>
         {n > 0 && <span className="contatore t-xs medio" aria-hidden>{n}</span>}
       </div>
       {aperto && (
         <Sovrapposto ancora={punto()} className={n ? "popover-attivita con-sessioni" : "popover-attivita"} role="dialog" label="Attività" onChiudi={() => setAperto(false)}>
           <div className="testata">
             <span className="medio">Attività</span>
-            <button type="button" aria-label="Chiudi" title="Chiudi" onClick={() => setAperto(false)}><Icona nome="chiudi" /></button>
+            <BottoneIcona icona="chiudi" etichetta="Chiudi" className="chiudi-popover" onClick={() => setAperto(false)} />
           </div>
-          {n === 0 ? <div className="t-sm secondario">Qui trovi le sessioni che aspettano te: permessi, domande e piani da approvare.</div> : (
+          {attesa === "carica" ? <div className="riga-stato t-sm secondario"><Icona nome="spinner" colore="secondaria" gira />Leggendo il registro…</div>
+            : attesa === "errore" ? (
+              <>
+                <div className="riga-stato t-sm"><Icona nome="avviso" colore="errore" />Registro non leggibile</div>
+                <Bottone tipo="secondario" onClick={r.riprova}>Riprova ora</Bottone>
+              </>
+            ) : n === 0 ? <div className="t-sm secondario">Qui trovi le sessioni che aspettano te: permessi, domande e piani da approvare.</div> : (
             <div className="elenco" onKeyDown={frecce}>
               {attese.map((a) => (
                 <button key={a.chat} type="button" className="riga-attesa" aria-current={a.chat === sessione || undefined}
