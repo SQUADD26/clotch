@@ -12,18 +12,28 @@ import type { ElencoMacchine } from "./usaMacchine";
 import { PannelloSsh } from "./MenuMacchine";
 import "./nuova-sessione.css";
 
-export function Selettore({ icona, etichetta, aperto = false, stato, avviso = false, fisso = false, onClick, children }: {
-  icona: NomeIcona; etichetta: string; aperto?: boolean; stato?: "spento" | "errore"; /** Icona gialla: la macchina non è pronta. */ avviso?: boolean; /** Si legge soltanto (ramo di una macchina SSH): senza menu. */ fisso?: boolean; onClick(): void; children?: ReactNode;
+export function Selettore({ icona, etichetta, aperto = false, stato, avviso = false, fisso = false, premuto, nome, onClick, children }: {
+  icona: NomeIcona; etichetta: string; aperto?: boolean; stato?: "spento" | "errore"; /** Icona gialla: la macchina non è pronta. */ avviso?: boolean; /** Si legge soltanto (ramo di una macchina SSH): senza menu. */ fisso?: boolean; /** Interruttore (Copia di lavoro): acceso o spento, senza menu; `nome` è quello per VoiceOver, uguale nei due stati. */ premuto?: boolean; nome?: string; onClick(): void; children?: ReactNode;
 }) {
+  const menu = !fisso && premuto === undefined;
   const colore = stato === "errore" ? "errore" : avviso ? "lavoro" : stato === "spento" ? "terziaria" : "secondaria";
   return (
     <span className="selettore-avvio">
-      <button type="button" className={`selettore${aperto ? " aperto" : ""}${stato ? ` ${stato}` : ""}`} aria-haspopup={fisso ? undefined : "menu"} aria-expanded={fisso ? undefined : aperto} disabled={fisso} onClick={onClick}>
+      <button type="button" className={`selettore${aperto ? " aperto" : ""}${stato ? ` ${stato}` : ""}`} aria-haspopup={menu ? "menu" : undefined} aria-expanded={menu ? aperto : undefined} aria-pressed={premuto} aria-label={nome} disabled={fisso} onClick={onClick}>
         <Icona nome={icona} colore={colore} /><span className="etichetta" title={etichetta}>{etichetta}</span>
       </button>
       {children}
     </span>
   );
+}
+
+/** ↑ ↓ Home Fine tra le voci di `el`, come i menu del Mac (base/Menu.tsx); `true` se il tasto era suo. */
+function naviga(el: HTMLElement, e: KeyboardEvent, voci: string) {
+  if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Home" && e.key !== "End") return false;
+  const v = [...el.querySelectorAll<HTMLElement>(voci)], i = v.indexOf(document.activeElement as HTMLElement);
+  v[e.key === "Home" ? 0 : e.key === "End" ? v.length - 1 : (i + (e.key === "ArrowDown" ? 1 : v.length - 1)) % v.length]?.focus();
+  e.preventDefault();
+  return true;
 }
 
 /** Menu sopra il suo selettore (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al selettore): ricerca in cima, frecce tra le voci.
@@ -35,12 +45,7 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, rif, onChiudi, childr
   useEffect(() => {
     if (!el) return;
     el.querySelector("input")?.focus();
-    const tasto = (e: KeyboardEvent) => {
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      const v = [...el.querySelectorAll<HTMLElement>("input, button.voce:not(:disabled), [role=menuitemcheckbox]")], i = v.indexOf(document.activeElement as HTMLElement);
-      v[(i + (e.key === "ArrowDown" ? 1 : v.length - 1)) % v.length]?.focus();
-      e.preventDefault();
-    };
+    const tasto = (e: KeyboardEvent) => { naviga(el, e, "input, button.voce:not(:disabled), [role=menuitemcheckbox]"); };
     el.addEventListener("keydown", tasto);
     return () => el.removeEventListener("keydown", tasto);
   }, [el]);
@@ -56,11 +61,14 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, rif, onChiudi, childr
 const Separatore = () => <div className="separatore" role="separator"><div className="linea" /></div>;
 const Titolo = ({ children }: { children: string }) => <div className="titolo-gruppo">{children}</div>;
 
-function Riga({ icona, etichetta, valore, titolo, fine, scelta = false, attiva = false, disabled, onClick }: {
-  icona?: NomeIcona; titolo?: string; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; attiva?: boolean; disabled?: boolean; onClick(): void;
+/** `onSotto`: la voce apre un sottomenu; → lo apre ed entra (HIG, Menus). */
+function Riga({ icona, etichetta, valore, titolo, fine, scelta = false, attiva = false, disabled, onClick, onSotto }: {
+  icona?: NomeIcona; titolo?: string; etichetta: string; valore?: string; fine?: "spunta" | "freccia"; scelta?: boolean; attiva?: boolean; disabled?: boolean; onClick(): void; onSotto?(): void;
 }) {
   return (
-    <button type="button" role="menuitem" className={`voce${attiva ? " scelta" : ""}`} title={titolo ?? etichetta} disabled={disabled} onClick={onClick}>
+    <button type="button" role="menuitem" className={`voce${attiva ? " scelta" : ""}`} title={titolo ?? etichetta} disabled={disabled} onClick={onClick}
+      aria-haspopup={onSotto ? "menu" : undefined} aria-expanded={onSotto ? attiva : undefined} data-sotto={onSotto ? "" : undefined}
+      onKeyDown={onSotto && ((e) => { if (e.key === "ArrowRight") { e.preventDefault(); onSotto(); } })}>
       {icona && <Icona nome={icona} />}
       <span className="etichetta">{etichetta}</span>
       {valore && <span className="valore" title={valore}>{valore}</span>}
@@ -74,6 +82,17 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
   onScegli(a: Ambiente): void; onAggiungi(p?: Proposta): void; onTogli(m: Macchina): void; onChiudi(): void;
 }) {
   const [cerca, setCerca] = useState(""), [host, setHost] = useState(ssh), [menu, setMenu] = useState<HTMLDivElement | null>(null);
+  const [sotto, setSotto] = useState<HTMLDivElement | null>(null), [entra, setEntra] = useState(false);
+  useEffect(() => { if (entra && sotto) { sotto.querySelector<HTMLElement>(".voce")?.focus(); setEntra(false); } }, [entra, sotto]);
+  useEffect(() => {
+    if (!sotto) return;
+    const tasto = (e: KeyboardEvent) => {
+      if (naviga(sotto, e, ".voce") || e.key !== "ArrowLeft") return;
+      e.preventDefault(); setHost(false); menu?.querySelector<HTMLElement>("[data-sotto]")?.focus();
+    };
+    sotto.addEventListener("keydown", tasto);
+    return () => sotto.removeEventListener("keydown", tasto);
+  }, [sotto, menu]);
   const q = cerca.trim().toLowerCase(), trova = (t: string) => t.toLowerCase().includes(q);
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
@@ -89,7 +108,7 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
             <Separatore />
             <Riga etichetta="Cloud" fine="freccia" onClick={() => scegli({ tipo: "cloud" })} />
             <Riga etichetta="Remote Control" fine="freccia" onClick={() => scegli({ tipo: "remote_control" })} />
-            <Riga etichetta="SSH" fine="freccia" attiva={host} onClick={() => setHost(!host)} />
+            <Riga etichetta="SSH" fine="freccia" attiva={host} onClick={() => setHost(!host)} onSotto={() => { setHost(true); setEntra(true); }} />
             <Separatore />
             {/* shortcut: gli ambienti nuovi sono le macchine SSH («Aggiungi macchina…»); il disegno non dice altro, la voce resta spenta */}
             <Riga icona="piu" etichetta="Crea ambiente" disabled onClick={() => {}} />
@@ -97,7 +116,7 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
         )}
       </Menu>
       {host && !q && menu && (
-        <Sovrapposto ancora={menu} lato="destra" scarto={numero("spazio-1")} className="menu-casella menu-ssh" role="menu" label="Macchine SSH" onChiudi={() => setHost(false)}>
+        <Sovrapposto ancora={menu} lato="destra" scarto={numero("spazio-1")} className="menu-casella menu-ssh" role="menu" label="Macchine SSH" rif={setSotto} onChiudi={() => setHost(false)}>
           <PannelloSsh mac={mac} ambiente={ambiente} mostraBase={mostraBase} onScegli={scegli} onAggiungi={(p) => { onChiudi(); onAggiungi(p); }} onTogli={(m) => { onChiudi(); onTogli(m); }} />
         </Sovrapposto>
       )}

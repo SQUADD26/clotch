@@ -2,6 +2,7 @@
 // comando da copiare 149:67696; collega GitHub col codice 149:70649.
 import { useState } from "react";
 import { Bottone } from "../base/Bottone";
+import { avvisa } from "../base/Avvisi";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { titoloECorpo, type RigaPasso, type StatoPasso } from "./macchine";
 import "./macchine.css";
@@ -42,7 +43,7 @@ export function AvvisoPasso({ testo }: { testo: string }) {
   );
 }
 
-const copia = (t: string) => { void navigator.clipboard.writeText(t).catch(() => {}); };
+const copia = (t: string) => navigator.clipboard.writeText(t);
 
 /** «Accedi a Claude dal Terminale del Mac»: il comando esatto del motore, da copiare; mai un segreto. */
 export function BloccoComando({ riga }: { riga: RigaPasso }) {
@@ -53,7 +54,7 @@ export function BloccoComando({ riga }: { riga: RigaPasso }) {
       <span className="testo-comando">Incolla il comando nel Terminale, accedi, poi torna qui.</span>
       <div className="riga-comando">
         <code className="codice-macchina">{riga.comando}</code>
-        <Bottone tipo="secondario" onClick={() => { copia(riga.comando ?? ""); setCopiato(true); }}>{copiato ? "Copiato" : "Copia"}</Bottone>
+        <Bottone tipo="secondario" onClick={() => void copia(riga.comando ?? "").then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); }, () => avvisa({ tipo: "errore", messaggio: "Comando non copiato" }))}>{copiato ? "Copiato" : "Copia"}</Bottone>
       </div>
     </div>
   );
@@ -61,7 +62,7 @@ export function BloccoComando({ riga }: { riga: RigaPasso }) {
 
 /** Accesso a GitHub col codice di verifica: il bottone copia il codice e apre `url` nel browser (il main lascia passare solo https). */
 export function BloccoCodice({ riga }: { riga: RigaPasso }) {
-  const apri = () => { copia(riga.codice ?? ""); if (riga.url) window.open(riga.url, "_blank", "noopener"); };
+  const apri = () => { void copia(riga.codice ?? "").then(() => avvisa({ tipo: "successo", messaggio: "Codice copiato" }), () => {}); if (riga.url) window.open(riga.url, "_blank", "noopener"); };
   return (
     <div className="codice-github">
       <div className="codice-grande" aria-label="Codice di GitHub">{riga.codice}</div>

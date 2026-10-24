@@ -126,7 +126,7 @@ export function NuovaSessione() {
   const togli = async (nome: string) => {
     setDialogo(null);
     const e = await comandaEsito("macchina_togli", { nome });
-    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
+    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); avvisa({ tipo: "successo", messaggio: "Macchina rimossa" }); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
     mac.ricarica();
   };
   const apri = (m: Menu) => setMenu(menu === m ? null : m);
@@ -167,7 +167,7 @@ export function NuovaSessione() {
               <Selettore icona="ramo" etichetta={ramo ?? "Nessun ramo"} aperto={menu === "ramo"} fisso={remoto} onClick={() => apri("ramo")}>
                 {menu === "ramo" && <MenuRamo rami={contesto.rami} ramo={ramo} inizio={provaDi(sezione, "cerca") ?? ""} onScegli={setRamo} onChiudi={chiudi} />}
               </Selettore>
-              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
+              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} stato={worktree ? undefined : "spento"} premuto={worktree} nome="Copia di lavoro" onClick={() => setWorktree(!worktree)} />
             </>
           )}
         </div>
