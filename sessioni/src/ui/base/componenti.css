@@ -72,3 +72,13 @@
 /* voce scelta (già col fondo «scelta»): passaggio e premuto la velano */
 .voce.scelta:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
 .voce.scelta:active:not(:disabled) { opacity: var(--opacita-premuto); }
+
+/* Interruttore (impostazioni, pannello, menu della casella): uno solo. Acceso = la manopola scorre a destra con transform,
+   mai con justify-content (non si anima); il movimento sta in base/movimento.css */
+.interruttore {
+  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
+  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
+}
+.interruttore.acceso { background: var(--colore-fondo-accento); }
+.interruttore .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
+.interruttore.acceso .manopola { transform: translateX(calc(var(--misura-interruttore-largo) - var(--misura-icona) - 2 * var(--spazio-0-5))); }

@@ -17,13 +17,7 @@
 .pezzo-pannello .riga-info { display: flex; align-items: center; gap: var(--spazio-2); }
 .pezzo-pannello .riga-info .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* controllo remoto: stesso interruttore delle impostazioni, in sola lettura */
-.pezzo-pannello .interruttore {
-  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none;
-  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta); display: flex;
-}
-.pezzo-pannello .interruttore.acceso { background: var(--colore-fondo-accento); justify-content: flex-end; }
-.pezzo-pannello .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
+/* controllo remoto: stesso interruttore delle impostazioni (base/componenti.css), in sola lettura */
 
 /* contesto: usato, barra e legenda */
 .pezzo-pannello .uso { display: flex; align-items: center; justify-content: space-between; }
