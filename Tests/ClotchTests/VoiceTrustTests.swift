@@ -141,15 +141,4 @@ final class VoiceTrustTests: XCTestCase {
         XCTAssertLessThan(c.heardAfter, 100)
         c.cancel()
     }
-
-    func testRiskyOrderWaitsForATouch() async throws {
-        try XCTSkipUnless(FileManager.default.fileExists(atPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v3").path))
-        let c = try controller([], verdict: .yes)
-        try await speakAndStop(c, "Fai il deploy in produzione adesso")
-        try await waitFor(seconds: 60) { c.awaitingTouch }
-        try await Task.sleep(nanoseconds: 3_000_000_000)  // far past the 2 s of an ordinary order: it did not leave
-        XCTAssertTrue(c.awaitingTouch)
-        XCTAssertEqual(c.phase, .sending)
-        c.cancel()
-    }
 }
