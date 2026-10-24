@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { EsitoComando } from "../../comandi";
 import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
+import { messaggioErrore } from "../base/dati";
 import { useRegistro } from "../clotch-ai/dati";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 
@@ -26,7 +27,7 @@ export default function ClotchAi() {
   // cambi mandati e non ancora tornati nel registro: si vedono subito, se clotch AI rifiuta tornano com'erano
   const [inViaggio, setInViaggio] = useState<Valori>({});
   useEffect(() => {
-    window.impostazioni.radici().then((r) => setAccount(r.map((p) => p.split("/").pop()!.replace(/^\.claude-?/, "") || "claude")), () => {});
+    window.impostazioni.radici().then((r) => setAccount(r.map((p) => p.split("/").pop()!.replace(/^\.claude-?/, "") || "claude")), (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
   }, []);
   // un cambio arrivato nel registro non è più in viaggio
   useEffect(() => setInViaggio((x) => Object.fromEntries(Object.entries(x).filter(([k, val]) => letti?.[k] !== val))), [letti]);
