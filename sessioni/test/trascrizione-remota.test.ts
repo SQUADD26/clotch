@@ -11,12 +11,13 @@ import { leggiElenco } from "../src/elenco";
 import { leggiPagina } from "../src/messaggi";
 import { svuotaCache } from "../src/quote-uso";
 
-const HOST = "sandbox-app@51.83.1.9", CLI = "cli-remota", APP = "local_remota-1";
+const HOST = "sandbox-app@51.83.1.9", NOME_SSH = "squaddv2", CLI = "cli-remota", APP = "local_remota-1";
 const scrivi = (f: string, c: string) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, c); };
 const riga = (testo: string) => JSON.stringify({ type: "user", cwd: "/work/x", message: { role: "user", content: testo }, timestamp: "2026-10-24T10:00:00Z" }) + "\n";
 const mese = (h: string) => path.join(h, ".claude", "registro", `${new Date().toISOString().slice(0, 7)}.jsonl`);
 const comandi = (h: string) => path.join(h, ".claude", "casella", "comandi");
-const copia = (h: string, host = HOST) => path.join(h, ".claude", "casella", "trascrizioni", host, `${CLI}.jsonl`);
+// il motore vero scrive sotto il suo nome SSH («squaddv2»), non sotto l'indirizzo dell'app
+const copia = (h: string, host = NOME_SSH) => path.join(h, ".claude", "casella", "trascrizioni", host, `${CLI}.jsonl`);
 
 function casa(extra: object = {}) {
   const h = fs.mkdtempSync(path.join(os.tmpdir(), "clotch-1001-"));

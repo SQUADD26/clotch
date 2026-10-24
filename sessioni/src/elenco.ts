@@ -73,12 +73,10 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     });
   }
   // sessione su una macchina SSH: la copia del motore (trascrizione_remota) ha la coda più nuova di quella dell'app Claude, e a volte è l'unica
-  for (const s of tutte) {
-    const o = s.app?.ospite;
-    if (!o || o !== path.basename(o) || o === ".." || s.id !== path.basename(s.id)) continue;
-    const copia = path.join(opz.home, ".claude", "casella", "trascrizioni", o, `${s.id}.jsonl`);
-    if (fs.existsSync(copia)) s.file = copia;
-  }
+  // la cartella porta il nome SSH che usa il motore («squaddv2»), non l'indirizzo dell'app («sandbox-app@51.83.1.9»): si cerca per id
+  const radice = path.join(opz.home, ".claude", "casella", "trascrizioni"), copie = new Map<string, string>();
+  try { for (const h of fs.readdirSync(radice)) for (const f of fs.readdirSync(path.join(radice, h))) if (f.endsWith(".jsonl")) copie.set(f.slice(0, -6), path.join(radice, h, f)); } catch { /* nessuna copia ancora */ }
+  for (const s of tutte) if (s.app?.ospite && copie.has(s.id)) s.file = copie.get(s.id)!;
   if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));
   if (!imp || imp.sorgenteCursor) tutte.push(...leggiCursor(opz.home, errori));
 
