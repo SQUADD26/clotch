@@ -2,6 +2,7 @@ import AVFoundation
 import AudioToolbox
 import CoreAudio
 import ClotchCore
+import os.log
 
 /// The microphone as 16 kHz mono (#110): every tap buffer is converted once and handed over both as the buffer (the local
 /// model takes it as is) and as 16-bit PCM (Scribe's socket and the level meter). `onAudio` runs on the audio thread.
@@ -41,8 +42,11 @@ class VoiceCapture: @unchecked Sendable {
             .devices.map { ($0.uniqueID, $0.localizedName) }
     }
 
+    /// #1119: Friday's `imposta microfono` writes the name macOS shows («Microfono MacBook Pro»), the page writes the uid; both work.
+    static func uid(_ choice: String) -> String { inputs().first { $0.name == choice }?.id ?? choice }
+
     private static func deviceID(uid: String) -> AudioDeviceID? {
-        var uidRef = uid as CFString
+        var uidRef = Self.uid(uid) as CFString
         var device = AudioDeviceID(0)
         var size = UInt32(MemoryLayout<AudioDeviceID>.size)
         var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyTranslateUIDToDevice,
@@ -70,6 +74,7 @@ class VoiceCapture: @unchecked Sendable {
         let input = engine.inputNode
         if !microphone.isEmpty, var device = Self.deviceID(uid: microphone), let unit = input.audioUnit {
             AudioUnitSetProperty(unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &device, UInt32(MemoryLayout<AudioDeviceID>.size))
+            Logger(subsystem: ClotchLog.subsystem, category: "VoiceInput").notice("microphone: \(self.microphone, privacy: .public) = device \(device)")
         }
         engine.prepare()
     }

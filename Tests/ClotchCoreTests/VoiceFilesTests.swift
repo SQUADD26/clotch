@@ -22,6 +22,17 @@ final class VoiceFilesTests: XCTestCase {
         try text.write(to: url, atomically: true, encoding: .utf8)
     }
 
+    /// #1119: the microphone Friday set (`friday comando imposta`) wins when read, and a page save never copies it into config.json.
+    func testFridayMicrophoneWins() throws {
+        try put(#"{"ingresso_microfono": "BuiltInMicrophoneDevice"}"#, files.configURL)
+        XCTAssertEqual(try files.readConfig()["ingresso_microfono"] as? String, "BuiltInMicrophoneDevice")
+        try put(#"{"microfono": "Microfono MacBook Pro"}"#, files.fridaySettingsURL)
+        XCTAssertEqual(try files.readConfig()["ingresso_microfono"] as? String, "Microfono MacBook Pro")
+        try files.updateConfig(["speed": 1.3])
+        let saved = try JSONSerialization.jsonObject(with: Data(contentsOf: files.configURL)) as? [String: Any]
+        XCTAssertEqual(saved?["ingresso_microfono"] as? String, "BuiltInMicrophoneDevice")
+    }
+
     func testUpdateKeepsUnknownFields() throws {
         try put(#"{"voice_id": "abc123", "silenzio": [1, 2], "futuro": {"x": true}}"#, files.configURL)
         try files.updateConfig(["speed": 1.3, "voice_id": "nuovo99"])
