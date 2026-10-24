@@ -76,7 +76,7 @@ function Riferimento({ x }: { x: Citata }) {
       onKeyDown={(e) => { if (sopra && e.key === "Escape") { e.stopPropagation(); setSopra(false); } }}>
       <button type="button" className="riferimento-sessione" onClick={() => n.apri("sessione", x.s.id)}>
         <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-        <span className="titolo">{x.s.titolo}</span>
+        <span className="titolo" title={x.s.titolo}>{x.s.titolo}</span>
         <SegnoStato stato={x.s.stato} />
       </button>
       {/* il ponte (padding) fa parte di .con-scheda: attraversando lo spazio la scheda non sparisce */}

@@ -83,7 +83,7 @@ app.whenReady().then(async () => {
       await wait(() => document.querySelectorAll('.menu-ssh .riga-macchina').length === 3);
       const togli = await run(() => [...document.querySelectorAll('.menu-ssh .riga-macchina')].map((r) => !!r.querySelector('.togli')));
       assert.deepEqual(togli, [false, true, true], 'la macchina di base (tabella) non ha il cestino');
-      assert.equal(await run(() => document.querySelector('.menu-ssh .riga-macchina .tooltip').textContent), 'È la macchina di base: non si toglie.');
+      assert.equal(await run(() => document.querySelector('.menu-ssh .riga-macchina .tooltip').textContent), 'È la macchina di base: non si rimuove.');
     });
     await check('TOGLI_CON_CONFERMA_E_ANNULLA', async () => {
       await load('menu:ssh');
@@ -182,6 +182,43 @@ app.whenReady().then(async () => {
       assert.equal(await run(() => document.querySelectorAll('.dialogo .passo.ok').length), 7);
       await clicca('.dialogo .bottoni button', 'Nuova sessione');
       await wait(() => !document.querySelector('.dialogo') && [...document.querySelectorAll('.selettore')].some((e) => e.textContent.trim() === 'build-server'));
+    });
+    await check('MODULO_INVIO_ERRORI_CON_TESTO_E_FUOCO_AL_CAMPO_SBAGLIATO', async () => {
+      await load('vuota');
+      await apriMenuSsh();
+      await clicca('.menu-ssh button.voce', 'Aggiungi macchina');
+      await wait(() => !!document.querySelector('.dialogo .campi-macchina'));
+      const invio = () => run(() => document.querySelector('.dialogo input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })));
+      await invio();
+      await wait(() => document.querySelectorAll('.dialogo .messaggio-campo').length === 3);
+      assert.deepEqual(await testi('.dialogo .messaggio-campo'), ['Serve l’indirizzo della macchina.', 'Usa minuscole, numeri e trattini (massimo 32).', 'Serve un percorso che parte da «/».']);
+      await wait(() => document.activeElement === document.querySelector('.dialogo input[aria-invalid=true]'));
+      assert.equal(comandi.filter((c) => c.cmd === 'macchina_aggiungi').length, 0, 'il modulo vuoto non parte');
+      await campo('Indirizzo', '10.0.4.9'); await campo('Nome', 'mac-prova'); await campo('Cartella', '/srv/prova');
+      await invio();
+      await attendi(() => comandi.some((c) => c.cmd === 'macchina_aggiungi'));
+    });
+    await check('TASTIERA_MENU_MAC_FRECCIA_DESTRA_SINISTRA_HOME_FINE_E_NOMI', async () => {
+      await load('vuota');
+      await clicca('.selettore', 'Questo computer');
+      await wait(() => !!document.querySelector('.menu-avvio'));
+      const tasto = (key) => run((key) => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })), key);
+      const fuoco = () => run(() => document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 30));
+      await run(() => [...document.querySelectorAll('.menu-avvio .voce')].find((e) => e.textContent.trim() === 'Cloud').focus());
+      await tasto('End');
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'SSH', 'Fine va all’ultima voce attiva (Crea ambiente è spenta)');
+      await tasto('Home');
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'Questo computer');
+      await run(() => [...document.querySelectorAll('.menu-avvio .voce')].find((e) => e.textContent.trim() === 'SSH').focus());
+      assert.equal(await run(() => document.activeElement.getAttribute('aria-expanded')), 'false');
+      await tasto('ArrowRight');
+      await wait(() => !!document.querySelector('.menu-ssh') && document.activeElement.closest('.menu-ssh'));
+      assert.equal(await fuoco(), 'rise, roberto@rise', 'il nome per VoiceOver è nome e utente, senza il suggerimento');
+      await tasto('ArrowDown');
+      assert.equal(await fuoco(), 'worker, roberto@worker');
+      await tasto('ArrowLeft');
+      await wait(() => !document.querySelector('.menu-ssh'));
+      assert.equal(await run(() => document.activeElement.textContent.trim()), 'SSH', '← chiude il pannello e il fuoco torna su SSH');
     });
     await check('LOGIN_MANCANTE_COMANDO_DA_COPIARE_E_HO_FATTO_RIPROVA', async () => {
       await load('vuota');

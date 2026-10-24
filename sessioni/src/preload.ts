@@ -17,6 +17,12 @@ const api: SessioniApi = {
     return () => ipcRenderer.removeListener("sessioni:preferenze", f);
   },
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
+  menuBarra: (aperta) => ipcRenderer.send("sessioni:menu-barra", aperta),
+  onMenu: (cb) => {
+    const f = (_e: unknown, a: string) => cb(a);
+    ipcRenderer.on("sessioni:menu", f);
+    return () => ipcRenderer.removeListener("sessioni:menu", f);
+  },
   impostazioni: () => ipcRenderer.invoke("sessioni:impostazioni"),
   impostaImpostazioni: (parte) => ipcRenderer.invoke("sessioni:imposta-impostazioni", parte),
   onImpostazioni: (cb) => {

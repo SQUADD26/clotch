@@ -72,7 +72,7 @@ export function AreaAvvisi() {
           <Icona nome={SEGNO[a.tipo][0]} colore={SEGNO[a.tipo][1]} gira={a.tipo === "caricamento"} />
           <span className="messaggio t-sm">{a.messaggio}</span>
           {a.azione && <button type="button" className="t-sm medio" onClick={() => { a.azione!.fai(); chiudiAvviso(a.id); }}>{a.azione.etichetta}</button>}
-          <button type="button" aria-label="Chiudi" onClick={() => chiudiAvviso(a.id)}><Icona nome="chiudi" colore="terziaria" /></button>
+          <button type="button" aria-label="Chiudi" title="Chiudi" onClick={() => chiudiAvviso(a.id)}><Icona nome="chiudi" colore="terziaria" /></button>
         </div>
       ))}
     </div>

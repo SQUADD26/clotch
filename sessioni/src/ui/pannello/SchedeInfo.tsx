@@ -68,7 +68,7 @@ export function Contesto({ usati, max, mcp }: { usati: number; max: number | nul
         <span className={`t-sm testo ${livello}`}>{oltre ? "Oltre il limite" : `Usato ${percento(usato, 0)}`}</span>
         <span className="t-sm secondario">{token(usati)} / {token(max)}</span>
       </div>
-      <div className="barra-contesto"><span className={`parte ${livello}`} style={{ width: `${usato * 100}%` }} /></div>
+      <div className="barra-contesto" role="meter" aria-label="Contesto usato" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(usato * 100)}><span className={`parte ${livello}`} style={{ width: `${usato * 100}%` }} /></div>
       <div className="voci-contesto">
         <div className="voce"><span className="campione usato" /><span className="t-sm secondario nome">Usato</span><span className="t-sm secondario">{token(usati)}</span><span className="t-sm">{percento(usato)}</span></div>
         <div className="voce"><span className="campione libero" /><span className="t-sm secondario nome">Spazio libero</span><span className="t-sm secondario">{token(libero)}</span><span className="t-sm">{percento(1 - usato)}</span></div>

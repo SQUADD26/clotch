@@ -76,23 +76,29 @@ app.whenReady().then(async () => {
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })));
     await pausa(100);
     assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '2 di 3');
+    // ⌘G e ⇧⌘G col fuoco fuori dal campo (#857)
+    const g = (shiftKey) => run(new Function(`return () => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'g', code: 'KeyG', metaKey: true, shiftKey: ${shiftKey}, bubbles: true }))`)());
+    await g(false); await pausa(100);
+    assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '3 di 3');
+    await g(true); await g(true); await pausa(100);
+    assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '1 di 3');
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await pausa(100);
     assert.equal(await run(() => !document.querySelector('.trova') && !CSS.highlights.has('trova')), true);
     console.log('FILO_TROVA_OK');
 
-    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no
+    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no (⌘E: ⌘G è fisso, Trova successivo, #857)
     const tasto = (code, key) => run(`() => { dispatchEvent(new KeyboardEvent('keydown', { code: '${code}', key: '${key}', metaKey: true, bubbles: true, cancelable: true })); }`);
-    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘G' } });
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘E' } });
     await pausa(200);
     await tasto('KeyF', 'f'); await pausa(150);
     assert.equal(await run(() => !document.querySelector('.trova')), true, 'il vecchio tasto non apre più la barra');
-    await tasto('KeyG', 'g');
+    await tasto('KeyE', 'e');
     await ready('.trova input');
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: null } });
     await pausa(200);
-    await tasto('KeyG', 'g'); await pausa(150);
+    await tasto('KeyE', 'e'); await pausa(150);
     assert.equal(await run(() => !document.querySelector('.trova')), true, 'tolta: nessun tasto apre la barra');
     win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K' } });
     await pausa(200);
