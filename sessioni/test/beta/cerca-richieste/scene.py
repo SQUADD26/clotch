@@ -30,3 +30,8 @@ mk('esiti',[],[u("Esiti."),
  st("ExitPlanMode",{"plan":plan},{"testo":"The user doesn't want to proceed with this tool use. The tool use was rejected","errore":True},3,4),
  st("Edit",{"file_path":"sessioni/src/ui/chat/Richieste.tsx","old_string":"a\nb","new_string":"a\nc\n"+"x"*300},{"testo":"ok","errore":False},4,5),
  st("Bash",{"command":"rm -rf x"},{"testo":"The user doesn't want to proceed with this tool use. The tool use was rejected","errore":True},5,6)])
+# giro 2: piani veri di Claude (markdown con titoli, sotto-voci, testo dopo l'elenco) e in sola prosa
+p2="## Piano\n\nCapisco il problema: la barra non si apre a 480.\n\n### Passi\n1. Leggo la barra\n   - controllo il breakpoint\n   - controllo il CSS\n2. Correggo la regola\n3. Provo a 480 e a 1440\n\n**Verifica**: lancio i test e confronto con Figma.\n\n### Rischi\nNessuno, tocco un solo file."
+mk('piano-markdown',[{"rid":"r3","genere":"piano","strumento":"ExitPlanMode","ingresso":{"plan":p2},"domande":[]}],[u("Piano."),st("ExitPlanMode",{"plan":p2},None,0,1)])
+p3="Il problema è nel breakpoint della barra. Ho letto il CSS e la regola a 480 non scatta perché il contenitore ha una larghezza fissa.\n\nCorreggo la regola, poi provo la finestra stretta e quella larga e confronto con il disegno.\n\nNon tocco altri file."
+mk('piano-prosa',[{"rid":"r3","genere":"piano","strumento":"ExitPlanMode","ingresso":{"plan":p3},"domande":[]}],[u("Piano."),st("ExitPlanMode",{"plan":p3},None,0,1)])
