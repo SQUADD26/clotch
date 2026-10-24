@@ -12,6 +12,8 @@ export interface Descrizione {
   dettaglio: string;
   /** Riga «$ comando» del blocco aperto (solo i comandi). */
   comando: string | null;
+  /** La chiamata in parole semplici, per la riga del gruppo compatto (#876): «Legge Filo.tsx», «Cerca «x» in 4 file». */
+  frase: string;
 }
 
 const campo = (x: unknown, k: string) => (x && typeof x === "object" && typeof (x as Record<string, unknown>)[k] === "string" ? String((x as Record<string, unknown>)[k]) : "");
@@ -22,7 +24,41 @@ export function relativo(p: string, cartella: string) {
   return cartella && p.startsWith(c) ? p.slice(c.length) : p;
 }
 
-export function descrivi(nome: string, ingresso: unknown, stato: StatoStrumento, cartella = ""): Descrizione {
+export function descrivi(nome: string, ingresso: unknown, stato: StatoStrumento, cartella = "", uscita = ""): Descrizione {
+  return { ...riga(nome, ingresso, stato, cartella), frase: frase(nome, ingresso, uscita) };
+}
+
+const base = (p: string) => p.split("/").filter(Boolean).pop() ?? p;
+
+/** Quanti file nomina l'esito di Grep e Glob: «Found 4 files» o una riga per file («a.ts:12:…» o «a.ts»). */
+function fileTrovati(uscita: string) {
+  const n = uscita.match(/^Found (\d+) files?/);
+  if (n) return Number(n[1]);
+  const righe = uscita.split("\n").filter((r) => r.trim() && !/^No (files|matches) found/.test(r));
+  return new Set(righe.map((r) => r.replace(/:\d+[:-].*$/, ""))).size;
+}
+
+export function frase(nome: string, ingresso: unknown, uscita = ""): string {
+  const file = base(campo(ingresso, "file_path") || campo(ingresso, "path") || campo(ingresso, "notebook_path"));
+  switch (nome) {
+    case "Bash": return campo(ingresso, "description") || "Esegue un comando";
+    case "Read": return file ? `Legge ${file}` : "Legge un file";
+    case "Grep": case "Glob": {
+      const cosa = `«${campo(ingresso, "pattern")}»`, n = uscita ? fileTrovati(uscita) : 0;
+      if (nome === "Glob") return n ? `Trova ${n} file ${cosa}` : `Trova file ${cosa}`;
+      return n ? `Cerca ${cosa} in ${n} file` : campo(ingresso, "path") ? `Cerca ${cosa} in ${file}` : `Cerca ${cosa}`;
+    }
+    case "Write": return `Scrive ${file}`;
+    case "Edit": case "MultiEdit": case "NotebookEdit": return `Modifica ${file}`;
+    case "WebSearch": return `Cerca sul web «${campo(ingresso, "query")}»`;
+    case "WebFetch": { const u = campo(ingresso, "url"); try { return `Apre ${new URL(u).hostname.replace(/^www\./, "")}`; } catch { return "Apre una pagina web"; } }
+    default:
+      if (/screenshot/i.test(nome)) return "Fa una schermata";
+      return `Usa ${nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " ")}`;
+  }
+}
+
+function riga(nome: string, ingresso: unknown, stato: StatoStrumento, cartella: string): Omit<Descrizione, "frase"> {
   const file = relativo(campo(ingresso, "file_path") || campo(ingresso, "path") || campo(ingresso, "notebook_path"), cartella);
   switch (nome) {
     case "Bash": {
