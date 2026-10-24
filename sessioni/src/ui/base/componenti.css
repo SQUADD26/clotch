@@ -55,3 +55,6 @@
 
 /* Bottone icona, stato Fuoco (153:71027): bordo da misura-tratto-forte, dentro il bottone */
 .bottone-icona:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
+
+/* Bottone, Caricamento (158:82182): non è «spento» come un disabilitato, resta leggibile */
+.bottone.caricamento:disabled { opacity: 1; }
