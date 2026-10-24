@@ -26,7 +26,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
   if (vista === "decisioni") {
     const g = r ? decisioniPerGiorno(r, Date.now()) : [];
     const n = g.filter((x) => x.titolo === "Oggi" || x.titolo === "Ieri").reduce((a, x) => a + x.voci.length, 0);
-    return { icona: "libro", titolo: "Decisioni", stato: g.length ? `${n} decisioni tra oggi e ieri` : "Nessuna decisione" };
+    return { icona: "libro", titolo: "Decisioni", stato: g.length ? `${plurale(n, "decisione", "decisioni")} tra oggi e ieri` : "Nessuna decisione" };
   }
   if (vista === "regole") {
     const n = r?.regole.length ?? 0;
