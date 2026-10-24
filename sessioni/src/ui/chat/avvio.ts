@@ -20,6 +20,8 @@ export const notaAvvio = (worktree: boolean, ramo: string | null, cartella: stri
 
 export interface Scelte {
   ambiente: Ambiente; cartella: string; prompt: string; modello: string; sforzo: string;
+  /** Email scelta nel bottone account della barra (#478); null = il motore sceglie. */
+  account?: string | null;
   /** Solo se la cartella è un repo git: ramo e worktree non si scelgono altrove. */
   git: { ramo: string | null; worktree: boolean } | null;
 }
@@ -28,5 +30,5 @@ export interface Scelte {
 export const argsNuovaSessione = (s: Scelte) => ({
   ambiente: s.ambiente.tipo, ...(s.ambiente.tipo === "ssh" && s.ambiente.host ? { macchina: s.ambiente.host } : {}),
   cartella: s.cartella, ...(s.git ? { worktree: s.git.worktree, ...(s.git.ramo ? { branch: s.git.ramo } : {}) } : {}),
-  modello: s.modello, sforzo: s.sforzo, prompt: s.prompt,
+  modello: s.modello, sforzo: s.sforzo, prompt: s.prompt, ...(s.account ? { account: s.account } : {}),
 });

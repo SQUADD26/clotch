@@ -10,6 +10,7 @@ import { useChiamata } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useApriSessione } from "../barra/apri";
+import { accountScelto } from "../barra/account-dati";
 import { useImpostazioni } from "../impostazioni/stato";
 import { argsNuovaSessione, LOCALE, nomeAmbiente, notaAvvio, type Ambiente } from "./avvio";
 import { ChipPermessi } from "./Chip";
@@ -88,7 +89,7 @@ export function NuovaSessione() {
     if (!pronto || !dati) return;
     setAttesa(true);
     const e = await comandaEsito("nuova_sessione", argsNuovaSessione({ ambiente, cartella: cartella?.percorso ?? dati.casa, prompt: testo.trim(), modello, sforzo: sforzoDi(p).id,
-      git: conGit ? { ramo, worktree } : null }));
+      account: accountScelto.leggi(), git: conGit ? { ramo, worktree } : null }));
     if (e?.esito !== "ok") {
       setAttesa(false);
       // il motore dice il perché (cartella che non c'è, ramo, lock occupato…); riprovare serve solo se non l'ha rifiutato

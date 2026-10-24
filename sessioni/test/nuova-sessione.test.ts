@@ -40,6 +40,8 @@ test("argomenti: macchina solo con ssh; ramo e worktree solo in un repo", () => 
     { ambiente: "locale", cartella: "/r/x", worktree: true, branch: "dev", modello: "claude-opus-5-5", sforzo: "high", prompt: "ciao" });
   assert.deepEqual(argsNuovaSessione({ ...base, ambiente: { tipo: "ssh", host: "rise" }, git: null }),
     { ambiente: "ssh", macchina: "rise", cartella: "/r/x", modello: "claude-opus-5-5", sforzo: "high", prompt: "ciao" });
+  assert.equal(argsNuovaSessione({ ...base, ambiente: LOCALE, git: null, account: "squadd@example.com" }).account, "squadd@example.com");
+  assert.equal("account" in argsNuovaSessione({ ...base, ambiente: LOCALE, git: null, account: null }), false);
 });
 
 test("menu ramo: predefiniti e altri; col testo un elenco solo; nessun risultato", () => {
