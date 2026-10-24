@@ -69,7 +69,8 @@
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) {
         if (/hidden|clip|auto|scroll/.test(getComputedStyle(p).overflow) && !dentro(r, p.getBoundingClientRect())) { una('TAGLIATO', e, `tagliato da ${sel(p)}`); break; }
       }
-      const coperti = [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
+      // chi non prende il mouse (tooltip, pointer-events: none) non si vede con elementFromPoint: non si misura
+      const coperti = getComputedStyle(e).pointerEvents === 'none' ? [] : [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
         .filter(([x, y]) => x >= 0 && y >= 0 && x < innerWidth && y < innerHeight).filter(([x, y]) => { const t = document.elementFromPoint(x, y); return t && !e.contains(t); });
       if (coperti.length) una('COPERTO', e, `${coperti.length}/5 punti coperti da ${sel(document.elementFromPoint(...coperti[0]))}`);
     }

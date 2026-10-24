@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Menu, type VoceMenu } from "../base/Menu";
+import { numero } from "../base/token";
 import { casella } from "./percorsi";
 import type { SkillNome } from "../../tipi";
 
@@ -33,7 +34,7 @@ export function Aggiungi({ account, disabilitata, aperto, onApri, onChiudi, alle
     <span className="aggiungi">
       <BottoneIcona icona="piu" etichetta="Aggiungi" disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
         onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
-      {aperto && <Menu voci={voci} onChiudi={onChiudi} />}
+      {aperto && <Menu voci={voci} lato="sopra" scarto={numero("spazio-2")} classe="menu-aggiungi" onChiudi={onChiudi} />}
     </span>
   );
 }

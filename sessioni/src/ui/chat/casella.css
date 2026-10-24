@@ -43,14 +43,11 @@
 }
 .pezzo-chat .nota-casella { justify-content: center; }
 
-/* suggerimento sopra il bottone, al passaggio (101:43945) */
-.pezzo-chat .con-suggerimento.sopra .suggerimento { display: none; top: auto; bottom: calc(100% + var(--spazio-1)); align-items: center; gap: var(--spazio-2); }
-.pezzo-chat .con-suggerimento.sopra:hover .suggerimento, .pezzo-chat .con-suggerimento.sopra.visibile .suggerimento { display: inline-flex; }
 
 /* «menu sessioni» sopra la casella, dopo @ (101:45260) */
 .pezzo-chat .area-casella.con-menu { position: relative; }
 .pezzo-chat .menu-sessioni {
-  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: 3;
+  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: var(--livello-menu);
   display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-xl); background: var(--colore-fondo-elevato);
 }
 .pezzo-chat .menu-sessioni .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
