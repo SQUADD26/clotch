@@ -67,12 +67,13 @@ export function Allegato({ a, onRimuovi }: { a: AllegatoCasella; onRimuovi(): vo
   const grande = statoAllegato(a) === "grande";
   const foto = a.tipo === "immagine" && !grande;
   const url = useImmagine(foto && !a.carico ? { percorso: a.percorso } : null);
-  const stato = grande || (foto && url === null) ? "errore" : a.carico || (foto && url === undefined) ? "carico" : "";
+  const [rotta, setRotta] = useState(false); // i byte ci sono ma non sono un'immagine: il browser mostrerebbe il solo testo alternativo
+  const stato = grande || (foto && (url === null || rotta)) ? "errore" : a.carico || (foto && url === undefined) ? "carico" : "";
   return (
     <div className={`allegato ${foto ? "immagine" : "file"} ${stato}`} title={a.nome}>
       {foto ? (stato === "errore"
         ? <><Icona nome="avviso" colore="errore" /><span className="dettaglio">Non letta</span></>
-        : url ? <img src={url} alt={a.nome} /> : null) : (
+        : url ? <img src={url} alt={a.nome} onError={() => setRotta(true)} /> : null) : (
         <>
           <div className="testa-allegato">
             {stato === "carico" ? <span className="sagoma" /> : <Icona nome={grande ? "avviso" : a.tipo === "cartella" ? "cartella" : "file"} colore={grande ? "errore" : "secondaria"} />}
@@ -148,9 +149,10 @@ export function Miniature({ immagini, nome }: { immagini: RifImmagine[]; nome: s
 
 function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(): void }) {
   const url = useImmagine(da);
+  const [rotta, setRotta] = useState(false);
   return (
     <button type="button" className="miniatura" onClick={onApri} aria-label={`Apri ${nome}`}>
-      {url ? <img src={url} alt={nome} /> : url === null ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta</span> : null}
+      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : url === null || rotta ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta</span> : null}
     </button>
   );
 }

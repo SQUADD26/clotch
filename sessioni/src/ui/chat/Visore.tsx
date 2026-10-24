@@ -1,5 +1,5 @@
 // figma: 101-28232 — «Visore immagine»: velo sulla finestra, nome e «1 di 2», «Copia», «Salva con nome…», chiudi, frecce tra le immagini del filo.
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -13,6 +13,11 @@ export function Visore({ galleria, indice, onIndice, onChiudi }: { galleria: Voc
   const v = galleria[indice];
   const url = useImmagine(v?.da ?? null);
   const n = galleria.length;
+  const [rotta, setRotta] = useState(false);
+  useEffect(() => setRotta(false), [indice]);
+  // chiuso il visore, il fuoco torna dov'era (la miniatura o il testo), non sulla pagina
+  const prima = useRef(document.activeElement as HTMLElement | null);
+  useEffect(() => () => { if (prima.current?.isConnected) prima.current.focus(); }, []);
   const vai = (d: number) => onIndice((indice + d + n) % n);
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {
@@ -40,7 +45,7 @@ export function Visore({ galleria, indice, onIndice, onChiudi }: { galleria: Voc
             <Bottone tipo="secondario" onClick={salva}>Salva con nome…</Bottone>
             <button type="button" className="chiudi" onClick={onChiudi} aria-label="Chiudi"><Icona nome="chiudi" colore="primaria" /></button>
           </div>
-          <div className="immagine-visore">{url ? <img src={url} alt={v.nome} /> : url === null ? <span className="t-sm secondario">Immagine non letta</span> : null}</div>
+          <div className="immagine-visore">{url && !rotta ? <img src={url} alt={v.nome} onError={() => setRotta(true)} /> : url === null || rotta ? <span className="t-sm secondario">Immagine non letta</span> : null}</div>
         </div>
         {n > 1 && <button type="button" className="freccia" onClick={() => vai(1)} aria-label="Immagine successiva"><Icona nome="avanti" colore="primaria" /></button>}
       </div>

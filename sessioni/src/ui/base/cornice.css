@@ -36,4 +36,5 @@
 /* contenitore di un pezzo (base/Pezzo.tsx): non è una scatola, i suoi figli stanno nel layout del genitore */
 .pezzo { display: contents; }
 .pannello { width: var(--misura-pannello); flex: none; display: flex; flex-direction: column; }
-.pannello:empty { display: none; }
+/* un pezzo che torna null (nessuna sessione, nessun obiettivo da dire) lascia solo il suo contenitore vuoto: la colonna centrale si allarga */
+.pannello:empty, .pannello:has(> .pezzo:empty) { display: none; }

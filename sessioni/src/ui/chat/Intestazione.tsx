@@ -28,14 +28,14 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
       <div className="testi">
         <div className="riga-titolo">
           <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-          <span className="titolo">{s.titolo}</span>
+          <span className="titolo">{s.titolo || "Senza titolo"}</span>
         </div>
         <div className="dati">
           <span className="stato"><SegnoStato stato={stato} />{STATO[stato]}</span>
           {dati.map((d, i) => d && (
             <span key={i} className="dato">
               <span className="separatore">·</span>
-              {i === 1 ? <span className="ramo"><Icona nome="ramo" /><span className="codice">{d}</span></span> : d}
+              {i === 1 ? <span className="ramo"><Icona nome="ramo" /><span className="codice">{d}</span></span> : <span className="testo-dato">{d}</span>}
             </span>
           ))}
         </div>

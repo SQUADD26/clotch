@@ -32,7 +32,7 @@ function rimuovi(percorso: string, tolti: string[]) {
   avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("accountTolti", tolti) } });
 }
 
-async function aggiungi(tolti: string[], aggiunti: string[]) {
+export async function aggiungi(tolti: string[], aggiunti: string[]) {
   try {
     const p = await window.impostazioni.scegliCartella();
     if (!p) return;

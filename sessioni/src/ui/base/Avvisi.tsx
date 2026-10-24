@@ -2,9 +2,11 @@
 // Un solo sistema per tutta l'app: `avvisa()` da qualunque pezzo, `<AreaAvvisi/>` lo disegna (la cornice lo monta).
 // Entrata, uscita e pila con le View Transition di base/movimento (#520); Info e Successo si chiudono da soli dopo
 // tempo/avviso. Errore e Caricamento restano finché li chiudi o li aggiorni.
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { provaDi } from "../chat/testi";
 import { Icona, type NomeIcona } from "./Icona";
 import { conTransizione } from "./movimento";
+import { useNavigazione } from "./navigazione";
 import { numero } from "./token";
 import "./avvisi.css";
 
@@ -48,6 +50,15 @@ export function chiudiAvviso(id: number) {
 }
 
 export function AreaAvvisi() {
+  const { sezione } = useNavigazione();
+  // scena di prova 101:24007: i quattro avvisi del disegno, uno per tipo
+  useEffect(() => {
+    if (provaDi(sezione, "avvisi") === null) return;
+    avvisa({ tipo: "caricamento", messaggio: "Leggo le sessioni…" });
+    avvisa({ tipo: "successo", messaggio: "Link copiato" });
+    avvisa({ tipo: "errore", messaggio: "Sessione non raggiunta", azione: { etichetta: "Riprova", fai() {} } });
+    avvisa({ tipo: "info", messaggio: "Sessione archiviata", azione: { etichetta: "Annulla", fai() {} } });
+  }, [sezione]);
   const lista = useSyncExternalStore((f) => { ascolta.add(f); return () => ascolta.delete(f); }, () => avvisi);
   return (
     <div className="area-avvisi" role="status" aria-live="polite">

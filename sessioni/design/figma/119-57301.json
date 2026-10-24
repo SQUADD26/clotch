@@ -37,10 +37,10 @@
   "misura/riga": 32,
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
-  "spazio/4": 16,
+  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/testo/secondario": "#ffffffb5",
+  "spazio/4": 16,
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
   "raggio/lg": 12.5,
@@ -525,6 +525,25 @@
    },
    "senza": [],
    "testo": "tema",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I119:57308;154:71336;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 285,
+    "y": 157,
+    "w": 21,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
