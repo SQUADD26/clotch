@@ -9,9 +9,13 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 }
 :is(.bottone, .bottone-icona, .pillola, .pillola-filtro, .chip):active:not(:disabled) { transform: scale(var(--scala-premuto)); }
 
+/* fine dell'avvio (101-30345): il corpo compare con dissolvenza quando arriva l'elenco */
+.cornice .corpo { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
+.cornice.in-avvio .corpo { opacity: 0; }
+
 /* comparsa di un sovrapposto (menu, popup, tooltip, popover, dialogo): class="entra-sovrapposto" sul suo contenitore;
    chiusura: view-transition-name unico + view-transition-class: sovrapposto, e lo smontaggio dentro conTransizione() */
-@keyframes entra-sovrapposto { from { opacity: 0; transform: translateY(var(--spostamento-entrata)) scale(var(--scala-entrata)); } }
+@keyframes entra-sovrapposto { from { opacity: 0; transform: translateY(var(--spazio-1)) scale(var(--scala-entrata)); } }
 .entra-sovrapposto { animation: entra-sovrapposto var(--tempo-entrata) var(--curva-entrata); }
 
 /* View Transition (base/movimento.ts): ogni gruppo con nome si sposta e ridimensiona, il resto dissolve */
@@ -31,7 +35,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 
 @keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
 @keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
-@keyframes compare { from { opacity: 0; transform: translateY(var(--spostamento-entrata)) scale(var(--scala-entrata)); } }
+@keyframes compare { from { opacity: 0; transform: translateY(var(--spazio-1)) scale(var(--scala-entrata)); } }
 @keyframes dissolve { from { opacity: 0; } }
 ::view-transition-new(barra):only-child { animation-name: scivola-barra; }
 ::view-transition-old(barra):only-child { animation-name: scivola-barra; animation-direction: reverse; }
@@ -45,7 +49,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 
 /* riduci movimento del Mac: niente spostamenti né scale, solo dissolvenza breve; nessuna animazione infinita */
 @media (prefers-reduced-motion: reduce) {
-  :root { --scivola-barra: 0%; --scivola-pannello: 0%; --spostamento-entrata: 0px; --scala-entrata: 1; --scala-premuto: 1; }
+  :root { --scivola-barra: 0%; --scivola-pannello: 0%; --scala-entrata: 1; --scala-premuto: 1; }
   ::view-transition-group(*) { animation: none; }
   .gira, .luccica-finestra, .luccica-copia, .pezzo-chat .cursore { animation: none !important; }
 }
