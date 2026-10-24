@@ -28,8 +28,8 @@ export function Attivita() {
   return (
     <>
       <div className="bottone-attivita">
-        <BottoneIcona icona="campana" etichetta="Mostra attività" aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
-        {n > 0 && <span className="contatore t-xs medio">{n}</span>}
+        <BottoneIcona icona="campana" etichetta={n > 0 ? `Mostra attività, ${n} in attesa` : "Mostra attività"} aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
+        {n > 0 && <span className="contatore t-xs medio" aria-hidden>{n}</span>}
       </div>
       {aperto && (
         <Sovrapposto ancora={punto()} className="popover-attivita" role="dialog" label="Attività" onChiudi={() => setAperto(false)}>
