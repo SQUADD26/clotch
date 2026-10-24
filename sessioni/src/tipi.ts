@@ -319,8 +319,8 @@ export interface NuovaSessioneApi {
   /** Le cartelle delle sessioni già lette, dalla più recente, e la cartella di casa (per «Nessuna cartella»). */
   cartelle(): Promise<{ recenti: CartellaAvvio[]; casa: string }>;
   contesto(cartella: string): Promise<ContestoCartella>;
-  /** Gli `Host` di ~/.ssh/config, senza caratteri jolly. */
-  ssh(): Promise<string[]>;
+  /** Dialogo nativo per il file della chiave SSH (parte da ~/.ssh): torna solo il percorso, mai il contenuto; null se annullato. */
+  scegliChiave(): Promise<string | null>;
   /** Dialogo nativo «Apri cartella…»; null se annullato. */
   scegliCartella(): Promise<CartellaAvvio | null>;
 }

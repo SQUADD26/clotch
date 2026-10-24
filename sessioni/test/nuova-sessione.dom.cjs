@@ -16,7 +16,7 @@ app.whenReady().then(async () => {
   const comandi = [];
   let esito = { esito: 'ok', testo: 'Sessione aperta.' };
   ipcMain.removeHandler('clotch-ai:comando');
-  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { if (cmd !== 'account_previsto') comandi.push({ cmd, args }); return { id: 'c', ...esito }; });
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { if (cmd !== 'account_previsto' && cmd !== 'macchine') comandi.push({ cmd, args }); return { id: 'c', ...esito }; }); // `macchine` (l'elenco SSH, #479) è una lettura: non è un comando della prova
 
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });

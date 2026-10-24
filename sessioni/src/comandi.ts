@@ -4,13 +4,15 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { msgErrore, parseRiga, righeNuove } from "./jsonl";
 import { cartellaRegistro, Comando, mandaComando } from "./clotch-ai";
+import type { EsitoPasso, Macchina, Proposta } from "./macchine-tipi";
 
 /** `account_previsto` (contratto 3, #2599): con quale account partirebbe una sessione nuova; uso in %, reset ISO. */
 export interface AccountPrevisto { email: string; config_dir: string | null; uso_5h: number | null; uso_7g: number | null; reset_5h: string | null; reset_7g: string | null; scelto: boolean; motivo: string }
 
 export type EsitoComando =
   /** clotch AI ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto }
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto;
+      /** `macchine`: il registro e le connessioni di Claude Desktop da aggiungere. `macchina_aggiungi`: la voce (`voce`) e i passi fatti. */ macchine?: Macchina[]; proposte?: Proposta[]; voce?: Macchina; passi?: EsitoPasso[] }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
   /** Nessuna risposta in tempo. `preso: false` = clotch AI non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
@@ -70,6 +72,10 @@ async function invia(home: string, cmd: Comando, args: Record<string, unknown>, 
       if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da clotch AI
       if (typeof r.dati.sessione === "string") fatto.sessione = r.dati.sessione; // nuova_sessione
       if (typeof r.dati.macchina === "string") fatto.macchina = r.dati.macchina;
+      else if (r.dati.macchina && typeof r.dati.macchina === "object") fatto.voce = r.dati.macchina; // macchina_aggiungi
+      if (Array.isArray(r.dati.macchine)) fatto.macchine = r.dati.macchine;
+      if (Array.isArray(r.dati.proposte)) fatto.proposte = r.dati.proposte;
+      if (Array.isArray(r.dati.passi)) fatto.passi = r.dati.passi;
       if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
       if (r.dati.account && typeof r.dati.account === "object") fatto.account = r.dati.account; // account_previsto
       return fatto;
