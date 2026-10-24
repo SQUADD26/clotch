@@ -96,7 +96,7 @@ H.avvia('requisiti-c', async () => {
       assert.deepEqual(fatte('clotch-ai:avvia').length, attesi, nota);
     };
     await avvio({ clotchAi: null, impostazioni: { attiva: true } }, 1, 'impostazioni accese, nessun evento: parte una volta');
-    assert.match(await run(() => document.body.innerText), /Avvio…/);
+    assert.match(await run(() => document.body.innerText), /Avviando…/);
     await avvio({ clotchAi: null, impostazioni: { attiva: false } }, 0, 'impostazioni spente: non parte');
     await avvio({ clotchAi: { evento: 'stop', t: H.ora - 60000 }, impostazioni: { attiva: true } }, 0, 'spenta da Roberto: non parte');
     await avvio({ clotchAi: null, impostazioni: null }, 0, 'senza impostazioni: non parte');

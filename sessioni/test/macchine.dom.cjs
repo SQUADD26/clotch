@@ -197,10 +197,10 @@ app.whenReady().then(async () => {
       assert.equal(await run(() => document.querySelector('.dialogo .codice-macchina').textContent), comando);
       assert.equal(await run(() => document.querySelector('.dialogo .titolo-comando').textContent), 'Accedi a Claude dal Terminale del Mac');
       assert.equal(await run(() => document.querySelector('.dialogo .passo.mano .dettaglio-passo').textContent), 'Da fare nel Terminale');
-      assert.deepEqual(await bottoni(), ['Chiudi', 'Ho fatto, riprova']);
+      assert.deepEqual(await bottoni(), ['Chiudi', 'Riprova']);
       await clicca('.dialogo .riga-comando button', 'Copia');
       await wait(() => [...document.querySelectorAll('.dialogo .riga-comando button')].some((b) => b.textContent === 'Copiato'));
-      await clicca('.dialogo .bottoni button', 'Ho fatto, riprova');
+      await clicca('.dialogo .bottoni button', 'Riprova');
       await attendi(() => comandi.length === 2);
       assert.deepEqual(comandi[1], comandi[0]);
     });

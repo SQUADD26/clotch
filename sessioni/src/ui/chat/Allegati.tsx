@@ -59,7 +59,7 @@ export function ChipAllegato({ a, onApri }: { a: Chip; onApri?(): void }) {
 export type AllegatoCasella = FileAllegato & { carico?: boolean };
 
 const sigla = (nome: string) => /\.([^.]+)$/.exec(nome)?.[1].toUpperCase();
-const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Carico…" : statoAllegato(a) === "grande" ? "Troppo grande"
+const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Caricando…" : statoAllegato(a) === "grande" ? "Troppo grande"
   : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(" · "));
 
 /** La miniatura di un allegato, sopra il testo della casella (148:43692 «Allegato nella casella»): immagine quadrata o riquadro col nome. */

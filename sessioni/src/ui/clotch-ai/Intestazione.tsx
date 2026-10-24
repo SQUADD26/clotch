@@ -33,7 +33,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
     return { icona: "scudo", titolo: "Regole", stato: n ? plurale(n, "regola", "regole") : "Nessuna regola" };
   }
   if (vista === "casella") {
-    if (s.stato === "carica") return { icona: "posta", titolo: "Casella", segno: ["spinner", "secondaria"], stato: "Leggo il registro…" };
+    if (s.stato === "carica") return { icona: "posta", titolo: "Casella", segno: ["spinner", "secondaria"], stato: "Leggendo il registro…" };
     if (!r || s.stato === "errore" || r.errori.length) return { icona: "posta", titolo: "Casella", segno: ["avviso", "errore"], stato: "Registro non leggibile" };
     const c = casella(r, Date.now());
     if (!c.aspettano) return { icona: "posta", titolo: "Casella", segno: ["finita", "successo"], stato: "Niente in attesa" };
@@ -45,7 +45,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
     const [icona, colore, testo] = STATO_VOCE[voce];
     return { icona: "scintille", accento: true, titolo: "clotch AI", segno: [icona, colore], stato: testo };
   }
-  const stato = avvio === "avvio" ? "Avvio…" : avvio === "riavvio" ? "Riavvio…" : !st ? "" : st.stato === "spenta" ? "Spenta"
+  const stato = avvio === "avvio" ? "Avviando…" : avvio === "riavvio" ? "Riavviando…" : !st ? "" : st.stato === "spenta" ? "Spenta"
     : st.stato === "pausa" ? (st.da ? `In pausa fino alle ${orario(st.da)}` : "In pausa") : "Sempre attiva";
   return { icona: "scintille", accento: true, titolo: "clotch AI", segno, stato };
 }
