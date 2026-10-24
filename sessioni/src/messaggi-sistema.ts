@@ -39,7 +39,7 @@ function rigaNotifica(corpo: string): string {
 /** «Messaggio da <nome sessione>»: il nome sta in `from-name` (o `name`) del tag del messaggio tra sessioni. */
 function rigaPeer(attributi: string): string {
   const nome = attributi.match(/\b(?:from-name|name)="([^"]*)"/)?.[1].trim();
-  return `Messaggio da ${nome ? (nome.length > 60 ? `${nome.slice(0, 59)}…` : nome) : "un'altra sessione"}`;
+  return `Messaggio da ${nome ? (nome.length > 60 ? `${nome.slice(0, 59)}…` : nome) : "un’altra sessione"}`;
 }
 
 /** Le righe evento di un testo utente (notifiche di fine attività, messaggi da altre sessioni) e quel che resta, tolte. */

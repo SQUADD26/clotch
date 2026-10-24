@@ -1,5 +1,5 @@
 // Processo main: canali IPC verso il renderer (src/ui) e la finestra. `--parita <node-id>` disegna e salva la prova di parità.
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
 import { impostaIdentita, impostaNome } from "./branding";
@@ -69,6 +69,7 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  nativeTheme.themeSource = "dark"; // l'app è solo scura: menu nativi e controlli del motore non seguono il Mac (#642)
   if (iParita > 0 && !scena) {
     console.error(`parità: scena non disponibile per ${idParita || "nessun frame"}; servizi dal vivo disattivati`);
     app.exit(1);

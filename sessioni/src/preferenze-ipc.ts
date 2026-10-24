@@ -30,7 +30,7 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
       case "copia-id": return clipboard.writeText(s.id);
       case "copia-cartella": return clipboard.writeText(s.cartella);
       case "copia-link":
-        if (!s.idApp) throw new Error("questa sessione non è dell'app Claude: nessun link");
+        if (!s.idApp) throw new Error("questa sessione non è dell’app Claude: nessun link");
         return clipboard.writeText(`claude://code/continue?session=${s.idApp}`);
       case "mostra-nel-finder": shell.showItemInFolder(s.file && fs.existsSync(s.file) ? s.file : s.cartella); return; // il file della sessione, se c'è
       case "apri-terminale":

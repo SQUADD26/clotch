@@ -1,5 +1,5 @@
-// figma: 101-17893 — Impostazioni · Dati; sottopagina «Cartelle escluse»: 101-33235.
-// Cronologia aperta: 119:56891. Conferma di «Elimina dati…»: 119:57106.
+// figma: 101-17893 — Impostazioni · Dati; sottopagina «Cartelle nascoste»: 101-33235.
+// «Sessioni finite» aperta: 119:56891. Conferma di «Elimina dati…»: 119:57106.
 import { useState } from "react";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -29,7 +29,7 @@ function CartelleEscluse() {
     </button>
   );
   return (
-    <Pagina titolo="Cartelle escluse" sopra={indietro}>
+    <Pagina titolo="Cartelle nascoste" sopra={indietro}>
       <Gruppo>
         {v.cartelleEscluse.length === 0
           ? (
@@ -67,21 +67,21 @@ export default function Dati({ sotto }: { sotto?: string }) {
         <Riga etichetta="Nascondi chiavi e token" descrizione="Li copre con •••• nei messaggi e nei comandi">
           <Interruttore etichetta="Nascondi chiavi e token" acceso={v.nascondiChiavi} onCambia={(x) => imposta("nascondiChiavi", x)} />
         </Riga>
-        <Riga etichetta="Cartelle escluse" descrizione="Le sessioni in queste cartelle non si leggono">
+        <Riga etichetta="Cartelle nascoste" descrizione="Le sessioni in queste cartelle non si leggono">
           <button type="button" className="valore-scelta" onClick={() => n.apri("impostazioni", undefined, "dati/cartelle")}>
             <span className="t-sm secondario">{escluse === 1 ? "1 cartella" : `${escluse} cartelle`}</span>
             <Icona nome="destra" />
           </button>
         </Riga>
-        <Riga etichetta="Cronologia" descrizione="Per quanto tempo restano le sessioni finite">
-          <Scelta etichetta="Cronologia" valore={v.cronologia} voci={CRONOLOGIA} onScegli={(x) => imposta("cronologia", x)} />
+        <Riga etichetta="Sessioni finite" descrizione="Per quanto tempo restano le sessioni finite">
+          <Scelta etichetta="Sessioni finite" valore={v.cronologia} voci={CRONOLOGIA} onScegli={(x) => imposta("cronologia", x)} />
         </Riga>
         <Riga etichetta="Dati di clotch" descrizione="Indice e impostazioni. Le sessioni originali non si toccano." azione>
           <Bottone tipo="secondario" className="pericolo" onClick={() => setConferma(true)}>Elimina dati…</Bottone>
         </Riga>
       </Gruppo>
       {conferma && (
-        <Dialogo titolo="Eliminare i dati di clotch?" corpo="Cancello indice, cache e impostazioni. Le sessioni originali non si toccano e clotch le rilegge da capo."
+        <Dialogo titolo="Eliminare i dati di clotch?" corpo="Indice, cache e impostazioni vengono eliminati. Le sessioni originali non si toccano e clotch le rilegge da capo."
           onChiudi={() => setConferma(false)}
           bottoni={<>
             <Bottone tipo="secondario" onClick={() => setConferma(false)}>Annulla</Bottone>

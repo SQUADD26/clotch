@@ -1,5 +1,5 @@
 // figma: 131-59690 — risposta formattata (titoli, elenchi, codice, citazione, tabella); 140-60491 tabella larga e lunga.
-// Chiaro: 140-60134, 140-62309. Testo 101-7216; codice 101-7213; link 101-28289.
+// Testo 101-7216; codice 101-7213; link 101-28289.
 import { Children, isValidElement, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

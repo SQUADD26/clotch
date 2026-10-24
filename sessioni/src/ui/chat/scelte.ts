@@ -81,6 +81,6 @@ export function motivoNonInviato(e: EsitoComando | null): string {
   const perche = !e ? "la sessione non è raggiungibile"
     : e.esito === "scaduto" ? "la sessione non risponde"
     : e.esito === "non_scritto" ? "il messaggio non si è potuto scrivere"
-    : e.testo.trim() || (e.esito === "rifiutato" ? "il motore l'ha rifiutato" : "il motore ha dato un errore");
+    : e.testo.trim() || (e.esito === "rifiutato" ? "il motore l’ha rifiutato" : "il motore ha dato un errore");
   return `Non inviato: ${perche.replace(/\.$/, "")}.`;
 }

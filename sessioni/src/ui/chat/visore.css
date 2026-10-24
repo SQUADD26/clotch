@@ -1,5 +1,5 @@
 /* figma: 101-28232 — «Visore immagine»: colonna 960 al centro del velo, frecce a 24 dai lati */
-.pezzo-chat .velo.visore-velo { padding-bottom: 0; gap: var(--spazio-6); }
+.pezzo-chat .velo.visore-velo { gap: var(--spazio-6); }
 .pezzo-chat .visore { flex: 0 1 var(--misura-visore-largo); min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-chat .barra-visore { display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone-invio); }
 .pezzo-chat .barra-visore .nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-primario); }

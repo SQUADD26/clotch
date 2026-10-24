@@ -91,7 +91,7 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
             <Riga etichetta="SSH" fine="freccia" attiva={host} onClick={() => setHost(!host)} />
             <Separatore />
             {/* shortcut: gli ambienti nuovi sono le macchine SSH («Aggiungi macchina…»); il disegno non dice altro, la voce resta spenta */}
-            <Riga icona="piu" etichetta="Nuovo ambiente" disabled onClick={() => {}} />
+            <Riga icona="piu" etichetta="Crea ambiente" disabled onClick={() => {}} />
           </>
         )}
       </Menu>
