@@ -85,7 +85,7 @@
    "box": {
     "x": 24,
     "y": 20,
-    "w": 104,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -93,7 +93,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Sto ragionando…",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -170,7 +170,7 @@
    "box": {
     "x": 46,
     "y": 62,
-    "w": 104,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -179,7 +179,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Sto ragionando…",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
@@ -225,7 +225,7 @@
    "box": {
     "x": 24,
     "y": 104,
-    "w": 132,
+    "w": 124,
     "h": 18
    },
    "variabili": {
@@ -234,7 +234,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho ragionato per 14 s",
+   "testo": "Ragionamento · 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -242,7 +242,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 162,
+    "x": 154,
     "y": 105,
     "w": 16,
     "h": 16
@@ -258,7 +258,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 167.33203125,
+    "x": 159.33203125,
     "y": 108.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -311,7 +311,7 @@
    "box": {
     "x": 24,
     "y": 146,
-    "w": 132,
+    "w": 124,
     "h": 18
    },
    "variabili": {
@@ -320,7 +320,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho ragionato per 14 s",
+   "testo": "Ragionamento · 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -328,7 +328,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 162,
+    "x": 154,
     "y": 147,
     "w": 16,
     "h": 16
@@ -344,7 +344,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 165.33203125,
+    "x": 157.33203125,
     "y": 152.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619

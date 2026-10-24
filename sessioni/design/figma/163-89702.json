@@ -3198,7 +3198,7 @@
    "box": {
     "x": 373,
     "y": 503,
-    "w": 132,
+    "w": 124,
     "h": 18
    },
    "variabili": {
@@ -3207,7 +3207,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho ragionato per 14 s",
+   "testo": "Ragionamento · 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3215,7 +3215,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 511,
+    "x": 503,
     "y": 504,
     "w": 16,
     "h": 16
@@ -3231,7 +3231,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 516.33203125,
+    "x": 508.33203125,
     "y": 507.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3283,7 +3283,7 @@
    "box": {
     "x": 373,
     "y": 531,
-    "w": 135,
+    "w": 76,
     "h": 18
    },
    "variabili": {
@@ -3292,7 +3292,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ho usato 12 strumenti",
+   "testo": "12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3300,7 +3300,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 514,
+    "x": 455,
     "y": 531,
     "w": 35,
     "h": 18
@@ -3319,7 +3319,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 555,
+    "x": 496,
     "y": 532,
     "w": 16,
     "h": 16
@@ -3335,7 +3335,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 558.33203125,
+    "x": 499.33203125,
     "y": 537.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3467,7 +3467,7 @@
    "box": {
     "x": 414,
     "y": 559,
-    "w": 37,
+    "w": 46,
     "h": 18
    },
    "variabili": {
@@ -3476,7 +3476,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerco",
+   "testo": "Ricerca",
    "font": "SF Pro Regular"
   },
   {
@@ -3484,9 +3484,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 455,
+    "x": 464,
     "y": 559,
-    "w": 128,
+    "w": 121,
     "h": 18
    },
    "variabili": {
@@ -3495,7 +3495,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"canAccess\" in 4 file",
+   "testo": "\"canAccess\" · 4 file",
    "font": "SF Pro Regular"
   },
   {
@@ -3605,7 +3605,7 @@
    "box": {
     "x": 414,
     "y": 587,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -3614,7 +3614,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -3622,7 +3622,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 462,
     "y": 587,
     "w": 108,
     "h": 18
@@ -3743,7 +3743,7 @@
    "box": {
     "x": 414,
     "y": 615,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -3752,7 +3752,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -3760,7 +3760,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 543,
+    "x": 477,
     "y": 616,
     "w": 16,
     "h": 16
@@ -3776,7 +3776,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 546.33203125,
+    "x": 480.33203125,
     "y": 621.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3979,7 +3979,7 @@
    "box": {
     "x": 414,
     "y": 695,
-    "w": 125,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -3988,7 +3988,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo un comando",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -3996,7 +3996,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 543,
+    "x": 477,
     "y": 695,
     "w": 54,
     "h": 18
@@ -4117,7 +4117,7 @@
    "box": {
     "x": 414,
     "y": 730,
-    "w": 60,
+    "w": 28,
     "h": 18
    },
    "variabili": {
@@ -4126,7 +4126,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Fotografo",
+   "testo": "Foto",
    "font": "SF Pro Regular"
   },
   {
@@ -4134,9 +4134,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 478,
+    "x": 446,
     "y": 730,
-    "w": 126,
+    "w": 112,
     "h": 18
    },
    "variabili": {
@@ -4145,7 +4145,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "la pagina Dashboard",
+   "testo": "pagina Dashboard",
    "font": "SF Pro Regular"
   },
   {
@@ -4274,7 +4274,7 @@
    "box": {
     "x": 414,
     "y": 765,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -4283,7 +4283,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -4291,7 +4291,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 462,
     "y": 765,
     "w": 93,
     "h": 18
@@ -4412,7 +4412,7 @@
    "box": {
     "x": 414,
     "y": 793,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -4421,7 +4421,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -4429,7 +4429,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 462,
     "y": 793,
     "w": 119,
     "h": 18
@@ -4550,7 +4550,7 @@
    "box": {
     "x": 414,
     "y": 821,
-    "w": 37,
+    "w": 46,
     "h": 18
    },
    "variabili": {
@@ -4559,7 +4559,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerco",
+   "testo": "Ricerca",
    "font": "SF Pro Regular"
   },
   {
@@ -4567,9 +4567,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 455,
+    "x": 464,
     "y": 821,
-    "w": 123,
+    "w": 116,
     "h": 18
    },
    "variabili": {
@@ -4578,7 +4578,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"Live chat\" in 12 file",
+   "testo": "\"Live chat\" · 12 file",
    "font": "SF Pro Regular"
   },
   {
@@ -4652,14 +4652,14 @@
    "senza": []
   },
   {
-   "id": "I163:89959;163:84530;163:84140;101:6959",
+   "id": "I163:89959;163:84530;163:84140;101:7061",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 392,
-    "y": 850.66650390625,
-    "w": 12.000650405883789,
-    "h": 14.6669921875
+    "x": 390.66796875,
+    "y": 850.666015625,
+    "w": 14.666559219360352,
+    "h": 14.666609764099121
    },
    "variabili": {
     "fills[0]": "colore/icona/terziaria"
@@ -4688,7 +4688,7 @@
    "box": {
     "x": 414,
     "y": 849,
-    "w": 39,
+    "w": 53,
     "h": 18
    },
    "variabili": {
@@ -4697,7 +4697,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Modifica",
    "font": "SF Pro Regular"
   },
   {
@@ -4705,9 +4705,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 471,
     "y": 849,
-    "w": 37,
+    "w": 68,
     "h": 18
    },
    "variabili": {
@@ -4716,7 +4716,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "sb.tsx",
+   "testo": "Ricerca.tsx",
    "font": "SF Pro Regular"
   },
   {
@@ -4826,7 +4826,7 @@
    "box": {
     "x": 414,
     "y": 877,
-    "w": 46,
+    "w": 59,
     "h": 18
    },
    "variabili": {
@@ -4835,7 +4835,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Eseguo",
+   "testo": "Comando",
    "font": "SF Pro Regular"
   },
   {
@@ -4843,7 +4843,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 464,
+    "x": 477,
     "y": 877,
     "w": 119,
     "h": 18
@@ -4964,7 +4964,7 @@
    "box": {
     "x": 414,
     "y": 905,
-    "w": 39,
+    "w": 44,
     "h": 18
    },
    "variabili": {
@@ -4973,7 +4973,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Lettura",
    "font": "SF Pro Regular"
   },
   {
@@ -4981,7 +4981,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 462,
     "y": 905,
     "w": 68,
     "h": 18
@@ -5066,14 +5066,14 @@
    "senza": []
   },
   {
-   "id": "I163:89959;163:84554;163:84140;101:6959",
+   "id": "I163:89959;163:84554;163:84140;101:6988",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 392,
-    "y": 934.66650390625,
-    "w": 12.000650405883789,
-    "h": 14.6669921875
+    "x": 392.66796875,
+    "y": 936.66650390625,
+    "w": 10.6669921875,
+    "h": 10.6669921875
    },
    "variabili": {
     "fills[0]": "colore/icona/terziaria"
@@ -5102,7 +5102,7 @@
    "box": {
     "x": 414,
     "y": 933,
-    "w": 39,
+    "w": 62,
     "h": 18
    },
    "variabili": {
@@ -5111,7 +5111,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo",
+   "testo": "Creazione",
    "font": "SF Pro Regular"
   },
   {
@@ -5119,9 +5119,9 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 457,
+    "x": 480,
     "y": 933,
-    "w": 44,
+    "w": 51,
     "h": 18
    },
    "variabili": {
@@ -5130,7 +5130,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Filo.tsx",
+   "testo": "nota.md",
    "font": "SF Pro Regular"
   },
   {
@@ -5196,7 +5196,7 @@
    "box": {
     "x": 373,
     "y": 801,
-    "w": 96,
+    "w": 91,
     "h": 18
    },
    "variabili": {
@@ -5204,7 +5204,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Leggo Filo.tsx…",
+   "testo": "Lettura Filo.tsx",
    "font": "SF Pro Regular"
   },
   {
@@ -5212,7 +5212,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 475,
+    "x": 470,
     "y": 801,
     "w": 78,
     "h": 18
