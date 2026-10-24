@@ -6,8 +6,8 @@
 .pezzo-dialoghi .colonne-tasti { display: flex; gap: var(--spazio-6); }
 .pezzo-dialoghi .colonna-tasti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-5); }
 .pezzo-dialoghi .gruppo-tasti { display: flex; flex-direction: column; gap: var(--spazio-1); }
-.pezzo-dialoghi .riga-tasto { height: var(--misura-riga); gap: var(--spazio-2); display: flex; align-items: center; justify-content: space-between; }
-.pezzo-dialoghi .riga-tasto .azione { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pezzo-dialoghi .riga-tasto { min-height: var(--misura-riga); gap: var(--spazio-2); display: flex; align-items: center; justify-content: space-between; }
+.pezzo-dialoghi .riga-tasto .azione { flex: 1; min-width: 0; }
 .pezzo-dialoghi .tasto-chip {
   flex: none; padding: var(--spazio-0-5) var(--spazio-2); border-radius: var(--raggio-xs);
   background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-secondario);
