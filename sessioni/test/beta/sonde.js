@@ -57,7 +57,7 @@
       let scorre = false;
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflow)) { scorre = true; break; }
       if (e.disabled || e.getAttribute('aria-disabled') === 'true') {
-        const aspetto = (x) => { const z = getComputedStyle(x); return z.color + z.backgroundColor + z.opacity + z.borderTopColor; };
+        const aspetto = (x) => [x, ...x.querySelectorAll('*')].map((y) => { const z = getComputedStyle(y); return z.color + z.backgroundColor + z.opacity + z.borderTopColor + z.fill + z.stroke; }).join();
         const gemello = [...document.querySelectorAll(`${radice} :is(${CLIC})`)].find((o) => o !== e && o.className === e.className && !o.disabled && o.getAttribute('aria-disabled') !== 'true' && vis(o));
         if (gemello && aspetto(gemello) === aspetto(e)) una('STATO', e, `disabilitato uguale all'attivo ${sel(gemello)}`);
       }
@@ -101,7 +101,7 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: tim.duration, infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]'), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
           anim.get(a).serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
@@ -121,6 +121,8 @@
       });
     },
     sopra,
+    // menu, popover e dialoghi aperti da un gesto: tooltip e avvisi a comparsa non si chiudono con Esc né prendono il fuoco
+    menuAperti: () => sopra().filter((e) => !e.matches('.avviso-comparsa,[role=tooltip],.tooltip,[role=status]')).length,
     firma: (radice) => [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).length + '|' + sopra().length + '|' + location.search,
   };
 })();

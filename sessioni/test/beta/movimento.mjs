@@ -36,7 +36,8 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
       const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata / 2), meta = i >= 0 ? p[i] : null;
       if (a.durata > 100 && meta != null && Math.abs(meta - 0.5) < 0.08) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
     } else if (a.durata > 100 && a.curva === 'linear') D('M3', a, `curva dichiarata lineare (${a.nome})`);
-    if (c.evento != null && t0 != null && t0 - c.evento > 50) D('M5', a, `parte ${Math.round(t0 - c.evento)} ms dopo il gesto`);
+    // un avviso a comparsa nasce dalla risposta del main, non dal gesto: la sua partenza non misura la prontezza
+    if (!a.avviso && c.evento != null && t0 != null && t0 - c.evento > 50) D('M5', a, `parte ${Math.round(t0 - c.evento)} ms dopo il gesto`);
   }
   const dt = c.T.slice(1).map((t, i) => t - c.T[i]).sort((a, b) => a - b);
   const fps = dt.length ? 1000 / dt[Math.floor(dt.length / 2)] : 60, lunghi = dt.filter((x) => x > 50).length;
