@@ -1,6 +1,6 @@
 // figma: 101-21010 — «menu sessione»: voci con icona, scorciatoia e separatori; testata del «menu profilo» 101-21498;
 // voce pericolo rossa con la sua icona (101-21348); voci con scelta fatta, spunta a sinistra (101-32999). Esc o clic fuori chiudono.
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
 import { Icona, type NomeIcona } from "./Icona";
 import "./menu.css";
 
@@ -21,9 +21,8 @@ interface Props {
   inizio?: number;
 }
 
-export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
-  const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
-  const ref = useRef<HTMLDivElement>(null);
+/** Tastiera e mouse di ogni menu: fuoco alla scelta o alla voce `inizio`, frecce, Esc, clic fuori. Il clic sul bottone che l'ha aperto (aria-expanded) lo toglie lui, non il clic fuori: se no lo riaprirebbe. */
+export function useTastiMenu(ref: RefObject<HTMLElement | null>, onChiudi: () => void, inizio = 0) {
   useEffect(() => {
     (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
     const tasto = (e: KeyboardEvent) => {
@@ -34,11 +33,20 @@ export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
       b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
-    const fuori = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) onChiudi(); };
+    const fuori = (e: MouseEvent) => {
+      const t = e.target as Element;
+      if (!ref.current?.contains(t) && !t.closest?.('[aria-expanded="true"]')) onChiudi();
+    };
     addEventListener("keydown", tasto);
     addEventListener("mousedown", fuori);
     return () => { removeEventListener("keydown", tasto); removeEventListener("mousedown", fuori); };
   }, [onChiudi]);
+}
+
+export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
+  const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
+  const ref = useRef<HTMLDivElement>(null);
+  useTastiMenu(ref, onChiudi, inizio);
   return (
     <div ref={ref} className="menu" role="menu" style={style}>
       {testata && (

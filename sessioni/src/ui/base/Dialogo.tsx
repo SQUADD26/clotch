@@ -8,7 +8,16 @@ export function Dialogo({ titolo, corpo, bottoni, children, largo = false, centr
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     (ref.current?.querySelector<HTMLElement>("[data-fuoco]") ?? ref.current?.querySelector<HTMLElement>("textarea, input, button"))?.focus();
-    const tasto = (e: KeyboardEvent) => { if (e.key === "Escape") onChiudi(); };
+    const tasto = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onChiudi();
+      if (e.key !== "Tab") return;
+      // Tab resta nel dialogo: dall'ultimo controllo torna al primo e viceversa
+      const c = [...(ref.current?.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex='-1'])") ?? [])];
+      if (!c.length) return e.preventDefault();
+      const i = c.indexOf(document.activeElement as HTMLElement);
+      const fine = e.shiftKey ? i <= 0 : i === c.length - 1;
+      if (fine || i < 0) { e.preventDefault(); c[e.shiftKey ? c.length - 1 : 0].focus(); }
+    };
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [onChiudi]);

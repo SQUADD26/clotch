@@ -1,6 +1,7 @@
 // figma: 101-37879 — «comandi globali» della barra del titolo: luna di Non disturbare (menu 101-38626, con Clotch 101-50008,
 // senza 101-50071, attivo 101-38897) e «Ferma tutto» (conferma 101-37696, in corso 101-37879, fatto 101-38124, errore 101-38374).
 import { useCallback, useEffect, useRef } from "react";
+import { useTastiMenu } from "../base/Menu";
 import { acceso as clotchAcceso } from "../pannello/clotch";
 import { aggiornaAvviso, avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -55,11 +56,13 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
     ["luna", "Fino a domani mattina", { fino: prossima(Date.now(), ORA_MATTINA, true) }],
     ["nascondi", "Finché non lo tolgo", { fino: null }],
   ];
+  const ref = useRef<HTMLDivElement>(null);
+  useTastiMenu(ref, onChiudi);
   return (
-    <div className="menu" role="menu">
+    <div ref={ref} className="menu" role="menu">
       <div className="titolo-menu t-xs medio secondario">Non disturbare</div>
       {voci.map(([icona, etichetta, args]) => (
-        <button key={etichetta} type="button" role="menuitem" className="voce" onClick={() => metti(args)}>
+        <button key={etichetta} type="button" role="menuitem" className="voce" onMouseEnter={(e) => e.currentTarget.focus()} onClick={() => metti(args)}>
           <Icona nome={icona} />
           <span className="etichetta t-sm">{etichetta}</span>
         </button>
