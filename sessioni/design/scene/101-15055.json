@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "ferma",
     "perche": null,
-    "ultimaAttivita": 1792844528283,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,8 +44,7 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": "",
-    "contesto": 124000
+    "file": ""
    }
   ],
   "errori": []
@@ -55,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Rifai tutta la barra laterale.",
-    "t": 1792844524283
+    "t": 1792793045531
    },
    {
     "tipo": "strumento",
@@ -67,18 +66,18 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792844525283,
+    "t": 1792793046531,
     "id": "t0"
    },
    {
     "tipo": "utente",
     "testo": "[Request interrupted by user]",
-    "t": 1792844526283
+    "t": 1792793047531
    },
    {
     "tipo": "utente",
     "testo": "Fermati: prima mostrami il disegno in Figma.",
-    "t": 1792844527283
+    "t": 1792793048531
    }
   ]
  },
@@ -88,16 +87,7 @@
   }
  },
  "registro": {
-  "chat": {
-   "s1": {
-    "chat": "s1",
-    "coda": [],
-    "richieste": [],
-    "aiutanti": {},
-    "passi": [],
-    "contestoMax": 200000
-   }
-  },
+  "chat": {},
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

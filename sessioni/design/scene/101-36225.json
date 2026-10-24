@@ -19,7 +19,6 @@
     "percorso": "~/.claude/registro/2026-10.jsonl",
     "messaggio": "permesso negato"
    }
-  ],
-  "passiMacchina": []
+  ]
  }
 }
