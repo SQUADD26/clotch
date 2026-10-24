@@ -103,9 +103,11 @@
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
     // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
-    let ev = null; const eventi = [], l = () => { const t = performance.now(); ev ??= t; eventi.push(t); }, GESTI = ['pointerdown', 'pointerup', 'keydown'];
+    let ev = null; const eventi = [], bersagli = [], l = (x) => { const t = performance.now(); ev ??= t; eventi.push(t); if (x.target instanceof Element) bersagli.push(x.target); }, GESTI = ['pointerdown', 'pointerup', 'keydown', 'bt-gesto']; // bt-gesto: stato forzato dal cliccatore (CSS.forcePseudoState), che arriva dopo il pointerdown
     GESTI.forEach((g) => addEventListener(g, l, { capture: true }));
     const prima = new Set(document.getAnimations()), anim = new Map(), T = [];
+    // sovrapposti che compaiono durante il campione: al primo fotogramma, opaci e senza nessuna animazione = comparsi di colpo
+    const giaSopra = new Set(sopra()), comparsi = new Map();
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
         T.push(t);
@@ -115,6 +117,8 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
+              // legata al gesto: sul pezzo toccato (o dentro/attorno) o in un sovrapposto; il resto è una conseguenza, non la prontezza (#1076)
+              legata: bersagli.some((g) => g.contains(a.effect.target) || a.effect.target.contains(g)) || !!a.effect.target.closest?.(SOPRA),
               durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest(SECONDARI) || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
               // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
               coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
@@ -127,9 +131,14 @@
           if (e.inizio == null && a.startTime != null) e.inizio = a.startTime;
           e.serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
+        for (const e of sopra()) if (!giaSopra.has(e) && !comparsi.has(e)) {
+          let su = false; for (let q = e.parentElement; q && !su; q = q.parentElement) su = q.getAnimations().length > 0; // entra con il contenitore
+          const mosso = su || e.getAnimations({ subtree: true }).length || document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition'));
+          comparsi.set(e, { dove: sel(e), opacita: +getComputedStyle(e).opacity, animato: !!mosso, secondario: e.matches(SECONDARI) });
+        }
         if (t - t0 < ms) return requestAnimationFrame(passo);
         GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));
-        ok({ evento: ev, eventi, T, animazioni: [...anim.values()] });
+        ok({ evento: ev, eventi, T, animazioni: [...anim.values()], comparsi: [...comparsi.values()] });
       };
       requestAnimationFrame(passo);
     });
