@@ -11,7 +11,7 @@ const ORA = Date.parse("2026-10-23T14:00:00.000Z");
 const vuoto = (): Registro => leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: "/non/esiste" }); // nome del protocollo del motore
 const chat = (id: string, progetto: string, stato: string, extra: Partial<ChatClotchAi> = {}): ChatClotchAi => ({
   chat: id, titolo: id, madre: null, progetto, account: null, sorgente: null, daHandoff: null, stato, dettaglio: null, aspetto: null, domanda: null, limite: null,
-  richieste: [], battito: ORA, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [], obiettivo: null, passi: [], visto: ORA, fine: null, fineT: null,
+  richieste: [], contestoMax: null, battito: ORA, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [], obiettivo: null, passi: [], visto: ORA, fine: null, fineT: null,
   chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0, ...extra,
 });
 const conClotch = (ascolta: boolean, parla: boolean, t = ORA): Registro => ({ ...vuoto(), clotch: { voce: "accesa", ascolta, parla, t } });
