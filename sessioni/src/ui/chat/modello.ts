@@ -2,6 +2,7 @@
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
 import type { Messaggio, RifImmagine } from "../../tipi";
+import { notifiche } from "../../messaggi-sistema";
 import { ramoCreato } from "./eventi";
 import { senzaPercorsi, senzaSegnaposto } from "./percorsi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
@@ -107,6 +108,14 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
 
   function elabora(m: Messaggio, i: number, chiave: string) {
     if (m.tipo === "utente") {
+      // fine di un'attività in background: l'ha scritta l'harness, non Roberto (#484)
+      const { righe, resto } = notifiche(m.testo);
+      if (righe.length) {
+        turno = null;
+        righe.forEach((testo, k) => out.push({ tipo: "evento", chiave: `${chiave}:${k}`, testo, t: m.t }));
+        if (!resto && !m.immagini) return;
+        m = { ...m, testo: resto };
+      }
       if (INTERRUZIONE.test(m.testo)) { (turno ?? apri(m.t, chiave)).blocchi.push({ tipo: "interrotta" }); return; }
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;
