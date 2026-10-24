@@ -2,6 +2,8 @@
 // campionatore delle animazioni a ogni fotogramma. Ogni difetto: { criterio, dove, valore }. Criteri in sessioni/test/beta/LEGGIMI.md.
 (() => {
   const SOPRA = '[role=menu],[role=listbox],[role=dialog],[role=tooltip],.menu,.tooltip,.popover-attivita,.dialogo,[popover]:popover-open,dialog[open],.avviso-comparsa';
+  // tooltip e avvisi: nascono dal passaggio o dalla risposta del main, non si chiudono con Esc e non misurano la prontezza del gesto
+  const SECONDARI = '.avviso-comparsa,[role=status],[role=tooltip],.tooltip,.suggerimento';
   const CLIC = 'button,a,[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[role=tab],[role=option],input,textarea,[tabindex]:not([tabindex="-1"])';
   const LAYOUT = /^(width|height|top|left|right|bottom|inset|margin|padding|max-|min-|flex-basis|grid-template)/;
   const num = (s) => (String(s).match(/-?[\d.]+/g) || []).map(Number);
@@ -113,7 +115,7 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest(SECONDARI) || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
               // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
               coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
               // il tooltip compare dopo un'attesa voluta (base/Suggerimento.tsx), non subito al gesto
@@ -143,7 +145,7 @@
     },
     sopra,
     // menu, popover e dialoghi aperti da un gesto: tooltip e avvisi a comparsa non si chiudono con Esc né prendono il fuoco
-    menuAperti: () => sopra().filter((e) => !e.matches('.avviso-comparsa,[role=tooltip],.tooltip,[role=status]')).length,
+    menuAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).length,
     firma: (radice) => [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).length + '|' + sopra().length + '|' + location.search,
   };
 })();

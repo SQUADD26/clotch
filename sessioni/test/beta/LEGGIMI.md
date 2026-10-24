@@ -24,7 +24,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 | COLORE, RAGGIO, SPAZIO | colore, raggio o padding/margin/gap che non è un valore di `src/ui/base/token.css` (uno spazio scritto con `var(--…)` o `auto` nel CSS vale) |
 | FOCUS | con Tab: nessun anello del fuoco, o anello con un raggio diverso dalla forma che si vede |
 | ESC, FUOCO-RITORNO | Esc non chiude il sovrapposto; dopo Esc il fuoco non torna al pulsante che l'ha aperto |
-| HOVER, PREMUTO | col mouse sopra, o premuto, l'elemento non cambia di un pixel (foto `-hover`, `-premuto`; il fuoco da tastiera è nelle foto `tab<N>`) |
+| HOVER, PREMUTO | col mouse sopra, o premuto, l'elemento non cambia né un pixel né l'aspetto calcolato (non per i campi di testo; PREMUTO non col movimento ridotto) (foto `-hover`, `-premuto`; il fuoco da tastiera è nelle foto `tab<N>`) |
 | STATO | un elemento disabilitato ha lo stesso aspetto di uno attivo della stessa classe |
 | SPORGE | un elemento esce dal riquadro visibile (fondo o bordo) del genitore |
 | CONSOLE | errore in console o eccezione della pagina |

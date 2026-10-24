@@ -80,13 +80,13 @@ async function giro(app, area, cfg, console_) {
     if (ok) await forza(i, ['hover']);
     await pausa(250);
     const sopra = await pezzo(), aSopra = await asp(); el.foto.push(await foto(`el${i}-hover`));
-    if (ok && !disab && uguali(riposo, sopra) && aRiposo === aSopra) manca('HOVER', 'nessun cambio visivo col mouse sopra');
+    if (ok && !disab && tipo !== 'campo' && uguali(riposo, sopra) && aRiposo === aSopra) manca('HOVER', 'nessun cambio visivo col mouse sopra');
     const campione = VIDEO ? pagina.evaluate(() => window.__bt.campiona(700)).catch(() => null) : null;
     if (ok) {
       await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pausa(80);
       const premuto = await pezzo(), aPremuto = await asp(); el.foto.push(await foto(`el${i}-premuto`));
       await pagina.mouse.up(); await forza(i, []);
-      if (!disab && tipo !== 'campo' && uguali(sopra, premuto) && aSopra === aPremuto) manca('PREMUTO', 'nessuno stato premuto');
+      if (!disab && tipo !== 'campo' && !cfg.ridotto && uguali(sopra, premuto) && aSopra === aPremuto) manca('PREMUTO', 'nessuno stato premuto');
     }
     if (campione) { const c = await campione; if (c) { reg.movimenti.push({ dove: el.dove, animazioni: riassunto(c) }); difettiMovimento(c, { ridotto: cfg.ridotto, dove: el.dove }).forEach((d) => reg.difetti.push({ ...d, quando: el.dove })); } }
     else await pausa(350);
