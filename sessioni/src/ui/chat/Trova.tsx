@@ -77,6 +77,7 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
   }, [r, i]);
 
   if (!aperta) return null;
+  const chiudi = () => { setAperta(false); document.querySelector<HTMLTextAreaElement>(".area-casella textarea")?.focus(); }; // il fuoco torna alla casella, non cade sulla pagina
   const vai = (passo: number) => { if (r.length) { scorrere.current = true; setK((i + passo + r.length) % r.length); } };
   return (
     <div className="trova" role="search">
@@ -84,13 +85,13 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
       <input ref={campo} autoFocus={iniziale === null} value={testo} placeholder="Cerca nella sessione" aria-label="Cerca nella sessione"
         onChange={(e) => { scorrere.current = true; setTesto(e.target.value); setK(0); }}
         onKeyDown={(e) => {
-          if (e.key === "Escape") setAperta(false);
+          if (e.key === "Escape") chiudi();
           else if (e.key === "Enter") { e.preventDefault(); vai(e.shiftKey ? -1 : 1); }
         }} />
       {testo && <span className="contatore" aria-live="polite">{r.length ? `${i + 1} di ${r.length}` : "Nessun risultato"}</span>}
       <button type="button" className="icona-trova su" aria-label="Risultato precedente" disabled={!r.length} onClick={() => vai(-1)}><Icona nome="giu" /></button>
       <button type="button" className="icona-trova" aria-label="Risultato successivo" disabled={!r.length} onClick={() => vai(1)}><Icona nome="giu" /></button>
-      <button type="button" className="icona-trova" aria-label="Chiudi" onClick={() => setAperta(false)}><Icona nome="chiudi" /></button>
+      <button type="button" className="icona-trova" aria-label="Chiudi" onClick={chiudi}><Icona nome="chiudi" /></button>
     </div>
   );
 }

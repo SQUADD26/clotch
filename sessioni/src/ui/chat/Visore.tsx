@@ -1,5 +1,5 @@
 // figma: 101-28232 — «Visore immagine»: velo sulla finestra, nome e «1 di 2», «Copia», «Salva con nome…», chiudi, frecce tra le immagini del filo.
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -13,6 +13,9 @@ export function Visore({ galleria, indice, onIndice, onChiudi }: { galleria: Voc
   const v = galleria[indice];
   const url = useImmagine(v?.da ?? null);
   const n = galleria.length;
+  // chiuso il visore, il fuoco torna dov'era (la miniatura o il testo), non sulla pagina
+  const prima = useRef(document.activeElement as HTMLElement | null);
+  useEffect(() => () => { if (prima.current?.isConnected) prima.current.focus(); }, []);
   const vai = (d: number) => onIndice((indice + d + n) % n);
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {
