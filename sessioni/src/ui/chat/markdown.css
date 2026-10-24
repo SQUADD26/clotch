@@ -75,6 +75,7 @@
   overflow: auto; max-height: var(--misura-tabella-altezza-max);
   border: var(--misura-tratto) solid var(--colore-bordo-leggero); border-radius: var(--raggio-lg);
 }
+.pezzo-chat .tabella-markdown:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); } /* anello da 2 px che segue il raggio, come i bottoni */
 .pezzo-chat .tabella-markdown::-webkit-scrollbar { width: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); height: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); }
 .pezzo-chat .tabella-markdown::-webkit-scrollbar-thumb {
   border: var(--spazio-1) solid transparent; border-radius: var(--raggio-pieno); background: var(--colore-icona-terziaria); background-clip: padding-box;
