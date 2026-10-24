@@ -3221,7 +3221,7 @@
    "box": {
     "x": 395,
     "y": 689,
-    "w": 104,
+    "w": 149,
     "h": 18
    },
    "variabili": {
@@ -3230,7 +3230,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Sta ragionando…",
+   "testo": "Claude sta ragionando…",
    "font": "SF Pro Regular"
   },
   {
@@ -3275,7 +3275,7 @@
    "box": {
     "x": 373,
     "y": 717,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -3284,7 +3284,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3292,7 +3292,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 513,
+    "x": 558,
     "y": 717,
     "w": 35,
     "h": 18
@@ -3311,7 +3311,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 554,
+    "x": 599,
     "y": 718,
     "w": 16,
     "h": 16
@@ -3327,7 +3327,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 559.33203125,
+    "x": 604.33203125,
     "y": 721.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3425,7 +3425,7 @@
    "box": {
     "x": 397,
     "y": 745,
-    "w": 59,
+    "w": 60,
     "h": 18
    },
    "variabili": {
@@ -3434,7 +3434,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "L’aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3442,9 +3442,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 460,
+    "x": 461,
     "y": 745,
-    "w": 96,
+    "w": 94,
     "h": 18
    },
    "variabili": {
@@ -3453,7 +3453,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Controlla i tipi…",
+   "testo": "controlla i tipi…",
    "font": "SF Pro Regular"
   },
   {
@@ -3563,7 +3563,7 @@
    "box": {
     "x": 397,
     "y": 773,
-    "w": 59,
+    "w": 60,
     "h": 18
    },
    "variabili": {
@@ -3572,7 +3572,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "L’aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3580,9 +3580,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 460,
+    "x": 461,
     "y": 773,
-    "w": 148,
+    "w": 144,
     "h": 18
    },
    "variabili": {
@@ -3591,7 +3591,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge la barra laterale…",
+   "testo": "legge la barra laterale…",
    "font": "SF Pro Regular"
   },
   {
@@ -3670,7 +3670,7 @@
    "box": {
     "x": 395,
     "y": 801,
-    "w": 96,
+    "w": 138,
     "h": 18
    },
    "variabili": {
@@ -3679,7 +3679,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge Filo.tsx…",
+   "testo": "Claude legge Filo.tsx…",
    "font": "SF Pro Regular"
   },
   {
@@ -3687,7 +3687,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 497,
+    "x": 539,
     "y": 801,
     "w": 78,
     "h": 18

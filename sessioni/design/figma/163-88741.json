@@ -3191,7 +3191,7 @@
    "box": {
     "x": 373,
     "y": 621,
-    "w": 115,
+    "w": 176,
     "h": 18
    },
    "variabili": {
@@ -3200,7 +3200,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Claude ha ragionato per 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3208,7 +3208,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 494,
+    "x": 555,
     "y": 622,
     "w": 16,
     "h": 16
@@ -3224,7 +3224,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 499.33203125,
+    "x": 560.33203125,
     "y": 625.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3276,7 +3276,7 @@
    "box": {
     "x": 373,
     "y": 649,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -3285,7 +3285,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3293,7 +3293,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 513,
+    "x": 558,
     "y": 649,
     "w": 35,
     "h": 18
@@ -3312,7 +3312,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 554,
+    "x": 599,
     "y": 650,
     "w": 16,
     "h": 16
@@ -3328,7 +3328,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 554.66796875,
+    "x": 599.66796875,
     "y": 650.66650390625,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -3343,7 +3343,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 576,
+    "x": 621,
     "y": 649,
     "w": 47,
     "h": 18
@@ -3362,7 +3362,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 629,
+    "x": 674,
     "y": 650,
     "w": 16,
     "h": 16
@@ -3378,7 +3378,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 634.33203125,
+    "x": 679.33203125,
     "y": 653.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3476,7 +3476,7 @@
    "box": {
     "x": 397,
     "y": 677,
-    "w": 59,
+    "w": 60,
     "h": 18
    },
    "variabili": {
@@ -3485,7 +3485,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "L’aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3493,9 +3493,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 460,
+    "x": 461,
     "y": 677,
-    "w": 86,
+    "w": 84,
     "h": 18
    },
    "variabili": {
@@ -3504,7 +3504,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Controlla i tipi",
+   "testo": "controlla i tipi",
    "font": "SF Pro Regular"
   },
   {
@@ -3512,7 +3512,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 550,
+    "x": 549,
     "y": 677,
     "w": 92,
     "h": 18
@@ -3531,7 +3531,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 646,
+    "x": 645,
     "y": 678,
     "w": 16,
     "h": 16
@@ -3547,7 +3547,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 649.33203125,
+    "x": 648.33203125,
     "y": 683.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3716,7 +3716,7 @@
    "box": {
     "x": 397,
     "y": 735,
-    "w": 59,
+    "w": 60,
     "h": 18
    },
    "variabili": {
@@ -3725,7 +3725,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "L’aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3733,9 +3733,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 460,
+    "x": 461,
     "y": 735,
-    "w": 93,
+    "w": 89,
     "h": 18
    },
    "variabili": {
@@ -3744,7 +3744,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Lancia le prove",
+   "testo": "lancia le prove",
    "font": "SF Pro Regular"
   },
   {
@@ -3752,7 +3752,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 557,
+    "x": 554,
     "y": 735,
     "w": 55,
     "h": 18
@@ -3771,7 +3771,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 616,
+    "x": 613,
     "y": 736,
     "w": 16,
     "h": 16
@@ -3787,7 +3787,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 621.33203125,
+    "x": 618.33203125,
     "y": 739.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461

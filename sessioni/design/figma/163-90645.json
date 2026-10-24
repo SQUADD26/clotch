@@ -3095,7 +3095,7 @@
    "box": {
     "x": 89,
     "y": 608,
-    "w": 115,
+    "w": 176,
     "h": 18
    },
    "variabili": {
@@ -3104,7 +3104,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Claude ha ragionato per 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3112,7 +3112,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 210,
+    "x": 271,
     "y": 609,
     "w": 16,
     "h": 16
@@ -3128,7 +3128,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 215.33203125,
+    "x": 276.33203125,
     "y": 612.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3180,7 +3180,7 @@
    "box": {
     "x": 89,
     "y": 636,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -3189,7 +3189,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3197,7 +3197,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 229,
+    "x": 274,
     "y": 636,
     "w": 35,
     "h": 18
@@ -3216,7 +3216,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 270,
+    "x": 315,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3232,7 +3232,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 270.66796875,
+    "x": 315.66796875,
     "y": 637.666015625,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -3247,7 +3247,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 292,
+    "x": 337,
     "y": 636,
     "w": 47,
     "h": 18
@@ -3266,7 +3266,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 345,
+    "x": 390,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3282,7 +3282,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 350.33203125,
+    "x": 395.33203125,
     "y": 640.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3380,7 +3380,7 @@
    "box": {
     "x": 113,
     "y": 664,
-    "w": 59,
+    "w": 60,
     "h": 18
    },
    "variabili": {
@@ -3389,7 +3389,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "L’aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -3397,9 +3397,9 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 176,
+    "x": 177,
     "y": 664,
-    "w": 156,
+    "w": 154,
     "h": 18
    },
    "variabili": {
@@ -3408,7 +3408,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerca i ruoli nel database",
+   "testo": "cerca i ruoli nel database",
    "font": "SF Pro Regular"
   },
   {
@@ -3416,7 +3416,7 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 336,
+    "x": 335,
     "y": 664,
     "w": 92,
     "h": 18
@@ -3435,7 +3435,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 432,
+    "x": 431,
     "y": 665,
     "w": 16,
     "h": 16
@@ -3451,7 +3451,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 437.33203125,
+    "x": 436.33203125,
     "y": 668.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3557,7 +3557,7 @@
    "box": {
     "x": 89,
     "y": 801,
-    "w": 96,
+    "w": 138,
     "h": 18
    },
    "variabili": {
@@ -3565,7 +3565,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge Filo.tsx…",
+   "testo": "Claude legge Filo.tsx…",
    "font": "SF Pro Regular"
   },
   {
@@ -3573,7 +3573,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 191,
+    "x": 233,
     "y": 801,
     "w": 78,
     "h": 18
