@@ -39,6 +39,13 @@ async function giro(app, area, cfg, console_) {
     if (AREE[area].apri && !(await pagina.locator(radice).first().isVisible())) { await pagina.locator(AREE[area].apri).first().click({ timeout: 2000 }).catch(() => {}); await pausa(400); }
   };
 
+  // la foto della finestra di prova non ridisegna :hover e :active del mouse finto: si forzano con CSS.forcePseudoState sul pezzo
+  const cdp = await pagina.context().newCDPSession(pagina);
+  const forza = async (i, stati) => { try {
+    await cdp.send('DOM.enable'); await cdp.send('CSS.enable');
+    const { root } = await cdp.send('DOM.getDocument', { depth: 0 }), { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `[data-bt="${i}"]` });
+    if (nodeId) await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: stati });
+  } catch { /* pezzo sparito */ } };
   await pulito();
   const f0 = await foto('iniziale');
   await difetti('iniziale', f0);
@@ -60,17 +67,20 @@ async function giro(app, area, cfg, console_) {
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
     const manca = (criterio, valore) => reg.difetti.push({ criterio, dove: el.dove, valore, quando: el.dove, foto: el.foto.at(-1) });
-    await pagina.mouse.move(0, 0); await pausa(200);
+    await pagina.mouse.move(0, 0, { steps: 2 }); await pausa(200);
     const riposo = await pezzo();
     const ok = await loc.hover({ timeout: 2000 }).then(() => true, (e) => (el.errore = e.message.split('\n')[0], false));
+    // un solo spostamento non sempre accende :hover (visto sulle righe della barra, #522): si entra con qualche passo, come una mano vera
+    if (ok && box) await pagina.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 1, { steps: 4 });
+    if (ok) await forza(i, ['hover']);
     await pausa(250);
     const sopra = await pezzo(); el.foto.push(await foto(`el${i}-hover`));
     if (ok && !disab && uguali(riposo, sopra)) manca('HOVER', 'nessun cambio visivo col mouse sopra');
     const campione = VIDEO ? pagina.evaluate(() => window.__bt.campiona(700)).catch(() => null) : null;
     if (ok) {
-      await pagina.mouse.down(); await pausa(80);
+      await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pausa(80);
       const premuto = await pezzo(); el.foto.push(await foto(`el${i}-premuto`));
-      await pagina.mouse.up();
+      await pagina.mouse.up(); await forza(i, []);
       if (!disab && tipo !== 'campo' && uguali(sopra, premuto)) manca('PREMUTO', 'nessuno stato premuto');
     }
     if (campione) { const c = await campione; if (c) { reg.movimenti.push({ dove: el.dove, animazioni: riassunto(c) }); difettiMovimento(c, { ridotto: cfg.ridotto, dove: el.dove }).forEach((d) => reg.difetti.push({ ...d, quando: el.dove })); } }
