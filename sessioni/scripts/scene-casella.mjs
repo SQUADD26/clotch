@@ -16,6 +16,7 @@ function scena(id, sezione, extra = {}) {
   const dati = structuredClone(base);
   dati.navigazione.sezione = sezione;
   Object.assign(dati.elenco.sessioni[0], { permessi: "default", contesto: 124000 }); // 62% di 200 000
+  dati.registro.chat.s1 = { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 }; // la finestra la dà il motore (contesto_max, #475)
   writeFileSync(new URL(`101-${id}.json`, cartella), JSON.stringify({ ...dati, ...extra }, null, 1) + "\n");
 }
 
