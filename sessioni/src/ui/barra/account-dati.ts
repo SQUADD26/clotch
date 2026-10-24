@@ -22,7 +22,7 @@ export const useAccountScelto = () => useSyncExternalStore(accountScelto.segui, 
 
 /** Nome corto dell'account: «accountmanager» da un'email, da una cartella `.claude-accountmanager` o da un nome. */
 export const nome = (x: string) => nomeAccount(x.split("@")[0]);
-export const trova = (quote: QuotaUso[], x: string | null | undefined) => (x ? quote.find((q) => q.email === x || q.account === nome(x)) : undefined);
+export const trova = (quote: QuotaUso[], x: string | null | undefined) => (x ? quote.find((q) => q.email === x || q.account === nome(x) || q.cartelle?.includes(x)) : undefined);
 /** Due lettere per l'avatar. */
 export const iniziali = (x: string) => x.slice(0, 2).toUpperCase();
 
