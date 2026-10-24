@@ -157,6 +157,8 @@ export interface SessioniApi {
   impostazioni(): Promise<Record<string, unknown>>;
   impostaImpostazioni(parte: Record<string, unknown>): Promise<void>;
   onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
+  /** Voce del menu del Mac scelta (#867): il nome dell'azione, come nelle scorciatoie. */
+  onMenu(cb: (azione: string) => void): () => void;
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
   cerca(testo: string): Promise<RisultatoRicerca[]>;
   /** Comandi con «/» che la sessione conosce (suoi, dell'account e del progetto). */

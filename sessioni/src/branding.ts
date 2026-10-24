@@ -43,19 +43,34 @@ export function impostaIdentita() {
   if (icona.isEmpty()) throw new Error("Icona non leggibile");
   app.dock?.setIcon(icona);
   app.setAboutPanelOptions({ applicationName: NOME_APP, applicationVersion: app.getVersion() });
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp()));
+  aggiornaMenu();
 }
 
 type Ruolo = NonNullable<Electron.MenuItemConstructorOptions["role"]>;
 const voce = (role: Ruolo, label: string, accelerator?: string): Electron.MenuItemConstructorOptions => ({ role, label, ...(accelerator && { accelerator }) });
 const sep: Electron.MenuItemConstructorOptions = { type: "separator" };
 
+// «⇧⌘F» dell'app -> «Shift+Command+F» di Electron; un tasto senza nome nel menu: nessuna scorciatoia scritta
+const TASTO: Record<string, string> = { "⌃": "Control+", "⌥": "Alt+", "⇧": "Shift+", "⌘": "Command+", "↵": "Return", "⌫": "Backspace", "⇥": "Tab", "←": "Left", "→": "Right", "↑": "Up", "↓": "Down", "+": "Plus" };
+const acceleratore = (t: string | null | undefined) => {
+  const m = t && /^([⌃⌥⇧⌘]*)(.+)$/u.exec(t);
+  return m ? [...m[1]].map((c) => TASTO[c]).join("") + (TASTO[m[2]] ?? (m[2].length === 1 ? m[2] : "")) : undefined;
+};
+/** Voce che fa un'azione dell'app (#867): la fa il renderer, che ha anche il tasto (registerAccelerator false: il menu la mostra soltanto). */
+const azione = (label: string, nome: string, tasti: Record<string, string | null>): Electron.MenuItemConstructorOptions => {
+  const accelerator = acceleratore(tasti[nome]);
+  return { label, ...(accelerator && !accelerator.endsWith("+") && { accelerator, registerAccelerator: false }), click: (_v, w) => (w as Electron.BrowserWindow | undefined)?.webContents.send("sessioni:menu", nome) };
+};
+
+/** Il menu con le scorciatoie dell'app (il main le unisce a quelle di partenza; branding non importa altro, è caricato prima del profilo). */
+export const aggiornaMenu = (tasti: Record<string, string | null> = {}) => Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp(tasti)));
+
 /** Menu di un'app macOS, voci e scorciatoie dei frame Figma 148:63680 (clotch), 148:63718 (File), 148:63756 (Modifica), 148:63794 (Vista), 148:63832 (Finestra).
  *  Electron scrive i ruoli in inglese: ogni voce porta etichetta e scorciatoia sue, così il template si verifica (test/menu.test.ts). */
-export function menuApp(): Electron.MenuItemConstructorOptions[] {
+export function menuApp(tasti: Record<string, string | null> = {}): Electron.MenuItemConstructorOptions[] {
   return [
     ...(process.platform === "darwin" ? [{ label: NOME_APP, submenu: [
-      voce("about", `Informazioni su ${NOME_APP}`), sep, voce("services", "Servizi"), sep,
+      voce("about", `Informazioni su ${NOME_APP}`), sep, azione("Impostazioni…", "impostazioni", tasti), sep, voce("services", "Servizi"), sep,
       voce("hide", `Nascondi ${NOME_APP}`, "Command+H"), voce("hideOthers", "Nascondi altre", "Alt+Command+H"), voce("unhide", "Mostra tutto"),
       sep, voce("quit", `Esci da ${NOME_APP}`, "Command+Q"),
     ] }] : []),
@@ -67,6 +82,7 @@ export function menuApp(): Electron.MenuItemConstructorOptions[] {
       { label: "Voce", submenu: [voce("startSpeaking", "Inizia a parlare"), voce("stopSpeaking", "Interrompi")] },
     ] },
     { label: "Vista", submenu: [
+      azione("Mostra/nascondi barra laterale", "barra", tasti), sep, azione("Indietro", "indietro", tasti), azione("Avanti", "avanti", tasti), sep,
       voce("reload", "Ricarica", "CommandOrControl+R"), voce("forceReload", "Forza ricarica", "Shift+CommandOrControl+R"),
       voce("toggleDevTools", "Attiva/disattiva strumenti sviluppatore", "Alt+CommandOrControl+I"), sep,
       voce("resetZoom", "Dimensione reale", "CommandOrControl+0"), voce("zoomIn", "Ingrandisci", "CommandOrControl+Plus"), voce("zoomOut", "Riduci", "CommandOrControl+-"), sep,

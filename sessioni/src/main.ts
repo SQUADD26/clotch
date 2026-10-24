@@ -2,7 +2,7 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
-import { impostaIdentita, impostaNome } from "./branding";
+import { aggiornaMenu, impostaIdentita, impostaNome } from "./branding";
 import { provaSilenziosa } from "./modalita-prova";
 import { verificaChiamante } from "./ipc-fiducia";
 
@@ -30,6 +30,7 @@ import { collegaImpostazioni } from "./impostazioni";
 import { collegaNuovaSessione } from "./nuova-sessione";
 import { collegaIndice } from "./indice-ipc";
 import { leggiImpostazioni } from "./preferenze";
+import { PARTENZA } from "./partenza";
 import { collegaCasella } from "./casella-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
@@ -117,10 +118,12 @@ app.whenReady().then(() => {
   });
   collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
+  const menuSalvato = () => aggiornaMenu({ ...PARTENZA.scorciatoie, ...(impostazioniApp().scorciatoie as Record<string, string | null> | undefined) });
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
-    if (c === "sessioni:impostazioni") barraMenu();
+    if (c === "sessioni:impostazioni") { barraMenu(); menuSalvato(); }
   };
+  menuSalvato();
   collegaPreferenze(ipcMain, invia, sessioni);
   collegaCasella(ipcMain, sessioni);
   collegaNuovaSessione(ipcMain, () => sessioni.elencoSessioni().sessioni);

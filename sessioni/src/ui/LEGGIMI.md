@@ -20,7 +20,7 @@ Navigazione condivisa: `useNavigazione()` da `base/navigazione` (vista, sessione
 
 Finestre (`base/layout.tsx`, frame 101:29280, 29399, 29552, 29770, 29971): sotto `LARGHEZZA_BARRA_FISSA` (la colonna non tiene più la bolla piena) la barra laterale non sta accanto alla colonna ma sopra, con il velo (`useNavigazione().sovrapposta`; chiude con clic sul velo, Esc, scelta di una sessione). Barra e pannello hanno uno stato per ogni misura (`barraAperta`/`pannelloAperto` sono quelli della misura di adesso). Sotto la bolla piena la casella è compatta: `.corpo[data-compatta]` nasconde `.chip .etichetta`, `.chip .livello` e `.contesto` della casella. La barra a finestra larga si allarga con la maniglia (`barraLarghezza` nelle impostazioni, doppio clic = misura del disegno). Misura minima della finestra: «Finestra 480».
 
-Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `clotch-ai/` lo esportano con nome.
+Barra del titolo: dopo la navigazione la campana «Attività» della base (numero = sessioni che aspettano te, come «Casella»; il clic apre il popover). A destra, nei «comandi globali», la cornice monta `ComandiTitolo` se `pannello/` o `clotch-ai/` lo esportano con nome. Il titolo della finestra è quello della sessione o il nome della vista (`base/Cornice.tsx`). Il menu del Mac (`src/branding.ts`) mostra le scorciatoie salvate senza registrarle; la voce scelta arriva con `api().onMenu` e la fa `base/scorciatoie.ts`, come il tasto.
 
 Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvato.
 
