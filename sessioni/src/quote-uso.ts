@@ -41,32 +41,64 @@ const MS_GIORNO = 86_400_000;
  * shortcut: sono token (input + output + scrittura cache), non la % di quota; senza email nel `.claude.json` l'account non si abbina.
  */
 export async function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<Map<string, { giorno: string; v: number }[]>> {
-  const oggi = Math.floor(ora / MS_GIORNO), da = (oggi - GIORNI + 1) * MS_GIORNO;
-  const out = new Map<string, number[]>();
+  const oggi = Math.floor(ora / MS_GIORNO), primo = oggi - GIORNI + 1, da = primo * MS_GIORNO;
+  const out = new Map<string, number[]>(), perCartella = new Map<string, Voce[][]>(), visti = new Set<string>();
   for (const r of radici) {
     const chiave = r.email?.split("@")[0];
     if (!chiave) continue;
-    const somme = out.get(chiave) ?? new Array<number>(GIORNI).fill(0), visti = new Set<string>();
+    const somme = out.get(chiave) ?? new Array<number>(GIORNI).fill(0), messaggi = new Set<string>();
     out.set(chiave, somme);
-    let nomi: string[] = [];
-    try { nomi = (await fs.readdir(path.join(r.path, "projects"), { recursive: true })).filter((n) => n.endsWith(".jsonl")); } catch { continue; }
-    for (const n of nomi) {
-      const file = path.join(r.path, "projects", n);
-      let testo: string;
-      try { if ((await fs.stat(file)).mtimeMs < da) continue; testo = await fs.readFile(file, "utf8"); } catch { continue; }
-      for (const riga of testo.split("\n")) {
-        if (!riga.includes('"usage"')) continue;
-        try {
-          const o = JSON.parse(riga), u = o.message?.usage, t = Date.parse(o.timestamp);
-          const id = o.message?.id && o.requestId ? `${o.message.id}:${o.requestId}` : null;
-          if (o.type !== "assistant" || !u || !(t >= da) || t >= (oggi + 1) * MS_GIORNO || (id && visti.has(id))) continue;
-          if (id) visti.add(id);
-          somme[Math.floor(t / MS_GIORNO) - (oggi - GIORNI + 1)] += (+u.input_tokens || 0) + (+u.output_tokens || 0) + (+u.cache_creation_input_tokens || 0);
-        } catch { /* riga non JSON */ }
+    // più account con `projects` linkata alla stessa cartella: una lettura sola (#474)
+    const dir = path.join(r.path, "projects"), reale = await fs.realpath(dir).catch(() => dir);
+    let liste = perCartella.get(reale);
+    if (!liste) {
+      liste = [];
+      perCartella.set(reale, liste);
+      let nomi: string[] = [];
+      try { nomi = (await fs.readdir(dir, { recursive: true })).filter((n) => n.endsWith(".jsonl")); } catch { continue; }
+      for (const n of nomi) {
+        const file = path.join(reale, n);
+        visti.add(file);
+        try { const st = await fs.stat(file); if (st.mtimeMs >= da) liste.push(await vociDi(file, st)); } catch { /* file illeggibile: si salta */ }
       }
     }
+    for (const voci of liste) for (const e of voci) {
+      if (e.g < primo || e.g > oggi || (e.id && messaggi.has(e.id))) continue;
+      if (e.id) messaggi.add(e.id);
+      somme[e.g - primo] += e.v;
+    }
   }
-  return new Map([...out].map(([k, v]) => [k, v.map((n, i) => ({ giorno: new Date((oggi - GIORNI + 1 + i) * MS_GIORNO).toISOString().slice(0, 10), v: n }))]));
+  for (const f of letti.keys()) if (!visti.has(f)) letti.delete(f);
+  return new Map([...out].map(([k, v]) => [k, v.map((n, i) => ({ giorno: new Date((primo + i) * MS_GIORNO).toISOString().slice(0, 10), v: n }))]));
+}
+
+/** Un messaggio con uso: id (per contarlo una volta), giorno UTC assoluto, token. */
+type Voce = { id: string | null; g: number; v: number };
+/** Per file: dove si è arrivati e le voci già lette (#474): ogni minuto si leggono solo i byte nuovi, non tutte le trascrizioni dei 14 giorni. */
+const letti = new Map<string, { ino: number; fine: number; voci: Voce[] }>();
+
+async function vociDi(file: string, st: { ino: number; size: number }): Promise<Voce[]> {
+  let c = letti.get(file);
+  if (!c || c.ino !== st.ino || st.size < c.fine) c = { ino: st.ino, fine: 0, voci: [] }; // sostituito o accorciato: da capo
+  letti.set(file, c);
+  if (st.size <= c.fine) return c.voci;
+  const fh = await fs.open(file, "r");
+  try {
+    const b = Buffer.alloc(st.size - c.fine);
+    const { bytesRead } = await fh.read(b, 0, b.length, c.fine);
+    const chiuse = b.lastIndexOf(10, bytesRead - 1) + 1; // l'ultima riga a metà si legge al giro dopo
+    for (const riga of b.toString("utf8", 0, chiuse).split("\n")) {
+      if (!riga.includes('"usage"')) continue;
+      try {
+        const o = JSON.parse(riga), u = o.message?.usage, t = Date.parse(o.timestamp);
+        if (o.type !== "assistant" || !u || !Number.isFinite(t)) continue;
+        c.voci.push({ id: o.message?.id && o.requestId ? `${o.message.id}:${o.requestId}` : null, g: Math.floor(t / MS_GIORNO),
+          v: (+u.input_tokens || 0) + (+u.output_tokens || 0) + (+u.cache_creation_input_tokens || 0) });
+      } catch { /* riga non JSON */ }
+    }
+    c.fine += chiuse;
+  } finally { await fh.close(); }
+  return c.voci;
 }
 
 /** Le quote del feed con `giorni` per ogni account (zeri se non ha trascrizioni); senza nessun uso nel periodo la serie manca e la scheda resta vuota. */
@@ -91,4 +123,4 @@ export function sogliePassate(quote: { account: string; usato: number }[], viste
 }
 
 /** Solo per i test. */
-export const svuotaCache = () => { cache = null; inVolo = null; giorniCache = null; };
+export const svuotaCache = () => { cache = null; inVolo = null; giorniCache = null; letti.clear(); };

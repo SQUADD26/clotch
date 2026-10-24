@@ -1,6 +1,7 @@
 // figma: 101-45956 — Impostazioni · Clotch con Clotch collegato; senza Clotch: 101-45993.
 // La versione arriva dall'evento clotch del registro (#339); finché Clotch non la scrive (#344) la descrizione la salta.
-import { useEffect, useState } from "react";
+
+import { useRegistro } from "../clotch-ai/dati";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { useClotchAcceso } from "../pannello/Pillole";
@@ -17,15 +18,7 @@ const VOCI: [Chiave, string, string][] = [
 /** Dove si scarica Clotch: il main apre i collegamenti web nel browser (link-esterni.ts). */
 const SCARICA = "https://github.com/SQUADD26/clotch/releases/latest";
 
-function useVersioneClotch(): string | null {
-  const [v, setV] = useState<string | null>(null);
-  useEffect(() => {
-    const prendi = (p: any) => setV(p?.clotch?.versione ?? null);
-    window.clotchAi.registro().then(prendi, () => {});
-    return window.clotchAi.onRegistro(prendi);
-  }, []);
-  return v;
-}
+const useVersioneClotch = (): string | null => useRegistro().dati?.clotch?.versione ?? null;
 
 export default function Clotch() {
   const acceso = useClotchAcceso();

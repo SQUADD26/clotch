@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { EsitoComando } from "../../comandi";
 import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
+import { useRegistro } from "../clotch-ai/dati";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 
 declare global {
@@ -13,15 +14,7 @@ declare global {
 type Valori = Record<string, unknown>;
 
 /** Ultimo evento `impostazioni` di clotch AI, aggiornato dal vivo; null finché clotch AI non l'ha mai scritto. */
-function useImpostazioniClotchAi(): Valori | null {
-  const [v, setV] = useState<Valori | null>(null);
-  useEffect(() => {
-    const prendi = (p: any) => setV(p?.impostazioni ?? null);
-    window.clotchAi.registro().then(prendi, () => {});
-    return window.clotchAi.onRegistro(prendi);
-  }, []);
-  return v;
-}
+const useImpostazioniClotchAi = (): Valori | null => (useRegistro().dati?.impostazioni as Valori | null | undefined) ?? null;
 
 /** Testi dei frame: «clotch AI non risponde» se non ha preso il comando, se no il perché di clotch AI o «Comando non riuscito». */
 export const testoEsito = (e: EsitoComando) =>

@@ -32,15 +32,31 @@ export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unkn
 
   const dir = cartellaRegistro(home, env);
   let attesa: NodeJS.Timeout | null = null;
-  let visti: Set<string> | null = null, ultimo = "";
+  let visti: Set<string> | null = null;
+  // l'ultimo inviato, per campo e per chat: a ogni cambio partono solo i pezzi diversi (#474: il registro intero è ~440 KB e la voce scrive ogni secondo)
+  const ultimi = new Map<string, string>(), ultimeChat = new Map<string, string>();
+  const parziale = (dati: Record<string, any>) => {
+    const campi: Record<string, unknown> = {}, chat: Record<string, unknown> = {}, tolte: string[] = [];
+    for (const [k, v] of Object.entries(dati)) {
+      if (k === "chat") continue;
+      const j = JSON.stringify(v);
+      if (ultimi.get(k) !== j) { campi[k] = v; ultimi.set(k, j); }
+    }
+    for (const [id, c] of Object.entries(dati.chat ?? {})) {
+      const j = JSON.stringify(c);
+      if (ultimeChat.get(id) !== j) { chat[id] = c; ultimeChat.set(id, j); }
+    }
+    for (const id of ultimeChat.keys()) if (!(id in (dati.chat ?? {}))) { tolte.push(id); ultimeChat.delete(id); }
+    return Object.keys(campi).length || Object.keys(chat).length || tolte.length ? { parziale: true, campi, chat, tolte } : null;
+  };
   const aggiorna = () => {
     const r = leggiRegistro();
     const v = daLeggere(r, visti);
     visti = v.visti;
     v.testi.forEach(leggi);
-    const dati = completo(r, home, env), json = JSON.stringify(dati);
-    if (json !== ultimo) invia("clotch-ai:registro", dati); // .lock e contatori.json svegliano il watcher senza cambiare il registro
-    ultimo = json;
+    const p = parziale(completo(r, home, env));
+    if (p) invia("clotch-ai:registro", p); // .lock e contatori.json svegliano il watcher senza cambiare il registro: niente
+
   };
   const cambiato = () => { attesa ??= setTimeout(() => { attesa = null; aggiorna(); }, 300); };
   const guarda = () => { try { fs.watch(dir, cambiato); } catch { setTimeout(guarda, 5000); } }; // cartella non ancora creata: riprova
