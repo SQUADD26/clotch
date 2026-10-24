@@ -16,7 +16,7 @@ export const normalizza = <T extends string | null>(tasti: T): T => (tasti ? (ta
 export function tastiDi(e: { key: string; code: string; metaKey: boolean; shiftKey: boolean; altKey: boolean; ctrlKey: boolean }): string | null {
   if (["Meta", "Shift", "Alt", "Control"].includes(e.key)) return null;
   // con ⌥ o ⇧ `key` cambia carattere: per lettere e cifre vale il tasto fisico
-  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.code === "Semicolon" ? ";" : e.key.length === 1 ? e.key.toUpperCase() : e.key);
   return (e.ctrlKey ? "⌃" : "") + (e.altKey ? "⌥" : "") + (e.shiftKey ? "⇧" : "") + (e.metaKey ? "⌘" : "") + tasto; // ordine del Mac: ⇧ prima di ⌘ (⇧⌘F), come nelle etichette fisse
 }
 

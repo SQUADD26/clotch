@@ -90,6 +90,13 @@
     return null;
   }
 
+  // Una transizione invertita a metà (il mouse esce durante il passaggio) dura meno di quanto dichiarato: si misura la durata scritta nel CSS.
+  function dichiarata(a) {
+    if (!a.transitionProperty || a.effect.pseudoElement) return null;
+    const s = getComputedStyle(a.effect.target), d = s.transitionDuration.split(','), i = s.transitionProperty.split(',').map((x) => x.trim()).indexOf(a.transitionProperty);
+    const t = d[(i < 0 ? 0 : i) % d.length].trim(), v = parseFloat(t);
+    return Number.isFinite(v) ? (t.endsWith('ms') ? v : v * 1000) : null;
+  }
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
     // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
@@ -104,7 +111,7 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
           const e = anim.get(a);

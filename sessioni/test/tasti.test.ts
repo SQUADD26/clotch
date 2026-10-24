@@ -25,3 +25,13 @@ test("tasto senza scorciatoia, solo modificatore o scorciatoia tolta: nessuna az
 test("stessa scorciatoia su due azioni: nessuna delle due scatta", () => {
   assert.equal(azioneDi("⌘K", { ...salvate, ferma: "⌘K" }), null);
 });
+
+test("tasti riservati: fissi dell'app e menu nativo non si assegnano (#686); ⇧⌘; è il punto e virgola", async () => {
+  const { riservatoDa, FISSE } = await import("../src/ui/impostazioni/riservati");
+  const k = (key: string, code: string, m = {}) => tastiDi({ key, code, metaKey: true, shiftKey: false, altKey: false, ctrlKey: false, ...m });
+  assert.equal(riservatoDa(k("n", "KeyN")!), "Nuova sessione");
+  assert.equal(riservatoDa(k("w", "KeyW")!), "Chiudi finestra");
+  assert.equal(riservatoDa(k(":", "Semicolon", { shiftKey: true })!), "Copia ultimo blocco di codice");
+  assert.equal(riservatoDa(k("k", "KeyK")!), undefined);
+  assert.equal(FISSE["⇧⌘P"][0], "piano"); // ⇧⇥ torna al browser (#684)
+});
