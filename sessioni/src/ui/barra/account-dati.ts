@@ -23,7 +23,7 @@ export const useAccountScelto = () => useSyncExternalStore(accountScelto.segui, 
 /** Nome corto dell'account: «accountmanager» da un'email, da una cartella `.claude-accountmanager` o da un nome. */
 export const nome = (x: string) => nomeAccount(x.split("@")[0]);
 /** Stesso account scritto in modi diversi: «.claude-terminal-r-bondici», «terminal-r-bondici», «r-bondici» (il motore usa l'ultimo). */
-const chiave = (x: string) => nome(x).replace(/^terminal-/, "");
+const chiave = (x: string) => { const n = nome(x).replace(/^terminal-/, ""); return n === "default" ? "claude" : n; }; // il motore chiama «default» la cartella ~/.claude
 export const trova = (quote: QuotaUso[], x: string | null | undefined) =>
   (x ? quote.find((q) => q.email === x || q.account === nome(x) || q.cartelle?.some((c) => c === x || chiave(c) === chiave(x))) : undefined);
 /** Due lettere per l'avatar. */
@@ -82,5 +82,6 @@ export function useCorrente(chat: string | null, registro: Registro | null, daDi
   }, [nuova, nuovo, previsto]);
   if (nuovo) return { chiave: scelto ?? auto, motore: null };
   const c = registro?.chat.get(chat);
-  return { chiave: c?.account ?? daDisco ?? null, motore: c?.sorgente === "motore" };
+  // l'email letta dal disco è la più precisa; il nome scritto dal motore cambia forma («default», «b», «r-bondici», «r.bondici»)
+  return { chiave: (daDisco?.includes("@") ? daDisco : null) ?? c?.account ?? daDisco ?? null, motore: c?.sorgente === "motore" };
 }
