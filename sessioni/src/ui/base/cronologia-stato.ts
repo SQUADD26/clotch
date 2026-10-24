@@ -14,14 +14,17 @@ export interface CronologiaStato {
   pagina: number;
   errore: string | null;
   invalida: boolean;
+  /** L'istantanea non vale più (rotazione, troncamento): chi ascolta può ripartire da solo con una nuova. */
+  riparti: boolean;
 }
 const MAX_BUFFER = 10_000;
 export const nuovaCronologia = (sessione: string | null): CronologiaStato => ({
   sessione, snapshot: null, righe: new Map(), overlay: new Map(), buffer: [],
-  sequenza: null, totale: null, cursore: null, pagina: 0, errore: null, invalida: false,
+  sequenza: null, totale: null, cursore: null, pagina: 0, errore: null, invalida: false, riparti: false,
 });
 export const righeOrdinate = (s: CronologiaStato) => [...s.righe.values()].sort((a, b) => a.ordine - b.ordine);
-export const fallita = (s: CronologiaStato, errore: string, invalida = true): CronologiaStato => ({ ...s, errore, invalida });
+export const fallita = (s: CronologiaStato, errore: string, invalida = true, riparti = false): CronologiaStato => ({ ...s, errore, invalida, riparti });
+const CAMBIATA = "La cronologia è cambiata. Riprova.";
 const TIPI = new Set(["utente", "assistente", "pensiero", "strumento", "errore"]);
 // Il messaggio arriva dal main: ne controlliamo forma e tipi prima di darlo da disegnare.
 const messaggioValido = (m: Messaggio): boolean => {
@@ -39,12 +42,12 @@ export function applicaDelta(s: CronologiaStato, d: DeltaCronologia): Cronologia
     return { ...s, buffer: [...s.buffer, structuredClone(d)] };
   }
   if (d.tipo === "errore") return d.epoca !== null && d.epoca !== s.snapshot.epoca ? s
-    : fallita(s, d.errore.testo, d.errore.ripartenza === "nuova_snapshot");
+    : fallita(s, d.errore.testo, d.errore.ripartenza === "nuova_snapshot", d.errore.ripartenza === "nuova_snapshot");
   if (d.tipo === "reset") {
     if (d.epoca === s.snapshot.epoca) return s; // reset già incluso nella snapshot nuova
-    return fallita(s, "La cronologia è cambiata. Riprova.");
+    return fallita(s, CAMBIATA, true, true);
   }
-  if (d.epoca !== s.snapshot.epoca) return fallita(s, "La cronologia è cambiata. Riprova.");
+  if (d.epoca !== s.snapshot.epoca) return fallita(s, CAMBIATA, true, true);
   const seq = s.sequenza!;
   if (!Number.isInteger(d.daSeq) || !Number.isInteger(d.aSeq) || d.aSeq <= d.daSeq || d.daSeq < 0)
     return fallita(s, "Aggiornamento della cronologia non valido.");
