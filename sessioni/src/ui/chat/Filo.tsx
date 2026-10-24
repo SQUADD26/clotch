@@ -14,7 +14,7 @@ import { Risposta } from "./Risposta";
 import { MenuSelezione } from "./Selezione";
 import { giorniDelFilo } from "./eventi";
 import { riepilogo, type Blocco, type Voce } from "./modello";
-import { Domanda, Esito, Permesso, Piano, passiPiano } from "./Richieste";
+import { Domanda, Esito, Permesso, Piano, contoPassi } from "./Richieste";
 import { chiaveImmagine, galleria as galleriaDi } from "./percorsi";
 import { provaDi, quanti } from "./testi";
 import { Visore } from "./Visore";
@@ -36,15 +36,15 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, aperto }: {
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
     case "errore":
-      if (b.riprova) return <AvvisoFilo tipo="attesa" titolo="Riprovo" corpo={`Tentativo ${b.riprova.n} di ${b.riprova.di}`} />;
+      if (b.riprova) return <AvvisoFilo tipo="attesa" icona="orologio" titolo="Riprovo" corpo={`Tentativo ${Math.min(b.riprova.n, b.riprova.di)} di ${b.riprova.di}${b.riprova.n >= b.riprova.di ? ", l’ultimo" : ""}`} />;
       return /^API Error/.test(b.testo) ? <AvvisoFilo tipo="errore" titolo="Richiesta non riuscita" corpo={b.testo} /> : <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":
       if (!b.aperta) return b.risposta ? <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta} /> : <Esito icona="persona" colore="secondaria" esito="Senza risposta" />;
       return <Domanda chat={chat} rid={richiesta("domanda")?.rid ?? null} domande={b.domande} da={da} />;
     case "piano":
-      if (b.approvato) return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={quanti(passiPiano(b.testo).passi.length, "passo", "passi")} />;
-      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : <Esito icona="chiudi" colore="errore" esito="Piano rifiutato" />;
+      if (b.approvato) return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={contoPassi(b.testo)} />;
+      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : <Esito icona="chiudi" colore="errore" esito="Piano rifiutato" dettaglio={b.rifiuto} />;
   }
 }
 

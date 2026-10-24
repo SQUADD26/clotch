@@ -93,6 +93,8 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
     sotto.addEventListener("keydown", tasto);
     return () => sotto.removeEventListener("keydown", tasto);
   }, [sotto, alFuoco, menu]);
+  // a finestra stretta il pannello SSH non sta accanto al menu: sta sopra, senza coprirne le voci
+  const stretto = numero("misura-menu") + numero("spazio-1") + numero("misura-menu-avvio-largo") + 2 * numero("misura-margine-finestra") > window.innerWidth;
   const q = cerca.trim().toLowerCase(), trova = (t: string) => t.toLowerCase().includes(q);
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
@@ -116,7 +118,7 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
         )}
       </Menu>
       {host && !q && menu && (
-        <Sovrapposto ancora={menu} lato="destra" scarto={numero("spazio-1")} className="menu-casella menu-ssh" role="menu" label="Macchine SSH" rif={setSotto} onChiudi={() => setHost(false)}>
+        <Sovrapposto ancora={menu} lato={stretto ? "sopra" : "destra"} scarto={numero("spazio-1")} className="menu-casella menu-ssh" role="menu" label="Macchine SSH" rif={setSotto} onChiudi={() => setHost(false)}>
           <PannelloSsh mac={mac} ambiente={ambiente} mostraBase={mostraBase} onScegli={scegli} onAggiungi={(p) => { onChiudi(); onAggiungi(p); }} onTogli={(m) => { onChiudi(); onTogli(m); }} />
         </Sovrapposto>
       )}

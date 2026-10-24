@@ -12,15 +12,26 @@ const ICONE: NomeIcona[] = [
   "lampadina", "fulmine", "cuore", "bandiera", "casa", "chiave", "scudo", "strati", "scintille", "pacco", "valigetta", "bussola",
 ];
 
-/** Un solo punto di Tab per gruppo (il scelto, o il primo); frecce, Home e Fine spostano il fuoco, Invio e Spazio scelgono. Su/giù saltano una riga di `colonne` celle. */
+const tappa = (g?: Element | null) => g?.querySelector<HTMLElement>("[role=radio][tabindex='0']");
+
+/** Un solo punto di Tab per gruppo (il scelto, o il primo); frecce, Home e Fine spostano il fuoco, Invio e Spazio scelgono.
+ *  Destra e sinistra una cella; su e giù una riga se il gruppo ne ha più d'una, altrimenti passano al gruppo vicino (campo, colori, icone). */
 function frecce(e: KeyboardEvent<HTMLElement>) {
   const g = (e.target as HTMLElement).closest<HTMLElement>("[role=radiogroup]");
   const b = g ? [...g.querySelectorAll<HTMLElement>("[role=radio]")] : [];
   const i = b.indexOf(e.target as HTMLElement);
   if (i < 0) return;
   const colonne = b.filter((x) => x.offsetTop === b[0].offsetTop).length;
+  const verticale = e.key === "ArrowDown" || e.key === "ArrowUp";
   const passo = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: colonne, ArrowUp: -colonne }[e.key];
-  const j = e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : passo ? Math.min(b.length - 1, Math.max(0, i + passo)) : -1;
+  if (verticale && (colonne === b.length || i + passo! < 0 || i + passo! >= b.length)) {
+    e.preventDefault();
+    const gruppi = [...(g!.closest(".scelta-icona")?.querySelectorAll("[role=radiogroup]") ?? [])], k = gruppi.indexOf(g!) + (e.key === "ArrowDown" ? 1 : -1);
+    if (k < 0) g!.closest(".scelta-icona")?.querySelector<HTMLElement>(".cerca-icone input")?.focus();
+    else tappa(gruppi[k])?.focus();
+    return;
+  }
+  const j = e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : passo ? i + passo : -1;
   if (j < 0) return;
   e.preventDefault();
   b[j].focus();
@@ -40,7 +51,8 @@ export function SceltaIcona({ a, pref, onImposta, onChiudi }: { a: Ancora; pref?
     <Sovrapposto ancora={a} className="scelta-icona" onChiudi={onChiudi}>
       <label className="cerca-icone">
         <Icona nome="cerca" />
-        <input ref={campoRif} placeholder="Cerca icone" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input ref={campoRif} placeholder="Cerca icone" value={q} onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); tappa(e.currentTarget.closest(".scelta-icona")?.querySelector("[role=radiogroup]"))?.focus(); } }} />
         {q && <BottoneIcona icona="chiudi" etichetta="Cancella ricerca" onClick={() => { setQ(""); campo.current?.focus(); }} />}
       </label>
       <div className="t-xs secondario">Colore</div>

@@ -7,6 +7,7 @@ import { registraAzione } from "../base/scorciatoie";
 import type { DomandaTesto } from "./modello";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
+import { Markdown } from "./Markdown";
 import { comanda } from "./clotch-ai";
 import { useInCorso } from "./inCorso";
 import { useRiserva } from "./riserva";
@@ -163,30 +164,38 @@ export function NotaVoce({ acceso, spento }: { acceso: string; spento: string })
   return <div className="nota-voce"><Icona nome={c ? "schermo" : "microfono"} /><span>{c ? acceso : spento}</span></div>;
 }
 
-/** Passi del piano: le righe «1. …» o «- …» del testo; il resto prima dei passi è l'introduzione. */
+/** Il piano come lo scrive Claude: le righe «1. …» o «- …» a margine sono i passi (con le loro sotto-voci), il testo prima e dopo è introduzione e coda. */
 export function passiPiano(testo: string) {
-  const righe = testo.split("\n").map((r) => r.trim()).filter(Boolean);
   const passo = /^(\d+[.)]|[-*])\s+/;
-  const passi = righe.filter((r) => passo.test(r)).map((r) => r.replace(passo, "").replace(/\*\*/g, ""));
-  const primo = righe.findIndex((r) => passo.test(r));
-  const intro = righe.slice(0, primo < 0 ? 1 : primo).filter((r) => !r.startsWith("#")).join(" ");
-  return { intro, passi };
+  const passi: string[] = [], intro: string[] = [], coda: string[] = [];
+  for (const r of testo.split("\n")) {
+    if (passo.test(r)) passi.push(r.replace(passo, "").replace(/\*\*/g, "").trim());
+    else if (passi.length && /^\s+\S/.test(r)) passi[passi.length - 1] += "\n" + r.trim().replace(passo, "• ");
+    else if (r.trim()) (passi.length ? coda : intro).push(r);
+    else if (passi.length ? coda.length : intro.length) (passi.length ? coda : intro).push(r);
+  }
+  return { intro: intro.join("\n").trim(), passi, coda: coda.join("\n").trim() };
 }
+
+/** «3 passi»; un piano in prosa non ha un conto da dire. */
+export const contoPassi = (testo: string) => { const n = passiPiano(testo).passi.length; return n ? quanti(n, "passo", "passi") : undefined; };
 
 export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; testo: string }) {
   const [esito, setEsito] = useState<"approva" | "modifica" | null>(null);
   const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
-  const { intro, passi } = passiPiano(testo);
-  const nPassi = quanti(passi.length, "passo", "passi");
+  const { intro, passi, coda } = passiPiano(testo);
+  const nPassi = contoPassi(testo);
   if (esito === "modifica") return <Esito icona="matita" colore="secondaria" esito="Modifica chiesta" dettaglio={nPassi} />;
   if (esito === "approva") return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={nPassi} />;
   const decidi = (e: "approva" | "modifica") => fai(async () => { if (rid && await comanda("piano", { chat, rid, esito: e })) setEsito(e); });
   return (
     <Carta icona="libro" titolo="Piano da approvare" dettaglio={nPassi}>
-      {intro && <div className="motivo">{ris.testo(intro)}</div>}
+      {intro && passi.length > 0 && <div className="motivo"><Markdown testo={ris.testo(intro)} /></div>}
       <div className="passi">
+        {intro && !passi.length && <div className="motivo"><Markdown testo={ris.testo(intro)} /></div>}
         {passi.map((p, i) => <div key={i} className="passo"><span className="numero">{i + 1}</span><span className="testo">{ris.testo(p)}</span></div>)}
+        {coda && <div className="motivo"><Markdown testo={ris.testo(coda)} /></div>}
       </div>
       <div className="bottoni">
         <Bottone onClick={() => decidi("approva")} disabled={!rid || inCorso}>Approva</Bottone>

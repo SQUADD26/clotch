@@ -18,7 +18,8 @@ import { RigheClotchAi, useRegistro } from "./ClotchAi";
 import { AccountBarra } from "./Account";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
-import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
+import { copiaUltimoBlocco } from "./Ricerca";
+import { impostaRicerca, useRicercaAperta } from "./RicercaGlobale";
 import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { APezzi } from "./APezzi";
@@ -59,7 +60,7 @@ export default function Barra() {
   const [vista, setVistaSubito] = useState<Vista>(p?.vista ?? conservato.vista);
   const setVista = (v: Vista) => conTransizione(() => setVistaSubito(v)); // filtri, raggruppa, ordina: le righe entrano ed escono (#520)
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
-  const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
+  const ricerca = useRicercaAperta();
   const [chiuse, setChiuse] = useState<Set<string>>(conservato.chiuse);
   const [suggerimento, setSuggerimento] = useState<{ testo: string; a: Punto } | null>(p?.suggerimento ?? null);
   const barra = useMemo(() => componi(sessioni, vista, pref, adesso), [sessioni, vista, pref, adesso]);
@@ -113,7 +114,6 @@ export default function Barra() {
     addEventListener("keydown", frecce);
     return () => removeEventListener("keydown", frecce);
   }, []);
-  useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
   const filtri = vista.filtri;
   // una pillola rimasta senza valori non filtra niente: alla chiusura del menu si toglie da sola
@@ -152,7 +152,7 @@ export default function Barra() {
   return (
     <>
       <RigaComando icona="piu" etichetta="Nuova sessione" tasto="⌘N" scelta={pagina === "nuova-sessione"} onClick={() => n.apri("nuova-sessione")} />
-      <RigaComando icona="cerca" etichetta="Cerca sessioni" tasto={tastoCerca ?? undefined} onClick={() => setRicerca(true)} />
+      <RigaComando icona="cerca" etichetta="Cerca sessioni" tasto={tastoCerca ?? undefined} onClick={() => impostaRicerca(true)} />
       <RigaComando icona="filtra" etichetta="Filtra" lato={attivi ? `${attivi} ${attivi === 1 ? "attivo" : "attivi"}` : undefined}
         onClick={(e) => setAperto({ tipo: "raggruppa", a: accanto(e.currentTarget, -numero("spazio-1")) })} />
       <RigheClotchAi r={registro} adesso={adesso} pagina={pagina} />
@@ -205,7 +205,8 @@ export default function Barra() {
 
       <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
         daDisco={((s) => s?.email ?? s?.account)(sessione(p ? p.scelta ?? "" : n.sessione ?? ""))}
-        onAltro={(e) => setAperto({ tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
+        onApre={() => aperto?.tipo === "profilo" && chiudi()}
+        onAltro={(e) => setAperto(aperto?.tipo === "profilo" ? null : { tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
@@ -226,10 +227,6 @@ export default function Barra() {
       )}
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
       {suggerimento && !aperto && !ricerca && <Sovrapposto passivo ancora={suggerimento.a} className="suggerimento t-xs" role="tooltip">{suggerimento.testo}</Sovrapposto>}
-      {ricerca && (
-        <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
-          onApri={apriSessione} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />
-      )}
     </>
   );
 }

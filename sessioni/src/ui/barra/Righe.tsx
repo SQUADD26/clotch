@@ -5,6 +5,8 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { SegnoStato } from "../base/SegnoStato";
+import { useRegistro } from "../clotch-ai/dati";
+import { nonRisponde } from "../chat/clotch-ai";
 import { STATI } from "./elenco";
 import { IndicatorePr } from "./Pr";
 import "./barra.css";
@@ -79,7 +81,9 @@ const stessiDati = (a: PropsSessione, b: PropsSessione) =>
   (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
 export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: { currentTarget: HTMLElement }) => suggerisci(e.currentTarget, s.titolo, onTroncato);
-  const stato = s.situazione?.adesso === "errore" ? "errore" : s.stato;
+  const c = useRegistro().dati?.chat.get(s.id);
+  // stessa regola della testata e del filo: una sessione che non risponde ha lo stesso segno ovunque
+  const stato = s.situazione?.adesso === "errore" || (!!c && nonRisponde(c, Date.now())) ? "errore" : s.stato;
   return (
     <div
       role="button" tabIndex={0} aria-current={scelta || undefined} data-figlia={figlia || undefined}
@@ -89,7 +93,7 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
       onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onApri(); } }}
     >
       {figlia && <Icona nome="figlia" colore="terziaria" />}
-      <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
+      <button type="button" aria-label="Icona della sessione" title="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
       {pref?.nonLetta && <span className="pallino-non-letta" role="img" aria-label="Non letta" />}

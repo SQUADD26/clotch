@@ -27,7 +27,7 @@ export function useRegistro(): Registro | null {
 
 export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"]> }) {
   return (
-    <div className="banda">
+    <div className="banda" role="status">
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
         <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${orario(nd.fino)}`}</span>

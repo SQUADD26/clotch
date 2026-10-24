@@ -2,13 +2,14 @@
 // Finestre strette e barra ridimensionabile: 101-29280, 101-29399, 101-29552, 101-29770, 101-29971 (base/layout.tsx).
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import Barra from "../barra";
+import { RicercaGlobale } from "../barra/RicercaGlobale";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
 import { Dialoghi } from "../dialoghi";
 import ClotchAi, { Intestazione as IntestazioneClotchAi } from "../clotch-ai";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
-import { Avvio, useAvvio } from "./Avvio";
+import { Avvio, useCoperto } from "./Avvio";
 import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { Pezzo } from "./Pezzo";
@@ -47,7 +48,7 @@ function Corpo() {
   useEscChiude(barraSopra, chiudiBarra);
   useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
   // sotto il velo della barra sopra niente fuoco né clic (#941)
-  const attributi = { ref: corpo, inert: useAvvio() || barraSopra || undefined, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
+  const attributi = { ref: corpo, inert: useCoperto() || barraSopra || undefined, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
   if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni" centro><Impostazioni /></Pezzo></div>;
   const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
   const fissa = n.barraAperta && !n.sovrapposta;
@@ -69,6 +70,7 @@ function Corpo() {
           </div>
         </main>
       </div>
+      <Pezzo nome="barra"><RicercaGlobale /></Pezzo>
       {/* barra sopra la colonna (101:29552): velo su tutta la finestra, barra del titolo compresa */}
       {barraSopra && (
         <>
@@ -80,19 +82,21 @@ function Corpo() {
   );
 }
 
+function Guscio() {
+  const avvio = useCoperto();
+  return (
+    <div className={`cornice ${avvio ? "in-avvio" : ""}`}>
+      <BarraTitolo inerte={avvio} />
+      <Corpo />
+      <Avvio fine={!avvio} />
+      <Pezzo nome="dialoghi"><Dialoghi /></Pezzo>
+    </div>
+  );
+}
+
 export function Cornice() {
   useAspetto();
-  const avvio = useAvvio();
-  return (
-    <ConNavigazione>
-      <div className={`cornice ${avvio ? "in-avvio" : ""}`}>
-        <BarraTitolo inerte={avvio} />
-        <Corpo />
-        <Avvio fine={!avvio} />
-        <Pezzo nome="dialoghi"><Dialoghi /></Pezzo>
-      </div>
-    </ConNavigazione>
-  );
+  return <ConNavigazione><Guscio /></ConNavigazione>;
 }
 
 /** Superficie con bordo, come «Superficie» del frame: per i pezzi che disegnano una pagina intera (impostazioni). */
