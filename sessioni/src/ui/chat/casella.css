@@ -27,7 +27,10 @@
 }
 .pezzo-chat .casella.vuota .bottone-invia, .pezzo-chat .casella.disabilitata .bottone-invia, .pezzo-chat .bottone-invia.spento { background: var(--colore-fondo-bottone-secondario); }
 
-.pezzo-chat .coda { display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-chat .coda, .pezzo-chat .elenco-coda { display: flex; flex-direction: column; gap: var(--spazio-1); }
+/* oltre 4 righe la coda scorre dentro di sé; il conto resta fermo sopra (#652) */
+.pezzo-chat .coda.lunga .elenco-coda { max-height: calc(4 * var(--spazio-12) + 3 * var(--spazio-1)); overflow-y: auto; }
+.pezzo-chat .conto-coda { padding: 0 var(--spazio-3); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .messaggio-in-coda {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3);
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-md);

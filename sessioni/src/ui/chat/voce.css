@@ -6,12 +6,12 @@
 }
 .pezzo-chat .casella-voce.ascolta { border: var(--misura-tratto) solid var(--colore-bordo-fuoco); }
 .pezzo-chat .casella-voce .testo {
-  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; min-width: 0; overflow: hidden; white-space: nowrap;
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
 .pezzo-chat .casella-voce.ascolta .testo { color: var(--colore-testo-primario); }
 .pezzo-chat .casella-voce .onda { display: flex; align-items: center; gap: var(--spazio-0-5); flex: none; }
-.pezzo-chat .casella-voce .barra { width: var(--misura-onda-barra); border-radius: var(--raggio-pieno); background: var(--colore-icona-accento); }
+.pezzo-chat .casella-voce .barra { width: var(--misura-onda-barra); height: var(--h); transform-origin: center; border-radius: var(--raggio-pieno); background: var(--colore-icona-accento); }
 
 .pezzo-chat .nota-voce-casella {
   display: flex; align-items: center; justify-content: center; gap: var(--spazio-2); padding: 0 var(--spazio-2);
@@ -23,3 +23,11 @@
   display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-2); flex: none;
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
 }
+
+/* onda viva: ascolto più rapido, parlato più lento; solo transform, ferma con «riduci movimento» */
+.pezzo-chat .casella-voce .onda.ascolta .barra { animation: onda-barra var(--tempo-cursore) ease-in-out infinite alternate; animation-delay: calc(var(--i) * -120ms); }
+.pezzo-chat .casella-voce .onda.parla .barra { animation: onda-barra var(--tempo-luccica) ease-in-out infinite alternate; animation-delay: calc(var(--i) * -200ms); }
+@keyframes onda-barra { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+.pezzo-chat .solo-lettore { position: absolute; opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pezzo-chat .casella-voce .barra { animation: none !important; } }
+.parita .pezzo-chat .casella-voce .barra { animation: none !important; }

@@ -4,16 +4,19 @@ import { Bottone } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
 import { chiudiDialogo, type DatiDialoghi } from "../base/dialoghi";
 
-/** Salva il nome scritto (senza spazi ai bordi; vuoto = torna il nome di prima) e chiude. */
+const LIMITE = 120;
+
+/** Salva il nome scritto (senza spazi ai bordi; vuoto non si salva) e chiude. */
 export function DialogoRinomina({ titolo, valore, nota, salva }: DatiDialoghi["rinomina"]) {
   const [testo, setTesto] = useState(valore);
-  const fai = () => { salva(testo.trim()); chiudiDialogo(); };
+  const vuoto = !testo.trim();
+  const fai = () => { if (!vuoto) { salva(testo.trim()); chiudiDialogo(); } };
   return (
     <Dialogo titolo={titolo} onChiudi={chiudiDialogo}
-      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone onClick={fai}>Salva</Bottone></>}>
-      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus onFocus={(e) => e.currentTarget.select()}
+      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={vuoto} onClick={fai}>Salva</Bottone></>}>
+      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus maxLength={LIMITE} title={testo.length > 40 ? testo : undefined} aria-invalid={vuoto || undefined} onFocus={(e) => e.currentTarget.select()}
         onChange={(e) => setTesto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) fai(); }} />
-      <div className="t-sm secondario">{nota}</div>
+      <div className={vuoto ? "t-sm errore-ore" : "t-sm secondario"} role={vuoto ? "alert" : undefined}>{vuoto ? "Scrivi un nome." : nota}</div>
     </Dialogo>
   );
 }

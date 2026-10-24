@@ -33,6 +33,10 @@ export function DialogoOre({ valore, attivo = [0, 0], salva }: DatiDialoghi["ore
   const fai = () => { if (!uguali) { salva(scriviOre(ore)); chiudiDialogo(); } };
   const tasto = (e: KeyboardEvent, r: number, s: number) => {
     if (e.key === "Enter") { e.preventDefault(); fai(); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); segmenti.current[r * 2 + s + (e.key === "ArrowRight" ? 1 : -1)]?.focus(); }
+    else if (e.key === "Home" || e.key === "End") { e.preventDefault(); metti(r, s, () => (e.key === "Home" ? 0 : MAX[s])); }
+    else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); scritto.current = ""; metti(r, s, () => 0); }
+    else if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); metti(r, s, (v) => (v + (e.key === "PageUp" ? 6 : -6) + MAX[s] + 1) % (MAX[s] + 1)); }
     else if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); metti(r, s, (v) => passo(v, e.key === "ArrowUp" ? 1 : -1, s)); }
     else if (/^\d$/.test(e.key) && !e.metaKey && !e.ctrlKey) {
       e.preventDefault();
@@ -51,7 +55,7 @@ export function DialogoOre({ valore, attivo = [0, 0], salva }: DatiDialoghi["ore
           <Fragment key={s}>
             {s === 1 && <span>:</span>}
             <span ref={(el) => { segmenti.current[r * 2 + s] = el; }} className={att?.[0] === r && att[1] === s ? "segmento scelto" : "segmento"}
-              role="spinbutton" tabIndex={0} aria-label={`${nome}, ${s ? "minuti" : "ore"}`} aria-valuemin={0} aria-valuemax={MAX[s]} aria-valuenow={ore[r][s]}
+              role="spinbutton" tabIndex={0} aria-label={`${nome}, ${s ? "minuti" : "ore"}`} aria-valuemin={0} aria-valuemax={MAX[s]} aria-valuenow={ore[r][s]} aria-valuetext={`${s ? "minuti" : "ore"} ${due(ore[r][s])}`}
               data-fuoco={attivo[0] === r && attivo[1] === s ? "" : undefined}
               onFocus={() => { scritto.current = ""; setAtt([r, s]); }} onBlur={() => setAtt(null)} onKeyDown={(e) => tasto(e, r, s)}>{due(ore[r][s])}</span>
           </Fragment>
