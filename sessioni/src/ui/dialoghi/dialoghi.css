@@ -37,3 +37,9 @@
 .pezzo-dialoghi .freccia.su .icona { transform: rotate(180deg); }
 .pezzo-dialoghi .errore-ore { color: var(--colore-testo-errore); }
 .pezzo-dialoghi .bottone:disabled { opacity: var(--opacita-spento); }
+
+.pezzo-dialoghi .chiudi { border-radius: var(--raggio-xs); }
+.pezzo-dialoghi .chiudi:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-dialoghi .segmento:hover:not(.scelto) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-dialoghi .freccia { border-radius: var(--raggio-xs); }
+.pezzo-dialoghi .freccia:hover { background: var(--colore-fondo-riga-passaggio); }

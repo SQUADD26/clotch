@@ -91,3 +91,13 @@
 .pezzo-impostazioni .riga.stato-clotch { gap: var(--spazio-3); }
 /* nelle impostazioni il dialogo sta al centro esatto della finestra (119:57106, 119:57552), non spazio-10 più su */
 .pezzo-impostazioni .impostazioni .velo { padding-bottom: 0; }
+
+/* stati di passaggio e disabilitato dei controlli (riga-passaggio = passaggio, riga-scelta = premuto) */
+.pezzo-impostazioni .interruttore:hover:not(:disabled) { box-shadow: inset 0 0 0 var(--spazio-16) var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .interruttore:disabled { opacity: var(--opacita-spento); }
+.pezzo-impostazioni .scelta .valore:hover:not(:disabled) .secondario, .pezzo-impostazioni .valore-scelta:hover .secondario { color: var(--colore-testo-primario); }
+.pezzo-impostazioni button:hover > .tasto-chip:not(.errore) { background: var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni .tab-uso:hover:not(.scelta) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .indietro:hover { color: var(--colore-testo-primario); }
+.pezzo-impostazioni .riga > button[aria-label^="Assegna"] { border-radius: var(--raggio-xs); }
+.pezzo-impostazioni .riga > button[aria-label^="Assegna"]:hover { background: var(--colore-fondo-riga-passaggio); }
