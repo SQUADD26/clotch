@@ -31,6 +31,11 @@ export function voci(tokens) {
     };
     giu(modi[modo], []);
   }
+  // una curva in Figma sono quattro numeri (curva/<nome>/x1…y2): il CSS ne vuole una sola, --curva-<nome>: cubic-bezier(…)
+  for (const n of [...out.keys()].filter((k) => /^curva-.+-x1$/.test(k))) {
+    const base = n.slice(0, -3), p = ['x1', 'y1', 'x2', 'y2'].map((c) => out.get(`${base}-${c}`)?.valore);
+    if (p.every((x) => typeof x === 'number')) out.set(base, { tipo: 'cubicBezier', valore: `cubic-bezier(${p.join(', ')})` });
+  }
   return out;
 }
 
