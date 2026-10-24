@@ -19,21 +19,21 @@ export function PannelloSsh({ mac, ambiente, mostraBase = null, onScegli, onAggi
     <>
       {vuoto && (
         <div className="vuoto-ssh">
-          <span className="titolo">{mac.carica ? "Cerco le macchine…" : mac.errore ? "Macchine non raggiungibili" : "Nessuna macchina SSH"}</span>
+          <span className="titolo">{mac.carica ? "Cercando le macchine…" : mac.errore ? "Macchine non raggiungibili" : "Nessuna macchina SSH"}</span>
           <span className="corpo">{mac.errore ?? "Aggiungi una macchina per aprirci sessioni."}</span>
         </div>
       )}
       {remote.map((m) => {
         const base = m.fonte === "tabella", daFinire = m.stato === "da_completare";
         return (
-          <div key={m.nome} role="menuitem" tabIndex={0} className={`voce riga-macchina${mostraBase === m.nome ? " mostra" : ""}`}
-            onClick={() => onScegli({ tipo: "ssh", host: m.nome })} onKeyDown={(e) => { if (e.key === "Enter") onScegli({ tipo: "ssh", host: m.nome }); }}>
+          <div key={m.nome} role="menuitem" tabIndex={0} aria-label={`${m.nome}, ${daFinire ? "da completare" : `${m.utente}@${m.nome}`}`} aria-describedby={base ? `base-${m.nome}` : undefined} className={`voce riga-macchina${mostraBase === m.nome ? " mostra" : ""}`}
+            onClick={() => onScegli({ tipo: "ssh", host: m.nome })} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onScegli({ tipo: "ssh", host: m.nome }); } }}>
             {daFinire ? <Icona nome="avviso" colore="lavoro" /> : <Icona nome="computer" />}
             <span className="etichetta">{m.nome}</span>
             {daFinire ? <span className="valore da-completare">Da completare</span> : <span className="valore">{m.utente}@{m.nome}</span>}
             {ambiente.tipo === "ssh" && ambiente.host === m.nome && <Icona nome="spunta" colore="primaria" />}
-            {!base && <button type="button" className="togli" aria-label={`Togli ${m.nome}`} onClick={(e) => { e.stopPropagation(); onTogli(m); }}><Icona nome="cestino" /></button>}
-            {base && <span className="tooltip" role="tooltip">È la macchina di base: non si toglie.</span>}
+            {!base && <button type="button" className="togli" aria-label={`Rimuovi ${m.nome}`} onClick={(e) => { e.stopPropagation(); onTogli(m); }}><Icona nome="cestino" /></button>}
+            {base && <span id={`base-${m.nome}`} className="tooltip" role="tooltip">È la macchina di base: non si rimuove.</span>}
           </div>
         );
       })}

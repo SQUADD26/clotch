@@ -84,11 +84,11 @@ app.whenReady().then(async () => {
       ipcMain.removeHandler('clotch-ai:comando');
       ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
     });
-    await check('TESTO_DI_CLOTCH_DAL_VIVO', async () => { // il parziale del registro finisce nella stessa vista della dettatura; senza testo torna «Parla…»
+    await check('TESTO_DI_CLOTCH_DAL_VIVO', async () => { // il parziale del registro finisce nella stessa vista della dettatura; senza testo torna «In ascolto…» (#812)
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA, testo: 'apri il notch' } }));
       await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'apri il notch');
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA } }));
-      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'Parla…');
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'In ascolto…');
     });
     await check('STA_PARLANDO_APP_INTERROMPI', async () => {
       await carica(registro({ voceApp: true }), { voce: true });
@@ -129,7 +129,7 @@ app.whenReady().then(async () => {
       win.webContents.send('clotch-ai:dettatura', { testo: 'ciao dall’app' });
       await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'ciao dall’app');
       assert.equal(comandi.length, prima, 'nessun segnale a Clotch');
-      await run(() => document.querySelector('.casella-voce button').click()); // «Fine»
+      await run(() => document.querySelector('.casella-voce > button:last-child').click()); // «Fine»
       await pausa();
       assert.deepEqual(dettature, [true, false]);
       assert.deepEqual(comandi.at(-1), { cmd: 'parla', args: { testo: 'ciao dall’app' } });
@@ -141,7 +141,7 @@ app.whenReady().then(async () => {
       await wait(() => !!document.querySelector('.casella-voce.ascolta'));
       win.webContents.send('clotch-ai:dettatura', { fine: true, errore: 'Microfono non consentito' });
       await wait(() => !document.querySelector('.casella-voce.ascolta'));
-      assert.match(await run(() => document.body.textContent), /Microfono non consentito/);
+      await wait(() => document.body.textContent.includes('Microfono non consentito'));
     });
     await check('DETTATURA_CLOTCH_ACCESO_NESSUN_ESEGUIBILE', async () => {
       await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: false, t: ORA } }));
@@ -150,6 +150,36 @@ app.whenReady().then(async () => {
       await pausa();
       assert.equal(comandi.at(-1).cmd, 'clotch_dettatura');
       assert.deepEqual(dettature, [], 'con Clotch acceso il main non apre niente');
+    });
+    await check('DETTATURA_APP_ESC_ANNULLA_E_FUOCO_SU_FINE', async () => { // #743: Esc butta la dettatura, il fuoco va su «Fine» e torna a «Detta»
+      await carica(registro());
+      dettature.length = 0; const prima = comandi.length;
+      await detta();
+      await wait(() => document.activeElement?.textContent === 'Fine');
+      win.webContents.send('clotch-ai:dettatura', { testo: 'da buttare' });
+      await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })));
+      await wait(() => !document.querySelector('.casella-voce'));
+      assert.deepEqual(dettature, [true, false]);
+      assert.equal(comandi.length, prima, 'Annulla non manda niente');
+      await wait(() => document.activeElement?.getAttribute('aria-label') === 'Detta');
+    });
+    await check('DETTATURA_APP_ERRORE_SALVA_IL_TESTO', async () => { // #744: l'errore non butta il testo già detto, finisce nella casella
+      await carica(registro());
+      await detta();
+      await wait(() => !!document.querySelector('.casella-voce.ascolta'));
+      win.webContents.send('clotch-ai:dettatura', { testo: 'testo già detto' });
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'testo già detto');
+      win.webContents.send('clotch-ai:dettatura', { fine: true, errore: 'Dettatura interrotta' });
+      await wait(() => document.querySelector('.area-casella textarea')?.value === 'testo già detto');
+    });
+    await check('DETTATURA_APP_FINE_SENZA_TESTO', async () => {
+      await carica(registro());
+      const prima = comandi.length;
+      await detta();
+      await wait(() => !!document.querySelector('.casella-voce.ascolta'));
+      await run(() => document.querySelector('.casella-voce > button:last-child').click());
+      await wait(() => document.body.textContent.includes('Nessuna parola sentita'));
+      assert.equal(comandi.length, prima);
     });
     assert.deepEqual(fallite, []);
     assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false);

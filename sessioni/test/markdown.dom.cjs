@@ -32,15 +32,16 @@ app.whenReady().then(async () => {
         images: bad.querySelectorAll('img').length, script: bad.querySelectorAll('script').length,
         pwned: window.MARKDOWN_PWNED, html: bad.innerHTML, partial: partial.querySelector('pre code')?.textContent };
     });
-    await run(() => document.querySelector('a[href="#radice"]').click());
-    const anchor = await win.webContents.executeJavaScript(`new Promise(resolve => { const end = Date.now() + 500; const tick = () => location.hash === '#radice' ? resolve(true) : Date.now() > end ? resolve(false) : setTimeout(tick, 20); tick(); })`);
-    assert.equal(anchor, true, 'Ancora naviga nel documento corrente');
+    // un'ancora non è più un link (#787): resta scritta, inerte, con l'indirizzo da copiare; non cambia la pagina né apre finestre
+    assert.equal(await run(() => document.querySelector('a[href="#radice"]')), null);
+    await run(() => document.querySelector('.link-inerte[data-link="#radice"]').click());
+    await new Promise(resolve => setTimeout(resolve, 100));
+    assert.equal(await run(() => location.hash), '', 'Ancora inerte non naviga');
     assert.deepEqual(finestre, [], 'Ancora non apre finestre esterne');
-    assert.equal(await run(() => document.querySelector('a[href="#radice"]').hasAttribute('target')), false);
     assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false);
     assert.equal(BrowserWindow.getAllWindows().length, 1);
     console.log('MARKDOWN_HIDDEN_WINDOW visible=false focused=false count=1');
-    console.log('MARKDOWN_ANCHOR_CLICK current-document/no-window/mailto-blocked: OK');
+    console.log('MARKDOWN_ANCHOR_CLICK inert/no-window/mailto-blocked: OK');
     assert.equal(state.heading, 'Verifica delle sessioni');
     assert.equal(state.list, 3); assert.equal(state.ordered, 2);
     assert.equal(state.table, 'Chat'); assert.equal(state.strong, 'tre percorsi');
@@ -61,7 +62,7 @@ app.whenReady().then(async () => {
     assert.match(plain, /Riga uno\nRiga due/);
     assert.match(plain, /Apri la prova/); assert.match(plain, /Chat/); assert.match(plain, /npm test/);
     assert.doesNotMatch(plain, /\*\*|```|\]\(https|^# /m);
-    await run(() => document.querySelector('.risposta .azioni button[aria-label="Altro"]').click());
+    await run(() => document.querySelector('.risposta .azioni button[aria-label="Altre azioni"]').click());
     await run(() => [...document.querySelectorAll('button')].find(b => b.textContent === 'Copia come Markdown').click());
     await new Promise(resolve => setTimeout(resolve, 80));
     assert.equal(await run(() => window.__markdownCopies.at(-1)), positivo);

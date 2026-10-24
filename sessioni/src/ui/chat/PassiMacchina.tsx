@@ -1,6 +1,7 @@
 // figma: 149-67632 — «Passo preparazione» 149:67422 (Connessione … GitHub: In attesa, In corso, spunta, Non riuscito, Da fare nel Terminale); passo fallito 149:67664;
 // comando da copiare 149:67696; collega GitHub col codice 149:70649.
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { titoloECorpo, type RigaPasso, type StatoPasso } from "./macchine";
@@ -47,6 +48,7 @@ const copia = (t: string) => { void navigator.clipboard.writeText(t).catch(() =>
 /** «Accedi a Claude dal Terminale del Mac»: il comando esatto del motore, da copiare; mai un segreto. */
 export function BloccoComando({ riga }: { riga: RigaPasso }) {
   const [copiato, setCopiato] = useState(false);
+  useEffect(() => { if (!copiato) return; const t = setTimeout(() => setCopiato(false), 1500); return () => clearTimeout(t); }, [copiato]);
   return (
     <div className="comando-passo">
       <span className="titolo-comando">Accedi a {riga.passo === "login" ? "Claude" : riga.etichetta} dal Terminale del Mac</span>
@@ -61,12 +63,12 @@ export function BloccoComando({ riga }: { riga: RigaPasso }) {
 
 /** Accesso a GitHub col codice di verifica: il bottone copia il codice e apre `url` nel browser (il main lascia passare solo https). */
 export function BloccoCodice({ riga }: { riga: RigaPasso }) {
-  const apri = () => { copia(riga.codice ?? ""); if (riga.url) window.open(riga.url, "_blank", "noopener"); };
+  const apri = () => { copia(riga.codice ?? ""); avvisa({ tipo: "successo", messaggio: "Codice copiato" }); if (riga.url) window.open(riga.url, "_blank", "noopener"); };
   return (
     <div className="codice-github">
       <div className="codice-grande" aria-label="Codice di GitHub">{riga.codice}</div>
       <Bottone tipo="primario" onClick={apri}>Copia il codice e apri GitHub</Bottone>
-      <span className="nota-codice">Incolla il codice nella pagina che si apre. Aspetto fino a 10 minuti.</span>
+      <span className="nota-codice">Incolla il codice nella pagina che si apre. Attesa massima: 10 minuti.</span>
     </div>
   );
 }

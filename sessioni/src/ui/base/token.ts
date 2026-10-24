@@ -10,6 +10,7 @@ export type Token =
   | "primitivo-bianco-a904"
   | "primitivo-bianco-a078"
   | "primitivo-bianco-a498"
+  | "primitivo-bianco-a55"
   | "primitivo-grigio-141414"
   | "primitivo-grigio-181818"
   | "primitivo-grigio-232323"
@@ -26,6 +27,9 @@ export type Token =
   | "primitivo-arancio-fdf5f1"
   | "primitivo-arancio-ff8549"
   | "primitivo-arancio-b9461b"
+  | "primitivo-arancio-c15625"
+  | "primitivo-arancio-7d3b1b"
+  | "primitivo-verde-338554"
   | "primitivo-verde-40c977"
   | "primitivo-verde-40c977-a16"
   | "primitivo-verde-37915b"
@@ -35,6 +39,7 @@ export type Token =
   | "primitivo-rosso-ff6764"
   | "primitivo-rosso-fa423e-a16"
   | "primitivo-rosso-c8312d"
+  | "primitivo-rosso-ff7673"
   | "primitivo-semaforo-rosso"
   | "primitivo-semaforo-giallo"
   | "primitivo-semaforo-verde"
@@ -55,12 +60,18 @@ export type Token =
   | "primitivo-blu-1982e5"
   | "primitivo-blu-f0f7fe"
   | "primitivo-blu-0a66d6"
+  | "primitivo-blu-4aa6ff"
+  | "primitivo-blu-1778d3"
+  | "primitivo-blu-124d85"
   | "primitivo-viola-ad7bf9"
   | "primitivo-viola-ad7bf9-a16"
   | "primitivo-viola-9965e8"
   | "primitivo-viola-6925d0"
   | "primitivo-viola-f6f1fd"
   | "primitivo-viola-6f2fd6"
+  | "primitivo-viola-8f56e6"
+  | "primitivo-viola-5b20b4"
+  | "primitivo-argento-707783"
   | "primitivo-argento-c4c8ce"
   | "primitivo-argento-c4c8ce-a16"
   | "primitivo-argento-7a818d"
@@ -114,6 +125,7 @@ export type Token =
   | "colore-testo-bolla-verde"
   | "colore-testo-bolla-viola"
   | "colore-testo-bolla-argento"
+  | "colore-testo-su-avatar"
   | "colore-icona-primaria"
   | "colore-icona-secondaria"
   | "colore-icona-terziaria"
@@ -253,6 +265,9 @@ export type Token =
   | "misura-campo-porta"
   | "misura-riga-menu-larga"
   | "misura-margine-finestra"
+  | "misura-miniatura-strumento-larga"
+  | "misura-miniatura-strumento-alta"
+  | "misura-elenco-strumenti-alto"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -313,6 +328,7 @@ export const valori: Record<Token, string> = {
   "primitivo-bianco-a904": "#ffffffe7",
   "primitivo-bianco-a078": "#ffffff14",
   "primitivo-bianco-a498": "#ffffff7f",
+  "primitivo-bianco-a55": "#ffffff8c",
   "primitivo-grigio-141414": "#141414",
   "primitivo-grigio-181818": "#181818",
   "primitivo-grigio-232323": "#232323",
@@ -329,6 +345,9 @@ export const valori: Record<Token, string> = {
   "primitivo-arancio-fdf5f1": "#fdf5f1",
   "primitivo-arancio-ff8549": "#ff8549",
   "primitivo-arancio-b9461b": "#b9461b",
+  "primitivo-arancio-c15625": "#c15625",
+  "primitivo-arancio-7d3b1b": "#7d3b1b",
+  "primitivo-verde-338554": "#338554",
   "primitivo-verde-40c977": "#40c977",
   "primitivo-verde-40c977-a16": "#40c97729",
   "primitivo-verde-37915b": "#37915b",
@@ -338,6 +357,7 @@ export const valori: Record<Token, string> = {
   "primitivo-rosso-ff6764": "#ff6764",
   "primitivo-rosso-fa423e-a16": "#fa423e29",
   "primitivo-rosso-c8312d": "#c8312d",
+  "primitivo-rosso-ff7673": "#ff7673",
   "primitivo-semaforo-rosso": "#ff5f57",
   "primitivo-semaforo-giallo": "#febc2e",
   "primitivo-semaforo-verde": "#28c840",
@@ -358,12 +378,18 @@ export const valori: Record<Token, string> = {
   "primitivo-blu-1982e5": "#1982e5",
   "primitivo-blu-f0f7fe": "#f0f7fe",
   "primitivo-blu-0a66d6": "#0a66d6",
+  "primitivo-blu-4aa6ff": "#4aa6ff",
+  "primitivo-blu-1778d3": "#1778d3",
+  "primitivo-blu-124d85": "#124d85",
   "primitivo-viola-ad7bf9": "#ad7bf9",
   "primitivo-viola-ad7bf9-a16": "#ad7bf929",
   "primitivo-viola-9965e8": "#9965e8",
   "primitivo-viola-6925d0": "#6925d0",
   "primitivo-viola-f6f1fd": "#f6f1fd",
   "primitivo-viola-6f2fd6": "#6f2fd6",
+  "primitivo-viola-8f56e6": "#8f56e6",
+  "primitivo-viola-5b20b4": "#5b20b4",
+  "primitivo-argento-707783": "#707783",
   "primitivo-argento-c4c8ce": "#c4c8ce",
   "primitivo-argento-c4c8ce-a16": "#c4c8ce29",
   "primitivo-argento-7a818d": "#7a818d",
@@ -377,12 +403,12 @@ export const valori: Record<Token, string> = {
   "colore-fondo-codice": "#141414",
   "colore-fondo-elevato": "#2d2d2d",
   "colore-fondo-casella": "#363636",
-  "colore-fondo-bolla": "#87401d",
+  "colore-fondo-bolla": "#7d3b1b",
   "colore-fondo-riga-passaggio": "#ffffff0d",
   "colore-fondo-riga-scelta": "#ffffff14",
   "colore-fondo-bottone-secondario": "#ffffff0d",
   "colore-fondo-bottone-primario": "#ffffff",
-  "colore-fondo-accento": "#d25e28",
+  "colore-fondo-accento": "#c15625",
   "colore-fondo-errore": "#fa423e29",
   "colore-fondo-sagoma": "#ffffff14",
   "colore-fondo-velo": "#00000080",
@@ -390,33 +416,34 @@ export const valori: Record<Token, string> = {
   "colore-fondo-manopola": "#ffffff",
   "colore-fondo-aggiunta": "#40c97729",
   "colore-fondo-attesa": "#ee7c3729",
-  "colore-fondo-accento-blu": "#1982e5",
-  "colore-fondo-bolla-blu": "#145694",
+  "colore-fondo-accento-blu": "#1778d3",
+  "colore-fondo-bolla-blu": "#124d85",
   "colore-fondo-attesa-blu": "#339cff29",
-  "colore-fondo-accento-verde": "#37915b",
+  "colore-fondo-accento-verde": "#338554",
   "colore-fondo-bolla-verde": "#265f3d",
   "colore-fondo-attesa-verde": "#40c97729",
-  "colore-fondo-accento-viola": "#9965e8",
-  "colore-fondo-bolla-viola": "#6925d0",
+  "colore-fondo-accento-viola": "#8f56e6",
+  "colore-fondo-bolla-viola": "#5b20b4",
   "colore-fondo-attesa-viola": "#ad7bf929",
-  "colore-fondo-accento-argento": "#7a818d",
+  "colore-fondo-accento-argento": "#707783",
   "colore-fondo-bolla-argento": "#50555c",
   "colore-fondo-attesa-argento": "#c4c8ce29",
   "colore-fondo-tabella-intestazione": "#ffffff14",
   "colore-testo-primario": "#ffffff",
   "colore-testo-secondario": "#ffffffb5",
   "colore-testo-su-primario": "#2d2d2d",
-  "colore-testo-errore": "#ff6764",
+  "colore-testo-errore": "#ff7673",
   "colore-testo-successo": "#40c977",
   "colore-testo-bolla": "#fdf5f1",
-  "colore-testo-terziario": "#ffffff7f",
-  "colore-testo-link": "#339cff",
+  "colore-testo-terziario": "#ffffff8c",
+  "colore-testo-link": "#4aa6ff",
   "colore-testo-lavoro": "#f2c14e",
   "colore-testo-lavoro-luce": "#fff1c2",
   "colore-testo-bolla-blu": "#f0f7fe",
   "colore-testo-bolla-verde": "#f3fbf6",
   "colore-testo-bolla-viola": "#f6f1fd",
   "colore-testo-bolla-argento": "#f6f7f8",
+  "colore-testo-su-avatar": "#141414",
   "colore-icona-primaria": "#ffffffe7",
   "colore-icona-secondaria": "#ffffffb5",
   "colore-icona-terziaria": "#ffffff82",
@@ -438,7 +465,7 @@ export const valori: Record<Token, string> = {
   "colore-bordo-fuoco-verde": "#40c977",
   "colore-bordo-fuoco-viola": "#ad7bf9",
   "colore-bordo-fuoco-argento": "#c4c8ce",
-  "colore-bordo-errore": "#ff6764",
+  "colore-bordo-errore": "#ff7673",
   "colore-ombra-colore": "#00000030",
   "colore-semaforo-rosso": "#ff5f57",
   "colore-semaforo-giallo": "#febc2e",
@@ -556,6 +583,9 @@ export const valori: Record<Token, string> = {
   "misura-campo-porta": "96",
   "misura-riga-menu-larga": "312",
   "misura-margine-finestra": "8px",
+  "misura-miniatura-strumento-larga": "48px",
+  "misura-miniatura-strumento-alta": "32px",
+  "misura-elenco-strumenti-alto": "240px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",

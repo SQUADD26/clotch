@@ -1,6 +1,6 @@
 // figma: 101-29552 — finestre strette: sotto questa misura la barra laterale sta sopra la colonna, con il velo (768, 600, 480);
 // 101-29399: la maniglia che ridimensiona la barra («Trascina per allargare. Doppio clic: 266 px»).
-import { useEffect, useLayoutEffect, useState, type KeyboardEvent, type PointerEvent, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from "react";
 import { imposta, useImpostazioni } from "../impostazioni/stato";
 import { useNavigazione } from "./navigazione";
 import { numero } from "./token";
@@ -33,6 +33,17 @@ export function useEscChiude(aperto: boolean, chiudi: () => void) {
     addEventListener("keydown", premi);
     return () => removeEventListener("keydown", premi);
   }, [aperto, chiudi]);
+}
+
+/** Pannello sopra col velo (#941): aperto, il fuoco va alla sua prima voce. Torna il `chiudi` da dare a Esc e al velo:
+ *  chiuso così, il fuoco torna a `ritorno`; chiuso dalla scelta di una sessione resta alla vista nuova (navigazione.daiFuoco). */
+export function useFuocoDentro(aperto: boolean, dove: RefObject<HTMLElement | null>, ritorno: string, chiudi: () => void) {
+  const torna = useRef(false);
+  useEffect(() => {
+    if (aperto) dove.current?.querySelector<HTMLElement>("button:not([disabled]), [href], input, [tabindex]:not([tabindex='-1'])")?.focus({ preventScroll: true });
+    else if (torna.current) { torna.current = false; document.querySelector<HTMLElement>(ritorno)?.focus({ preventScroll: true }); }
+  }, [aperto, dove, ritorno]);
+  return useCallback(() => { torna.current = true; chiudi(); }, [chiudi]);
 }
 
 const dentro = (w: number) => Math.round(Math.min(BARRA_MAX, Math.max(BARRA_MIN, w)));

@@ -4,6 +4,13 @@
   display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; max-width: 100%; padding: var(--spazio-1) var(--spazio-2);
   background: var(--colore-fondo-bottone-secondario); border-radius: var(--raggio-lg);
 }
+.pezzo-chat .chip-allegato:has(button.apri):hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .chip-allegato:has(button.apri:active) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-chat .chip-allegato:has(button.apri:focus-visible) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .chip-allegato.mancante { opacity: var(--opacita-spento); }
+.pezzo-chat .chip-allegato button.apri, .pezzo-chat .miniatura { cursor: pointer; }
+.pezzo-chat .miniatura:hover, .pezzo-chat .miniatura:focus-visible { border-color: var(--colore-bordo-forte); }
+.pezzo-chat .miniatura.carico { background: var(--colore-fondo-sagoma); }
 .pezzo-chat .chip-allegato .apri { display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; text-align: left; }
 .pezzo-chat .chip-allegato .testi { display: flex; flex-direction: column; min-width: 0; }
 .pezzo-chat .chip-allegato .nome {
@@ -64,6 +71,8 @@
 .pezzo-chat .casella.trascina {
   background: linear-gradient(var(--colore-fondo-attesa), var(--colore-fondo-attesa)), var(--colore-fondo-casella);
   border: var(--misura-tratto-forte) dashed var(--colore-bordo-fuoco);
+  /* il bordo è più spesso: il padding cala della differenza, il contenuto non si muove */
+  padding: calc(var(--spazio-3) - var(--misura-tratto-forte) + var(--misura-tratto)) calc(var(--spazio-3) - var(--misura-tratto-forte) + var(--misura-tratto)) calc(var(--spazio-2-5) - var(--misura-tratto-forte) + var(--misura-tratto));
 }
 /* l'avviso sotto la casella (148:43700): un file oltre il limite non parte */
 .pezzo-chat .avviso-allegato { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); }

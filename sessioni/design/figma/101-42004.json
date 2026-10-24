@@ -4,8 +4,7 @@
   "id": "101:42004",
   "nome": "Barra laterale",
   "w": 266,
-  "h": 856,
-  "dentro": "101:42000"
+  "h": 856
  },
  "variabili": {
   "spazio/0-5": 2,
@@ -25,7 +24,7 @@
   "testo/riga/sm": 18,
   "colore/fondo/riga-scelta": "#ffffff14",
   "colore/icona/accento": "#ee7c37",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
   "spazio/3": 12,

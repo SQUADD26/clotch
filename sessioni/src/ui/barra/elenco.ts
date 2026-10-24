@@ -2,6 +2,7 @@
 // Testi dei frame 101:7728, 101:9860 (filtri), 101:16778 (stati), 101:17031 (proprietà), 101:30304 (raggruppa e ordina).
 import type { PreferenzeSessione, Sessione, Sorgente, Stato } from "../../tipi";
 import type { NomeIcona } from "../base/icone";
+import { giornoRelativo } from "../base/formato";
 
 type StatoSegno = Stato | "errore";
 
@@ -27,7 +28,7 @@ export const PROPRIETA: { chiave: Proprieta; etichetta: string; icona: NomeIcona
 export const STATI: { chiave: StatoSegno; voce: string; corta: string; icona: NomeIcona; colore: "accento" | "secondaria" | "successo" | "errore" }[] = [
   { chiave: "lavora", voce: "In corso", corta: "In corso", icona: "in-corso", colore: "accento" },
   { chiave: "aspetta", voce: "In attesa di te", corta: "In attesa", icona: "mano", colore: "accento" },
-  { chiave: "ferma", voce: "Ferma", corta: "Ferma", icona: "pausa", colore: "secondaria" },
+  { chiave: "ferma", voce: "In pausa", corta: "In pausa", icona: "pausa", colore: "secondaria" },
   { chiave: "finita", voce: "Finita", corta: "Finita", icona: "finita", colore: "successo" },
   { chiave: "errore", voce: "Errore", corta: "Errore", icona: "avviso", colore: "errore" },
 ];
@@ -36,20 +37,18 @@ const SORGENTI: Record<Sorgente, string> = { "claude-code": "Claude Code", "clau
 export const nomeSorgente = (s: Sorgente) => SORGENTI[s];
 
 /** «Oggi», «Ieri», «12 ott»: le date della ricerca 101:10247. */
-export function giorno(t: number, ora: number) {
-  const d = new Date(t), oggi = new Date(ora);
-  const ieri = new Date(ora); ieri.setDate(ieri.getDate() - 1);
-  if (d.toDateString() === oggi.toDateString()) return "Oggi";
-  if (d.toDateString() === ieri.toDateString()) return "Ieri";
-  return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" }).replace(".", "");
-}
+export const giorno = giornoRelativo;
+
+/** Chiave vera del giorno (con l'anno): «2026-10-12»; l'etichetta («Oggi», «12 ott») si ricava a parte. */
+const chiaveGiorno = (t: number) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const daChiave = (k: string) => { const [a, m, g] = k.split("-").map(Number); return new Date(a, m - 1, g).getTime(); };
 
 /** Valore di una proprietà per filtri e menu delle opzioni. */
 export function valore(s: Sessione, p: Proprieta, ora: number): string {
   switch (p) {
     case "sorgente": return nomeSorgente(s.sorgente);
-    case "stato": return s.stato;
-    case "attivita": return giorno(s.ultimaAttivita, ora);
+    case "stato": return s.situazione?.adesso === "errore" ? "errore" : s.stato; // come il segno della riga (#636)
+    case "attivita": return chiaveGiorno(s.ultimaAttivita);
     default: return s[p] ?? "";
   }
 }
@@ -59,13 +58,16 @@ export interface Opzione { chiave: string; voce: string; icona?: NomeIcona; colo
 export function opzioni(sessioni: Sessione[], p: Proprieta, ora: number): Opzione[] {
   if (p === "stato") return STATI;
   const visti = [...new Set(sessioni.map((s) => valore(s, p, ora)).filter(Boolean))];
+  // le date dalla più recente, con l'etichetta del giorno; le altre in ordine alfabetico
+  if (p === "attivita") return visti.sort((a, b) => daChiave(b) - daChiave(a)).map((k) => ({ chiave: k, voce: giorno(daChiave(k), ora) }));
   return visti.sort((a, b) => a.localeCompare(b)).map((v) => ({ chiave: v, voce: v }));
 }
 
 /** Testo della pillola: «Stato:» e «In attesa» (101:9860). */
 export function pillola(f: Filtro) {
   const etichetta = PROPRIETA.find((p) => p.chiave === f.proprieta)!.etichetta;
-  const valori = f.proprieta === "stato" ? f.valori.map((v) => STATI.find((s) => s.chiave === v)?.corta ?? v) : f.valori;
+  const valori = f.proprieta === "stato" ? f.valori.map((v) => STATI.find((s) => s.chiave === v)?.corta ?? v)
+    : f.proprieta === "attivita" ? f.valori.map((k) => giorno(daChiave(k), Date.now())) : f.valori;
   return { proprieta: `${etichetta}:`, valore: valori.join(", ") };
 }
 
@@ -90,18 +92,18 @@ export function componi(sessioni: Sessione[], v: Vista, pref: Preferenze, ora: n
     gruppi.set(titolo, g);
   }
   const attivi = v.filtri.filter((f) => f.valori.length).length;
-  return { fissate, gruppi: [...gruppi.values()], totale: scelte.length, titolo: attivi ? `${scelte.length} sessioni` : "Progetti" };
+  return { fissate, gruppi: [...gruppi.values()], totale: scelte.length, titolo: attivi ? `${scelte.length} ${scelte.length === 1 ? "sessione" : "sessioni"}` : "Progetti" };
 }
 
 /** Riga sotto il nome nel piede: «6 account · 4 sorgenti» (101:7728), «Nessuna sessione» (101:8772). */
 /** Account distinti nell'elenco (per sorgente): «Roberto · 6 account» nel bottone account della barra. */
-export const numeroAccount = (sessioni: Sessione[]) => new Set(sessioni.map((s) => `${s.sorgente}:${s.account}`)).size;
+export const numeroAccount = (sessioni: Sessione[]) => new Set(sessioni.map((s) => s.account).filter(Boolean)).size;
 
 export function dettaglioProfilo(sessioni: Sessione[]) {
   if (!sessioni.length) return "Nessuna sessione";
   const account = numeroAccount(sessioni);
-  const sorgenti = new Set(sessioni.map((s) => s.sorgente)).size;
-  return `${account} account · ${sorgenti} sorgenti`;
+  const app = new Set(sessioni.map((s) => s.sorgente)).size;
+  return `${account} account · ${app} app`;
 }
 
 /** «Rinomina etichetta…»: l'etichetta della cartella `chiave`; vuota = torna il nome della cartella. */

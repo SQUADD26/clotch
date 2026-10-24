@@ -31,6 +31,9 @@ export function caricaImpostazioni() {
     (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e), azione: { etichetta: "Riprova", fai: caricaImpostazioni } }));
 }
 
+/** Il valore di adesso, per un «Annulla» che parte più tardi (non quello del momento del clic, #956). */
+export const leggi = <K extends Chiave>(chiave: K): Impostazioni[K] => valori[chiave];
+
 export function imposta<K extends Chiave>(chiave: K, valore: Impostazioni[K]) {
   const prima = valori[chiave];
   cambia({ ...valori, [chiave]: valore });

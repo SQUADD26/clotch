@@ -2,6 +2,7 @@
 // AFK: `afk.json` e `afk-fatto.jsonl` di Clotch, letti dal main (stato-app.ts) e mandati dentro il registro.
 import type { Registro } from "../../clotch-ai";
 import { Icona } from "../base/Icona";
+import { plurale } from "../base/formato";
 import { durata } from "../chat/testi";
 import { acceso as clotchAcceso } from "../pannello/clotch";
 import "./via.css";
@@ -11,22 +12,22 @@ export function ViaDalMac({ r, adesso, aspettano, inCasella }: { r: Registro | n
   if (!r) return null;
   if (clotchAcceso(r, adesso)) {
     if (!r.afk) return null;
-    const n = r.afk.avvisi;
+    const n = r.afk.avvisi, ms = adesso - r.afk.da; // minuti interi: l'orologio non batte al secondo
     return (
-      <div className="banda via">
+      <div className="banda via" role="status">
         <div className="riga-banda">
           <Icona nome="luna" colore="accento" />
-          <span className="titolo t-sm medio">Sei via dal Mac da {durata(Math.max(60_000, adesso - r.afk.da))}</span>
+          <span className="titolo t-sm medio">Sei via dal Mac {ms < 60_000 ? "da meno di 1 min" : `da ${durata(Math.floor(ms / 60_000) * 60_000)}`}</span>
         </div>
         <span className="dettaglio t-xs secondario">
-          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${n} ${n === 1 ? "avviso e te lo legge" : "avvisi e te li legge"} al ritorno.`}
+          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${plurale(n, "avviso", "avvisi")} e te ${n === 1 ? "lo" : "li"} legge al ritorno.`}
         </span>
       </div>
     );
   }
   if (!inCasella || !aspettano) return null;
   return (
-    <div className="banda via senza">
+    <div className="banda via senza" role="status">
       <div className="riga-banda">
         <Icona nome="info" />
         <span className="titolo t-sm medio">Sessioni non sa quando sei via</span>

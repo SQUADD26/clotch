@@ -8,9 +8,9 @@ import "./suggerimento.css";
 const ATTESA_MS = 500;
 
 /** `forzato`: sempre visibile (scena di prova 101-24069). `lato` (con `allinea` e `scarto`): appoggiato al bottone da quel lato, come i suggerimenti
- *  della chat (101:43945, 101:26425); senza, sotto e spostato di spazio-2 a sinistra come in 101:24123. `classe`: lo stile del pezzo («suggerimento» nella chat). */
-export function Suggerimento({ testo, scorciatoia, forzato = false, lato, allinea, scarto, classe = "tooltip", children }: {
-  testo: string; scorciatoia?: string | null; forzato?: boolean; lato?: Lato; allinea?: "fine" | "centro"; scarto?: number; classe?: string; children: ReactNode;
+ *  della chat (101:43945, 101:26425); senza, sotto e spostato di spazio-2 a sinistra come in 101:24123. `classe`: lo stile del pezzo («suggerimento» nella chat). `nascosto`: il controllo ha aperto il suo menu, che sta nello stesso punto. */
+export function Suggerimento({ testo, scorciatoia, forzato = false, lato, allinea, scarto, classe = "tooltip", nascosto = false, children }: {
+  testo: string; scorciatoia?: string | null; forzato?: boolean; lato?: Lato; allinea?: "fine" | "centro"; scarto?: number; classe?: string; nascosto?: boolean; children: ReactNode;
 }) {
   const [visibile, setVisibile] = useState(false);
   const [el, setEl] = useState<HTMLSpanElement | null>(null);
@@ -22,7 +22,7 @@ export function Suggerimento({ testo, scorciatoia, forzato = false, lato, alline
     <span ref={setEl} className="con-tooltip" onMouseEnter={apri} onMouseLeave={chiudi} onMouseDown={chiudi}
       onFocus={(e) => { if (e.target.matches(":focus-visible")) setVisibile(true); }} onBlur={chiudi}>
       {children}
-      {(visibile || forzato) && el && (
+      {(visibile || forzato) && !nascosto && el && (
         <Sovrapposto passivo className={classe} role="tooltip" lato={lato} fine={allinea === "fine"} centro={allinea === "centro"} scarto={scarto}
           ancora={lato ? el : { x: el.getBoundingClientRect().left - numero("spazio-2"), y: el.getBoundingClientRect().bottom + numero("spazio-1-5") }}>
           <span>{testo}</span>

@@ -81,8 +81,8 @@ test("#484 messaggio da un'altra sessione: riga evento «Messaggio da <nome>», 
   const msg = (attr: string) => `Another Claude session sent a message:\n<cross-session-message ${attr}>\nCiao dal fratello\n</cross-session-message>`;
   assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock" from-name="H-331 - Orchestratore" from-mode="bypass"')), ["Messaggio da H-331 - Orchestratore"]);
   assert.deepEqual(eventi(msg('from="local_4caf" name="★ MENU BAR" encoded="1"')), ["Messaggio da ★ MENU BAR"]);
-  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock"')), ["Messaggio da un'altra sessione"]);
-  assert.deepEqual(eventi('<relay from="coordinator" session="s1">\n  nota\n</relay>'), ["Messaggio da un'altra sessione"]);
+  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock"')), ["Messaggio da un’altra sessione"]);
+  assert.deepEqual(eventi('<relay from="coordinator" session="s1">\n  nota\n</relay>'), ["Messaggio da un’altra sessione"]);
   // un reminder fra due messaggi: solo gli eventi, nessuna bolla
   const due = `${msg('name="A"')}\n<system-reminder>\nnota\n</system-reminder>\n${msg('name="B"')}`;
   assert.deepEqual(eventi(due), ["Messaggio da A", "Messaggio da B"]);
@@ -91,4 +91,15 @@ test("#484 messaggio da un'altra sessione: riga evento «Messaggio da <nome>», 
 test("#484 notifica più testo vero: evento e bolla, nell'ordine", () => {
   const v = voci([{ tipo: "utente", testo: `${notifica("completed", 'Agent "A" finished')}\n\nOra il test`, t: 1 }], false);
   assert.deepEqual(v.map((x) => x.tipo === "evento" ? x.testo : x.tipo === "roberto" ? `roberto:${x.testo}` : x.tipo), ['Agente "A" finito', "roberto:Ora il test"]);
+});
+
+test("stati del turno: api_error diventa «Riprovo», limite e «No response requested» non fanno avvisi grezzi", () => {
+  const c = new Convertitore();
+  const riprova = c.riga({ type: "system", subtype: "api_error", level: "error", retryAttempt: 1, maxRetries: 10 }).nuovi;
+  assert.deepEqual(riprova, [{ tipo: "errore", testo: "", t: null, riprova: { n: 1, di: 10 } }]);
+  const grezzi = [...riprova, { tipo: "errore" as const, testo: "You've hit your session limit · resets 5pm", t: null }, { tipo: "errore" as const, testo: "No response requested.", t: null }];
+  const v = voci([{ tipo: "utente", testo: "x", t: 0 }, ...grezzi], false);
+  const b = v[1].tipo === "turno" ? v[1].blocchi : [];
+  assert.deepEqual(b.map((x) => x.tipo), ["errore"]);
+  assert.deepEqual(b[0].tipo === "errore" && b[0].riprova, { n: 1, di: 10 });
 });

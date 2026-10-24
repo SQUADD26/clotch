@@ -91,6 +91,13 @@
     return null;
   }
 
+  // Una transizione invertita a metà (il mouse esce durante il passaggio) dura meno di quanto dichiarato: si misura la durata scritta nel CSS.
+  function dichiarata(a) {
+    if (!a.transitionProperty || a.effect.pseudoElement) return null;
+    const s = getComputedStyle(a.effect.target), d = s.transitionDuration.split(','), i = s.transitionProperty.split(',').map((x) => x.trim()).indexOf(a.transitionProperty);
+    const t = d[(i < 0 ? 0 : i) % d.length].trim(), v = parseFloat(t);
+    return Number.isFinite(v) ? (t.endsWith('ms') ? v : v * 1000) : null;
+  }
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
     // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
@@ -100,15 +107,23 @@
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
         T.push(t);
-        for (const a of document.getAnimations()) {
+        // anche le ombre: l'uscita dei sovrapposti è una copia in uno shadow root (base/Sovrapposto.tsx)
+        for (const a of [...document.getAnimations(), ...[...document.body.children].flatMap((e) => e.shadowRoot?.getAnimations() ?? [])]) {
           if (prima.has(a) || !a.effect?.target) continue;
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
+              // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
+              coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
+              // il tooltip compare dopo un'attesa voluta (base/Suggerimento.tsx), non subito al gesto
+              attesa: !!a.effect.target.closest?.('[role=tooltip],.tooltip,.suggerimento'), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
-          anim.get(a).serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
+          const e = anim.get(a);
+          // inizio vero dalla linea del tempo: il primo campione può arrivare tardi se uno screenshot ferma i fotogrammi
+          if (e.inizio == null && a.startTime != null) e.inizio = a.startTime;
+          e.serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
         if (t - t0 < ms) return requestAnimationFrame(passo);
         GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));

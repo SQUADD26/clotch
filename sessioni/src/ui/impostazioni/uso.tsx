@@ -1,12 +1,14 @@
 // figma: 101-48825 — Impostazioni · Uso (Panoramica) con Clotch (dati dal notch); senza Clotch: 101-48888; scheda Andamento: 119-57613.
-// Dati veri dal feed di Clotch (quote-uso.ts, #374). Errore del feed: nessun numero (nessun testo di errore disegnato).
+// Dati veri dal feed di Clotch (quote-uso.ts, #374). Lettura in corso, errore con «Riprova» e nessun account: righe di stato nel gruppo (#952).
 // shortcut: il feed non dà l'uso al giorno, quindi la scheda Andamento resta vuota; quando la fonte ha la serie (`giorni`), si disegna da sola.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { QuotaUso } from "../../tipi";
 import { fa } from "../../uso-testi";
+import { useAggiornamenti, useChiamata } from "../base/dati";
 import { Icona } from "../base/Icona";
+import { useOra } from "../chat/clotch-ai";
 import { useClotchAcceso } from "../pannello/Pillole";
-import { Gruppo, Pagina, VuotoLista } from "./controlli";
+import { Carica, ErroreLista, Gruppo, Pagina, VuotoLista } from "./controlli";
 import { prova } from "./prova";
 import "./uso.css";
 
@@ -78,15 +80,18 @@ function Andamento({ quote }: { quote: QuotaUso[] }) {
 
 export default function Uso() {
   const clotch = useClotchAcceso();
-  const [quote, setQuote] = useState<QuotaUso[] | null>(null);
+  const lette = useChiamata(() => window.impostazioni.uso(), []);
+  useAggiornamenti(() => lette.ricarica()); // dati nuovi dal notch: numeri e «aggiornati … fa» seguono
+  const ora = useOra();
+  const quote = lette.dati ?? null;
   const [scheda, setScheda] = useState<Scheda>(prova?.scheda ?? "panoramica");
-  useEffect(() => { window.impostazioni.uso().then(setQuote, () => setQuote(null)); }, []);
   return (
     <Pagina titolo="Uso">
       <div className="schede" role="tablist" onKeyDown={(e) => {
         const i = SCHEDE.findIndex(([id]) => id === scheda), d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-        if (!d) return;
-        e.preventDefault(); setScheda(SCHEDE[(i + d + SCHEDE.length) % SCHEDE.length][0]);
+        const vai = e.key === "Home" ? 0 : e.key === "End" ? SCHEDE.length - 1 : d ? (i + d + SCHEDE.length) % SCHEDE.length : -1;
+        if (vai < 0) return;
+        e.preventDefault(); setScheda(SCHEDE[vai][0]);
         queueMicrotask(() => document.querySelector<HTMLElement>('[role=tab][aria-selected=true]')?.focus());
       }}>
         {SCHEDE.map(([id, nome]) => (
@@ -94,11 +99,14 @@ export default function Uso() {
             onClick={() => setScheda(id)}>{nome}</button>
         ))}
       </div>
-      {quote && (scheda === "panoramica" ? <Panoramica quote={quote} /> : <Andamento quote={quote} />)}
+      {lette.stato === "carica" ? <Gruppo><Carica testo="Caricando l’uso degli account…" /></Gruppo>
+        : lette.stato === "errore" && !quote ? <Gruppo><ErroreLista titolo="Uso non letto" errore={lette.errore} riprova={lette.riprova} /></Gruppo>
+        : !quote?.length ? <Gruppo><VuotoLista titolo="Nessun account" corpo="L’uso compare quando un account Claude Code lavora su questo Mac." /></Gruppo>
+        : scheda === "panoramica" ? <Panoramica quote={quote} /> : <Andamento quote={quote} />}
       {quote?.length && scheda === "panoramica" ? (
         <div className="nota-uso">
           <Icona nome={clotch ? "schermo" : "grafico"} />
-          <span className="t-xs secondario">{(clotch ? NOTA.con : NOTA.senza)(fa(Math.max(...quote.map((q) => q.letto ?? 0)) || undefined, Date.now()))}</span>
+          <span className="t-xs secondario">{(clotch ? NOTA.con : NOTA.senza)(fa(Math.max(...quote.map((q) => q.letto ?? 0)) || undefined, ora))}</span>
         </div>
       ) : null}
     </Pagina>

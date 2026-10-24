@@ -20,7 +20,7 @@ const file = (dove: string) => (dove === GENERALI ? "global/hooks/friday/regole-
 const titolo = (dove: string) => (dove === GENERALI ? `Generali · ${GENERALI}` : `Progetto · ${repo(dove)}`);
 
 /** Modifica = aggiunta della nuova e poi `togli` della vecchia (contratto): se qualcosa va storto la vecchia resta. */
-export const avvisoSalvataggio = (dove: string) => avvisa({ tipo: "caricamento", messaggio: `Apro la PR in ${repo(dove)}…` });
+export const avvisoSalvataggio = (dove: string) => avvisa({ tipo: "caricamento", messaggio: `Aprendo la PR in ${repo(dove)}…` });
 
 /** Esito del salvataggio: `pr` della PR aperta da clotch AI, o il perché del no (`riprova` rifà tutto). */
 export function esitoSalvataggio(id: number, e: { esito: string; testo: string; pr?: number }, riprova: () => void) {
@@ -42,13 +42,15 @@ async function salva(vecchia: Regola, testo: string) {
 function Modifica({ regola, nuovo, onChiudi }: { regola: Regola; nuovo?: string; onChiudi(): void }) {
   const [testo, setTesto] = useState(nuovo ?? regola.testo);
   const ok = testo.trim() && testo.trim() !== regola.testo;
+  const salvaEChiudi = () => { onChiudi(); salva(regola, testo.trim()); };
   return (
     <Dialogo titolo="Modifica regola" onChiudi={onChiudi}
       bottoni={<>
         <Bottone tipo="secondario" onClick={onChiudi}>Annulla</Bottone>
-        <Bottone disabled={!ok} onClick={() => { onChiudi(); salva(regola, testo.trim()); }}>Salva</Bottone>
+        <Bottone disabled={!ok} onClick={salvaEChiudi}>Salva</Bottone>
       </>}>
-      <textarea className="testo-regola t-base" value={testo} onChange={(e) => setTesto(e.target.value)} aria-label="Testo della regola" />
+      <textarea className="testo-regola t-base" value={testo} onChange={(e) => setTesto(e.target.value)} aria-label="Testo della regola"
+        onKeyDown={(e) => { if (e.key === "Enter" && e.metaKey && ok) { e.preventDefault(); salvaEChiudi(); } }} />
       <span className="t-sm secondario">{file(regola.dove)} · apre una PR in {repo(regola.dove)}</span>
     </Dialogo>
   );
@@ -63,7 +65,7 @@ export function Regole() {
   const gruppi = r ? regolePerDove(r) : [];
   const tutte = gruppi.flatMap((g) => g.regole);
   if (r && !gruppi.length) {
-    return <div className="vista-clotch-ai"><Vuoto icona="scudo" titolo="Nessuna regola imparata" corpo="Quando correggi clotch AI, la correzione diventa una regola e la trovi qui." /></div>;
+    return <div className="vista-clotch-ai"><Vuoto icona="scudo" titolo="Nessuna regola imparata" corpo="Ogni correzione a clotch AI diventa una regola e compare qui." /></div>;
   }
   return (
     <div className="vista-clotch-ai">

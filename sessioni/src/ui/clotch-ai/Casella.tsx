@@ -94,8 +94,11 @@ function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
 
 function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["proposti"][number]; clotch: boolean }) {
   // fatto: la scheda sparisce col registro nuovo; non riuscito: il perché di clotch AI (testo del disegno se non ne dà)
+  const [invio, setInvio] = useState(false); // niente doppio invio mentre clotch AI risponde
   const decidi = async (esito: "accetta" | "rifiuta") => {
-    const e = await clotchAi().comando("obiettivo", { chat: o.chat, esito });
+    setInvio(true);
+    const e = await clotchAi().comando("obiettivo", { chat: o.chat, esito }).catch(() => ({ esito: "errore", testo: "" }));
+    setInvio(false);
     if (e.esito !== "ok") avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde" });
   };
   return (
@@ -106,8 +109,8 @@ function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["propo
       </div>
       <span className="t-sm secondario">{o.testo}</span>
       <div className="riga-f">
-        <Bottone onClick={() => decidi("accetta")}>Accetta</Bottone>
-        <Bottone tipo="secondario" onClick={() => decidi("rifiuta")}>Rifiuta</Bottone>
+        <Bottone disabled={invio} onClick={() => decidi("accetta")}>Accetta</Bottone>
+        <Bottone tipo="secondario" disabled={invio} onClick={() => decidi("rifiuta")}>Rifiuta</Bottone>
         {clotch && (
           <span className="riga-f nota-clotch"><Icona nome="schermo" /><span className="t-xs secondario">Puoi decidere anche dal notch</span></span>
         )}
@@ -146,7 +149,7 @@ export function Casella() {
   if (rotto || !s.dati) {
     return (
       <div className="vista-clotch-ai">
-        <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s." />
+        <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere il registro. Nuovo tentativo tra 10 s." />
         <div className="riga-f">
           <Bottone tipo="secondario" onClick={s.riprova}>Riprova ora</Bottone>
           {/* shortcut: il percorso è quello di serie; con FRIDAY_REGISTRO diverso (solo prove) apre comunque ~/.claude/registro */}
@@ -159,7 +162,7 @@ export function Casella() {
   if (!c.progetti.length && !c.proposti.length) {
     return (
       <div className="vista-clotch-ai">
-        <Vuoto icona="posta" titolo="Niente aspetta te" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
+        <Vuoto icona="posta" titolo="Nessuna richiesta" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
           <Bottone tipo="secondario" onClick={() => n.apri("clotch-ai")}>Scrivi a clotch AI</Bottone>
         </Vuoto>
       </div>

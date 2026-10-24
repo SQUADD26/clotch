@@ -23,3 +23,8 @@ test("scena: elenco vuoto di base, messaggi a pagine dalla fine, canali che scri
     [[], { indice: 0, messaggi: 0, immagini: 0, altro: 0 }, {}]);
   assert.equal(rispostaScena(s, "sessioni:svuota", []), undefined);
 });
+
+test("scena (#581): i canali di clotch AI rispondono sempre con un esito, come il main, mai undefined", () => {
+  assert.deepEqual(rispostaScena({}, "clotch-ai:avvia", []), { ok: true, testo: "" });
+  for (const cmd of ["ferma_tutto", "obiettivo", "regola", "annulla"]) assert.equal((rispostaScena({}, "clotch-ai:comando", [cmd, {}]) as { esito: string }).esito, "ok");
+});

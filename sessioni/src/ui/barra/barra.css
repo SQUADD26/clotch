@@ -5,6 +5,10 @@
 }
 .pezzo-barra .riga:hover, .pezzo-barra .riga.passaggio { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-barra .riga.scelta, .pezzo-barra .riga-sessione:active { background: var(--colore-fondo-riga-scelta); } /* la riga sessione è un div: il :active dei bottoni non la copre */
+/* la riga scelta ha in più una barra a sinistra: senza, scelta e passaggio erano quasi uguali (#641) */
+.pezzo-barra .riga.scelta { box-shadow: inset var(--spazio-0-5) 0 0 var(--colore-fondo-accento); }
+.pezzo-barra .pallino-non-letta { flex: none; width: var(--spazio-2); height: var(--spazio-2); border-radius: 50%; background: var(--colore-fondo-accento); }
+.pezzo-barra .vuoto-filtri { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spazio-2); padding: var(--spazio-2); }
 .pezzo-barra .riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pezzo-barra .riga .lato { flex: none; white-space: nowrap; }
 .pezzo-barra .riga.titolo-sezione, .pezzo-barra .riga.titolo-sezione:hover { background: none; }
@@ -20,12 +24,20 @@
 .pezzo-barra .gruppo { display: flex; flex-direction: column; gap: var(--spazio-0-5); } /* 101:9109: 2 px tra cartella e sessioni */
 .pezzo-barra .sessioni-gruppo { display: flex; flex-direction: column; gap: var(--spazio-0-5); padding-left: var(--spazio-6); }
 .pezzo-barra .riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
-.pezzo-barra .riga-sessione:hover .azioni, .pezzo-barra .riga-sessione.passaggio .azioni { display: flex; }
+.pezzo-barra .riga-sessione:hover .azioni, .pezzo-barra .riga-sessione.passaggio .azioni, .pezzo-barra .riga-sessione:focus-within .azioni { display: flex; }
 /* al passaggio le azioni prendono il posto di stato e PR: senza, il titolo di una riga con freccia e PR si riduceva a una lettera (#522) */
-.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno,
-.pezzo-barra .riga-sessione:hover .indicatore-pr, .pezzo-barra .riga-sessione.passaggio .indicatore-pr { display: none; }
+.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno, .pezzo-barra .riga-sessione:focus-within .segno,
+.pezzo-barra .riga-sessione:hover .indicatore-pr, .pezzo-barra .riga-sessione.passaggio .indicatore-pr, .pezzo-barra .riga-sessione:focus-within .indicatore-pr { display: none; }
+.pezzo-barra .segno { display: flex; align-items: center; gap: var(--spazio-1); }
 /* madri, figlie e PR (101:34605): freccia dopo il titolo, indicatore PR a destra */
 .pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
+/* icona e freccia sono 16 px: l'area del clic cresce di 2 px per lato, 20×20 (minimo HIG macOS), l'aspetto non cambia (#962) */
+.pezzo-barra .riga-sessione > button:not(.bottone-icona) { position: relative; }
+/* il bottone dell'icona apre un pannello, non la sessione: ha il suo passaggio e il suo premuto sopra quello della riga (#977) */
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"] { border-radius: var(--raggio-md); }
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"]:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-barra .riga-sessione > button[aria-label="Icona della sessione"]:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-bottone-secondario); }
+.pezzo-barra .riga-sessione > button:not(.bottone-icona)::before { content: ""; position: absolute; inset: calc(-1 * var(--spazio-0-5)); }
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
 
@@ -68,6 +80,7 @@
   display: flex; flex-direction: column; background: var(--colore-fondo-attesa);
 }
 .pezzo-barra .banda .riga-banda { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-barra .banda .riga-banda button:hover { color: var(--colore-testo-primario); }
 .pezzo-barra .banda .titolo { flex: 1; min-width: 0; }
 .pezzo-barra .banda .dettaglio { white-space: nowrap; overflow: hidden; }
 

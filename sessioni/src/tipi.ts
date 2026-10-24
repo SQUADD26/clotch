@@ -77,7 +77,7 @@ export interface PrInfo { numero: number; url: string; stato: PrSessione["stato"
 export interface InfoSessione {
   /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
   contesto: number | null;
-  file: { quanti: number; aggiunte: number; tolte: number };
+  file: { quanti: number; aggiunte: number; tolte: number; nomi?: string[] };
   /** Tutte le PR della sessione (file dell'app + `pr-link` della trascrizione); assente = nessuna. */
   prs?: PrInfo[];
 }
@@ -117,7 +117,7 @@ export type Messaggio =
       esito: { testo: string; errore: boolean; immagini?: RifImmagine[] } | null;
       t: number | null;
     }
-  | { tipo: "errore"; testo: string; t: number | null };
+  | { tipo: "errore"; testo: string; t: number | null; /** errore di rete che il motore sta ritentando (`api_error`). */ riprova?: { n: number; di: number } };
 
 export interface PaginaMessaggi {
   /** In ordine di tempo. Pagina 0 = i più recenti. */
@@ -231,6 +231,8 @@ export interface CasellaApi {
   copiaImmagine(da: DaImmagine): Promise<boolean>;
   /** Finestra «Salva con nome»; false se annullata. */
   salvaImmagine(da: DaImmagine, nome: string): Promise<boolean>;
+  /** Mostra il file nel Finder. */
+  mostra(percorso: string): Promise<void>;
   /** Le skill dell'account della sessione, in ordine alfabetico. */
   skill(account: string): Promise<SkillNome[]>;
 }
@@ -277,6 +279,8 @@ export interface QuotaUso {
   /** Per finestra (#478): percentuale usata (null senza dato) e quando riparte, in ms; `usato` resta quello del 7 giorni (100 se le 5 ore sono finite). */
   /** Email dell'account: è quella che chiedono `nuova_sessione` e `riprendi_altrove`. */
   email?: string;
+  /** Cartelle dell'account sul Mac (`.claude-x`) con quell'email: la sessione porta il nome della cartella (#993). */
+  cartelle?: string[];
   cinque?: number | null; cinqueFine?: number | null; sette?: number | null; setteFine?: number | null; giorni?: { giorno: string; v: number }[] }
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }

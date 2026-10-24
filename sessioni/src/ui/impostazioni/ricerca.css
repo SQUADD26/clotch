@@ -1,5 +1,5 @@
 /* figma: 119-57161 — «comando cerca» col testo scritto, «risultati»; 119-57301 — «nessun risultato» */
-.pezzo-impostazioni .cerca-voce:focus-within, .pezzo-impostazioni .cerca-voce.piena { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .cerca-voce:hover, .pezzo-impostazioni .cerca-voce:has(> input:hover), .pezzo-impostazioni .cerca-voce:focus-within, .pezzo-impostazioni .cerca-voce.piena { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-impostazioni .cerca-voce input { flex: 1; min-width: 0; }
 .pezzo-impostazioni .cerca-voce input::placeholder { color: var(--colore-testo-primario); }
 

@@ -25,7 +25,7 @@ for (const { f, i, r } of righe) {
   const posto = `${f}:${i}`, fam = f.replace('.jsonl', '');
   let v; try { v = JSON.parse(r); } catch { errori.push(`${posto}: JSON non valido`); continue; }
   const pre = (prefissi[fam] ??= String(v.id ?? '').split('-')[0]);
-  if (!/^[A-Z]{3,4}$/.test(pre)) { errori.push(`${posto}: id «${v.id}» senza prefisso di 3-4 lettere maiuscole`); continue; }
+  if (!/^[A-Z][A-Z0-9]{2,3}$/.test(pre)) { errori.push(`${posto}: id «${v.id}» senza prefisso di 3-4 lettere maiuscole o cifre (ABC-001)`); continue; }
   const altro = Object.entries(prefissi).find(([g, p]) => p === pre && g !== fam);
   if (altro) errori.push(`${posto}: prefisso ${pre} già usato da ${altro[0]}.jsonl`);
   if (!new RegExp(`^${pre}-\\d{3}$`).test(v.id ?? '')) errori.push(`${posto}: id «${v.id}» non è ${pre}-001…`);

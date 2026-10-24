@@ -6,10 +6,11 @@ import { Bottone } from "./Bottone";
 import "./stati.css";
 
 /** Vuoto ed errore: titolo, testo e bottoni al centro della superficie. Testi dal frame Figma della situazione. */
-export function MessaggioAlCentro({ titolo, corpo, children }: { titolo: string; corpo: string; children?: ReactNode }) {
+/** `allarme`: un errore, VoiceOver lo dice appena compare (#866). */
+export function MessaggioAlCentro({ titolo, corpo, allarme, children }: { titolo: string; corpo: string; allarme?: boolean; children?: ReactNode }) {
   return (
-    <div className="messaggio-al-centro">
-      <div className="t-xl">{titolo}</div>
+    <div className="messaggio-al-centro" role={allarme ? "alert" : undefined}>
+      <div className="t-xl" role="heading" aria-level={2}>{titolo}</div>
       <div className="t-base secondario">{corpo}</div>
       {children && <div className="bottoni">{children}</div>}
     </div>
@@ -19,7 +20,7 @@ export function MessaggioAlCentro({ titolo, corpo, children }: { titolo: string;
 /** Errore con «Riprova» (testo di 101-9090): per una chiamata fallita di dati.ts. */
 export function StatoErrore({ titolo, corpo, riprova, children }: { titolo: string; corpo: string; riprova(): void; children?: ReactNode }) {
   return (
-    <MessaggioAlCentro titolo={titolo} corpo={corpo}>
+    <MessaggioAlCentro titolo={titolo} corpo={corpo} allarme>
       {children}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
@@ -38,12 +39,22 @@ export function NessunaSessione({ aggiungi, impostazioni }: { aggiungi(): void; 
 
 const IMPOSTAZIONI_DI_SISTEMA = "/System/Applications/System Settings.app"; // shortcut: apre l'app, non il pannello «Accesso completo al disco»; da cambiare se serve il pannello
 
-/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l'accesso completo al disco del Mac. */
-export function CartellaNonLeggibile({ errore, riprova }: { errore: ErroreLettura; riprova(): void }) {
-  const permesso = errore.messaggio === "permesso negato";
+/** Il messaggio del main (jsonl.ts `msgErrore`) in parole semplici: gli errori di sistema, in inglese e con percorsi, non si mostrano. */
+export const motivoErrore = (m: string, ospite?: string | null) => m === "permesso negato" ? "permesso negato" : m === "file sparito" ? "non c’è più"
+  : /non trovata sul disco/i.test(m) ? (ospite ? `la trascrizione è su ${ospite}, non su questo Mac` : "la trascrizione non è sul disco") : "non si apre";
+
+const MAX_CARTELLE = 3;
+
+/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l’accesso completo al disco del Mac.
+ *  Con più cartelle le nomina tutte (le prime tre, poi «e altre N»). */
+export function CartellaNonLeggibile({ errori, riprova }: { errori: ErroreLettura[]; riprova(): void }) {
+  const permesso = errori.some((e) => e.messaggio === "permesso negato");
+  const uno = errori.length === 1;
+  const lista = errori.slice(0, MAX_CARTELLE).map((e) => `${e.percorso}: ${motivoErrore(e.messaggio)}`).join("\n");
+  const altre = errori.length > MAX_CARTELLE ? `\ne altre ${errori.length - MAX_CARTELLE}` : "";
   return (
-    <MessaggioAlCentro titolo="Cartella non leggibile"
-      corpo={`clotch non può leggere ${errore.percorso}: ${errore.messaggio}.${permesso ? "\nDai a clotch l'accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
+    <MessaggioAlCentro allarme titolo={uno ? "Cartella non leggibile" : "Cartelle non leggibili"}
+      corpo={`${uno ? `clotch non può leggere ${lista}.` : `clotch non può leggere ${errori.length} cartelle:\n${lista}${altre}`}${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
       {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
@@ -66,7 +77,7 @@ const righe = nodi.filter((n) => /sagoma$/.test(n.nome) && n.nome !== "sagoma").
 export function Sagome() {
   const stileFilo: CSSProperties = { gap: v(filo.variabili.itemSpacing), paddingTop: v(filo.variabili.paddingTop), paddingBottom: v(filo.variabili.paddingBottom) };
   return (
-    <div className="sagome" style={stileFilo} aria-busy="true">
+    <div className="sagome" style={stileFilo} role="progressbar" aria-label="Caricamento" aria-busy="true">
       {righe.map((r, i) => (
         <div key={i} className={r.bolla ? "riga bolla" : "riga"} style={{ gap: v(r.gap) }}>
           {r.sagome.map((s, j) => (

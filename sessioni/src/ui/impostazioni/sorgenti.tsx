@@ -1,11 +1,11 @@
 // figma: 101-10300 — Impostazioni · Sorgenti: da quali app si leggono le sessioni.
-import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
+import { Gruppo, Interruttore, Pagina, Riga, VuotoLista } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
 
 const SORGENTI: [Chiave, string, string][] = [
   ["sorgenteClaudeCode", "Claude Code", "Sessioni da terminale, da tutte le cartelle degli account"],
-  ["sorgenteClaude", "Claude", "Sessioni dell'app Claude per Mac"],
-  ["sorgenteCodex", "Codex", "Sessioni di Codex in ~/.codex"],
+  ["sorgenteClaude", "Claude", "Sessioni dell’app Claude per Mac"],
+  ["sorgenteCodex", "Codex", "Sessioni di Codex su questo computer"],
   ["sorgenteCursor", "Cursor", "Chat di Cursor. Si leggono, ma non ricevono messaggi"],
 ];
 
@@ -20,6 +20,8 @@ export default function Sorgenti() {
           </Riga>
         ))}
       </Gruppo>
+      {/* tutte spente: l'elenco delle sessioni resta vuoto, e la pagina lo dice (#957) */}
+      {SORGENTI.every(([k]) => v[k] !== true) && <Gruppo><VuotoLista titolo="Nessuna sorgente attiva" corpo="clotch non legge sessioni finché non ne accendi almeno una." /></Gruppo>}
     </Pagina>
   );
 }

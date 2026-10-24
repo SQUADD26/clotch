@@ -18,6 +18,8 @@ export interface SessioneApp {
   ultimaAttivita: number | null;
   /** Profilo dell'app: `Claude`, `Claude-x`. */
   profilo: string;
+  /** Uuid dell'account che ha la sessione: cartella `claude-code-sessions/<uuid>/<org>/` (non il profilo: `Claude` ne ha più d'uno). */
+  uuid?: string | null;
   file: string;
   app?: AppSessione;
 }
@@ -56,6 +58,7 @@ function daFile(file: string, profilo: string): SessioneApp | null | undefined {
   }
   // come Clotch: niente attività pianificate e niente sessioni senza id CLI
   if (!d || testo(d.scheduledTaskId) || !testo(d.cliSessionId)) return null;
+  const pezzi = file.split(path.sep);
   return {
     idApp: testo(d.sessionId) ?? path.basename(file, ".json"),
     cliId: d.cliSessionId,
@@ -68,6 +71,7 @@ function daFile(file: string, profilo: string): SessioneApp | null | undefined {
     archiviata: d.isArchived === true,
     ultimaAttivita: aMillisecondi(d.lastActivityAt),
     profilo,
+    uuid: pezzi.at(-4) === "claude-code-sessions" ? pezzi.at(-3)! : null,
     file,
     app: datiApp(d),
   };

@@ -18,7 +18,9 @@ export function voci(tokens) {
   const out = new Map(); // nome CSS -> {tipo, valore}
   for (const [col, modi] of Object.entries(tokens)) {
     if (col.startsWith('$')) continue;
-    const modo = Object.keys(modi).find((m) => !m.startsWith('$')); // un solo tema: lo scuro
+    const modi_ = Object.keys(modi).filter((m) => !m.startsWith('$'));
+    if (modi_.length !== 1) throw new Error(`tokens.json: «${col}» ha ${modi_.length} modi (${modi_.join(', ')}); l'app è solo scura, ne serve uno`);
+    const modo = modi_[0];
     const giu = (nodo, via) => {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;

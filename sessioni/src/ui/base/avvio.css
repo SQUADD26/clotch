@@ -1,6 +1,8 @@
 /* figma: 101-30345 — «Avvio»: logo 48 px al centro della finestra, corpo nascosto */
-.cornice.in-avvio .corpo { visibility: hidden; }
-.avvio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.cornice.in-avvio .corpo { pointer-events: none; }
+.avvio { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spazio-4); pointer-events: none; }
+.avvio[data-fine] { opacity: 0; }
+.avvio .lento { display: flex; flex-direction: column; align-items: center; gap: var(--spazio-2); pointer-events: auto; }
 .avvio .logo {
   width: var(--misura-logo); height: var(--misura-logo); border-radius: var(--raggio-lg);
   display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-accento);
@@ -8,3 +10,4 @@
 .avvio .logo .icona { width: var(--misura-logo-icona); height: var(--misura-logo-icona); }
 /* senza dati la campana e i comandi globali (Ferma tutto, Non disturbare) non dicono niente: il disegno li toglie */
 .cornice.in-avvio .bottone-attivita, .cornice.in-avvio .comandi-globali { visibility: hidden; }
+.avvio .lento .bottoni { display: flex; gap: var(--spazio-2); }

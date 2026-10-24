@@ -50,7 +50,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
 
   const avvia = async (ripreso: string | null) => {
     const m = mancano(v);
-    if (m.host || m.nome || m.cartella) { setProvato(true); return; }
+    if (m.host || m.nome || m.cartella) { setProvato(true); requestAnimationFrame(() => document.querySelector<HTMLElement>(".dialogo input[aria-invalid=true]")?.focus()); return; }
     const da = Date.now();
     setCorsa((c) => ({ da: c?.da ?? da, ripreso: ripreso ? { passo: ripreso, t: da } : null })); setEsito(null); setErrore(null); setFase("prep");
     const e = await comandaEsito("macchina_aggiungi", argomentiAggiungi(v));
@@ -65,7 +65,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
     return (
       <Dialogo largo centrato titolo="Aggiungi macchina" corpo="Collega una macchina SSH e preparala per le sessioni." onChiudi={chiudi}
         bottoni={<><Bottone tipo="secondario" onClick={onChiudi}>Annulla</Bottone><Bottone tipo="primario" onClick={() => void avvia(null)}>Aggiungi</Bottone></>}>
-        <FormMacchina v={v} proposte={proposte} provato={provato} onCambia={(x) => setV((y) => ({ ...y, ...x }))} onProposta={(x) => setV((y) => daProposta(x, y))} onChiave={scegliChiave} />
+        <FormMacchina v={v} proposte={proposte} provato={provato} onCambia={(x) => setV((y) => ({ ...y, ...x }))} onProposta={(x) => setV((y) => daProposta(x, y))} onChiave={scegliChiave} onInvio={() => void avvia(null)} />
         {errore && <AvvisoPasso testo={errore} />}
       </Dialogo>
     );
@@ -80,7 +80,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
     <Dialogo largo centrato titolo={titolo} corpo={corpo} onChiudi={chiudi}
       bottoni={lavora ? undefined : pronta
         ? <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => onNuovaSessione(v.nome)}>Nuova sessione</Bottone></>
-        : <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => void avvia(ripartiDa)}>{mano ? "Ho fatto, riprova" : "Riprova"}</Bottone></>}>
+        : <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => void avvia(ripartiDa)}>Riprova</Bottone></>}>
       <Passi righe={righe} />
       {github ? <BloccoCodice riga={github} />
         : !lavora && mano?.comando ? <BloccoComando riga={mano} />

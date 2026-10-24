@@ -1,6 +1,6 @@
 // Movimento (#520): ogni cosa animata, misurata fotogramma per fotogramma con document.getAnimations() e requestAnimationFrame.
 // Durata e curva devono essere quelle dei token (tempo/*, curva/*); con «riduci movimento» niente spostamenti né infinite.
-// Finestra visibile sotto xvfb (una finestra nascosta salta le View Transition), muta. Stampa una riga «MOV …» per misura.
+// Finestra visibile sotto xvfb con il fuoco (senza fuoco le View Transition non partono), muta. Stampa una riga «MOV …» per misura.
 const { app, BrowserWindow, ipcMain } = require('electron');
 process.env.CLOTCH_TEST_SILENT = '1';
 app.commandLine.appendSwitch('mute-audio');
@@ -18,10 +18,11 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
   const t0 = performance.now(); let prima = t0;
   const tick = (t) => {
     passi.push(t - prima); prima = t;
-    for (const a of document.getAnimations()) if (!viste.has(a)) {
+    // anche le ombre (uscita dei sovrapposti: copia muta in uno shadow root, base/Sovrapposto.tsx)
+    for (const a of [...document.getAnimations(), ...[...document.body.children].flatMap((e) => e.shadowRoot?.getAnimations() ?? [])]) if (!viste.has(a)) {
       const tempi = a.effect.getTiming(), chiavi = a.effect.getKeyframes();
       viste.set(a, { nome: a.animationName ?? a.transitionProperty, pseudo: a.effect.pseudoElement ?? '', classe: String(a.effect.target?.className ?? ''),
-        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations });
+        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations, primo: a.effect.target ? Number(getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null).opacity) : null });
     }
     if (t - t0 < ms) requestAnimationFrame(tick); else fine({ animazioni: [...viste.values()], passi: passi.slice(1) });
   };
@@ -30,13 +31,14 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
-  const win = new BrowserWindow({ show: true, focusable: false, width: 1440, height: 900,
+  const win = new BrowserWindow({ show: true, width: 1440, height: 900,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true, backgroundThrottling: false } });
   const run = (fn) => win.webContents.executeJavaScript(typeof fn === 'string' ? fn : `(${fn})()`);
   const wait = async (test, ms = 8000) => { const fine = Date.now() + ms; while (!(await run(test))) { if (Date.now() > fine) throw new Error('Condizione UI non raggiunta: ' + test); await new Promise((r) => setTimeout(r, 20)); } };
   try {
     await win.loadFile(path.join(root, 'renderer/index.html'));
-    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden);
+    win.focus(); win.webContents.focus(); // le transizioni partono solo nella finestra che ha il fuoco
+    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden && document.hasFocus());
     await run(REGISTRA + ";0");
     const tok = await run(() => Object.fromEntries(['tempo-entrata', 'tempo-uscita', 'tempo-pressione', 'tempo-spostamento', 'curva-entrata', 'curva-uscita', 'curva-spostamento', 'scala-premuto']
       .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim()])));
@@ -67,7 +69,7 @@ app.whenReady().then(async () => {
     await misura('MOV-002', 'barra aperta', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E]]);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
     // pannello: il bottone gira obiettivo -> info -> chiuso
-    const pannello = clic('button[aria-label="Pannello"]');
+    const pannello = clic('.intestazione button[aria-expanded]:is([aria-label="Mostra il pannello"], [aria-label="Chiudi il pannello"], [aria-label="Mostra Info sessione"])');
     const statoPannello = () => run(() => !!document.querySelector('.pannello'));
     while (!(await statoPannello())) await run(`(${pannello})()`), await new Promise((r) => setTimeout(r, 300));
     await misura('MOV-003', 'pannello info', pannello, [['::view-transition-group(pannello)', ...S]]);
@@ -83,10 +85,10 @@ app.whenReady().then(async () => {
     await wait(() => !!document.querySelector('.pezzo-chat .testata[aria-expanded="false"]'));
     await misura('MOV-017', 'blocco del filo aperto', clic('.pezzo-chat .testata[aria-expanded="false"]'), [['::view-transition-new(superficie)', ...E], ['::view-transition-old(superficie)', ...E]]);
     await misura('MOV-017', 'blocco del filo chiuso', clic('.pezzo-chat .testata[aria-expanded="true"]'), [['::view-transition-new(superficie)', ...E]]);
-    // avviso: «Nascondi cartella» dal menu della cartella, poi chiuso dalla sua X
-    await run(() => document.querySelector('.pezzo-barra button.riga[aria-expanded]').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 40, clientY: 200 })));
-    await wait(() => [...document.querySelectorAll('[role="menuitem"], .voce')].some((v) => v.textContent.includes('Nascondi cartella')));
-    const r = await misura('MOV-009', 'avviso entra', `() => [...document.querySelectorAll('[role="menuitem"], .voce')].find((v) => v.textContent.includes('Nascondi cartella')).click()`, [], 400);
+    // avviso: «Copia ID sessione» dal menu della riga (avviso di esito, barra/esiti.ts), poi chiuso dalla sua X
+    await run(() => document.querySelector('.riga-sessione').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 40, clientY: 200 })));
+    await wait(() => [...document.querySelectorAll('[role="menuitem"], .voce')].some((v) => v.textContent.includes('Copia ID sessione')));
+    const r = await misura('MOV-009', 'avviso entra', `() => [...document.querySelectorAll('[role="menuitem"], .voce')].find((v) => v.textContent.includes('Copia ID sessione')).click()`, [], 400);
     const avviso = r.animazioni.find((a) => /view-transition-new\(avviso-\d+\)/.test(a.pseudo));
     assert.ok(avviso, 'MOV-009: l\'avviso entra con la sua transizione');
     console.log(`MOV MOV-009 avviso entra ${avviso.pseudo} durata=${avviso.durata}ms curva=${curva(avviso.curva)}`);
@@ -97,6 +99,17 @@ app.whenReady().then(async () => {
     console.log(`MOV MOV-010 avviso esce ${esce.pseudo} durata=${esce.durata}ms curva=${curva(esce.curva)}`);
     assert.equal(esce.durata, ms(tok['tempo-uscita'])); assert.equal(curva(esce.curva), curva(tok['curva-uscita']));
     await run(() => [...document.querySelectorAll('.avviso-comparsa button')].find((b) => b.textContent === 'Annulla')?.click());
+
+    // sovrapposto chiuso a metà apertura (M10): l'uscita parte dall'opacità raggiunta, non da 1
+    await run(`(${clic('.intestazione button[aria-haspopup="menu"]')})()`);
+    await new Promise((r) => setTimeout(r, 50));
+    const aperto = await run(() => Number(getComputedStyle(document.querySelector('.sovrapposto')).opacity));
+    const uscita = await run(`window.registra(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), 300)`);
+    const m10 = uscita.animazioni.filter((a) => a.classe.includes('esce'));
+    console.log(`MOV MOV-022 sovrapposto interrotto aperto=${aperto.toFixed(2)} uscite=${m10.length} ${m10.map((a) => `parte=${a.primo.toFixed(2)} durata=${a.durata}ms`).join(' ')}`);
+    assert.ok(m10.length >= 1, 'MOV-022: il menu chiuso a metà ha la sua uscita');
+    assert.ok(aperto < 0.9 && m10.every((a) => Math.abs(a.primo - aperto) < 0.25), `MOV-022: aperto a ${aperto}, l'uscita parte da ${m10.map((a) => a.primo)}`);
+    assert.ok(m10.every((a) => a.durata === ms(tok['tempo-uscita'])), 'MOV-022: uscita in tempo-uscita');
 
     // pressione: un bottone icona premuto scende a scala-premuto in tempo-pressione
     const c = await run(() => { const r = document.querySelector('button[aria-label="Barra laterale"]').getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; });
@@ -120,6 +133,13 @@ app.whenReady().then(async () => {
     await misura('MOV-012', 'barra sopra apre', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E], ['::view-transition-new(velo)', ...E]]);
     await misura('MOV-013', 'barra sopra chiude', clic('.velo-barra'), [['::view-transition-old(barra)', ...U], ['::view-transition-old(velo)', ...U]]);
 
+    // due cambi di struttura nello stesso fotogramma: la prima transizione è saltata, niente errore non gestito (#750)
+    const rifiuti = await run(`new Promise((fine) => { const r = []; const f = (e) => r.push(String(e.reason)); addEventListener('unhandledrejection', f);
+      const b = document.querySelector('button[aria-label="Barra laterale"]'); b.click(); b.click();
+      setTimeout(() => { removeEventListener('unhandledrejection', f); fine(r); }, 400); })`);
+    assert.deepEqual(rifiuti, [], '#750: promesse di View Transition rifiutate senza gestore');
+    console.log('MOV-023 due transizioni nello stesso fotogramma: 0 errori');
+
     // riduci movimento: niente gruppi che si spostano, niente scale né infinite
     // controllo positivo: uno spinner gira (infinito, tempo-giro) finché il movimento non è ridotto
     await run(() => { document.body.append(Object.assign(document.createElement('span'), { className: 'gira prova-gira' })); return 0; });
@@ -130,9 +150,12 @@ app.whenReady().then(async () => {
     const rr = await run(`window.registra(${clic('button[aria-label="Barra laterale"]')}, 400)`);
     const gruppi = rr.animazioni.filter((a) => a.pseudo.startsWith('::view-transition-group'));
     const infinite = await run(() => document.getAnimations().filter((a) => a.effect.getTiming().iterations === Infinity).length);
-    const scivola = await run(() => getComputedStyle(document.documentElement).getPropertyValue('--scivola-barra').trim());
+    // ogni spostamento e scala delle keyframes di movimento.css passa da queste variabili: con movimento ridotto sono neutre
+    const fermi = await run(() => Object.fromEntries(['--scivola-barra', '--scivola-pannello', '--sposta-entrata', '--scala-entrata', '--scala-premuto']
+      .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue(n).trim()])));
+    const scivola = fermi['--scivola-barra'];
     console.log(`MOV ridotto infinite_prima=${giri} gruppi=${gruppi.length} infinite=${infinite} scivola=${scivola} animazioni=${rr.animazioni.map((a) => a.pseudo || a.nome).join(',')}`);
-    assert.equal(gruppi.length, 0); assert.equal(infinite, 0); assert.equal(scivola, '0%');
+    assert.equal(gruppi.length, 0); assert.equal(infinite, 0); assert.deepEqual(fermi, { '--scivola-barra': '0%', '--scivola-pannello': '0%', '--sposta-entrata': '0px', '--scala-entrata': '1', '--scala-premuto': '1' }, JSON.stringify(fermi));
     console.log('MOVIMENTO_OK');
   } catch (e) { console.error(e); process.exitCode = 1; }
   app.quit();

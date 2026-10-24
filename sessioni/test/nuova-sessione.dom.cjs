@@ -49,7 +49,7 @@ app.whenReady().then(async () => {
     await check('INVIO_MANDA_NUOVA_SESSIONE_COI_CAMPI', async () => {
       esito = { esito: 'ok', testo: 'Sessione aperta.', sessione: 'abcd1234', macchina: 'mac' };
       await load('vuota');
-      assert.deepEqual(await selettori(), ['Questo computer', 'goal-notch', 'dev', 'Worktree']);
+      assert.deepEqual(await selettori(), ['Questo computer', 'goal-notch', 'dev', 'Copia di lavoro']);
       await scrivi('Aggiungi lo stato vuoto');
       await invio();
       await attendi(() => comandi.length === 1);
@@ -70,8 +70,8 @@ app.whenReady().then(async () => {
     });
     await check('WORKTREE_SPENTO_E_RAMO_SCELTO', async () => {
       await load('vuota');
-      await clicca('.selettore', 'Worktree');
-      await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.includes('Senza worktree')));
+      await clicca('.selettore', 'Copia di lavoro');
+      await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.includes('Senza copia di lavoro')));
       assert.equal(await run(() => document.querySelector('.nota-avvio').textContent), 'Lavora su dev direttamente dentro goal-notch.');
       await clicca('.selettore', 'dev');
       await wait(() => !!document.querySelector('.menu-avvio input'));
