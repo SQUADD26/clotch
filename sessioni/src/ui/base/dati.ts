@@ -90,9 +90,12 @@ function iscriviElenco(f: () => void) {
 }
 const ricaricaElenco = () => caricaElenco(true), riprovaElenco = () => caricaElenco(false);
 
+/** Stato dell'elenco senza le preferenze (nessun ascolto in più): per chi guarda solo se è arrivato (avvio, tasti). */
+export const useStatoElenco = () => ({ ...useSyncExternalStore(iscriviElenco, () => elenco), riprova: riprovaElenco });
+
 /** Elenco delle sessioni, corretto in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
 export function useElenco() {
-  const c = { ...useSyncExternalStore(iscriviElenco, () => elenco), ricarica: ricaricaElenco, riprova: riprovaElenco };
+  const c = { ...useStatoElenco(), ricarica: ricaricaElenco };
   const pref = usePreferenze().dati;
   // «Rinomina…» (#460): il nome dato in clotch prende il posto del titolo ovunque l'app lo mostra; il file della sessione non cambia
   const dati = useMemo(() => c.dati && { ...c.dati, sessioni: c.dati.sessioni.map((s) => (pref[s.id]?.nome ? { ...s, titolo: pref[s.id].nome! } : s)) }, [c.dati, pref]);
