@@ -3,7 +3,7 @@
 
 .barra-titolo {
   height: var(--misura-barra-titolo); flex: none; padding: 0 var(--spazio-5); gap: var(--spazio-6);
-  display: flex; align-items: center; -webkit-app-region: drag; position: relative; container: barra-titolo / inline-size;
+  display: flex; align-items: center; -webkit-app-region: drag; position: relative;
 }
 .semaforo { display: flex; gap: var(--spazio-2); }
 .luce { width: var(--misura-semaforo); height: var(--misura-semaforo); border-radius: var(--raggio-pieno); visibility: hidden; }

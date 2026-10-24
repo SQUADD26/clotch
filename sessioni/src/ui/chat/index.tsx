@@ -2,6 +2,7 @@
 // Vuota 101:9841; caricamento ed errore coi pezzi della base. clotch AI monta `FiloClotchAi` e `CasellaClotchAi`.
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { avvisa } from "../base/Avvisi";
+import { Bottone } from "../base/Bottone";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
 import { aggiungi } from "../impostazioni/account";
@@ -75,6 +76,11 @@ function ChatSessione() {
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={elenco.errore} riprova={elenco.riprova} />;
   if (!s) {
     if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errore={elenco.dati.errori[0]} riprova={elenco.riprova} />;
+    if (sessione && elenco.dati) return (
+      <MessaggioAlCentro titolo="Sessione non trovata" corpo="Questa sessione non è più nell'elenco: forse è stata archiviata o il collegamento è vecchio.">
+        {recente && <Bottone onClick={() => apri("sessione", recente)}>Apri la più recente</Bottone>}
+      </MessaggioAlCentro>
+    );
     return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
   }
   if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
