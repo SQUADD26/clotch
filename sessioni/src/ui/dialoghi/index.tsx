@@ -1,8 +1,8 @@
 // figma: 101-22137 — monta i dialoghi dell'app (aggiornamento, scorciatoie, rinomina, novità) e i tasti che non stanno in «Impostazioni · Scorciatoie»:
 // ⌘/ apre le scorciatoie, ⌃↑ e ⌃↓ passano alla sessione prima e dopo. Nelle scene di prova `sezione` = «dialogo-aggiornamento», «dialogo-scorciatoie» o «dialogo-rinomina:<nome>».
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useApriSessione } from "../barra/apri";
-import { alternaDialogo, apriDialogo, useDialogo, type DatiDialoghi } from "../base/dialoghi";
+import { alternaDialogo, apriDialogo, ultimoApritore, useDialogo, type DatiDialoghi } from "../base/dialoghi";
 import { useElenco } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
 import { provaDi } from "../chat/testi";
@@ -26,6 +26,15 @@ export function Dialoghi() {
     const rinomina = provaDi(n.sezione, "dialogo-rinomina"); // 101-22044: il nome già scritto nel campo
     if (rinomina !== null) apriDialogo("rinomina", { titolo: "Rinomina sessione", valore: rinomina, nota: "Il nome cambia solo in clotch.", salva() {} });
   }, [n.sezione]);
+  // chiuso il dialogo, il fuoco torna a chi lo aveva aperto (la voce di menu non c'è più: il suo bottone)
+  const eraAperto = useRef(false);
+  useEffect(() => {
+    if (aperto) { eraAperto.current = true; return; }
+    if (!eraAperto.current) return;
+    eraAperto.current = false;
+    const a = ultimoApritore();
+    if (a?.isConnected && (!document.activeElement || document.activeElement === document.body)) a.focus();
+  }, [aperto]);
   useEffect(() => {
     const premi = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.repeat) return;

@@ -41,7 +41,7 @@ const chiaveDi = (chiave: string) => new RegExp(`(^|\\|)${chiave}(\\||:|$)`).tes
 const daiFuoco = () => {
   const a = document.activeElement;
   if (a && a !== document.body && a.isConnected && !a.matches(".area-principale")) return;
-  (document.querySelector<HTMLElement>(".area-principale textarea:not([disabled])") ?? document.querySelector<HTMLElement>(".area-principale"))?.focus({ preventScroll: true });
+  (document.querySelector<HTMLElement>(".area-principale textarea:not([disabled])") ?? document.querySelector<HTMLElement>(".pezzo-impostazioni input:not([type=hidden]):not([disabled])") ?? document.querySelector<HTMLElement>(".area-principale"))?.focus({ preventScroll: true });
 };
 const cambia = (fai: () => void) => conTransizione(fai).then(() => void [0, 300].forEach((ms) => setTimeout(daiFuoco, ms))); // la casella della chat compare dopo i messaggi: un secondo giro
 
@@ -69,8 +69,8 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null,
       daClotchAi: vista === "sessione" && VISTE_CLOTCH_AI.includes(passi[i].vista) };
     if (passo.vista === passi[i].vista && passo.sessione === passi[i].sessione && passo.sezione === passi[i].sezione) return { passi, i };
-    // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine; la pagina vuota dell'avvio non resta nella cronologia.
-    if ((vista === "impostazioni" && passi[i].vista === "impostazioni") || (passi[i].vista === "sessione" && !passi[i].sessione))
+    // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine; la vista senza sessione (vuoto, errore, la più recente) resta nella cronologia: Indietro ci riporta (#900).
+    if (vista === "impostazioni" && passi[i].vista === "impostazioni")
       return { passi: [...passi.slice(0, i), passo], i };
     return { passi: [...passi.slice(0, i + 1), passo], i: i + 1 };
   }), []);

@@ -55,7 +55,7 @@ export function DialogoOre({ valore, attivo = [0, 0], salva }: DatiDialoghi["ore
           <Fragment key={s}>
             {s === 1 && <span>:</span>}
             <span ref={(el) => { segmenti.current[r * 2 + s] = el; }} className={att?.[0] === r && att[1] === s ? "segmento scelto" : "segmento"}
-              role="spinbutton" tabIndex={0} aria-label={`${nome}, ${s ? "minuti" : "ore"}`} aria-valuemin={0} aria-valuemax={MAX[s]} aria-valuenow={ore[r][s]} aria-valuetext={`${s ? "minuti" : "ore"} ${due(ore[r][s])}`}
+              role="spinbutton" tabIndex={0} aria-label={`${nome}, ${s ? "minuti" : "ore"}`} aria-describedby={uguali ? "errore-ore" : undefined} aria-valuemin={0} aria-valuemax={MAX[s]} aria-valuenow={ore[r][s]} aria-valuetext={`${s ? "minuti" : "ore"} ${due(ore[r][s])}`}
               data-fuoco={attivo[0] === r && attivo[1] === s ? "" : undefined}
               onFocus={() => { scritto.current = ""; setAtt([r, s]); }} onBlur={() => setAtt(null)} onKeyDown={(e) => tasto(e, r, s)}>{due(ore[r][s])}</span>
           </Fragment>
@@ -75,7 +75,7 @@ export function DialogoOre({ valore, attivo = [0, 0], salva }: DatiDialoghi["ore
       bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={uguali} onClick={fai}>Salva</Bottone></>}>
       {riga(0, "Dalle")}
       {riga(1, "Alle", delGiornoDopo(ore) ? "del giorno dopo" : undefined)}
-      {uguali ? <div className="t-sm errore-ore" role="alert">Inizio e fine sono uguali. Scegli due orari diversi.</div> : <div className="t-sm secondario">Niente notifiche in queste ore.</div>}
+      {uguali ? <div id="errore-ore" className="t-sm errore-ore" role="alert">Inizio e fine sono uguali. Scegli due orari diversi.</div> : <div className="t-sm secondario">Niente notifiche in queste ore.</div>}
     </Dialogo>
   );
 }
