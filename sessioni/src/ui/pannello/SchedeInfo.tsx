@@ -5,7 +5,7 @@ import type { InfoSessione, PrSessione, Sessione } from "../../tipi";
 import { ICONA_PR } from "../barra/Pr";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { nomeAccount } from "../chat/testi";
-import { FINESTRA_CONTESTO, percento, testoPr, token } from "./info";
+import { percento, testoPr, token } from "./info";
 import "./info.css";
 
 function Scheda({ titolo, aperta, onAlterna, dettaglio, children }: { titolo: string; aperta: boolean; onAlterna(): void; dettaglio?: string; children?: ReactNode }) {
@@ -53,20 +53,22 @@ export function Ambiente({ s }: { s: Sessione }) {
   );
 }
 
-export function Contesto({ usati, mcp }: { usati: number; mcp: number }) {
+/** `max` = finestra dichiarata dal motore (`contesto_max`); senza, solo i token usati: niente percentuale né «usati / totale». */
+export function Contesto({ usati, max, mcp }: { usati: number; max: number | null; mcp: number }) {
   const [aperta, setAperta] = useState(true);
-  const usato = Math.min(usati / FINESTRA_CONTESTO, 1), libero = FINESTRA_CONTESTO - Math.min(usati, FINESTRA_CONTESTO);
+  const usato = max ? Math.min(usati / max, 1) : 0, libero = max ? max - Math.min(usati, max) : 0;
   return (
     <Scheda titolo="Contesto" aperta={aperta} onAlterna={() => setAperta(!aperta)}>
+      {!max ? <div className="riga-info"><span className="t-sm testo">Usato</span><span className="t-sm secondario">{token(usati)}</span></div> : <>
       <div className="uso">
         <span className="t-sm testo">Usato {percento(usato, 0)}</span>
-        <span className="t-sm secondario">{token(usati)} / {token(FINESTRA_CONTESTO)}</span>
+        <span className="t-sm secondario">{token(usati)} / {token(max)}</span>
       </div>
       <div className="barra-contesto"><span className="parte" style={{ width: `${usato * 100}%` }} /></div>
       <div className="voci-contesto">
         <div className="voce"><span className="campione usato" /><span className="t-sm secondario nome">Usato</span><span className="t-sm secondario">{token(usati)}</span><span className="t-sm">{percento(usato)}</span></div>
         <div className="voce"><span className="campione libero" /><span className="t-sm secondario nome">Spazio libero</span><span className="t-sm secondario">{token(libero)}</span><span className="t-sm">{percento(1 - usato)}</span></div>
-      </div>
+      </div></>}
       {mcp > 0 && <div className="riga-info"><span className="t-sm testo">Strumenti MCP</span><span className="t-sm secondario">{mcp}</span></div>}
     </Scheda>
   );

@@ -231,6 +231,9 @@ export interface ClotchAiApi {
   /** L'app sta leggendo un avviso a voce (Clotch assente), e quando comincia o smette. */
   voce(): Promise<boolean>;
   onVoce(cb: (parla: boolean) => void): () => void;
+  /** Dettatura dell'app (Clotch spento, #470): `true` apre il microfono nel main, `false` lo chiude; il testo capito torna con `onDettatura`. */
+  dettatura(avvia: boolean): Promise<void>;
+  onDettatura(cb: (e: import("./dettatura-app").EventoDettatura) => void): () => void;
 }
 
 /** Impostazioni dell'app (#351) nel file delle preferenze (`SessioniApi.impostazioni`); i valori di partenza sono quelli del disegno. */

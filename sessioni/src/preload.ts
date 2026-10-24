@@ -44,6 +44,12 @@ const clotchAi: ClotchAiApi = {
     ipcRenderer.on("clotch-ai:voce", f);
     return () => ipcRenderer.removeListener("clotch-ai:voce", f);
   },
+  dettatura: (avvia) => ipcRenderer.invoke("clotch-ai:dettatura", avvia),
+  onDettatura: (cb) => {
+    const f = (_e: unknown, e: Parameters<typeof cb>[0]) => cb(e);
+    ipcRenderer.on("clotch-ai:dettatura", f);
+    return () => ipcRenderer.removeListener("clotch-ai:dettatura", f);
+  },
   onRegistro: (cb) => {
     const f = (_e: unknown, r: unknown) => cb(r);
     ipcRenderer.on("clotch-ai:registro", f);

@@ -6,12 +6,15 @@ import { fermaVoce, leggi, staParlando, suVoce } from "../src/voce-app";
 import { statoVoce } from "../src/ui/clotch-ai/statoVoce";
 import { suggerimenti } from "../src/ui/clotch-ai/vista";
 import childProcess = require("node:child_process");
+import fs = require("node:fs");
+import os = require("node:os");
+import path = require("node:path");
 
 const ORA = Date.parse("2026-10-23T14:00:00.000Z");
 const vuoto = (): Registro => leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: "/non/esiste" }); // nome del protocollo del motore
 const chat = (id: string, progetto: string, stato: string, extra: Partial<ChatClotchAi> = {}): ChatClotchAi => ({
   chat: id, titolo: id, madre: null, progetto, account: null, sorgente: null, daHandoff: null, stato, dettaglio: null, aspetto: null, domanda: null, limite: null,
-  richieste: [], battito: ORA, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [], obiettivo: null, passi: [], visto: ORA, fine: null, fineT: null,
+  richieste: [], contestoMax: null, battito: ORA, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [], obiettivo: null, passi: [], visto: ORA, fine: null, fineT: null,
   chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0, ...extra,
 });
 const conClotch = (ascolta: boolean, parla: boolean, t = ORA): Registro => ({ ...vuoto(), clotch: { voce: "accesa", ascolta, parla, t } });
@@ -77,4 +80,18 @@ test("voce dell'app: sta parlando finché say gira, Interrompi lo ferma e chi as
   leggi("Dopo");
   assert.equal(visti.length, 4, "chi ha smesso di ascoltare non riceve più niente");
   console.log("VOCE_APP_STATO_OK parla=false dopo interrompi");
+});
+
+test("parziale di Clotch (claude-config#2572): il testo c'è solo se Roberto parla e il parziale ha meno di 10 s", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "reg-"));
+  const clotch = (eta: number, dati: object) => {
+    fs.writeFileSync(path.join(dir, "2026-10.jsonl"), JSON.stringify({ v: 1, chat: "clotch", tipo: "clotch", t: new Date(Date.now() - eta).toISOString(), dati: { voce: "accesa", parla: false, ...dati } }) + "\n");
+    return leggiRegistro("/non/esiste", { FRIDAY_REGISTRO: dir }).clotch;
+  };
+  assert.equal(clotch(1000, { ascolta: true, testo: "apri il" })?.testo, "apri il");
+  assert.equal(clotch(1000, { ascolta: true, testo: "x".repeat(2500) })?.testo?.length, 2000);
+  assert.equal("testo" in clotch(1000, { ascolta: true })!, false, "fine dettatura: la chiave manca");
+  assert.equal("testo" in clotch(1000, { ascolta: true, testo: "" })!, false);
+  assert.equal("testo" in clotch(11_000, { ascolta: true, testo: "vecchio" })!, false, "parziale di 11 s ignorato");
+  assert.equal("testo" in clotch(1000, { ascolta: false, testo: "fuori ascolto" })!, false);
 });

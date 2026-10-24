@@ -6,6 +6,7 @@ import type { IpcMain } from "electron";
 import { cartellaRegistro, Comando, lettoreRegistro, Registro } from "./clotch-ai";
 import { inviaComando } from "./comandi";
 import { daLeggere, leggi, staParlando, suVoce } from "./voce-app";
+import { avviaDettatura, fermaDettatura } from "./dettatura-app";
 import { cartelleStatoApp, leggiStatoApp } from "./stato-app";
 import { eComandoApp, eseguiComandoApp, type ComandoApp } from "./comandi-app";
 
@@ -23,6 +24,8 @@ export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unkn
   // Voce dell'app (Clotch assente): lo stato «sta parlando» e «Interrompi» del frame 101-37055.
   ipc.handle("clotch-ai:voce", () => staParlando());
   suVoce((parla) => invia("clotch-ai:voce", parla));
+  // Dettatura dell'app (Clotch spento): la pagina chiede solo «avvia»/«ferma», il microfono lo apre l'eseguibile nativo.
+  ipc.handle("clotch-ai:dettatura", (_e, avvia: unknown) => avvia === true ? avviaDettatura((e) => invia("clotch-ai:dettatura", e)) : fermaDettatura());
   // Contratto: a clotch AI spenta la casella non serve; si avvia con `friday avvia` (launchctl kickstart). // nome del protocollo del motore
   ipc.handle("clotch-ai:avvia", () => new Promise((ok) =>
     execFile(path.join(home, ".claude", "bin", "friday"), ["avvia"], (err, out, errOut) => ok({ ok: !err, testo: String(err ? errOut || err.message : out).trim() })))); // nome del protocollo del motore

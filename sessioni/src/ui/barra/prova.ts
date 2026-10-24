@@ -199,6 +199,9 @@ FRAME["101-47883"] = DOMANDA({});
 // frame «Casella: …» (#437): la barra è quella di 101:8036
 for (const id of ["101-26745", "101-27018", "101-26140", "101-26427", "101-27528"]) FRAME[id] = FRAME["101-8036"];
 
+// risposte formattate (#466: 131-59690, 140-60134, 140-60491, 140-62309): sessione aperta, barra di 101:8036
+for (const id of ["131-59690", "140-60134", "140-60491", "140-62309"]) FRAME[id] = FRAME["101-8036"];
+
 // i dialoghi (#437) stanno sopra la sessione aperta, con la barra di «Sessione aperta»
 FRAME["101-22137"] = FRAME["101-8036"];
 FRAME["101-22186"] = FRAME["101-8036"];

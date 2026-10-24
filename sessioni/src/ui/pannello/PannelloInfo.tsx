@@ -2,6 +2,7 @@
 import { useLayoutEffect, useRef } from "react";
 import type { InfoSessione, Sessione } from "../../tipi";
 import { useNavigazione } from "../base/navigazione";
+import { useChatClotchAi } from "../chat/clotch-ai";
 import { provaDi } from "../chat/testi";
 import { useInfo } from "./info";
 import { PannelloObiettivo, type DatiPannello } from "./PannelloObiettivo";
@@ -21,6 +22,7 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
 /** `esteso`: il bottone «Pannello» è premuto e sotto l'obiettivo ci sono le schede di Info sessione. */
 export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
   const info = useInfo(s.id);
+  const max = useChatClotchAi(s.id)?.contestoMax ?? null;
   const pr = s.app?.prs.at(-1);
   // scena di prova «scorrendo» (101:34190): il pannello parte già scorso di tanti px
   const scorri = Number(provaDi(useNavigazione().sezione, "scorri"));
@@ -31,7 +33,7 @@ export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
       <PannelloObiettivo dati={datiPannello(s, info)} />
       {esteso && <>
         <Ambiente s={s} />
-        {info?.contesto != null && <Contesto usati={info.contesto} mcp={s.app?.strumentiMcp ?? 0} />}
+        {info?.contesto != null && <Contesto usati={info.contesto} max={max} mcp={s.app?.strumentiMcp ?? 0} />}
         {!!s.app?.connettori.length && <Connettori nomi={s.app.connettori} />}
         {info && (info.file.quanti > 0 || pr) && <Modifiche file={info.file} pr={pr} />}
       </>}

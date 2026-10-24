@@ -18,7 +18,7 @@ if (args.length === 1 && args[0] === '--help') {
   console.log(`Uso: npm run pacchetto:mac
 Crea ${out}/clotch-darwin-arm64/clotch.app con Electron fissato nel lock.
 Esegue prima la build. Richiede macOS arm64, Node >=22.12 e npm ci locale.
-Include solo moduli main raggiungibili, renderer, icona e frame/scena necessari.
+Include solo moduli main raggiungibili, renderer, icona, eseguibile della dettatura (swiftc) e frame/scena necessari.
 Firma ad hoc locale. Non installa, non avvia, non crea DMG, non notarizza e non usa Keychain.
 Sovrascrive soltanto lo staging e l'output .build/electron di questo checkout.
 La prova GUI richiede autorizzazione separata: CLOTCH_TEST_SILENT non nasconde la preview.`);
@@ -85,6 +85,19 @@ async function mainModule(relative) {
 await mainModule(pkg.main);
 // BrowserWindow carica il preload per percorso, fuori dal grafo require del main.
 await mainModule('dist/src/preload.js');
+// Dettatura dell'app (#470): eseguibile nativo (native/dettatura.swift) accanto al main; i due testi del permesso stanno nel plist dell'app e in quello incorporato nell'eseguibile.
+const privacy = {
+  NSMicrophoneUsageDescription: 'clotch usa il microfono per scrivere quello che detti.',
+  NSSpeechRecognitionUsageDescription: 'clotch usa il riconoscimento vocale del Mac per trasformare in testo quello che detti.',
+};
+const plistDettatura = path.join(work, 'dettatura.plist');
+await fs.writeFile(plistDettatura, JSON.stringify({ CFBundleIdentifier: 'com.squadd.clotch.dettatura', ...privacy }));
+execFileSync('/usr/bin/plutil', ['-convert', 'xml1', plistDettatura]);
+await fs.mkdir(path.join(stage, 'bin'));
+const dettatura = path.join(stage, 'bin', 'dettatura');
+execFileSync('/usr/bin/swiftc', ['-O', '-target', 'arm64-apple-macos13', path.join(root, 'native', 'dettatura.swift'), '-o', dettatura,
+  '-Xlinker', '-sectcreate', '-Xlinker', '__TEXT', '-Xlinker', '__info_plist', '-Xlinker', plistDettatura], { stdio: 'inherit' });
+files.set('bin/dettatura', createHash('sha256').update(await fs.readFile(dettatura)).digest('hex'));
 async function renderer(dir) {
   for (const entry of await fs.readdir(path.join(root, dir), { withFileTypes: true })) {
     const relative = path.join(dir, entry.name);
@@ -108,7 +121,7 @@ const outputs = await packager({ dir: stage, out, name: 'clotch', executableName
   appBundleId: 'com.squadd.clotch.sessioni', helperBundleId: 'com.squadd.clotch.sessioni.helper',
   appVersion: pkg.version, appCategoryType: 'public.app-category.developer-tools',
   asar: false, prune: false, derefSymlinks: false, overwrite: false,
-  extendInfo: { CFBundleName: 'clotch', CFBundleDisplayName: 'clotch' },
+  extendInfo: { CFBundleName: 'clotch', CFBundleDisplayName: 'clotch', ...privacy },
 });
 assert.equal(outputs.length, 1);
 const bundle = path.join(outputs[0], 'clotch.app');
@@ -118,6 +131,7 @@ assert.equal(plist.CFBundleName, 'clotch');
 assert.equal(plist.CFBundleDisplayName, 'clotch');
 assert.equal(plist.CFBundleIdentifier, 'com.squadd.clotch.sessioni');
 assert.equal(plist.CFBundleExecutable, 'clotch');
+for (const k of Object.keys(privacy)) assert.equal(plist[k], privacy[k], k);
 const iconFile = plist.CFBundleIconFile.endsWith('.icns') ? plist.CFBundleIconFile : `${plist.CFBundleIconFile}.icns`;
 const sha = (data) => createHash('sha256').update(data).digest('hex');
 assert.equal(sha(await fs.readFile(path.join(bundle, 'Contents', 'Resources', iconFile))), sha(await fs.readFile(icon)));

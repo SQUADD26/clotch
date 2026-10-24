@@ -22,6 +22,9 @@ app.whenReady().then(async () => {
   const comandi = [];
   ipcMain.removeHandler('clotch-ai:comando');
   ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
+  const dettature = []; // il main non apre il microfono: registra solo avvia (true) e ferma (false)
+  ipcMain.removeHandler('clotch-ai:dettatura');
+  ipcMain.handle('clotch-ai:dettatura', (_e, avvia) => { dettature.push(avvia); });
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
   let mostrate = 0, focalizzate = 0;
@@ -69,7 +72,23 @@ app.whenReady().then(async () => {
       assert.equal(await stato(), 'Sta parlando');
       await run(() => document.querySelector('.casella-voce button').click()); // «Interrompi»
       await new Promise((ok) => setTimeout(ok, 200));
-      assert.equal(comandi.at(-1).cmd, 'clotch_interrompi_voce');
+      assert.equal(comandi.at(-1).cmd, 'zitto', 'Interrompi con Clotch è il comando del motore');
+    });
+    await check('ZITTO_RIFIUTATO_NELL_AVVISO', async () => { // Clotch chiusa: il rifiuto del motore arriva a Roberto con il suo testo
+      await carica(registro({ clotch: { voce: 'accesa', parla: true, ascolta: false, t: ORA } }));
+      await wait(() => !!document.querySelector('.casella-voce.parla'));
+      ipcMain.removeHandler('clotch-ai:comando');
+      ipcMain.handle('clotch-ai:comando', () => ({ esito: 'rifiutato', testo: 'Clotch non è aperta.' }));
+      await run(() => document.querySelector('.casella-voce button').click());
+      await wait(() => document.body.textContent.includes('Clotch non è aperta.'));
+      ipcMain.removeHandler('clotch-ai:comando');
+      ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { esito: 'ok', testo: '' }; });
+    });
+    await check('TESTO_DI_CLOTCH_DAL_VIVO', async () => { // il parziale del registro finisce nella stessa vista della dettatura; senza testo torna «Parla…»
+      await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA, testo: 'apri il notch' } }));
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'apri il notch');
+      await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: true, t: ORA } }));
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'Parla…');
     });
     await check('STA_PARLANDO_APP_INTERROMPI', async () => {
       await carica(registro({ voceApp: true }), { voce: true });
@@ -98,6 +117,39 @@ app.whenReady().then(async () => {
       await run(() => [...document.querySelectorAll('.carta-richiesta button')].find((b) => b.textContent === 'Consenti sempre').click());
       await new Promise((ok) => setTimeout(ok, 200));
       assert.deepEqual(comandi.at(-1), { cmd: 'rispondi_permesso', args: { chat: 'b', rid: 'q1', scelta: 'consenti_sempre' } });
+    });
+    const detta = () => run(() => document.querySelector('button[aria-label="Detta"]').click());
+    const pausa = () => new Promise((ok) => setTimeout(ok, 200));
+    await check('DETTATURA_APP_CLOTCH_SPENTO', async () => { // il main apre il microfono (qui un finto): la pagina chiede e riceve il testo
+      await carica(registro());
+      const prima = comandi.length;
+      await detta();
+      await wait(() => !!document.querySelector('.casella-voce.ascolta'));
+      assert.deepEqual(dettature, [true]);
+      win.webContents.send('clotch-ai:dettatura', { testo: 'ciao dall’app' });
+      await wait(() => document.querySelector('.casella-voce .testo')?.textContent === 'ciao dall’app');
+      assert.equal(comandi.length, prima, 'nessun segnale a Clotch');
+      await run(() => document.querySelector('.casella-voce button').click()); // «Fine»
+      await pausa();
+      assert.deepEqual(dettature, [true, false]);
+      assert.deepEqual(comandi.at(-1), { cmd: 'parla', args: { testo: 'ciao dall’app' } });
+    });
+    await check('DETTATURA_APP_ERRORE_DAL_MAIN', async () => {
+      await carica(registro());
+      dettature.length = 0;
+      await detta();
+      await wait(() => !!document.querySelector('.casella-voce.ascolta'));
+      win.webContents.send('clotch-ai:dettatura', { fine: true, errore: 'Microfono non consentito' });
+      await wait(() => !document.querySelector('.casella-voce.ascolta'));
+      assert.match(await run(() => document.body.textContent), /Microfono non consentito/);
+    });
+    await check('DETTATURA_CLOTCH_ACCESO_NESSUN_ESEGUIBILE', async () => {
+      await carica(registro({ clotch: { voce: 'accesa', parla: false, ascolta: false, t: ORA } }));
+      dettature.length = 0;
+      await detta();
+      await pausa();
+      assert.equal(comandi.at(-1).cmd, 'clotch_dettatura');
+      assert.deepEqual(dettature, [], 'con Clotch acceso il main non apre niente');
     });
     assert.deepEqual(fallite, []);
     assert.equal(win.isVisible(), false); assert.equal(win.isFocused(), false);

@@ -12,7 +12,7 @@ export const STATI_CLOTCH_AI = ["lavora", "aspetta", "finito", "serve_roberto", 
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta",
+  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta", "zitto",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 20 minuti», come friday_triage.FERMO_S (la copia della UI è in ui/chat/clotch-ai.ts). Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 1_200_000;
@@ -37,6 +37,8 @@ export interface ChatClotchAi {
   limite: { account: string | null; ripartenza: number | null } | null;
   /** Permessi, domande e piani ancora aperti (chi risponde primo vince). */
   richieste: { rid: string; genere: string; strumento: string | null; ingresso: unknown; /** ms dell'evento `richiesta`: «da 2 min». */ t?: number | null; domande: { domanda: string; opzioni: string[] }[] }[];
+  /** Finestra di contesto in token, dall'ultimo `inizio` o `battito` che ha `contesto_max`; null = il motore non la dà (Cursor). */
+  contestoMax: number | null;
   /** Ultimo `battito` (non risponde si misura da qui). */
   battito: number | null;
   aiutanti: Map<string, { tipo: string | null; modello: string | null; testo: string | null; esito: string | null; finito: boolean }>;
@@ -65,7 +67,9 @@ export interface Registro {
   fermoTutto: boolean;
   avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null; sessioni: string[] }[];
   /** `versione`: CFBundleShortVersionString di Clotch, se l'evento la porta (#344). */
-  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number } | null;
+  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number;
+    /** Parziale di quello che Clotch capisce mentre Roberto parla (claude-config#2572): assente se non parla o se più vecchio di 10 s. */
+    testo?: string } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */ // nome del protocollo del motore
   clotchAi: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
@@ -91,7 +95,7 @@ export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => e
 
 const nuova = (chat: string): ChatClotchAi => ({
   chat, titolo: null, madre: null, progetto: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
-  domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
+  domanda: null, limite: null, richieste: [], contestoMax: null, battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
   obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
 /** friday_hook.py scrive i passi in italiano; l'app li legge con i nomi di TodoWrite. */ // nome del protocollo del motore
@@ -174,6 +178,7 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string, home: string,
       }
       const t = aMillisecondi(o.t);
       if (t !== null) c.visto = Math.max(c.visto ?? 0, t);
+      if ((o.tipo === "inizio" || o.tipo === "battito") && Number.isInteger(d.contesto_max) && d.contesto_max > 0) c.contestoMax = d.contesto_max;
       switch (o.tipo) {
         case "inizio":
           Object.assign(c, { titolo: s(d.titolo), madre: s(d.madre), progetto: s(d.progetto), account: s(d.account), sorgente: s(d.sorgente), daHandoff: s(d.da_handoff), fine: null });
@@ -222,7 +227,10 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string, home: string,
           c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") };
           break;
         }
-        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
+        case "clotch": if (t !== null) {
+          const testo = d.ascolta === true && typeof d.testo === "string" && d.testo && Date.now() - t <= 10_000 ? d.testo.slice(0, 2000) : undefined;
+          r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t, ...(testo ? { testo } : {}) };
+        } break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
           else if (d.ambito === "chat" && s(d.chi)) {

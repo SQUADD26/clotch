@@ -15,7 +15,7 @@ scrivi("27294", con("rilascio"));
 const con25542 = structuredClone(base);
 Object.assign(con25542.elenco.sessioni[0], { permessi: "default", contesto: 124_000 }); // 62% di 200 000, come il disegno
 con25542.info = { s1: { contesto: 124_000, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }; // «File toccati» del pannello
-con25542.registro = { ...con25542.registro, clotch: { voce: "accesa", parla: false, ascolta: false, versione: "2.4", t: -60_000 } }; // con clotch acceso il filo non ha la nota «Senza clotch»
+con25542.registro = { ...con25542.registro, chat: { s1: { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 } }, clotch: { voce: "accesa", parla: false, ascolta: false, versione: "2.4", t: -60_000 } }; // con clotch acceso il filo non ha la nota «Senza clotch»
 scrivi("25542", { ...con25542, navigazione: { ...base.navigazione, sezione: "scritta:Guarda la schermata: il notch copre il titolo della sessione.\nNel file lettore.ts la cartella vuota manda in errore il lettore.\nSistema tutti e due, poi rifai la prova di parità a scala 1.|allegati" } });
 
 // 28041 e 28232: un messaggio con due file e una schermata dello strumento; la stessa immagine fa da miniatura e da pagina del visore

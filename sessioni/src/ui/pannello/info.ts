@@ -9,9 +9,6 @@ export function useInfo(id: string): InfoSessione | null {
   return c.dati ?? null;
 }
 
-// shortcut: finestra del contesto fissa a 1M (i modelli 5.x con più di 200k di token nelle sessioni vere); il file non dice la finestra, si cambia se arrivano modelli con un'altra.
-export const FINESTRA_CONTESTO = 1_000_000;
-
 const num = (n: number, dec = 1) => n.toLocaleString("it-IT", { maximumFractionDigits: dec });
 
 /** 258000 -> «258k», 345500 -> «345,5k», 1000000 -> «1M». */
