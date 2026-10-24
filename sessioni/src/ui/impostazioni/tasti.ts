@@ -4,7 +4,7 @@ const SIMBOLI: Record<string, string> = { Enter: "↵", Backspace: "⌫", Delete
 /** Nomi delle azioni con scorciatoia: l'unica tabella, letta da Impostazioni, dal dialogo ⌘/ e dalla ricerca nelle impostazioni. */
 export const AZIONI: [string, string][] = [
   ["cerca", "Cerca sessioni"], ["clotchAi", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
-  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["impostazioni", "Apri impostazioni"],
+  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["indietro", "Indietro"], ["avanti", "Avanti"], ["impostazioni", "Apri impostazioni"],
   ["inviaInterrompi", "Interrompi e invia"], ["coda", "Metti in coda"], ["trova", "Cerca nella sessione"],
 ];
 export const nomeAzione = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
