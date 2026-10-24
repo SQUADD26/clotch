@@ -13,7 +13,6 @@ export const SENZA_CARTELLA = "Nessuna cartella";
 const SCRATCH = /^scratch-\d{4}-\d{2}-\d{2}-\w+$/;
 const WORKTREE = /^(.+?)\/\.claude\/worktrees\/[^/]+/;
 const TEMPORANEE = [...new Set([os.tmpdir(), "/tmp", "/private/tmp", "/var/folders", "/private/var/folders"])];
-const PROVA = /(^|\s)PROVA-|CLOTCH_TEST/; // titolo di una prova automatica
 
 const sotto = (c: string, d: string) => c === d || c.startsWith(d + "/");
 const scratch = (cartella: string) => SCRATCH.test(path.basename(cartella));
@@ -48,8 +47,8 @@ export function progettoDi(cartella: string): string {
   return nomeProgetto(repo ?? c);
 }
 
-/** Una prova automatica: lavora sotto le cartelle temporanee, o lo dice il titolo. Le chat senza cartella (scratch) sono vere e non contano mai. */
+/** Una prova automatica: lavora sotto le cartelle temporanee del sistema. Mai dal titolo: una sessione vera può chiamarsi «PROVA-…». Le chat senza cartella (scratch) sono vere e non contano mai. */
 export function eProva(s: Pick<Sessione, "cartella" | "titolo">): boolean {
   if (scratch(s.cartella)) return false;
-  return TEMPORANEE.some((t) => sotto(s.cartella, t)) || PROVA.test(s.titolo);
+  return TEMPORANEE.some((t) => sotto(s.cartella, t));
 }
