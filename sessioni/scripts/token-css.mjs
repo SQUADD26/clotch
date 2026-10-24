@@ -14,12 +14,11 @@ const CSS = join(root, 'src/ui/base/token.css'), TS = join(root, 'src/ui/base/to
 const FAMIGLIA = { 'SF Pro': '"SF Pro", -apple-system, system-ui', Menlo: 'Menlo, monospace',
   'SF Pro Rounded': 'ui-rounded, "SF Pro Rounded", -apple-system, system-ui', 'SF Mono': 'ui-monospace, "SF Mono", Menlo, monospace' };
 
-export function voci(tokens, i = 0) {
+export function voci(tokens) {
   const out = new Map(); // nome CSS -> {tipo, valore}
   for (const [col, modi] of Object.entries(tokens)) {
     if (col.startsWith('$')) continue;
-    const modo = Object.keys(modi).filter((m) => !m.startsWith("$"))[i]; // 0 = scuro (i token base), 1 = chiaro (solo i valori che cambiano)
-    if (!modo) continue;
+    const modo = Object.keys(modi).find((m) => !m.startsWith('$')); // un solo tema: lo scuro
     const giu = (nodo, via) => {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
@@ -37,10 +36,7 @@ export function genera(tokens) {
   const v = voci(tokens);
   const testa = '/* Generato da scripts/token-css.mjs da design/tokens.json: non si modifica a mano. */\n';
   const css = testa + ':root {\n' + [...v].map(([n, { tipo, valore }]) =>
-    `  --${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n' +
-    // tema chiaro: solo i valori che cambiano rispetto allo scuro; si accende con data-tema="chiaro" sulla radice
-    ':root[data-tema="chiaro"] {\n' + [...voci(tokens, 1)].filter(([n, x]) => v.get(n)?.valore !== x.valore)
-      .map(([n, { valore }]) => `  --${n}: ${valore};`).join('\n') + '\n}\n';
+    `  --${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
   const ts = testa.replace('/*', '//').replace(' */', '') +
     `export type Token =\n${[...v.keys()].map((n) => `  | "${n}"`).join('\n')};\n\n` +
     '/** `var(--nome)` da usare negli stili in linea. */\nexport const t = (n: Token) => `var(--${n})`;\n\n' +

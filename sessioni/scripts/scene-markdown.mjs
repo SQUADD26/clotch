@@ -78,15 +78,13 @@ const info = { s1: { contesto: 124_000, file: { quanti: 3, aggiunte: 214, tolte:
 const elenco = structuredClone(base.elenco);
 Object.assign(elenco.sessioni[0], { permessi: "default", contesto: 124_000 });
 const registro = { ...base.registro, clotch: { voce: "accesa", parla: false, ascolta: false, versione: "2.4", t: -60_000 } };
-const scena = (id, domanda, risposta, { chiaro = false, sezione } = {}) => writeFileSync(new URL(`../design/scene/${id}.json`, import.meta.url), JSON.stringify({
+const scena = (id, domanda, risposta, { sezione } = {}) => writeFileSync(new URL(`../design/scene/${id}.json`, import.meta.url), JSON.stringify({
   ...base, info, elenco, registro,
-  navigazione: { ...base.navigazione, ...(sezione ? { sezione } : {}), ...(chiaro ? { tema: "chiaro" } : {}) },
+  navigazione: { ...base.navigazione, ...(sezione ? { sezione } : {}) },
   messaggi: { s1: [{ tipo: "utente", testo: domanda, t: T - 5_000 }, { tipo: "assistente", testo: risposta, modello: "claude-opus-5-5", t: T }] },
 }, null, 1) + "\n");
 
 const D1 = "Mostrami il riepilogo con elenco, tabella e codice.", D2 = "Mostrami le ultime sessioni con costi e durate.";
 // la tabella larga parte scorsa di 244 px: la colonna «Sessione» resta ferma e «Progetto» sparisce sotto di lei
 scena("131-59690", D1, RIEPILOGO);
-scena("140-60134", D1, RIEPILOGO, { chiaro: true });
 scena("140-60491", D2, TABELLA, { sezione: "tabella:244" });
-scena("140-62309", D2, TABELLA, { sezione: "tabella:244", chiaro: true });

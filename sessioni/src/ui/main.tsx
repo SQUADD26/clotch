@@ -15,9 +15,6 @@ import { Pezzo } from "./base/Pezzo";
 // `scene: Record<"<node-id>", () => JSX.Element>` nel suo index.tsx.
 const parita = new URLSearchParams(location.search).get("parita");
 if (parita) document.documentElement.classList.add("parita");
-// ?tema=chiaro: scena di prova nel tema chiaro (140-60134, 140-62309); l'app per ora si apre sempre scura
-const tema = new URLSearchParams(location.search).get("tema");
-if (parita && tema === "chiaro") document.documentElement.dataset.tema = tema;
 // ogni scena dentro il contenitore del suo pezzo, come nella cornice: il CSS del pezzo sta sotto `.pezzo-<nome>`
 const pezzi = { barra, chat, "clotch-ai": clotchAi, impostazioni, pannello };
 const scene = Object.fromEntries(Object.entries(pezzi).flatMap(([nome, m]) =>
