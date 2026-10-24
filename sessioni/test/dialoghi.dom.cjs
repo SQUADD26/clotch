@@ -69,7 +69,7 @@ app.whenReady().then(async () => {
   });
 
   await check('SCORCIATOIE: dal menu del profilo, con i tasti salvati dalle impostazioni', async () => {
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await wait(() => [...document.querySelectorAll('[role=menu] .voce')].some((e) => e.textContent.includes('Scorciatoie da tastiera')));
     await clicca('[role=menu] .voce', 'Scorciatoie da tastiera⌘/');
     await wait(() => !!document.querySelector('[role=dialog]'));
@@ -88,7 +88,7 @@ app.whenReady().then(async () => {
 
   await check('AGGIORNAMENTO: nessuna versione nuova = avviso con la versione vera, nessun dialogo', async () => {
     finto.nuova = false; finto.chiamate.length = 0;
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
     await wait(() => document.body.innerText.includes('Già aggiornato · versione 0.1.0'));
     assert.equal(await dialogo(), null);
@@ -97,7 +97,7 @@ app.whenReady().then(async () => {
 
   await check('AGGIORNAMENTO: versione nuova = dialogo; «Più tardi» chiude senza riaprire', async () => {
     finto.nuova = true; finto.chiamate.length = 0;
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Aggiornare clotch ora?');
@@ -108,7 +108,7 @@ app.whenReady().then(async () => {
 
   await check('AGGIORNAMENTO: «Aggiorna» chiede al main di riaprire; se non riapre, lo dice', async () => {
     finto.nuova = true; finto.chiamate.length = 0;
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
     await wait(() => !!document.querySelector('[role=dialog]'));
     await clicca('[role=dialog] button', 'Aggiorna');
@@ -119,7 +119,7 @@ app.whenReady().then(async () => {
 
   await check('AGGIORNAMENTO: errore del main = avviso, nessun dialogo', async () => {
     finto.errore = 'Controllo non riuscito. Riprova.';
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
     await wait(() => document.body.innerText.includes('Controllo non riuscito'));
     assert.equal(await dialogo(), null);

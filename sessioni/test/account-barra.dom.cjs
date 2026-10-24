@@ -94,6 +94,7 @@ app.whenReady().then(async () => {
     assert.match(await testo('.menu-account .motivo'), /Sessione avviata fuori da clotch: l’account non si cambia\./);
     assert.equal(await run(() => !!document.querySelector('.menu-account .voce')), false);
     assert.equal(comandi.filter(([c]) => c === 'riprendi_altrove').length, 0);
+    assert.equal(comandi.filter(([c]) => c === 'account_previsto').length, 0, 'con una sessione aperta l’account viene dal registro: niente account_previsto');
   });
 
   await check('90 %: barra gialla, «5 ore quasi finite»; al 100 % barra rossa', async () => {
@@ -109,7 +110,7 @@ app.whenReady().then(async () => {
   await check('NUOVA SESSIONE: l’account è quello di account_previsto; sceglierne un altro non manda comandi di cambio', async () => {
     await carica({ nuova: true });
     await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'friday');
-    assert.ok(comandi.some(([c]) => c === 'account_previsto'));
+    assert.equal(comandi.filter(([c]) => c === 'account_previsto').length, 1, 'una volta per apertura');
     await run(() => document.querySelector('.piede-account').click());
     await wait(() => !!document.querySelector('.menu-account'));
     await clicca('.menu-account .voce', 'Cambia account');

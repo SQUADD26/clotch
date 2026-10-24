@@ -81,7 +81,9 @@ app.whenReady().then(async () => {
     });
     await check('DRAFT_SETTINGS_BACK', async () => {
       await load(); await type('Dopo impostazioni');
-      await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
+      await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
+      await wait(() => !!document.querySelector('[role=menu] .voce'));
+      await run(() => [...document.querySelectorAll('[role=menu] .voce')].find((e) => e.textContent.startsWith('Impostazioni')).click());
       await wait(() => !!document.querySelector('.nav-impostazioni'));
       await run(() => document.querySelector('button[aria-label="Indietro"]').click());
       await wait(() => !!document.querySelector('.area-casella textarea'));

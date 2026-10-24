@@ -47,7 +47,9 @@ app.whenReady().then(async () => {
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: scene.navigazione });
     await wait(() => !!document.querySelector('.pannello') && document.querySelector('.contenuto').getBoundingClientRect().width > 1200);
     await wait(() => document.querySelector('.messaggio-roberto .bolla')?.textContent === 'Messaggio responsive v1');
-    await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
+    await wait(() => !!document.querySelector('[role=menu] .voce'));
+    await run(() => [...document.querySelectorAll('[role=menu] .voce')].find((e) => e.textContent.startsWith('Impostazioni')).click());
     await wait(() => !!document.querySelector('.nav-impostazioni'));
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());
     await wait(() => !!document.querySelector('.contenuto'));
@@ -59,7 +61,9 @@ app.whenReady().then(async () => {
     win.setSize(1800, 1000);
     await wait(() => !!document.querySelector('.pannello'));
     console.log('PANEL_AFTER_SETTINGS_1800: visible');
-    await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
+    await wait(() => !!document.querySelector('[role=menu] .voce'));
+    await run(() => [...document.querySelectorAll('[role=menu] .voce')].find((e) => e.textContent.startsWith('Impostazioni')).click());
     await wait(() => !!document.querySelector('.nav-impostazioni'));
     win.setSize(1024, 1000);
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());

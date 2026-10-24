@@ -104,6 +104,7 @@ async function run(args, scene, initialEnv = {}) {
     './indice-ipc': { collegaIndice: (_ipc, _s, quando) => { quando.then(() => calls.push('indice-live')); return {}; } },
     './preferenze': { leggiImpostazioni: () => ({}) },
     './casella-ipc': { collegaCasella: record('casella-live') },
+    './nuova-sessione': { collegaNuovaSessione: record('nuova-sessione-live') },
     './preferenze-ipc': { collegaPreferenze: record('preferenze-live') },
     './registro': { CARTELLA_REGISTRO: '/test-no-real-user', scriviRegistro: record('registro-live'), testoErrore: String },
     './scena': { leggiScena: () => { if (scene instanceof Error) throw scene; return scene; }, fileScena: () => '/test-fixture', collegaScena(ipc) { calls.push('scena'); for (const c of channels) ipc.handle(c, (_e, ...a) => { calls.push('ipc:' + c); return a; }); } },

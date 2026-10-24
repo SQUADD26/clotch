@@ -61,6 +61,7 @@ app.whenReady().then(async () => {
     await check('CARTELLA_SENZA_GIT_NIENTE_RAMO_NE_WORKTREE', async () => {
       await load('cartella:appunti', 2);
       assert.deepEqual(await selettori(), ['Questo computer', 'appunti']);
+      await wait(() => !!document.querySelector('.avviso-avvio .titolo'));
       assert.equal(await run(() => document.querySelector('.avviso-avvio .titolo').textContent), '«appunti» non è un repo git');
       await scrivi('Prendi nota');
       await invio();

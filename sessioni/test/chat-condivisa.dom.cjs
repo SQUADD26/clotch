@@ -75,7 +75,9 @@ app.whenReady().then(async () => {
           failures.push(`${width} ${selector}: larghezza o centro diversi dalla colonna`);
       }
     }
-    await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
+    await ready('[role=menu] .voce');
+    await run(() => [...document.querySelectorAll('[role=menu] .voce')].find((e) => e.textContent.startsWith('Impostazioni')).click());
     await ready('.nav-impostazioni');
     await run(() => [...document.querySelectorAll('.nav-impostazioni button')].find((b) => b.textContent === 'Aspetto').click());
     await ready('.nav-impostazioni button[aria-current="page"]');

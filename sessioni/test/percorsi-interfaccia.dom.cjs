@@ -185,7 +185,9 @@ app.whenReady().then(async () => {
     await clicca('.barra-laterale .riga .testo', 'Filtra'); await clicca('.menu .voce .etichetta', 'Aggiungi filtro');
     await clicca('.menu-filtro .voce .etichetta', 'Sorgente'); await clicca('.menu-filtro .voce .etichetta', 'Codex');
     await run(() => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
-    await run(() => document.querySelector('button[aria-label="Impostazioni"]').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
+    await wait(() => !!document.querySelector('[role=menu] .voce'));
+    await run(() => [...document.querySelectorAll('[role=menu] .voce')].find((e) => e.textContent.startsWith('Impostazioni')).click());
     await wait(() => !!document.querySelector('.nav-impostazioni'));
     await run(() => document.querySelector('button[aria-label="Indietro"]').click());
     await wait(() => !!document.querySelector('.barra-laterale'));

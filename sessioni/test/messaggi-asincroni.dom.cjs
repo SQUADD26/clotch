@@ -199,7 +199,7 @@ app.whenReady().then(async () => {
       window.retainedButton = retainedThought.querySelector('button'); retainedButton.click(); retainedButton.focus();`);
     await wait(async () => await run('document.querySelector(".testo-pensiero")?.textContent === "Pensiero persistente"'), 'pensiero espanso');
     assert.equal(await run('document.activeElement === retainedButton'), true);
-    await run(`[...document.querySelectorAll('.precedenti button')].find(b=>b.textContent==='Carica precedenti').click()`);
+    await run(`[...document.querySelectorAll('.precedenti button')].find(b=>b.textContent==='Carica precedenti')?.click()`); // il focus può già averle caricate dallo scorrimento in cima (Filo.tsx:100)
     await wait(async () => await run('document.querySelector(".messaggio-roberto .bolla")?.textContent === "Inizio turno precedente"'), 'prepend vero della chat');
     assert.equal(await run('document.querySelector(".pensiero") === retainedThought && retainedThought.isConnected'), true);
     assert.equal(await run('retainedButton.getAttribute("aria-expanded")'), 'true');

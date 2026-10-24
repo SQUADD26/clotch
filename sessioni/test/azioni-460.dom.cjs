@@ -130,13 +130,13 @@ app.whenReady().then(async () => {
   });
 
   await check('PROFILO: «Novità» apre le note della versione; senza note lo dice', async () => {
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await wait(() => [...document.querySelectorAll('[role=menu] .voce')].some((e) => e.textContent === 'Novità'));
     await clicca('[role=menu] .voce', 'Novità');
     await wait(() => document.body.innerText.includes('Nessuna novità per la versione 0.1.0'));
     assert.equal(await dialogo(), null);
     finto.novita = { data: '23 ottobre 2026', voci: ['Prima voce', 'Seconda voce'] };
-    await run(() => document.querySelector('.piede .avatar').click());
+    await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Novità');
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Novità della versione 0.1.0');

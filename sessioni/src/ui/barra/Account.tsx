@@ -13,7 +13,7 @@ import "./account.css";
 
 /** Dati fissi della scena di prova (`npm run parita`): ora, quote, account previsto, menu aperto (1 = uso, 2 = anche gli altri account), riga col passaggio. */
 export interface ProvaAccount { ora: number; quote: QuotaUso[]; previsto: string | null; menu?: 0 | 1 | 2; passaggio?: string }
-interface Props { /** Account distinti nell'elenco delle sessioni. */ conta: number; chat: string | null; registro: Registro | null; daDisco?: string; prova?: ProvaAccount; onAltro(e: MouseEvent): void }
+interface Props { /** Account distinti nell'elenco delle sessioni. */ conta: number; chat: string | null; registro: Registro | null; daDisco?: string; /** Vista Nuova sessione: la sola in cui si chiede `account_previsto`. */ nuova?: boolean; prova?: ProvaAccount; onAltro(e: MouseEvent): void }
 
 // un colore per account, nell'ordine del feed (come la legenda di Uso nelle impostazioni)
 const COLORI = ["blu", "arancione", "viola", "verde"];
@@ -47,11 +47,11 @@ function avviso(q: QuotaUso): string | null {
   return !cosa ? null : l === "pieno" ? `${cosa} ${cosa === "5 ore" ? "finite" : "finiti"}` : `${cosa} quasi ${cosa === "5 ore" ? "finite" : "finiti"}`;
 }
 
-export function AccountBarra({ conta, chat, registro, daDisco, prova, onAltro }: Props) {
+export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onAltro }: Props) {
   const utente = useProfilo().nome.split(" ")[0];
   const ora = useOra(prova?.ora);
   const quote = useQuote(prova?.quote) ?? [];
-  const cor = useCorrente(chat, registro, daDisco, prova?.previsto);
+  const cor = useCorrente(chat, registro, daDisco, prova?.previsto, nuova);
   const [menu, setMenu] = useState<0 | 1 | 2>(prova?.menu ?? 0);
   const radice = useRef<HTMLDivElement>(null), piede = useRef<HTMLDivElement>(null);
   const [punto, setPunto] = useState({ x: 0, y: 0 });

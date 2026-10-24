@@ -68,7 +68,7 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => !!document.querySelector('.zona-rilascio')), false);
     console.log('RILASCIO_OK');
 
-    // menu Aggiungi -> «Allega file o cartelle…» -> miniatura nella casella -> invio coi percorsi della copia nel campo `allegati`, testo senza `@`
+    // menu Aggiungi -> «Allega file…» -> miniatura nella casella -> invio coi percorsi della copia nel campo `allegati`, testo senza `@`
     const scrivi = (testo) => run(() => {}).then(() => win.webContents.executeJavaScript(`(() => {
       const t = document.querySelector('.casella textarea');
       Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(t, ${JSON.stringify(testo)});
@@ -78,7 +78,7 @@ app.whenReady().then(async () => {
     await run(() => document.querySelector('button[aria-label="Aggiungi"]').click());
     await ready('.aggiungi .menu');
     assert.deepEqual(await run(() => [...document.querySelectorAll('.aggiungi .menu .voce .etichetta')].map((e) => e.textContent)).then((x) => x.slice(0, 3)),
-      ['Allega file o cartelle…', 'Imposta obiettivo', 'Modalità piano']);
+      ['Allega file…', 'Imposta obiettivo', 'Modalità piano']);
     await run(() => document.querySelector('.aggiungi .menu .voce').click());
     await ready('.allegati-casella .allegato');
     assert.equal(await run(() => document.querySelector('.allegati-casella .allegato').title), 'prova.png');

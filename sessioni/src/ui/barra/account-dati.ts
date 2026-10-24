@@ -67,16 +67,16 @@ export interface Corrente {
 }
 
 /** Account di una sessione aperta (registro: `inizio`; se la chat non è nel registro, quello letto dal disco) o, per la nuova, quello scelto o `account_previsto`. */
-export function useCorrente(chat: string | null, registro: Registro | null, daDisco: string | undefined, previsto?: string | null): Corrente {
+export function useCorrente(chat: string | null, registro: Registro | null, daDisco: string | undefined, previsto?: string | null, nuova = false): Corrente {
   const nuovo = !chat;
   const scelto = useAccountScelto();
   const [auto, setAuto] = useState<string | null>(previsto ?? null);
   useEffect(() => {
-    if (!nuovo || previsto !== undefined) return;
+    if (!nuova || !nuovo || previsto !== undefined) return; // `account_previsto` solo nella vista Nuova sessione
     let vivo = true;
     void comandaEsito("account_previsto", {}).then((e) => { if (vivo && e?.esito === "ok" && e.account?.email) setAuto(e.account.email); });
     return () => { vivo = false; };
-  }, [nuovo, previsto]);
+  }, [nuova, nuovo, previsto]);
   if (nuovo) return { chiave: scelto ?? auto, motore: null };
   const c = registro?.chat.get(chat);
   return { chiave: c?.account ?? daDisco ?? null, motore: c?.sorgente === "motore" };

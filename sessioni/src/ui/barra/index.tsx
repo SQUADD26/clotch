@@ -152,7 +152,7 @@ export default function Barra() {
         </div>
       )}
 
-      <AccountBarra conta={numeroAccount(sessioni)} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
+      <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
         daDisco={sessione(p ? p.scelta ?? "" : n.sessione ?? "")?.account}
         onAltro={(e) => { const r = e.currentTarget.closest(".piede-account")!.getBoundingClientRect(); setAperto({ tipo: "profilo", a: { x: r.left, y: r.top } }); }} />
 
