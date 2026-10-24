@@ -68,8 +68,8 @@ export const useAvvio = avvio.usa;
 export async function avviaClotchAi(come: "avvio" | "riavvio") {
   avvio.metti(come);
   const r = await clotchAi().avvia().catch((e) => ({ ok: false, testo: messaggioErrore(e) }));
-  if (!r.ok) avvio.metti(null);
-  return r;
+  if (!r?.ok) avvio.metti(null);
+  return r ?? { ok: false, testo: "clotch AI non risponde" };
 }
 export const fineAvvio = () => { if (avvio.get()) avvio.metti(null); };
 /** Scena di prova: «Avvio…» o «Riavvio…» senza lanciare niente. */
