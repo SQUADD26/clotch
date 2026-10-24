@@ -18,6 +18,7 @@ FAMIGLIE['cerca-voce'] = 'CVO';
 FAMIGLIE['ux-mac'] = 'UXM';
 FAMIGLIE['cerca-impostazioni-3'] = 'CI3';
 FAMIGLIE['cerca-impostazioni-2'] = 'CI2';
+FAMIGLIE['cerca-impostazioni-1'] = 'CI1';
 FAMIGLIE['cerca-decisioni-regole'] = 'CDR';
 FAMIGLIE['cerca-ricerca'] = 'CRS';
 FAMIGLIE['cerca-stati-turno'] = 'CST';
