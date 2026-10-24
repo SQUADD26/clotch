@@ -67,7 +67,7 @@ export const useAvvio = avvio.usa;
 /** `friday avvia`; «Avvio…» resta finché il registro non mostra clotch AI viva (lo toglie `fineAvvio`). */ // nome del protocollo del motore
 export async function avviaClotchAi(come: "avvio" | "riavvio") {
   avvio.metti(come);
-  const r = await clotchAi().avvia().catch((e) => ({ ok: false, testo: messaggioErrore(e) }));
+  const r = (await clotchAi().avvia().catch((e) => ({ ok: false, testo: messaggioErrore(e) }))) ?? { ok: false, testo: "clotch AI non risponde" };
   if (!r.ok) avvio.metti(null);
   return r;
 }
