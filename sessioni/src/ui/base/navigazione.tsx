@@ -25,6 +25,8 @@ export interface Navigazione extends Passo {
   pannelloInfo: boolean;
   /** Il bottone «Pannello» gira: obiettivo -> Info sessione -> chiuso -> obiettivo. */
   alternaPannello(): void;
+  /** Chiude il pannello da qualunque stato (Esc quando sta sopra la colonna). */
+  chiudiPannello(): void;
   /** Finestra stretta: la barra non sta accanto alla colonna ma sopra, con il velo. */
   sovrapposta: boolean;
   /** Lo dice la cornice, dopo aver misurato: `stretta` = la barra va sopra; `largo` = il pannello sta accanto alla colonna (se no, sopra). */
@@ -81,6 +83,7 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
       else if (!pannelloInfo) setInfo(true);
       else { setInfo(false); imposta(false); }
     },
+    chiudiPannello: () => { setInfo(false); (misura.largo ? setPannelloLargo : setPannelloStretto)(false); },
     sovrapposta: misura.stretta, adatta,
   }), [storia, apri, misura, adatta, barraLarga, barraStretta, pannelloAperto, pannelloInfo]);
   return <Contesto.Provider value={nav}>{children}</Contesto.Provider>;

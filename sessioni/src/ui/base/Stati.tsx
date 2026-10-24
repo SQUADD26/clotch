@@ -1,6 +1,7 @@
 // figma: 101-8805 — stati vuoto (101-8805) ed errore (101-9090): «Messaggio al centro»; caricamento (101-8912): sagome.
 import type { CSSProperties, ReactNode } from "react";
 import caricamento from "../../../design/figma/101-8912.json";
+import type { ErroreLettura } from "../../tipi";
 import { Bottone } from "./Bottone";
 import "./stati.css";
 
@@ -20,6 +21,30 @@ export function StatoErrore({ titolo, corpo, riprova, children }: { titolo: stri
   return (
     <MessaggioAlCentro titolo={titolo} corpo={corpo}>
       {children}
+      <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
+    </MessaggioAlCentro>
+  );
+}
+
+/** «Vuoto» (101-8805): l'elenco è arrivato e non ha sessioni. */
+export function NessunaSessione({ aggiungi, impostazioni }: { aggiungi(): void; impostazioni(): void }) {
+  return (
+    <MessaggioAlCentro titolo="Nessuna sessione" corpo={"Qui appaiono le sessioni di Claude Code, Claude, Codex e Cursor di questo Mac.\nApri una sessione in una di queste app, o aggiungi la cartella di un account."}>
+      <Bottone onClick={aggiungi}>Aggiungi cartella</Bottone>
+      <Bottone tipo="secondario" onClick={impostazioni}>Apri impostazioni</Bottone>
+    </MessaggioAlCentro>
+  );
+}
+
+const IMPOSTAZIONI_DI_SISTEMA = "/System/Applications/System Settings.app"; // shortcut: apre l'app, non il pannello «Accesso completo al disco»; da cambiare se serve il pannello
+
+/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l'accesso completo al disco del Mac. */
+export function CartellaNonLeggibile({ errore, riprova }: { errore: ErroreLettura; riprova(): void }) {
+  const permesso = errore.messaggio === "permesso negato";
+  return (
+    <MessaggioAlCentro titolo="Cartella non leggibile"
+      corpo={`clotch non può leggere ${errore.percorso}: ${errore.messaggio}.${permesso ? "\nDai a clotch l'accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
+      {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
   );

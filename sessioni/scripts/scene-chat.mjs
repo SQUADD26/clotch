@@ -60,7 +60,7 @@ const TURNO_8036 = [
   a("Errore corretto. Il controllo del file torna vuoto. Manca solo il tuo sì sul disegno."),
 ];
 const FINITO = { situazione: { adesso: "turno_finito", strumento: null, inCoda: 0, segni: [] } };
-scena("8036", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036));
+scena("8036", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { info: { contesto: null, file: { quanti: 3, aggiunte: 214, tolte: 12 } } }); // «File toccati» del pannello, come nel frame
 scena("23727", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-risposta" });
 scena("20859", { ...ELECTRON, ...FINITO }, messaggi(TURNO_8036), { sezione: "menu-sessione" });
 

@@ -11,7 +11,7 @@ export const minutiSecondi = (ms: number) => { const s = Math.max(0, Math.floor(
 
 export function CentroTitolo() {
   const da = useRegistro().dati?.schermo?.da;
-  return da == null ? null : <Contatore da={da} />; // il secondo che scorre solo quando c'è uno script: niente render al secondo a vuoto (#474)
+  return da == null ? null : <Contatore da={da} />; // il secondo che scorre solo quando c'è uno script: niente render al secondo a vuoto (issue 474)
 }
 
 function Contatore({ da }: { da: number }) {

@@ -4,7 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { avvisa } from "../base/Avvisi";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
-import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
+import { aggiungi } from "../impostazioni/account";
+import { useImpostazioni } from "../impostazioni/stato";
+import { CartellaNonLeggibile, MessaggioAlCentro, NessunaSessione, Sagome, StatoErrore } from "../base/Stati";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Casella } from "./Casella";
 import { NotaSchermo } from "./CasellaVoce";
@@ -50,6 +52,7 @@ export default function Chat() {
 function ChatSessione() {
   const { elenco, s, sezione } = useSessione();
   const { vista, sessione, apri } = useNavigazione();
+  const impostazioni = useImpostazioni();
   const recente = elenco.dati?.sessioni[0]?.id; // l'elenco è già dalla più recente
   // all'avvio nessuna sessione scelta: si apre la più recente, mai una colonna vuota
   useEffect(() => { if (vista === "sessione" && !sessione && recente) apri("sessione", recente); }, [vista, sessione, recente, apri]);
@@ -70,7 +73,10 @@ function ChatSessione() {
 
   if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={elenco.errore} riprova={elenco.riprova} />;
-  if (!s) return null;
+  if (!s) {
+    if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errore={elenco.dati.errori[0]} riprova={elenco.riprova} />;
+    return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
+  }
   if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);

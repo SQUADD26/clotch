@@ -36,7 +36,7 @@ function Corpo() {
   const { adatta } = n;
   useLayoutEffect(() => adatta(stretta, largo), [adatta, stretta, largo]);
   useEscChiude(n.sovrapposta && n.barraAperta, n.alternaBarra);
-  useEscChiude(!largo && n.pannelloAperto, n.alternaPannello);
+  useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
   const attributi = { ref: corpo, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
   if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
   const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
