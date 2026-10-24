@@ -40,6 +40,7 @@ export type Token =
   | "primitivo-rosso-fa423e-a16"
   | "primitivo-rosso-c8312d"
   | "primitivo-rosso-ff7673"
+  | "primitivo-rosso-c5302c"
   | "primitivo-semaforo-rosso"
   | "primitivo-semaforo-giallo"
   | "primitivo-semaforo-verde"
@@ -63,6 +64,7 @@ export type Token =
   | "primitivo-blu-4aa6ff"
   | "primitivo-blu-1778d3"
   | "primitivo-blu-124d85"
+  | "primitivo-blu-0a65d4"
   | "primitivo-viola-ad7bf9"
   | "primitivo-viola-ad7bf9-a16"
   | "primitivo-viola-9965e8"
@@ -359,6 +361,7 @@ export const valori: Record<Token, string> = {
   "primitivo-rosso-fa423e-a16": "#fa423e29",
   "primitivo-rosso-c8312d": "#c8312d",
   "primitivo-rosso-ff7673": "#ff7673",
+  "primitivo-rosso-c5302c": "#c5302c",
   "primitivo-semaforo-rosso": "#ff5f57",
   "primitivo-semaforo-giallo": "#febc2e",
   "primitivo-semaforo-verde": "#28c840",
@@ -382,6 +385,7 @@ export const valori: Record<Token, string> = {
   "primitivo-blu-4aa6ff": "#4aa6ff",
   "primitivo-blu-1778d3": "#1778d3",
   "primitivo-blu-124d85": "#124d85",
+  "primitivo-blu-0a65d4": "#0a65d4",
   "primitivo-viola-ad7bf9": "#ad7bf9",
   "primitivo-viola-ad7bf9-a16": "#ad7bf929",
   "primitivo-viola-9965e8": "#9965e8",
