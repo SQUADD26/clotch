@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2141,7 +2142,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -5239,11 +5240,47 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "163:91953",
+   "nome": "titolo menu Vai",
+   "tipo": "FRAME",
+   "box": {
+    "x": 242,
+    "y": 3,
+    "w": 36,
+    "h": 22
+   },
+   "variabili": {
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91954",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 6,
+    "w": 20,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario"
+   },
+   "senza": [
+    "fontSize 13"
+   ],
+   "testo": "Vai",
+   "font": "SF Pro Semibold"
+  },
+  {
    "id": "148:64350",
    "nome": "titolo menu Finestra",
    "tipo": "FRAME",
    "box": {
-    "x": 242,
+    "x": 282,
     "y": 3,
     "w": 66,
     "h": 22
@@ -5260,7 +5297,7 @@
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
-    "x": 250,
+    "x": 290,
     "y": 6,
     "w": 50,
     "h": 16
@@ -5275,6 +5312,42 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "163:91955",
+   "nome": "titolo menu Aiuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 352,
+    "y": 3,
+    "w": 50,
+    "h": 22
+   },
+   "variabili": {
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91956",
+   "nome": "testo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 360,
+    "y": 6,
+    "w": 34,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario"
+   },
+   "senza": [
+    "fontSize 13"
+   ],
+   "testo": "Aiuto",
+   "font": "SF Pro Semibold"
+  },
+  {
    "id": "148:64352",
    "nome": "menu Vista",
    "tipo": "FRAME",
@@ -5282,7 +5355,7 @@
     "x": 191,
     "y": 28,
     "w": 330,
-    "h": 264
+    "h": 136
    },
    "variabili": {
     "fills[0]": "colore/fondo/elevato",
@@ -5295,8 +5368,8 @@
    "senza": []
   },
   {
-   "id": "163:83855",
-   "nome": "voce Nascondi barra laterale",
+   "id": "163:91899",
+   "nome": "voce Mostra o nascondi barra laterale",
    "tipo": "FRAME",
    "box": {
     "x": 197,
@@ -5313,7 +5386,7 @@
    "senza": []
   },
   {
-   "id": "163:83856",
+   "id": "163:91900",
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
@@ -5328,11 +5401,11 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "Nascondi barra laterale",
+   "testo": "Mostra o nascondi barra laterale",
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83857",
+   "id": "163:91901",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -5351,7 +5424,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83858",
+   "id": "163:91902",
    "nome": "separatore",
    "tipo": "FRAME",
    "box": {
@@ -5369,7 +5442,7 @@
    "senza": []
   },
   {
-   "id": "163:83859",
+   "id": "163:91903",
    "nome": "linea",
    "tipo": "RECTANGLE",
    "box": {
@@ -5384,8 +5457,8 @@
    "senza": []
   },
   {
-   "id": "163:83860",
-   "nome": "voce Indietro",
+   "id": "163:91904",
+   "nome": "voce Ingrandisci testo",
    "tipo": "FRAME",
    "box": {
     "x": 197,
@@ -5402,13 +5475,13 @@
    "senza": []
   },
   {
-   "id": "163:83861",
+   "id": "163:91905",
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
     "x": 205,
     "y": 66,
-    "w": 269,
+    "w": 265,
     "h": 16
    },
    "variabili": {
@@ -5417,17 +5490,17 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "Indietro",
+   "testo": "Ingrandisci testo",
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83862",
+   "id": "163:91906",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
-    "x": 490,
+    "x": 486,
     "y": 66,
-    "w": 17,
+    "w": 21,
     "h": 16
    },
    "variabili": {
@@ -5436,12 +5509,12 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "⌘[",
+   "testo": "⌘+",
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83863",
-   "nome": "voce Avanti",
+   "id": "163:91907",
+   "nome": "voce Riduci testo",
    "tipo": "FRAME",
    "box": {
     "x": 197,
@@ -5458,13 +5531,13 @@
    "senza": []
   },
   {
-   "id": "163:83864",
+   "id": "163:91908",
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
     "x": 205,
     "y": 88,
-    "w": 269,
+    "w": 267,
     "h": 16
    },
    "variabili": {
@@ -5473,17 +5546,17 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "Avanti",
+   "testo": "Riduci testo",
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83865",
+   "id": "163:91909",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
-    "x": 490,
+    "x": 488,
     "y": 88,
-    "w": 17,
+    "w": 19,
     "h": 16
    },
    "variabili": {
@@ -5492,49 +5565,16 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "⌘]",
+   "testo": "⌘-",
    "font": "SF Pro Regular"
   },
   {
-   "id": "163:83901",
-   "nome": "separatore",
+   "id": "163:91910",
+   "nome": "voce Dimensione reale",
    "tipo": "FRAME",
    "box": {
     "x": 197,
     "y": 107,
-    "w": 318,
-    "h": 9
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "paddingTop": "spazio/1",
-    "paddingBottom": "spazio/1"
-   },
-   "senza": []
-  },
-  {
-   "id": "163:83902",
-   "nome": "linea",
-   "tipo": "RECTANGLE",
-   "box": {
-    "x": 205,
-    "y": 111,
-    "w": 302,
-    "h": 1
-   },
-   "variabili": {
-    "fills[0]": "colore/bordo/normale"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64353",
-   "nome": "voce Ricarica",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 116,
     "w": 318,
     "h": 22
    },
@@ -5547,12 +5587,12 @@
    "senza": []
   },
   {
-   "id": "148:64354",
+   "id": "163:91911",
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
     "x": 205,
-    "y": 119,
+    "y": 110,
     "w": 265,
     "h": 16
    },
@@ -5562,16 +5602,16 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "Ricarica",
+   "testo": "Dimensione reale",
    "font": "SF Pro Regular"
   },
   {
-   "id": "148:64355",
+   "id": "163:91912",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
     "x": 486,
-    "y": 119,
+    "y": 110,
     "w": 21,
     "h": 16
    },
@@ -5581,12 +5621,45 @@
    "senza": [
     "fontSize 13"
    ],
-   "testo": "⌘R",
+   "testo": "⌘0",
    "font": "SF Pro Regular"
   },
   {
-   "id": "148:64356",
-   "nome": "voce Forza ricarica",
+   "id": "163:91913",
+   "nome": "separatore",
+   "tipo": "FRAME",
+   "box": {
+    "x": 197,
+    "y": 129,
+    "w": 318,
+    "h": 9
+   },
+   "variabili": {
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91914",
+   "nome": "linea",
+   "tipo": "RECTANGLE",
+   "box": {
+    "x": 205,
+    "y": 133,
+    "w": 302,
+    "h": 1
+   },
+   "variabili": {
+    "fills[0]": "colore/bordo/normale"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:91915",
+   "nome": "voce Attiva/disattiva schermo intero",
    "tipo": "FRAME",
    "box": {
     "x": 197,
@@ -5603,358 +5676,12 @@
    "senza": []
   },
   {
-   "id": "148:64357",
+   "id": "163:91916",
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
     "x": 205,
     "y": 141,
-    "w": 252,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "Forza ricarica",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64358",
-   "nome": "scorciatoia",
-   "tipo": "TEXT",
-   "box": {
-    "x": 473,
-    "y": 141,
-    "w": 34,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "⇧⌘R",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64359",
-   "nome": "voce Attiva/disattiva strumenti sviluppatore",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 160,
-    "w": 318,
-    "h": 22
-   },
-   "variabili": {
-    "cornerRadius": "raggio/xs",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64360",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 205,
-    "y": 163,
-    "w": 257,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "Attiva/disattiva strumenti sviluppatore",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64361",
-   "nome": "scorciatoia",
-   "tipo": "TEXT",
-   "box": {
-    "x": 478,
-    "y": 163,
-    "w": 29,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "⌥⌘I",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64362",
-   "nome": "separatore",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 182,
-    "w": 318,
-    "h": 9
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "paddingTop": "spazio/1",
-    "paddingBottom": "spazio/1"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64363",
-   "nome": "linea",
-   "tipo": "RECTANGLE",
-   "box": {
-    "x": 205,
-    "y": 186,
-    "w": 302,
-    "h": 1
-   },
-   "variabili": {
-    "fills[0]": "colore/bordo/normale"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64364",
-   "nome": "voce Dimensione reale",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 191,
-    "w": 318,
-    "h": 22
-   },
-   "variabili": {
-    "cornerRadius": "raggio/xs",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64365",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 205,
-    "y": 194,
-    "w": 265,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "Dimensione reale",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64366",
-   "nome": "scorciatoia",
-   "tipo": "TEXT",
-   "box": {
-    "x": 486,
-    "y": 194,
-    "w": 21,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "⌘0",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64367",
-   "nome": "voce Ingrandisci",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 213,
-    "w": 318,
-    "h": 22
-   },
-   "variabili": {
-    "cornerRadius": "raggio/xs",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64368",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 205,
-    "y": 216,
-    "w": 265,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "Ingrandisci",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64369",
-   "nome": "scorciatoia",
-   "tipo": "TEXT",
-   "box": {
-    "x": 486,
-    "y": 216,
-    "w": 21,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "⌘+",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64370",
-   "nome": "voce Riduci",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 235,
-    "w": 318,
-    "h": 22
-   },
-   "variabili": {
-    "cornerRadius": "raggio/xs",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64371",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 205,
-    "y": 238,
-    "w": 267,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/primario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "Riduci",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64372",
-   "nome": "scorciatoia",
-   "tipo": "TEXT",
-   "box": {
-    "x": 488,
-    "y": 238,
-    "w": 19,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario"
-   },
-   "senza": [
-    "fontSize 13"
-   ],
-   "testo": "⌘-",
-   "font": "SF Pro Regular"
-  },
-  {
-   "id": "148:64373",
-   "nome": "separatore",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 257,
-    "w": 318,
-    "h": 9
-   },
-   "variabili": {
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "paddingTop": "spazio/1",
-    "paddingBottom": "spazio/1"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64374",
-   "nome": "linea",
-   "tipo": "RECTANGLE",
-   "box": {
-    "x": 205,
-    "y": 261,
-    "w": 302,
-    "h": 1
-   },
-   "variabili": {
-    "fills[0]": "colore/bordo/normale"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64375",
-   "nome": "voce Attiva/disattiva schermo intero",
-   "tipo": "FRAME",
-   "box": {
-    "x": 197,
-    "y": 266,
-    "w": 318,
-    "h": 22
-   },
-   "variabili": {
-    "cornerRadius": "raggio/xs",
-    "itemSpacing": "spazio/4",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "148:64376",
-   "nome": "testo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 205,
-    "y": 269,
     "w": 255,
     "h": 16
    },
@@ -5968,12 +5695,12 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "148:64377",
+   "id": "163:91917",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
     "x": 476,
-    "y": 269,
+    "y": 141,
     "w": 31,
     "h": 16
    },
