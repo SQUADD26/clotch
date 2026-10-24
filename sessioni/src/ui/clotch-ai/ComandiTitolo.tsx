@@ -29,7 +29,7 @@ export const fermo = negozio<"chiuso" | "conferma" | "in-corso">("chiuso");
 /** Menu di Non disturbare aperto (anche dalla scena di prova 101-38626). */
 export const menuQuiete = negozio(false);
 
-export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", messaggio: `Fermo ${plurale(quante, "sessione", "sessioni")}…` });
+export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", messaggio: `Fermando ${plurale(quante, "sessione", "sessioni")}…` });
 
 /** Esito di Ferma tutto: `non` = sessioni non ferme (null = clotch AI non ha risposto, col suo testo). */
 export function esitoFermo(id: number, quante: number, non: string[] | null, testo = "") {

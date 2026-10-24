@@ -53,7 +53,7 @@ H.avvia('requisiti-b', async () => {
   await req('B6', async () => {
     nuova(); await caricaChat(); await riga('beta-app');
     await riga('Filtra'); await voce('Aggiungi filtro'); await voce('Stato');
-    assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In corso', 'In attesa di te', 'Ferma', 'Finita', 'Errore']);
+    assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In corso', 'In attesa di te', 'In pausa', 'Finita', 'Errore']);
     await scrivi('.menu-filtro input', 'att'); assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In attesa di te'], 'la ricerca nel menu restringe le opzioni');
     await scrivi('.menu-filtro input', ''); await voce('Finita'); await voce('In attesa di te'); await esc(); // la cartella con i risultati si apre da sola (UI-FILTRO-CARTELLA-CHIUSA corretto): nessun clic su «clotch»
     assert.equal(await run(() => [...document.querySelectorAll('.barra-laterale .riga')].find((r) => r.querySelector('.testo')?.textContent === 'clotch')?.getAttribute('aria-expanded')), 'true', 'la cartella con i risultati è aperta da sola');
@@ -188,7 +188,7 @@ H.avvia('requisiti-b', async () => {
     await imp('101-17893');
     assert.match(await run(() => document.body.innerText), /2 cartelle/);
     await clicca('button[role=switch]', 'Nascondi chiavi e token'); await attesa(60); assert.deepEqual(imposta(), [{ nascondiChiavi: false }]);
-    await clicca('.scelta .valore', 'Cronologia: 30 giorni'); await clicca('.menu-scelta .voce .etichetta', '90 giorni'); await attesa(60); assert.deepEqual(imposta().at(-1), { cronologia: '90 giorni' });
+    await clicca('.scelta .valore', 'Sessioni finite: 30 giorni'); await clicca('.menu-scelta .voce .etichetta', '90 giorni'); await attesa(60); assert.deepEqual(imposta().at(-1), { cronologia: '90 giorni' });
     await clicca('button', 'Elimina dati…'); await wait(() => !!document.querySelector('[role=dialog]'));
     await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('impostazioni:elimina-dati'), []);
     await clicca('button', 'Elimina dati…'); await esc(); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('impostazioni:elimina-dati'), []);
@@ -197,7 +197,7 @@ H.avvia('requisiti-b', async () => {
 
   await req('H36', async () => {
     await imp('101-17893');
-    await run(() => document.querySelector('.valore-scelta').click()); await wait(() => document.querySelector('h1')?.textContent === 'Cartelle escluse');
+    await run(() => document.querySelector('.valore-scelta').click()); await wait(() => document.querySelector('h1')?.textContent === 'Cartelle nascoste');
     assert.deepEqual(await testo('.riga.azione .t-base'), ['~/Repos/vecchi', '~/Downloads']);
     await clicca('.riga.azione button', 'Rimuovi'); await wait(() => document.querySelectorAll('.riga.azione').length === 1); assert.deepEqual(imposta(), [{ cartelleEscluse: ['~/Downloads'] }]);
     await clicca('.indietro', 'Dati'); await wait(() => document.querySelector('h1')?.textContent === 'Dati'); assert.match(await run(() => document.body.innerText), /1 cartella/);

@@ -59,7 +59,7 @@ export function AreaAvvisi() {
   // scena di prova 101:24007: i quattro avvisi del disegno, uno per tipo
   useEffect(() => {
     if (provaDi(sezione, "avvisi") === null) return;
-    avvisa({ tipo: "caricamento", messaggio: "Leggo le sessioni…" });
+    avvisa({ tipo: "caricamento", messaggio: "Leggendo le sessioni…" });
     avvisa({ tipo: "successo", messaggio: "Link copiato" });
     avvisa({ tipo: "errore", messaggio: "Sessione non raggiunta", azione: { etichetta: "Riprova", fai() {} } });
     avvisa({ tipo: "info", messaggio: "Sessione archiviata", azione: { etichetta: "Annulla", fai() {} } });

@@ -35,12 +35,16 @@ export function Esito({ icona, colore, esito, dettaglio, codice = false }: {
     <div className="esito-richiesta">
       <Icona nome={icona} colore={colore} />
       <span className="esito">{esito}</span>
-      {dettaglio && <span className={codice ? "dettaglio codice" : "dettaglio"}>{ris.testo(dettaglio)}</span>}
+      {dettaglio && <span className={codice ? "dettaglio codice" : "dettaglio"} title={ris.testo(dettaglio)}>{ris.testo(dettaglio)}</span>}
     </div>
   );
 }
 
 export interface Richiesta { rid: string; strumento: string | null; ingresso: unknown }
+
+/** Gli argomenti dello strumento, una riga «chiave: valore» ciascuno, senza `description` (ha la sua riga): chi approva vede cosa approva. */
+const argomenti = (ingresso: unknown) => !ingresso || typeof ingresso !== "object" ? "" : Object.entries(ingresso as Record<string, unknown>)
+  .filter(([k, v]) => k !== "description" && ["string", "number", "boolean"].includes(typeof v) && v !== "").map(([k, v]) => `${k}: ${v}`).join("\n");
 
 type Scelta = "consenti" | "consenti_sempre" | "nega";
 
@@ -50,7 +54,9 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
   const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
   const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
-  const mostra = cmd ? `$ ${cmd}` : r.strumento;
+  const args = cmd ? "" : ris.testo(argomenti(r.ingresso));
+  const mostra = cmd ? `$ ${cmd}` : [r.strumento, args].filter(Boolean).join("\n");
+  const cosa = cmd || args.split("\n")[0] || r.strumento || "";
   const rispondi = (s: Scelta) => fai(async () => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); });
   // finché aspetta la risposta, le scorciatoie salvate «Consenti» e «Nega» rispondono a questo permesso
   useEffect(() => {
@@ -60,12 +66,12 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
   }, [scelta, chat, r.rid]); // eslint-disable-line react-hooks/exhaustive-deps
   if (scelta) {
     return scelta === "nega"
-      ? <Esito icona="chiudi" colore="errore" esito="Negato da te" dettaglio={cmd || r.strumento || ""} codice />
-      : <Esito icona="spunta" colore="successo" esito="Consentito da te" dettaglio={cmd || r.strumento || ""} codice />;
+      ? <Esito icona="chiudi" colore="errore" esito="Negato da te" dettaglio={cosa} codice />
+      : <Esito icona="spunta" colore="successo" esito={scelta === "consenti_sempre" ? "Consentito sempre" : "Consentito da te"} dettaglio={cosa} codice />;
   }
   return (
     <Carta icona="mano" titolo={titolo} dettaglio={da}>
-      {cmd && <div className="domanda">Eseguire questo comando?</div>}
+      {mostra && <div className="domanda">{cmd ? "Eseguire questo comando?" : "Usare questo strumento?"}</div>}
       {mostra && <BloccoCodice comando={mostra} />}
       {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}
       <div className="bottoni">
@@ -95,18 +101,18 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
   // l'opzione consigliata parte scelta, come nel disegno
   const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));
   const [altro, setAltro] = useState("");
-  const [fatta, setFatta] = useState<string | null>(null);
+  const [fatta, setFatta] = useState<{ testo: string; saltata: boolean } | null>(null);
   const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
-  if (fatta !== null) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={fatta} />;
+  if (fatta !== null) return fatta.saltata ? <Esito icona="persona" colore="secondaria" esito="Saltata" /> : <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={fatta.testo} />;
   const risposte = domande.map((d, i) => {
     const o = scelte[i];
     const scelta = o == null ? "" : d.opzioni[o].replace(CONSIGLIATA, "");
     return { domanda: d.domanda, scelta, testo: i === domande.length - 1 ? altro.trim() : "" };
   });
   const pronta = !!rid && !inCorso && risposte.every((r) => r.scelta || r.testo);
-  const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta(risposte.map((r) => r.testo || r.scelta).join(" · ")); }) : undefined;
-  const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta(""); }) : undefined;
+  const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta({ testo: risposte.map((r) => r.testo || r.scelta).join(" · "), saltata: false }); }) : undefined;
+  const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta({ testo: "", saltata: true }); }) : undefined;
   return (
     <>
       <Carta icona="persona" titolo="Domanda per te" dettaglio={da}>
@@ -159,6 +165,7 @@ export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; 
   const ris = useRiserva();
   const { intro, passi } = passiPiano(testo);
   const nPassi = quanti(passi.length, "passo", "passi");
+  if (esito === "modifica") return <Esito icona="matita" colore="secondaria" esito="Modifica chiesta" dettaglio={nPassi} />;
   if (esito === "approva") return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={nPassi} />;
   const decidi = (e: "approva" | "modifica") => fai(async () => { if (rid && await comanda("piano", { chat, rid, esito: e })) setEsito(e); });
   return (
@@ -167,12 +174,10 @@ export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; 
       <div className="passi">
         {passi.map((p, i) => <div key={i} className="passo"><span className="numero">{i + 1}</span><span className="testo">{ris.testo(p)}</span></div>)}
       </div>
-      {esito !== "modifica" && (
-        <div className="bottoni">
-          <Bottone onClick={() => decidi("approva")} disabled={!rid || inCorso}>Approva</Bottone>
-          <Bottone tipo="secondario" onClick={() => decidi("modifica")} disabled={!rid || inCorso}>Modifica</Bottone>
-        </div>
-      )}
+      <div className="bottoni">
+        <Bottone onClick={() => decidi("approva")} disabled={!rid || inCorso}>Approva</Bottone>
+        <Bottone tipo="secondario" onClick={() => decidi("modifica")} disabled={!rid || inCorso}>Modifica</Bottone>
+      </div>
     </Carta>
   );
 }

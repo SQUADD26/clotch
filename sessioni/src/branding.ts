@@ -40,7 +40,7 @@ export function impostaNome() {
 /** macOS richiede il Dock esplicito; BrowserWindow usa la stessa immagine sugli altri sistemi. */
 export function impostaIdentita() {
   const icona = iconaApp();
-  if (icona.isEmpty()) throw new Error("Icona di clotch non leggibile");
+  if (icona.isEmpty()) throw new Error("Icona non leggibile");
   app.dock?.setIcon(icona);
   app.setAboutPanelOptions({ applicationName: NOME_APP, applicationVersion: app.getVersion() });
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp()));

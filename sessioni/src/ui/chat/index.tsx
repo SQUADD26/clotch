@@ -77,7 +77,7 @@ function ChatSessione() {
   if (!s) {
     if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errore={elenco.dati.errori[0]} riprova={elenco.riprova} />;
     if (sessione && elenco.dati) return (
-      <MessaggioAlCentro titolo="Sessione non trovata" corpo="Questa sessione non è più nell'elenco: forse è stata archiviata o il collegamento è vecchio.">
+      <MessaggioAlCentro titolo="Sessione non trovata" corpo="Questa sessione non è più nell’elenco: forse è stata archiviata o il collegamento è vecchio.">
         {recente && <Bottone onClick={() => apri("sessione", recente)}>Apri la più recente</Bottone>}
       </MessaggioAlCentro>
     );
@@ -102,6 +102,7 @@ function ChatSessione() {
       <>
         <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="La sessione è aperta ma non ha ancora messaggi." /></div>
         {casella}
+        <Trova iniziale={provaDi(sezione, "trova")} />
       </>
     );
   }

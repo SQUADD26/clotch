@@ -1,13 +1,15 @@
 // figma: 131-59690 — risposta formattata (titoli, elenchi, codice, citazione, tabella); 140-60491 tabella larga e lunga.
-// Chiaro: 140-60134, 140-62309. Testo 101-7216; codice 101-7213; link 101-28289.
-import { Children, isValidElement, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+// Testo 101-7216; codice 101-7213; link 101-28289.
+import { Children, isValidElement, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { toString } from "mdast-util-to-string";
 import type { Nodes } from "mdast";
+import { avvisa } from "../base/Avvisi";
 import { BottoneIcona } from "../base/Bottone";
+import { Icona } from "../base/Icona";
 import { evidenzia } from "./evidenzia";
 import { provaDi } from "./testi";
 import "./markdown.css";
@@ -29,14 +31,13 @@ export function senzaMarkdown(testo: string): string {
   return leggi(parser.parse(testo));
 }
 
-/** Solo destinazioni web e ancore del documento: mai percorsi locali o protocolli eseguibili. */
-const destinazione = (url: string): string | undefined => {
-  if (/[\u0000-\u0020\u007f]/.test(url)) return undefined;
-  return /^(https?:\/\/|#)/i.test(url) ? url : undefined;
-};
+/** Solo indirizzi web si aprono; ogni altro (file, mail, ancora) resta scritto ma inerte, con l'indirizzo da copiare. */
+const web = (url: string) => !/[\u0000-\u0020\u007f]/.test(url) && /^https?:\/\//i.test(url);
 
 function Codice({ children }: { children?: ReactNode }) {
   const [copiato, setCopiato] = useState(false);
+  const timer = useRef<number>(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
   const code = isValidElement<{ children?: ReactNode; className?: string }>(children) ? children : null;
   const grezzo = String(code?.props.children ?? ""), testo = grezzo.replace(/\n$/, "");
   const lingua = code?.props.className?.replace(/^language-/, "");
@@ -44,7 +45,10 @@ function Codice({ children }: { children?: ReactNode }) {
     <div className="testata-codice">
       <span>{lingua}</span>
       <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta={copiato ? "Copiato" : "Copia codice"}
-        onClick={() => { void navigator.clipboard.writeText(testo).then(() => setCopiato(true)).catch(() => setCopiato(false)); }} />
+        onClick={() => {
+          void navigator.clipboard.writeText(testo).then(() => { setCopiato(true); clearTimeout(timer.current); timer.current = window.setTimeout(() => setCopiato(false), 1500); })
+            .catch(() => avvisa({ tipo: "errore", messaggio: "Copia non riuscita" }));
+        }} />
     </div>
     <pre><code>{evidenzia(grezzo, lingua)}</code></pre>
   </div>;
@@ -83,10 +87,11 @@ const Th = cella("th"), Td = cella("td");
 
 /** HTML mai interpretato; immagini come testo alternativo, senza richieste di rete dal transcript. */
 export function Markdown({ testo }: { testo: string }) {
-  return <div className="markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml urlTransform={destinazione} components={{
+  return <div className="markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml urlTransform={(u) => u} components={{
     pre: ({ children }) => <Codice>{children}</Codice>,
-    a: ({ href, children }) => href ? <a href={href} target={href.startsWith("#") ? undefined : "_blank"} rel={href.startsWith("#") ? undefined : "noreferrer noopener"}>{children}</a> : <span>{children}</span>,
-    img: ({ alt }) => <span>{alt}</span>,
+    a: ({ href = "", children }) => web(href) ? <a href={href} title={href} target="_blank" rel="noreferrer noopener">{children}</a> : <span className="link-inerte" data-link={href} title={href}>{children}</span>,
+    img: ({ alt }) => <span className="immagine"><Icona nome="immagine" />{alt || "Immagine"}</span>,
+    ol: ({ start, children }) => <ol style={{ "--inizio": start ?? 1 } as CSSProperties}>{children}</ol>,
     table: ({ children }) => <Tabella>{children}</Tabella>,
     th: Th, td: Td,
   }}>{testo}</ReactMarkdown></div>;

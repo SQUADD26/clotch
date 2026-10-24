@@ -102,7 +102,7 @@ test("motivoNonInviato: il perché dall'esito del comando", () => {
   assert.equal(motivoNonInviato({ id: "1", esito: "scaduto", testo: "", preso: false }), "Non inviato: la sessione non risponde.");
   assert.equal(motivoNonInviato(null), "Non inviato: la sessione non è raggiungibile.");
   assert.equal(motivoNonInviato({ id: "1", esito: "rifiutato", testo: "il modello non esiste." }), "Non inviato: il modello non esiste.");
-  assert.equal(motivoNonInviato({ id: "1", esito: "rifiutato", testo: "" }), "Non inviato: il motore l'ha rifiutato.");
+  assert.equal(motivoNonInviato({ id: "1", esito: "rifiutato", testo: "" }), "Non inviato: il motore l’ha rifiutato.");
   assert.equal(motivoNonInviato({ id: null, esito: "non_scritto", testo: "disco pieno" }), "Non inviato: il messaggio non si è potuto scrivere.");
 });
 
