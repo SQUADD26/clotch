@@ -179,6 +179,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
 
+  useEffect(() => { // ⌘U e ⇧⌘P: azioni del gestore unico, valgono anche col fuoco fuori dalla casella
+    const fuori = [registraAzione("allega", () => void allega()), registraAzione("piano", () => comando("/plan "))];
+    return () => fuori.forEach((f) => f());
+  });
+
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (voci.length && !e.nativeEvent.isComposing) {
       const su = e.key === "ArrowUp", giu = e.key === "ArrowDown", scelto = voci[Math.min(scelta, voci.length - 1)];
@@ -186,12 +191,10 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       if (e.key === "Escape") { e.preventDefault(); setChiuso(true); return; }
       // un comando scritto per intero e Invio: parte, non si riscrive
       const intero = cerca?.tipo === "comando" && testo.trim() === scelto.nome;
-      if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
+      if ((e.key === "Tab" && !e.shiftKey) || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
     }
     if (e.key === "Escape" && modifica) { bozza.esci(); return; }
     if (e.nativeEvent.isComposing) return;
-    if (e.metaKey && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "u") { e.preventDefault(); void allega(); return; } // «Allega file o cartelle…» ⌘U
-    if (e.key === "Tab" && e.shiftKey) { e.preventDefault(); comando("/plan "); return; } // «Modalità piano» ⇧⇥
     const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
     if (azione !== "inviaInterrompi" && azione !== "coda") return;
     e.preventDefault();
