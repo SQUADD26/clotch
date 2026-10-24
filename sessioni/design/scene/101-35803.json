@@ -19,14 +19,14 @@
     "limite": null,
     "richieste": [],
     "contestoMax": null,
-    "battito": 1792846174419,
+    "battito": 1792870716913,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792851120000,
+    "visto": 1792870716913,
     "fine": null,
     "fineT": null,
     "chatNuova": null,
@@ -52,7 +52,7 @@
     "genere": "archivio",
     "nonAnnullabile": null,
     "effettoAnnullo": null,
-    "annullabile": false,
+    "annullabile": true,
     "annullata": false
    },
    {
@@ -76,11 +76,11 @@
     "genere": "risposta",
     "nonAnnullabile": null,
     "effettoAnnullo": null,
-    "annullabile": false,
+    "annullabile": true,
     "annullata": false
    },
    {
-    "id": "r-000000000007",
+    "id": "r-000000000006",
     "t": 1792849200000,
     "cosa": "Fermata la sessione «Notch: avviso schermo»",
     "perche": "",
@@ -88,11 +88,11 @@
     "genere": "fermo",
     "nonAnnullabile": null,
     "effettoAnnullo": null,
-    "annullabile": false,
+    "annullabile": true,
     "annullata": false
    },
    {
-    "id": "r-000000000008",
+    "id": "r-000000000007",
     "t": 1792851120000,
     "cosa": "Consentita la migrazione 0042 su dev",
     "perche": "",
@@ -100,7 +100,7 @@
     "genere": "permesso",
     "nonAnnullabile": null,
     "effettoAnnullo": "clotch AI ha consentito la migrazione 0042 su dev. Annullarla lancia la migrazione inversa e rimette la sessione in attesa di te.",
-    "annullabile": false,
+    "annullabile": true,
     "annullata": false
    }
   ],

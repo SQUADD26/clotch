@@ -5,7 +5,8 @@ import { Pezzi } from "../base/Pezzi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Aiutante, Passo } from "./modello";
-import { useQuote, trova } from "../barra/account-dati";
+import type { QuotaUso } from "../../tipi";
+import { disponibili, useQuote, trova } from "../barra/account-dati";
 import { comanda } from "./clotch-ai";
 import { durata, nomeAccount, ora, quanti } from "./testi";
 import { useRiserva } from "./riserva";
@@ -125,7 +126,9 @@ function quando(ms: number, adesso: number) {
 export function Limite({ chat, chiave, ripartenza, adesso }: { chat: string; chiave: string; ripartenza: number | null; adesso: number }) {
   const quote = useQuote() ?? [];
   const questo = trova(quote, chiave);
-  const altri = quote.filter((q) => q !== questo && q.email).slice(0, 3); // un pulsante per account, come `riprendi_altrove` del menu account
+  // un pulsante per account con cartella su questo Mac, il più libero per primo (il feed è in ordine di email, #1146)
+  const pieno = (q: QuotaUso) => Math.max(q.cinque ?? 0, q.sette ?? 0);
+  const altri = disponibili(quote).filter((q) => q !== questo).sort((a, b) => pieno(a) - pieno(b)).slice(0, 3);
   const nome = nomeAccount(chiave);
   const passato = ripartenza != null && ripartenza <= adesso;
   const corpo = passato ? `L’account ${nome} può ripartire.`

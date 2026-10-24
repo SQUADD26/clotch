@@ -1,22 +1,21 @@
 // figma: 148-62026 — bottone account in fondo alla barra (#478): account in uso con le quote 5 ore e 7 giorni; primo menu 148:62191
-// (uso attuale + «Cambia account»), secondo menu 148:62379 (gli altri account), 90 % 148:62621, cambio non disponibile 148:62813.
+// (uso attuale + «Cambia account»), secondo menu 148:62379 (gli altri account), 90 % 148:62621. L'account è quello delle sessioni nuove (#1146).
 import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
 import { Pezzi } from "../base/Pezzi";
-import type { Registro } from "../../clotch-ai";
 import type { QuotaUso } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { useTastiMenu } from "../base/tastiera-menu";
 import { Sovrapposto } from "../base/Sovrapposto";
 import { numero } from "../base/token";
-import { comanda } from "../chat/clotch-ai";
-import { accountScelto, conto, iniziali, livello, nome, trova, useCorrente, useOra, useQuote, type Livello } from "./account-dati";
+import { imposta, useImpostazioni } from "../impostazioni/stato";
+import { accountNuove, conto, disponibili, iniziali, livello, nome, useOra, useQuote, type Livello } from "./account-dati";
 import { useProfilo } from "./Righe";
 import "./account.css";
 
-/** Dati fissi della scena di prova (`npm run parita`): ora, quote, account previsto, menu aperto (1 = uso, 2 = anche gli altri account), riga col passaggio. */
-export interface ProvaAccount { ora: number; quote: QuotaUso[]; previsto: string | null; menu?: 0 | 1 | 2; passaggio?: string }
-interface Props { /** Account distinti nell'elenco delle sessioni. */ conta: number; chat: string | null; registro: Registro | null; daDisco?: string; /** Vista Nuova sessione: la sola in cui si chiede `account_previsto`. */ nuova?: boolean; prova?: ProvaAccount; onAltro(e: MouseEvent): void; /** Il piede sta per aprire il menu uso: la barra chiude gli altri sovrapposti suoi (uno solo in cima). */ onApre?(): void }
+/** Dati fissi della scena di prova (`npm run parita`): ora, quote, account scelto, menu aperto (1 = uso, 2 = anche gli altri account), riga col passaggio. */
+export interface ProvaAccount { ora: number; quote: QuotaUso[]; scelto?: string | null; menu?: 0 | 1 | 2; passaggio?: string }
+interface Props { /** Account distinti nell'elenco delle sessioni. */ conta: number; prova?: ProvaAccount; onAltro(e: MouseEvent): void; /** Il piede sta per aprire il menu uso: la barra chiude gli altri sovrapposti suoi (uno solo in cima). */ onApre?(): void }
 
 // un colore per account, nell'ordine del feed (come la legenda di Uso nelle impostazioni)
 const COLORI = ["blu", "arancione", "viola", "verde"];
@@ -57,11 +56,11 @@ function avviso(q: QuotaUso): string | null {
   return !cosa ? null : l === "pieno" ? `${cosa} ${cosa === "5 ore" ? "finite" : "finiti"}` : `${cosa} quasi ${cosa === "5 ore" ? "finite" : "finiti"}`;
 }
 
-export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onAltro, onApre }: Props) {
+export function AccountBarra({ conta, prova, onAltro, onApre }: Props) {
   const utente = useProfilo().nome.split(" ")[0];
   const ora = useOra(prova?.ora);
   const quote = useQuote(prova?.quote) ?? [];
-  const cor = useCorrente(chat, registro, daDisco, prova?.previsto, nuova);
+  const salvato = useImpostazioni().accountNuove;
   const [menu, setMenu] = useState<0 | 1 | 2>(prova?.menu ?? 0);
   const [piede, setPiede] = useState<HTMLDivElement | null>(null);
   // il secondo menu si appoggia al primo, alla sua destra, coi fondi allineati
@@ -71,17 +70,13 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
   useTastiMenu(primo, () => setMenu(0));
   useTastiMenu(secondo, () => setMenu(0));
 
-  // senza sessione l'account è quello previsto (o il primo del feed se il motore non risponde)
-  const q = trova(quote, cor.chiave) ?? (cor.motore === null ? quote[0] : undefined);
-  const titolo = q?.account ?? (cor.chiave ? nome(cor.chiave) : utente || "Account");
+  // un solo account, sempre lo stesso: quello con cui partono le sessioni nuove (#1146); la sessione aperta non lo cambia
+  const { email, q } = accountNuove(quote, prova ? prova.scelto : salvato);
+  const titolo = q?.account ?? (email ? nome(email) : utente || "Account");
   const colori = Math.max(0, quote.findIndex((x) => x === q));
-  const cambia = cor.motore !== false && quote.length > 1;
-  const passa = (x: QuotaUso) => {
-    setMenu(0);
-    const email = x.email ?? x.account;
-    if (cor.motore && chat) void comanda("riprendi_altrove", { chat, account: email });
-    else accountScelto.imposta(email);
-  };
+  const altri = disponibili(quote).filter((x) => x !== q);
+  const cambia = altri.length > 0;
+  const passa = (x: QuotaUso) => { setMenu(0); imposta("accountNuove", x.email!); };
   const avvisoLimite = q && avviso(q);
 
   return (
@@ -119,21 +114,19 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
                 {avvisoLimite && <div className="avviso-limite"><Icona nome="avviso" /><span className="t-sm">{avvisoLimite}</span></div>}
               </div>
             : <div className="motivo"><Icona nome="info" /><span className="t-sm secondario">Non riesco a leggere l’uso di questo account. Riprova tra poco.</span></div>}
-          <div className="linea" />
-          {cor.motore === false
-            ? <div className="motivo"><Icona nome="info" /><span className="t-sm secondario">Sessione avviata fuori da clotch: l’account non si cambia.</span></div>
-            : <button type="button" role="menuitem" aria-haspopup="menu" aria-expanded={menu === 2} className={`voce ${menu === 2 ? "scelta" : ""}`} onClick={() => setMenu(menu === 2 ? 1 : 2)}>
-                <Icona nome="persona" /><span className="t-sm testo">Cambia account</span><Icona nome="destra" />
-              </button>}
+          {cambia && <div className="linea" />}
+          {cambia && <button type="button" role="menuitem" aria-haspopup="menu" aria-expanded={menu === 2} className={`voce ${menu === 2 ? "scelta" : ""}`} onClick={() => setMenu(menu === 2 ? 1 : 2)}>
+              <Icona nome="persona" /><span className="t-sm testo">Cambia account</span><Icona nome="destra" />
+            </button>}
         </Sovrapposto>
       )}
 
       {menu === 2 && cambia && (stretto ? piede : primo) && (
         <Sovrapposto ancora={stretto ? piede : primo} lato={stretto ? "sopra" : "destra"} fine={!stretto} scarto={numero("spazio-2")} className="menu-account secondo" role="menu" rif={setSecondo} onChiudi={() => setMenu(1)}>
           <div className="titolo-menu t-sm secondario">Cambia account</div>
-          {quote.map((x, i) => x !== q && (
+          {altri.map((x) => (
             <button key={x.account} type="button" role="menuitem" className={`riga-altro ${prova?.passaggio === x.account ? "passaggio" : ""}`} onClick={() => passa(x)}>
-              <span className="avatar piccolo" style={colore(i)}><span className="t-xs medio">{iniziali(x.account)}</span></span>
+              <span className="avatar piccolo" style={colore(quote.indexOf(x))}><span className="t-xs medio">{iniziali(x.account)}</span></span>
               <span className="testi">
                 <span className="nome">
                   <span className="t-sm testo">{x.account}</span>
@@ -144,7 +137,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
             </button>
           ))}
           <div className="linea" />
-          <div className="nota t-xs secondario">{cor.motore ? "La sessione riprende sull’account scelto." : "La sessione parte con l’account scelto."}</div>
+          <div className="nota t-xs secondario">La sessione parte con l’account scelto.</div>
         </Sovrapposto>
       )}
     </div>

@@ -58,6 +58,28 @@ app.whenReady().then(async () => {
       // la sessione nata si apre per id: la vista Nuova sessione sparisce
       await wait(() => !document.querySelector('.nuova-corpo'));
     });
+    await check('#1146_PARTE_CON_L_ACCOUNT_SCELTO_E_RICORDATO', async () => {
+      esito = { esito: 'ok', testo: 'Sessione aperta.' };
+      const q = (email, cartella) => ({ account: email.split('@')[0], email, cartelle: [cartella], usato: 20, ripartenza: '', cinque: 10, cinqueFine: null, sette: 20, setteFine: null });
+      scena.uso = [q('base@x.it', '.claude'), q('info@dentalspace.ai', '.claude-terminal-dentalspace')];
+      scena.impostazioni = { accountNuove: 'info@dentalspace.ai' };
+      try {
+        await load('vuota');
+        await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'info');
+        await scrivi('Prova account');
+        await invio();
+        await attendi(() => comandi.length === 1);
+        assert.equal(comandi[0].args.account, 'info@dentalspace.ai');
+        scena.impostazioni = null; // senza scelta: l'account di ~/.claude, mandato per email (quello mostrato è quello usato)
+        await load('vuota');
+        await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'base');
+        await scrivi('Prova account');
+        await invio();
+        await attendi(() => comandi.length === 1);
+        assert.equal(comandi[0].args.account, 'base@x.it');
+      } finally { delete scena.uso; scena.impostazioni = null; }
+    });
+
     await check('CARTELLA_SENZA_GIT_NIENTE_RAMO_NE_WORKTREE', async () => {
       await load('cartella:appunti', 2);
       assert.deepEqual(await selettori(), ['Questo computer', 'appunti']);

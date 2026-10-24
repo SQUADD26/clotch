@@ -9,7 +9,7 @@ import { svuotaCache, usoAlGiorno } from "../src/quote-uso";
 const ORA = Date.UTC(2026, 9, 23, 12, 0, 0);
 const riga = (i: number, giorno = "2026-10-23") =>
   JSON.stringify({ type: "assistant", requestId: `r${i}`, timestamp: `${giorno}T10:00:00.000Z`, message: { id: `m${i}`, usage: { input_tokens: 10, output_tokens: 0 } } }) + "\n";
-const totale = (g: Map<string, { v: number }[]>) => g.get("roberto")!.reduce((s, x) => s + x.v, 0);
+const totale = (g: Map<string, { v: number }[]>) => g.get("roberto@x.it")!.reduce((s, x) => s + x.v, 0);
 
 test("usoAlGiorno: due richieste insieme poi la trascrizione cresce: nessuna riga persa", async (t) => {
   svuotaCache();

@@ -265,6 +265,8 @@ export interface ImpostazioniApp {
   sorgenteClaudeCode: boolean; sorgenteClaude: boolean; sorgenteCodex: boolean; sorgenteCursor: boolean;
   /** Cartelle ~/.claude-* tolte o aggiunte a mano, oltre a quelle trovate dal main. */
   accountTolti: string[]; accountAggiunti: string[];
+  /** Email dell'account con cui partono le sessioni nuove, scelta nel piede della barra (#1146); null = quello di ~/.claude. */
+  accountNuove: string | null;
   comandiInteri: boolean; nascondiChiavi: boolean; cartelleEscluse: string[]; cronologia: string;
   /** «Rinomina etichetta…» (#460): nome mostrato per una cartella della barra, per nome originale; la cartella sul disco non cambia. */
   etichetteCartelle: Record<string, string>;

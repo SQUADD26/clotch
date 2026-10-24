@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792846084306,
+    "ultimaAttivita": 1792870626802,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -57,7 +57,7 @@
    {
     "tipo": "utente",
     "testo": "Guarda la schermata: il notch copre il titolo della sessione.\n@/Users/privato/Desktop/schermata-notch.png\n@/Users/privato/Desktop/lettore.ts",
-    "t": 1792846023306
+    "t": 1792870565802
    },
    {
     "tipo": "strumento",
@@ -66,7 +66,7 @@
     "ingresso": {
      "name": "notch-sopra-il-titolo.png"
     },
-    "t": 1792846024306,
+    "t": 1792870566802,
     "esito": {
      "testo": "",
      "errore": false,
@@ -84,7 +84,7 @@
     "tipo": "assistente",
     "testo": "Il notch copre i primi 40 px della barra del titolo. Sposto il titolo sotto i semafori.",
     "modello": "claude-opus-5-5",
-    "t": 1792846026306
+    "t": 1792870568802
    }
   ]
  },
