@@ -1,5 +1,6 @@
 /* figma: 101-28232 — «Visore immagine»: colonna 960 al centro del velo, frecce a 24 dai lati */
-.pezzo-chat .velo.visore-velo { gap: var(--spazio-6); }
+/* velo più fitto del solito (3 strati dello stesso token): il testo della pagina sotto non si legge in mezzo ai controlli */
+.pezzo-chat .velo.visore-velo { gap: var(--spazio-6); background: linear-gradient(var(--colore-fondo-velo), var(--colore-fondo-velo)), linear-gradient(var(--colore-fondo-velo), var(--colore-fondo-velo)), var(--colore-fondo-velo); backdrop-filter: blur(var(--spazio-2)); }
 .pezzo-chat .visore { flex: 0 1 var(--misura-visore-largo); min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-chat .barra-visore { display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone-invio); }
 .pezzo-chat .barra-visore .nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-primario); }
@@ -15,6 +16,7 @@
 }
 .pezzo-chat .immagine-visore img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 .pezzo-chat .immagine-visore[data-zoom="giu"] img { cursor: zoom-in; }
+.pezzo-chat .immagine-visore:focus-visible { outline-offset: calc(-1 * var(--misura-tratto-forte)); }
 .pezzo-chat .immagine-visore[data-zoom="su"] { cursor: grab; touch-action: none; }
 .pezzo-chat .immagine-visore[data-zoom="su"]:active { cursor: grabbing; }
 .pezzo-chat .immagine-visore.carico { background: var(--colore-fondo-sagoma); }
