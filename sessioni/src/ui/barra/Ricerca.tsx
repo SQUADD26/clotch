@@ -1,5 +1,6 @@
 // figma: 101-10247 — ricerca ⌘K: sessioni e messaggi (101:10247), azioni (101:23035), nessun risultato (101:23280).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { AzioneSessione, PreferenzeSessione, RisultatoRicerca, Sessione } from "../../tipi";
 import { Campo } from "../base/Campo";
 import { api } from "../base/dati";
@@ -27,10 +28,10 @@ export async function copiaUltimoBlocco(id: string) {
   }
 }
 
-/** «clotch-ai-mac-v2 · Codex»: l'account solo se non è il nome della sorgente (101:10247). */
+/** «clotch-ai-mac-v2» e «Codex» uno accanto all'altro: l'account solo se non è il nome della sorgente (101:10247). */
 const dettaglio = (s: Sessione) => {
   const account = nomeAccount(s.account);
-  return [s.progetto, nomeSorgente(s.sorgente), account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : account].filter(Boolean).join(", ");
+  return [s.progetto, nomeSorgente(s.sorgente), account.toLowerCase() === nomeSorgente(s.sorgente).toLowerCase() ? "" : account].filter(Boolean);
 };
 
 /** La parola cercata in evidenza dentro un testo (#865): peso medio e colore primario. */
@@ -137,7 +138,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo"><Evidenzia testo={v.s.titolo} parole={parole} /></span>
-                <span className="testo t-sm secondario"><Evidenzia testo={dettaglio(v.s)} parole={parole} /></span>
+                <span className="testo t-sm secondario"><Pezzi parti={dettaglio(v.s).map((d) => <Evidenzia testo={d} parole={parole} />)} /></span>
               </span>
               <span className="t-xs secondario">{giorno(v.s.ultimaAttivita, ora)}</span>
             </button>

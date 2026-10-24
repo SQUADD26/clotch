@@ -43,7 +43,7 @@ test("testi: pillola, giorni, opzioni, piede", () => {
   assert.equal(giorno(ORA - 24 * 3600_000, ORA), "Ieri");
   assert.deepEqual(opzioni(elenco, "progetto", ORA).map((o) => o.voce), ["clotch", "dentalspace", "squadd-v2"]);
   assert.equal(opzioni(elenco, "stato", ORA).length, 5);
-  assert.equal(dettaglioProfilo(elenco), "3 account, 3 app");
+  assert.equal(dettaglioProfilo(elenco), "3 account 3 app");
   assert.equal(dettaglioProfilo([]), "Nessuna sessione");
 });
 

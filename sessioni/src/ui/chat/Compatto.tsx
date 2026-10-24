@@ -42,8 +42,8 @@ export function Ragionamento({ b, aperto: iniziale = false }: { b: Extract<Blocc
   return (
     <div className="compatto pensiero">
       <button type="button" className="riga-compatta" aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
-        <span className="titolo">Ragionamento</span><span className="durata">{durata(b.durata ?? 0)}</span>
-        <Freccia aperta={aperto} />
+        <span className="titolo">Ragionamento</span><Freccia aperta={aperto} />
+        <span className="durata">{durata(b.durata ?? 0)}</span>
       </button>
       {aperto && <Rientrato testo={r.testo(b.testo)} />}
     </div>
@@ -115,11 +115,11 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
         ) : (
           <>
             <span className="titolo">{quanti(n, "strumento", "strumenti")}</span>
-            {g.durata > 0 && <><span className="durata">{tempo(g.durata)}</span></>}
           </>
         )}
         {g.errori.length > 0 && <>{" "}<Icona nome="avviso" colore="errore" /><span className="errori">{quanti(g.errori.length, "errore", "errori")}</span></>}
         {!ora && <Freccia aperta={aperto} />}
+        {!ora && g.durata > 0 && <span className="durata">{tempo(g.durata)}</span>}
       </button>
       {aperto && (
         <div className="elenco-strumenti">

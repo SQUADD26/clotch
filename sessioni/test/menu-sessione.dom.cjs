@@ -16,7 +16,7 @@ const CARTELLA = '/tmp/lavori/clotch';
 scene.navigazione = { vista: 'sessione', sessione: 'a' };
 scene.elenco.sessioni = ['a', 'b', 'c'].map((id) => ({ ...scene.elenco.sessioni[0], id, titolo: `Sessione ${id}`, cartella: CARTELLA, idApp: id === 'c' ? null : 'local_' + id }));
 scene.messaggi = { a: [], b: [], c: [] };
-scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni, letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione, letta ora', errore: false }];
+scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione letta ora', errore: false }];
 let win;
 const run = async (fn, ...a) => {
   const r = await win.webContents.executeJavaScript(`(async () => { try { return { v: await (${fn})(...${JSON.stringify(a)}) }; } catch (e) { return { e: String(e && e.message || e) }; } })()`);

@@ -37,7 +37,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
     if (!r || s.stato === "errore" || r.errori.length) return { icona: "posta", titolo: "Casella", segno: ["avviso", "errore"], stato: "Registro non leggibile" };
     const c = casella(r, Date.now());
     if (!c.aspettano) return { icona: "posta", titolo: "Casella", segno: ["finita", "successo"], stato: "Niente in attesa" };
-    return { icona: "posta", titolo: "Casella", segno: ["mano", "accento"], stato: `${c.aspettano === 1 ? "1 aspetta te" : `${c.aspettano} aspettano te`}, ${c.alLavoro} al lavoro` };
+    return { icona: "posta", titolo: "Casella", segno: ["mano", "accento"], stato: `${c.aspettano === 1 ? "1 aspetta te" : `${c.aspettano} aspettano te`} ${c.alLavoro} al lavoro` };
   }
   const st = r && statoClotchAi(r, Date.now());
   const segno: Testa["segno"] = avvio ? ["spinner", "secondaria"] : st ? SEGNO_CLOTCH_AI[st.stato] : undefined;

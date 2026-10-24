@@ -103,7 +103,7 @@ export function dettaglioProfilo(sessioni: Sessione[]) {
   if (!sessioni.length) return "Nessuna sessione";
   const account = numeroAccount(sessioni);
   const app = new Set(sessioni.map((s) => s.sorgente)).size;
-  return `${account} account, ${app} app`;
+  return `${account} account ${app} app`;
 }
 
 /** «Rinomina etichetta…»: l'etichetta della cartella `chiave`; vuota = torna il nome della cartella. */

@@ -1,6 +1,7 @@
 // figma: 101-40473 — «vista Regole»: regole imparate da clotch AI per repo, con Modifica. Stati: modifica 101-40699,
 // salvataggio 101-40936, salvata 101-41166, errore 101-41397, vuoto 101-41628.
 import { useState } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { Registro } from "../../clotch-ai";
 import { aggiornaAvviso, avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -17,7 +18,7 @@ type Regola = Registro["regole"][number];
 const GENERALI = "claude-config";
 const repo = (dove: string) => (dove === GENERALI ? GENERALI : dove.split("/").filter(Boolean).pop() ?? dove);
 const file = (dove: string) => (dove === GENERALI ? "global/hooks/friday/regole-imparate.md" : ".claude/friday-regole.md"); // nome del protocollo del motore
-const titolo = (dove: string) => (dove === GENERALI ? `Generali: ${GENERALI}` : `Progetto: ${repo(dove)}`);
+const titolo = (dove: string) => (dove === GENERALI ? `Generali ${GENERALI}` : `Progetto ${repo(dove)}`);
 
 /** Modifica = aggiunta della nuova e poi `togli` della vecchia (contratto): se qualcosa va storto la vecchia resta. */
 export const avvisoSalvataggio = (dove: string) => avvisa({ tipo: "caricamento", messaggio: `Aprendo la PR in ${repo(dove)}…` });
@@ -51,7 +52,7 @@ function Modifica({ regola, nuovo, onChiudi }: { regola: Regola; nuovo?: string;
       </>}>
       <textarea className="testo-regola t-base" value={testo} onChange={(e) => setTesto(e.target.value)} aria-label="Testo della regola"
         onKeyDown={(e) => { if (e.key === "Enter" && e.metaKey && ok) { e.preventDefault(); salvaEChiudi(); } }} />
-      <span className="t-sm secondario">{file(regola.dove)}, apre una PR in {repo(regola.dove)}</span>
+      <span className="t-sm secondario">{file(regola.dove)} apre una PR in {repo(regola.dove)}</span>
     </Dialogo>
   );
 }
@@ -77,7 +78,7 @@ export function Regole() {
             <div key={x.testo} className="voce-f">
               <div className="testi">
                 <span className="t-sm">{x.testo}</span>
-                <span className="t-xs secondario">{[file(x.dove), x.t !== null ? giorno(x.t) : ""].filter(Boolean).join(", ")}</span>
+                <span className="t-xs secondario"><Pezzi parti={[file(x.dove), x.t !== null ? giorno(x.t) : ""]} /></span>
               </div>
               <Bottone tipo="secondario" onClick={() => setModifica({ i: tutte.indexOf(x) })}>Modifica</Bottone>
             </div>

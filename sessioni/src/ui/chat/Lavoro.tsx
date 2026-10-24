@@ -1,6 +1,7 @@
 // figma: 101-14396 — lavoro e righe di stato nel filo: «Attività» 101:13368, «Aiutanti» 101:13419, «Interrotta» 101:13475 (finestra «Interrotta da te»: 101-15055),
 // «Riassunto» 101:13480, «Fine turno» 101:13494, «Bloccato da una regola» 101:13532, «Non risponde» 101:13541, «Avviso» 101:7316.
 import type { ReactNode } from "react";
+import { Pezzi } from "../base/Pezzi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Aiutante, Passo } from "./modello";
@@ -63,7 +64,7 @@ export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello:
   );
 }
 
-export function RigaStato({ icona, colore, esito, dettaglio }: { icona: NomeIcona; colore: "terziaria" | "successo"; esito: string; dettaglio?: string }) {
+export function RigaStato({ icona, colore, esito, dettaglio }: { icona: NomeIcona; colore: "terziaria" | "successo"; esito: string; dettaglio?: ReactNode }) {
   return (
     <div className="riga-stato">
       <Icona nome={icona} colore={colore} />
@@ -87,8 +88,8 @@ export function FineTurno({ ms, strumenti, file, aiutanti }: { ms: number | null
     strumenti && quanti(strumenti, "strumento", "strumenti"),
     file && quanti(file, "file", "file"),
     aiutanti && quanti(aiutanti, "aiutante", "aiutanti"),
-  ].filter(Boolean).join(", ");
-  return <RigaStato icona="finita" colore="successo" esito={ms != null ? `Finita in ${durata(ms)}` : "Finita"} dettaglio={parti} />;
+  ];
+  return <RigaStato icona="finita" colore="successo" esito={ms != null ? `Finita in ${durata(ms)}` : "Finita"} dettaglio={<Pezzi parti={parti} />} />;
 }
 
 /** Avvisi nel filo: bloccata (fondo attesa, scudo), non risponde e limite di uso (fondo errore). */

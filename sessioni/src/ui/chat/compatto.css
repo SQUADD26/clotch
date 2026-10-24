@@ -8,6 +8,8 @@
 }
 .pezzo-chat .compatto .riga-compatta { gap: var(--spazio-1-5); align-self: flex-start; max-width: calc(100% + 2 * var(--spazio-2)); }
 .pezzo-chat .compatto .riga { gap: var(--spazio-2); }
+/* con la durata la riga occupa tutta la larghezza e la durata sta a destra (163:84565) */
+.pezzo-chat .compatto .riga-compatta:has(> .durata) { align-self: stretch; max-width: none; }
 .pezzo-chat .compatto button.riga-compatta:hover, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-chat .compatto button.riga-compatta:active, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-chat .compatto button.riga-compatta:hover .titolo,

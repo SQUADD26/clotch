@@ -47,7 +47,7 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
     const err = elenco.errori.find((e) => e.percorso.split("/").includes(account));
     if (err) return { percorso, dettaglio: `Non leggibile: ${err.messaggio}`, errore: true };
     const n = elenco.sessioni.filter((s) => s.sorgente === "claude-code" && s.account === account).length;
-    return { percorso, dettaglio: `${n} sessioni, letta ora`, errore: false };
+    return { percorso, dettaglio: `${n} sessioni letta ora`, errore: false };
   });
 }
 
