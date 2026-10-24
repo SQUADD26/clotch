@@ -21,7 +21,7 @@ export type Blocco = (
   | { tipo: "attivita"; passi: Passo[] }
   | { tipo: "aiutanti"; aiutanti: Aiutante[] }
   | { tipo: "domanda"; id: string; domande: DomandaTesto[]; risposta: string | null; aperta: boolean }
-  | { tipo: "piano"; id: string; testo: string; approvato: boolean; aperto: boolean }
+  | { tipo: "piano"; id: string; testo: string; approvato: boolean; aperto: boolean; /** perché l'utente l'ha rifiutato («the user said: …»). */ rifiuto?: string }
   | { tipo: "bloccato"; id: string; testo: string }
   | { tipo: "file-toccati"; file: FileToccato[] }
   | { tipo: "risposta"; testo: string; inScrittura: boolean }
@@ -124,7 +124,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
         if (!resto && !m.immagini) return;
         m = { ...m, testo: resto };
       }
-      if (INTERRUZIONE.test(m.testo)) { (turno ?? apri(m.t, chiave)).blocchi.push({ tipo: "interrotta" }); return; }
+      if (INTERRUZIONE.test(m.testo)) { const b = (turno ?? apri(m.t, chiave)).blocchi; if (b.at(-1)?.tipo !== "interrotta") b.push({ tipo: "interrotta" }); return; }
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;
       inizio = m.t;
@@ -140,7 +140,9 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     const ultimo = i === messaggi.length - 1;
     switch (m.tipo) {
       case "pensiero": tu.blocchi.push({ tipo: "pensiero", testo: m.testo, durata: durata(i), inCorso: vivo && ultimo }); return;
-      case "assistente": tu.blocchi.push({ tipo: "risposta", testo: m.testo, inScrittura: vivo && ultimo }); return;
+      case "assistente":
+        if (/^No response requested\.?$/i.test(m.testo.trim())) return; // il resto di un'interruzione, non una risposta
+        tu.blocchi.push({ tipo: "risposta", testo: m.testo, inScrittura: vivo && ultimo }); return;
       case "errore":
         // «hit your limit» lo dice già l'avviso «Limite di uso raggiunto»; «No response requested.» è il resto di un'interruzione; un errore vuoto non ha nulla da dire
         if (!m.riprova && (!m.testo.trim() || NASCOSTI.test(m.testo))) return;
@@ -157,7 +159,8 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
 
   function strumento(tu: Extract<Voce, { tipo: "turno" }>, m: Strumento, i: number) {
     const st = stato(m, vivo), esito = m.esito?.testo ?? "";
-    if (m.esito?.errore && RIFIUTO.test(esito)) return; // «Negato da te»: lo dice la riga «Interrotta da te» che segue
+    // un rifiuto o un'interruzione dell'utente non è un errore dello strumento: la richiesta resta nel filo con il suo esito
+    const negato = !!m.esito?.errore && (RIFIUTO.test(esito) || INTERRUZIONE.test(esito));
     if (m.nome === "TodoWrite") {
       const b = tu.blocchi.find((x) => x.tipo === "attivita");
       if (b && b.tipo === "attivita") b.passi = passiDi(m.ingresso); else tu.blocchi.push({ tipo: "attivita", passi: passiDi(m.ingresso) });
@@ -178,7 +181,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       return;
     }
     if (m.nome === "ExitPlanMode") {
-      tu.blocchi.push({ tipo: "piano", id: m.id, testo: testoCampo(m.ingresso, "plan"), approvato: !!m.esito && !m.esito.errore, aperto: !m.esito });
+      tu.blocchi.push({ tipo: "piano", id: m.id, testo: testoCampo(m.ingresso, "plan"), approvato: !!m.esito && !m.esito.errore, aperto: !m.esito, ...(negato && /the user said:\s*(\S[\s\S]*)$/i.test(esito) ? { rifiuto: esito.match(/the user said:\s*(\S[\s\S]*)$/i)![1].trim() } : {}) });
       return;
     }
     if (m.nome === "WebSearch" || m.nome === "WebFetch") {
@@ -193,10 +196,16 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     }
     // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
     const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
-    const stRiga = bloccato ? "chiusa" : st;
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella, esito) });
+    const stRiga = bloccato || negato ? "chiusa" : st;
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: negato ? (INTERRUZIONE.test(esito) ? "Interrotto da te" : "Negato da te") : esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella, esito) });
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
+
+  // «Riprovo» dice che sta riprovando: se dopo è arrivato altro, la ripresa c'è stata e l'avviso va tolto
+  out.forEach((v, k) => {
+    if (v.tipo !== "turno") return;
+    v.blocchi = v.blocchi.filter((b, j) => b.tipo !== "errore" || !b.riprova || (k === out.length - 1 && j === v.blocchi.length - 1));
+  });
 
   // turni finiti: le modifiche diventano un solo «File toccati» prima dell'ultima risposta
   out.forEach((v, k) => {
