@@ -270,7 +270,12 @@ export interface ImpostazioniApp {
 
 export interface CartellaAccount { percorso: string; dettaglio: string; errore: boolean }
 /** `giorni`: uso al giorno dell'account (scheda Andamento), dal più vecchio a oggi; `giorno` = data ISO. `letto`: quando il feed ha letto i numeri (ms). */
-export interface QuotaUso { account: string; usato: number; ripartenza: string; letto?: number; giorni?: { giorno: string; v: number }[] }
+export interface QuotaUso {
+  account: string; usato: number; ripartenza: string; letto?: number;
+  /** Per finestra (#478): percentuale usata (null senza dato) e quando riparte, in ms; `usato` resta quello del 7 giorni (100 se le 5 ore sono finite). */
+  /** Email dell'account: è quella che chiedono `nuova_sessione` e `riprendi_altrove`. */
+  email?: string;
+  cinque?: number | null; cinqueFine?: number | null; sette?: number | null; setteFine?: number | null; giorni?: { giorno: string; v: number }[] }
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }
 

@@ -1,4 +1,4 @@
-/* figma: 101-7728 — barra laterale: righe comando, clotch AI, titolo sezione, cartella, sessione, piede (101:7728, 101:21065) */
+/* figma: 101-7728 — barra laterale: righe comando, clotch AI, titolo sezione, cartella, sessione (101:7728, 101:21065); il piede è in account.css */
 .pezzo-barra .riga {
   height: var(--misura-riga); padding: 0 var(--spazio-2); gap: var(--spazio-2); flex: none;
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left; width: 100%;
@@ -37,18 +37,6 @@
 /* parità: il fotogramma a 0 ms del disegno, banda sulle lettere 4-10 */
 .parita .pezzo-barra .lavoro { animation: none; background-position: 72% 0; }
 
-.pezzo-barra .piede {
-  padding: var(--spazio-2); gap: var(--spazio-2); flex: none;
-  display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
-}
-.pezzo-barra .piede:hover { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-barra .avatar {
-  width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-pieno); flex: none;
-  display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-bottone-secondario);
-}
-.pezzo-barra .piede .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-.pezzo-barra .piede .testi > * { max-width: 100%; }
-.pezzo-barra .piede .testi > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* stati della barra: vuoto 101:8772, caricamento 101:8824, errore 101:8931 */
 .pezzo-barra .elenco.vuoto { padding-left: var(--spazio-2); }
