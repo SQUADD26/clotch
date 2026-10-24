@@ -33,10 +33,10 @@ const wait = (fn, ...a) => win.webContents.executeJavaScript(`new Promise((ok, k
 const testo = (sel) => run((s) => document.querySelector(s)?.textContent ?? null, sel);
 const clicca = (sel, t) => run((sel, t) => { const el = [...document.querySelectorAll(sel)].find((e) => (e.textContent || '').includes(t)); if (!el) throw new Error('manca ' + sel + ' ' + t); el.click(); }, sel, t);
 // scenario: tipo di chat nel registro (null = nessuna chat), quote, sessione aperta o nuova
-const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager' }) => {
+const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno }) => {
   scene.uso = quote(cinque);
   scene.registro = { ...scene.registro, chat: sorgente ? { s1: chat(sorgente, account) } : {} };
-  scene.elenco = elencoPieno;
+  scene.elenco = elenco;
   scene.navigazione = nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' };
   comandi.length = 0;
   await win.loadFile(path.join(root, 'renderer/index.html'), { query: nuova ? { vista: 'nuova-sessione' } : { vista: 'sessione', sessione: 's1' } });
@@ -73,6 +73,15 @@ app.whenReady().then(async () => {
 
   await check('#993 CARTELLA: la sessione porta la cartella (.claude-terminal-dentalspace), non l\u2019email: il bottone mostra l\u2019uso di dentalspace', async () => {
     await carica({ sorgente: 'motore', account: '.claude-terminal-dentalspace' });
+    assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
+    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
+    await carica({ sorgente: 'motore' });
+  });
+
+  await check('#996 APP CLAUDE: sessione senza registro, account = profilo (Claude-dentalspace) ma con l’email del suo uuid: il bottone mostra l’uso di dentalspace', async () => {
+    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-dentalspace', email: 'dentalspace@example.com' } : x);
+    await carica({ sorgente: null, elenco: { ...elencoPieno, sessioni: app } });
     assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
     const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
     assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
