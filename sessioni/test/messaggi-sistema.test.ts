@@ -92,3 +92,14 @@ test("#484 notifica più testo vero: evento e bolla, nell'ordine", () => {
   const v = voci([{ tipo: "utente", testo: `${notifica("completed", 'Agent "A" finished')}\n\nOra il test`, t: 1 }], false);
   assert.deepEqual(v.map((x) => x.tipo === "evento" ? x.testo : x.tipo === "roberto" ? `roberto:${x.testo}` : x.tipo), ['Agente "A" finito', "roberto:Ora il test"]);
 });
+
+test("stati del turno: api_error diventa «Riprovo», limite e «No response requested» non fanno avvisi grezzi", () => {
+  const c = new Convertitore();
+  const riprova = c.riga({ type: "system", subtype: "api_error", level: "error", retryAttempt: 1, maxRetries: 10 }).nuovi;
+  assert.deepEqual(riprova, [{ tipo: "errore", testo: "", t: null, riprova: { n: 1, di: 10 } }]);
+  const grezzi = [...riprova, { tipo: "errore" as const, testo: "You've hit your session limit · resets 5pm", t: null }, { tipo: "errore" as const, testo: "No response requested.", t: null }];
+  const v = voci([{ tipo: "utente", testo: "x", t: 0 }, ...grezzi], false);
+  const b = v[1].tipo === "turno" ? v[1].blocchi : [];
+  assert.deepEqual(b.map((x) => x.tipo), ["errore"]);
+  assert.deepEqual(b[0].tipo === "errore" && b[0].riprova, { n: 1, di: 10 });
+});

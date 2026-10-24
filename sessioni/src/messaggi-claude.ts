@@ -51,7 +51,9 @@ export class Convertitore {
     const t = tempo(o);
 
     if (o.type === "system" && o.level === "error") {
-      nuovi.push({ tipo: "errore", testo: String(o.content ?? ""), t });
+      nuovi.push(o.subtype === "api_error" && o.retryAttempt
+        ? { tipo: "errore", testo: "", t, riprova: { n: Number(o.retryAttempt), di: Number(o.maxRetries) || Number(o.retryAttempt) } }
+        : { tipo: "errore", testo: String(o.content ?? ""), t });
     } else if (o.type === "user" || o.type === "assistant") {
       const c = o.message?.content;
       const fuori = o.type === "user" && nonDigitato(o);

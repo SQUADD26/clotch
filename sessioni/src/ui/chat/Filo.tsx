@@ -35,7 +35,9 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
     case "file-toccati": return <FileToccati b={b} aperto={aperto} />;
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
-    case "errore": return <AvvisoFilo tipo="errore" titolo={b.testo} />;
+    case "errore":
+      if (b.riprova) return <AvvisoFilo tipo="attesa" titolo="Riprovo" corpo={`Tentativo ${b.riprova.n} di ${b.riprova.di}`} />;
+      return /^API Error/.test(b.testo) ? <AvvisoFilo tipo="errore" titolo="Richiesta non riuscita" corpo={b.testo} /> : <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":
       if (!b.aperta) return b.risposta ? <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta} /> : <Esito icona="persona" colore="secondaria" esito="Senza risposta" />;

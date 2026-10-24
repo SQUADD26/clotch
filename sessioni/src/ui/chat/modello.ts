@@ -26,7 +26,7 @@ export type Blocco = (
   | { tipo: "file-toccati"; file: FileToccato[] }
   | { tipo: "risposta"; testo: string; inScrittura: boolean }
   | { tipo: "interrotta" }
-  | { tipo: "errore"; testo: string }) & { chiave?: string; origini?: string[] };
+  | { tipo: "errore"; testo: string; riprova?: { n: number; di: number } }) & { chiave?: string; origini?: string[] };
 
 export type Voce =
   /** `immagini`: incollate (101:28041); `percorsi`: file scritti in fondo al testo come `@percorso` (la casella li mette così). */
@@ -41,6 +41,7 @@ const INTERRUZIONE = /^\[Request interrupted by user/;
 const RIASSUNTO = /^This session is being continued from a previous conversation/;
 // esiti che dicono «bloccato da una regola o da un hook» (situazioni 11, 11b del catalogo)
 const BLOCCO = /^(<tool_use_error>)?(PreToolUse|Permission to use|.*denied by .*(rule|hook))/;
+const NASCOSTI = /hit your (session |usage |weekly )?limit|^No response requested/i;
 const RIFIUTO = /^The user doesn't want to proceed/;
 
 /** Stato di uno strumento: ancora senza esito = in corso finché la sessione lavora, poi chiuso. */
@@ -140,7 +141,10 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     switch (m.tipo) {
       case "pensiero": tu.blocchi.push({ tipo: "pensiero", testo: m.testo, durata: durata(i), inCorso: vivo && ultimo }); return;
       case "assistente": tu.blocchi.push({ tipo: "risposta", testo: m.testo, inScrittura: vivo && ultimo }); return;
-      case "errore": tu.blocchi.push({ tipo: "errore", testo: m.testo }); return;
+      case "errore":
+        // «hit your limit» lo dice già l'avviso «Limite di uso raggiunto»; «No response requested.» è il resto di un'interruzione; un errore vuoto non ha nulla da dire
+        if (!m.riprova && (!m.testo.trim() || NASCOSTI.test(m.testo))) return;
+        tu.blocchi.push({ tipo: "errore", testo: m.testo, ...(m.riprova ? { riprova: m.riprova } : {}) }); return;
       case "strumento": return strumento(tu, m, i);
     }
   }

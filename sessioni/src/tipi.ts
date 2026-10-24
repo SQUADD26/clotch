@@ -117,7 +117,7 @@ export type Messaggio =
       esito: { testo: string; errore: boolean; immagini?: RifImmagine[] } | null;
       t: number | null;
     }
-  | { tipo: "errore"; testo: string; t: number | null };
+  | { tipo: "errore"; testo: string; t: number | null; /** errore di rete che il motore sta ritentando (`api_error`). */ riprova?: { n: number; di: number } };
 
 export interface PaginaMessaggi {
   /** In ordine di tempo. Pagina 0 = i più recenti. */
