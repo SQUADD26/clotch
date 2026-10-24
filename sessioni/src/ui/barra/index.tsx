@@ -124,7 +124,7 @@ export default function Barra() {
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
       figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
-      onApri={() => vivi.current.apriSessione(s.id)}
+      onApri={() => { vivi.current.apriSessione(s.id); if (vivi.current.pref[s.id]?.nonLetta) void api().impostaPreferenze(s.id, { nonLetta: null }); }}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
       onFissa={() => void api().impostaPreferenze(s.id, { fissa: vivi.current.pref[s.id]?.fissa ? null : true })}
       onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "riga", id: s.id, a: punto(e) }); }}
@@ -167,6 +167,12 @@ export default function Barra() {
           ))}
           {!!barra.fissate.length && <><TitoloSezione>Fissate</TitoloSezione>{righe(barra.fissate, true)}</>}
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
+          {!!sessioni.length && !barra.totale && (
+            <div className="vuoto-filtri">
+              <span className="t-sm secondario">Nessuna sessione con questi filtri</span>
+              <Bottone tipo="secondario" onClick={() => setVista({ ...vista, filtri: [] })}>Togli i filtri</Bottone>
+            </div>
+          )}
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
               <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
