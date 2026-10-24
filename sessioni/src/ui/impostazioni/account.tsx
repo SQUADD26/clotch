@@ -48,7 +48,7 @@ export default function Account() {
   useEffect(() => { if (prova?.dopoRimuovi) avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => {} } }); }, []);
   return (
     <Pagina titolo="Account">
-      <div className="t-base secondario">Le cartelle ~/.claude-* da cui leggere le sessioni di Claude Code.</div>
+      <div className="t-base secondario">Le cartelle degli account da cui leggere le sessioni di Claude Code.</div>
       {cartelle && cartelle.length > 0 && (
         <Gruppo>
           {cartelle.map((c) => (

@@ -123,8 +123,8 @@ export function MenuCartella({ recenti, cartella, ctx, ramo, worktree, inizio = 
           <Separatore />
           <Riga etichetta="Ramo" valore={ramo ?? undefined} fine="freccia" onClick={() => { onChiudi(); onRamo(); }} />
           <div className="voce" role="menuitemcheckbox" aria-checked={worktree} onClick={() => onWorktree(!worktree)}>
-            <span className="etichetta">Worktree</span>
-            <span onClick={(e) => e.stopPropagation()}><Interruttore etichetta="Worktree" acceso={worktree} onCambia={onWorktree} /></span>
+            <span className="etichetta">Copia di lavoro</span>
+            <span onClick={(e) => e.stopPropagation()}><Interruttore etichetta="Copia di lavoro" acceso={worktree} onCambia={onWorktree} /></span>
           </div>
         </>
       )}

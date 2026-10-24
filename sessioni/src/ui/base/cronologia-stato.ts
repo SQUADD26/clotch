@@ -24,7 +24,7 @@ export const nuovaCronologia = (sessione: string | null): CronologiaStato => ({
 });
 export const righeOrdinate = (s: CronologiaStato) => [...s.righe.values()].sort((a, b) => a.ordine - b.ordine);
 export const fallita = (s: CronologiaStato, errore: string, invalida = true, riparti = false): CronologiaStato => ({ ...s, errore, invalida, riparti });
-const CAMBIATA = "La cronologia è cambiata. Riprova.";
+const CAMBIATA = "La sessione è cambiata. Riprova.";
 const TIPI = new Set(["utente", "assistente", "pensiero", "strumento", "errore"]);
 // Il messaggio arriva dal main: ne controlliamo forma e tipi prima di darlo da disegnare.
 const messaggioValido = (m: Messaggio): boolean => {
@@ -50,23 +50,23 @@ export function applicaDelta(s: CronologiaStato, d: DeltaCronologia): Cronologia
   if (d.epoca !== s.snapshot.epoca) return fallita(s, CAMBIATA, true, true);
   const seq = s.sequenza!;
   if (!Number.isInteger(d.daSeq) || !Number.isInteger(d.aSeq) || d.aSeq <= d.daSeq || d.daSeq < 0)
-    return fallita(s, "Aggiornamento della cronologia non valido.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   if (d.aSeq <= seq) return s;
-  if (d.daSeq !== seq) return fallita(s, "Mancano aggiornamenti della cronologia. Riprova.");
+  if (d.daSeq !== seq) return fallita(s, "Aggiornamenti persi. Riprova.");
   if (!Number.isInteger(d.totale) || d.totale < (s.totale ?? 0) || d.totale < s.righe.size || d.righe.some((r) => !valida(r) || r.revisione <= d.daSeq || r.revisione > d.aSeq))
-    return fallita(s, "Aggiornamento della cronologia non valido.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   const righe = new Map(s.righe), overlay = new Map(s.overlay);
   const minimo = [...s.righe.values()].reduce((min, r) => Math.min(min, r.ordine), Infinity);
   for (const r of d.righe) {
     const prima = overlay.get(r.chiave) ?? righe.get(r.chiave);
     if (prima && (prima.ordine !== r.ordine || prima.revisione > r.revisione))
-      return fallita(s, "Identità della cronologia non valida.");
+      return fallita(s, "Messaggi non leggibili. Riprova.");
     const valore = copia(r);
     overlay.set(r.chiave, valore);
     if (righe.has(r.chiave) || r.ordine >= minimo || s.snapshot.totaleSnapshot === 0) righe.set(r.chiave, valore);
   }
   if (new Set([...overlay.values(), ...righe.values()].map((r) => `${r.ordine}:${r.chiave}`)).size !== new Set([...overlay.values(), ...righe.values()].map((r) => r.ordine)).size)
-    return fallita(s, "Identità della cronologia non valida.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   if (overlay.size > MAX_BUFFER) return fallita(s, "Troppi aggiornamenti in attesa. Riprova.");
   return { ...s, righe, overlay, sequenza: d.aSeq, totale: d.totale, errore: null };
 }
@@ -77,20 +77,20 @@ export function applicaPagina(s: CronologiaStato, p: PaginaMessaggi): Cronologia
     return fallita(s, p.erroreCronologia?.testo || p.errore!, p.erroreCronologia?.ripartenza !== "stessa_pagina");
   const c = p.cronologia;
   if (!c || c.v !== 1 || c.sessione !== s.sessione)
-    return fallita(s, "Protocollo cronologia non disponibile.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   if (!c.epoca || !c.snapshot || !Number.isInteger(c.watermark) || c.watermark < 0 ||
       !Number.isInteger(c.totaleSnapshot) || c.totaleSnapshot < c.righe.length || c.righe.some((r) => !valida(r) || r.revisione > c.watermark) || new Set(c.righe.map((r) => r.chiave)).size !== c.righe.length)
-    return fallita(s, "Pagina della cronologia non valida.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   if (s.snapshot && (c.epoca !== s.snapshot.epoca || c.snapshot !== s.snapshot.snapshot || c.watermark !== s.snapshot.watermark || c.totaleSnapshot !== s.snapshot.totaleSnapshot))
-    return fallita(s, "La pagina non appartiene alla cronologia aperta. Riprova.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   const righe = s.snapshot ? new Map(s.righe) : new Map<string, RigaCronologia>();
   for (const r of c.righe) {
     const prima = s.overlay.get(r.chiave) ?? righe.get(r.chiave);
-    if (prima && prima.ordine !== r.ordine) return fallita(s, "Identità della cronologia non valida.");
+    if (prima && prima.ordine !== r.ordine) return fallita(s, "Messaggi non leggibili. Riprova.");
     righe.set(r.chiave, s.overlay.get(r.chiave) ?? copia(r));
   }
   if (new Set([...righe.values()].map((r) => r.ordine)).size !== righe.size)
-    return fallita(s, "Identità della cronologia non valida.");
+    return fallita(s, "Messaggi non leggibili. Riprova.");
   let prossimo: CronologiaStato = { ...s, snapshot: s.snapshot ?? structuredClone(c), righe,
     sequenza: s.sequenza ?? c.watermark, totale: s.totale ?? c.totaleSnapshot,
     cursore: c.cursorePrima, pagina: p.pagina, errore: null, buffer: [] };

@@ -73,7 +73,7 @@ export function Contesto({ usati, max, mcp }: { usati: number; max: number | nul
         <div className="voce"><span className="campione usato" /><span className="t-sm secondario nome">Usato</span><span className="t-sm secondario">{token(usati)}</span><span className="t-sm">{percento(usato)}</span></div>
         <div className="voce"><span className="campione libero" /><span className="t-sm secondario nome">Spazio libero</span><span className="t-sm secondario">{token(libero)}</span><span className="t-sm">{percento(1 - usato)}</span></div>
       </div></>}
-      {mcp > 0 && <div className="riga-info"><span className="t-sm testo">Strumenti MCP</span><span className="t-sm secondario">{mcp}</span></div>}
+      {mcp > 0 && <div className="riga-info"><span className="t-sm testo">Connettori</span><span className="t-sm secondario">{mcp}</span></div>}
     </Scheda>
   );
 }
