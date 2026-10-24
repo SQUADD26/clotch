@@ -101,7 +101,7 @@ export function NuovaSessione() {
 
   const imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>) => setP((x) => ({ ...x, ...parte }) as PreferenzeSessione);
   const modello = modelloDi({ modello: idModello(globale) ?? null }, p) ?? "";
-  const pronto = !!testo.trim() && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
+  const pronto = !!testo.trim() && !!dati && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
   const manda = async () => {
     if (!pronto || !dati) return;
     setAttesa(true);
@@ -126,7 +126,7 @@ export function NuovaSessione() {
   const togli = async (nome: string) => {
     setDialogo(null);
     const e = await comandaEsito("macchina_togli", { nome });
-    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
+    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); avvisa({ tipo: "successo", messaggio: `${nome} rimossa` }); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
     mac.ricarica();
   };
   const apri = (m: Menu) => setMenu(menu === m ? null : m);
@@ -142,11 +142,11 @@ export function NuovaSessione() {
                 placeholder="Descrivi il lavoro" aria-label="Descrivi il lavoro" />
             </div>
             <div className="azioni">
-              <BottoneIcona icona="piu" etichetta="Allega" disabled />
+              <BottoneIcona icona="piu" etichetta="Allega, disponibile dopo il primo messaggio" disabled />
               <ChipPermessi s={{ modello, permessi: null, contesto: null }} p={p} imposta={imposta} aperto={menu === "permessi"} onAperto={(a) => setMenu(a ? "permessi" : null)} disabled={!!attesa} />
               <span className="spinta" />
               <ChipModello s={{ modello, permessi: null, contesto: null }} p={p} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={!!attesa} />
-              <BottoneIcona icona="microfono" etichetta="Detta" disabled />
+              <BottoneIcona icona="microfono" etichetta="Detta, disponibile dopo il primo messaggio" disabled />
               <button type="button" className="bottone-invia" disabled={!pronto} aria-label={attesa ? "In attesa della sessione" : "Invia"} title={attesa ? "In attesa della sessione" : "Invia"} onClick={() => void manda()}>
                 {attesa ? <Icona nome="spinner" gira colore="su-accento" /> : <Icona nome="invia" colore={testo && !bloccata ? "su-accento" : "terziaria"} />}
               </button>
@@ -167,7 +167,7 @@ export function NuovaSessione() {
               <Selettore icona="ramo" etichetta={ramo ?? "Nessun ramo"} aperto={menu === "ramo"} fisso={remoto} onClick={() => apri("ramo")}>
                 {menu === "ramo" && <MenuRamo rami={contesto.rami} ramo={ramo} inizio={provaDi(sezione, "cerca") ?? ""} onScegli={setRamo} onChiudi={chiudi} />}
               </Selettore>
-              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
+              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} acceso={worktree} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
             </>
           )}
         </div>

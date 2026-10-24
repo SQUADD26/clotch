@@ -5,6 +5,7 @@ import { Icona } from "../base/Icona";
 import { Gruppo, Pagina, Tasto } from "./controlli";
 import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
+import { riservatoDa } from "./riservati";
 import { AZIONI, nomeAzione, normalizza, tastiDi } from "./tasti";
 
 const nome = nomeAzione;
@@ -26,7 +27,7 @@ export default function Scorciatoie() {
       const t = tastiDi(e);
       if (!t) return;
       setAscolta(null);
-      const con = Object.entries(v.scorciatoie).find(([a, x]) => x === t && a !== ascolta)?.[0];
+      const con = Object.entries(v.scorciatoie).find(([a, x]) => normalizza(x) === t && a !== ascolta)?.[0] ?? riservatoDa(t); // `nome()` lascia com'è ciò che non è un'azione modificabile
       if (con) setConflitto({ azione: ascolta, tasti: t, con });
       else { setConflitto(null); imposta("scorciatoie", { ...v.scorciatoie, [ascolta]: t }); }
     };
@@ -51,7 +52,7 @@ export default function Scorciatoie() {
               {c && (
                 <div className="conflitto">
                   <span className="t-sm errore">Già usata da «{nome(c.con)}»</span>
-                  <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>
+                  {AZIONI.some(([a]) => a === c.con) && <Bottone tipo="secondario" onClick={() => sostituisci(c)}>Sostituisci</Bottone>}
                 </div>
               )}
               {ascolta === azione ? <span className="tasto-chip in-ascolto">Premi i tasti…</span>

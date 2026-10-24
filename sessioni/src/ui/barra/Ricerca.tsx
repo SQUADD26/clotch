@@ -1,5 +1,5 @@
 // figma: 101-10247 — ricerca ⌘K: sessioni e messaggi (101:10247), azioni (101:23035), nessun risultato (101:23280).
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { AzioneSessione, PreferenzeSessione, RisultatoRicerca, Sessione } from "../../tipi";
 import { Campo } from "../base/Campo";
 import { api } from "../base/dati";
@@ -66,6 +66,14 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
     ];
   }, [sessioni, aperta, parole, dalMain]);
   useEffect(() => setI(0), [parole]);
+  // la scelta fatta con le frecce resta in vista (#835); scorre solo la lista: scrollIntoView spostava anche la finestra (overflow hidden)
+  const lista = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const l = lista.current, el = l?.querySelector(`#ricerca-voce-${i}`);
+    if (!l || !el) return;
+    const a = l.getBoundingClientRect(), b = el.getBoundingClientRect(), bordo = parseFloat(getComputedStyle(l).paddingTop);
+    if (b.top < a.top + bordo) l.scrollTop -= a.top + bordo - b.top; else if (b.bottom > a.bottom - bordo) l.scrollTop += b.bottom - a.bottom + bordo;
+  }, [i]);
 
   const scegli = (v: Voce) => {
     onChiudi();
@@ -85,8 +93,9 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
   return (
     <Velo onChiudi={onChiudi}>
       <div className="finestra-ricerca" role="dialog" aria-label="Cerca sessioni" onKeyDown={tasto}>
-        <Campo grande tasto="esc" placeholder="Cerca sessioni" value={q} autoFocus onChange={(e) => setQ(e.target.value)} />
-        <div className="risultati">
+        <Campo grande tasto="esc" placeholder="Cerca sessioni" value={q} autoFocus onChange={(e) => setQ(e.target.value)}
+          role="combobox" aria-expanded aria-controls="ricerca-risultati" aria-activedescendant={voci[i] ? `ricerca-voce-${i}` : undefined} />
+        <div ref={lista} className="risultati" id="ricerca-risultati" role="listbox" aria-label="Risultati">
           {!voci.length && (
             <div className="nessun-risultato">
               <Icona nome="cerca" colore="terziaria" />
@@ -96,7 +105,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           )}
           {!!azioni.length && <div className="titolo-gruppo t-xs medio secondario">Azioni</div>}
           {azioni.map((v) => v.tipo === "azione" && (
-            <button key={v.a.azione} type="button" className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.a.azione} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <Icona nome={v.a.icona} />
               <span className="t-sm etichetta">{v.a.etichetta}</span>
               {v.a.scorciatoia && <span className="t-sm secondario">{v.a.scorciatoia}</span>}
@@ -104,7 +113,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           ))}
           {!!trovate.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Sessioni</span></div>}
           {trovate.map((v) => v.tipo === "sessione" && (
-            <button key={v.s.id} type="button" className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo">{v.s.titolo}</span>
@@ -115,7 +124,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           ))}
           {!!messaggi.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Messaggi</span></div>}
           {messaggi.map((v) => v.tipo === "messaggio" && (
-            <button key={v.s.id} type="button" className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseEnter={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo">{v.s.titolo}</span>

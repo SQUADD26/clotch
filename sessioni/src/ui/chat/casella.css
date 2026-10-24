@@ -5,6 +5,7 @@
   padding: var(--spazio-3) var(--spazio-3) var(--spazio-2-5) var(--spazio-3);
   background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-casella);
 }
+.pezzo-chat .casella:hover:not(.errore) { border-color: var(--colore-bordo-forte); }
 .pezzo-chat .casella:focus-within, .pezzo-chat .casella.fuoco { border-color: var(--colore-bordo-fuoco); }
 .pezzo-chat .casella .area-testo { display: flex; padding-left: var(--spazio-1); }
 .pezzo-chat .casella textarea {
@@ -20,6 +21,8 @@
   display: inline-flex; align-items: center; gap: var(--spazio-1); height: var(--misura-bottone); padding: 0 var(--spazio-2);
   border-radius: var(--raggio-pieno); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
+/* fuoco da tastiera come il Bottone icona (153:71027): 2 px dentro, su ogni controllo della riga */
+.pezzo-chat .casella .chip:focus-visible, .pezzo-chat .bottone-invia:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
 .pezzo-chat .casella .chip .modello { color: var(--colore-testo-primario); }
 .pezzo-chat .bottone-invia {
   width: var(--misura-bottone-invio); height: var(--misura-bottone-invio); flex: none; border-radius: var(--raggio-pieno);

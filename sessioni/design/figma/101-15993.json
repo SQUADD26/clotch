@@ -55,7 +55,7 @@
   "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "spazio/2-5": 10,
   "colore/testo/bolla": "#fdf5f1",
@@ -67,7 +67,7 @@
   "raggio/casella": 22,
   "raggio/xl": 15,
   "misura/pannello": 320,
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff7673"
  },
  "nodi": [
   {

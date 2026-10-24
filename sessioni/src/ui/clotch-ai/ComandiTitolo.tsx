@@ -10,6 +10,7 @@ import "../base/menu.css"; // stile di «menu» della base: qui il menu ha titol
 import { useAvvisoNotch } from "./avvisoNotch";
 import { useEscChiude } from "../base/layout";
 import { useNavigazione } from "../base/navigazione";
+import { comanda } from "../chat/clotch-ai";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
 import { plurale } from "../base/formato";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
@@ -34,7 +35,7 @@ export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", m
 /** Esito di Ferma tutto: `non` = sessioni non ferme (null = clotch AI non ha risposto, col suo testo). */
 export function esitoFermo(id: number, quante: number, non: string[] | null, testo = "") {
   if (non && !non.length) {
-    aggiornaAvviso(id, { tipo: "info", messaggio: `${plurale(quante, "sessione ferma", "sessioni ferme")}`, azione: { etichetta: "Riprendi tutte", fai: () => clotchAi().comando("riprendi_tutto") } });
+    aggiornaAvviso(id, { tipo: "info", messaggio: `${plurale(quante, "sessione ferma", "sessioni ferme")}`, azione: { etichetta: "Riprendi tutte", fai: () => void comanda("riprendi_tutto", {}) } });
   } else {
     const messaggio = non ? (non.length === 1 ? "1 sessione non si è fermata" : `${non.length} sessioni non si sono fermate`) : testo || "clotch AI non risponde";
     aggiornaAvviso(id, { tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: () => fermaTutto(quante) } });
@@ -54,7 +55,7 @@ const scelta = negozio("");
 
 function MenuNonDisturbare({ clotch, quiete, onChiudi }: { clotch: boolean; quiete: boolean; onChiudi(): void }) {
   const attuale = scelta.usa();
-  const metti = (etichetta: string, args: Record<string, unknown>) => { scelta.metti(etichetta); onChiudi(); clotchAi().comando("non_disturbare", { acceso: true, ...args }); };
+  const metti = (etichetta: string, args: Record<string, unknown>) => { scelta.metti(etichetta); onChiudi(); void comanda("non_disturbare", { acceso: true, ...args }); };
   const voci: [NomeIcona, string, Record<string, unknown>][] = [
     ["orologio", "Per 1 ora", { minuti: 60 }],
     ["orologio", `Fino alle ${ORA_SERA}:00`, { fino: prossima(Date.now(), ORA_SERA) }],
@@ -72,9 +73,9 @@ function MenuNonDisturbare({ clotch, quiete, onChiudi }: { clotch: boolean; quie
         </button>
       ))}
       {quiete && (
-        <button type="button" role="menuitem" className="voce" onClick={() => { scelta.metti(""); onChiudi(); clotchAi().comando("non_disturbare", { acceso: false }); }}>
+        <button type="button" role="menuitem" className="voce" onClick={() => { scelta.metti(""); onChiudi(); void comanda("non_disturbare", { acceso: false }); }}>
           <Icona nome="chiudi" />
-          <span className="etichetta t-sm">Togli</span>
+          <span className="etichetta t-sm">Rimuovi</span>
         </button>
       )}
       <div className="separatore" role="separator"><div className="linea" /></div>
