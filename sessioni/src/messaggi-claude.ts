@@ -9,6 +9,11 @@ const tempo = (o: any): number | null => {
   return Number.isNaN(t) ? null : t;
 };
 
+// Chi ha scritto il turno: solo human e sdk (anche i prompt di dispatch) sono testo da mostrare come utente; task_notification e peer
+// diventano righe evento (modello.ts); ogni altro valore (system, scheduled, auto_continuation, plugin, coordinator…) l'ha scritto l'harness (#484).
+const DIGITATI = new Set(["human", "sdk", "task_notification", "task-notification", "peer"]);
+const nonDigitato = (o: any) => (o.turnOrigin !== undefined && !DIGITATI.has(o.turnOrigin)) || (o.origin?.kind !== undefined && !DIGITATI.has(o.origin.kind));
+
 const stringa = (x: unknown) => (typeof x === "string" ? x : "");
 
 const testoDi = (c: unknown): string => {
@@ -49,17 +54,18 @@ export class Convertitore {
       nuovi.push({ tipo: "errore", testo: String(o.content ?? ""), t });
     } else if (o.type === "user" || o.type === "assistant") {
       const c = o.message?.content;
+      const fuori = o.type === "user" && nonDigitato(o);
       if (o.type === "assistant" && o.isApiErrorMessage) {
         nuovi.push({ tipo: "errore", testo: testoDi(c), t });
       } else if (typeof c === "string") {
-        const testo = o.type === "user" ? senzaSistema(c) : c; // i testi dell'harness non sono di Roberto (#484)
+        const testo = o.type === "user" ? (fuori ? "" : senzaSistema(c)) : c; // i testi dell'harness non sono di Roberto (#484)
         if (testo.trim()) nuovi.push(o.type === "user" ? { tipo: "utente", testo, t } : { tipo: "assistente", testo, modello: o.message?.model ?? null, t });
       } else if (Array.isArray(c)) {
         // le immagini incollate stanno sul primo testo della riga; quelle di un esito sullo strumento
         const rif = (i: { n: number; mime: string; byte: number }, nome?: string): RifImmagine => ({ riga: o.uuid, n: i.n, mime: i.mime, byte: i.byte, ...(nome ? { nome } : {}) });
-        const imgs = typeof o.uuid === "string" && o.type === "user" ? immaginiDiRiga(c) : [];
+        const imgs = typeof o.uuid === "string" && o.type === "user" && !fuori ? immaginiDiRiga(c) : [];
         const mie = imgs.filter((i) => i.tool === null).map((i, k) => rif(i, `Immagine ${o.imagePasteIds?.[k] ?? k + 1}`));
-        const testoBlocco = (b: any): string => (b?.type === "text" && typeof b.text === "string" ? (o.type === "user" ? senzaSistema(b.text) : b.text) : "");
+        const testoBlocco = (b: any): string => (b?.type === "text" && typeof b.text === "string" ? (o.type === "user" ? (fuori ? "" : senzaSistema(b.text)) : b.text) : "");
         if (mie.length && !c.some((b: any) => testoBlocco(b).trim())) nuovi.push({ tipo: "utente", testo: "", t, immagini: mie });
         for (const b of c) {
           const testo = testoBlocco(b);

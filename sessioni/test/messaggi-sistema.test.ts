@@ -13,7 +13,6 @@ test("#484 system-reminder da solo: nascosto, in stringa e in blocco", () => {
   assert.deepEqual(utente([{ type: "text", text: r }]), []);
   assert.deepEqual(utente("<command-name>/clear</command-name>\n<command-message>clear</command-message>\n<command-args></command-args>"), []);
   assert.deepEqual(utente("<local-command-stdout>ok</local-command-stdout>"), []);
-  assert.deepEqual(utente('<cross-session-message from="x">ciao</cross-session-message>'), []);
 });
 
 test("#484 testo vero più reminder: resta solo il testo vero", () => {
@@ -59,6 +58,34 @@ test("#484 di Roberto restano: pasted_content, bash-input, tag in mezzo al disco
     assert.deepEqual(utente(t), [{ tipo: "utente", testo: t, t: null }]);
   const m = utente("<system-reminder>n</system-reminder>\n<pasted_content>log</pasted_content>");
   assert.deepEqual(m.map((x) => (x as any).testo), ["<pasted_content>log</pasted_content>"]);
+});
+
+const riga = (extra: object, content: unknown) => new Convertitore().riga({ type: "user", message: { content }, ...extra }).nuovi;
+const eventi = (testo: string) => voci(riga({ turnOrigin: "peer" }, testo) as any, false).map((x) => (x.tipo === "evento" ? x.testo : x.tipo));
+
+test("#484 turnOrigin: system, scheduled, auto_continuation, valori mai visti e origin plugin/coordinator si nascondono; human e sdk no", () => {
+  for (const turnOrigin of ["system", "scheduled", "auto_continuation", "nuovo_valore"]) assert.deepEqual(riga({ turnOrigin }, "Testo dell'harness"), [], turnOrigin);
+  for (const kind of ["plugin", "coordinator", "auto-continuation"]) assert.deepEqual(riga({ origin: { kind } }, [{ type: "text", text: "Nota" }]), [], kind);
+  for (const turnOrigin of ["human", "sdk"]) assert.equal(riga({ turnOrigin }, "Ciao").length, 1, turnOrigin);
+  assert.equal(riga({}, "Ciao").length, 1);
+});
+
+test("#484 turnOrigin nascosto non perde l'esito di uno strumento nella stessa riga", () => {
+  const c = new Convertitore();
+  c.riga({ type: "assistant", message: { content: [{ type: "tool_use", id: "t1", name: "Bash", input: {} }] } });
+  const r = c.riga({ type: "user", turnOrigin: "system", message: { content: [{ type: "tool_result", tool_use_id: "t1", content: "ok" }] } });
+  assert.equal(r.aggiornati.length, 1);
+});
+
+test("#484 messaggio da un'altra sessione: riga evento «Messaggio da <nome>», mai una bolla", () => {
+  const msg = (attr: string) => `Another Claude session sent a message:\n<cross-session-message ${attr}>\nCiao dal fratello\n</cross-session-message>`;
+  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock" from-name="H-331 - Orchestratore" from-mode="bypass"')), ["Messaggio da H-331 - Orchestratore"]);
+  assert.deepEqual(eventi(msg('from="local_4caf" name="★ MENU BAR" encoded="1"')), ["Messaggio da ★ MENU BAR"]);
+  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock"')), ["Messaggio da un'altra sessione"]);
+  assert.deepEqual(eventi('<relay from="coordinator" session="s1">\n  nota\n</relay>'), ["Messaggio da un'altra sessione"]);
+  // un reminder fra due messaggi: solo gli eventi, nessuna bolla
+  const due = `${msg('name="A"')}\n<system-reminder>\nnota\n</system-reminder>\n${msg('name="B"')}`;
+  assert.deepEqual(eventi(due), ["Messaggio da A", "Messaggio da B"]);
 });
 
 test("#484 notifica più testo vero: evento e bolla, nell'ordine", () => {
