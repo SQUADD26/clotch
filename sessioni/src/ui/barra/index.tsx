@@ -78,13 +78,11 @@ export default function Barra() {
     });
   };
 
-  useEffect(() => {
-    const tasto = (e: KeyboardEvent) => {
-      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.clotchAi.comando("archivia", { chat: n.sessione }); }
-      if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
-    };
-    addEventListener("keydown", tasto);
-    return () => removeEventListener("keydown", tasto);
+  useEffect(() => { // ⇧⌘A e ⇧⌘;: azioni del gestore unico (base/scorciatoie), con le sue regole
+    const id = n.sessione;
+    if (!id) return;
+    const fuori = [registraAzione("archivia", () => void window.clotchAi.comando("archivia", { chat: id })), registraAzione("copiaBlocco", () => void copiaUltimoBlocco(id))];
+    return () => fuori.forEach((f) => f());
   }, [n.sessione]);
   // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
   useEffect(() => {

@@ -27,7 +27,7 @@ export function PannelloSsh({ mac, ambiente, mostraBase = null, onScegli, onAggi
         const base = m.fonte === "tabella", daFinire = m.stato === "da_completare";
         return (
           <div key={m.nome} role="menuitem" tabIndex={0} className={`voce riga-macchina${mostraBase === m.nome ? " mostra" : ""}`}
-            onClick={() => onScegli({ tipo: "ssh", host: m.nome })} onKeyDown={(e) => { if (e.key === "Enter") onScegli({ tipo: "ssh", host: m.nome }); }}>
+            onClick={() => onScegli({ tipo: "ssh", host: m.nome })} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onScegli({ tipo: "ssh", host: m.nome }); } }}>
             {daFinire ? <Icona nome="avviso" colore="lavoro" /> : <Icona nome="computer" />}
             <span className="etichetta">{m.nome}</span>
             {daFinire ? <span className="valore da-completare">Da completare</span> : <span className="valore">{m.utente}@{m.nome}</span>}
