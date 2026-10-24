@@ -35,15 +35,16 @@ function CercaNelMenu({ segnaposto, valore, onCambia }: { segnaposto: string; va
   return (
     <label className="campo-menu">
       <Icona nome="cerca" colore="terziaria" />
-      <input className="t-sm" placeholder={segnaposto} value={valore} autoFocus onChange={(e) => onCambia(e.target.value)} />
+      <input className="t-sm" placeholder={segnaposto} value={valore} onChange={(e) => onCambia(e.target.value)} />
     </label>
   );
 }
 
-/** Tastiera dei menu: frecce (e Tab) tra campo e voci, il fuoco entra sulla prima voce se non c'è un campo. */
-const frecce = (primaVoce = false) => (el: HTMLDivElement | null) => {
+/** Tastiera dei menu: frecce (e Tab) tra campo e voci; il fuoco entra sul campo o sulla prima voce. */
+const frecce = (el: HTMLDivElement | null) => {
   if (!el) return;
-  if (primaVoce) el.querySelector<HTMLElement>(".voce")?.focus();
+  // il menu è nascosto finché non sa dove stare: il fuoco si dà al fotogramma dopo
+  requestAnimationFrame(() => el.querySelector<HTMLElement>("input, .voce")?.focus());
   el.addEventListener("keydown", (e) => {
     const verso = e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey) ? 1 : e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey) ? -1 : 0;
     if (!verso) return;
@@ -61,7 +62,7 @@ const cerca = (testo: string, q: string) => testo.toLowerCase().includes(q.trim(
 export function MenuProprieta({ a, onScegli, onChiudi }: { a: Ancora; onScegli(p: Proprieta): void; onChiudi(): void }) {
   const [q, setQ] = useState("");
   return (
-    <Sovrapposto ancora={a} className="menu menu-filtro" role="menu" label="Aggiungi filtro" rif={frecce()} onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-filtro" role="menu" label="Aggiungi filtro" rif={frecce} onChiudi={onChiudi}>
       <CercaNelMenu segnaposto="Cerca proprietà" valore={q} onCambia={setQ} />
       {!PROPRIETA.some((p) => cerca(p.etichetta, q)) && <Vuoto testo="Nessuna proprietà" />}
       {PROPRIETA.filter((p) => cerca(p.etichetta, q)).map((p) => (
@@ -83,7 +84,7 @@ export function MenuOpzioni({ a, filtro, opzioni, onCambia, onRimuovi, onChiudi 
   const etichetta = PROPRIETA.find((p) => p.chiave === filtro.proprieta)!.etichetta;
   const alterna = (v: string) => onCambia(filtro.valori.includes(v) ? filtro.valori.filter((x) => x !== v) : [...filtro.valori, v]);
   return (
-    <Sovrapposto ancora={a} className="menu menu-filtro" role="menu" label={`Filtro ${etichetta}`} rif={frecce()} onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-filtro" role="menu" label={`Filtro ${etichetta}`} rif={frecce} onChiudi={onChiudi}>
       <div className="testata t-sm secondario">
         <span className="medio">{etichetta}</span>
         <span>è</span>
@@ -129,7 +130,7 @@ export function MenuRaggruppa({ a, raggruppa, ordina, onRaggruppa, onOrdina, onA
   onRaggruppa(r: Raggruppa): void; onOrdina(o: Ordina): void; onAggiungi(e: MouseEvent): void; onChiudi(): void;
 }) {
   return (
-    <Sovrapposto ancora={a} className="menu menu-raggruppa" role="menu" label="Filtra" rif={frecce(true)} onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-raggruppa" role="menu" label="Filtra" rif={frecce} onChiudi={onChiudi}>
       <div className="titolo-gruppo t-xs medio secondario">Raggruppa per</div>
       {RAGGRUPPA.map((r) => <Scelta key={r.chiave} etichetta={r.etichetta} scelta={raggruppa === r.chiave} onClick={() => onRaggruppa(r.chiave)} />)}
       <div className="separatore"><div className="linea" /></div>
