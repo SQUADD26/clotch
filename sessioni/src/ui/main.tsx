@@ -7,6 +7,7 @@ import * as impostazioni from "./impostazioni";
 import * as pannello from "./pannello";
 import "./base/token.css";
 import "./base/stile.css";
+import "./base/movimento.css";
 import { Cornice } from "./base/Cornice";
 import { Pezzo } from "./base/Pezzo";
 

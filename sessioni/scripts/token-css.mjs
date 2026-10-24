@@ -36,8 +36,9 @@ export function voci(tokens) {
 export function genera(tokens) {
   const v = voci(tokens);
   const testa = '/* Generato da scripts/token-css.mjs da design/tokens.json: non si modifica a mano. */\n';
+  // le curve (gruppo «curva», STRING in Figma) sono funzioni CSS: vanno senza virgolette
   const css = testa + ':root {\n' + [...v].map(([n, { tipo, valore }]) =>
-    `  --${n}: ${tipo === 'string' ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
+    `  --${n}: ${tipo === 'string' && !n.startsWith('curva-') ? FAMIGLIA[valore] ?? JSON.stringify(valore) : valore};`).join('\n') + '\n}\n';
   const ts = testa.replace('/*', '//').replace(' */', '') +
     `export type Token =\n${[...v.keys()].map((n) => `  | "${n}"`).join('\n')};\n\n` +
     '/** `var(--nome)` da usare negli stili in linea. */\nexport const t = (n: Token) => `var(--${n})`;\n\n' +
