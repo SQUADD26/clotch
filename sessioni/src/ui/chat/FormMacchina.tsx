@@ -47,7 +47,7 @@ export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChi
               const scelta = v.desktopId === p.desktop_id;
               return (
                 <button key={p.desktop_id} type="button" className={`chip-proposta${scelta ? " scelta" : ""}`} aria-pressed={scelta} onClick={() => onProposta(p)}>
-                  <Icona nome={scelta ? "spunta" : "finestra"} />{p.nome}
+                  <Icona nome={scelta ? "spunta" : "finestra"} /><span className="nome-chip" title={p.nome}>{p.nome}</span>
                 </button>
               );
             })}

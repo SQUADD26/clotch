@@ -23,6 +23,8 @@
   display: inline-flex; align-items: center; gap: var(--spazio-1-5); height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-pieno);
   background: var(--colore-fondo-bottone-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
 }
+.pezzo-chat .dialogo .chip-proposta { max-width: 100%; min-width: 0; }
+.pezzo-chat .nome-chip, .pezzo-chat .riferimento-sessione .titolo { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* nome lungo: ellissi, non due righe (#746) */
 .pezzo-chat .dialogo .chip-proposta.scelta { background: var(--colore-fondo-riga-scelta); border: var(--misura-tratto) solid var(--colore-bordo-forte); }
 .pezzo-chat .dialogo .campi-macchina { display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-chat .dialogo .riga-campi { display: flex; gap: var(--spazio-3); }
