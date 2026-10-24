@@ -10,4 +10,6 @@
   height: var(--misura-bottone); padding: 0 var(--spazio-3); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-pieno);
   color: var(--colore-testo-primario); white-space: nowrap;
 }
-.pezzo-clotch-ai .prima-apertura .suggerimento:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-clotch-ai .prima-apertura .suggerimento:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
+/* clotch AI spenta o domanda in volo: come le voci spente dei menu (base/menu.css) */
+.pezzo-clotch-ai .prima-apertura .suggerimento:disabled { color: var(--colore-testo-terziario); cursor: default; }
