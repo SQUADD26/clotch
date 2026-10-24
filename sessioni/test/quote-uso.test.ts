@@ -1,7 +1,10 @@
 import { strict as assert } from "node:assert";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { test } from "node:test";
-import { quoteUso, svuotaCache } from "../src/quote-uso";
-import { contoAllaRovescia, fa, quoteDalFeed, riparteTra } from "../src/uso-testi";
+import { quoteConGiorni, quoteUso, svuotaCache } from "../src/quote-uso";
+import { trovaRadici } from "../src/radici";import { contoAllaRovescia, fa, quoteDalFeed, riparteTra } from "../src/uso-testi";
 
 const ORA = Date.UTC(2026, 9, 23, 12, 0, 0), S = ORA / 1000, H = 3600, G = 86_400;
 const riga = (email: string, ts: number, cinque: [number | null, number | null], sette: [number | null, number | null]) =>
@@ -77,4 +80,29 @@ test("quoteDalFeed: per finestra percentuale e fine (#478); finestra ripartita =
   const a = per("accountmanager");
   assert.deepEqual([a.email, a.cinque, a.cinqueFine, a.sette, a.setteFine], ["accountmanager@x.it", 90, (S + 21 * 60) * 1000, 61, (S + 3 * G) * 1000]);
   assert.deepEqual([per("ripartito").cinque, per("ripartito").cinqueFine], [0, null]);
+});
+
+test("#993: cartella -> email da .claude.json; due righe stessa email, vince l'host di questo Mac; senza riga = niente", async () => {
+  const home = mkdtempSync(path.join(os.tmpdir(), "clotch-993-"));
+  try {
+    for (const [cartella, email] of [[".claude-terminal-dentalspace", "dental@x.it"], [".claude-terminal-solo", "senza-riga@x.it"]]) {
+      mkdirSync(path.join(home, cartella, "projects"), { recursive: true });
+      writeFileSync(path.join(home, cartella, ".claude.json"), JSON.stringify({ oauthAccount: { emailAddress: email } }));
+    }
+    const radici = trovaRadici(home), mio = os.hostname();
+    assert.deepEqual(radici.map((r) => [r.account, r.email]), [[".claude-terminal-dentalspace", "dental@x.it"], [".claude-terminal-solo", "senza-riga@x.it"]]);
+    const adesso = Date.now() / 1000, r = (host: string, ts: number, sette: number) => ({ ...riga("dental@x.it", ts, [1, adesso + H], [sette, adesso + G]), host });
+    // l'altra macchina è più recente, ma la riga di questo Mac è fresca: vince questa
+    svuotaCache();
+    await quoteUso(Date.now(), async () => ({ rows: [r("altro-mac", adesso - 5, 90), r(mio, adesso - 60, 30)] }));
+    const q = await quoteConGiorni(radici, Date.now(), async () => new Map());
+    const dental = q.find((x) => x.email === "dental@x.it")!;
+    assert.equal(dental.sette, 30);
+    assert.deepEqual(dental.cartelle, [".claude-terminal-dentalspace"]);
+    assert.equal(q.some((x) => x.cartelle?.includes(".claude-terminal-solo")), false, "account senza riga nel feed: niente quota");
+    // la riga di questo Mac è vecchia: vince la più recente
+    svuotaCache();
+    await quoteUso(Date.now(), async () => ({ rows: [r("altro-mac", adesso - 5, 90), r(mio, adesso - 2 * G, 30)] }));
+    assert.equal((await quoteConGiorni(radici, Date.now(), async () => new Map())).find((x) => x.email === "dental@x.it")!.sette, 90);
+  } finally { svuotaCache(); rmSync(home, { recursive: true, force: true }); }
 });

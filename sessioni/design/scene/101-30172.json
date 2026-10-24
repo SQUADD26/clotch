@@ -169,15 +169,33 @@
  "preferenze": {
   "s1": {
    "icona": "stella"
+  },
+  "a1": {
+   "colore": "arancione"
+  },
+  "a2": {
+   "colore": "arancione"
+  },
+  "a3": {
+   "colore": "arancione"
+  },
+  "a4": {
+   "colore": "arancione"
+  },
+  "a5": {
+   "colore": "arancione"
+  },
+  "a6": {
+   "colore": "arancione"
   }
  },
  "registro": {
   "chat": {
-   "a": {
-    "chat": "a",
-    "titolo": "Clotch: sessioni in Electron",
+   "a1": {
+    "chat": "a1",
+    "titolo": "Backend: auth e RLS",
     "madre": null,
-    "progetto": null,
+    "progetto": "clotch",
     "account": null,
     "sorgente": null,
     "daHandoff": null,
@@ -186,15 +204,24 @@
     "aspetto": null,
     "domanda": null,
     "limite": null,
-    "richieste": [],
-    "battito": 1792846204509,
+    "richieste": [
+     {
+      "rid": "r-a1",
+      "genere": "permesso",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792847809962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792846204509,
+    "visto": 1792848529962,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -203,11 +230,11 @@
     "rifiuto": null,
     "persi": 0
    },
-   "b": {
-    "chat": "b",
-    "titolo": "Clotch: notch",
+   "a2": {
+    "chat": "a2",
+    "titolo": "Sessioni: disegno e app Electron con tutti gli stati",
     "madre": null,
-    "progetto": null,
+    "progetto": "clotch",
     "account": null,
     "sorgente": null,
     "daHandoff": null,
@@ -216,15 +243,180 @@
     "aspetto": null,
     "domanda": null,
     "limite": null,
-    "richieste": [],
-    "battito": 1792846204509,
+    "richieste": [
+     {
+      "rid": "r-a2",
+      "genere": "domanda",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792848049962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792846204509,
+    "visto": 1792848529962,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   },
+   "a3": {
+    "chat": "a3",
+    "titolo": "Figma: schermate app Sessioni",
+    "madre": null,
+    "progetto": "clotch",
+    "account": null,
+    "sorgente": null,
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r-a3",
+      "genere": "piano",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792848229962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792848529962,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   },
+   "a4": {
+    "chat": "a4",
+    "titolo": "Notch: avviso schermo",
+    "madre": null,
+    "progetto": "clotch",
+    "account": null,
+    "sorgente": null,
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r-a4",
+      "genere": "permesso",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792848349962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792848529962,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   },
+   "a5": {
+    "chat": "a5",
+    "titolo": "Voce: parole inglesi",
+    "madre": null,
+    "progetto": "clotch",
+    "account": null,
+    "sorgente": null,
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r-a5",
+      "genere": "domanda",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792848409962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792848529962,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   },
+   "a6": {
+    "chat": "a6",
+    "titolo": "squadd-v2: policy RLS",
+    "madre": null,
+    "progetto": "clotch",
+    "account": null,
+    "sorgente": null,
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [
+     {
+      "rid": "r-a6",
+      "genere": "piano",
+      "strumento": null,
+      "ingresso": {},
+      "t": 1792848469962,
+      "domande": []
+     }
+    ],
+    "battito": 1792848529962,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792848529962,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
