@@ -46,7 +46,7 @@ function Corpo() {
       <div className="corpo" {...attributi}>
         {fissa && <nav className="barra-laterale"><Pezzo nome="barra" centro><Barra /></Pezzo></nav>}
         {fissa && <ManigliaBarra corpo={corpo} {...barra} />}
-        <main className="area-principale">
+        <main className="area-principale" tabIndex={-1}>
           <div className="superficie">
             {clotchAi ? <Pezzo nome="clotch-ai"><IntestazioneClotchAi /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
             <div className="contenuto" ref={contenuto}>
@@ -87,5 +87,5 @@ export function Cornice() {
 
 /** Superficie con bordo, come «Superficie» del frame: per i pezzi che disegnano una pagina intera (impostazioni). */
 export function Superficie({ children }: { children: React.ReactNode }) {
-  return <div className="area-principale"><div className="superficie">{children}</div></div>;
+  return <div className="area-principale" tabIndex={-1}><div className="superficie">{children}</div></div>;
 }

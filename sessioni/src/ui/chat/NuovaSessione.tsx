@@ -57,6 +57,9 @@ function guardaErrore(comando: string) {
 type Menu = "ambiente" | "cartella" | "ramo" | "permessi" | "modello" | null;
 type Dialogo = { tipo: "aggiungi"; proposta?: Proposta | null; macchina?: Macchina | null } | { tipo: "togli"; nome: string } | null;
 
+// Ciò che si è scelto e scritto resta finché la sessione non parte: Indietro dopo un giro in un'altra vista lo ritrova (#698).
+const ricordo: { testo?: string; ambiente?: Ambiente; scelta?: CartellaAvvio | null; ramo?: string | null; worktree?: boolean } = {};
+
 export function NuovaSessione() {
   const { sezione } = useNavigazione();
   const apriSessione = useApriSessione();
@@ -64,13 +67,14 @@ export function NuovaSessione() {
   const dati = useChiamata(() => window.nuovaSessione.cartelle(), []).dati;
   const mac = useMacchine();
   const [menu, setMenu] = useState<Menu>(() => { const m = provaDi(sezione, "menu"); return m === "ssh" ? "ambiente" : m === "ambiente" || m === "cartella" || m === "ramo" ? m : null; });
-  const [ambiente, setAmbiente] = useState<Ambiente>(() => { const a = provaDi(sezione, "ambiente"); return a ? { tipo: "ssh", host: a } : LOCALE; });
+  const [ambiente, setAmbiente] = useState<Ambiente>(() => { const a = provaDi(sezione, "ambiente"); return a ? { tipo: "ssh", host: a } : ricordo.ambiente ?? LOCALE; });
   const [dialogo, setDialogo] = useState<Dialogo>(() => { const d = provaDi(sezione, "dialogo"), r = provaDi(sezione, "rimuovi"); return r ? { tipo: "togli", nome: r } : d ? { tipo: "aggiungi" } : null; });
-  const [scelta, setScelta] = useState<CartellaAvvio | null | undefined>(undefined); // undefined = ancora la prima dei recenti
-  const [ramoScelto, setRamo] = useState<string | null>(null);
-  const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") !== "spento");
+  const [scelta, setScelta] = useState<CartellaAvvio | null | undefined>(ricordo.scelta); // undefined = ancora la prima dei recenti
+  const [ramoScelto, setRamo] = useState<string | null>(ricordo.ramo ?? null);
+  const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") ? provaDi(sezione, "worktree") !== "spento" : ricordo.worktree ?? true);
   const [p, setP] = useState<PreferenzeSessione>({});
-  const [testo, setTesto] = useState(() => provaDi(sezione, "testo") ?? "");
+  const [testo, setTesto] = useState(() => provaDi(sezione, "testo") ?? ricordo.testo ?? "");
+  useEffect(() => { Object.assign(ricordo, { testo, ambiente, scelta, ramo: ramoScelto, worktree }); }, [testo, ambiente, scelta, ramoScelto, worktree]);
   const [attesa, setAttesa] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
 
@@ -110,7 +114,7 @@ export function NuovaSessione() {
       return;
     }
     guardaErrore(e.id);
-    if (e.sessione) void apriSessione(e.sessione);
+    if (e.sessione) { for (const k of Object.keys(ricordo)) delete ricordo[k as keyof typeof ricordo]; void apriSessione(e.sessione); }
     else setTimeout(() => { setAttesa(false); setTesto(""); }, ATTESA_MS);
   };
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {

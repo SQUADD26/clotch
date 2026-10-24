@@ -32,7 +32,7 @@ export function useScorciatoie() {
       if (avvio || e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
       if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey && e.key.toLowerCase() === "n") { e.preventDefault(); n.apri("nuova-sessione"); return; } // «Nuova sessione» ⌘N, fisso
       const a = azioneDi(tastiDi(e), scorciatoie);
-      const navigazione: Record<string, () => void> = { clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni"),
+      const navigazione: Record<string, () => void> = { clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, indietro: n.indietro, avanti: n.avanti, impostazioni: () => n.apri("impostazioni"),
         prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
       const fai = a && (navigazione[a] ?? azioni.get(a));
       if (fai) { e.preventDefault(); fai(); }

@@ -34,8 +34,8 @@ export function BarraTitolo({ inerte = false }: { inerte?: boolean }) {
             <BottoneIcona icona="barra-laterale" etichetta="Barra laterale" onClick={n.alternaBarra} aria-pressed={n.barraAperta} {...nuda} />
           </Suggerimento>
         )}
-        <Suggerimento testo="Indietro"><BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} {...nuda} /></Suggerimento>
-        <Suggerimento testo="Avanti"><BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} {...nuda} /></Suggerimento>
+        <Suggerimento testo="Indietro" scorciatoia={scorciatoie.indietro}><BottoneIcona icona="indietro" etichetta="Indietro" onClick={n.indietro} disabled={!n.puoIndietro} {...nuda} /></Suggerimento>
+        <Suggerimento testo="Avanti" scorciatoia={scorciatoie.avanti}><BottoneIcona icona="avanti" etichetta="Avanti" onClick={n.avanti} disabled={!n.puoAvanti} {...nuda} /></Suggerimento>
       </div>
       <TornaAClotchAi />
       {/* le impostazioni non hanno attività né comandi globali (101-17193) */}
