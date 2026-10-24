@@ -1,4 +1,5 @@
 // Mette insieme le sorgenti in un solo elenco di sessioni.
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { chiaveCartella, dimenticaProgetti, leggiRadice, progettiDi } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
@@ -70,6 +71,13 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
       progetto: "", cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
       ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file, app: a.app,
     });
+  }
+  // sessione su una macchina SSH: la copia del motore (trascrizione_remota) ha la coda più nuova di quella dell'app Claude, e a volte è l'unica
+  for (const s of tutte) {
+    const o = s.app?.ospite;
+    if (!o || o !== path.basename(o) || o === ".." || s.id !== path.basename(s.id)) continue;
+    const copia = path.join(opz.home, ".claude", "casella", "trascrizioni", o, `${s.id}.jsonl`);
+    if (fs.existsSync(copia)) s.file = copia;
   }
   if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));
   if (!imp || imp.sorgenteCursor) tutte.push(...leggiCursor(opz.home, errori));
