@@ -47,3 +47,6 @@
   border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
 }
 .campo.piccolo input { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+
+/* Bottone icona, stato Fuoco (153:71027): bordo da misura-tratto-forte, dentro il bottone */
+.bottone-icona:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
