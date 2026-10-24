@@ -22,7 +22,8 @@ export function BarraTitolo({ inerte = false }: { inerte?: boolean }) {
   // il suggerimento sostituisce quello nativo (title); «suggerimento-barra» nella sezione di una scena di prova lo tiene aperto (101-24069)
   const nuda = { title: undefined };
   return (
-    <div className="barra-titolo" inert={inerte || undefined}>
+    // sotto il velo della barra sopra (#941) la barra del titolo non prende il fuoco
+    <div className="barra-titolo" inert={inerte || (n.sovrapposta && n.barraAperta) || undefined}>
       {/* il semaforo vero è del Mac (trafficLightPosition in finestra.ts); le luci si disegnano solo nella prova di parità */}
       <div className="semaforo" aria-hidden>
         <span className="luce rosso" /><span className="luce giallo" /><span className="luce verde" />
