@@ -47,7 +47,7 @@ app.whenReady().then(async () => {
   const check = async (name, test) => { try { await test(); console.log(`${name}: OK`); } catch (e) { failures.push(`${name}: ${e.message}`); console.error(`FAIL ${name}: ${e.message}`); } };
   try {
     await check('INVIO_MANDA_NUOVA_SESSIONE_COI_CAMPI', async () => {
-      esito = { esito: 'ok', testo: 'Sessione aperta.' };
+      esito = { esito: 'ok', testo: 'Sessione aperta.', sessione: 'abcd1234', macchina: 'mac' };
       await load('vuota');
       assert.deepEqual(await selettori(), ['Questo computer', 'goal-notch', 'dev', 'Worktree']);
       await scrivi('Aggiungi lo stato vuoto');
@@ -55,10 +55,8 @@ app.whenReady().then(async () => {
       await attendi(() => comandi.length === 1);
       assert.deepEqual(comandi[0], { cmd: 'nuova_sessione', args: { ambiente: 'locale', cartella: '/Users/roberto/Repos/goal-notch', worktree: true, branch: 'dev',
         modello: 'claude-opus-5-5', sforzo: 'medium', prompt: 'Aggiungi lo stato vuoto' } });
-      // in attesa: la casella resta col messaggio, ferma, con il giro
-      assert.equal(await run(() => document.querySelector('.nuova-corpo textarea').disabled), true);
-      assert.equal(await run(() => document.querySelector('.nuova-corpo textarea').value), 'Aggiungi lo stato vuoto');
-      assert.equal(await run(() => !!document.querySelector('.bottone-invia svg.gira')), true);
+      // la sessione nata si apre per id: la vista Nuova sessione sparisce
+      await wait(() => !document.querySelector('.nuova-corpo'));
     });
     await check('CARTELLA_SENZA_GIT_NIENTE_RAMO_NE_WORKTREE', async () => {
       await load('cartella:appunti', 2);

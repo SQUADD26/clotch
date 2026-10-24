@@ -7,7 +7,7 @@ import { cartellaRegistro, Comando, mandaComando } from "./clotch-ai";
 
 export type EsitoComando =
   /** clotch AI ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[] }
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
   /** Nessuna risposta in tempo. `preso: false` = clotch AI non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
@@ -65,6 +65,8 @@ async function invia(home: string, cmd: Comando, args: Record<string, unknown>, 
       const e = r.dati.esito;
       const fatto: EsitoComando = { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
       if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da clotch AI
+      if (typeof r.dati.sessione === "string") fatto.sessione = r.dati.sessione; // nuova_sessione
+      if (typeof r.dati.macchina === "string") fatto.macchina = r.dati.macchina;
       if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
       return fatto;
     }

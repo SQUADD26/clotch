@@ -1,20 +1,23 @@
 // figma: 148-51982 — «Nuova sessione»: intestazione 148:52165, casella del primo messaggio e selettori Ambiente, Cartella, Ramo, Worktree.
 // Menu ambiente 148:52243, cartella 148:52543, ramo 148:52864; worktree spento 148:53138; cartella senza git 148:53399; finestra stretta 148:53655.
-// Invio manda `nuova_sessione` (il motore ci mette fino a ~3 minuti); quando la sessione compare nell'elenco si apre.
+// Invio manda `nuova_sessione`; il motore risponde a sessione nata (fino a ~1 minuto) con il suo id e si apre quella.
+// Se modello o sforzo partono diversi, il motore scrive dopo un `errore` per lo stesso comando: si mostra nell'avviso.
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { CartellaAvvio, ContestoCartella, NuovaSessioneApi, PreferenzeSessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
-import { useChiamata, useElenco } from "../base/dati";
+import { avvisa } from "../base/Avvisi";
+import { useChiamata } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useApriSessione } from "../barra/apri";
 import { useImpostazioni } from "../impostazioni/stato";
 import { argsNuovaSessione, LOCALE, nomeAmbiente, notaAvvio, type Ambiente } from "./avvio";
 import { ChipModello, ChipPermessi } from "./Chip";
-import { comanda } from "./clotch-ai";
+import { daPiano } from "../clotch-ai/registro";
+import { comandaEsito } from "./clotch-ai";
 import { Selettore, MenuAmbiente, MenuCartella, MenuRamo } from "./MenuAvvio";
 import { modelloDi, sforzoDi } from "./scelte";
-import { idModello, provaDi } from "./testi";
+import { erroreComando, idModello, provaDi } from "./testi";
 import "./casella.css";
 import "./nuova-sessione.css";
 
@@ -22,11 +25,23 @@ declare global {
   interface Window { nuovaSessione: NuovaSessioneApi }
 }
 
-const ATTESA_MS = 60_000; // dopo `ok` la sessione deve comparire nell'elenco; oltre, la casella si libera
+const ATTESA_MS = 60_000; // `ok` senza id di sessione: la casella si libera dopo un minuto
+const ERRORE_DOPO_MS = 120_000; // quanto si resta in ascolto dell'`errore` che il motore scrive dopo `ok`
 const SENZA_GIT: ContestoCartella = { git: false, rami: [], predefinito: null };
 
 export function IntestazioneNuovaSessione() {
   return <div className="intestazione"><div className="testi"><span className="titolo">Nuova sessione</span></div></div>;
+}
+
+/** «modello letto …, chiesto …»: l'`errore` che il motore scrive dopo `ok` per lo stesso comando; arriva quando la vista è già chiusa, quindi l'avviso è dell'app. */
+function guardaErrore(comando: string) {
+  const t = setTimeout(() => off(), ERRORE_DOPO_MS);
+  const off = window.clotchAi.onRegistro((r) => {
+    const x = daPiano(r).esiti.get(comando);
+    if (x?.esito !== "errore") return;
+    off(); clearTimeout(t);
+    avvisa({ tipo: "errore", messaggio: x.testo || "La sessione è partita con modello o sforzo diversi da quelli chiesti" });
+  });
 }
 
 type Menu = "ambiente" | "cartella" | "ramo" | "permessi" | "modello" | null;
@@ -35,7 +50,6 @@ export function NuovaSessione() {
   const { sezione } = useNavigazione();
   const apriSessione = useApriSessione();
   const { modello: globale } = useImpostazioni();
-  const elenco = useElenco();
   const dati = useChiamata(() => window.nuovaSessione.cartelle(), []).dati;
   const ssh = useChiamata(() => window.nuovaSessione.ssh(), []).dati ?? [];
   const [menu, setMenu] = useState<Menu>(() => { const m = provaDi(sezione, "menu"); return m === "ambiente" || m === "cartella" || m === "ramo" ? m : null; });
@@ -45,7 +59,7 @@ export function NuovaSessione() {
   const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") !== "spento");
   const [p, setP] = useState<PreferenzeSessione>({});
   const [testo, setTesto] = useState("");
-  const [attesa, setAttesa] = useState<Set<string> | "invio" | null>(null);
+  const [attesa, setAttesa] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
 
   const recenti = dati?.recenti ?? [];
@@ -65,25 +79,24 @@ export function NuovaSessione() {
   const conGit = !!contesto?.git;
 
   useLayoutEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
-  // la sessione nata: la prima comparsa nell'elenco dopo `ok`. shortcut: se ne nasce un'altra nello stesso momento si apre quella; il motore non dice l'id.
-  useEffect(() => {
-    if (!(attesa instanceof Set)) return;
-    const nuova = elenco.dati?.sessioni.find((s) => !attesa.has(s.id));
-    if (nuova) { void apriSessione(nuova.id); return; }
-    const t = setTimeout(() => { setAttesa(null); setTesto(""); }, ATTESA_MS);
-    return () => clearTimeout(t);
-  }, [attesa, elenco.dati]);
 
   const imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>) => setP((x) => ({ ...x, ...parte }) as PreferenzeSessione);
   const modello = modelloDi({ modello: idModello(globale) ?? null }, p) ?? "";
   const pronto = !!testo.trim() && !attesa && (!cartella || !locale || !!contesto);
   const manda = async () => {
     if (!pronto || !dati) return;
-    const prima = new Set(elenco.dati?.sessioni.map((s) => s.id));
-    setAttesa("invio");
-    const ok = await comanda("nuova_sessione", argsNuovaSessione({ ambiente, cartella: cartella?.percorso ?? dati.casa, prompt: testo.trim(), modello, sforzo: sforzoDi(p).id,
+    setAttesa(true);
+    const e = await comandaEsito("nuova_sessione", argsNuovaSessione({ ambiente, cartella: cartella?.percorso ?? dati.casa, prompt: testo.trim(), modello, sforzo: sforzoDi(p).id,
       git: conGit ? { ramo, worktree } : null }));
-    setAttesa(ok ? prima : null);
+    if (e?.esito !== "ok") {
+      setAttesa(false);
+      // il motore dice il perché (cartella che non c'è, ramo, lock occupato…); riprovare serve solo se non l'ha rifiutato
+      avvisa({ tipo: "errore", messaggio: (e && (e.esito === "rifiutato" || e.esito === "errore") && e.testo) || erroreComando(e), azione: e?.esito === "rifiutato" ? undefined : { etichetta: "Riprova", fai: () => void manda() } });
+      return;
+    }
+    guardaErrore(e.id);
+    if (e.sessione) void apriSessione(e.sessione);
+    else setTimeout(() => { setAttesa(false); setTesto(""); }, ATTESA_MS);
   };
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
