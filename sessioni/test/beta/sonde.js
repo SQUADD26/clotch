@@ -79,6 +79,9 @@
 
   // Anello del fuoco: c'è (outline o box-shadow) e segue la forma (stesso raggio del pezzo che si vede, se il fuoco è su un figlio o un genitore).
   function anello(e) {
+    // un campo non disegna l'anello: lo disegna il contenitore (#521), il primo antenato col fuoco dentro che ha outline
+    const nudo = (x) => { const z = getComputedStyle(x); return z.outlineStyle !== 'none' && parseFloat(z.outlineWidth) > 0; };
+    if (e.matches('input,textarea') && !nudo(e)) { for (let p = e.parentElement, n = 0; p && n < 4; p = p.parentElement, n++) if (nudo(p)) return null; }
     const s = getComputedStyle(e), r = e.getBoundingClientRect();
     const c = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0, o = s.boxShadow !== 'none';
     if (!c && !o) return { criterio: 'FOCUS', dove: sel(e), valore: 'nessun anello del fuoco' };
