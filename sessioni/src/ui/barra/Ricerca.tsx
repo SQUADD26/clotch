@@ -7,6 +7,7 @@ import { api } from "../base/dati";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { Velo } from "../base/Sovrapposto";
 import { nomeAccount } from "../chat/testi";
+import { orario } from "../base/formato";
 import { giorno, nomeSorgente } from "./elenco";
 import { IconaRiga } from "./Righe";
 import "./ricerca.css";
@@ -43,6 +44,10 @@ function Evidenzia({ testo, parole }: { testo: string; parole: string }) {
 
 /** Voci che saltano PagSu e PagGiù. */
 const PAGINA = 5;
+/** Righe per gruppo (#1144): con 3000 sessioni disegnarle tutte rendeva lento ogni passaggio del mouse; si affina scrivendo. */
+const MASSIMO = 50;
+/** Ultima attività a destra (#1144): oggi l'ora, perché «Oggi» su ogni riga non spiega l'ordine; poi «Ieri» e la data. */
+const quando = (t: number, ora: number) => (giorno(t, ora) === "Oggi" ? orario(t) : giorno(t, ora));
 
 type Voce = { tipo: "sessione"; s: Sessione } | { tipo: "messaggio"; s: Sessione; r: RisultatoRicerca } | { tipo: "azione"; a: (typeof AZIONI)[number] };
 
@@ -75,14 +80,16 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
     cerca(parole).then((r) => { if (vivo) { setDalMain(r); setFallita(false); setCercando(false); } }, () => { if (vivo) { setFallita(true); setCercando(false); } });
     return () => { vivo = false; };
   }, [parole]);
+  // ordine (#1144): prima le corrispondenze nel titolo, poi quelle nei messaggi; in ogni gruppo l'ultima attività più recente in alto
   const voci = useMemo<Voce[]>(() => {
-    const perId = new Map(sessioni.map((s) => [s.id, s]));
+    const perId = new Map(sessioni.map((s) => [s.id, s])), recenti = (a: { s: Sessione }, b: { s: Sessione }) => b.s.ultimaAttivita - a.s.ultimaAttivita;
     return [
       ...(aperta && parole ? AZIONI.filter((a) => a.etichetta.toLowerCase().includes(parole)).map((a) => ({ tipo: "azione" as const, a })) : []),
-      ...sessioni.filter((s) => s.titolo.toLowerCase().includes(parole)).sort((a, b) => b.ultimaAttivita - a.ultimaAttivita).map((s) => ({ tipo: "sessione" as const, s })),
-      ...dalMain.filter((r) => !r.nelTitolo && perId.has(r.id)).map((r) => ({ tipo: "messaggio" as const, s: perId.get(r.id)!, r })),
+      ...sessioni.filter((s) => s.titolo.toLowerCase().includes(parole)).map((s) => ({ tipo: "sessione" as const, s })).sort(recenti).slice(0, MASSIMO),
+      ...dalMain.filter((r) => !r.nelTitolo && perId.has(r.id)).map((r) => ({ tipo: "messaggio" as const, s: perId.get(r.id)!, r })).sort(recenti).slice(0, MASSIMO),
     ];
   }, [sessioni, aperta, parole, dalMain]);
+  const pos = useMemo(() => new Map(voci.map((v, k) => [v, k])), [voci]);
   useEffect(() => setI(0), [parole]);
   // la scelta fatta con le frecce resta in vista (#835); scorre solo la lista: scrollIntoView spostava anche la finestra (overflow hidden)
   const lista = useRef<HTMLDivElement>(null);
@@ -126,7 +133,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           )}
           {!!azioni.length && <div className="titolo-gruppo t-xs medio secondario">Azioni</div>}
           {azioni.map((v) => v.tipo === "azione" && (
-            <button key={v.a.azione} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.a.azione} type="button" role="option" id={`ricerca-voce-${pos.get(v)!}`} aria-selected={voci[i] === v} tabIndex={-1} className={`voce-azione ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(pos.get(v)!)} onClick={() => scegli(v)}>
               <Icona nome={v.a.icona} />
               <span className="t-sm etichetta">{v.a.etichetta}</span>
               {v.a.scorciatoia && <span className="t-sm secondario">{v.a.scorciatoia}</span>}
@@ -134,13 +141,13 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           ))}
           {!!trovate.length && <div className="riga titolo-sezione"><span className="testo t-sm secondario">Sessioni</span></div>}
           {trovate.map((v) => v.tipo === "sessione" && (
-            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${pos.get(v)!}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(pos.get(v)!)} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo"><Evidenzia testo={v.s.titolo} parole={parole} /></span>
                 <span className="testo t-sm secondario"><Pezzi parti={dettaglio(v.s).map((d) => <Evidenzia testo={d} parole={parole} />)} /></span>
               </span>
-              <span className="t-xs secondario">{giorno(v.s.ultimaAttivita, ora)}</span>
+              <span className="t-xs secondario">{quando(v.s.ultimaAttivita, ora)}</span>
             </button>
           ))}
           {(!!messaggi.length || fallita || (cercando && !!parole)) && (
@@ -151,13 +158,13 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
             </div>
           )}
           {messaggi.map((v) => v.tipo === "messaggio" && (
-            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${voci.indexOf(v)}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(voci.indexOf(v))} onClick={() => scegli(v)}>
+            <button key={v.s.id} type="button" role="option" id={`ricerca-voce-${pos.get(v)!}`} aria-selected={voci[i] === v} tabIndex={-1} className={`risultato ${voci[i] === v ? "scelta" : ""}`} onMouseMove={() => setI(pos.get(v)!)} onClick={() => scegli(v)}>
               <IconaRiga titolo={v.s.titolo} pref={pref[v.s.id]} />
               <span className="testi">
                 <span className="testo"><Evidenzia testo={v.s.titolo} parole={parole} /></span>
                 <span className="testo t-sm secondario"><Evidenzia testo={v.r.frammento.replace(/^…/, "… ").replace(/…$/, " …")} parole={parole} /></span>
               </span>
-              <span className="t-xs secondario">{giorno(v.r.t ?? v.s.ultimaAttivita, ora)}</span>
+              <span className="t-xs secondario">{quando(v.s.ultimaAttivita, ora)}</span>
             </button>
           ))}
         </div>
