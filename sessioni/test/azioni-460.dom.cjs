@@ -17,7 +17,7 @@ const CARTELLA = '/tmp/lavori/clotch';
 scene.navigazione = { vista: 'sessione', sessione: 'a' };
 scene.elenco.sessioni = ['a', 'b', 'c'].map((id) => ({ ...scene.elenco.sessioni[0], id, titolo: `Sessione ${id}`, cartella: CARTELLA }));
 scene.messaggi = { a: [], b: [], c: [] };
-scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni, letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione, letta ora', errore: false }];
+scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione letta ora', errore: false }];
 const finto = { pref: {}, impostazioni: {}, chiamatePref: [], chiamateImp: [], novita: null };
 let win, mostrate = 0, fuochi = 0;
 const run = async (fn, ...a) => {
@@ -179,7 +179,7 @@ app.whenReady().then(async () => {
   await check('MINIATURE: «Caricando…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
     await carica({ vista: 'sessione', sessione: 'a', sezione: 'scritta:Guarda questi|allegati' });
     await wait(() => document.querySelectorAll('.allegato').length === 4);
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS, 4 KB', 'Non letta', 'Caricando…', 'Troppo grande']);
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS 4 KB', 'Non letta', 'Caricando…', 'Troppo grande']);
     assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), true);
     await run(() => document.querySelector('button[aria-label="Rimuovi registro.log"]').click());
     await wait(() => document.querySelectorAll('.allegato').length === 3);

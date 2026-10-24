@@ -68,7 +68,7 @@ async function giro(app, area, cfg, console_) {
     // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
     const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true', null, { timeout: 2000 }).catch(() => false);
     await loc.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {}); // prima di misurare: il riquadro vale dopo lo scorrimento
-    const box = await loc.boundingBox(), clip = box && { x: Math.max(0, box.x - 4), y: Math.max(0, box.y - 4), width: box.width + 8, height: box.height + 8 };
+    const box = await loc.boundingBox(), cont = await loc.locator('xpath=ancestor::*[contains(concat(" ",@class," ")," casella ")][1]').boundingBox().catch(() => null), clip = box && ((b) => ({ x: Math.max(0, b.x - 4), y: Math.max(0, b.y - 4), width: b.width + 8, height: b.height + 8 }))(cont ?? box); // un campo dentro la casella: il bordo che cambia al passaggio è del contenitore
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
     const manca = (criterio, valore) => reg.difetti.push({ criterio, dove: el.dove, valore, quando: el.dove, foto: el.foto.at(-1) });

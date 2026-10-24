@@ -1,6 +1,7 @@
 // figma: 101-33775 — schede del pannello «Info sessione» (componente «Pannello info» 101:33614): Ambiente, Contesto, Connettori, Modifiche.
 // Contesto: le categorie (messaggi, file di memoria, strumenti…) le dà solo il comando /context di Claude Code e non stanno nei file: qui il totale usato.
 import { Fragment, useState, type ReactNode } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { InfoSessione, PrInfo, Sessione } from "../../tipi";
 import { ICONA_PR } from "../barra/Pr";
 import { Icona, type NomeIcona } from "../base/Icona";
@@ -27,11 +28,11 @@ const Riga = ({ icona, colore, children, lato }: { icona: NomeIcona; colore?: "s
   <div className="riga-info"><Icona nome={icona} colore={colore} /><span className="t-sm testo" title={[children].flat().every((c) => typeof c === "string" || typeof c === "number") ? [children].flat().join("") : undefined}>{children}</span>{lato}</div>
 );
 
-/** «/Users/privato/Documents/Repos/goal-notch» -> «goal-notch · ~/Documents/Repos». */
+/** «/Users/privato/Documents/Repos/goal-notch» -> «goal-notch» e «~/Documents/Repos» uno accanto all'altro. */
 const doveSta = (s: Sessione) => {
   const cartella = s.cartella.replace(/\/+$/, "");
   const dir = cartella.replace(/\/[^/]*$/, "").replace(/^\/(Users|home)\/[^/]+/, "~");
-  return cartella ? `${cartella.replace(/^.*\//, "")}, ${dir}` : s.progetto;
+  return cartella ? <Pezzi parti={[cartella.replace(/^.*\//, ""), dir]} /> : s.progetto;
 };
 
 export function Ambiente({ s }: { s: Sessione }) {

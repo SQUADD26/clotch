@@ -105,7 +105,7 @@ function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["propo
     <section className="scheda proposta">
       <div className="riga-f">
         <Icona nome="obiettivo" colore="accento" />
-        <span className="riempi t-base medio">Obiettivo proposto: {o.progetto}</span>
+        <span className="riempi t-base medio">Obiettivo proposto {o.progetto}</span>
       </div>
       <span className="t-sm secondario">{o.testo}</span>
       <div className="riga-f">
