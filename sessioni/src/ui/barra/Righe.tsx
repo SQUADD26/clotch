@@ -1,5 +1,5 @@
 // figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta).
-import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { memo, useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import type { PreferenzeSessione, Profilo, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
@@ -64,7 +64,10 @@ interface PropsSessione {
   onTroncato(titolo: string | null, el?: HTMLElement): void;
 }
 
-export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+/** Memo: una riga si ridisegna solo se cambiano i suoi dati; le funzioni no (Barra le fa chiamare sempre l'ultima versione). */
+const stessiDati = (a: PropsSessione, b: PropsSessione) =>
+  (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
+export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: MouseEvent<HTMLElement>) => {
     const t = e.currentTarget.querySelector<HTMLElement>(".testo");
     onTroncato(t && t.scrollWidth > t.clientWidth ? s.titolo : null, t ?? undefined);
@@ -80,7 +83,10 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figl
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>{s.titolo}</span>
+      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>
+        {s.titolo}
+        {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia">{s.titolo}</span></span></span>}
+      </span>
       {figlie > 0 && (
         <button type="button" className="freccia-figlie" aria-expanded={figlieAperte} aria-label={figlieAperte ? "Nascondi le figlie" : "Mostra le figlie"}
           onClick={(e) => { e.stopPropagation(); onFiglie?.(); }}>
@@ -95,7 +101,7 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figl
       </span>
     </div>
   );
-}
+}, stessiDati);
 
 let letto: Promise<Profilo> | undefined;
 /** Nome e iniziali dell'utente, dal main (account Claude o macOS); vuoti finché non arrivano. */

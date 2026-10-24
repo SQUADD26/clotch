@@ -77,7 +77,18 @@ app.whenReady().then(() => {
   let apri!: () => void;
   const dopo = new Promise<void>((ok) => { apri = ok; });
   const pronte = dopo.then(() => caricaSessioni());
-  ipcMain.handle("sessioni:elenco", async () => { await pronte; return elenco(); });
+  // finché il worker legge, la finestra mostra l'elenco dell'avvio di prima (#474); a lettura finita lo rilegge (aggiornamento senza `elenco`)
+  const fileCache = path.join(app.getPath("userData"), "avvio-cache.json");
+  let pronto = false, inCache: ReturnType<typeof sessioni.elencoInCache> | undefined;
+  void pronte.then(() => {
+    pronto = true;
+    const ids = sessioni.elencoSessioni().sessioni.map((s) => s.id);
+    if (inCache) BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", { sessioni: ids, nuoviMessaggi: [] }));
+  });
+  ipcMain.handle("sessioni:elenco", async () => {
+    if (!pronto && (inCache ??= sessioni.elencoInCache(fileCache))) return inCache;
+    await pronte; return elenco();
+  });
   ipcMain.handle("sessioni:info", async (_e, id: string) => { await pronte; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
   const indice = collegaIndice(ipcMain, sessioni, pronte);
   ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
@@ -115,15 +126,24 @@ app.whenReady().then(() => {
   if (finestra) finestra.once("ready-to-show", () => setImmediate(apri)); else apri();
   setTimeout(apri, 10_000).unref();
   const caricaSessioni = async () => {
-    await sessioni.osservaInWorker((a) => {
+    // un giro dà più aggiornamenti nello stesso momento (un delta di cronologia per file, poi l'elenco): partono insieme, un messaggio per giro (#474)
+    let raccolto: Required<Pick<Aggiornamento, "sessioni" | "nuoviMessaggi" | "cronologia">> | null = null;
+    const raccogli = (a: Aggiornamento) => {
+      if (!raccolto) { raccolto = { sessioni: [], nuoviMessaggi: [], cronologia: [] }; setImmediate(() => { const r = raccolto!; raccolto = null; manda({ ...r, sessioni: [...new Set(r.sessioni)] }); }); }
+      raccolto.sessioni.push(...a.sessioni); raccolto.nuoviMessaggi.push(...a.nuoviMessaggi); raccolto.cronologia.push(...(a.cronologia ?? []));
+    };
+    const manda = (a: Aggiornamento) => {
       barraMenu();
-      BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
+      const el = sessioni.elencoSessioni().sessioni, per = new Map(el.map((s) => [s.id, s]));
+      // le sessioni cambiate viaggiano con l'evento: il renderer non rilegge l'elenco intero (#474)
+      const elenco = { cambiate: a.sessioni.flatMap((id) => per.get(id) ?? []), tolte: a.sessioni.filter((id) => !per.has(id)) };
+      BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", { ...a, elenco }));
       const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
-      const el = sessioni.elencoSessioni().sessioni;
-      const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
+      const sparite = [...ids].some((id) => !per.has(id)); // fuori dall'elenco = fuori dall'indice
       if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
       avvisa(a);
-    });
+    };
+    await sessioni.osservaInWorker(raccogli, fileCache);
     // dopo l'osservatore: da qui l'elenco è il suo
     avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();

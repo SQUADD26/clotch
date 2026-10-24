@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
-import { daPiano } from "../clotch-ai/registro";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
@@ -21,7 +20,7 @@ const SCARICA = "https://github.com/SQUADD26/clotch/releases/latest";
 function useVersioneClotch(): string | null {
   const [v, setV] = useState<string | null>(null);
   useEffect(() => {
-    const prendi = (p: unknown) => setV(daPiano(p).clotch?.versione ?? null);
+    const prendi = (p: any) => setV(p?.clotch?.versione ?? null);
     window.clotchAi.registro().then(prendi, () => {});
     return window.clotchAi.onRegistro(prendi);
   }, []);

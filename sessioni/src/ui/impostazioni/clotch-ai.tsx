@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import type { EsitoComando } from "../../comandi";
 import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
-import { daPiano } from "../clotch-ai/registro";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 
 declare global {
@@ -17,7 +16,7 @@ type Valori = Record<string, unknown>;
 function useImpostazioniClotchAi(): Valori | null {
   const [v, setV] = useState<Valori | null>(null);
   useEffect(() => {
-    const prendi = (p: unknown) => setV(daPiano(p).impostazioni);
+    const prendi = (p: any) => setV(p?.impostazioni ?? null);
     window.clotchAi.registro().then(prendi, () => {});
     return window.clotchAi.onRegistro(prendi);
   }, []);
