@@ -1,5 +1,5 @@
 // Valori ammessi per le sonde (#518): colori, raggi e spazi di src/ui/base/token.css (generato da design/tokens.json, fonte Figma).
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { RADICE } from './avvio.mjs';
 
@@ -12,5 +12,7 @@ export function tokenPagina(file = join(RADICE, 'src/ui/base/token.css')) {
     colori: v.filter(([, x]) => /^#([\da-f]{6}|[\da-f]{8})$/i.test(x)).map(([, x]) => hex(x)),
     raggi: px('raggio-'),
     spazi: px('spazio-'),
+    // il CSS costruito, per leggere i valori scritti (es. `auto`): da file:// la pagina non può leggere i suoi fogli
+    css: readdirSync(join(RADICE, 'renderer/assets')).filter((f) => f.endsWith('.css')).map((f) => readFileSync(join(RADICE, 'renderer/assets', f), 'utf8')).join('\n'),
   };
 }

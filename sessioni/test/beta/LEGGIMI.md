@@ -10,7 +10,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 
 - Aree: `barra`, `chat`, `nuova`, `friday`, `impostazioni`, `cornice`, `tutto` (scena e radice in `avvio.mjs`, `AREE`).
 - Opzioni: `--tema chiaro|scuro`, `--misura min|grande` (min = «Finestra 480», grande = 1440×900), `--dati con|senza`, `--lungo` (titoli e nomi da 120 caratteri, messaggi da 600), `--ridotto` (prefers-reduced-motion), `--matrice` (tema × misura × dati × lungo, più un giro ridotto), `--video` (registra e misura ogni animazione), `--max N` (elementi per giro, 80).
-- L'app parte con `--scena <file>` (src/main.ts): CLOTCH_TEST_SILENT=1, HOME temporanea copiata da `test/fixtures/home`, un Electron alla volta (`/tmp/clotch-electron.lock`, come `scripts/prove-dom.mjs`). Senza DISPLAY avvia un Xvfb suo. Nella sandbox prende le librerie GTK da `/work/r.bondici/gtk/root`.
+- L'app parte con `--scena <file>` (src/main.ts): CLOTCH_TEST_SILENT=1, HOME temporanea copiata da `test/fixtures/home`, al massimo N Electron insieme sulla macchina (`scripts/posti.mjs`, `CLOTCH_BETA_POSTI`, se no un quarto dei core; posti di pid morti liberati da soli). Senza DISPLAY avvia un Xvfb suo. Nella sandbox prende le librerie GTK da `/work/r.bondici/gtk/root`.
 - Uscita: `<out>/<area>/<config>/registro.json`, `foto/`, `<out>/<area>/video/`, `<out>/sommario.json`, e la riga «N elementi cliccati, M foto».
 
 ## Criteri delle sonde (campo `criterio` dei difetti)
@@ -21,7 +21,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 | TAGLIATO | un sovrapposto (menu, popover, tooltip, dialogo, avviso) è tagliato da un antenato con overflow |
 | COPERTO | uno dei 5 punti del sovrapposto dà un altro elemento a `elementFromPoint` |
 | TESTO | testo tagliato (overflow hidden o clip) senza ellissi voluta |
-| COLORE, RAGGIO, SPAZIO | colore, raggio o padding/margin/gap che non è un valore di `src/ui/base/token.css` |
+| COLORE, RAGGIO, SPAZIO | colore, raggio o padding/margin/gap che non è un valore di `src/ui/base/token.css` (uno spazio scritto con `var(--…)` o `auto` nel CSS vale) |
 | FOCUS | con Tab: nessun anello del fuoco, o anello con un raggio diverso dalla forma che si vede |
 | ESC, FUOCO-RITORNO | Esc non chiude il sovrapposto; dopo Esc il fuoco non torna al pulsante che l'ha aperto |
 | HOVER, PREMUTO | col mouse sopra, o premuto, l'elemento non cambia di un pixel (foto `-hover`, `-premuto`; il fuoco da tastiera è nelle foto `tab<N>`) |
