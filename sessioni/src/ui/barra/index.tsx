@@ -205,7 +205,8 @@ export default function Barra() {
 
       <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
         daDisco={((s) => s?.email ?? s?.account)(sessione(p ? p.scelta ?? "" : n.sessione ?? ""))}
-        onAltro={(e) => setAperto({ tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
+        onApre={() => aperto?.tipo === "profilo" && chiudi()}
+        onAltro={(e) => setAperto(aperto?.tipo === "profilo" ? null : { tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
