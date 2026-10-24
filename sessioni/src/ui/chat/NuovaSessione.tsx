@@ -12,7 +12,7 @@ import { useChiamata } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useApriSessione } from "../barra/apri";
-import { accountScelto } from "../barra/account-dati";
+import { accountNuove, useQuote } from "../barra/account-dati";
 import { useImpostazioni } from "../impostazioni/stato";
 import { argsNuovaSessione, LOCALE, nomeAmbiente, notaAvvio, type Ambiente } from "./avvio";
 import { ChipPermessi } from "./Chip";
@@ -63,7 +63,8 @@ const ricordo: { testo?: string; ambiente?: Ambiente; scelta?: CartellaAvvio | n
 export function NuovaSessione() {
   const { sezione } = useNavigazione();
   const apriSessione = useApriSessione();
-  const { modello: globale } = useImpostazioni();
+  const { modello: globale, accountNuove: sceltoAccount } = useImpostazioni();
+  const quote = useQuote() ?? [];
   const dati = useChiamata(() => window.nuovaSessione.cartelle(), []).dati;
   const mac = useMacchine();
   const [menu, setMenu] = useState<Menu>(() => { const m = provaDi(sezione, "menu"); return m === "ssh" ? "ambiente" : m === "ambiente" || m === "cartella" || m === "ramo" ? m : null; });
@@ -106,7 +107,7 @@ export function NuovaSessione() {
     if (!pronto || !dati) return;
     setAttesa(true);
     const e = await comandaEsito("nuova_sessione", argsNuovaSessione({ ambiente, cartella: cartella?.percorso ?? dati.casa, prompt: testo.trim(), modello, sforzo: sforzoDi(p).id,
-      account: accountScelto.leggi(), git: conGit ? { ramo, worktree } : null }));
+      account: accountNuove(quote, sceltoAccount).email, git: conGit ? { ramo, worktree } : null }));
     if (e?.esito !== "ok") {
       setAttesa(false);
       // il motore dice il perché (cartella che non c'è, ramo, lock occupato…); riprovare serve solo se non l'ha rifiutato

@@ -1,5 +1,5 @@
-// Bottone account in fondo alla barra (#478) nel renderer vero: conto alla rovescia vivo, menu di uso, cambio account (`riprendi_altrove`),
-// sessione fuori dal motore (cambio non disponibile), 90 % (stato giallo), sessione nuova (`account_previsto` e account scelto).
+// Bottone account in fondo alla barra (#478) nel renderer vero: conto alla rovescia vivo, menu di uso, 90 % (stato giallo).
+// #1146: un solo account, quello delle sessioni nuove, scelto e salvato; la sessione aperta e l'uso non lo cambiano; l'uso è per email intera.
 // Finestra nascosta e muta; il finto main registra i comandi a clotch AI.
 const { app, BrowserWindow, ipcMain } = require('electron');
 process.env.CLOTCH_TEST_SILENT = '1';
@@ -14,10 +14,11 @@ const { collegaScena } = require(path.join(root, 'dist/src/scena.js'));
 
 const scene = JSON.parse(JSON.stringify(require('../design/scene/101-8036.json')));
 const H = 3_600_000, M = 60_000, S = 1000;
-const quota = (account, cinque, cf, sette, sf) => ({ account, email: `${account}@example.com`, usato: sette, ripartenza: '', cinque, cinqueFine: Date.now() + cf, sette, setteFine: Date.now() + sf });
+const quota = (account, cinque, cf, sette, sf) => ({ account, email: `${account}@example.com`, cartelle: [`.claude-${account}`], usato: sette, ripartenza: '', cinque, cinqueFine: Date.now() + cf, sette, setteFine: Date.now() + sf });
 const quote = (cinque = 38) => [
   quota('accountmanager', cinque, 2 * H + 14 * M + 8 * S + 900, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S),
   quota('squadd', 72, 3 * H, 40, 2 * 24 * H), quota('friday', 100, 47 * M + 30 * S, 88, 24 * H), { ...quota('dentalspace', 12, 4 * H, 20, 5 * 24 * H), cartelle: ['.claude-terminal-dentalspace'] },
+  { ...quota('info', 50, 4 * H, 50, 5 * 24 * H), email: 'info@squaddcrm.com', cartelle: [] }, // un account del feed senza cartella su questo Mac: non si sceglie
 ];
 const chat = (sorgente, account) => ({ chat: 's1', titolo: null, madre: null, progetto: null, account, sorgente, stato: null, richieste: [], coda: [], passi: [], aiutanti: {} });
 const elencoPieno = scene.elenco;
@@ -33,7 +34,9 @@ const wait = (fn, ...a) => win.webContents.executeJavaScript(`new Promise((ok, k
 const testo = (sel) => run((s) => document.querySelector(s)?.textContent ?? null, sel);
 const clicca = (sel, t) => run((sel, t) => { const el = [...document.querySelectorAll(sel)].find((e) => (e.textContent || '').includes(t)); if (!el) throw new Error('manca ' + sel + ' ' + t); el.click(); }, sel, t);
 // scenario: tipo di chat nel registro (null = nessuna chat), quote, sessione aperta o nuova
-const carica = async ({ sorgente, cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno, quoteExtra = false, attesa = '.piede-account .uso-piede' }) => {
+// `scelto`: l'account salvato per le sessioni nuove (undefined = quello di prima, null = nessuno)
+const carica = async ({ sorgente = 'motore', cinque, nuova = false, account = '.claude-accountmanager', elenco = elencoPieno, quoteExtra = false, scelto, attesa = '.piede-account .uso-piede' }) => {
+  if (scelto !== undefined) scene.impostazioni = scelto ? { accountNuove: scelto } : null;
   scene.uso = quote(cinque);
   if (quoteExtra) scene.uso[3] = { ...scene.uso[3], cartelle: ['.claude'] }; // la quota di ~/.claude (il motore la chiama «default»)
   scene.registro = { ...scene.registro, chat: sorgente ? { s1: chat(sorgente, account) } : {} };
@@ -53,7 +56,7 @@ async function check(nome, fn) {
 }
 
 app.whenReady().then(async () => {
-  collegaScena(ipcMain, scene);
+  collegaScena(ipcMain, scene, (c, d) => win.webContents.send(c, d)); // le impostazioni si salvano nella scena, come nel main
   ipcMain.removeHandler('clotch-ai:comando');
   ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => {
     comandi.push([cmd, args]);
@@ -62,8 +65,8 @@ app.whenReady().then(async () => {
   win = new BrowserWindow({ show: false, focusable: false, width: 1600, height: 1000, webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
   win.on('show', () => mostrate++); win.on('focus', () => fuochi++);
 
-  await check('PIEDE: account della sessione, quote e conto alla rovescia vivo «2 h 14 m 0x s» e «3 g 05 h 12 m 4x s»', async () => {
-    await carica({ sorgente: 'motore' });
+  await check('PIEDE: account scelto, quote e conto alla rovescia vivo «2 h 14 m 0x s» e «3 g 05 h 12 m 4x s»', async () => {
+    await carica({ scelto: 'accountmanager@example.com' });
     assert.equal(await testo('.piede-account .testi .t-base'), 'accountmanager');
     const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => [...e.children].map((c) => c.textContent)));
     assert.equal(t[0][0], '5 ore 38%'); assert.equal(t[1][0], '7 giorni 61%');
@@ -73,46 +76,32 @@ app.whenReady().then(async () => {
     assert.notEqual(dopo, t[0][1], 'il conto non scorre');
   });
 
-  await check('#993 CARTELLA: la sessione porta la cartella (.claude-terminal-dentalspace), non l\u2019email: il bottone mostra l\u2019uso di dentalspace', async () => {
-    await carica({ sorgente: 'motore', account: '.claude-terminal-dentalspace' });
+  await check('#1146 STABILE: una sessione di un altro account (cartella, app Claude, fuori dal motore) e la vista nuova non cambiano l’account del piede', async () => {
+    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-dentalspace', email: 'dentalspace@example.com' } : x);
+    for (const c of [{ account: '.claude-terminal-dentalspace' }, { sorgente: null, elenco: { ...elencoPieno, sessioni: app } }, { sorgente: 'cli', account: 'friday' }, { nuova: true }]) {
+      await carica(c);
+      assert.equal(await testo('.piede-account .testi .t-base'), 'accountmanager', JSON.stringify(c).slice(0, 80));
+      const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
+      assert.deepEqual(t, ['5 ore 38%', '7 giorni 61%']);
+    }
+    assert.equal(comandi.filter(([c]) => c === 'account_previsto').length, 0, 'l’account non lo decide il motore a ogni apertura');
+  });
+
+  await check('#1146 SENZA SCELTA: l’account di ~/.claude (dentalspace), anche se un altro ha più margine', async () => {
+    await carica({ scelto: null, quoteExtra: true });
     assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
-    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
-    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
-    await carica({ sorgente: 'motore' });
+    await carica({ cinque: 0, quoteExtra: true });
+    assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace', 'l’uso che cambia non sposta l’account');
   });
 
-  await check('#993 DEFAULT: il motore chiama «default» la cartella ~/.claude: il bottone trova l\u2019uso di quella cartella', async () => {
-    await carica({ sorgente: 'motore', account: 'default', quoteExtra: true });
-    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
-    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
-    await carica({ sorgente: 'motore' });
-  });
-
-  await check('#993 EMAIL INTERA: info@altro.ai non prende l\u2019uso di un altro «info»: il bottone dice che l\u2019uso non c\u2019è', async () => {
-    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-altro', email: 'dentalspace@altro.ai' } : x);
-    await carica({ sorgente: null, elenco: { ...elencoPieno, sessioni: app }, attesa: '.piede-account' });
+  await check('#1146 EMAIL INTERA: scelto info@dentalspace.ai, il feed ha solo info@squaddcrm.com: niente uso di un altro «info»', async () => {
+    await carica({ scelto: 'info@dentalspace.ai', attesa: '.piede-account' });
     await wait(() => document.querySelector('.piede-account')?.textContent.includes('Uso non disponibile'));
     assert.equal(await run(() => document.querySelectorAll('.piede-account .uso-piede .testata').length), 0);
-    await carica({ sorgente: 'motore' });
   });
 
-  await check('#993 NOME DEL MOTORE: la sessione porta «terminal-dentalspace» (la cartella senza punto e senza claude-): il bottone trova lo stesso uso', async () => {
-    await carica({ sorgente: 'motore', account: 'terminal-dentalspace' });
-    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
-    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
-    await carica({ sorgente: 'motore' });
-  });
-
-  await check('#996 APP CLAUDE: sessione senza registro, account = profilo (Claude-dentalspace) ma con l’email del suo uuid: il bottone mostra l’uso di dentalspace', async () => {
-    const app = elencoPieno.sessioni.map((x) => x.id === 's1' ? { ...x, sorgente: 'claude-desktop', account: 'Claude-dentalspace', email: 'dentalspace@example.com' } : x);
-    await carica({ sorgente: null, elenco: { ...elencoPieno, sessioni: app } });
-    assert.equal(await testo('.piede-account .testi .t-base'), 'dentalspace');
-    const t = await run(() => [...document.querySelectorAll('.piede-account .uso-piede .testata')].map((e) => e.children[0].textContent));
-    assert.deepEqual(t, ['5 ore 12%', '7 giorni 20%']);
-    await carica({ sorgente: 'motore' });
-  });
-
-  await check('CAMBIO: sessione del motore -> menu uso, «Cambia account», clic su squadd manda riprendi_altrove', async () => {
+  await check('#1146 CAMBIO: «Cambia account» elenca solo gli account con cartella; la scelta si salva, resta dopo un riavvio, nessun riprendi_altrove', async () => {
+    await carica({ scelto: 'accountmanager@example.com' });
     await run(() => document.querySelector('.piede-account').click());
     await wait(() => !!document.querySelector('.menu-account'));
     assert.match(await testo('.menu-account'), /5 ore38% usato/);
@@ -120,44 +109,24 @@ app.whenReady().then(async () => {
     await clicca('.menu-account .voce', 'Cambia account');
     await wait(() => !!document.querySelector('.menu-account.secondo'));
     const nomi = await run(() => [...document.querySelectorAll('.riga-altro .nome .testo')].map((e) => e.textContent));
-    assert.deepEqual(nomi, ['squadd', 'friday', 'dentalspace']);
+    assert.deepEqual(nomi, ['squadd', 'friday', 'dentalspace'], 'info (senza cartella) non c’è');
     assert.match(await testo('.riga-altro:nth-of-type(2) .nome'), /Riparte tra 0 h 47 m \d\d s/, 'friday al 100 %: il conto in rosso');
     await clicca('.riga-altro', 'squadd');
-    await wait(() => !document.querySelector('.menu-account'));
-    assert.deepEqual(comandi.at(-1), ['riprendi_altrove', { chat: 's1', account: 'squadd@example.com' }]);
-  });
-
-  await check('NON DISPONIBILE: sessione avviata fuori dal motore -> motivo, niente «Cambia account», niente freccia', async () => {
-    await carica({ sorgente: 'cli' });
-    assert.equal(await run(() => !!document.querySelector('.piede-account .cambia')), false);
-    await run(() => document.querySelector('.piede-account').click());
-    await wait(() => !!document.querySelector('.menu-account .motivo'));
-    assert.match(await testo('.menu-account .motivo'), /Sessione avviata fuori da clotch: l’account non si cambia\./);
-    assert.equal(await run(() => !!document.querySelector('.menu-account .voce')), false);
+    await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'squadd');
+    assert.equal(scene.impostazioni?.accountNuove, 'squadd@example.com');
     assert.equal(comandi.filter(([c]) => c === 'riprendi_altrove').length, 0);
-    assert.equal(comandi.filter(([c]) => c === 'account_previsto').length, 0, 'con una sessione aperta l’account viene dal registro: niente account_previsto');
+    await carica({});
+    assert.equal(await testo('.piede-account .testi .t-base'), 'squadd', 'ricordato dopo il riavvio della finestra');
   });
 
   await check('90 %: barra gialla, «5 ore quasi finite»; al 100 % barra rossa', async () => {
-    await carica({ sorgente: 'motore', cinque: 90 });
+    await carica({ scelto: 'accountmanager@example.com', cinque: 90 });
     assert.equal(await run(() => !!document.querySelector('.piede-account .pieno.l-giallo')), true);
     await run(() => document.querySelector('.piede-account').click());
     await wait(() => !!document.querySelector('.menu-account .avviso-limite'));
     assert.equal(await testo('.menu-account .avviso-limite'), '5 ore quasi finite');
-    await carica({ sorgente: 'motore', cinque: 100 });
+    await carica({ cinque: 100 });
     assert.equal(await run(() => !!document.querySelector('.piede-account .pieno.l-pieno')), true);
-  });
-
-  await check('NUOVA SESSIONE: l’account è quello di account_previsto; sceglierne un altro non manda comandi di cambio', async () => {
-    await carica({ nuova: true });
-    await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'friday');
-    assert.equal(comandi.filter(([c]) => c === 'account_previsto').length, 1, 'una volta per apertura');
-    await run(() => document.querySelector('.piede-account').click());
-    await wait(() => !!document.querySelector('.menu-account'));
-    await clicca('.menu-account .voce', 'Cambia account');
-    await clicca('.riga-altro', 'dentalspace');
-    await wait(() => document.querySelector('.piede-account .testi .t-base')?.textContent === 'dentalspace');
-    assert.equal(comandi.filter(([c]) => c === 'riprendi_altrove').length, 0);
   });
 
   assert.equal(mostrate, 0, 'nessun evento show'); assert.equal(fuochi, 0, 'nessun evento focus');

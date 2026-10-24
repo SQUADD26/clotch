@@ -22,8 +22,6 @@ function riga(d: Record<string, unknown>): Account | null {
 
 /** Percentuale ora; null se non c'è dato o la finestra è già ripartita (come `usedNow`). */
 const usatoOra = (f: Finestra, ora: number) => (f.usato === null || (f.reset !== null && f.reset <= ora) ? null : Math.max(0, Math.min(100, f.usato)));
-/** Quanto resta; una finestra ripartita dopo la lettura è di nuovo intera (come `leftNow`). */
-const restaOra = (f: Finestra, ora: number) => { const u = usatoOra(f, ora); return u !== null ? 100 - u : f.usato !== null && f.reset !== null ? 100 : null; };
 
 /** Una lettura diretta («real») vince, finché non ha 10 minuti e una riga dell'host è più nuova (come `merge`).
  *  Più righe per la stessa email (una per macchina): vince quella di questo Mac se non è vecchia, se no la più recente (#993). */
@@ -43,21 +41,6 @@ function unisci(reali: Account[], righe: Account[], ora: number, mio: string | n
 }
 
 const vecchio = (a: Account, ora: number) => a.ts === null || ora - a.ts >= 86_400;
-
-/** Prima i dati freschi, poi l'account da usare per primo: molto margine davanti, quelli quasi finiti dopo, per ripartenza. */
-function ordina(l: Account[], ora: number): Account[] {
-  const chiave = (a: Account): number[] => {
-    const c = restaOra(a.cinque, ora), s = restaOra(a.sette, ora);
-    const fascia = (s ?? 100) < 5 ? 2 : (c ?? 100) < 5 ? 1 : 0;
-    const reset = (fascia === 2 ? a.sette.reset : a.cinque.reset) ?? Infinity;
-    return [vecchio(a, ora) ? 1 : 0, fascia, fascia === 0 ? -Math.min(c ?? 50, s ?? 50) : reset, -(ora - (a.ts ?? -Infinity))];
-  };
-  return [...l].sort((a, b) => {
-    const ka = chiave(a), kb = chiave(b);
-    for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] < kb[i] ? -1 : 1;
-    return a.email < b.email ? -1 : a.email > b.email ? 1 : 0;
-  });
-}
 
 const orario = (ms: number) => new Date(ms).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 
@@ -86,10 +69,12 @@ export function quoteDalFeed(json: unknown, oraMs: number, mio: string | null = 
   if (!radice || !Array.isArray(radice.rows)) return null;
   const ora = oraMs / 1000, come = (v: unknown) => (Array.isArray(v) ? v : []).map((d) => riga(d as Record<string, unknown>)).filter((a): a is Account => !!a);
   const uso: QuotaUso[] = [];
-  // un account senza lettura da un giorno non ha numeri; senza dato del 7 giorni neanche
-  for (const a of ordina(unisci(come(radice.real), come(radice.rows), ora, mio), ora)) {
-    if (vecchio(a, ora) || a.sette.usato === null) continue;
-    const account = a.email.split("@")[0], letto = a.ts! * 1000;
+  // un account senza lettura da un giorno non ha numeri; senza dato del 7 giorni neanche. Ordine fisso per email: l'elenco e i colori non si spostano con l'uso (#1146)
+  const vivi = unisci(come(radice.real), come(radice.rows), ora, mio).filter((a) => !vecchio(a, ora) && a.sette.usato !== null).sort((a, b) => (a.email < b.email ? -1 : a.email > b.email ? 1 : 0));
+  const corto = (e: string) => e.split("@")[0], doppi = new Set(vivi.map((a) => corto(a.email)).filter((c, i, l) => l.indexOf(c) !== i));
+  for (const a of vivi) {
+    // due account con lo stesso nome corto (info@dentalspace.ai, info@squaddcrm.com) si chiamano con l'email intera (#1146)
+    const account = doppi.has(corto(a.email)) ? a.email : corto(a.email), letto = a.ts! * 1000;
     const finestre = { email: a.email, cinque: pct(a.cinque, ora), cinqueFine: fine(a.cinque, ora), sette: pct(a.sette, ora), setteFine: fine(a.sette, ora) };
     if ((usatoOra(a.cinque, ora) ?? 0) >= 100) {
       uso.push({ account, usato: 100, ripartenza: `Limite raggiunto riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });

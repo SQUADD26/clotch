@@ -33,13 +33,13 @@ function casa() {
 test("usoAlGiorno: token per account e giorno, 14 giorni fino a oggi, messaggi doppi una volta", async () => {
   const { radici } = casa();
   const g = await usoAlGiorno(radici, ORA);
-  const roberto = g.get("roberto")!;
+  const roberto = g.get("roberto@x.it")!;
   assert.equal(roberto.length, 14);
   assert.deepEqual([roberto[0].giorno, roberto[13].giorno], ["2026-10-10", "2026-10-23"]);
   assert.equal(roberto[13].v, 150);
   assert.equal(roberto[12].v, 15);
   assert.equal(roberto.reduce((s, x) => s + x.v, 0), 165);
-  assert.equal(g.get("lavoro")!.reduce((s, x) => s + x.v, 0), 0);
+  assert.equal(g.get("lavoro@x.it")!.reduce((s, x) => s + x.v, 0), 0);
 });
 
 test("quoteConGiorni: ogni account ha la serie (zeri se vuota); senza alcun uso la scheda resta vuota", async () => {
@@ -64,7 +64,7 @@ test("quoteConGiorni: ogni account ha la serie (zeri se vuota); senza alcun uso 
 test("#1006: con il conteggio dei giorni lento le quote rispondono subito; al giro dopo c'è la serie", async () => {
   svuotaCache();
   await quoteUso(ORA, async () => ({ rows: [{ email: "roberto@x.it", ts: S - 60, five_used: 10, five_resets: S + 3600, seven_used: 38, seven_resets: S + 86_400 }] }));
-  const serie = new Map([["roberto", [{ giorno: "2026-10-23", v: 7 }]]]);
+  const serie = new Map([["roberto@x.it", [{ giorno: "2026-10-23", v: 7 }]]]);
   let chiamate = 0;
   const lento = () => { chiamate++; return new Promise<typeof serie>((r) => setTimeout(() => r(serie), 1500)); };
   const t = Date.now();

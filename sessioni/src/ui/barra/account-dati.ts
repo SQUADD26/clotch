@@ -1,32 +1,39 @@
 // figma: 148-62026 — dati del bottone account in fondo alla barra (#478): quote per account dal feed, conto alla rovescia vivo,
-// account della sessione aperta o previsto per la nuova, e l'account scelto per la nuova sessione (letto da chi la avvia).
-import { useEffect, useState, useSyncExternalStore } from "react";
-import type { Registro } from "../../clotch-ai";
-import type { QuotaUso } from "../../tipi";
+// e l'account con cui partono le sessioni nuove (#1146): scelto dall'utente e salvato nelle impostazioni, mai dedotto dalla sessione aperta.
+import { useEffect, useState } from "react";
+import type { ImpostazioniApi, QuotaUso } from "../../tipi";
 import { contoAllaRovescia } from "../../uso-testi";
-import { comandaEsito } from "../chat/clotch-ai";
 import { nomeAccount } from "../chat/testi";
 
 export { contoAllaRovescia };
 
-// Account scelto nel menu quando la vista è una sessione nuova: email (o null = «auto», sceglie il motore). Lo legge la vista «nuova sessione»
-// con `accountScelto.leggi()` / `useAccountScelto()` e lo manda nel campo `account` di `nuova_sessione`.
-let scelto: string | null = null;
-const seguaci = new Set<() => void>();
-export const accountScelto = {
-  leggi: () => scelto,
-  imposta(email: string | null) { scelto = email; seguaci.forEach((f) => f()); },
-  segui(f: () => void) { seguaci.add(f); return () => { seguaci.delete(f); }; },
-};
-export const useAccountScelto = () => useSyncExternalStore(accountScelto.segui, accountScelto.leggi);
+declare global { interface Window { impostazioni: ImpostazioniApi } } // come in impostazioni/stato.ts: qui senza la sua catena di .tsx (lo legge anche il test node)
 
 /** Nome corto dell'account: «accountmanager» da un'email, da una cartella `.claude-accountmanager` o da un nome. */
 export const nome = (x: string) => nomeAccount(x.split("@")[0]);
 /** Stesso account scritto in modi diversi: «.claude-terminal-r-bondici», «terminal-r-bondici», «r-bondici» (il motore usa l'ultimo). */
 const chiave = (x: string) => { const n = nome(x).replace(/^terminal-/, ""); return n === "default" ? "claude" : n; }; // il motore chiama «default» la cartella ~/.claude
-export const trova = (quote: QuotaUso[], x: string | null | undefined) =>
+export function trova(quote: QuotaUso[], x: string | null | undefined): QuotaUso | undefined {
+  if (!x) return undefined;
   // un'email si confronta intera: «info@dentalspace.ai» non è «info@squaddcrm.com» anche se il nome corto è uguale
-  (!x ? undefined : x.includes("@") ? quote.find((q) => q.email === x) : quote.find((q) => q.account === nome(x) || q.cartelle?.some((c) => c === x || chiave(c) === chiave(x))));
+  if (x.includes("@")) return quote.find((q) => q.email?.toLowerCase() === x.toLowerCase());
+  const perCartella = quote.find((q) => q.cartelle?.some((c) => c === x || chiave(c) === chiave(x)));
+  if (perCartella) return perCartella;
+  const perNome = quote.filter((q) => q.account === nome(x));
+  return perNome.length === 1 ? perNome[0] : undefined; // due account con quel nome: non si indovina (#1146)
+}
+
+/** Gli account con cui si può far partire una sessione: dati veri dal feed (letti nelle ultime 24 ore, già filtrati da `quoteDalFeed`)
+ *  e una cartella di config su questo Mac (#1146). Nell'ordine del feed, fisso per email. */
+export const disponibili = (quote: QuotaUso[]) => quote.filter((q) => q.email && q.cartelle?.length);
+
+/** L'account delle sessioni nuove: quello scelto (anche se il feed oggi non lo legge: non si cambia da solo), se no quello di ~/.claude
+ *  (lo usa `claude` senza altre cartelle), se no il primo disponibile. `q` = le sue quote, se il feed le ha. */
+export function accountNuove(quote: QuotaUso[], scelta: string | null | undefined): { email: string | null; q: QuotaUso | undefined } {
+  if (scelta) return { email: scelta, q: trova(quote, scelta) };
+  const l = disponibili(quote), q = l.find((x) => x.cartelle!.includes(".claude")) ?? l[0];
+  return { email: q?.email ?? null, q };
+}
 /** Due lettere per l'avatar. */
 export const iniziali = (x: string) => x.slice(0, 2).toUpperCase();
 
@@ -61,28 +68,4 @@ export function useOra(fisso?: number): number {
     return () => { clearInterval(t); document.removeEventListener("visibilitychange", giro); };
   }, [fisso]);
   return fisso ?? ora;
-}
-
-export interface Corrente {
-  /** Email o cartella dell'account con cui lavora (o lavorerebbe) la sessione; null se non si sa. */
-  chiave: string | null;
-  /** Sessione avviata dal motore: l'account si cambia con `riprendi_altrove`. Null = sessione nuova (si sceglie per `nuova_sessione`). */
-  motore: boolean | null;
-}
-
-/** Account di una sessione aperta (registro: `inizio`; se la chat non è nel registro, quello letto dal disco) o, per la nuova, quello scelto o `account_previsto`. */
-export function useCorrente(chat: string | null, registro: Registro | null, daDisco: string | undefined, previsto?: string | null, nuova = false): Corrente {
-  const nuovo = !chat;
-  const scelto = useAccountScelto();
-  const [auto, setAuto] = useState<string | null>(previsto ?? null);
-  useEffect(() => {
-    if (!nuova || !nuovo || previsto !== undefined) return; // `account_previsto` solo nella vista Nuova sessione
-    let vivo = true;
-    void comandaEsito("account_previsto", {}).then((e) => { if (vivo && e?.esito === "ok" && e.account?.email) setAuto(e.account.email); });
-    return () => { vivo = false; };
-  }, [nuova, nuovo, previsto]);
-  if (nuovo) return { chiave: scelto ?? auto, motore: null };
-  const c = registro?.chat.get(chat);
-  // l'email letta dal disco è la più precisa; il nome scritto dal motore cambia forma («default», «b», «r-bondici», «r.bondici»)
-  return { chiave: (daDisco?.includes("@") ? daDisco : null) ?? c?.account ?? daDisco ?? null, motore: c?.sorgente === "motore" };
 }

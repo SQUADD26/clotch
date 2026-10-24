@@ -8,7 +8,7 @@ export const PARTENZA: ImpostazioniApp = {
   tema: "Scuro", colore: "Arancione", carattere: "Sistema", dimensione: "Media", densita: "Normale", pannelloAperto: true, iconeSessioni: true,
   avvisoAttesa: true, avvisoFinita: true, avvisoErrori: true, avvisoLimite: true, suono: "Vetro", silenzio: "22:00–08:00",
   sorgenteClaudeCode: true, sorgenteClaude: true, sorgenteCodex: true, sorgenteCursor: false,
-  accountTolti: [], accountAggiunti: [],
+  accountTolti: [], accountAggiunti: [], accountNuove: null,
   comandiInteri: true, nascondiChiavi: true, cartelleEscluse: [], etichetteCartelle: {}, cronologia: "30 giorni",
   aggiornamentiAutomatici: true,
   clotchVoce: true, clotchDettatura: true, clotchAvvisi: true, clotchObiettivi: true,

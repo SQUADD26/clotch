@@ -39,7 +39,7 @@ const MS_GIORNO = 86_400_000;
 /**
  * Uso al giorno (UTC, ultimi 14, dal più vecchio a oggi) per account: token di `message.usage` nelle trascrizioni
  * `projects/**\/*.jsonl` toccate in quel periodo, ogni messaggio una volta. Il feed non dà l'uso al giorno.
- * Chiave = parte prima della @ dell'email dell'account (come `QuotaUso.account`). Un file illeggibile si salta.
+ * Chiave = email dell'account in minuscolo: due «info@» di domini diversi restano due account (#1146). Un file illeggibile si salta.
  * shortcut: sono token (input + output + scrittura cache), non la % di quota; senza email nel `.claude.json` l'account non si abbina.
  */
 export function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<Map<string, { giorno: string; v: number }[]>> {
@@ -54,7 +54,7 @@ async function contaUso(radici: Radice[], ora: number): Promise<Map<string, { gi
   const oggi = Math.floor(ora / MS_GIORNO), primo = oggi - GIORNI + 1, da = primo * MS_GIORNO;
   const out = new Map<string, number[]>(), perCartella = new Map<string, Voce[][]>(), visti = new Set<string>();
   for (const r of radici) {
-    const chiave = r.email?.split("@")[0];
+    const chiave = r.email?.toLowerCase();
     if (!chiave) continue;
     const somme = out.get(chiave) ?? new Array<number>(GIORNI).fill(0), messaggi = new Set<string>();
     out.set(chiave, somme);
@@ -124,7 +124,7 @@ export async function quoteConGiorni(radici: Radice[], ora = Date.now(), contaGi
   // le cartelle dell'account per email: la sessione porta il nome della cartella, non l'email (#993)
   const conCartelle = quote.map((q) => ({ ...q, cartelle: radici.filter((r) => r.email?.toLowerCase() === q.email?.toLowerCase()).map((r) => r.account) }));
   if (![...uso.values()].some((g) => g.some((x) => x.v))) return conCartelle;
-  return conCartelle.map((q) => ({ ...q, giorni: uso.get(q.account) ?? vuota }));
+  return conCartelle.map((q) => ({ ...q, giorni: uso.get(q.email?.toLowerCase() ?? "") ?? vuota }));
 }
 
 /** Quando l'uso supera l'80% e il 90%: `viste` = ultima soglia già raggiunta per account (si aggiorna qui). Lo stesso account avvisa una volta per soglia e finestra: se l'uso scende sotto, la soglia si azzera. La prima lettura di un account è solo il punto di partenza; da 100% in su c'è l'avviso del limite. */
