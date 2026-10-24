@@ -71,11 +71,11 @@
 .pezzo-chat .tabella-markdown :is(th,td).numero { width: var(--misura-tabella-colonna-numero); min-width: var(--misura-tabella-colonna-numero); text-align: right; }
 .pezzo-chat .tabella-markdown tr:last-child > td { border-bottom: 0; }
 .pezzo-chat .tabella-markdown th {
-  position: sticky; top: 0; z-index: calc(var(--livello-sopra) + 1); color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500;
+  position: sticky; top: 0; z-index: var(--livello-sopra-2); color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500;
   background-color: var(--colore-fondo-superficie); background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione));
 }
 .pezzo-chat .tabella-markdown :is(th,td):first-child { position: sticky; left: 0; background-color: var(--colore-fondo-superficie); }
-.pezzo-chat .tabella-markdown th:first-child { z-index: calc(var(--livello-sopra) + 2); background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione)); }
+.pezzo-chat .tabella-markdown th:first-child { z-index: var(--livello-sopra-3); background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione)); }
 .pezzo-chat .tabella-markdown td:first-child { z-index: var(--livello-sopra); }
 .pezzo-chat .tabella-markdown.scorre :is(th,td):first-child { border-right: var(--misura-tratto) solid var(--colore-bordo-normale); }
 .pezzo-chat .tabella-markdown td strong { font-weight: 500; }

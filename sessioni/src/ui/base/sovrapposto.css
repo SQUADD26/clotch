@@ -1,7 +1,4 @@
 /* figma: 101-20859 — livelli, posto e movimento comuni di menu, popover, tooltip, dialoghi e ricerca (base/Sovrapposto.tsx, #519) */
-/* shortcut: `--livello-sopra` (sopra i fratelli dentro un pezzo: barra trova, «nuovi messaggi», maniglia, intestazioni delle tabelle) manca in Figma,
-   chiesto a «🎨 Figma: Clotch movimento e livelli» (#528); arrivato in token.css, questa riga si toglie. */
-:root { --livello-sopra: 1; }
 .sovrapposto, .velo {
   --curva-in: cubic-bezier(var(--curva-entrata-x1), var(--curva-entrata-y1), var(--curva-entrata-x2), var(--curva-entrata-y2));
   --curva-out: cubic-bezier(var(--curva-uscita-x1), var(--curva-uscita-y1), var(--curva-uscita-x2), var(--curva-uscita-y2));
