@@ -1,4 +1,4 @@
-// Le scelte della casella (#437): permessi 101:26398, modello e sforzo 101:26707, contesto usato 101:26425, messaggio non inviato 101:27798.
+// Le scelte della casella (#437): permessi 101:26398, modello e sforzo 101:26707 e 148:28674, contesto usato 101:26425, messaggio non inviato 101:27798.
 // Le scelte per chat stanno nelle preferenze della sessione (`modello` è l'id CLI che #457 manda al motore).
 import type { EsitoComando } from "../../comandi";
 import type { PreferenzeSessione, Sessione } from "../../tipi";
@@ -19,12 +19,11 @@ export const PERMESSI: Scelta[] = [
   { id: "bypassPermissions", etichetta: "Tutto senza chiedere", descrizione: "Rischio alto: nessuna domanda", pericolo: true },
 ];
 
-const DESCRIZIONI: Record<string, string> = {
-  "claude-opus-5-5": "Il più capace", "claude-sonnet-5-5": "Veloce, per il lavoro di tutti i giorni",
-  "claude-haiku-5-5": "Il più rapido", "claude-fable-5-1": "Per i casi più difficili",
-};
-/** Dalla lista unica dei modelli (testi.ts): etichetta «Opus 5.5», id CLI e nota del menu. */
-export const MODELLI_MENU: Scelta[] = Object.entries(MODELLI).map(([etichetta, m]) => ({ id: m.id, etichetta, descrizione: DESCRIZIONI[m.id] }));
+/** Ordine del menu modello (101:26707 → 148:28674): i quattro modelli noti; un modello nuovo di `MODELLI` va in fondo. */
+const ORDINE_MENU = ["claude-opus-5-5", "claude-fable-5-1", "claude-sonnet-5-5", "claude-haiku-5-5"];
+const posto = (id: string) => (ORDINE_MENU.includes(id) ? ORDINE_MENU.indexOf(id) : ORDINE_MENU.length);
+/** Dalla lista unica dei modelli (testi.ts): etichetta «Opus 5.5» e id CLI. */
+export const MODELLI_MENU: Scelta[] = Object.entries(MODELLI).map(([etichetta, m]) => ({ id: m.id, etichetta })).sort((x, y) => posto(x.id) - posto(y.id));
 
 export const SFORZI: Scelta[] = [
   { id: "low", etichetta: "Basso" }, { id: "medium", etichetta: "Medio" }, { id: "high", etichetta: "Alto" },
@@ -49,6 +48,15 @@ export const modelloDi = (s: Pick<Sessione, "modello">, p?: PreferenzeSessione) 
 export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => m.id === id)?.etichetta;
 
 export const sforzoDi = (p?: PreferenzeSessione) => SFORZI.find((x) => x.id === p?.sforzo) ?? SFORZI.find((x) => x.id === SFORZO_BASE)!;
+
+/** Dalle preferenze cambiate ai campi di `sessione_imposta`: solo modello, impegno e modalità veloce; `null` = tornato al predefinito (impegno «medium», veloce spenta). undefined se non ne cambia nessuno. */
+export function impostazioneMotore(parte: Partial<Record<keyof PreferenzeSessione, unknown>>) {
+  const o: { modello?: string; sforzo?: string; rapida?: boolean } = {};
+  if (typeof parte.modello === "string") o.modello = parte.modello;
+  if ("sforzo" in parte) o.sforzo = (parte.sforzo as string | null) ?? SFORZO_BASE;
+  if ("rapida" in parte) o.rapida = parte.rapida === true;
+  return Object.keys(o).length ? o : undefined;
+}
 
 /** «Non inviato: la sessione non risponde.»: il perché dall'esito del comando (null = il canale verso il motore è caduto). */
 export function motivoNonInviato(e: EsitoComando | null): string {

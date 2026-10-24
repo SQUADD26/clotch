@@ -14,7 +14,8 @@ app.whenReady().then(async () => {
   const scene = structuredClone(require('../design/scene/101-26745.json'));
   scene.file = ['sessioni/src/lettore.ts', 'sessioni/src/lettore.test.ts', 'sessioni/src/lettura/cartelle.ts'];
   scene.navigazione.sezione = undefined;
-  scene.preferenze = { s1: { icona: 'stella', modello: 'claude-fable-5-1' } }; // la chat ha scelto un modello diverso da quello della sessione
+  scene.elenco.sessioni[0].situazione.adesso = 'lavora'; // la sessione lavora: ↵ interrompe e manda, ⌘↵ mette in coda
+  scene.preferenze = { s1: { icona: 'stella', modello: 'claude-fable-5-1', sforzo: 'high', rapida: true } }; // la chat ha scelto modello, impegno e modalità veloce
   collegaScena(ipcMain, scene);
   const history = creaCronologiaScena((id) => scene.messaggi[id] ?? []);
   ipcMain.removeHandler('sessioni:messaggi');
@@ -23,9 +24,9 @@ app.whenReady().then(async () => {
   ipcMain.removeHandler('sessioni:imposta-preferenze');
   ipcMain.handle('sessioni:imposta-preferenze', (_e, id, parte) => { preferenze.push({ id, parte }); });
   const comandi = [];
-  let esito = 'scaduto';
+  let esito = 'scaduto', testoEsito = '';
   ipcMain.removeHandler('clotch-ai:comando');
-  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { id: 'c', esito, testo: '', ...(esito === 'scaduto' ? { preso: false } : {}) }; });
+  ipcMain.handle('clotch-ai:comando', (_e, cmd, args) => { comandi.push({ cmd, args }); return { id: 'c', esito, testo: testoEsito, ...(esito === 'scaduto' ? { preso: false } : {}) }; });
 
   const win = new BrowserWindow({ show: false, focusable: false, width: 1440, height: 1000,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
@@ -99,21 +100,41 @@ app.whenReady().then(async () => {
       await wait(() => !document.querySelector('.menu-casella'));
     });
     await check('MODELLO_CHIP', async () => {
+      comandi.length = 0;
       await load();
-      assert.equal(await run(() => document.querySelectorAll('.chip-menu')[1].textContent.trim()), 'Fable 5.1Medio'); // la scelta di questa chat, non quella della trascrizione
-      await clicca('.chip-menu button.chip[aria-label="Modello e sforzo"]');
-      await wait(() => document.querySelectorAll('.menu-casella .tacca').length === 5);
-      assert.deepEqual(await testi('.menu-casella .tacca .livello'), ['Basso', 'Medio', 'Alto', 'Molto alto', 'Massimo']);
-      await clicca('.menu-casella .tacca', 'Alto'); // il menu resta aperto per le tacche
-      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { sforzo: 'high' } });
-      await clicca('.menu-casella button[role="switch"]');
-      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { rapida: true } });
-      await clicca('.menu-casella .voce', 'Sonnet 5.5');
+      assert.equal(await run(() => document.querySelectorAll('.chip-menu')[1].textContent.trim()), 'Fable 5.1Alto'); // la scelta di questa chat, non quella della trascrizione
+      await clicca('.chip-menu button.chip[aria-label="Modello e impegno"]');
+      await wait(() => document.querySelectorAll('.menu-casella .voce').length === 4);
+      assert.deepEqual(await testi('.menu-casella .voce .etichetta'), ['Opus 5.5', 'Fable 5.1', 'Sonnet 5.5', 'Haiku 5.5']);
+      assert.deepEqual(await testi('.menu-casella .predefinito'), ['Predefinito']); // il modello delle impostazioni
+      assert.deepEqual(await testi('.menu-casella .numero'), ['1', '3', '4']); // la spunta sta al posto del numero del modello in uso
+      assert.deepEqual(await testi('.menu-casella .titolo-gruppo'), ['Modalità veloce']);
+      assert.equal(await run(() => !!document.querySelector('.menu-casella.impegno')), false, "l'impegno si apre al passaggio");
+      await run(() => document.querySelectorAll('.menu-casella .voce')[0].dispatchEvent(new MouseEvent('mouseover', { bubbles: true })));
+      await wait(() => !!document.querySelector('.menu-casella.impegno'));
+      assert.deepEqual(await testi('.menu-casella.impegno .voce'), ['Basso', 'Medio', 'Alto', 'Molto alto', 'Massimo']);
+      assert.equal(await run(() => document.querySelector('.menu-casella.impegno .voce[aria-checked="true"]').textContent.trim()), 'Alto');
+      await clicca('.menu-casella .voce', 'Sonnet 5.5'); // il menu resta aperto, con l'impegno a destra
       assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: 'claude-sonnet-5-5' } });
-      await clicca('.chip-menu button.chip[aria-label="Modello e sforzo"]');
+      assert.equal(await run(() => !!document.querySelector('.menu-casella.impegno')), true);
+      await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: '4', bubbles: true }))); // scorciatoia: quarto modello
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: 'claude-haiku-5-5' } });
+      await clicca('.menu-casella button[role="switch"]'); // la modalità veloce è accesa in questa scena: spegnerla torna al predefinito
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { rapida: null } });
+      await clicca('.menu-casella.impegno .voce', 'Massimo'); // l'impegno chiude il menu
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { sforzo: 'max' } });
+      await wait(() => !document.querySelector('.menu-casella'));
+      await clicca('.chip-menu button.chip[aria-label="Modello e impegno"]');
       await wait(() => !!document.querySelector('.menu-casella'));
-      await clicca('.menu-casella .voce', 'Reimposta');
-      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { modello: null, sforzo: null, rapida: null } });
+      await clicca('.menu-casella .voce', 'Opus 5.5');
+      await clicca('.menu-casella.impegno .voce', 'Medio');
+      assert.deepEqual(preferenze.at(-1), { id: 's1', parte: { sforzo: null } }); // il livello base si cancella dalle preferenze
+      // ogni scelta va subito anche al motore (`sessione_imposta`), col livello base scritto per intero
+      assert.deepEqual(comandi.map((c) => [c.cmd, c.args]), [
+        ['sessione_imposta', { chat: 's1', modello: 'claude-sonnet-5-5' }], ['sessione_imposta', { chat: 's1', modello: 'claude-haiku-5-5' }],
+        ['sessione_imposta', { chat: 's1', rapida: false }], ['sessione_imposta', { chat: 's1', sforzo: 'max' }],
+        ['sessione_imposta', { chat: 's1', modello: 'claude-opus-5-5' }], ['sessione_imposta', { chat: 's1', sforzo: 'medium' }],
+      ]);
     });
     await check('CONTESTO_TOOLTIP', async () => {
       await load();
@@ -125,7 +146,17 @@ app.whenReady().then(async () => {
       await load(); await scrivi('Vai avanti');
       await clicca('button[aria-label="Invia"]');
       await attendi(() => comandi.length === 1);
-      assert.deepEqual(comandi[0], { cmd: 'manda', args: { chat: 's1', testo: 'Vai avanti', modo: 'subito', modello: 'claude-fable-5-1' } });
+      assert.deepEqual(comandi[0], { cmd: 'manda', args: { chat: 's1', testo: 'Vai avanti', modo: 'subito', modello: 'claude-fable-5-1', sforzo: 'high', rapida: true } });
+    });
+    await check('CODA_SENZA_SCELTE_E_RIFIUTO', async () => {
+      comandi.length = 0; esito = 'rifiutato'; testoEsito = 'il modello non si cambia con la sessione al lavoro';
+      await load(); await scrivi('Poi controlla i titoli');
+      await tasto('Enter', { metaKey: true }); // ⌘↵: in coda
+      await attendi(() => comandi.length === 1);
+      assert.deepEqual(comandi[0], { cmd: 'manda', args: { chat: 's1', testo: 'Poi controlla i titoli', modo: 'coda' } }, 'in coda il motore rifiuta modello, impegno e modalità veloce: non partono');
+      await wait(() => !!document.querySelector('.errore-invio'));
+      assert.equal(await run(() => document.querySelector('.errore-invio .testo').textContent), 'Non inviato: il modello non si cambia con la sessione al lavoro.');
+      esito = 'scaduto'; testoEsito = '';
     });
     await check('NON_INVIATO_E_RIPROVA', async () => {
       comandi.length = 0; esito = 'scaduto';

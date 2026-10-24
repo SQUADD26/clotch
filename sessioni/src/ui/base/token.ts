@@ -241,6 +241,13 @@ export type Token =
   | "misura-menu-modello"
   | "misura-onda-barra"
   | "misura-menu-permessi"
+  | "misura-casella-testo-max"
+  | "misura-menu-impegno"
+  | "misura-allegato-lato"
+  | "misura-allegato-x"
+  | "misura-finestra-stretta"
+  | "misura-allegato-avviso-largo"
+  | "misura-menu-avvio-largo"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -494,6 +501,13 @@ export const valori: Record<Token, string> = {
   "misura-menu-modello": "320px",
   "misura-onda-barra": "3px",
   "misura-menu-permessi": "336px",
+  "misura-casella-testo-max": "240px",
+  "misura-menu-impegno": "200",
+  "misura-allegato-lato": "120",
+  "misura-allegato-x": "20",
+  "misura-finestra-stretta": "480",
+  "misura-allegato-avviso-largo": "734",
+  "misura-menu-avvio-largo": "320",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
