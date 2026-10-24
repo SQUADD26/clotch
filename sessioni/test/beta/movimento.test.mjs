@@ -12,6 +12,12 @@ test('token e curva viva: nessun difetto', () => assert.deepEqual(difettiMovimen
 test('durata fuori token, lineare, parte tardi', () =>
   assert.deepEqual(criteri(difettiMovimento(giro([anim({ durata: 300, curva: 'linear', serie: serie(300, (p) => p) })], 0))), ['M2', 'M3', 'M5']));
 test('proprietà di layout', () => assert.deepEqual(criteri(difettiMovimento(giro([anim({ proprieta: ['height'], serie: serie(200, (p) => 1 - (1 - p) ** 3) })]))), ['MLAYOUT']));
+test('M5 dal clic, non dal premuto: parte subito dopo il rilascio', () => {
+  const a = [anim({ serie: serie(200, (p) => 1 - (1 - p) ** 3).map((s) => [s[0] + 240, ...s.slice(1)]) })];
+  assert.deepEqual(criteri(difettiMovimento({ evento: 0, eventi: [0, 330], T: a[0].serie.map((s) => s[0]), animazioni: a })), []);
+  assert.deepEqual(criteri(difettiMovimento({ evento: 0, eventi: [0], T: a[0].serie.map((s) => s[0]), animazioni: a })), ['M5']);
+});
+test('gruppo di una View Transition: la misura della foto non è layout', () => assert.deepEqual(criteri(difettiMovimento(giro([anim({ dove: 'html::view-transition-group(superficie)', proprieta: ['width', 'height', 'transform'], serie: serie(200, (p) => 1 - (1 - p) ** 3) })]))), []));
 test('movimento ridotto: si sposta', () =>
   assert.deepEqual(criteri(difettiMovimento(giro([anim({ proprieta: ['transform'], serie: serie(200, () => 1, (p) => 8 * p) })]), { ridotto: true })), ['M8']));
 test('interruzione con salto', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 0, 0, 0, 1], [16, 0.2, 0, 0, 1], [32, 1, 0, 0, 1]] })] })), ['M10']));
