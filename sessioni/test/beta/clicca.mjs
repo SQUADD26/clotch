@@ -125,7 +125,8 @@ async function giro(app, area, cfg, console_) {
     if (await pagina.evaluate((r) => window.__bt.firma(r), radice) !== firma0) { await pulito(); nomi = await segna(); }
   }
   // menu della riga e della cartella, col clic destro e col «⋯», e ogni loro voce attivata (#1081)
-  await pulito(); await provaMenu({ pagina, radice, reg, foto, difetti, segna, pulito, firma0 });
+  // nella matrice solo scuro con dati (min, grande, con e senza testo lungo): il tema chiaro e il movimento ridotto hanno gli stessi menu, e ogni voce costa ~2 s
+  if (!arg.matrice || (cfg.tema === 'scuro' && cfg.dati === 'con' && !cfg.ridotto)) { await pulito(); await provaMenu({ pagina, radice, reg, foto, difetti, segna, pulito, firma0 }); }
   // Tab su tutta l'area: anello del fuoco presente e con la forma del pezzo
   await pulito(); await segna(); await pagina.evaluate(() => document.activeElement?.blur());
   for (let k = 0; k < Math.min(60, n + 5); k++) {
