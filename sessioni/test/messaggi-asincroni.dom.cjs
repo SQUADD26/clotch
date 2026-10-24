@@ -167,16 +167,25 @@ app.whenReady().then(async () => {
 
     const rr = await fetch('Reset', [user('Vecchia pagina'), user('Vecchia coda')]); await settle(rr);
     const obsolete = await previous();
-    emit({ tipo: 'reset', sessione: 'Reset', epocaPrecedente: rr.result.cronologia.epoca, epoca: 'reset-epoch', motivo: 'truncate' });
-    await wait(async () => await run('probe.stato') === 'errore', 'reset visibile');
-    assert.equal(await text(), 'Vecchia coda');
     sources.Reset = [user('Nuova epoca')]; n = pending.length;
-    await run('probe.riprova()'); await requests(n + 1);
+    emit({ tipo: 'reset', sessione: 'Reset', epocaPrecedente: rr.result.cronologia.epoca, epoca: 'reset-epoch', motivo: 'truncate' });
+    await requests(n + 1); // #482: l'istantanea non vale più, il hook riparte da solo con una nuova
+    assert.equal(pending[n].pagina, 0); assert.equal(pending[n].opzioni.cursore, undefined);
+    assert.equal(await text(), 'Vecchia coda', 'durante la ripartenza restano le righe in vista');
+    assert.equal(await run('probe.errore'), null);
     const fresh = pending[n].result;
     fresh.cronologia.epoca = 'reset-epoch'; fresh.cronologia.righe[0].chiave = 'reset-epoch:0';
     await settle(pending[n]); await settle(obsolete);
     assert.equal(await text(), 'Nuova epoca'); assert.equal(await run('probe.identita[0].chiave'), 'reset-epoch:0');
-    assert.equal(await run('probe.altriCarica'), false); console.log('ASYNC_V1_RESET_OBSOLETE_PAGE_IGNORED_OK');
+    assert.equal(await run('probe.errore'), null); assert.equal(await run('probe.stato'), 'pronto');
+    assert.equal(await run('probe.altriCarica'), false); console.log('ASYNC_V1_RESET_AUTO_RESTART_OK');
+    // se anche la ripartenza fallisce l'avviso resta, senza altre ripartenze
+    n = pending.length;
+    emit({ tipo: 'reset', sessione: 'Reset', epocaPrecedente: 'reset-epoch', epoca: 'reset-epoch-2', motivo: 'replace' });
+    await requests(n + 1);
+    await settle(pending[n], failure(pending[n], 'non_letta', 'Trascrizione non letta', 'stessa_pagina'));
+    assert.equal(await run('probe.stato'), 'errore'); assert.equal(await run('probe.errore'), 'Trascrizione non letta');
+    assert.equal(pending.length, n + 1); console.log('ASYNC_V1_RESTART_FAILURE_KEEPS_ERROR_OK');
 
     const invalid = await fetch('NoProtocol', [user('Non accettare legacy')]);
     await settle(invalid, { messaggi: [user('Non accettare legacy')], pagina: 0, haAltre: false, totale: 1, errore: null });

@@ -69,6 +69,8 @@ export function useElenco() {
   return { ...c, dati } as typeof c;
 }
 
+const MAX_RIAVVII = 3;
+
 /** Snapshot immutabile e delta fisici; il listener precede sempre la prima richiesta. */
 export function useMessaggi(id: string | null) {
   const [dati, setDati] = useState(() => nuovaCronologia(id));
@@ -77,10 +79,17 @@ export function useMessaggi(id: string | null) {
   const [altriErrore, setAltriErrore] = useState<string | null>(null);
   const stato = useRef(dati), corrente = useRef(id), giro = useRef(0);
   const precedente = useRef<object | null>(null);
+  const riavvii = useRef(0); // ripartenze automatiche di fila: oltre MAX_RIAVVII l'avviso resta
   if (corrente.current !== id) {
     corrente.current = id; giro.current++; precedente.current = null;
   }
   const pubblica = (s: CronologiaStato) => { stato.current = s; setDati(s); };
+  // Istantanea scaduta o file riscritto dal programma che lo scrive: caso normale, si riparte senza avviso e senza perdere le righe in vista.
+  const ripartiDaSola = (s: CronologiaStato) => {
+    if (!s.riparti || riavvii.current >= MAX_RIAVVII) return false;
+    riavvii.current++; riprova();
+    return true;
+  };
   const riprova = useCallback(() => {
     if (corrente.current !== id) return;
     const mio = ++giro.current;
@@ -91,7 +100,10 @@ export function useMessaggi(id: string | null) {
     if (!id) return;
     api().messaggi(id, 0, { v: 1 }).then((p) => {
       if (mio !== giro.current || corrente.current !== id) return;
-      pubblica(applicaPagina(stato.current, p));
+      const s = applicaPagina(stato.current, p);
+      if (ripartiDaSola(s)) return;
+      if (!s.errore) riavvii.current = 0;
+      pubblica(s);
     }).catch((e) => {
       if (mio === giro.current && corrente.current === id) pubblica(fallita(stato.current, messaggioErrore(e)));
     }).finally(() => {
@@ -105,8 +117,9 @@ export function useMessaggi(id: string | null) {
       if (!attivo || corrente.current !== id || !oggetto(a) || !Array.isArray(a.cronologia)) return;
       let s = stato.current;
       for (const d of a.cronologia) if (oggetto(d)) s = applicaDelta(s, d);
-      if (s !== stato.current) pubblica(s);
+      if (s !== stato.current && !ripartiDaSola(s)) pubblica(s);
     });
+    riavvii.current = 0;
     riprova();
     return () => { attivo = false; stop(); giro.current++; precedente.current = null; };
   }, [id, riprova]);
