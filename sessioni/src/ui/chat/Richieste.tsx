@@ -50,7 +50,7 @@ const argomenti = (ingresso: unknown) => !ingresso || typeof ingresso !== "objec
 type Scelta = "consenti" | "consenti_sempre" | "nega";
 
 /** `titolo`: nella chat di clotch AI la carta dice di quale sessione è (101-37492). */
-export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat: string; r: Richiesta; da: string | null; titolo?: string }) {
+export function Permesso({ chat, r, da, titolo = "Permesso richiesto", prima = true }: { chat: string; r: Richiesta; da: string | null; titolo?: string; /** con più permessi aperti le scorciatoie rispondono solo al primo, quello in cima */ prima?: boolean }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
   const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
@@ -61,10 +61,10 @@ export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat:
   const rispondi = (s: Scelta) => fai(async () => { if (await comanda("rispondi_permesso", { chat, rid: r.rid, scelta: s })) setScelta(s); });
   // finché aspetta la risposta, le scorciatoie salvate «Consenti» e «Nega» rispondono a questo permesso
   useEffect(() => {
-    if (scelta) return;
+    if (scelta || !prima) return;
     const fuori = [registraAzione("consenti", () => void rispondi("consenti")), registraAzione("nega", () => void rispondi("nega"))];
     return () => fuori.forEach((f) => f());
-  }, [scelta, chat, r.rid]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [scelta, prima, chat, r.rid]); // eslint-disable-line react-hooks/exhaustive-deps
   if (scelta) {
     return scelta === "nega"
       ? <Esito icona="chiudi" colore="errore" esito="Negato da te" dettaglio={cosa} codice />
