@@ -12,9 +12,7 @@ let cartellaProva: string | undefined;
 /** Prima degli import applicativi e di ready: Chromium non deve usare il profilo reale. */
 function profiloProva() {
   if (cartellaProva) return path.join(cartellaProva, "userData");
-  // CLOTCH_PROVA_RADICE: il banco di misura (#474) sceglie la cartella, per metterci prima indice e cache d'avvio
-  const scelta = process.env.CLOTCH_PROVA_RADICE;
-  cartellaProva = scelta ? (fs.mkdirSync(scelta, { recursive: true }), scelta) : fs.mkdtempSync(path.join(os.tmpdir(), "clotch-prova-"));
+  cartellaProva = fs.mkdtempSync(path.join(os.tmpdir(), "clotch-prova-"));
   const radice = cartellaProva, dati = path.join(radice, "userData");
   const pulisci = () => {
     try { fs.rmSync(radice, { recursive: true, force: true }); }

@@ -49,7 +49,7 @@ export async function leggiImmagine(da: DaImmagine | undefined, fileSessione: (i
     if (da && "percorso" in da) {
       const mime = MIME[estensione(String(da.percorso))];
       if (!mime || !assoluto(da.percorso) || fs.statSync(da.percorso).size > MAX_IMMAGINE) return null;
-      return { mime, base64: (await fs.promises.readFile(da.percorso)).toString("base64") }; // a pezzi: un file grande non ferma il main (#474)
+      return { mime, base64: fs.readFileSync(da.percorso).toString("base64") };
     }
     const rif: RifImmagine | undefined = da?.rif;
     const file = da && typeof da.sessione === "string" ? fileSessione(da.sessione) : null;

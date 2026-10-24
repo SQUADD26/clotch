@@ -1,7 +1,6 @@
 // Aggiornamento dal vivo: fs.watch sulle cartelle, legge solo la coda nuova dei file JSONL.
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { chiaveCartella, progettiDi, tocca } from "./claude-code";
 import { leggiElenco } from "./elenco";
 import { firmaFile } from "./messaggi";
 import { Cronologia } from "./cronologia";
@@ -29,7 +28,6 @@ export class Osservatore {
   private avviato = false;
   private timer: NodeJS.Timeout | null = null;
   private dirty = new Set<string>();
-  private controllo = 0; // ultimo controllo di tutti i file (giro())
 
   /** `partenza`: lo stato già letto altrove (worker); senza, si legge qui. */
   constructor(private home: string, private cb: (a: Aggiornamento) => void, private env: NodeJS.ProcessEnv = process.env, private attesaMs = 250, private imp?: () => Record<string, unknown> | undefined, private cronologia = new Cronologia(), private partenza?: StatoIniziale) {
@@ -48,7 +46,7 @@ export class Osservatore {
     let profili: string[] = [];
     try { profili = fs.readdirSync(support).filter((n) => /^[Cc]laude/.test(n)); } catch { /* niente app */ }
     return [
-      ...new Map(radici.map((r) => progettiDi(path.join(h, r))).reverse().map((p) => [chiaveCartella(p), p])).values(), // una cartella vera, un osservatore (col nome del primo account)
+      ...radici.map((r) => path.join(h, r, "projects")),
       ...profili.map((p) => path.join(support, p, "claude-code-sessions")),
       path.join(h, ".claude", "obiettivi"), path.join(h, ".claude", "sessioni-stato"),
       path.join(h, ".codex", "sessions"), path.join(h, ".cursor", "projects"),
@@ -74,7 +72,7 @@ export class Osservatore {
     this.avviato = true;
     this.guarda();
     // macOS (FSEvents) comincia a mandare eventi qualche istante dopo fs.watch: quello che si scrive prima non arriva.
-    // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; poi ogni giro rilegge solo ciò che è cambiato (giro()).
+    // Un giro subito raccoglie ciò che è cambiato dalla lettura iniziale; ogni giro poi raccoglie ogni file cresciuto (giro()).
     // shortcut: con lo stato letto da un worker niente giro subito (costa ~2,5 s di main con migliaia di sessioni): ciò che è cambiato nel frattempo si riconcilia al primo evento, quando si abbassa il costo del giro si rimette.
     if (!this.partenza) this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
@@ -91,28 +89,21 @@ export class Osservatore {
     this.timer ??= setTimeout(() => { this.timer = null; this.giro(); }, this.attesaMs);
   }
 
-  /** Un giro: rilegge l'elenco solo dove è cambiato qualcosa (evento o firma del file: rileggere tutto con migliaia di sessioni blocca il main per secondi, #474),
-   * conta chi è cambiato, legge le code nuove. Un errore del watcher sporca la sua cartella intera: quel giro rilegge tutto lì. */
+  /** Un giro: rilegge l'elenco (costa un stat per file), conta chi è cambiato, legge le code nuove. */
   giro() {
     const file = [...this.dirty];
     this.dirty.clear();
     if (this.avviato) this.guarda();
-    // un evento perso non deve perdere messaggi: un file noto cambiato senza evento conta come evento (uno stat per file, niente readdir).
-    // shortcut: il controllo di tutti i file gira al più ogni 5 s (con migliaia di sessioni costa decine di ms): un evento perso arriva entro il giro dopo i 5 s; se serve prima, abbassare CONTROLLO_MS.
-    const attuali = new Map<string, string>();
-    if (Date.now() - this.controllo >= CONTROLLO_MS) {
-      this.controllo = Date.now();
-      for (const [f, v] of this.firme) { const a = firma(f); attuali.set(f, a); if (a !== v) file.push(f); }
-    }
     const prima = this.firmeSessioni;
-    this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.(), sporchi: file });
+    this.elenco = leggiElenco({ home: this.home, env: this.env, impostazioni: this.imp?.() });
     this.firmeSessioni = new Map(this.elenco.sessioni.map((s) => [s.id, JSON.stringify(s)]));
     // anche quelle sparite (spenta una sorgente, cartella esclusa): il renderer deve rileggere l'elenco
     const cambiate = [...this.firmeSessioni.keys()].filter((id) => prima.get(id) !== this.firmeSessioni.get(id)).concat([...prima.keys()].filter((id) => !this.firmeSessioni.has(id)));
     for (const s of this.elenco.sessioni) {
       if (!s.file.endsWith(".jsonl")) continue;
-      if (this.firme.has(s.file) && !file.some((f) => tocca(f, s.file))) continue;
-      const attuale = attuali.get(s.file) ?? firma(s.file);
+      const attuale = firma(s.file);
+      // La riconciliazione parte solo da avvio/evento; include rename, riscritture e crescita senza evento nominato.
+      if (attuale === this.firme.get(s.file) && !file.some((f) => s.file === f || s.file.startsWith(`${f}${path.sep}`))) continue;
       this.cronologia.aggiorna(s, fineCompletaFinoA(s.file, this.iniziali.get(s.file) ?? 0));
       this.iniziali.delete(s.file);
       this.firme.set(s.file, attuale);
@@ -123,8 +114,6 @@ export class Osservatore {
   }
 
 }
-
-const CONTROLLO_MS = 5000;
 
 const firma = (file: string) => {
   try { return firmaFile(file); }

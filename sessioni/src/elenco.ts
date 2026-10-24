@@ -1,6 +1,6 @@
 // Mette insieme le sorgenti in un solo elenco di sessioni.
 import * as path from "node:path";
-import { chiaveCartella, dimenticaProgetti, leggiRadice, nomeProgetto, progettiDi } from "./claude-code";
+import { leggiRadice, nomeProgetto } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
 import { leggiCodex, leggiCursor } from "./altre-sorgenti";
 import { conPartenza, filtraElenco } from "./filtro-elenco";
@@ -22,27 +22,18 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
 export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
 
 /** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
-export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown>; sporchi?: string[]; soloDopo?: number }): Elenco {
+export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown> }): Elenco {
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
   const imp = opz.impostazioni && conPartenza(opz.impostazioni);
-  const app = leggiApp(opz.home, errori, opz.sporchi);
+  const app = leggiApp(opz.home, errori);
   const perCli = new Map(app.map((a) => [a.cliId, a]));
   const obiettivi = leggiObiettivi(path.join(opz.home, ".claude"), errori);
   const stati = leggiStati(path.join(opz.home, ".claude"), errori);
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
-  // stessa cartella vera sotto più account: la legge il primo (come prima, a pari attività vinceva il primo)
-  const progetti = new Set<string>(), lette = new Set<string>();
-  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) {
-    lette.add(progettiDi(r.path));
-    const p = chiaveCartella(progettiDi(r.path));
-    if (progetti.has(p)) continue;
-    progetti.add(p);
-    tutte.push(...leggiRadice(r, errori, opz.sporchi, opz.soloDopo));
-  }
-  if (!opz.soloDopo) dimenticaProgetti(lette);
+  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) tutte.push(...leggiRadice(r, errori));
   const viste = new Set(tutte.map((s) => s.id));
   for (const s of tutte) {
     const a = perCli.get(s.id);

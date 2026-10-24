@@ -19,18 +19,10 @@ const identita = (p: string) => {
   }
 };
 
-/** `.claude.json` per firma (mtime e misura): è grande e cambia di rado, ma l'elenco chiede l'email a ogni giro (#474). */
-const email = new Map<string, { firma: string; email: string | null }>();
 const emailDi = (radice: string): string | null => {
-  const file = path.join(radice, ".claude.json");
   try {
-    const st = fs.statSync(file), firma = `${st.ino}:${st.mtimeMs}:${st.size}`, e = email.get(file);
-    if (e?.firma === firma) return e.email;
-    const v = JSON.parse(fs.readFileSync(file, "utf8"))?.oauthAccount?.emailAddress ?? null;
-    email.set(file, { firma, email: v });
-    return v;
+    return JSON.parse(fs.readFileSync(path.join(radice, ".claude.json"), "utf8"))?.oauthAccount?.emailAddress ?? null;
   } catch {
-    email.delete(file);
     return null;
   }
 };

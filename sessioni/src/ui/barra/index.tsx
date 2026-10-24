@@ -1,6 +1,6 @@
 // figma: 101-7728 — barra laterale (#348): comandi, clotch AI, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
 // caricamento 101:8824, errore cartella 101:8931, 200 sessioni 101:9109, titolo lunghissimo 101:9359.
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import caricamento from "../../../design/figma/101-8824.json";
 import { Bottone } from "../base/Bottone";
 import { api, useElenco, usePreferenze } from "../base/dati";
@@ -9,7 +9,6 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { registraAzione } from "../base/scorciatoie";
 import { useNavigazione } from "../base/navigazione";
 import { numero } from "../base/token";
-import { useOra } from "../chat/clotch-ai";
 import { useApriSessione } from "./apri";
 import { conFiglie } from "./figlie";
 import { componi, dettaglioProfilo, numeroAccount, opzioni, type Proprieta, type Vista } from "./elenco";
@@ -21,7 +20,6 @@ import { prova } from "./prova";
 import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
-import { APezzi } from "./APezzi";
 import { accanto, type Punto } from "./Sovrapposti";
 
 export type Aperto =
@@ -47,9 +45,7 @@ export default function Barra() {
   const elenco = p?.elenco ?? vivo;
   const pref = p?.pref ?? prefVive.dati;
   const registro = p ? p.registro : registroVivo;
-  // ora che scorre ogni 30 s, non a ogni render: con Date.now() `componi` si rifaceva a ogni passaggio del mouse (#474)
-  const ora = useOra();
-  const adesso = p?.ora ?? ora;
+  const adesso = p?.ora ?? Date.now();
   const sessioni = elenco.dati?.sessioni ?? [];
 
   const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
@@ -64,9 +60,7 @@ export default function Barra() {
   const filtrato = vista.filtri.some((f) => f.valori.length);
   const [aperteAMano, setAperteAMano] = useState<Set<string>>(p ? new Set(p.aperte ?? []) : conservato.aperteAMano);
   useEffect(() => { if (!p) Object.assign(conservato, { vista, chiuse, aperteAMano }); }, [p, vista, chiuse, aperteAMano]);
-  // la cartella della sessione scelta, calcolata una volta per render (prima: ogni cartella riscorreva tutte le cartelle, #474)
-  const conScelta = useMemo(() => barra.gruppi.find((g) => g.sessioni.some((s) => s.id === scelta))?.chiave, [barra, scelta]);
-  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || chiave === conScelta);
+  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
     setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
@@ -99,16 +93,13 @@ export default function Barra() {
 
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
   const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
-  // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
-  const vivi = useRef({ apriSessione, pref, alterna });
-  vivi.current = { apriSessione, pref, alterna };
   const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
       figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
-      onApri={() => vivi.current.apriSessione(s.id)}
+      onApri={() => apriSessione(s.id)}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
-      onFissa={() => void api().impostaPreferenze(s.id, { fissa: vivi.current.pref[s.id]?.fissa ? null : true })}
+      onFissa={() => void api().impostaPreferenze(s.id, { fissa: pref[s.id]?.fissa ? null : true })}
       onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "riga", id: s.id, a: punto(e) }); }}
       onTroncato={suTroncato}
     />
@@ -149,15 +140,15 @@ export default function Barra() {
           ))}
           {!!barra.fissate.length && <><TitoloSezione>Fissate</TitoloSezione>{righe(barra.fissate, true)}</>}
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
-          <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
+          {barra.gruppi.map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
-              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
+              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
                 onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
-              {aperta(g.chiave) && <div className="sessioni-gruppo"><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>}
+              {aperta(g.chiave) && <div className="sessioni-gruppo">{righe(g.sessioni)}</div>}
             </div>
           ) : (
-            <div key={g.chiave} className="gruppo"><TitoloSezione>{g.titolo}</TitoloSezione><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>
-          ))} />
+            <div key={g.chiave} className="gruppo"><TitoloSezione>{g.titolo}</TitoloSezione>{righe(g.sessioni)}</div>
+          ))}
         </div>
       )}
 

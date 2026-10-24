@@ -3,7 +3,6 @@
 // Invio manda `nuova_sessione`; il motore risponde a sessione nata (fino a ~1 minuto) con il suo id e si apre quella.
 // Se modello o sforzo partono diversi, il motore scrive dopo un `errore` per lo stesso comando: si mostra nell'avviso.
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
-import { seguiRegistro } from "../clotch-ai/dati";
 import type { CartellaAvvio, ContestoCartella, NuovaSessioneApi, PreferenzeSessione } from "../../tipi";
 import { Bottone, BottoneIcona } from "../base/Bottone";
 import { Dialogo } from "../base/Dialogo";
@@ -17,6 +16,7 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { argsNuovaSessione, LOCALE, nomeAmbiente, notaAvvio, type Ambiente } from "./avvio";
 import { ChipPermessi } from "./Chip";
 import { ChipModello } from "./ChipModello";
+import { daPiano } from "../clotch-ai/registro";
 import { comandaEsito } from "./clotch-ai";
 import { Selettore, MenuAmbiente, MenuCartella, MenuRamo } from "./MenuAvvio";
 import type { Macchina, Proposta } from "../../macchine-tipi";
@@ -46,8 +46,8 @@ export function IntestazioneNuovaSessione() {
 /** «modello letto …, chiesto …»: l'`errore` che il motore scrive dopo `ok` per lo stesso comando; arriva quando la vista è già chiusa, quindi l'avviso è dell'app. */
 function guardaErrore(comando: string) {
   const t = setTimeout(() => off(), ERRORE_DOPO_MS);
-  const off = seguiRegistro((r) => {
-    const x = r.esiti.get(comando);
+  const off = window.clotchAi.onRegistro((r) => {
+    const x = daPiano(r).esiti.get(comando);
     if (x?.esito !== "errore") return;
     off(); clearTimeout(t);
     avvisa({ tipo: "errore", messaggio: x.testo || "La sessione è partita con modello o sforzo diversi da quelli chiesti" });

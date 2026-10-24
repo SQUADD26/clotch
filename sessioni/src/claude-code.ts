@@ -62,79 +62,42 @@ function sfoltisci(progetti: string, viste: Set<string>) {
   for (const k of cache.keys()) if (k.startsWith(progetti + path.sep) && !viste.has(k)) cache.delete(k);
 }
 
-/** Ultima lettura per cartella `projects`, sottocartella per sottocartella (file e sessioni della cache, mai modificate):
- * un giro rilegge solo le sottocartelle toccate, il resto si riusa senza readdir, stat né scorrere la cache (#474). */
-type Cartella = { file: string[]; sessioni: Sessione[] };
-const ultimi = new Map<string, { radice: string; cartelle: Map<string, Cartella> }>();
-
-/** `<radice>/projects`, o la cartella vera se è un link: più account con `projects` linkata alla stessa cartella la leggono e la guardano una volta (#474). */
-export function progettiDi(radice: string): string {
-  const p = path.join(radice, "projects");
-  try { return fs.lstatSync(p).isSymbolicLink() ? fs.realpathSync(p) : p; } catch { return p; }
-}
-
-/** Chi è davvero una cartella (realpath): due nomi della stessa cartella danno la stessa chiave. */
-export const chiaveCartella = (p: string) => { try { return fs.realpathSync(p); } catch { return p; } };
-
-/** `f` (un percorso cambiato secondo fs.watch) tocca `x`: è x, o una cartella che lo contiene. */
-export const tocca = (f: string, x: string) => f === x || x.startsWith(f + path.sep);
-
-/** Qualcosa in `sporchi` tocca `x` o sta dentro `x`. */
-export const toccata = (sporchi: string[], x: string) => sporchi.some((f) => tocca(f, x) || f.startsWith(x + path.sep));
-/** Toglie l'ultima lettura (e le cache dei suoi file) delle cartelle `projects` che non sono più lette: account tolto o spento. Al ritorno si rilegge da capo. */
-export function dimenticaProgetti(lette: Set<string>) {
-  for (const k of [...ultimi.keys()]) if (!lette.has(k)) { sfoltisci(k, new Set()); ultimi.delete(k); }
-}
-
-const copie = (u: Map<string, Cartella>) => [...u.values()].flatMap((c) => c.sessioni.map((s) => ({ ...s })));
-
-/** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dall'ultima lettura. */
-/** `soloDopo` (anteprima d'avvio): i file mai letti e fermi da prima si saltano; la lettura vera viene dopo. */
-export function leggiRadice(radice: Radice, errori: ErroreLettura[], sporchi?: string[], soloDopo?: number): Sessione[] {
-  const progetti = progettiDi(radice.path), firmaRadice = `${radice.account}\0${radice.email}`;
-  const u = sporchi && ultimi.get(progetti)?.radice === firmaRadice ? ultimi.get(progetti)!.cartelle : undefined;
-  if (u && !toccata(sporchi!, progetti)) return copie(u);
-  ultimi.delete(progetti);
-  let nomi: string[];
+export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[] {
+  const progetti = path.join(radice.path, "projects");
+  let cartelle: string[];
   try {
-    nomi = fs.readdirSync(progetti);
+    cartelle = fs.readdirSync(progetti);
   } catch (e: any) {
     sfoltisci(progetti, new Set());
     if (e.code !== "ENOENT") errori.push({ percorso: progetti, messaggio: msgErrore(e) });
-    else ultimi.set(progetti, { radice: firmaRadice, cartelle: new Map() }); // radice senza progetti: il giro dopo non riscorre la cache
     return [];
   }
-  const erroriPrima = errori.length, cartelle = new Map<string, Cartella>();
-  for (const c of nomi) {
-    const dir = path.join(progetti, c), prima = u?.get(dir);
-    if (prima && !toccata(sporchi!, dir)) { cartelle.set(dir, prima); continue; }
+  const viste = new Set<string>(), out: Sessione[] = [];
+  for (const c of cartelle) {
     let files: string[];
     try {
-      files = fs.readdirSync(dir).filter((n) => n.endsWith(".jsonl")).map((n) => path.join(dir, n));
+      files = fs.readdirSync(path.join(progetti, c)).filter((n) => n.endsWith(".jsonl"));
     } catch (e: any) {
-      errori.push({ percorso: dir, messaggio: msgErrore(e) });
+      errori.push({ percorso: path.join(progetti, c), messaggio: msgErrore(e) });
       continue;
     }
-    const sessioni: Sessione[] = [];
-    for (const file of files) {
+    for (const n of files) {
+      const file = path.join(progetti, c, n);
       try {
+        const st = fs.statSync(file);
+        const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
         let e = cache.get(file);
-        if (!e || !u || sporchi!.some((f) => tocca(f, file))) {
-          const st = fs.statSync(file);
-          if (!e && soloDopo && st.mtimeMs < soloDopo) continue;
-          const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
-          if (!e || e.chiave !== chiave) cache.set(file, e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) });
+        if (!e || e.chiave !== chiave) {
+          e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) };
+          cache.set(file, e);
         }
-        if (e.s) sessioni.push(e.s);
+        viste.add(file);
+        if (e.s) out.push({ ...e.s });
       } catch (err: any) {
         errori.push({ percorso: file, messaggio: msgErrore(err) });
       }
     }
-    if (prima) { const ora = new Set(files); for (const f of prima.file) if (!ora.has(f)) cache.delete(f); } // spariti da questa cartella
-    cartelle.set(dir, { file: files, sessioni });
   }
-  if (u) { for (const [d, c] of u) if (!cartelle.has(d)) c.file.forEach((f) => cache.delete(f)); } // cartelle sparite
-  else sfoltisci(progetti, new Set([...cartelle.values()].flatMap((c) => c.file)));
-  if (errori.length === erroriPrima && !soloDopo) ultimi.set(progetti, { radice: firmaRadice, cartelle }); // con errori si riprova al prossimo giro
-  return copie(cartelle);
+  sfoltisci(progetti, viste);
+  return out;
 }

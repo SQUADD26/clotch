@@ -2,7 +2,6 @@
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
 import type { Messaggio, RifImmagine } from "../../tipi";
-import { notifiche } from "../../messaggi-sistema";
 import { ramoCreato } from "./eventi";
 import { senzaPercorsi, senzaSegnaposto } from "./percorsi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
@@ -87,35 +86,22 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
   messaggi.forEach((m, i) => {
     const fisica = identita?.[i]?.chiave;
     const chiave = fisica ? `fisico:${JSON.stringify([sessione, fisica])}` : `${i}-${m.t ?? ""}`;
-    // durante il giro i blocchi si aggiungono solo in coda e sono tutti nuovi di questa chiamata: si conta e si aggiunge sul posto,
-    // niente copie a ogni messaggio (con un turno di migliaia di tool call il filo costava O(n²) a ogni delta, #474)
-    const turnoPrima = turno, prima = turno?.blocchi.length ?? 0;
+    const prima = new Set(turno?.blocchi);
     elabora(m, i, chiave);
     if (!fisica || !turno) return;
-    (turno.origini ??= []).push(chiave);
-    // un TodoWrite o un aiutante si somma a un blocco già aperto: solo allora si guardano anche i blocchi vecchi
-    const somma = m.tipo === "strumento" && ["TodoWrite", "Agent", "Task"].includes(m.nome);
-    const blocchi = turno.blocchi;
-    for (let k = somma || turno !== turnoPrima ? 0 : prima; k < blocchi.length; k++) {
-      const b = blocchi[k];
-      const aggregato = somma && ((m.nome === "TodoWrite" && b.tipo === "attivita") || (m.nome !== "TodoWrite" && b.tipo === "aiutanti"));
-      if (k >= (turno === turnoPrima ? prima : 0) || aggregato) {
+    turno.origini = [...(turno.origini ?? []), chiave];
+    for (const b of turno.blocchi) {
+      const aggregato = m.tipo === "strumento" && ((m.nome === "TodoWrite" && b.tipo === "attivita") ||
+        (["Agent", "Task"].includes(m.nome) && b.tipo === "aiutanti"));
+      if (!prima.has(b) || aggregato) {
         b.chiave ??= `${chiave}:${b.tipo}`;
-        (b.origini ??= []).push(chiave);
+        b.origini = [...(b.origini ?? []), chiave];
       }
     }
   });
 
   function elabora(m: Messaggio, i: number, chiave: string) {
     if (m.tipo === "utente") {
-      // fine di un'attività in background: l'ha scritta l'harness, non Roberto (#484)
-      const { righe, resto } = notifiche(m.testo);
-      if (righe.length) {
-        turno = null;
-        righe.forEach((testo, k) => out.push({ tipo: "evento", chiave: `${chiave}:${k}`, testo, t: m.t }));
-        if (!resto && !m.immagini) return;
-        m = { ...m, testo: resto };
-      }
       if (INTERRUZIONE.test(m.testo)) { (turno ?? apri(m.t, chiave)).blocchi.push({ tipo: "interrotta" }); return; }
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;

@@ -1,6 +1,5 @@
 // Trascrizione Claude Code (righe JSONL) -> messaggi. Formato verificato su ~/.claude/projects.
 import { Messaggio, RifImmagine } from "./tipi";
-import { senzaSistema } from "./messaggi-sistema";
 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
 
@@ -52,19 +51,16 @@ export class Convertitore {
       if (o.type === "assistant" && o.isApiErrorMessage) {
         nuovi.push({ tipo: "errore", testo: testoDi(c), t });
       } else if (typeof c === "string") {
-        const testo = o.type === "user" ? senzaSistema(c) : c; // i testi dell'harness non sono di Roberto (#484)
-        if (testo.trim()) nuovi.push(o.type === "user" ? { tipo: "utente", testo, t } : { tipo: "assistente", testo, modello: o.message?.model ?? null, t });
+        if (c.trim()) nuovi.push(o.type === "user" ? { tipo: "utente", testo: c, t } : { tipo: "assistente", testo: c, modello: o.message?.model ?? null, t });
       } else if (Array.isArray(c)) {
         // le immagini incollate stanno sul primo testo della riga; quelle di un esito sullo strumento
         const rif = (i: { n: number; mime: string; byte: number }, nome?: string): RifImmagine => ({ riga: o.uuid, n: i.n, mime: i.mime, byte: i.byte, ...(nome ? { nome } : {}) });
         const imgs = typeof o.uuid === "string" && o.type === "user" ? immaginiDiRiga(c) : [];
         const mie = imgs.filter((i) => i.tool === null).map((i, k) => rif(i, `Immagine ${o.imagePasteIds?.[k] ?? k + 1}`));
-        const testoBlocco = (b: any): string => (b?.type === "text" && typeof b.text === "string" ? (o.type === "user" ? senzaSistema(b.text) : b.text) : "");
-        if (mie.length && !c.some((b: any) => testoBlocco(b).trim())) nuovi.push({ tipo: "utente", testo: "", t, immagini: mie });
+        if (mie.length && !c.some((b: any) => b?.type === "text" && typeof b.text === "string" && b.text.trim())) nuovi.push({ tipo: "utente", testo: "", t, immagini: mie });
         for (const b of c) {
-          const testo = testoBlocco(b);
-          if (testo.trim()) {
-            nuovi.push(o.type === "user" ? { tipo: "utente", testo, t, ...(mie.length ? { immagini: mie.splice(0) } : {}) } : { tipo: "assistente", testo, modello: o.message?.model ?? null, t });
+          if (b?.type === "text" && typeof b.text === "string" && b.text.trim()) {
+            nuovi.push(o.type === "user" ? { tipo: "utente", testo: b.text, t, ...(mie.length ? { immagini: mie.splice(0) } : {}) } : { tipo: "assistente", testo: b.text, modello: o.message?.model ?? null, t });
           } else if (b?.type === "thinking" && typeof b.thinking === "string" && b.thinking.trim()) {
             nuovi.push({ tipo: "pensiero", testo: b.thinking, t });
           } else if (b?.type === "tool_use") {

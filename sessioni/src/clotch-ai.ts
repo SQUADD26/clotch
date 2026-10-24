@@ -106,66 +106,29 @@ const nuova = (chat: string): ChatClotchAi => ({
 const STATO_PASSO = new Map([["fatto", "completed"], ["in_corso", "in_progress"], ["da_fare", "pending"]]);
 const s = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
 
-const statoVuoto = () => ({
-  r: { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [], passiMacchina: [] } as Registro,
-  ultimoN: new Map<string, number>(), annullate: new Set<string>(), versioniObiettivo: new Map<string, number>(), comandi: new Map<string, any>(), attese: [] as [any, () => void][],
-  nonRiprovabili: new Set<string>(), // annulla rifiutata dal motore per sempre: inutile riproporla
-  pos: new Map<string, { ino: number; fine: number }>(), // mese -> file e byte già applicati
-});
-
-/** Tutto il registro, letto da capo. Per letture ripetute (a ogni cambio) `lettoreRegistro`. */
-export const leggiRegistro = (home: string, env: NodeJS.ProcessEnv = {}): Registro => lettoreRegistro(home, env)();
-
-/** Lettore che ricorda dove è arrivato in ogni mese e applica solo le righe nuove (#474): rileggere tutto a ogni battito costava 15 ms più il clone.
- * Un mese accorciato, sostituito o sparito = si riparte da capo. Torna sempre lo stesso oggetto, aggiornato. */
-export function lettoreRegistro(home: string, env: NodeJS.ProcessEnv = {}): () => Registro {
-  let st = statoVuoto();
-  const leggi = (): Registro => {
-    const dir = cartellaRegistro(home, env);
-    let mesi: string[];
+export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Registro {
+  const r: Registro = { chat: new Map(), fermoTutto: false, avvisi: [], clotch: null, clotchAi: null, comandi: [], decisioni: [], regole: [], nonDisturbare: null, impostazioni: null, esiti: new Map(), errori: [], passiMacchina: [] };
+  const dir = cartellaRegistro(home, env);
+  let mesi: string[];
+  try {
+    mesi = fs.readdirSync(dir).filter((n) => /^\d{4}-\d{2}\.jsonl$/.test(n)).sort();
+  } catch (e: any) {
+    if (e.code !== "ENOENT") r.errori.push({ percorso: dir, messaggio: msgErrore(e) });
+    return r;
+  }
+  const ultimoN = new Map<string, number>();
+  const annullate = new Set<string>();
+  const nonRiprovabili = new Set<string>(); // annulla rifiutata dal motore per sempre: inutile riproporla
+  const versioniObiettivo = new Map<string, number>();
+  const comandi = new Map<string, any>();
+  for (const m of mesi) {
+    let testo: string;
     try {
-      mesi = fs.readdirSync(dir).filter((n) => /^\d{4}-\d{2}\.jsonl$/.test(n)).sort();
+      testo = fs.readFileSync(path.join(dir, m), "utf8");
     } catch (e: any) {
-      st = statoVuoto();
-      if (e.code !== "ENOENT") st.r.errori.push({ percorso: dir, messaggio: msgErrore(e) });
-      return st.r;
+      r.errori.push({ percorso: path.join(dir, m), messaggio: msgErrore(e) });
+      continue;
     }
-    if ([...st.pos.keys()].some((m) => !mesi.includes(m))) { st = statoVuoto(); return leggi(); }
-    st.r.errori = [];
-    for (const m of mesi) {
-      const file = path.join(dir, m);
-      let testo: string;
-      try {
-        const fd = fs.openSync(file, "r");
-        try {
-          const f = fs.fstatSync(fd), p = st.pos.get(m);
-          if (p && (p.ino !== f.ino || f.size < p.fine)) { st = statoVuoto(); return leggi(); }
-          const da = p?.fine ?? 0, b = Buffer.alloc(f.size - da);
-          const letti = fs.readSync(fd, b, 0, b.length, da);
-          // l'ultima riga senza a capo può essere a metà scrittura: si applica solo se è già JSON intero
-          const nl = b.lastIndexOf(10, letti - 1) + 1, resto = b.subarray(nl, letti).toString("utf8");
-          const intera = resto.trim() !== "" && parseRiga(resto) !== null;
-          testo = b.subarray(0, intera ? letti : nl).toString("utf8");
-          st.pos.set(m, { ino: f.ino, fine: da + (intera ? letti : nl) });
-        } finally { fs.closeSync(fd); }
-      } catch (e: any) {
-        st.r.errori.push({ percorso: file, messaggio: msgErrore(e) });
-        st.pos.set(m, { ino: -1, fine: 0 }); continue; // quando torna leggibile si riparte da capo: le sue righe vanno prima di quelle dei mesi dopo
-      }
-      applica(st, testo);
-    }
-    st.r.passiMacchina = st.r.passiMacchina!.slice(-200); // tetto anche tra una lettura e l'altra
-    // il motore scrive la ricevuta dopo la riga (friday_annulla.decidi): finché manca si riguarda a ogni lettura, come faceva la lettura da capo
-    st.attese = st.attese.filter(([o, fatto]) => !(ricevutaLocale(o, home, env) && (fatto(), true)));
-    for (const d of st.r.decisioni) if (st.annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true }); else if (st.nonRiprovabili.has(d.id)) d.annullabile = false;
-    return st.r;
-  };
-  return leggi;
-}
-
-function applica(st: ReturnType<typeof statoVuoto>, testo: string) {
-  const { r, ultimoN, annullate, nonRiprovabili, versioniObiettivo, comandi } = st;
-  {
     for (const riga of testo.split("\n")) {
       const o = parseRiga(riga);
       if (!o || o.v !== 1 || typeof o.chat !== "string" || typeof o.tipo !== "string") continue; // riga rotta o di un'altra versione
@@ -250,11 +213,10 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string) {
         case "avviso": r.avvisi.push({ id: String(o.id), t, testo: String(d.testo ?? ""), livello: String(d.livello ?? "normale"), motivo: String(d.motivo ?? ""), dettoDa: s(d.detto_da),
           // facoltativo (claude-config#2512): id chat delle sessioni citate in una risposta
           sessioni: Array.isArray(d.sessioni) ? d.sessioni.filter((x: unknown): x is string => typeof x === "string") : [] }); break;
-        case "decisione": { const x = { id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: false, annullata: false };
-          r.decisioni.push(x); if (Array.isArray(d.inverso)) st.attese.push([o, () => { x.annullabile = true; }]); // annullabile con la ricevuta (lettoreRegistro)
+        case "decisione": r.decisioni.push({ id: String(o.id), t, cosa: String(d.cosa ?? ""), perche: String(d.perche ?? ""), chat: s(d.chat), genere: String(d.genere ?? "altro"), nonAnnullabile: s(d.non_annullabile), effettoAnnullo: s(d.effetto_annullo), annullabile: Array.isArray(d.inverso) && ricevutaLocale(o, home, env), annullata: false });
           // annullata dal terminale: nessun comando dell'app, solo la decisione «annullata <id>» che il motore firma con la sua ricevuta
-          if (String(d.cosa).startsWith("annullata ")) st.attese.push([o, () => annullate.add(String(d.cosa).slice(10))]);
-          break; }
+          if (String(d.cosa).startsWith("annullata ") && ricevutaLocale(o, home, env)) annullate.add(String(d.cosa).slice(10));
+          break;
         case "comando":
           comandi.set(String(d.id), d);
           r.comandi.push({ id: String(d.id), t, cmd: String(d.cmd ?? ""), da: String(d.da ?? ""), args: d.args ?? {} });
@@ -277,6 +239,12 @@ function applica(st: ReturnType<typeof statoVuoto>, testo: string) {
       }
     }
   }
+  r.passiMacchina = r.passiMacchina!.slice(-200);
+  for (const d of r.decisioni) {
+    if (annullate.has(d.id)) Object.assign(d, { annullabile: false, annullata: true });
+    else if (nonRiprovabili.has(d.id)) d.annullabile = false;
+  }
+  return r;
 }
 
 /** Contratto: la chat dice «lavora» ma nessun battito da 20 minuti. */
