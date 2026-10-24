@@ -132,6 +132,13 @@ app.whenReady().then(async () => {
     await misura('MOV-012', 'barra sopra apre', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E], ['::view-transition-new(velo)', ...E]]);
     await misura('MOV-013', 'barra sopra chiude', clic('.velo-barra'), [['::view-transition-old(barra)', ...U], ['::view-transition-old(velo)', ...U]]);
 
+    // due cambi di struttura nello stesso fotogramma: la prima transizione è saltata, niente errore non gestito (#750)
+    const rifiuti = await run(`new Promise((fine) => { const r = []; const f = (e) => r.push(String(e.reason)); addEventListener('unhandledrejection', f);
+      const b = document.querySelector('button[aria-label="Barra laterale"]'); b.click(); b.click();
+      setTimeout(() => { removeEventListener('unhandledrejection', f); fine(r); }, 400); })`);
+    assert.deepEqual(rifiuti, [], '#750: promesse di View Transition rifiutate senza gestore');
+    console.log('MOV-023 due transizioni nello stesso fotogramma: 0 errori');
+
     // riduci movimento: niente gruppi che si spostano, niente scale né infinite
     // controllo positivo: uno spinner gira (infinito, tempo-giro) finché il movimento non è ridotto
     await run(() => { document.body.append(Object.assign(document.createElement('span'), { className: 'gira prova-gira' })); return 0; });
