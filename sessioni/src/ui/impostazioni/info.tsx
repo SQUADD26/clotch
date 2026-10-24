@@ -47,8 +47,8 @@ export default function Info() {
         <Riga etichetta="Versione" descrizione="Aggiornata">
           <TendinaVersione versione={versione} voci={voci} />
         </Riga>
-        <Riga etichetta="Aggiornamenti automatici" descrizione="Si installano alla prossima apertura">
-          <Interruttore etichetta="Aggiornamenti automatici" acceso={v.aggiornamentiAutomatici} onCambia={(x) => imposta("aggiornamentiAutomatici", x)} />
+        <Riga etichetta="Aggiornamenti automatici" descrizione="Non disponibili: non c’è un server di aggiornamenti">
+          <Interruttore etichetta="Aggiornamenti automatici" acceso={false} disabled onCambia={() => {}} />
         </Riga>
         <Riga etichetta="Registro" descrizione="File con gli errori dell’app">
           <button type="button" className="valore-scelta" onClick={apriRegistro}>
