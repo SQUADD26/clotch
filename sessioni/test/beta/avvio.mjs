@@ -88,7 +88,8 @@ export async function avvia(fileScena, { video } = {}) {
       timeout: 60000,
     });
     const pagina = await app.firstWindow();
-    await pagina.waitForLoadState('domcontentloaded');
+    // finestra caricata prima che Playwright si attacchi (visto in CI): la pagina resta senza contesto, un ricarico la sblocca
+    if (!(await pagina.waitForSelector('.cornice', { timeout: 10000 }).then(() => true, () => false))) await pagina.reload({ timeout: 20000 });
     await pagina.waitForSelector('.cornice:not(.in-avvio)', { timeout: 20000 }).catch(() => {});
     return { app, pagina, chiudi: async () => { await app.close().catch(() => {}); rmSync(home, { recursive: true, force: true }); rilasciaLock(); } };
   } catch (e) { rmSync(home, { recursive: true, force: true }); rilasciaLock(); throw e; }
