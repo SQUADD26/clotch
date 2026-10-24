@@ -23,13 +23,14 @@ import { Sessioni } from "./api";
 import { collegaAllegati } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
+import { collegaMenuApp } from "./menu-app";
 import { apriFinestra, parita } from "./finestra";
 import { infoSessione } from "./info-sessione";
 import { collegaClotchAi } from "./clotch-ai-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaNuovaSessione } from "./nuova-sessione";
 import { collegaIndice } from "./indice-ipc";
-import { leggiImpostazioni } from "./preferenze";
+import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { collegaCasella } from "./casella-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
@@ -76,6 +77,9 @@ app.whenReady().then(() => {
     return;
   }
   impostaIdentita();
+  // in prova le impostazioni sono quelle della scena: il menu ha le scorciatoie di partenza e ⌘+ non scrive
+  const menuApp = collegaMenuApp(scenaProva ? () => ({}) : impostazioniApp, (parte) => scenaProva || invia("sessioni:impostazioni", impostaImpostazioni(filePreferenze, parte)));
+  menuApp();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
@@ -115,11 +119,11 @@ app.whenReady().then(() => {
     }
     return { ...risposta, totale: indice.totale(String(id)) };
   });
-  collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
+  collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir(), process.env, (f) => sessioni.copiaRemota(f));
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
-    if (c === "sessioni:impostazioni") barraMenu();
+    if (c === "sessioni:impostazioni") { barraMenu(); menuApp(); }
   };
   collegaPreferenze(ipcMain, invia, sessioni);
   collegaCasella(ipcMain, sessioni);

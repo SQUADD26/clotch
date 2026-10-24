@@ -1,6 +1,7 @@
 // figma: 148-46383 — «Allegato nella casella» 148:43692, «Rimuovi allegato» 148:43627, «Spazio per rilascio» 148:43696 (una immagine 148:46383, tanti 148:47483, troppo grande 148:49251, trascinamento 148:45727)
 // figma: 101-28041 — «chip allegato», «allegati messaggio» e «miniatura» nel filo
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { DaImmagine, FileAllegato, RifImmagine } from "../../tipi";
 import { Icona } from "../base/Icona";
 import { casella, chiaveImmagine, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
@@ -63,7 +64,7 @@ export type AllegatoCasella = FileAllegato & { carico?: boolean };
 
 const sigla = (nome: string) => /\.([^.]+)$/.exec(nome)?.[1].toUpperCase();
 const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Caricando…" : statoAllegato(a) === "grande" ? "Troppo grande"
-  : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(" · "));
+  : a.tipo === "cartella" ? "Cartella" : <Pezzi parti={[sigla(a.nome), peso(a.byte)]} />);
 
 /** La miniatura di un allegato, sopra il testo della casella (148:43692 «Allegato nella casella»): immagine quadrata o riquadro col nome. */
 export function Allegato({ a, onRimuovi }: { a: AllegatoCasella; onRimuovi(): void }) {
@@ -163,7 +164,7 @@ function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(
   const mancante = url === null || rotta;
   return (
     <button type="button" className={`miniatura${url === undefined ? " carico" : ""}`} onClick={mancante ? riprova : onApri} aria-label={mancante ? `Riprova a leggere ${nome}` : `Apri ${nome}`}>
-      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : mancante ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta · Riprova</span> : null}
+      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : mancante ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta. Riprova</span> : null}
     </button>
   );
 }

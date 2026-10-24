@@ -16,12 +16,13 @@ const suggerisci = (riga: HTMLElement, titolo: string, onTroncato: (titolo: stri
 };
 
 /** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
-export function RigaComando({ icona, etichetta, lato, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
+export function RigaComando({ icona, etichetta, lato, tasto, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; tasto?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
   return (
-    <button type="button" className={`riga ${scelta ? "scelta" : ""}`} onClick={onClick}>
+    <button type="button" className={`riga ${scelta ? "scelta" : ""}`} data-comando={etichetta} onClick={onClick}>
       <Icona nome={icona} />
       <span className="testo">{etichetta}</span>
       {lato && <span className="lato t-sm secondario">{lato}</span>}
+      {tasto && <span className="tasto-chip">{tasto}</span>}
     </button>
   );
 }
@@ -54,6 +55,8 @@ export function IconaRiga({ titolo, pref }: { titolo: string; pref?: PreferenzeS
 
 interface PropsSessione {
   s: Sessione;
+  /** La sessione non risponde (chat/clotch-ai `nonRisponde`): la calcola la barra, così una riga si ridisegna solo se cambia. */
+  muta?: boolean;
   pref?: PreferenzeSessione;
   scelta: boolean;
   /** Nella sezione «Fissate» (101:21065): a destra lo spillo al posto dello stato. */
@@ -76,23 +79,24 @@ interface PropsSessione {
 /** Memo: una riga si ridisegna solo se cambiano i suoi dati; le funzioni no (Barra le fa chiamare sempre l'ultima versione). */
 const stessiDati = (a: PropsSessione, b: PropsSessione) =>
   (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
-export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+export const RigaSessione = memo(function RigaSessione({ s, muta, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: { currentTarget: HTMLElement }) => suggerisci(e.currentTarget, s.titolo, onTroncato);
-  const stato = s.situazione?.adesso === "errore" ? "errore" : s.stato;
+  // stessa regola della testata e del filo: una sessione che non risponde ha lo stesso segno ovunque
+  const stato = s.situazione?.adesso === "errore" || muta ? "errore" : s.stato;
   return (
     <div
-      role="button" tabIndex={0} aria-current={scelta || undefined}
+      role="button" tabIndex={0} aria-current={scelta || undefined} data-figlia={figlia || undefined}
       className={`riga riga-sessione ${scelta ? "scelta" : ""} ${passaggio ? "passaggio" : ""}`}
       onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
       onFocus={(e) => { if (e.target === e.currentTarget) entra(e); }} onBlur={(e) => { if (e.target === e.currentTarget) onTroncato(null); }}
       onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onApri(); } }}
     >
       {figlia && <Icona nome="figlia" colore="terziaria" />}
-      <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
+      <button type="button" aria-label="Icona della sessione" title="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
       {pref?.nonLetta && <span className="pallino-non-letta" role="img" aria-label="Non letta" />}
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""} ${pref?.nonLetta ? "medio" : ""}`}>
+      <span className={["testo", s.stato === "lavora" && "lavoro", pref?.nonLetta && "medio"].filter(Boolean).join(" ")}>
         {s.titolo}
         {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia" data-titolo={s.titolo} /></span></span>}
       </span>

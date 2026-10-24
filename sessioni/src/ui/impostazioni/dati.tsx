@@ -9,7 +9,7 @@ import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta, VuotoLista } from "./controlli";
 import { prova } from "./prova";
-import { imposta, useImpostazioni } from "./stato";
+import { imposta, leggi, useImpostazioni } from "./stato";
 
 const CRONOLOGIA = ["7 giorni", "30 giorni", "90 giorni", "Per sempre"];
 
@@ -18,6 +18,12 @@ async function escludi(escluse: string[]) {
     const p = await window.impostazioni.scegliCartella();
     if (p && !escluse.includes(p)) imposta("cartelleEscluse", [...escluse, p]);
   } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
+}
+
+/** Come «Rimuovi» in Account: subito, con «Annulla» nell'avviso. */
+function rimuovi(p: string) {
+  imposta("cartelleEscluse", leggi("cartelleEscluse").filter((x) => x !== p));
+  avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("cartelleEscluse", [...leggi("cartelleEscluse"), p]) } });
 }
 
 function CartelleEscluse() {
@@ -39,7 +45,7 @@ function CartelleEscluse() {
           )
           : v.cartelleEscluse.map((p) => (
             <Riga key={p} etichetta={p} azione>
-              <Bottone tipo="secondario" onClick={() => imposta("cartelleEscluse", v.cartelleEscluse.filter((x) => x !== p))}>Rimuovi</Bottone>
+              <Bottone tipo="secondario" aria-label={`Rimuovi ${p}`} onClick={() => rimuovi(p)}>Rimuovi</Bottone>
             </Riga>
           ))}
       </Gruppo>
@@ -54,7 +60,7 @@ export default function Dati({ sotto }: { sotto?: string }) {
   const [conferma, setConferma] = useState(!!prova?.conferma);
   const elimina = () => {
     setConferma(false);
-    window.impostazioni.eliminaDati().catch((e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
+    window.impostazioni.eliminaDati().then(() => avvisa({ tipo: "info", messaggio: "Dati eliminati" }), (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
   };
   if (sotto === "cartelle") return <CartelleEscluse />;
   const escluse = v.cartelleEscluse.length;

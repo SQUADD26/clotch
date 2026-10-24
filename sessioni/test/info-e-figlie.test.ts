@@ -94,7 +94,7 @@ test("pannello: testi dei numeri e delle PR come nel disegno", () => {
   assert.equal(percento(0.346), "34,6%");
   assert.equal(percento(0.346, 0), "35%");
   const pr = (stato: "aperta" | "unita" | "chiusa", verso: string | null) => testoPr({ numero: 336, stato, verso, url: "u" });
-  assert.equal(pr("aperta", "dev"), "PR #336 · aperta verso dev");
-  assert.equal(pr("unita", "dev"), "PR #336 · unita in dev");
-  assert.equal(pr("chiusa", null), "PR #336 · chiusa senza unire");
+  assert.equal(pr("aperta", "dev"), "PR #336 aperta verso dev");
+  assert.equal(pr("unita", "dev"), "PR #336 unita in dev");
+  assert.equal(pr("chiusa", null), "PR #336 chiusa senza unire");
 });

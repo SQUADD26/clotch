@@ -2,9 +2,10 @@
 // (consenti, nega, ferma) il pezzo le registra con `registraAzione`; quelle di navigazione le fa il gestore.
 import { useEffect } from "react";
 import { useImpostazioni } from "../impostazioni/stato";
+import { FISSE } from "../impostazioni/riservati";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { useApriSessione } from "../barra/apri";
-import { useAvvio } from "./Avvio";
+import { useAvvioLento, useCoperto } from "./Avvio";
 import { useElenco } from "./dati";
 import { useNavigazione } from "./navigazione";
 import { prossimaInAttesa } from "./prossima";
@@ -24,20 +25,23 @@ export function useScorciatoie() {
   const n = useNavigazione();
   const { scorciatoie } = useImpostazioni();
   const apriSessione = useApriSessione();
-  const avvio = useAvvio();
+  const avvio = useCoperto(), lento = useAvvioLento();
   const sessioni = useElenco().dati?.sessioni;
   useEffect(() => {
+    const navigazione: Record<string, () => void> = { nuova: () => n.apri("nuova-sessione"), clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, indietro: n.indietro, avanti: n.avanti, impostazioni: () => n.apri("impostazioni"),
+      prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
+    const azioneDiNome = (a: string | null) => a ? navigazione[a] ?? azioni.get(a) : undefined;
     const premi = (e: KeyboardEvent) => {
       // già gestito (la pagina Scorciatoie che registra, la casella); nei campi di testo solo le combinazioni con ⌘
-      if (avvio || e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
-      if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey && e.key.toLowerCase() === "n") { e.preventDefault(); n.apri("nuova-sessione"); return; } // «Nuova sessione» ⌘N, fisso
-      const a = azioneDi(tastiDi(e), scorciatoie);
-      const navigazione: Record<string, () => void> = { clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni"),
-        prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };
-      const fai = a && (navigazione[a] ?? azioni.get(a));
+      if (e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
+      const tasti = tastiDi(e);
+      const nome = (tasti && FISSE[tasti]?.[0]) || azioneDi(tasti, scorciatoie); // i tasti fissi vincono: la pagina Scorciatoie non li concede (#686)
+      if (avvio && !(lento && nome === "impostazioni")) return; // sotto il logo niente agisce, salvo la via d'uscita dell'avvio lento (#693, #901)
+      const fai = azioneDiNome(nome);
       if (fai) { e.preventDefault(); fai(); }
     };
+    // le voci del menu del Mac arrivano qui come tasti premuti (preload «menu:tasti», #885)
     addEventListener("keydown", premi);
     return () => removeEventListener("keydown", premi);
-  }, [n, scorciatoie, sessioni, apriSessione, avvio]);
+  }, [n, scorciatoie, sessioni, apriSessione, avvio, lento]);
 }

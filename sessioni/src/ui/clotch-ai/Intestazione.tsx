@@ -26,7 +26,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
   if (vista === "decisioni") {
     const g = r ? decisioniPerGiorno(r, Date.now()) : [];
     const n = g.filter((x) => x.titolo === "Oggi" || x.titolo === "Ieri").reduce((a, x) => a + x.voci.length, 0);
-    return { icona: "libro", titolo: "Decisioni", stato: g.length ? `${n} decisioni tra oggi e ieri` : "Nessuna decisione" };
+    return { icona: "libro", titolo: "Decisioni", stato: g.length ? `${plurale(n, "decisione", "decisioni")} tra oggi e ieri` : "Nessuna decisione" };
   }
   if (vista === "regole") {
     const n = r?.regole.length ?? 0;
@@ -37,7 +37,7 @@ function testa(vista: string, s: ReturnType<typeof useRegistro>, avvio: "avvio" 
     if (!r || s.stato === "errore" || r.errori.length) return { icona: "posta", titolo: "Casella", segno: ["avviso", "errore"], stato: "Registro non leggibile" };
     const c = casella(r, Date.now());
     if (!c.aspettano) return { icona: "posta", titolo: "Casella", segno: ["finita", "successo"], stato: "Niente in attesa" };
-    return { icona: "posta", titolo: "Casella", segno: ["mano", "accento"], stato: `${c.aspettano === 1 ? "1 aspetta te" : `${c.aspettano} aspettano te`} · ${c.alLavoro} al lavoro` };
+    return { icona: "posta", titolo: "Casella", segno: ["mano", "accento"], stato: `${c.aspettano === 1 ? "1 aspetta te" : `${c.aspettano} aspettano te`} ${c.alLavoro} al lavoro` };
   }
   const st = r && statoClotchAi(r, Date.now());
   const segno: Testa["segno"] = avvio ? ["spinner", "secondaria"] : st ? SEGNO_CLOTCH_AI[st.stato] : undefined;

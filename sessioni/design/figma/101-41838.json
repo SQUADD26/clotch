@@ -4,8 +4,7 @@
   "id": "101:41838",
   "nome": "Barra laterale",
   "w": 266,
-  "h": 856,
-  "dentro": "101:41834"
+  "h": 856
  },
  "variabili": {
   "spazio/0-5": 2,
@@ -35,7 +34,7 @@
   "colore/sessione/blu": "#339cff",
   "raggio/pieno": 9999,
   "misura/bottone": 28,
-  "colore/testo/su-primario": "#2d2d2d",
+  "colore/testo/su-avatar": "#141414",
   "spazio/1": 4,
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6
@@ -1749,7 +1748,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -1796,7 +1795,7 @@
    "box": {
     "x": 52,
     "y": 756,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -1805,7 +1804,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {

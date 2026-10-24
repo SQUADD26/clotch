@@ -19,12 +19,12 @@ H.avvia('requisiti-c', async () => {
   });
 
   await req('A27', async () => { // il menu dell'app macOS: «Informazioni su clotch» e le voci standard
-    const { menuApp } = require(H.root + '/dist/src/branding.js');
+    const { menuApp } = require(H.root + '/dist/src/menu-app.js');
     const m = menuApp(), app = m[0].submenu.map((v) => v.label || v.type);
     assert.equal(m[0].label, 'clotch');
     assert.deepEqual(m[0].submenu.map((v) => v.role).filter(Boolean), ['about', 'services', 'hide', 'hideOthers', 'unhide', 'quit']);
     assert.equal(app[0], 'Informazioni su clotch'); assert.equal(app.at(-1), 'Esci da clotch');
-    assert.deepEqual(m.slice(1).map((v) => v.label), ['File', 'Modifica', 'Vista', 'Finestra']);
+    assert.deepEqual(m.slice(1).map((v) => v.label), ['File', 'Modifica', 'Vista', 'Vai', 'Finestra', 'Aiuto']);
   });
 
 
@@ -48,7 +48,7 @@ H.avvia('requisiti-c', async () => {
     assert.equal(await run(() => document.querySelector('.pannello-obiettivo .prova:nth-child(3) span.errore')?.textContent), 'Prova rossa', 'la prova fallita ha il suo stato');
     assert.equal(await run(() => document.querySelectorAll('.pannello-obiettivo .prova span.errore').length), 1, 'solo quella fallita');
     await wait(() => document.querySelectorAll('.apri-pr').length === 3);
-    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1 · unita in dev', 'PR #2', 'PR #3 · aperta verso dev']);
+    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1 unita in dev', 'PR #2', 'PR #3 aperta verso dev']);
     assert.deepEqual(await run(() => [...document.querySelectorAll('.apri-pr')].map((a) => a.getAttribute('href'))), [1, 2, 3].map((n) => `https://example.test/pull/${n}`));
   });
 

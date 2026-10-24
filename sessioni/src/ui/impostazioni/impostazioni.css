@@ -12,7 +12,10 @@
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
 .pezzo-impostazioni .nav-impostazioni .voce:hover { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-impostazioni .nav-impostazioni .voce.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni .nav-impostazioni .voce.scelta, .pezzo-impostazioni .nav-impostazioni button.voce:active { background: var(--colore-fondo-riga-scelta); }
+/* la voce scelta risponde al passaggio e al clic come le righe scelte del resto dell'app (chat/richieste.css, barra/scelta-icona.css) */
+.pezzo-impostazioni .nav-impostazioni .voce.scelta:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .nav-impostazioni .voce.scelta:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
 
 .pezzo-impostazioni .scorre-impostazioni { flex: 1; min-height: 0; overflow-y: auto; }
 .pezzo-impostazioni .contenuto-impostazioni {
@@ -23,6 +26,8 @@
 .pezzo-impostazioni .contenuto-impostazioni > * { align-self: stretch; }
 .pezzo-impostazioni .contenuto-impostazioni > .bottone { align-self: flex-start; }
 .pezzo-impostazioni .titolo-pagina { margin: 0; font-weight: 400; }
+/* un testo senza spazi (percorso, nome, ricerca da 200 caratteri) va a capo invece di uscire dalla colonna (#838, #955) */
+.pezzo-impostazioni .contenuto-impostazioni, .pezzo-impostazioni .nav-impostazioni { overflow-wrap: anywhere; }
 .pezzo-impostazioni .contenuto-impostazioni .errore { color: var(--colore-testo-errore); }
 
 .pezzo-impostazioni .gruppo { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl); }
@@ -45,7 +50,7 @@
 
 /* Riga scelta: valore e freccia, con la tendina sotto a destra */
 .pezzo-impostazioni .scelta { position: relative; flex: none; }
-.pezzo-impostazioni .scelta .valore { display: flex; align-items: center; gap: var(--spazio-1); }
+.pezzo-impostazioni .scelta .valore { border-radius: var(--raggio-md); display: flex; align-items: center; gap: var(--spazio-1); }
 
 
 .pezzo-impostazioni .campo-testo {
@@ -65,12 +70,16 @@
 /* Scorciatoie: tasti in ascolto e tasti già usati (101-33015) */
 .pezzo-impostazioni .tasto-chip.in-ascolto { box-shadow: inset 0 0 0 var(--misura-tratto-forte) var(--colore-bordo-fuoco); }
 .pezzo-impostazioni .conflitto { display: flex; align-items: center; gap: var(--spazio-2); }
+/* finestra stretta: il conflitto va su una riga sua, sotto l'etichetta, invece di coprirla (#950) */
+.pezzo-impostazioni .impostazioni.stretta .riga:has(> .conflitto) { flex-wrap: wrap; }
+.pezzo-impostazioni .impostazioni.stretta .riga > .conflitto { order: 1; flex-basis: 100%; flex-wrap: wrap; }
+.pezzo-impostazioni .impostazioni.stretta .riga > .conflitto > span { flex-basis: 100%; }
 
 /* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */
 .pezzo-impostazioni .schede { display: flex; gap: var(--spazio-1); }
 .pezzo-impostazioni .contenuto-impostazioni > .schede { align-self: flex-start; }
 .pezzo-impostazioni .riga.uso { flex-direction: column; align-items: stretch; gap: var(--spazio-2); }
-.pezzo-impostazioni .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; }
+.pezzo-impostazioni .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; gap: var(--spazio-2); }
 .pezzo-impostazioni .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
 .pezzo-impostazioni .barra-uso .pieno { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
 .pezzo-impostazioni .barra-uso .pieno.errore { background: var(--colore-testo-errore); }
@@ -79,23 +88,30 @@
 .pezzo-impostazioni .spazio-usato { display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-impostazioni .barra-segmentata { height: var(--misura-riga); display: flex; gap: var(--spazio-0-5); }
 .pezzo-impostazioni .barra-segmentata > * { border-radius: var(--raggio-xs); }
-.pezzo-impostazioni .legenda { display: flex; gap: var(--spazio-4); }
-.pezzo-impostazioni .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); }
-.pezzo-impostazioni .campione { width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
+.pezzo-impostazioni .legenda { display: flex; flex-wrap: wrap; gap: var(--spazio-1) var(--spazio-4); }
+.pezzo-impostazioni .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); min-width: 0; max-width: 100%; }
+.pezzo-impostazioni .voce-legenda > .t-sm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-impostazioni .campione { flex: none; width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
 .pezzo-impostazioni .riga.calcolo { gap: var(--spazio-2); }
 
 /* Dati, Info, Clotch (101:17893, 101:33235, 101:18054, 101:45956) */
-.pezzo-impostazioni .valore-scelta { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
+.pezzo-impostazioni .valore-scelta { border-radius: var(--raggio-md); display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 .pezzo-impostazioni .indietro { display: flex; align-items: center; gap: var(--spazio-1); align-self: flex-start !important; }
 .pezzo-impostazioni .bottone.pericolo { font-weight: 400; }
 .pezzo-impostazioni .riga.stato-clotch { gap: var(--spazio-3); }
 
 /* stati di passaggio e disabilitato dei controlli (riga-passaggio = passaggio, riga-scelta = premuto) */
 .pezzo-impostazioni .interruttore:hover:not(:disabled) { box-shadow: inset 0 0 0 var(--spazio-16) var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .interruttore:active:not(:disabled) { box-shadow: inset 0 0 0 var(--spazio-16) var(--colore-fondo-riga-scelta); }
 .pezzo-impostazioni .interruttore:disabled { opacity: var(--opacita-spento); }
 .pezzo-impostazioni .scelta .valore:hover:not(:disabled) .secondario, .pezzo-impostazioni .valore-scelta:hover .secondario { color: var(--colore-testo-primario); }
-.pezzo-impostazioni button:hover > .tasto-chip:not(.errore) { background: var(--colore-fondo-riga-scelta); }
+/* il tasto «Cambia …»: stesso velo dei bottoni secondari (componenti.css), un gradino più forte perché il chip è piccolo (#951) */
+.pezzo-impostazioni button:hover > .tasto-chip:not(.errore) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni button:active > .tasto-chip:not(.errore) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta), inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
 .pezzo-impostazioni .tab-uso:hover:not(.scelta) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .tab-uso:active:not(.scelta) { background: var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni .tab-uso.scelta:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .tab-uso.scelta:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
 .pezzo-impostazioni .indietro:hover { color: var(--colore-testo-primario); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"] { border-radius: var(--raggio-xs); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"]:hover { background: var(--colore-fondo-riga-passaggio); }

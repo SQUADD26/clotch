@@ -14,6 +14,11 @@ import "./scelte.css";
 export type Imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>, base?: string) => void;
 export type Dati = { s: Pick<Sessione, "modello" | "permessi" | "contesto">; p?: PreferenzeSessione };
 
+/** Il nome di un controllo della casella, appoggiato sopra come «Contesto usato» (101:26425): lo stesso suggerimento per tutti, al posto del `title` del sistema. */
+export function NomeSopra({ testo, nascosto, children }: { testo: string; nascosto?: boolean; children: ReactNode }) {
+  return <Suggerimento testo={testo} nascosto={nascosto} classe="suggerimento" lato="sopra" allinea="centro" scarto={numero("spazio-3") + numero("spazio-0-5")}>{children}</Suggerimento>;
+}
+
 /** Un chip che apre il suo menu sopra di sé (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al chip); le frecce passano da una voce all'altra. */
 export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, children }: {
   aperto: boolean; onAperto(a: boolean): void; lato: "sinistra" | "destra"; etichetta: string; disabled?: boolean; chip: ReactNode; children: ReactNode;
@@ -25,9 +30,9 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
     (voci().find((b) => b.classList.contains("scelta")) ?? voci()[0])?.focus();
     const tasto = (e: KeyboardEvent) => {
       if (e.key === "Tab") { onAperto(false); e.preventDefault(); return; } // il menu si chiude e il fuoco torna al chip
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
       const b = voci(), i = b.indexOf(document.activeElement as HTMLButtonElement);
-      b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
+      b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
     menu.addEventListener("keydown", tasto);
@@ -35,7 +40,9 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
   }, [menu]);
   return (
     <span className="chip-menu">
-      <button type="button" className="chip" aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
+      <NomeSopra testo={etichetta} nascosto={aperto}>
+        <button type="button" className="chip" aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
+      </NomeSopra>
       {aperto && (
         <Sovrapposto lato="sopra" fine={lato === "destra"} scarto={numero(lato === "destra" ? "spazio-1" : "spazio-2")} className={`menu-casella flottante ${lato}`} role="menu"
           rif={setMenu} onChiudi={() => onAperto(false)}>{children}</Sovrapposto>

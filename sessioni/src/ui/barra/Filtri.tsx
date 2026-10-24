@@ -46,6 +46,14 @@ const frecce = (el: HTMLDivElement | null) => {
   // il menu è nascosto finché non sa dove stare: il fuoco si dà al fotogramma dopo
   requestAnimationFrame(() => el.querySelector<HTMLElement>("input, .voce")?.focus());
   el.addEventListener("keydown", (e) => {
+    if (e.key === "Home" || e.key === "End") {
+      // nel campo di ricerca Home e Fine spostano il cursore
+      if (document.activeElement instanceof HTMLInputElement) return;
+      const v = el.querySelectorAll<HTMLElement>("button");
+      v[e.key === "Home" ? 0 : v.length - 1]?.focus();
+      e.preventDefault();
+      return;
+    }
     const verso = e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey) ? 1 : e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey) ? -1 : 0;
     if (!verso) return;
     const v = [...el.querySelectorAll<HTMLElement>("input, button")];
@@ -91,6 +99,7 @@ export function MenuOpzioni({ a, filtro, opzioni, onCambia, onRimuovi, onChiudi 
         <Icona nome="giu" />
       </div>
       <CercaNelMenu segnaposto="Cerca opzione" valore={q} onCambia={setQ} />
+      <div className="lista-menu">
       {!opzioni.some((o) => cerca(o.voce, q)) && <Vuoto testo="Nessuna opzione" />}
       {opzioni.filter((o) => cerca(o.voce, q)).map((o) => {
         const spuntata = filtro.valori.includes(o.chiave);
@@ -102,6 +111,7 @@ export function MenuOpzioni({ a, filtro, opzioni, onCambia, onRimuovi, onChiudi 
           </button>
         );
       })}
+      </div>
       <div className="linea" />
       <button type="button" role="menuitem" className="voce" onClick={onRimuovi}>
         <span className="etichetta t-sm pericolo">Rimuovi filtro</span>

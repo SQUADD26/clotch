@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -54,7 +55,7 @@
   "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "spazio/2-5": 10,
   "colore/testo/bolla": "#fdf5f1",
@@ -63,7 +64,7 @@
   "colore/bordo/normale": "#ffffff15",
   "raggio/casella": 22,
   "misura/bottone-invio": 32,
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "misura/colonna": 760,
   "raggio/xl": 15,
   "colore/fondo/errore": "#fa423e29",
@@ -2140,7 +2141,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2187,7 +2188,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2196,7 +2197,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2637,7 +2638,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2695,7 +2696,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 488,
+    "x": 472,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2711,7 +2712,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
+    "x": 473.3330078125,
     "y": 141.33203125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2726,7 +2727,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 508,
+    "x": 492,
     "y": 140,
     "w": 181,
     "h": 16
@@ -4131,7 +4132,7 @@
    "box": {
     "x": 577,
     "y": 233,
-    "w": 630,
+    "w": 631,
     "h": 36
    },
    "variabili": {
@@ -4165,7 +4166,7 @@
    "box": {
     "x": 577,
     "y": 253,
-    "w": 157,
+    "w": 159,
     "h": 16
    },
    "variabili": {
@@ -4174,7 +4175,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Backend: auth e RLS · 14:12",
+   "testo": "Backend: auth e RLS 14:12",
    "font": "SF Pro Regular"
   },
   {
@@ -4182,9 +4183,9 @@
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
-    "x": 1219,
+    "x": 1220,
     "y": 242,
-    "w": 58,
+    "w": 57,
     "h": 18
    },
    "variabili": {
@@ -4193,7 +4194,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Annullata",
+   "testo": "Revocata",
    "font": "SF Pro Regular"
   },
   {
@@ -4254,7 +4255,7 @@
    "box": {
     "x": 577,
     "y": 289,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4288,7 +4289,7 @@
    "box": {
     "x": 577,
     "y": 309,
-    "w": 172,
+    "w": 174,
     "h": 16
    },
    "variabili": {
@@ -4297,7 +4298,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Notch: avviso schermo · 13:40",
+   "testo": "Notch: avviso schermo 13:40",
    "font": "SF Pro Regular"
   },
   {
@@ -4305,9 +4306,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 291,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4325,9 +4326,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 297,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4336,7 +4337,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4397,7 +4398,7 @@
    "box": {
     "x": 577,
     "y": 345,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4431,7 +4432,7 @@
    "box": {
     "x": 577,
     "y": 365,
-    "w": 218,
+    "w": 220,
     "h": 16
    },
    "variabili": {
@@ -4440,7 +4441,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Figma: schermate app Sessioni · 12:05",
+   "testo": "Figma: schermate app Sessioni 12:05",
    "font": "SF Pro Regular"
   },
   {
@@ -4448,9 +4449,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 347,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4468,9 +4469,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 353,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4479,7 +4480,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4540,7 +4541,7 @@
    "box": {
     "x": 577,
     "y": 401,
-    "w": 525,
+    "w": 528,
     "h": 36
    },
    "variabili": {
@@ -4574,7 +4575,7 @@
    "box": {
     "x": 577,
     "y": 421,
-    "w": 75,
+    "w": 77,
     "h": 16
    },
    "variabili": {
@@ -4583,7 +4584,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "clotch · 11:30",
+   "testo": "clotch 11:30",
    "font": "SF Pro Regular"
   },
   {
@@ -4591,9 +4592,9 @@
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
-    "x": 1114,
+    "x": 1117,
     "y": 410,
-    "w": 163,
+    "w": 160,
     "h": 18
    },
    "variabili": {
@@ -4602,7 +4603,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Già su main: non si annulla",
+   "testo": "Già su main: non si revoca",
    "font": "SF Pro Regular"
   },
   {
@@ -4721,7 +4722,7 @@
    "box": {
     "x": 577,
     "y": 513,
-    "w": 605,
+    "w": 607,
     "h": 36
    },
    "variabili": {
@@ -4755,7 +4756,7 @@
    "box": {
     "x": 577,
     "y": 533,
-    "w": 104,
+    "w": 105,
     "h": 16
    },
    "variabili": {
@@ -4764,7 +4765,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "squadd-v2 · 18:20",
+   "testo": "squadd-v2 18:20",
    "font": "SF Pro Regular"
   },
   {
@@ -4772,9 +4773,9 @@
    "nome": "bottone Annulla",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1194,
+    "x": 1196,
     "y": 515,
-    "w": 83,
+    "w": 81,
     "h": 32
    },
    "variabili": {
@@ -4792,9 +4793,9 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1210,
+    "x": 1212,
     "y": 521,
-    "w": 51,
+    "w": 49,
     "h": 20
    },
    "variabili": {
@@ -4803,7 +4804,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Annulla",
+   "testo": "Revoca",
    "font": "SF Pro Medium"
   },
   {
@@ -4977,7 +4978,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Decisione annullata. La sessione aspetta te.",
+   "testo": "Decisione revocata. La sessione aspetta te.",
    "font": "SF Pro Regular"
   },
   {

@@ -53,17 +53,15 @@ app.whenReady().then(async () => {
     // giorni ed eventi: «Ieri» in cima, «Oggi» dove cambia, «Ramo creato» al posto del comando
     const righeEvento = await run(() => [...document.querySelectorAll('.riga-evento .testo')].map((e) => e.textContent));
     assert.deepEqual(righeEvento, ['Ieri', 'Oggi', 'Ramo creato: feat/9-prova']);
-    assert.equal(await run(() => [...document.querySelectorAll('.filo .strumento .dettaglio')].some((e) => /checkout/.test(e.textContent))), false);
+    // filo compatto (#876): si apre il gruppo e ogni sua riga; il checkout è diventato l'evento, non una riga
+    for (let i = 0; i < 2; i++) { await run(() => document.querySelectorAll('.filo button[aria-expanded="false"]').forEach((b) => b.click())); await new Promise((r) => setTimeout(r, 300)); }
+    await ready('.comando-grezzo');
+    assert.equal(await run(() => [...document.querySelectorAll('.filo .comando-grezzo')].some((e) => /checkout/.test(e.textContent))), false);
     console.log('FILO_EVENTI_OK');
 
-    // «Mostra tutto (21 righe)»: tre righe finché non si apre, poi tutte; «Mostra meno» le richiude
-    await run(() => document.querySelector('.filo .strumento .testata:not(:disabled)').click());
-    await ready('.mostra-tutto');
-    assert.equal(await run(() => document.querySelector('.mostra-tutto').textContent), 'Mostra tutto (21 righe)');
-    assert.equal(await run(() => document.querySelector('.blocco-codice .uscita').textContent.split('\n').length), 3);
-    await run(() => document.querySelector('.mostra-tutto').click());
-    assert.equal(await run(() => document.querySelector('.blocco-codice .uscita').textContent.split('\n').length), 21);
-    assert.equal(await run(() => document.querySelector('.mostra-tutto').textContent), 'Mostra meno');
+    // uscita lunga: tutte le 21 righe nel blocco del comando aperto, che scorre dentro di sé
+    assert.equal(await run(() => document.querySelector('.comando-grezzo .uscita').textContent.trim().split('\n').length), 21);
+    assert.equal(await run(() => { const t = document.querySelector('.comando-grezzo .testo'); return t.scrollHeight > t.clientHeight && getComputedStyle(t).overflowY === 'auto'; }), true);
     console.log('FILO_MOSTRA_TUTTO_OK');
 
     // ⌘F apre la barra; tre «controllo» (due risposte e il pannello), il contatore dice «1 di 2»; Invio passa al secondo; Esc chiude e toglie le evidenziazioni
@@ -76,23 +74,29 @@ app.whenReady().then(async () => {
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })));
     await pausa(100);
     assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '2 di 3');
+    // ⌘G e ⇧⌘G col fuoco fuori dal campo (#857)
+    const g = (shiftKey) => run(new Function(`return () => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'g', code: 'KeyG', metaKey: true, shiftKey: ${shiftKey}, bubbles: true }))`)());
+    await g(false); await pausa(100);
+    assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '3 di 3');
+    await g(true); await g(true); await pausa(100);
+    assert.equal(await run(() => document.querySelector('.trova .contatore').textContent), '1 di 3');
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await pausa(100);
     assert.equal(await run(() => !document.querySelector('.trova') && !CSS.highlights.has('trova')), true);
     console.log('FILO_TROVA_OK');
 
-    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no
+    // ⌘F si cambia in Impostazioni · Scorciatoie: col tasto nuovo la barra si apre, col vecchio no (⌘E: ⌘G è fisso, Trova successivo, #857)
     const tasto = (code, key) => run(`() => { dispatchEvent(new KeyboardEvent('keydown', { code: '${code}', key: '${key}', metaKey: true, bubbles: true, cancelable: true })); }`);
-    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘G' } });
+    win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: '⌘E' } });
     await pausa(200);
     await tasto('KeyF', 'f'); await pausa(150);
     assert.equal(await run(() => !document.querySelector('.trova')), true, 'il vecchio tasto non apre più la barra');
-    await tasto('KeyG', 'g');
+    await tasto('KeyE', 'e');
     await ready('.trova input');
     await run(() => document.querySelector('.trova input').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K', trova: null } });
     await pausa(200);
-    await tasto('KeyG', 'g'); await pausa(150);
+    await tasto('KeyE', 'e'); await pausa(150);
     assert.equal(await run(() => !document.querySelector('.trova')), true, 'tolta: nessun tasto apre la barra');
     win.webContents.send('sessioni:impostazioni', { scorciatoie: { cerca: '⌘K' } });
     await pausa(200);
@@ -112,10 +116,12 @@ app.whenReady().then(async () => {
     await ready('.menu');
     assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce .etichetta')].map((e) => e.textContent)), ['Copia', 'Seleziona tutto', 'Chiedi a clotch AI']);
     // la prima voce è evidenziata all'apertura (101:28635), anche dopo un clic vero del mouse: fondo di passaggio come quando si apre da tastiera
+    await pausa(300); // il fondo delle voci passa in 75 ms (movimento.css, #586): si legge a transizione finita
     const colori = await run(() => { const [prima, seconda] = document.querySelectorAll('.menu .voce'); return { attiva: document.activeElement === prima,      prima: getComputedStyle(prima).backgroundColor, seconda: getComputedStyle(seconda).backgroundColor }; });
     assert.equal(colori.attiva, true, 'il fuoco è sulla prima voce');
     assert.notEqual(colori.prima, colori.seconda, 'la prima voce ha il fondo di passaggio, la seconda no');
-    await run(() => document.querySelectorAll('.menu .voce')[1].dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))); // il passaggio sposta l'evidenza
+    await run(() => document.querySelectorAll('.menu .voce')[1].dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))); // il movimento del mouse sposta l'evidenza (#818)
+    await pausa(300);
     assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce')].map((v) => getComputedStyle(v).backgroundColor !== 'rgba(0, 0, 0, 0)')), [false, true, false]);
     await win.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: false });
     win.webContents.debugger.detach();
@@ -143,8 +149,10 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => document.querySelector('.nuovi-messaggi').textContent), '1 nuovo messaggio');
     assert.equal(await run(() => document.querySelector('.filo').scrollTop), 0);
     await run(() => document.querySelector('.nuovi-messaggi').click());
-    await pausa(1200);
-    assert.equal(await run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); }), true);
+    // la corsa liscia dura più di un secondo: si aspetta la fine (al massimo 5 s) invece di un tempo fisso
+    const infondo = () => run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); });
+    for (let k = 0; k < 50 && !(await infondo()); k++) await pausa(100);
+    assert.equal(await infondo(), true);
     console.log('FILO_NUOVI_MESSAGGI_OK');
 
     // «Chiedi a clotch AI»: la citazione arriva nella casella di clotch AI e la vista si apre, senza inviare

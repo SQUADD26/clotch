@@ -10,3 +10,4 @@
 .avvio .logo .icona { width: var(--misura-logo-icona); height: var(--misura-logo-icona); }
 /* senza dati la campana e i comandi globali (Ferma tutto, Non disturbare) non dicono niente: il disegno li toglie */
 .cornice.in-avvio .bottone-attivita, .cornice.in-avvio .comandi-globali { visibility: hidden; }
+.avvio .lento .bottoni { display: flex; gap: var(--spazio-2); }

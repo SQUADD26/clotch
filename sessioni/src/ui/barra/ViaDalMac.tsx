@@ -12,22 +12,22 @@ export function ViaDalMac({ r, adesso, aspettano, inCasella }: { r: Registro | n
   if (!r) return null;
   if (clotchAcceso(r, adesso)) {
     if (!r.afk) return null;
-    const n = r.afk.avvisi;
+    const n = r.afk.avvisi, ms = adesso - r.afk.da; // minuti interi: l'orologio non batte al secondo
     return (
-      <div className="banda via">
+      <div className="banda via" role="status">
         <div className="riga-banda">
           <Icona nome="luna" colore="accento" />
-          <span className="titolo t-sm medio">Sei via dal Mac da {durata(Math.max(60_000, adesso - r.afk.da))}</span>
+          <span className="titolo t-sm medio">Sei via dal Mac {ms < 60_000 ? "da meno di 1 min" : `da ${durata(Math.floor(ms / 60_000) * 60_000)}`}</span>
         </div>
         <span className="dettaglio t-xs secondario">
-          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${plurale(n, "avviso", "avvisi")} da leggere al ritorno.`}
+          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${plurale(n, "avviso", "avvisi")} e te ${n === 1 ? "lo" : "li"} legge al ritorno.`}
         </span>
       </div>
     );
   }
   if (!inCasella || !aspettano) return null;
   return (
-    <div className="banda via senza">
+    <div className="banda via senza" role="status">
       <div className="riga-banda">
         <Icona nome="info" />
         <span className="titolo t-sm medio">Sessioni non sa quando sei via</span>

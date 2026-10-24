@@ -16,6 +16,8 @@
 .pezzo-chat .markdown a { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
 .pezzo-chat .markdown a:focus-visible { border-radius: var(--raggio-xs); outline-width: var(--misura-tratto-forte); outline-offset: 0; }
 .pezzo-chat .markdown a:active { opacity: var(--opacita-premuto); }
+.pezzo-chat .markdown .sr-only { position: absolute; width: var(--misura-tratto); height: var(--misura-tratto); overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pezzo-chat .markdown section[data-footnotes] { padding-top: var(--spazio-3); border-top: var(--misura-tratto) solid var(--colore-bordo-normale); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .markdown .link-inerte { color: var(--colore-testo-link); cursor: default; }
 .pezzo-chat .markdown .immagine { display: inline-flex; align-items: center; gap: var(--spazio-1-5); color: var(--colore-testo-secondario); vertical-align: bottom; }
 .pezzo-chat .markdown strong { font-weight: 600; }

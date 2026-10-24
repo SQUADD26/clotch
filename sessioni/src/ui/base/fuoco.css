@@ -1,8 +1,8 @@
 /* campi e focus (#521): un campo non disegna mai il suo bordo di focus; lo disegna il contenitore, con il suo raggio, dentro il suo bordo.
-   Esclusi apposta: il campo grande del dialogo (101:10247, il dialogo è il campo), «Cerca» delle impostazioni (101:119-57161, si tinge) e le caselle che cambiano già bordo. */
+   Esclusi apposta: il campo grande del dialogo (101:10247, il dialogo è il campo) e le caselle che cambiano già bordo. «Cerca» delle impostazioni (119-57161) si tinge e da tastiera ha anche l'anello (#914). */
 input:focus-visible, textarea:focus-visible { outline: none; }
 .campo.piccolo:has(> input:focus-visible), .campo-menu:has(> input:focus-visible), .cerca-icone:has(> input:focus-visible),
-.ricerca-avvio:has(> input:focus-visible), .trova:has(> input:focus-visible), .carta-richiesta .altro:focus-visible,
+.ricerca-avvio:has(> input:focus-visible), .cerca-voce:has(> input:focus-visible), .trova:has(> input:focus-visible), .carta-richiesta .altro:focus-visible,
 .casella:focus-within, .casella-macchina:focus-visible {
   outline: var(--misura-tratto) solid var(--colore-bordo-fuoco); outline-offset: calc(-1 * var(--misura-tratto));
 }

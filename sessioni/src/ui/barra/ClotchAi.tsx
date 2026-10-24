@@ -2,6 +2,7 @@
 // In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di clotch AI (src/ui/clotch-ai).
 import type { Registro } from "../../clotch-ai";
 import { useRegistro as useRegistroUnico } from "../clotch-ai/dati";
+import { comanda } from "../chat/clotch-ai";
 import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { casella, statoClotchAi, type StatoClotchAi } from "../clotch-ai/vista";
@@ -26,11 +27,11 @@ export function useRegistro(): Registro | null {
 
 export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"]> }) {
   return (
-    <div className="banda">
+    <div className="banda" role="status">
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
         <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${orario(nd.fino)}`}</span>
-        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Rimuovi</button>
+        <button type="button" className="t-sm medio" onClick={() => void comanda("non_disturbare", { acceso: false })}>Togli</button>
       </div>
       <span className="dettaglio t-xs secondario">{nd.tenuti} avvisi tenuti per dopo</span>
     </div>

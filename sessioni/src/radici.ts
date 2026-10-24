@@ -9,6 +9,8 @@ export interface Radice {
   /** Nome della cartella: `.claude`, `.claude-roberto`. È l'identità dell'account. */
   account: string;
   email: string | null;
+  /** `oauthAccount.accountUuid` di `.claude.json`: lega l'account alle sessioni dell'app Claude (cartella `claude-code-sessions/<uuid>/`, #996). */
+  uuid?: string | null;
 }
 
 const identita = (p: string) => {
@@ -20,18 +22,18 @@ const identita = (p: string) => {
 };
 
 /** `.claude.json` per firma (mtime e misura): è grande e cambia di rado, ma l'elenco chiede l'email a ogni giro (#474). */
-const email = new Map<string, { firma: string; email: string | null }>();
-const emailDi = (radice: string): string | null => {
+const email = new Map<string, { firma: string; email: string | null; uuid: string | null }>();
+const accountDi = (radice: string): { email: string | null; uuid: string | null } => {
   const file = path.join(radice, ".claude.json");
   try {
     const st = fs.statSync(file), firma = `${st.ino}:${st.mtimeMs}:${st.size}`, e = email.get(file);
-    if (e?.firma === firma) return e.email;
-    const v = JSON.parse(fs.readFileSync(file, "utf8"))?.oauthAccount?.emailAddress ?? null;
-    email.set(file, { firma, email: v });
+    if (e?.firma === firma) return { email: e.email, uuid: e.uuid };
+    const o = JSON.parse(fs.readFileSync(file, "utf8"))?.oauthAccount, v = { email: o?.emailAddress ?? null, uuid: o?.accountUuid ?? null };
+    email.set(file, { firma, ...v });
     return v;
   } catch {
     email.delete(file);
-    return null;
+    return { email: null, uuid: null };
   }
 };
 
@@ -57,7 +59,7 @@ export function trovaRadici(home: string): Radice[] {
     const id = identita(p);
     if (viste.has(id)) continue;
     viste.add(id);
-    out.push({ path: p, account: n, email: emailDi(p) });
+    out.push({ path: p, account: n, ...accountDi(p) });
   }
   return out;
 }
@@ -73,6 +75,6 @@ export function radiciScelte(home: string, aggiunte: string[] = [], tolte: strin
   const trovate = trovaRadici(home);
   return percorsiAccount(trovate.map((r) => accorcia(r.path, home)), aggiunte, tolte).map((p) => {
     const assoluto = espandi(p, home);
-    return trovate.find((r) => r.path === assoluto) ?? { path: assoluto, account: path.basename(assoluto), email: emailDi(assoluto) };
+    return trovate.find((r) => r.path === assoluto) ?? { path: assoluto, account: path.basename(assoluto), ...accountDi(assoluto) };
   });
 }

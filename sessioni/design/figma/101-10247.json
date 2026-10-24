@@ -4,8 +4,7 @@
   "id": "101:10247",
   "nome": "Finestra ricerca",
   "w": 640,
-  "h": 428,
-  "dentro": "101:10297"
+  "h": 428
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
@@ -335,7 +334,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "clotch · Claude Code · accountmanager",
+   "testo": "clotch Claude Code accountmanager",
    "font": "SF Pro Regular"
   },
   {
@@ -474,7 +473,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "clotch-ai-mac-v2 · Codex",
+   "testo": "clotch-ai-mac-v2 Codex",
    "font": "SF Pro Regular"
   },
   {

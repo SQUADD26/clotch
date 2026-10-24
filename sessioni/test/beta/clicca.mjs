@@ -14,7 +14,7 @@ for (let i = 2; i < process.argv.length; i++) {
   const k = process.argv[i].replace(/^--/, ''), v = process.argv[i + 1];
   arg[k] = v && !v.startsWith('--') ? (i++, v) : true;
 }
-const aree = arg.area === 'tutto' ? Object.keys(AREE) : [arg.area];
+const aree = arg.area === 'tutto' ? Object.keys(AREE).filter((a) => !AREE[a].extra) : [arg.area];
 if (!arg.out || aree.some((a) => !AREE[a])) { console.error(`uso: node test/beta/clicca.mjs --area <${Object.keys(AREE).join('|')}|tutto> --out <cartella> [--matrice]`); process.exit(2); }
 const OUT = resolve(arg.out), MAX = +arg.max || 80, VIDEO = !!arg.video;
 
@@ -45,6 +45,10 @@ async function giro(app, area, cfg, console_) {
     await cdp.send('DOM.enable'); await cdp.send('CSS.enable');
     const { root } = await cdp.send('DOM.getDocument', { depth: 0 }), { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `[data-bt="${i}"]` });
     if (nodeId) await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: stati });
+    // il mouse vero tiene `:hover` anche sugli antenati (una riga che mostra le sue azioni solo al passaggio): si forzano insieme
+    await pagina.evaluate((i) => { document.querySelectorAll('[data-bt-anc]').forEach((e) => e.removeAttribute('data-bt-anc')); if (!document.querySelector('[data-bt-anc]')) for (let e = document.querySelector(`[data-bt="${i}"]`)?.parentElement; e; e = e.parentElement) e.setAttribute('data-bt-anc', ''); }, i);
+    const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector: '[data-bt-anc]' });
+    for (const id of nodeIds) await cdp.send('CSS.forcePseudoState', { nodeId: id, forcedPseudoClasses: stati.filter((s) => s === 'hover') });
   } catch { /* pezzo sparito */ } };
   await pulito();
   const f0 = await foto('iniziale');
@@ -63,7 +67,7 @@ async function giro(app, area, cfg, console_) {
     if (!tipo) continue;
     // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
     const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true', null, { timeout: 2000 }).catch(() => false);
-    const box = await loc.boundingBox(), clip = box && { x: Math.max(0, box.x - 4), y: Math.max(0, box.y - 4), width: box.width + 8, height: box.height + 8 };
+    const box = await loc.boundingBox(), cont = await loc.locator('xpath=ancestor::*[contains(concat(" ",@class," ")," casella ")][1]').boundingBox().catch(() => null), clip = box && ((b) => ({ x: Math.max(0, b.x - 4), y: Math.max(0, b.y - 4), width: b.width + 8, height: b.height + 8 }))(cont ?? box); // un campo dentro la casella: il bordo che cambia al passaggio è del contenitore
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
     const manca = (criterio, valore) => reg.difetti.push({ criterio, dove: el.dove, valore, quando: el.dove, foto: el.foto.at(-1) });

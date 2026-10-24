@@ -1,5 +1,6 @@
 /* figma: 101-8036 + 101-29399 + 101-19480 — fondo, testo e font di base della finestra */
 html { color-scheme: dark; } /* app solo scura: controlli nativi e barre di sistema seguono (#642) */
+html.parita { color-scheme: light; } /* i PNG di Figma sono trasparenti e si confrontano sul bianco: la tela dietro i frame trasparenti resta chiara (#437) */
 html, body, #radice { height: 100%; margin: 0; }
 body {
   background: var(--colore-fondo-cornice);
@@ -38,3 +39,4 @@ button { cursor: default; }
 
 /* bottone premuto (101:19480, «Bottone» 101:35385): fondo riga-scelta; primario, pericolo e invio non hanno variante disegnata */
 button:active:not(:disabled):not(.bottone):not(.pillola):not(.primario):not(.pericolo):not(.attiva):not(.bottone-invia):not(.nuovi-messaggi) { background: var(--colore-fondo-riga-scelta); }
+.pezzi > span + span { margin-left: var(--spazio-2); }

@@ -41,7 +41,10 @@ app.whenReady().then(async () => {
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: scena.elenco.sessioni[0].id } });
     await ready('.allegati-messaggio .chip-allegato');
     // chip del messaggio: nome e peso veri dalle righe `@percorso`, il testo senza le righe
-    await ready('.miniatura img');
+    // la schermata dello strumento sta piccola dentro il gruppo compatto, chiuso di default (#876)
+    await ready('.gruppo-strumenti .riga-compatta');
+    await run(() => document.querySelector('.gruppo-strumenti .riga-compatta').click());
+    await ready('.foto-strumento .miniatura img');
     assert.deepEqual(await run(() => [...document.querySelectorAll('.allegati-messaggio .chip-allegato')].map((c) => c.textContent)), ['schermata-notch.png312 KB', 'lettore.ts4 KB']);
     assert.equal(await run(() => document.querySelector('.messaggio-roberto .bolla').textContent), 'Guarda la schermata: il notch copre il titolo della sessione.');
     console.log('ALLEGATI_FILO_OK');
@@ -49,10 +52,10 @@ app.whenReady().then(async () => {
     // visore: dalla miniatura, «1 di 2», frecce, Esc
     await run(() => document.querySelector('.miniatura').click());
     await ready('.visore');
-    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'notch-sopra-il-titolo.png · 1 di 2');
+    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'notch-sopra-il-titolo.png 1 di 2');
     await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })));
     await new Promise((r) => setTimeout(r, 100));
-    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'schermata-notch.png · 2 di 2');
+    assert.equal(await run(() => document.querySelector('.visore .nome').textContent), 'schermata-notch.png 2 di 2');
     await ready('.visore img');
     await run(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })));
     await new Promise((r) => setTimeout(r, 100));

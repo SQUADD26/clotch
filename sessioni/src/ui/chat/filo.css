@@ -46,8 +46,8 @@
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
 }
 
-/* testata comune di Pensiero, Chiamata strumento, Modifica file, Ricerca sul web */
-.pezzo-chat .strumento, .pezzo-chat .pensiero { display: flex; flex-direction: column; gap: var(--spazio-2); min-width: 0; }
+/* testata di Modifica file (pensiero e strumenti: compatto.css) */
+.pezzo-chat .strumento { display: flex; flex-direction: column; gap: var(--spazio-2); min-width: 0; }
 .pezzo-chat .filo .testata {
   display: flex; align-items: center; gap: var(--spazio-2); width: 100%; min-width: 0; text-align: left;
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
@@ -55,21 +55,14 @@
 /* passaggio e premuto come la testata del pannello Info (info.css): il fondo sporge, il testo resta dov'è */
 .pezzo-chat .filo .testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-chat .filo .testata:not(:disabled):active { background: var(--colore-fondo-riga-scelta); }
-.pezzo-chat .filo :is(.strumento, .pensiero) > .testata {
-  box-sizing: content-box; width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
+.pezzo-chat .filo .strumento > .testata {
+  width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
 }
-.pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
 .pezzo-chat .testata .tipo { font-weight: 500; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .testata .dettaglio {
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs);
-}
-.pezzo-chat .testata .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
-.pezzo-chat .testo-pensiero {
-  padding-left: var(--spazio-3); border-left: var(--misura-tratto) solid var(--colore-bordo-normale);
-  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); white-space: pre-wrap;
 }
 
 .pezzo-chat .blocco-codice {
@@ -99,7 +92,7 @@
 .pezzo-chat .differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
 
 .pezzo-chat .file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
-.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: calc(var(--raggio-lg) - var(--misura-tratto)); } /* il fuoco segue la forma dentro il bordo */
+.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: var(--raggio-lg); } /* il fuoco segue la forma del riquadro, che taglia il resto */
 .pezzo-chat .file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .file-toccati .file {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);

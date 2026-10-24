@@ -121,3 +121,28 @@ test("domanda: multiSelect, header e descrizione delle opzioni arrivano al filo"
   const b = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, st("q1", "AskUserQuestion", { questions: [q] }, null)], true)[1]);
   assert.deepEqual(b[0].tipo === "domanda" && b[0].domande, [{ domanda: "Quali schermate?", opzioni: ["Barra", "Chat"], descrizioni: ["La barra laterale", ""], header: "Schermate", multi: true }]);
 });
+
+test("rifiuti dell'utente: piano rifiutato col suo perché, comando negato e interruzioni in una riga sola", () => {
+  const no = "The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). the user said:\nprima il test";
+  const v = voci([
+    { tipo: "utente", testo: "x", t: 0 },
+    st("p1", "ExitPlanMode", { plan: "Piano libero in prosa." }, no, true),
+    st("b1", "Bash", { command: "rm -rf build" }, "[Request interrupted by user for tool use]", true),
+    { tipo: "utente", testo: "[Request interrupted by user for tool use]", t: 2 },
+    { tipo: "utente", testo: "[Request interrupted by user]", t: 3 },
+    { tipo: "assistente", testo: "No response requested.", modello: null, t: 4 },
+  ], false);
+  const b = turno(v[1]);
+  assert.deepEqual(b.map((x) => x.tipo), ["piano", "strumento", "interrotta"]);
+  assert.equal(b[0].tipo === "piano" && b[0].rifiuto, "prima il test");
+  assert.equal(b[1].tipo === "strumento" && b[1].stato, "chiusa");
+  assert.equal(b[1].tipo === "strumento" && b[1].uscita, "Interrotto da te");
+});
+
+test("«Riprovo» resta solo finché non c'è la ripresa", () => {
+  const rip = { tipo: "errore" as const, testo: "", t: 1, riprova: { n: 1, di: 10 } };
+  const aperto = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, rip], true)[1]);
+  assert.deepEqual(aperto.map((x) => x.tipo), ["errore"]);
+  const ripreso = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, rip, { tipo: "assistente", testo: "Rieccomi.", modello: null, t: 2 }], false)[1]);
+  assert.deepEqual(ripreso.map((x) => x.tipo), ["risposta"]);
+});

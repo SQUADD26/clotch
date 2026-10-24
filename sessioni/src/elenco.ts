@@ -1,9 +1,11 @@
 // Mette insieme le sorgenti in un solo elenco di sessioni.
+import * as fs from "node:fs";
 import * as path from "node:path";
-import { chiaveCartella, dimenticaProgetti, leggiRadice, nomeProgetto, progettiDi } from "./claude-code";
+import { chiaveCartella, dimenticaProgetti, leggiRadice, progettiDi } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
 import { leggiCodex, leggiCursor } from "./altre-sorgenti";
 import { conPartenza, filtraElenco } from "./filtro-elenco";
+import { eProva, progettoDi } from "./progetto";
 import { radiciScelte } from "./radici";
 import { leggiObiettivi, leggiStati, StatoRegistro } from "./registri";
 import { Elenco, ErroreLettura, Obiettivo, Sessione, Stato } from "./tipi";
@@ -22,7 +24,7 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
 export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
 
 /** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
-export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown>; sporchi?: string[]; soloDopo?: number }): Elenco {
+export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown>; sporchi?: string[]; soloDopo?: number; conProve?: boolean }): Elenco {
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
   const imp = opz.impostazioni && conPartenza(opz.impostazioni);
@@ -33,9 +35,12 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
+  const radici = radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti);
+  // l'account di una sessione dell'app è l'uuid nel suo percorso, non la cartella dove il CLI scrive: l'email la dà il `.claude.json` con quell'uuid (#996)
+  const emailApp = new Map(radici.filter((r) => r.uuid && r.email).map((r) => [r.uuid!, r.email!]));
   // stessa cartella vera sotto più account: la legge il primo (come prima, a pari attività vinceva il primo)
   const progetti = new Set<string>(), lette = new Set<string>();
-  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) {
+  for (const r of radici) {
     lette.add(progettiDi(r.path));
     const p = chiaveCartella(progettiDi(r.path));
     if (progetti.has(p)) continue;
@@ -49,10 +54,10 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     if (!a) continue;
     s.sorgente = "claude-desktop";
     s.idApp = a.idApp;
+    s.email = emailApp.get(a.uuid ?? "") ?? s.email;
     s.app = a.app;
     s.titolo = a.titolo || s.titolo;
     s.cartella = a.cartella ?? s.cartella;
-    s.progetto = nomeProgetto(s.cartella);
     s.ramo = a.ramo ?? s.ramo;
     s.modello = a.modello ?? s.modello;
     s.ultimaAttivita = Math.max(s.ultimaAttivita, a.ultimaAttivita ?? 0);
@@ -62,15 +67,21 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     if (viste.has(a.cliId)) continue;
     const cartella = a.cartella ?? "";
     tutte.push({
-      id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: null, idApp: a.idApp, titolo: a.titolo,
-      progetto: nomeProgetto(cartella), cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
+      id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: (a.uuid && emailApp.get(a.uuid)) || null, idApp: a.idApp, titolo: a.titolo,
+      progetto: "", cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
       ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file, app: a.app,
     });
   }
+  // sessione su una macchina SSH: la copia del motore (trascrizione_remota) ha la coda più nuova di quella dell'app Claude, e a volte è l'unica
+  // la cartella porta il nome SSH che usa il motore («squaddv2»), non l'indirizzo dell'app («sandbox-app@51.83.1.9»): si cerca per id
+  const radice = path.join(opz.home, ".claude", "casella", "trascrizioni"), copie = new Map<string, string>();
+  try { for (const h of fs.readdirSync(radice)) for (const f of fs.readdirSync(path.join(radice, h))) if (f.endsWith(".jsonl")) copie.set(f.slice(0, -6), path.join(radice, h, f)); } catch { /* nessuna copia ancora */ }
+  for (const s of tutte) if (s.app?.ospite && copie.has(s.id)) s.file = copie.get(s.id)!;
   if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));
   if (!imp || imp.sorgenteCursor) tutte.push(...leggiCursor(opz.home, errori));
 
   for (const s of tutte) {
+    if (s.sorgente !== "cursor") s.progetto = progettoDi(s.cartella); // worktree sotto il suo repo, scratch in un gruppo (#891)
     s.obiettivo = obiettivi.get(s.id) ?? null;
     const reg = stati.get(s.id) ?? (s.idApp ? statoPerLocale.get(s.idApp) : undefined);
     if (reg?.visto) s.ultimaAttivita = Math.max(s.ultimaAttivita, reg.visto);
@@ -79,6 +90,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   // lo stesso id in due radici: resta la più recente
   const unici = new Map<string, Sessione>();
   for (const s of tutte) {
+    if (!opz.conProve && eProva(s)) continue; // le prove automatiche non sono lavoro: restano sul disco (#891)
     const k = `${s.sorgente === "claude-desktop" ? "claude-code" : s.sorgente}:${s.id}`;
     const p = unici.get(k);
     if (!p || p.ultimaAttivita < s.ultimaAttivita) unici.set(k, s);

@@ -96,7 +96,7 @@ test("parità: profilo prima import/ready; errori IPC/processo non leggono o scr
         "node:os": os, "node:path": path,
         "./branding": { ...f.branding, impostaIdentita() {} }, "./modalita-prova": f.modo,
         "./ipc-fiducia": { verificaChiamante: (evento: unknown) => assert.equal(evento, eventoIpc) },
-        "./api": { Sessioni: class {} }, "./allegati-ipc": {}, "./avvisi-mac": {}, "./barra-menu": {}, "./finestra": { parita() {} },
+        "./api": { Sessioni: class {} }, "./allegati-ipc": {}, "./avvisi-mac": {}, "./barra-menu": {}, "./menu-app": { collegaMenuApp: () => () => {} }, "./finestra": { parita() {} },
         "./clotch-ai-ipc": {}, "./impostazioni": {}, "./indice-ipc": {}, "./info-sessione": { infoSessione() {} }, "./preferenze-ipc": {}, "./casella-ipc": {}, "./nuova-sessione": {},
         "./preferenze": { leggiImpostazioni: (...a: string[]) => { letturePreferenze++; return f.preferenze.leggiImpostazioni(...a); } },
         "./registro": f.registro,

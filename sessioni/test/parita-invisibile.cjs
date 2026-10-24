@@ -86,9 +86,9 @@ async function run(args, scene, initialEnv = {}) {
   };
   const handlers = new Map();
   let ready; // ready-to-show della finestra finta
-  const ipcMain = { handle: (canale, fn) => handlers.set(canale, fn) };
+  const ipcMain = { handle: (canale, fn) => handlers.set(canale, fn), on() {} };
   const modules = {
-    electron: { app, ipcMain, BrowserWindow: { getAllWindows: () => [] } },
+    electron: { app, ipcMain, BrowserWindow: { getAllWindows: () => [] }, nativeTheme: {} }, // main.ts fissa themeSource = "dark" (#642)
     './allegati-ipc': { collegaAllegati: record('casella-live') },
     './api': { Sessioni: class {
       elencoSessioni() { calls.push('elenco-letto'); return { sessioni: [], errori: [] }; }
@@ -97,13 +97,14 @@ async function run(args, scene, initialEnv = {}) {
     } },
     './avvisi-mac': { collegaAvvisi: record('avvisi-live') },
     './barra-menu': { collegaBarraMenu: () => record('tray-live') },
-    './branding': { impostaNome: record('nome'), impostaIdentita: record('identita') },
+    './branding': { impostaNome: record('nome'), impostaIdentita: record('identita'), aggiornaMenu: record('menu') },
     './finestra': { apriFinestra: () => { calls.push('finestra-live'); return { once: (_ev, cb) => { ready = cb; } }; }, parita: record('parita') },
     './clotch-ai-ipc': { collegaClotchAi: record('clotch-ai-live') },
     './impostazioni': { collegaImpostazioni: record('impostazioni-live') },
     './info-sessione': { infoSessione() {} },
     './indice-ipc': { collegaIndice: (_ipc, _s, quando) => { quando.then(() => calls.push('indice-live')); return {}; } },
     './preferenze': { leggiImpostazioni: () => ({}) },
+    './partenza': { PARTENZA: { scorciatoie: {} } }, // main.ts li unisce ai tasti salvati per il menu del Mac (#938)
     './casella-ipc': { collegaCasella: record('casella-live') },
     './nuova-sessione': { collegaNuovaSessione: record('nuova-sessione-live') },
     './preferenze-ipc': { collegaPreferenze: record('preferenze-live') },

@@ -1,6 +1,7 @@
 // figma: 101-33775 — schede del pannello «Info sessione» (componente «Pannello info» 101:33614): Ambiente, Contesto, Connettori, Modifiche.
 // Contesto: le categorie (messaggi, file di memoria, strumenti…) le dà solo il comando /context di Claude Code e non stanno nei file: qui il totale usato.
 import { Fragment, useState, type ReactNode } from "react";
+import { Pezzi } from "../base/Pezzi";
 import type { InfoSessione, PrInfo, Sessione } from "../../tipi";
 import { ICONA_PR } from "../barra/Pr";
 import { Icona, type NomeIcona } from "../base/Icona";
@@ -27,11 +28,11 @@ const Riga = ({ icona, colore, children, lato }: { icona: NomeIcona; colore?: "s
   <div className="riga-info"><Icona nome={icona} colore={colore} /><span className="t-sm testo" title={[children].flat().every((c) => typeof c === "string" || typeof c === "number") ? [children].flat().join("") : undefined}>{children}</span>{lato}</div>
 );
 
-/** «/Users/privato/Documents/Repos/goal-notch» -> «goal-notch · ~/Documents/Repos». */
+/** «/Users/privato/Documents/Repos/goal-notch» -> «goal-notch» e «~/Documents/Repos» uno accanto all'altro. */
 const doveSta = (s: Sessione) => {
   const cartella = s.cartella.replace(/\/+$/, "");
   const dir = cartella.replace(/\/[^/]*$/, "").replace(/^\/(Users|home)\/[^/]+/, "~");
-  return cartella ? `${cartella.replace(/^.*\//, "")} · ${dir}` : s.progetto;
+  return cartella ? <Pezzi parti={[cartella.replace(/^.*\//, ""), dir]} /> : s.progetto;
 };
 
 export function Ambiente({ s }: { s: Sessione }) {
@@ -68,12 +69,12 @@ export function Contesto({ usati, max, mcp }: { usati: number; max: number | nul
         <span className={`t-sm testo ${livello}`}>{oltre ? "Oltre il limite" : `Usato ${percento(usato, 0)}`}</span>
         <span className="t-sm secondario">{token(usati)} / {token(max)}</span>
       </div>
-      <div className="barra-contesto"><span className={`parte ${livello}`} style={{ width: `${usato * 100}%` }} /></div>
+      <div className="barra-contesto" role="meter" aria-label="Contesto usato" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(usato * 100)}><span className={`parte ${livello}`} style={{ width: `${usato * 100}%` }} /></div>
       <div className="voci-contesto">
         <div className="voce"><span className="campione usato" /><span className="t-sm secondario nome">Usato</span><span className="t-sm secondario">{token(usati)}</span><span className="t-sm">{percento(usato)}</span></div>
         <div className="voce"><span className="campione libero" /><span className="t-sm secondario nome">Spazio libero</span><span className="t-sm secondario">{token(libero)}</span><span className="t-sm">{percento(1 - usato)}</span></div>
       </div></>}
-      {mcp > 0 && <div className="riga-info"><span className="t-sm testo">Connettori</span><span className="t-sm secondario">{mcp}</span></div>}
+      {mcp > 0 && <div className="riga-info"><span className="t-sm testo">Strumenti dei connettori</span><span className="t-sm secondario">{mcp}</span></div>}
     </Scheda>
   );
 }

@@ -16,14 +16,20 @@ export type NomeDialogo = "aggiornamento" | "scorciatoie" | keyof DatiDialoghi;
 export interface Aperto { nome: NomeDialogo; dati?: unknown }
 
 let aperto: Aperto | null = null;
+/** Chi aveva il fuoco quando il dialogo si è aperto; una voce di menu sparisce col menu, allora conta il bottone che lo apriva. */
+let apritore: HTMLElement | null = null;
+export const ultimoApritore = () => apritore;
 const ascolta = new Set<() => void>();
-const cambia = (a: Aperto | null) => { aperto = a; ascolta.forEach((f) => f()); };
+const cambia = (a: Aperto | null) => {
+  if (a && !aperto) { const f = document.activeElement as HTMLElement | null; apritore = f?.closest(".sovrapposto") ? document.querySelector<HTMLElement>("[aria-haspopup][aria-expanded='true']") ?? f : f; }
+  aperto = a; ascolta.forEach((f) => f()); };
 
 export function apriDialogo(n: "aggiornamento" | "scorciatoie"): void;
 export function apriDialogo<N extends keyof DatiDialoghi>(n: N, dati: DatiDialoghi[N]): void;
 export function apriDialogo(n: NomeDialogo, dati?: unknown) { cambia({ nome: n, dati }); }
 export const chiudiDialogo = () => cambia(null);
-export const alternaDialogo = (n: "aggiornamento" | "scorciatoie") => cambia(aperto?.nome === n ? null : { nome: n });
+/** ⌘/: apre o chiude le Scorciatoie; con un altro dialogo aperto non fa niente (un solo dialogo alla volta, il testo scritto non si perde). */
+export const alternaDialogo = (n: "aggiornamento" | "scorciatoie") => { if (!aperto || aperto.nome === n) cambia(aperto ? null : { nome: n }); };
 export const useDialogo = () => useSyncExternalStore((f) => { ascolta.add(f); return () => { ascolta.delete(f); }; }, () => aperto);
 
 /** «Novità» (menu del profilo, Info): apre le note della versione; se il main non ne ha, lo dice. */
@@ -39,6 +45,6 @@ export async function apriNovita() {
 export async function verificaAggiornamenti() {
   try {
     if (await window.impostazioni.aggiornamenti(true)) return apriDialogo("aggiornamento");
-    avvisa({ tipo: "info", messaggio: `Già aggiornato · versione ${await window.impostazioni.versione()}` });
+    avvisa({ tipo: "info", messaggio: `Già aggiornato, versione ${await window.impostazioni.versione()}` });
   } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
 }

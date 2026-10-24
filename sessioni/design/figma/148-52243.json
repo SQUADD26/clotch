@@ -45,6 +45,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -2135,7 +2136,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2182,7 +2183,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2191,7 +2192,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -3657,7 +3658,7 @@
    "senza": []
   },
   {
-   "id": "I148:52504;148:45472;148:45363;101:7105",
+   "id": "I148:52504;148:45472;148:45353;101:7105",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -3672,13 +3673,13 @@
    "senza": []
   },
   {
-   "id": "I148:52504;148:45472;148:45365",
+   "id": "I148:52504;148:45472;148:45355",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 545,
     "y": 433,
-    "w": 212,
+    "w": 236,
     "h": 18
    },
    "variabili": {
@@ -3689,37 +3690,6 @@
    "senza": [],
    "testo": "Cloud",
    "font": "SF Pro Regular"
-  },
-  {
-   "id": "I148:52504;148:45472;148:45366",
-   "nome": "freccia",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 765,
-    "y": 434,
-    "w": 16,
-    "h": 16
-   },
-   "variabili": {
-    "width": "misura/icona",
-    "height": "misura/icona"
-   },
-   "senza": []
-  },
-  {
-   "id": "I148:52504;148:45472;148:45366;101:6895",
-   "nome": "forma",
-   "tipo": "VECTOR",
-   "box": {
-    "x": 770.333984375,
-    "y": 437.3330078125,
-    "w": 5.333883762359619,
-    "h": 9.333883285522461
-   },
-   "variabili": {
-    "fills[0]": "colore/icona/secondaria"
-   },
-   "senza": []
   },
   {
    "id": "I148:52504;148:45478",
@@ -3741,7 +3711,7 @@
    "senza": []
   },
   {
-   "id": "I148:52504;148:45478;148:45363;101:7105",
+   "id": "I148:52504;148:45478;148:45353;101:7105",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -3756,13 +3726,13 @@
    "senza": []
   },
   {
-   "id": "I148:52504;148:45478;148:45365",
+   "id": "I148:52504;148:45478;148:45355",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
     "x": 545,
     "y": 467,
-    "w": 212,
+    "w": 236,
     "h": 18
    },
    "variabili": {
@@ -3773,37 +3743,6 @@
    "senza": [],
    "testo": "Remote Control",
    "font": "SF Pro Regular"
-  },
-  {
-   "id": "I148:52504;148:45478;148:45366",
-   "nome": "freccia",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 765,
-    "y": 468,
-    "w": 16,
-    "h": 16
-   },
-   "variabili": {
-    "width": "misura/icona",
-    "height": "misura/icona"
-   },
-   "senza": []
-  },
-  {
-   "id": "I148:52504;148:45478;148:45366;101:6895",
-   "nome": "forma",
-   "tipo": "VECTOR",
-   "box": {
-    "x": 770.333984375,
-    "y": 471.3330078125,
-    "w": 5.333883762359619,
-    "h": 9.333883285522461
-   },
-   "variabili": {
-    "fills[0]": "colore/icona/secondaria"
-   },
-   "senza": []
   },
   {
    "id": "I148:52504;148:45484",

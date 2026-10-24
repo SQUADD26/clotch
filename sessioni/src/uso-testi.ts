@@ -3,15 +3,18 @@
 import type { QuotaUso } from "./tipi";
 
 interface Finestra { usato: number | null; reset: number | null }
-interface Account { email: string; ts: number | null; cinque: Finestra; sette: Finestra }
+interface Account { email: string; host: string | null; ts: number | null; cinque: Finestra; sette: Finestra }
 
 const num = (v: unknown) => (typeof v === "number" ? v : null);
 const secondi = (v: unknown) => { const n = num(v); return n !== null && n > 0 ? n : null; };
 
+/** Nome di un Mac come lo scrive il feed o `os.hostname()`: minuscolo, senza «.local». */
+export const nomeMac = (h: unknown) => (typeof h === "string" && h ? h.toLowerCase().replace(/\.local$/, "") : null);
+
 function riga(d: Record<string, unknown>): Account | null {
   if (typeof d.email !== "string" || !d.email) return null;
   return {
-    email: d.email, ts: secondi(d.ts),
+    email: d.email, host: nomeMac(d.host), ts: secondi(d.ts),
     cinque: { usato: num(d.five_used), reset: secondi(d.five_resets) },
     sette: { usato: num(d.seven_used), reset: secondi(d.seven_resets) },
   };
@@ -22,16 +25,18 @@ const usatoOra = (f: Finestra, ora: number) => (f.usato === null || (f.reset !==
 /** Quanto resta; una finestra ripartita dopo la lettura è di nuovo intera (come `leftNow`). */
 const restaOra = (f: Finestra, ora: number) => { const u = usatoOra(f, ora); return u !== null ? 100 - u : f.usato !== null && f.reset !== null ? 100 : null; };
 
-/** Una lettura diretta («real») vince, finché non ha 10 minuti e una riga dell'host è più nuova (come `merge`). */
-function unisci(reali: Account[], righe: Account[], ora: number): Account[] {
+/** Una lettura diretta («real») vince, finché non ha 10 minuti e una riga dell'host è più nuova (come `merge`).
+ *  Più righe per la stessa email (una per macchina): vince quella di questo Mac se non è vecchia, se no la più recente (#993). */
+function unisci(reali: Account[], righe: Account[], ora: number, mio: string | null): Account[] {
   const tutti = new Map<string, { a: Account; reale: boolean }>();
   for (const q of reali) tutti.set(q.email, { a: q, reale: true });
   for (const r of righe) {
-    const vuota: Account = { email: r.email, ts: null, cinque: { usato: null, reset: null }, sette: { usato: null, reset: null } };
+    const vuota: Account = { email: r.email, host: null, ts: null, cinque: { usato: null, reset: null }, sette: { usato: null, reset: null } };
     const x = tutti.get(r.email) ?? { a: vuota, reale: false };
     const t = (q: Account) => q.ts ?? 0;
     if (x.reale && ora - t(x.a) >= 600 && t(r) > t(x.a)) x.reale = false;
-    if (!x.reale && t(r) >= t(x.a)) x.a = r;
+    const rango = (q: Account) => (mio && q.host === mio && !vecchio(q, ora) ? 1e12 : 0) + t(q);
+    if (!x.reale && rango(r) >= rango(x.a)) x.a = r;
     tutti.set(r.email, x);
   }
   return [...tutti.values()].map((x) => x.a);
@@ -76,18 +81,18 @@ export function contoAllaRovescia(ms: number): string {
 }
 
 /** Il feed -> una riga per account. Tempi in secondi come li dà il feed, `ora` in ms. Null se il feed non si capisce. */
-export function quoteDalFeed(json: unknown, oraMs: number): QuotaUso[] | null {
+export function quoteDalFeed(json: unknown, oraMs: number, mio: string | null = null): QuotaUso[] | null {
   const radice = json as { rows?: unknown; real?: unknown } | null;
   if (!radice || !Array.isArray(radice.rows)) return null;
   const ora = oraMs / 1000, come = (v: unknown) => (Array.isArray(v) ? v : []).map((d) => riga(d as Record<string, unknown>)).filter((a): a is Account => !!a);
   const uso: QuotaUso[] = [];
   // un account senza lettura da un giorno non ha numeri; senza dato del 7 giorni neanche
-  for (const a of ordina(unisci(come(radice.real), come(radice.rows), ora), ora)) {
+  for (const a of ordina(unisci(come(radice.real), come(radice.rows), ora, mio), ora)) {
     if (vecchio(a, ora) || a.sette.usato === null) continue;
     const account = a.email.split("@")[0], letto = a.ts! * 1000;
     const finestre = { email: a.email, cinque: pct(a.cinque, ora), cinqueFine: fine(a.cinque, ora), sette: pct(a.sette, ora), setteFine: fine(a.sette, ora) };
     if ((usatoOra(a.cinque, ora) ?? 0) >= 100) {
-      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto · riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });
+      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });
       continue;
     }
     const sette = usatoOra(a.sette, ora);

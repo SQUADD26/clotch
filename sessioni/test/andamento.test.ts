@@ -49,12 +49,34 @@ test("quoteConGiorni: ogni account ha la serie (zeri se vuota); senza alcun uso 
     { email: "lavoro@x.it", ts: S - 60, five_used: 1, five_resets: S + 3600, seven_used: 5, seven_resets: S + 86_400 },
   ] };
   await quoteUso(ORA, async () => feed);
-  const q = await quoteConGiorni(casa().radici, ORA);
+  const radici = casa().radici;
+  assert.equal((await quoteConGiorni(radici, ORA)).every((x) => x.giorni === undefined), true, "il primo giro non aspetta i giorni (#1006)");
+  let q = await quoteConGiorni(radici, ORA);
+  for (let i = 0; i < 100 && !q[0].giorni; i++) { await new Promise((r) => setTimeout(r, 20)); q = await quoteConGiorni(radici, ORA); }
   assert.deepEqual(q.map((x) => [x.account, x.giorni?.length, x.giorni?.at(-1)?.v]).sort(), [["lavoro", 14, 0], ["roberto", 14, 150]]);
   svuotaCache();
   await quoteUso(ORA, async () => feed);
   const vuote = await quoteConGiorni([], ORA);
   assert.equal(vuote.every((x) => x.giorni === undefined), true);
+  svuotaCache();
+});
+
+test("#1006: con il conteggio dei giorni lento le quote rispondono subito; al giro dopo c'è la serie", async () => {
+  svuotaCache();
+  await quoteUso(ORA, async () => ({ rows: [{ email: "roberto@x.it", ts: S - 60, five_used: 10, five_resets: S + 3600, seven_used: 38, seven_resets: S + 86_400 }] }));
+  const serie = new Map([["roberto", [{ giorno: "2026-10-23", v: 7 }]]]);
+  let chiamate = 0;
+  const lento = () => { chiamate++; return new Promise<typeof serie>((r) => setTimeout(() => r(serie), 1500)); };
+  const t = Date.now();
+  const primo = await quoteConGiorni([], ORA, lento);
+  assert.ok(Date.now() - t < 500, `quote in ${Date.now() - t} ms`);
+  assert.equal(primo[0].cinque, 10);
+  assert.equal(primo[0].giorni, undefined);
+  await quoteConGiorni([], ORA, lento);
+  assert.equal(chiamate, 1, "un conteggio solo alla volta");
+  await new Promise((r) => setTimeout(r, 1700));
+  assert.deepEqual((await quoteConGiorni([], ORA, lento))[0].giorni, [{ giorno: "2026-10-23", v: 7 }]);
+  assert.equal(chiamate, 1, "la cache vale ancora");
   svuotaCache();
 });
 

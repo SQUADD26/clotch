@@ -1,0 +1,223 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "163:84216",
+  "nome": "Riga in corso",
+  "w": 792,
+  "h": 100
+ },
+ "variabili": {
+  "colore/fondo/superficie": "#181818",
+  "spazio/4": 16,
+  "spazio/1-5": 6,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/colonna": 760,
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/testo/terziario": "#ffffff8c",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
+  "misura/icona": 16,
+  "colore/icona/terziaria": "#ffffff82",
+  "colore/testo/secondario": "#ffffffb5"
+ },
+ "nodi": [
+  {
+   "id": "163:84216",
+   "nome": "Riga in corso",
+   "tipo": "COMPONENT_SET",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 792,
+    "h": 100
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/superficie",
+    "itemSpacing": "spazio/4",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "paddingTop": "spazio/4",
+    "paddingBottom": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84208",
+   "nome": "Movimento=Riflesso",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 16,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "167:92871",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 20,
+    "w": 673,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84209",
+   "nome": "testo con riflesso",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 20,
+    "w": 91,
+    "h": 18
+   },
+   "variabili": {
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Lettura Filo.tsx",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84210",
+   "nome": "conteggio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 703,
+    "y": 21,
+    "w": 65,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "3 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84211",
+   "nome": "Movimento=Fermo",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 58,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "167:92872",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 62,
+    "w": 673,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84212",
+   "nome": "segno in corso",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 24,
+    "y": 63,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84212;101:6864",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 24.66796875,
+    "y": 63.66632080078125,
+    "w": 14.666666984558105,
+    "h": 14.666666984558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84214",
+   "nome": "azione attuale",
+   "tipo": "TEXT",
+   "box": {
+    "x": 46,
+    "y": 62,
+    "w": 91,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Lettura Filo.tsx",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84215",
+   "nome": "conteggio",
+   "tipo": "TEXT",
+   "box": {
+    "x": 703,
+    "y": 63,
+    "w": 65,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "3 strumenti",
+   "font": "SF Pro Regular"
+  }
+ ]
+}

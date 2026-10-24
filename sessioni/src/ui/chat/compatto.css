@@ -1,0 +1,111 @@
+/* figma: 163-84565 — filo compatto (#876): righe da 26 px, testo sm, verbo grigio e oggetto chiaro, durata xs a destra.
+   Il fondo del passaggio sporge di spazio-2 a sinistra: il testo resta allineato alla risposta (come la testata del pensiero, filo.css). */
+.pezzo-chat .compatto { display: flex; flex-direction: column; gap: var(--spazio-0-5); min-width: 0; }
+.pezzo-chat .compatto .riga-compatta, .pezzo-chat .compatto .riga {
+  display: flex; align-items: center; min-width: 0; margin: 0 calc(-1 * var(--spazio-2));
+  padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-sm);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); text-align: left;
+}
+.pezzo-chat .compatto .riga-compatta { gap: var(--spazio-1-5); align-self: flex-start; max-width: calc(100% + 2 * var(--spazio-2)); }
+.pezzo-chat .compatto .riga { gap: var(--spazio-2); }
+/* con la durata la riga occupa tutta la larghezza e la durata sta a destra (163:84565) */
+.pezzo-chat .compatto .riga-compatta:has(> .durata) { align-self: stretch; max-width: none; }
+.pezzo-chat .compatto button.riga-compatta:hover, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .compatto button.riga-compatta:active, .pezzo-chat .compatto .riga:has(> .apri:not(:disabled)):active { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .compatto button.riga-compatta:hover .titolo,
+.pezzo-chat .compatto .riga:has(> .apri:not(:disabled):hover) .verbo { color: var(--colore-testo-primario); }
+/* il fuoco da tastiera segue la riga intera, non solo la parte che apre */
+.pezzo-chat .compatto button.riga-compatta:focus-visible, .pezzo-chat .compatto .riga:has(> .apri:focus-visible) {
+  outline: var(--misura-tratto-forte) solid var(--colore-bordo-fuoco); outline-offset: calc(-1 * var(--misura-tratto-forte));
+}
+.pezzo-chat .compatto .apri:focus-visible { outline: none; }
+.pezzo-chat .compatto .apri { display: flex; align-items: center; gap: var(--spazio-2); flex: 1; min-width: 0; text-align: left; color: inherit; }
+.pezzo-chat .compatto .apri:disabled { cursor: default; }
+.pezzo-chat .compatto .titolo, .pezzo-chat .compatto .verbo, .pezzo-chat .compatto .oggetto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-chat .compatto .verbo { flex: 0 1 auto; } /* si stringe per ultimo: prima si taglia l'oggetto */
+.pezzo-chat .compatto .oggetto { flex: 0 100 auto; color: var(--colore-testo-primario); }
+.pezzo-chat .compatto .azione { display: flex; align-items: center; gap: var(--spazio-1); flex: 0 1 auto; min-width: 0; }
+.pezzo-chat .compatto :is(.conto, .esito) { flex: none; color: var(--colore-testo-terziario); white-space: nowrap; }
+.pezzo-chat .compatto :is(.errori, .esito.errore) { flex: none; color: var(--colore-testo-errore); white-space: nowrap; }
+.pezzo-chat .compatto .durata { flex: none; margin-left: auto; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-terziario); }
+.pezzo-chat .compatto .freccia-riga { display: flex; flex: none; }
+/* la freccia di una riga appare al passaggio, al fuoco e da aperta (163:84207) */
+.pezzo-chat .compatto .riga .freccia-riga { display: none; }
+.pezzo-chat .compatto .riga:is(:hover, :focus-within) .freccia-riga, .pezzo-chat .compatto .apri[aria-expanded="true"] .freccia-riga { display: flex; }
+
+/* elenco aperto: rientro con la linea a sinistra, scorre oltre misura-elenco-strumenti-alto */
+.pezzo-chat .elenco-strumenti { padding-left: var(--spazio-2); }
+.pezzo-chat .elenco-strumenti .righe {
+  display: flex; flex-direction: column; gap: var(--spazio-0-5); padding-left: var(--spazio-2);
+  border-left: var(--misura-tratto) solid var(--colore-bordo-normale);
+  max-height: var(--misura-elenco-strumenti-alto); overflow-y: auto; overscroll-behavior: contain;
+}
+.pezzo-chat .elenco-strumenti .riga { margin: 0; }
+.pezzo-chat .riga-strumento { display: flex; flex-direction: column; gap: var(--spazio-1); min-width: 0; }
+.pezzo-chat .foto-strumento .miniature { display: flex; margin: 0; }
+.pezzo-chat .foto-strumento .miniatura {
+  width: var(--misura-miniatura-strumento-larga); height: var(--misura-miniatura-strumento-alta);
+  border: var(--misura-tratto) solid var(--colore-bordo-leggero); border-radius: var(--raggio-xs); overflow: hidden;
+}
+.pezzo-chat .foto-strumento .miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.pezzo-chat .foto-strumento .non-letta { font-size: 0; } /* a 48 px resta solo l'icona */
+
+.pezzo-chat .dettaglio-strumento { padding-left: var(--spazio-6); }
+.pezzo-chat .comando-grezzo {
+  display: flex; align-items: flex-start; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3);
+  border-radius: var(--raggio-md); background: var(--colore-fondo-codice);
+}
+.pezzo-chat .comando-grezzo .testo {
+  flex: 1; min-width: 0; font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs);
+  color: var(--colore-testo-secondario); white-space: pre-wrap; overflow-wrap: anywhere; max-height: calc(var(--misura-riga) * 8); overflow-y: auto;
+}
+.pezzo-chat .comando-grezzo .uscita { color: var(--colore-testo-terziario); }
+.pezzo-chat .comando-grezzo .uscita.errore { color: var(--colore-testo-errore); }
+.pezzo-chat .comando-grezzo .bottone-icona { flex: none; margin: calc(-1 * var(--spazio-1)); }
+.pezzo-chat .dettaglio-strumento.fonti { display: flex; flex-direction: column; gap: var(--spazio-1); }
+
+/* ragionamento aperto e rapporto di un aiutante: testo rientrato con la linea a sinistra (163:84329, 163:84382) */
+.pezzo-chat .compatto .rientrato { padding-left: var(--spazio-2); }
+.pezzo-chat .compatto .rientrato .testo {
+  padding: var(--spazio-1) 0 var(--spazio-1) var(--spazio-4); border-left: var(--misura-tratto) solid var(--colore-bordo-normale);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* riflesso di ciò che gira (163:84216): solo transform, come il titolo al lavoro nella barra (barra.css). Una finestra sfumata scorre
+   e dentro la copia chiara del testo scorre al contrario, così la luce passa sulle lettere senza ridisegnare il layout. */
+.pezzo-chat .luccica { position: relative; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-terziario); }
+.pezzo-chat .luccica-area { position: absolute; inset: 0; overflow: hidden; pointer-events: none; user-select: none; }
+.pezzo-chat .luccica-finestra {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 60%; overflow: hidden;
+  /* la maschera usa solo l'opacità: un colore pieno qualunque */
+  -webkit-mask-image: linear-gradient(90deg, transparent, var(--colore-testo-primario) 50%, transparent); mask-image: linear-gradient(90deg, transparent, var(--colore-testo-primario) 50%, transparent);
+  animation: luccica-filo var(--tempo-luccica) linear infinite;
+}
+.pezzo-chat .luccica-copia {
+  position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% / 0.6); white-space: nowrap; color: var(--colore-testo-primario);
+  animation: luccica-filo-copia var(--tempo-luccica) linear infinite;
+}
+.pezzo-chat .luccica-copia::after { content: attr(data-testo); } /* la copia è solo CSS: nel DOM il testo c'è una volta */
+@keyframes luccica-filo { from { transform: translateX(-133.333%); } to { transform: translateX(200%); } }
+@keyframes luccica-filo-copia { from { transform: translateX(80%); } to { transform: translateX(-120%); } }
+.pezzo-chat .solo-fermo { display: none; flex: none; }
+.parita .pezzo-chat .luccica-finestra { animation: none; transform: translateX(-40%); }
+.parita .pezzo-chat .luccica-copia { animation: none; transform: translateX(24%); }
+/* riduci movimento (163:90075): niente riflesso, il segno fermo «in corso» e il testo grigio */
+/* «fermo»: la stessa cosa nelle scene di prova, dove il sistema non dice «riduci movimento» */
+.pezzo-chat .fermo :is(.luccica-area, .segno-aiutante) { display: none; }
+.pezzo-chat .fermo .solo-fermo { display: flex; }
+.pezzo-chat .fermo .luccica { color: var(--colore-testo-secondario); }
+@media (prefers-reduced-motion: reduce) {
+  .pezzo-chat :is(.luccica-area, .segno-aiutante) { display: none; }
+  .pezzo-chat .solo-fermo { display: flex; }
+  .pezzo-chat .luccica { color: var(--colore-testo-secondario); }
+}
+/* righe compatte di fila (ragionamento, gruppo, aiutanti) stanno a spazio-0-5, non al passo del turno (163:87853) */
+.pezzo-chat .turno > .compatto + .compatto { margin-top: calc(var(--spazio-0-5) - var(--spazio-3)); }
+/* fogli dei pezzi (varianti-compatto.tsx): passaggio, premuto e fuoco forzati */
+.pezzo-chat .forza-passaggio :is(.riga-compatta, .riga) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .forza-premuto :is(.riga-compatta, .riga) { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .forza-fuoco :is(.riga-compatta, .riga) { outline: var(--misura-tratto-forte) solid var(--colore-bordo-fuoco); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
+.pezzo-chat :is(.forza-passaggio, .forza-premuto, .forza-fuoco) :is(.titolo, .verbo) { color: var(--colore-testo-primario); }
+.pezzo-chat :is(.forza-passaggio, .forza-premuto, .forza-fuoco) .riga .freccia-riga { display: flex; }

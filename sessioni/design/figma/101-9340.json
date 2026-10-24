@@ -47,6 +47,7 @@
   "colore/icona/terziaria": "#ffffff82",
   "colore/icona/errore": "#ff6764",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -55,11 +56,14 @@
   "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "spazio/2-5": 10,
   "colore/testo/bolla": "#fdf5f1",
   "testo/riga/messaggio": 21,
+  "raggio/sm": 7.5,
+  "spazio/1-5": 6,
+  "colore/testo/terziario": "#ffffff8c",
   "colore/fondo/errore": "#fa423e29",
   "colore/fondo/casella": "#363636",
   "colore/bordo/normale": "#ffffff15",
@@ -67,7 +71,7 @@
   "misura/bottone-invio": 32,
   "raggio/xl": 15,
   "misura/pannello": 320,
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff7673"
  },
  "nodi": [
   {
@@ -3171,7 +3175,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -3218,7 +3222,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -3227,7 +3231,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -3668,7 +3672,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -3751,30 +3755,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7420",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 411,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7421",
    "nome": "progetto",
    "tipo": "TEXT",
    "box": {
-    "x": 423,
+    "x": 415,
     "y": 140,
     "w": 35,
     "h": 16
@@ -3789,30 +3774,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7422",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 466,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7416",
    "nome": "ramo",
    "tipo": "FRAME",
    "box": {
-    "x": 478,
+    "x": 462,
     "y": 140,
     "w": 143,
     "h": 16
@@ -3827,7 +3793,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 478,
+    "x": 462,
     "y": 140,
     "w": 16,
     "h": 16
@@ -3843,7 +3809,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 479.3330078125,
+    "x": 463.3330078125,
     "y": 141.3330078125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -3858,7 +3824,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 498,
+    "x": 482,
     "y": 140,
     "w": 123,
     "h": 16
@@ -3873,30 +3839,11 @@
    "font": "Menlo Regular"
   },
   {
-   "id": "I101:9236;101:7423",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 629,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7424",
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 641,
+    "x": 617,
     "y": 140,
     "w": 51,
     "h": 16
@@ -3911,32 +3858,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9236;101:7425",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 700,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9236;101:7426",
    "nome": "sorgente",
    "tipo": "TEXT",
    "box": {
-    "x": 712,
+    "x": 680,
     "y": 140,
-    "w": 179,
+    "w": 180,
     "h": 16
    },
    "variabili": {
@@ -3945,7 +3873,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Claude Code · accountmanager",
+   "testo": "Claude Code accountmanager",
    "font": "SF Pro Regular"
   },
   {
@@ -4115,7 +4043,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 599,
+    "y": 583,
     "w": 760,
     "h": 41
    },
@@ -4128,7 +4056,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 713,
-    "y": 599,
+    "y": 583,
     "w": 412,
     "h": 41
    },
@@ -4148,7 +4076,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 729,
-    "y": 609,
+    "y": 593,
     "w": 380,
     "h": 21
    },
@@ -4167,9 +4095,9 @@
    "tipo": "FRAME",
    "box": {
     "x": 365,
-    "y": 664,
+    "y": 648,
     "w": 760,
-    "h": 159
+    "h": 175
    },
    "variabili": {
     "itemSpacing": "spazio/3"
@@ -4177,29 +4105,14 @@
    "senza": []
   },
   {
-   "id": "101:9271",
-   "nome": "pensiero",
+   "id": "167:96651",
+   "nome": "Ragionamento",
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 664,
+    "y": 648,
     "w": 760,
-    "h": 18
-   },
-   "variabili": {
-    "itemSpacing": "spazio/2"
-   },
-   "senza": []
-  },
-  {
-   "id": "I101:9271;101:7224",
-   "nome": "testata",
-   "tipo": "FRAME",
-   "box": {
-    "x": 365,
-    "y": 664,
-    "w": 135,
-    "h": 18
+    "h": 26
    },
    "variabili": {
     "itemSpacing": "spazio/1"
@@ -4207,13 +4120,48 @@
    "senza": []
   },
   {
-   "id": "I101:9271;101:7225",
-   "nome": "etichetta",
-   "tipo": "TEXT",
+   "id": "I167:96651;163:84317",
+   "nome": "riga",
+   "tipo": "FRAME",
    "box": {
     "x": 365,
-    "y": 664,
-    "w": 115,
+    "y": 648,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I167:96651;167:92868",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 373,
+    "y": 652,
+    "w": 715,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I167:96651;163:84318",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 373,
+    "y": 652,
+    "w": 88,
     "h": 18
    },
    "variabili": {
@@ -4222,16 +4170,16 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Ragionamento",
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9271;101:7226",
-   "nome": "icona destra",
+   "id": "I167:96651;163:84319",
+   "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 484,
-    "y": 665,
+    "x": 467,
+    "y": 653,
     "w": 16,
     "h": 16
    },
@@ -4242,57 +4190,115 @@
    "senza": []
   },
   {
-   "id": "I101:9271;101:7226;101:6895",
+   "id": "I167:96651;163:84319;101:6895",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
-    "y": 668.3330078125,
+    "x": 472.3330078125,
+    "y": 656.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
   },
   {
-   "id": "101:9276",
-   "nome": "chiamata strumento",
+   "id": "I167:96651;167:92867",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 1094,
+    "y": 653,
+    "w": 23,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "14 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "167:96658",
+   "nome": "Gruppo strumenti",
    "tipo": "INSTANCE",
    "box": {
     "x": 365,
-    "y": 694,
+    "y": 686,
     "w": 760,
-    "h": 18
+    "h": 26
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/0-5"
    },
    "senza": []
   },
   {
-   "id": "I101:9276;101:7240",
-   "nome": "testata",
+   "id": "I167:96658;163:84384",
+   "nome": "Riga del gruppo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 365,
+    "y": 686,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1"
+   },
+   "senza": []
+  },
+  {
+   "id": "I167:96658;163:84384;167:92861",
+   "nome": "azione",
    "tipo": "FRAME",
    "box": {
-    "x": 365,
-    "y": 694,
-    "w": 760,
+    "x": 373,
+    "y": 690,
+    "w": 720,
     "h": 18
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/1-5"
    },
    "senza": []
   },
   {
-   "id": "I101:9276;101:7241",
-   "nome": "icona terminale",
+   "id": "I167:96658;163:84384;163:84105",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 373,
+    "y": 690,
+    "w": 73,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "1 strumento",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I167:96658;163:84384;163:84107",
+   "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 365,
-    "y": 695,
+    "x": 452,
+    "y": 691,
     "w": 16,
     "h": 16
    },
@@ -4303,107 +4309,38 @@
    "senza": []
   },
   {
-   "id": "I101:9276;101:7241;101:7061",
+   "id": "I167:96658;163:84384;163:84107;101:6895",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 365.6669921875,
-    "y": 695.6661376953125,
-    "w": 14.666559219360352,
-    "h": 14.666609764099121
+    "x": 457.3330078125,
+    "y": 694.3330078125,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
    },
    "variabili": {
-    "fills[0]": "colore/icona/secondaria"
+    "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
   },
   {
-   "id": "I101:9276;101:7243",
-   "nome": "tipo",
-   "tipo": "TEXT",
-   "box": {
-    "x": 389,
-    "y": 694,
-    "w": 67,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "Modificato",
-   "font": "SF Pro Medium"
-  },
-  {
-   "id": "I101:9276;101:7244",
-   "nome": "dettaglio",
-   "tipo": "TEXT",
-   "box": {
-    "x": 464,
-    "y": 694,
-    "w": 611,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "Sources/Clotch/AfkStore.swift",
-   "font": "Menlo Regular"
-  },
-  {
-   "id": "I101:9276;101:7245",
+   "id": "I167:96658;163:84384;163:84106",
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 1083,
-    "y": 695,
+    "x": 1099,
+    "y": 691,
     "w": 18,
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/secondario",
+    "fills[0]": "colore/testo/terziario",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
    "testo": "3 s",
    "font": "SF Pro Regular"
-  },
-  {
-   "id": "I101:9276;101:7246",
-   "nome": "icona destra",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 1109,
-    "y": 695,
-    "w": 16,
-    "h": 16
-   },
-   "variabili": {
-    "width": "misura/icona",
-    "height": "misura/icona"
-   },
-   "senza": []
-  },
-  {
-   "id": "I101:9276;101:7246;101:6895",
-   "nome": "forma",
-   "tipo": "VECTOR",
-   "box": {
-    "x": 1114.3330078125,
-    "y": 698.3330078125,
-    "w": 5.333883762359619,
-    "h": 9.333883285522461
-   },
-   "variabili": {
-    "fills[0]": "colore/icona/secondaria"
-   },
-   "senza": []
   },
   {
    "id": "101:9285",

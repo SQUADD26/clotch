@@ -10,7 +10,7 @@ H.avvia('requisiti-a', async () => {
   await req('A1', async () => {
     nuova(); await caricaChat();
     const m = await run(() => { const b = document.querySelector('.barra-titolo'), q = (a) => document.querySelector(`button[aria-label="${a}"]`);
-      return { h: b.getBoundingClientRect().height, drag: getComputedStyle(b).getPropertyValue('-webkit-app-region'), i: q('Indietro').disabled, a: q('Avanti').disabled, barra: !!q('Barra laterale'), att: !!q('Attività') }; });
+      return { h: b.getBoundingClientRect().height, drag: getComputedStyle(b).getPropertyValue('-webkit-app-region'), i: q('Indietro').disabled, a: q('Avanti').disabled, barra: !!q('Barra laterale'), att: !!q('Mostra attività') }; });
     assert.deepEqual(m, { h: 44, drag: 'drag', i: true, a: true, barra: true, att: true });
     await clicca('.barra-laterale .riga .testo', 'beta-app'); await clicca('.riga-sessione .testo', 'Beta due'); await wait(() => !document.querySelector('button[aria-label="Indietro"]').disabled);
     await clicca('button', 'Indietro'); await wait(() => document.querySelector('.riga-sessione.scelta .testo')?.textContent === 'Alfa uno');
@@ -20,9 +20,9 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { const c = s.registro.chat.s1; c.stato = 'serve_roberto'; c.richieste = [{ rid: 'r1', genere: 'permesso', strumento: 'Bash', ingresso: { command: 'ls' }, domande: [] }];
       s.registro.chat.c2 = { ...c, chat: 'c2', titolo: 'Seconda', richieste: [] }; });
     await caricaChat(); await wait(() => document.querySelector('.bottone-attivita .contatore')?.textContent === '2');
-    await clicca('button', 'Mostra attività'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
+    await clicca('button', 'Mostra attività, 2 in attesa'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
     await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.popover-attivita'));
-    await clicca('button', 'Mostra attività'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
+    await clicca('button', 'Mostra attività, 2 in attesa'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
   });
 
   await req('A25', async () => {
@@ -147,18 +147,18 @@ H.avvia('requisiti-a', async () => {
 
   await req('D8', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000)]; }); await caricaChat();
-    await wait(() => document.querySelector('.pensiero .etichetta')?.textContent === 'Ragionando…');
+    await wait(() => document.querySelector('.pensiero .luccica')?.textContent === 'Ragionamento');
     assert.equal(await run(() => document.querySelector('.pensiero button')), null, 'in corso non si apre');
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000), AS('ecco', 5000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
-    await wait(() => /^Ragionato per/.test(document.querySelector('.pensiero .etichetta')?.textContent || ''));
-    assert.equal(await run(() => !!document.querySelector('.testo-pensiero')), false); await clicca('.pensiero button', 'Ragionato per 4 s');
-    assert.deepEqual(await testo('.testo-pensiero'), ['ragiono sul problema']);
+    await wait(() => /^Ragionamento/.test(document.querySelector('.pensiero button')?.textContent || ''));
+    assert.equal(await run(() => !!document.querySelector('.pensiero .rientrato')), false); await clicca('.pensiero button', 'Ragionamento 4 s');
+    assert.deepEqual(await testo('.pensiero .rientrato .testo'), ['ragiono sul problema']);
   });
 
   await req('D9', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('p', 1000), AS('prima', 65000), PE('q', 66000), AS('ecco', 3_726_000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
-    await wait(() => document.querySelectorAll('.pensiero .etichetta').length === 2);
-    assert.deepEqual(await testo('.pensiero .etichetta'), ['Ragionato per 1 min 4 s', 'Ragionato per 1 h 1 min']);
+    await wait(() => document.querySelectorAll('.pensiero .durata').length === 2);
+    assert.deepEqual(await testo('.pensiero .durata'), ['1 min 4 s', '1 h 1 min']);
     await wait(() => /^Finita/.test(document.querySelector('.riga-stato .esito')?.textContent || ''));
     assert.match(await run(() => document.querySelector('.riga-stato .esito').textContent), /^Finita in \d/);
   });

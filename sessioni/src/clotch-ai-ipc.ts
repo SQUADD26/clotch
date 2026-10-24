@@ -16,9 +16,9 @@ export const piano = (r: Registro) => JSON.parse(JSON.stringify(r, (_k, v) => (v
 /** Il registro più quello che l'app sa da Clotch fuori dal registro: schermo occupato, AFK, voce dell'app (`Registro` di clotch-ai.ts). */
 const completo = (r: Registro, home: string, env: NodeJS.ProcessEnv) => ({ ...piano(r), ...leggiStatoApp(home, Date.now(), env), voceApp: staParlando() });
 
-export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unknown) => void, home: string, env: NodeJS.ProcessEnv = process.env) {
+export function collegaClotchAi(ipc: IpcMain, invia: (canale: string, dati: unknown) => void, home: string, env: NodeJS.ProcessEnv = process.env, copiaRemota?: (file: string) => void) {
   ipc.handle("clotch-ai:comando", (_e, cmd: Comando | ComandoApp, args: Record<string, unknown>) =>
-    eComandoApp(cmd) ? eseguiComandoApp(cmd, args ?? {}) : inviaComando(home, cmd, args ?? {}, { env, ...(cmd === "nuova_sessione" ? { scadenzaMs: 90_000 } : cmd === "macchina_aggiungi" ? { scadenzaMs: 240_000 } : {}) })); // nuova_sessione: pochi secondi, fino a ~1 minuto se sceglie l'account; macchina_aggiungi: fino a ~3 minuti (installer)
+    eComandoApp(cmd) ? eseguiComandoApp(cmd, args ?? {}) : inviaComando(home, cmd, args ?? {}, { env, ...(cmd === "nuova_sessione" ? { scadenzaMs: 90_000 } : cmd === "macchina_aggiungi" ? { scadenzaMs: 240_000 } : {}) }).then((e) => { if (cmd === "trascrizione_remota" && e.esito === "ok" && e.percorso) copiaRemota?.(e.percorso); return e; })); // nuova_sessione: pochi secondi, fino a ~1 minuto se sceglie l'account; macchina_aggiungi: fino a ~3 minuti (installer)
   const leggiRegistro = lettoreRegistro(home, env); // un lettore solo: ogni lettura applica solo le righe nuove
   ipc.handle("clotch-ai:registro", () => completo(leggiRegistro(), home, env));
   // Voce dell'app (Clotch assente): lo stato «sta parlando» e «Interrompi» del frame 101-37055.

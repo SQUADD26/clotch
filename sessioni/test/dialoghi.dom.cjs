@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
     await tasto({ key: '/', code: 'Slash', metaKey: true });
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Scorciatoie da tastiera');
-    assert.equal(await run(() => document.querySelectorAll('.riga-tasto').length), 21); // con «Nuova sessione ⌘N» (#468)
+    assert.equal(await run(() => document.querySelectorAll('.riga-tasto').length), 22); // con «Nuova sessione ⌘N» (#468) e «Modalità piano ⇧⌘P» (#783)
     await run(() => { const i = document.querySelector('[role=dialog] input'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(i, 'coda'); i.dispatchEvent(new Event('input', { bubbles: true })); });
     await wait(() => document.querySelectorAll('.riga-tasto').length === 1);
     assert.equal(await run(() => document.querySelector('.riga-tasto').textContent), 'Metti in coda⌘↵');
@@ -90,7 +90,7 @@ app.whenReady().then(async () => {
     finto.nuova = false; finto.chiamate.length = 0;
     await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
     await clicca('[role=menu] .voce', 'Controlla aggiornamenti');
-    await wait(() => document.body.innerText.includes('Già aggiornato · versione 0.1.0'));
+    await wait(() => document.body.innerText.includes('Già aggiornato, versione 0.1.0'));
     assert.equal(await dialogo(), null);
     assert.deepEqual(finto.chiamate, [true]);
   });
@@ -131,7 +131,7 @@ app.whenReady().then(async () => {
     const voce = async () => { await wait(() => !!document.querySelector('button[aria-label^="Versione"]')); await run(() => document.querySelector('button[aria-label^="Versione"]').click()); await clicca('[role=menu] .voce', 'Controlla aggiornamenti'); };
     finto.nuova = false; finto.chiamate.length = 0;
     await voce();
-    await wait(() => document.body.innerText.includes('Già aggiornato · versione 0.1.0'));
+    await wait(() => document.body.innerText.includes('Già aggiornato, versione 0.1.0'));
     assert.deepEqual(finto.chiamate, [true]);
     finto.nuova = true;
     await voce();

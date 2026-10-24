@@ -54,7 +54,7 @@
   "raggio/xl": 15,
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff7673"
  },
  "nodi": [
   {
@@ -2029,7 +2029,7 @@
    "box": {
     "x": 389,
     "y": 494,
-    "w": 215,
+    "w": 216,
     "h": 18
    },
    "variabili": {
@@ -2038,7 +2038,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Limite raggiunto · riparte alle 18:00",
+   "testo": "Limite raggiunto riparte alle 18:00",
    "font": "SF Pro Regular"
   },
   {

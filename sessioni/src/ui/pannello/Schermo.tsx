@@ -27,5 +27,5 @@ export function CentroTitolo() {
 function Contatore({ da }: { da: number }) {
   const ora = useOra(1000);
   if (ora - da >= SCADUTO_MS) return null;
-  return <PillolaSchermoOccupato testo={`Uno script usa lo schermo · ${minutiSecondi(ora - da)}`} />;
+  return <PillolaSchermoOccupato testo={`Uno script usa lo schermo ${minutiSecondi(ora - da)}`} />;
 }

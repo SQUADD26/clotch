@@ -1,29 +1,29 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 import type { Aggiornamento, CasellaApi, ClotchAiApi, ImpostazioniApi, NuovaSessioneApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
+/** Un solo ascoltatore IPC per canale, con tutti i componenti che lo chiedono dietro: tanti `usePreferenze()` non superano
+ *  il limite di 10 ascoltatori dell'EventEmitter (avviso MaxListenersExceeded). */
+function ascolta<T>(canale: string) {
+  const chi = new Set<(d: T) => void>();
+  let acceso = false;
+  return (cb: (d: T) => void) => {
+    if (!acceso) { acceso = true; ipcRenderer.on(canale, (_e, d: T) => chi.forEach((f) => f(d))); }
+    chi.add(cb);
+    return () => { chi.delete(cb); };
+  };
+}
+
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
   messaggi: (id, pagina, opzioni) => ipcRenderer.invoke("sessioni:messaggi", id, pagina, opzioni),
-  onAggiornamento: (cb) => {
-    const f = (_e: unknown, a: Aggiornamento) => cb(a);
-    ipcRenderer.on("sessioni:aggiornamento", f);
-    return () => ipcRenderer.removeListener("sessioni:aggiornamento", f);
-  },
+  onAggiornamento: ascolta<Aggiornamento>("sessioni:aggiornamento"),
   preferenze: () => ipcRenderer.invoke("sessioni:preferenze"),
   impostaPreferenze: (id, parte) => ipcRenderer.invoke("sessioni:imposta-preferenze", id, parte),
-  onPreferenze: (cb) => {
-    const f = (_e: unknown, p: Record<string, PreferenzeSessione>) => cb(p);
-    ipcRenderer.on("sessioni:preferenze", f);
-    return () => ipcRenderer.removeListener("sessioni:preferenze", f);
-  },
+  onPreferenze: ascolta<Record<string, PreferenzeSessione>>("sessioni:preferenze"),
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
   impostazioni: () => ipcRenderer.invoke("sessioni:impostazioni"),
   impostaImpostazioni: (parte) => ipcRenderer.invoke("sessioni:imposta-impostazioni", parte),
-  onImpostazioni: (cb) => {
-    const f = (_e: unknown, i: Record<string, unknown>) => cb(i);
-    ipcRenderer.on("sessioni:impostazioni", f);
-    return () => ipcRenderer.removeListener("sessioni:impostazioni", f);
-  },
+  onImpostazioni: ascolta<Record<string, unknown>>("sessioni:impostazioni"),
   cerca: (testo) => ipcRenderer.invoke("sessioni:cerca", testo),
   comandi: (id) => ipcRenderer.invoke("sessioni:comandi", id),
   modelli: () => ipcRenderer.invoke("sessioni:modelli"),
@@ -40,22 +40,10 @@ const clotchAi: ClotchAiApi = {
   registro: () => ipcRenderer.invoke("clotch-ai:registro"),
   avvia: () => ipcRenderer.invoke("clotch-ai:avvia"),
   voce: () => ipcRenderer.invoke("clotch-ai:voce"),
-  onVoce: (cb) => {
-    const f = (_e: unknown, parla: boolean) => cb(parla);
-    ipcRenderer.on("clotch-ai:voce", f);
-    return () => ipcRenderer.removeListener("clotch-ai:voce", f);
-  },
+  onVoce: ascolta<boolean>("clotch-ai:voce"),
   dettatura: (avvia) => ipcRenderer.invoke("clotch-ai:dettatura", avvia),
-  onDettatura: (cb) => {
-    const f = (_e: unknown, e: Parameters<typeof cb>[0]) => cb(e);
-    ipcRenderer.on("clotch-ai:dettatura", f);
-    return () => ipcRenderer.removeListener("clotch-ai:dettatura", f);
-  },
-  onRegistro: (cb) => {
-    const f = (_e: unknown, r: unknown) => cb(r);
-    ipcRenderer.on("clotch-ai:registro", f);
-    return () => ipcRenderer.removeListener("clotch-ai:registro", f);
-  },
+  onDettatura: ascolta<import("./dettatura-app").EventoDettatura>("clotch-ai:dettatura"),
+  onRegistro: ascolta<unknown>("clotch-ai:registro"),
 };
 contextBridge.exposeInMainWorld("clotchAi", clotchAi);
 
@@ -96,3 +84,14 @@ const nuovaSessione: NuovaSessioneApi = {
   scegliCartella: () => ipcRenderer.invoke("nuova:scegli-cartella"),
 };
 contextBridge.exposeInMainWorld("nuovaSessione", nuovaSessione);
+
+// Menu dell'app (#885): i tasti di una voce arrivano come premuti a chi ha il fuoco, e passano per gli stessi gestori della tastiera
+const NOMI_TASTI: Record<string, string> = { "↵": "Enter", "⌫": "Backspace", "⌦": "Delete", "⇥": "Tab", Spazio: " ", "↑": "ArrowUp", "↓": "ArrowDown", "←": "ArrowLeft", "→": "ArrowRight" };
+ipcRenderer.on("menu:tasti", (_e, tasti: string) => {
+  const t = tasti.replace(/[⌃⌥⇧⌘]/g, "");
+  const code = /^[A-Z]$/.test(t) ? `Key${t}` : /^\d$/.test(t) ? `Digit${t}` : "";
+  (document.activeElement ?? document.body).dispatchEvent(new KeyboardEvent("keydown", {
+    key: NOMI_TASTI[t] ?? t.toLowerCase(), code, bubbles: true, cancelable: true,
+    metaKey: tasti.includes("⌘"), shiftKey: tasti.includes("⇧"), altKey: tasti.includes("⌥"), ctrlKey: tasti.includes("⌃"),
+  }));
+});

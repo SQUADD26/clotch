@@ -1664,7 +1664,7 @@
    "box": {
     "x": 417,
     "y": 294,
-    "w": 138,
+    "w": 139,
     "h": 18
    },
    "variabili": {
@@ -1673,7 +1673,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "312 sessioni · letta ora",
+   "testo": "312 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -1821,7 +1821,7 @@
    "box": {
     "x": 417,
     "y": 357,
-    "w": 137,
+    "w": 139,
     "h": 18
    },
    "variabili": {
@@ -1830,7 +1830,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "127 sessioni · letta ora",
+   "testo": "127 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -1978,7 +1978,7 @@
    "box": {
     "x": 417,
     "y": 420,
-    "w": 132,
+    "w": 134,
     "h": 18
    },
    "variabili": {
@@ -1987,7 +1987,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "48 sessioni · letta ora",
+   "testo": "48 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -2135,7 +2135,7 @@
    "box": {
     "x": 417,
     "y": 483,
-    "w": 161,
+    "w": 163,
     "h": 18
    },
    "variabili": {
@@ -2144,7 +2144,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "33 sessioni · letta 2 min fa",
+   "testo": "33 sessioni letta 2 min fa",
    "font": "SF Pro Regular"
   },
   {

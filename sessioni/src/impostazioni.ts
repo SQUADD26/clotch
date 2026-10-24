@@ -47,7 +47,7 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
     const err = elenco.errori.find((e) => e.percorso.split("/").includes(account));
     if (err) return { percorso, dettaglio: `Non leggibile: ${err.messaggio}`, errore: true };
     const n = elenco.sessioni.filter((s) => s.sorgente === "claude-code" && s.account === account).length;
-    return { percorso, dettaglio: `${n} sessioni · letta ora`, errore: false };
+    return { percorso, dettaglio: `${n} sessioni letta ora`, errore: false };
   });
 }
 
@@ -79,7 +79,7 @@ export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "com
   }
   return [...per].sort((x, y) => (y[1].quando ?? 0) - (x[1].quando ?? 0)).map(([id, v]) => {
     const quando = v.quando == null ? null : new Date(v.quando).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short", timeZone: fuso });
-    return { id, titolo: v.titolo, dove: [v.progetto, quando].filter(Boolean).join(" · ") };
+    return { id, titolo: v.titolo, dove: [v.progetto, quando].filter(Boolean).join(" ") };
   });
 }
 

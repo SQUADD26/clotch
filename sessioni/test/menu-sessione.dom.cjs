@@ -16,7 +16,7 @@ const CARTELLA = '/tmp/lavori/clotch';
 scene.navigazione = { vista: 'sessione', sessione: 'a' };
 scene.elenco.sessioni = ['a', 'b', 'c'].map((id) => ({ ...scene.elenco.sessioni[0], id, titolo: `Sessione ${id}`, cartella: CARTELLA, idApp: id === 'c' ? null : 'local_' + id }));
 scene.messaggi = { a: [], b: [], c: [] };
-scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni · letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione · letta ora', errore: false }];
+scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione letta ora', errore: false }];
 let win;
 const run = async (fn, ...a) => {
   const r = await win.webContents.executeJavaScript(`(async () => { try { return { v: await (${fn})(...${JSON.stringify(a)}) }; } catch (e) { return { e: String(e && e.message || e) }; } })()`);
@@ -128,6 +128,19 @@ app.whenReady().then(async () => {
     assert.equal(finto.comandi.filter((c) => c[0] === 'archivia').length, 3);
     await clicca('button', 'Annulla');
     await attendi(() => finto.comandi.filter((c) => c[0] === 'ripristina').length === 3);
+  });
+
+  await check('LIVELLI: a finestra stretta il primo Esc chiude solo il menu, il secondo la barra (#759)', async () => {
+    win.setSize(480, 768);
+    await wait(() => !document.querySelector('.barra-laterale'));
+    await run(() => document.querySelector('button[aria-label="Barra laterale"]').click());
+    await wait(() => !!document.querySelector('.barra-laterale.sopra'));
+    await apri('Sessione b');
+    await tasto('Escape');
+    await wait(() => !document.querySelector('[role=menu]'));
+    assert.ok(await run(() => !!document.querySelector('.barra-laterale.sopra')), 'la barra è rimasta');
+    await tasto('Escape');
+    await wait(() => !document.querySelector('.barra-laterale'));
   });
 
   console.log(`MENU_SESSIONE_RIEPILOGO ok=${risultati.filter(Boolean).length} fail=${risultati.filter((x) => !x).length}`);

@@ -4,7 +4,7 @@ const SIMBOLI: Record<string, string> = { Enter: "↵", Backspace: "⌫", Delete
 /** Nomi delle azioni con scorciatoia: l'unica tabella, letta da Impostazioni, dal dialogo ⌘/ e dalla ricerca nelle impostazioni. */
 export const AZIONI: [string, string][] = [
   ["cerca", "Cerca sessioni"], ["clotchAi", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
-  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["impostazioni", "Apri impostazioni"],
+  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["indietro", "Indietro"], ["avanti", "Avanti"], ["impostazioni", "Apri impostazioni"],
   ["inviaInterrompi", "Interrompi e invia"], ["coda", "Metti in coda"], ["trova", "Cerca nella sessione"],
 ];
 export const nomeAzione = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
@@ -16,7 +16,7 @@ export const normalizza = <T extends string | null>(tasti: T): T => (tasti ? (ta
 export function tastiDi(e: { key: string; code: string; metaKey: boolean; shiftKey: boolean; altKey: boolean; ctrlKey: boolean }): string | null {
   if (["Meta", "Shift", "Alt", "Control"].includes(e.key)) return null;
   // con ⌥ o ⇧ `key` cambia carattere: per lettere e cifre vale il tasto fisico
-  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  const tasto = SIMBOLI[e.key] ?? (/^(Key|Digit)/.test(e.code) ? e.code.slice(-1) : e.code === "Semicolon" ? ";" : e.key.length === 1 ? e.key.toUpperCase() : e.key);
   return (e.ctrlKey ? "⌃" : "") + (e.altKey ? "⌥" : "") + (e.shiftKey ? "⇧" : "") + (e.metaKey ? "⌘" : "") + tasto; // ordine del Mac: ⇧ prima di ⌘ (⇧⌘F), come nelle etichette fisse
 }
 

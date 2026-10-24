@@ -14,12 +14,12 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
 import { ALLEGATI_PROVA, AllegatiCasella, type AllegatoCasella } from "./Allegati";
-import { ChipContesto, ChipPermessi, impostaDi } from "./Chip";
+import { ChipContesto, ChipPermessi, impostaDi, NomeSopra } from "./Chip";
 import { ChipModello } from "./ChipModello";
 import { Coda, mandaOra } from "./Coda";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
-import { Suggerimenti, useVoci } from "./Suggerimenti";
+import { ID_MENU, idVoce, Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
 import { MAX_ALLEGATI, MAX_TOTALE_BYTE, limiteAllegato } from "../../allegati-limiti";
 import { casella, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
@@ -71,7 +71,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const [caret, setCaret] = useState<number | null>(null), [chiuso, setChiuso] = useState(false), [scelta, setScelta] = useState(0);
   const poi = useRef<number | null>(null);
   const cerca = chiuso || disabilitata ? null : cercaDi(testo, Math.min(caret ?? testo.length, testo.length));
-  const voci = useVoci(chat, cerca);
+  const { voci, stato: statoVoci } = useVoci(chat, cerca);
 
   // scelta fatta in un menu dei chip: il fuoco torna al testo, se è caduto sul fondo della pagina
   const eraAperto = useRef(false);
@@ -179,6 +179,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
 
+  useEffect(() => { // ⌘U e ⇧⌘P: azioni del gestore unico, valgono anche col fuoco fuori dalla casella
+    const fuori = [registraAzione("allega", () => void allega()), registraAzione("piano", () => comando("/plan "))];
+    return () => fuori.forEach((f) => f());
+  });
+
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (voci.length && !e.nativeEvent.isComposing) {
       const su = e.key === "ArrowUp", giu = e.key === "ArrowDown", scelto = voci[Math.min(scelta, voci.length - 1)];
@@ -186,12 +191,10 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       if (e.key === "Escape") { e.preventDefault(); setChiuso(true); return; }
       // un comando scritto per intero e Invio: parte, non si riscrive
       const intero = cerca?.tipo === "comando" && testo.trim() === scelto.nome;
-      if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
+      if ((e.key === "Tab" && !e.shiftKey) || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
     }
     if (e.key === "Escape" && modifica) { bozza.esci(); return; }
     if (e.nativeEvent.isComposing) return;
-    if (e.metaKey && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "u") { e.preventDefault(); void allega(); return; } // «Allega file o cartelle…» ⌘U
-    if (e.key === "Tab" && e.shiftKey) { e.preventDefault(); comando("/plan "); return; } // «Modalità piano» ⇧⇥
     const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
     if (azione !== "inviaInterrompi" && azione !== "coda") return;
     e.preventDefault();
@@ -204,7 +207,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const spento = stato === "vuota" || stato === "disabilitata" || invio; // il messaggio aspetta il motore: il bottone sembra spento, come quando non si può inviare
   return (
     <div className="area-casella con-menu" ref={areaCasella}>
-      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
+      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} stato={statoVoci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
       {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello} preferenza={preferenza} pref={pref} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
@@ -215,6 +218,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
         )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}
+            {...(cerca && { role: "combobox", "aria-expanded": true, "aria-controls": ID_MENU, "aria-autocomplete": "list", "aria-activedescendant": voci.length ? idVoce(Math.min(scelta, voci.length - 1)) : undefined })}
             onSelect={(e) => setCaret(e.currentTarget.selectionStart)} onFocus={() => setChiuso(false)} onBlur={() => setChiuso(true)}
             placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>
@@ -224,12 +228,14 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <span className="spinta" />
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} predefinito={idModello(globale)} impegnoAperto={provaDi(prova, "impegno") !== null} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
-          <BottoneIcona icona="microfono" etichetta="Detta" disabled />
+          <NomeSopra testo="Detta"><BottoneIcona icona="microfono" etichetta="Detta" title={undefined} disabled /></NomeSopra>
+          <NomeSopra testo={ferma ? "Interrompi" : "Invia"}>
           <button type="button" className={invio ? "bottone-invia spento" : "bottone-invia"} aria-busy={invio} disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
-            aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
+            aria-label={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
             <Icona nome={ferma ? "stop" : "invia"} colore={spento ? "terziaria" : "su-accento"} />
           </button>
+          </NomeSopra>
         </div>
       </div>
       {grandi.length > 0 && (

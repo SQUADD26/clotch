@@ -53,7 +53,7 @@
   "colore/bordo/normale": "#ffffff15",
   "raggio/xl": 15,
   "colore/icona/successo": "#40c977",
-  "colore/fondo/accento": "#d25e28",
+  "colore/fondo/accento": "#c15625",
   "misura/interruttore-largo": 32,
   "misura/interruttore-alto": 20,
   "colore/fondo/manopola": "#ffffff"
@@ -1645,7 +1645,7 @@
    "box": {
     "x": 417,
     "y": 252,
-    "w": 345,
+    "w": 347,
     "h": 18
    },
    "variabili": {
@@ -1654,7 +1654,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Versione 2.4 · voce, dettatura e avvisi passano dal notch",
+   "testo": "Versione 2.4 voce, dettatura e avvisi passano dal notch",
    "font": "SF Pro Regular"
   },
   {

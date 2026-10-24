@@ -18,11 +18,14 @@ import { TestaSessione } from "./Intestazione";
 import { IntestazioneNuovaSessione, NuovaSessione } from "./NuovaSessione";
 import { Trova } from "./Trova";
 import { Limite, NonRisponde } from "./Lavoro";
+import { useTrascrizioneRemota } from "./remota";
 import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
 export { CasellaClotchAi, FiloClotchAi } from "./FiloClotchAi";
-export { scene } from "./varianti";
+import { scene as varianti } from "./varianti";
+import { scene as compatto } from "./varianti-compatto";
+export const scene = { ...varianti, ...compatto };
 
 /** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
 function dopoInterruzione(voci: Voce[]) {
@@ -37,10 +40,12 @@ function useSessione() {
 }
 
 /** Perché il filo è vuoto, secondo lo stato della sessione (la barra laterale dice già lo stesso con l'icona). */
-const corpoVuoto = (stato: string, adesso?: string) =>
-  adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
+const corpoVuoto = (stato: string, adesso?: string, limite = false) =>
+  limite ? "La sessione ha raggiunto il limite di uso e non ha scritto nulla."
+  : adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
   : adesso === "interrotta" ? "La sessione è stata interrotta prima di scrivere."
   : stato === "lavora" ? "La sessione sta lavorando: i messaggi arrivano tra poco."
+  : stato === "aspetta" ? "La sessione aspetta una tua risposta."
   : stato === "finita" ? "La sessione è finita senza messaggi da mostrare."
   : "Scrivi per iniziare.";
 
@@ -75,12 +80,16 @@ function ChatSessione() {
     precedenti.current.sessione === s?.id ? precedenti.current.voci : [], s?.id), [m.messaggi, vivo, s?.cartella, m.identita, s?.id]);
   useLayoutEffect(() => { precedenti.current = { sessione: s?.id ?? null, voci }; }, [s?.id, voci]);
 
+  const remota = useTrascrizioneRemota(s, vivo, m.riprova);
+  useEffect(() => { // con già dei messaggi (la copia dell'app Claude) il rifiuto del motore non copre il filo: avviso con «Riprova»
+    if (remota.rifiuto && m.messaggi.length) avvisa({ tipo: "errore", messaggio: remota.rifiuto, azione: { etichetta: "Riprova", fai: remota.riprova } });
+  }, [remota.rifiuto]);
   useEffect(() => {
     const messaggio = m.altriErrore ?? (m.messaggi.length ? m.errore : null);
     if (messaggio) avvisa({ tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: m.altriErrore ? m.riprovaAltri : m.riprova } });
   }, [m.errore, m.altriErrore]);
 
-  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
+  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length) || remota.attesa) return <Sagome />;
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={`clotch non riesce a leggere l’elenco delle sessioni: ${motivoErrore(elenco.errore)}.`} riprova={elenco.riprova} />;
   if (!s) {
     if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errori={elenco.dati.errori} riprova={elenco.riprova} />;
@@ -91,14 +100,16 @@ function ChatSessione() {
     );
     return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
   }
-  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "")}.`} riprova={m.riprova} />;
+  if (remota.rifiuto && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${remota.rifiuto}.`} riprova={remota.riprova} />;
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "", s.app?.ospite)}.`} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
-  const ripartenza = c?.limite?.ripartenza != null ? orario(c.limite.ripartenza) : null;
+  const ripartenzaMs = c?.limite?.ripartenza ?? null;
+  const ripartenza = ripartenzaMs != null && ripartenzaMs > adesso ? orario(ripartenzaMs) : null; // già passato: niente «Riparte alle» vecchio
   const inFondo = muta
     ? <NonRisponde da={daQuanto(c.battito ?? 0, adesso)} terminale={() => void api().azione(s.id, "apri-terminale")} />
-    : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
+    : limite ? <Limite chat={s.id} chiave={c?.limite?.account ?? s.account} ripartenza={ripartenzaMs} adesso={adesso} /> : null;
   const casella = (
     <ContestoMax.Provider value={c?.contestoMax ?? null}><Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} permessi={s.permessi} contesto={s.contesto} prova={sezione} account={s.account}
       appenaMandato={dopoInterruzione(voci)}
@@ -108,7 +119,7 @@ function ChatSessione() {
   if (!m.messaggi.length) {
     return (
       <>
-        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso)} />{inFondo}</div>
+        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso, limite)} />{inFondo}</div>
         {casella}
         <Trova iniziale={provaDi(sezione, "trova")} />
       </>
@@ -121,6 +132,8 @@ function ChatSessione() {
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione}
         inCima={!clotch && s.stato === "lavora" ? <NotaSchermo /> : undefined} />
+      {/* VoiceOver dice quando il turno parte e finisce; key: cambiando sessione non si annuncia lo stato dell'altra */}
+      <span key={s.id} className="solo-lettore" role="status">{muta ? "Non risponde" : c?.richieste.length ? "Richiesta per te" : vivo ? "Al lavoro" : "Turno finito"}</span>
       {casella}
       <Trova iniziale={provaDi(sezione, "trova")} />
     </>

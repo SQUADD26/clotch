@@ -22,7 +22,7 @@ const p = (coppia: string, nome: string, esito: Esito, prova: string): Prova => 
 const eta = (ms: number) => `${Math.round((ora - ms) / 60000)} min fa`;
 
 function claude(): Prova[] {
-  const e = leggiElenco({ home, env, ora });
+  const e = leggiElenco({ home, env, ora, conProve: true });
   const cli = e.sessioni.filter((s) => s.sorgente === "claude-code");
   const app = e.sessioni.filter((s) => s.sorgente === "claude-desktop");
   const senza = cli.filter((s) => !s.situazione).length;
@@ -54,7 +54,7 @@ function sessioniVere(): Prova[] {
       const run = spawnSync(bin, ["-p", prompt, "--model", "haiku", "--output-format", "json", ...extra], { cwd: dir, encoding: "utf8", timeout: 180_000 });
       let r: any;
       try { r = JSON.parse(run.stdout); } catch { return p(c, nome, "fallita", `claude -p non ha dato JSON (uscita ${run.status}): ${run.stderr.slice(0, 160)}`); }
-      const s = leggiElenco({ home, env, ora: Date.now() }).sessioni.find((x) => x.id === r.session_id);
+      const s = leggiElenco({ home, env, ora: Date.now(), conProve: true }).sessioni.find((x) => x.id === r.session_id);
       if (!s?.situazione) return p(c, nome, "fallita", `sessione ${r.session_id} non trovata dal lettore`);
       return p(c, nome, ok(s.situazione, r) ? "verde" : "fallita", `sessione ${r.session_id}: ${JSON.stringify(s.situazione)}`);
     } finally {
@@ -117,7 +117,7 @@ function clotch(): Prova[] {
 function codex(): Prova[] {
   const c = "app <> Codex";
   const file = [path.join(home, ".codex"), env.CODEX_HOME].filter((r): r is string => !!r).flatMap((r) => trovaFile(path.join(r, "sessions"), (n) => /^rollout-.*\.jsonl$/.test(n), []));
-  const s = leggiElenco({ home, env, ora }).sessioni.filter((x) => x.sorgente === "codex");
+  const s = leggiElenco({ home, env, ora, conProve: true }).sessioni.filter((x) => x.sorgente === "codex");
   const out = [file.length
     ? p(c, "il lettore vede i rollout veri", s.length === new Set(file).size && s.every((x) => x.situazione) ? "verde" : "fallita",
       `${new Set(file).size} rollout, ${s.length} sessioni, ${s.filter((x) => x.situazione).length} con situazione`)
@@ -132,10 +132,10 @@ async function main() {
   const tutte: Record<string, () => Prova[] | Promise<Prova[]>> = { claude, "clotch-ai": clotchAi, clotch, codex };
   const prove: Prova[] = [];
   for (const [k, f] of Object.entries(tutte)) if (!scelta || scelta === k) prove.push(...(await f()));
-  const w = Math.max(...prove.map((x) => `${x.coppia} · ${x.nome}`.length));
-  for (const x of prove) console.log(`${x.esito.toUpperCase().padEnd(8)} ${`${x.coppia} · ${x.nome}`.padEnd(w)}  ${x.prova}`);
+  const w = Math.max(...prove.map((x) => `${x.coppia} / ${x.nome}`.length));
+  for (const x of prove) console.log(`${x.esito.toUpperCase().padEnd(8)} ${`${x.coppia} / ${x.nome}`.padEnd(w)}  ${x.prova}`);
   const n = (e: Esito) => prove.filter((x) => x.esito === e).length;
-  console.log(`\nverdi ${n("verde")} · fallite ${n("fallita")} · in attesa ${n("attesa")} · macchina ${os.hostname()}`);
+  console.log(`\nverdi ${n("verde")}, fallite ${n("fallita")}, in attesa ${n("attesa")}, macchina ${os.hostname()}`);
   process.exitCode = n("fallita") ? 1 : n("attesa") ? 3 : 0;
 }
 

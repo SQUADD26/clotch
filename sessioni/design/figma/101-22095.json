@@ -54,7 +54,7 @@
   "raggio/xl": 15,
   "misura/bottone-invio": 32,
   "colore/icona/errore": "#ff6764",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "colore/fondo/bottone-primario": "#ffffff",
   "colore/fondo/velo": "#00000080",
   "colore/fondo/elevato": "#2d2d2d",
@@ -1391,7 +1391,7 @@
    "box": {
     "x": 417,
     "y": 294,
-    "w": 138,
+    "w": 139,
     "h": 18
    },
    "variabili": {
@@ -1400,7 +1400,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "312 sessioni · letta ora",
+   "testo": "312 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -1548,7 +1548,7 @@
    "box": {
     "x": 417,
     "y": 357,
-    "w": 137,
+    "w": 139,
     "h": 18
    },
    "variabili": {
@@ -1557,7 +1557,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "127 sessioni · letta ora",
+   "testo": "127 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -1862,7 +1862,7 @@
    "box": {
     "x": 417,
     "y": 483,
-    "w": 132,
+    "w": 134,
     "h": 18
    },
    "variabili": {
@@ -1871,7 +1871,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "48 sessioni · letta ora",
+   "testo": "48 sessioni letta ora",
    "font": "SF Pro Regular"
   },
   {
@@ -2019,7 +2019,7 @@
    "box": {
     "x": 417,
     "y": 546,
-    "w": 161,
+    "w": 163,
     "h": 18
    },
    "variabili": {
@@ -2028,7 +2028,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "33 sessioni · letta 2 min fa",
+   "testo": "33 sessioni letta 2 min fa",
    "font": "SF Pro Regular"
   },
   {

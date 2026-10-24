@@ -46,6 +46,7 @@
   "colore/icona/successo": "#40c977",
   "colore/icona/terziaria": "#ffffff82",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -54,7 +55,7 @@
   "misura/tratto": 1,
   "spazio/4": 16,
   "misura/intestazione": 56,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "spazio/2-5": 10,
   "colore/testo/bolla": "#fdf5f1",
@@ -67,7 +68,7 @@
   "misura/riferimento": 24,
   "colore/fondo/casella": "#363636",
   "raggio/casella": 22,
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "colore/fondo/elevato": "#2d2d2d"
  },
  "nodi": [
@@ -2140,7 +2141,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -2187,7 +2188,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -2196,7 +2197,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2637,7 +2638,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2711,7 +2712,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 488,
+    "x": 472,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2727,7 +2728,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 489.3330078125,
+    "x": 473.3330078125,
     "y": 141.3359375,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2742,7 +2743,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 508,
+    "x": 492,
     "y": 140,
     "w": 181,
     "h": 16
@@ -3276,7 +3277,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "squadd-v2 · feat/2412-rls-sessioni · Claude Code",
+   "testo": "squadd-v2 feat/2412-rls-sessioni Claude Code",
    "font": "SF Pro Regular"
   },
   {
@@ -3620,7 +3621,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "clotch · design/332-sessioni-figma-3 · Claude Code",
+   "testo": "clotch design/332-sessioni-figma-3 Claude Code",
    "font": "SF Pro Regular"
   },
   {
@@ -5162,7 +5163,7 @@
    "box": {
     "x": 658,
     "y": 645,
-    "w": 208,
+    "w": 210,
     "h": 18
    },
    "variabili": {
@@ -5208,7 +5209,7 @@
    "box": {
     "x": 678,
     "y": 645,
-    "w": 188,
+    "w": 190,
     "h": 18
    },
    "variabili": {
@@ -5217,7 +5218,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Al lavoro da 2 ore · 3 di 5 passi",
+   "testo": "Al lavoro da 2 ore 3 di 5 passi",
    "font": "SF Pro Regular"
   },
   {
@@ -5236,7 +5237,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "clotch · design/332-sessioni-figma-3 · Claude Code",
+   "testo": "clotch design/332-sessioni-figma-3 Claude Code",
    "font": "SF Pro Regular"
   },
   {

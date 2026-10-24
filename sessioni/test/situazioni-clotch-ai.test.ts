@@ -85,6 +85,7 @@ const MOTORE_COMANDI = [ // global/hooks/friday_comandi.py:25-36, chiavi di FORM
   "sessione_imposta", // modello, sforzo, rapida di una chat ferma: claude-config#2568/#2571 (annunciato dal coordinatore, non ancora nel motore a 089cf3b)
   "nuova_sessione", // claude-config#2577
   "macchine", "macchina_aggiungi", "macchina_togli", // claude-config#2610: le macchine SSH (contratto 3, in main 06e44b81)
+  "trascrizione_remota", // clotch#1001: contratto annunciato dal motore (contratto-comandi-app.md), non ancora nel motore installato
 ];
 
 test("contratto col motore: stessa soglia «Non risponde» in src e in src/ui, uguale a friday_triage.FERMO_S", () => {

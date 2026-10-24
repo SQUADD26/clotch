@@ -1,10 +1,13 @@
 // figma: 101-14396 — lavoro e righe di stato nel filo: «Attività» 101:13368, «Aiutanti» 101:13419, «Interrotta» 101:13475 (finestra «Interrotta da te»: 101-15055),
 // «Riassunto» 101:13480, «Fine turno» 101:13494, «Bloccato da una regola» 101:13532, «Non risponde» 101:13541, «Avviso» 101:7316.
 import type { ReactNode } from "react";
+import { Pezzi } from "../base/Pezzi";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import type { Aiutante, Passo } from "./modello";
-import { durata, quanti } from "./testi";
+import { useQuote, trova } from "../barra/account-dati";
+import { comanda } from "./clotch-ai";
+import { durata, nomeAccount, ora, quanti } from "./testi";
 import { useRiserva } from "./riserva";
 import "./lavoro.css";
 
@@ -61,7 +64,7 @@ export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello:
   );
 }
 
-export function RigaStato({ icona, colore, esito, dettaglio }: { icona: NomeIcona; colore: "terziaria" | "successo"; esito: string; dettaglio?: string }) {
+export function RigaStato({ icona, colore, esito, dettaglio }: { icona: NomeIcona; colore: "terziaria" | "successo"; esito: string; dettaglio?: ReactNode }) {
   return (
     <div className="riga-stato">
       <Icona nome={icona} colore={colore} />
@@ -85,16 +88,16 @@ export function FineTurno({ ms, strumenti, file, aiutanti }: { ms: number | null
     strumenti && quanti(strumenti, "strumento", "strumenti"),
     file && quanti(file, "file", "file"),
     aiutanti && quanti(aiutanti, "aiutante", "aiutanti"),
-  ].filter(Boolean).join(" · ");
-  return <RigaStato icona="finita" colore="successo" esito={ms != null ? `Finita in ${durata(ms)}` : "Finita"} dettaglio={parti} />;
+  ];
+  return <RigaStato icona="finita" colore="successo" esito={ms != null ? `Finita in ${durata(ms)}` : "Finita"} dettaglio={<Pezzi parti={parti} />} />;
 }
 
 /** Avvisi nel filo: bloccata (fondo attesa, scudo), non risponde e limite di uso (fondo errore). */
-export function AvvisoFilo({ tipo, titolo, corpo, children }: { tipo: "attesa" | "errore"; titolo: string; corpo?: string; children?: ReactNode }) {
+export function AvvisoFilo({ tipo, titolo, corpo, icona, children }: { tipo: "attesa" | "errore"; titolo: string; corpo?: string; icona?: NomeIcona; children?: ReactNode }) {
   const r = useRiserva();
   return (
     <div className={`avviso-filo ${tipo}`}>
-      <Icona nome={tipo === "attesa" ? "scudo" : "avviso"} colore={tipo === "attesa" ? "accento" : "errore"} />
+      <Icona nome={icona ?? (tipo === "attesa" ? "scudo" : "avviso")} colore={tipo === "attesa" ? "accento" : "errore"} />
       <div className="testi">
         <div className="titolo">{r.testo(titolo)}</div>
         {corpo && <div className="corpo">{r.testo(corpo)}</div>}
@@ -112,10 +115,24 @@ export function NonRisponde({ da, terminale }: { da: string; terminale?: () => v
   );
 }
 
-export function Limite({ account, ripartenza }: { account: string | null; ripartenza: string | null }) {
-  const corpo = [
-    account && ripartenza ? `L’account ${account} riparte alle ${ripartenza}.` : null,
-    "Puoi riprendere la sessione da un altro account.",
-  ].filter(Boolean).join(" ");
-  return <AvvisoFilo tipo="errore" titolo="Limite di uso raggiunto" corpo={corpo} />;
+/** Quando riparte, col giorno se non è oggi: «alle 12:01», «giovedì alle 12:01». */
+function quando(ms: number, adesso: number) {
+  const g = new Date(ms), oggi = new Date(adesso);
+  const stessoGiorno = g.toDateString() === oggi.toDateString();
+  return `${stessoGiorno ? "" : `${g.toLocaleDateString("it-IT", { weekday: "long" })} `}alle ${ora(ms)}`;
+}
+
+export function Limite({ chat, chiave, ripartenza, adesso }: { chat: string; chiave: string; ripartenza: number | null; adesso: number }) {
+  const quote = useQuote() ?? [];
+  const questo = trova(quote, chiave);
+  const altri = quote.filter((q) => q !== questo && q.email).slice(0, 3); // un pulsante per account, come `riprendi_altrove` del menu account
+  const nome = nomeAccount(chiave);
+  const passato = ripartenza != null && ripartenza <= adesso;
+  const corpo = passato ? `L’account ${nome} può ripartire.`
+    : ripartenza != null ? `L’account ${nome} riparte ${quando(ripartenza, adesso)}.` : null;
+  return (
+    <AvvisoFilo tipo="errore" titolo={passato ? "Limite di uso finito" : "Limite di uso raggiunto"} corpo={[corpo, altri.length ? "Oppure riprendi la sessione con un altro account." : null].filter(Boolean).join(" ") || undefined}>
+      {altri.map((q) => <Bottone key={q.email} tipo="secondario" onClick={() => void comanda("riprendi_altrove", { chat, account: q.email })}>{`Riprendi con ${q.account}`}</Bottone>)}
+    </AvvisoFilo>
+  );
 }

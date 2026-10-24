@@ -27,9 +27,18 @@ export function useStrato(ref: RefObject<HTMLElement | null>, onChiudi: () => vo
     const tasto = (e: KeyboardEvent) => {
       if (!cima()) return;
       // il fuoco torna prima di chiudere: il bottone può sparire quando il sovrapposto non c'è più (azioni al passaggio)
-      if (e.key === "Escape") { e.stopPropagation(); if (prima?.isConnected) prima.focus(); chiudi.current(); return; }
-      // un dialogo è modale: le scorciatoie dell'app dietro il velo non partono (restano copia, incolla, annulla, seleziona tutto e ⌘/ che lo chiude)
-      if (trappola && (e.metaKey || e.ctrlKey) && ref.current?.querySelector(".dialogo") && !(e.metaKey && !e.altKey && /^[cvxazy/]$/i.test(e.key))) { e.stopPropagation(); if (e.key.startsWith("Arrow")) e.preventDefault(); return; }
+      if (e.key === "Escape" || (e.metaKey && e.key === ".")) { // ⌘. annulla come Esc (HIG Keyboards)
+        e.stopPropagation(); if (prima?.isConnected) prima.focus(); chiudi.current(); return; }
+      // un dialogo è modale: le scorciatoie dell'app dietro il velo non partono (restano copia, incolla, annulla, seleziona tutto, ⌘/ che lo chiude
+      // e ⌘Invio del dialogo stesso); ⇧ e ⌥ non valgono come ⌘ semplice (⇧⌘A archivia); un tasto semplice con il fuoco fuori dal dialogo si ferma;
+      // nei campi ⌘ e le frecce muovono il cursore come in ogni campo del Mac (#912)
+      if (trappola && ref.current?.querySelector(".dialogo")) {
+        const permesso = e.metaKey && !e.altKey && !e.shiftKey && !e.ctrlKey && (/^[cvxazy/]$/i.test(e.key) || e.key === "Enter");
+        const modificato = e.metaKey || e.ctrlKey || e.altKey;
+        if (modificato ? !permesso : e.key !== "Tab" && !ref.current.contains(e.target as Node)) {
+          e.stopPropagation(); if (e.key.startsWith("Arrow") && !(e.target as HTMLElement).matches?.("input, textarea")) e.preventDefault(); return;
+        }
+      }
       if (e.key !== "Tab" || !trappola || !ref.current) return;
       const f = [...ref.current.querySelectorAll<HTMLElement>(FOCALIZZABILI)];
       if (!f.length) return;

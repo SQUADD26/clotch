@@ -17,7 +17,7 @@ const CARTELLA = '/tmp/lavori/clotch';
 scene.navigazione = { vista: 'sessione', sessione: 'a' };
 scene.elenco.sessioni = ['a', 'b', 'c'].map((id) => ({ ...scene.elenco.sessioni[0], id, titolo: `Sessione ${id}`, cartella: CARTELLA }));
 scene.messaggi = { a: [], b: [], c: [] };
-scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni · letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione · letta ora', errore: false }];
+scene.cartelle = [{ percorso: '~/.claude-uno', dettaglio: '3 sessioni letta ora', errore: false }, { percorso: '~/.claude-due', dettaglio: '1 sessione letta ora', errore: false }];
 const finto = { pref: {}, impostazioni: {}, chiamatePref: [], chiamateImp: [], novita: null };
 let win, mostrate = 0, fuochi = 0;
 const run = async (fn, ...a) => {
@@ -87,7 +87,7 @@ app.whenReady().then(async () => {
     assert.ok(!(await run(() => [...document.querySelectorAll('.riga-sessione .testo')].some((e) => e.textContent === 'Sessione b'))));
   });
 
-  await check('RINOMINA: Annulla non cambia niente; un nome vuoto toglie il nome e torna il titolo', async () => {
+  await check('RINOMINA: Annulla non cambia niente; un nome vuoto non si salva', async () => {
     const prima = finto.chiamatePref.length;
     await menuDi('.riga-sessione', 'Lavoro nuovo');
     await clicca('[role=menu] .voce', 'Rinomina…');
@@ -100,9 +100,12 @@ app.whenReady().then(async () => {
     await clicca('[role=menu] .voce', 'Rinomina…');
     await wait(() => !!document.querySelector('[role=dialog]'));
     await scrivi('   ');
-    await clicca('[role=dialog] button', 'Salva');
-    assert.deepEqual(finto.chiamatePref.at(-1), ['b', { nome: null }]);
-    await wait(() => [...document.querySelectorAll('.riga-sessione .testo')].some((e) => e.textContent === 'Sessione b'));
+    // un nome vuoto non si salva (#786): «Salva» spento, «Scrivi un nome.», la sessione resta com'era
+    assert.equal(await run(() => [...document.querySelectorAll('[role=dialog] button')].find((e) => e.textContent === 'Salva').disabled), true);
+    await wait(() => document.querySelector('[role=dialog] [role=alert]')?.textContent === 'Scrivi un nome.');
+    await clicca('[role=dialog] button', 'Annulla');
+    await wait(() => !document.querySelector('[role=dialog]'));
+    assert.equal(finto.chiamatePref.length, prima);
   });
 
   await check('CARTELLA: «Rinomina etichetta…» salva l’etichetta nelle impostazioni e la barra la mostra', async () => {
@@ -167,7 +170,7 @@ app.whenReady().then(async () => {
   await check('INFO: «Novità della versione» apre lo stesso dialogo, al centro della finestra', async () => {
     await carica({ vista: 'impostazioni', sezione: 'info' });
     await wait(() => document.body.innerText.includes('Novità'));
-    await run(() => [...document.querySelectorAll('.valore-scelta')].find((b) => b.textContent.includes('Novità della versione')).click());
+    await run(() => [...document.querySelectorAll('.valore-scelta')].find((b) => b.textContent === 'Versione 0.1.0').click());
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Novità della versione 0.1.0');
     assert.equal(await run(() => getComputedStyle(document.querySelector('.velo')).paddingBottom), '0px');
@@ -176,7 +179,7 @@ app.whenReady().then(async () => {
   await check('MINIATURE: «Caricando…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
     await carica({ vista: 'sessione', sessione: 'a', sezione: 'scritta:Guarda questi|allegati' });
     await wait(() => document.querySelectorAll('.allegato').length === 4);
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS · 4 KB', 'Non letta', 'Caricando…', 'Troppo grande']);
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS 4 KB', 'Non letta', 'Caricando…', 'Troppo grande']);
     assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), true);
     await run(() => document.querySelector('button[aria-label="Rimuovi registro.log"]').click());
     await wait(() => document.querySelectorAll('.allegato').length === 3);

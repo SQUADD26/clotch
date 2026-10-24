@@ -19,7 +19,8 @@ export function statoClotchAi(r: Registro, ora: number): { stato: StatoClotchAi;
 const stessoGiorno = (a: number, b: number) => new Date(a).toDateString() === new Date(b).toDateString();
 const viva = (c: ChatClotchAi) => !c.fine && c.chat !== "friday" && c.chat !== "terminale"; // nome del protocollo del motore
 
-export interface Attesa { chat: string; titolo: string; genere: string }
+/** `da`: ms della richiesta (null se il motore non lo scrive), per «12 min» nel popover Attività (163:83900). */
+export interface Attesa { chat: string; titolo: string; genere: string; da: number | null }
 export interface Progetto {
   nome: string;
   obiettivo: { testo: string; fatti: number; passi: { testo: string; stato: string }[]; lavora: boolean } | null;
@@ -36,7 +37,7 @@ export function casella(r: Registro, ora: number) {
     const madre = vive.find((c) => !c.madre && c.obiettivo && c.obiettivo.stato !== "proposto");
     const aspettano = vive.flatMap((c): Attesa[] => {
       const g = c.richieste[0]?.genere ?? (c.stato === "serve_roberto" ? "domanda" : null);
-      return g ? [{ chat: c.chat, titolo: c.titolo ?? c.chat, genere: GENERE[g] ?? g }] : [];
+      return g ? [{ chat: c.chat, titolo: c.titolo ?? c.chat, genere: GENERE[g] ?? g, da: c.richieste[0]?.t ?? null }] : [];
     });
     // stati dei passi: quelli di TodoWrite (pending, in_progress, completed), come li scrive friday_passi.py // nome del protocollo del motore
     return {

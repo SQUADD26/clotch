@@ -1,5 +1,6 @@
 // figma: 101-14849 — «Messaggio in coda» 101:13488, «invia ora» 101:43945; con più voci della soglia la coda scorre e il conto resta sopra (#652).
 import type { PreferenzeSessione } from "../../tipi";
+import { avvisa } from "../base/Avvisi";
 import { BottoneIcona } from "../base/Bottone";
 import { Suggerimento } from "../base/Suggerimento";
 import { numero } from "../base/token";
@@ -12,6 +13,13 @@ const RIGHE_VISIBILI = 4;
 /** Manda subito una voce della coda (interrompe la sessione) e la toglie; vale per il bottone sulla riga e per ↵ a casella vuota. */
 export const mandaOra = async (chat: string, v: VoceCoda, preferenza: string, attuale: string | null, pref?: PreferenzeSessione) => {
   if (await comanda("manda", argsManda(chat, v.testo, "subito", preferenza, attuale, pref))) await comanda("coda_togli", { chat, voce: v.voce });
+};
+
+/** Rimuove la voce e lo dice, con Annulla che la rimette in coda. */
+// shortcut: Annulla la rimette in fondo alla coda, non al suo posto; il motore non ha `coda_metti {posizione}`
+const togli = async (chat: string, v: VoceCoda, preferenza: string, attuale: string | null) => {
+  if (await comanda("coda_togli", { chat, voce: v.voce }))
+    avvisa({ tipo: "successo", messaggio: "Messaggio rimosso", azione: { etichetta: "Annulla", fai: () => void comanda("manda", argsManda(chat, v.testo, "coda", preferenza, attuale)) } });
 };
 
 export function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, preferenza, pref }: {
@@ -27,11 +35,11 @@ export function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, 
             {i === 0 && !lunga && <span className="etichetta">{conto}</span>}
             <span className="testo">{v.testo}</span>
             <div className="azioni">
-              <Suggerimento testo="Interrompi e invia" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
+              <Suggerimento testo="Interrompi e invia" scorciatoia={i === 0 ? "↵" : null} classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
                 <BottoneIcona icona="invia-ora" etichetta="Interrompi e invia" onClick={() => mandaOra(chat, v, preferenza, attuale, pref)} />
               </Suggerimento>
               <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
-              <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
+              <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => togli(chat, v, preferenza, attuale)} />
             </div>
           </div>
         ))}

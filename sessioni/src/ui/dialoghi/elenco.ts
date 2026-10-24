@@ -17,7 +17,7 @@ export const GRUPPI: Gruppo[] = [
   ] },
   { titolo: "Sessione", colonna: 1, righe: [
     { etichetta: nomeAzione("consenti"), azione: "consenti" }, { etichetta: nomeAzione("nega"), azione: "nega" }, { etichetta: nomeAzione("ferma"), azione: "ferma" },
-    { etichetta: "Archivia", fisso: "⇧⌘A" }, { etichetta: "Copia ultimo blocco di codice", fisso: "⇧⌘;" },
+    { etichetta: "Archivia", fisso: "⇧⌘A" }, { etichetta: "Copia ultimo blocco di codice", fisso: "⇧⌘;" }, { etichetta: "Modalità piano", fisso: "⇧⌘P" },
   ] },
   { titolo: "Casella", colonna: 1, righe: [
     { etichetta: nomeAzione("inviaInterrompi"), azione: "inviaInterrompi" }, { etichetta: nomeAzione("coda"), azione: "coda" },
