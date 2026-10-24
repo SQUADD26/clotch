@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792845250547,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,7 +44,8 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": ""
+    "file": "",
+    "contesto": 124000
    }
   ],
   "errori": []
@@ -54,12 +55,12 @@
    {
     "tipo": "utente",
     "testo": "Porta il disegno Sessioni nel codice, pari pari.",
-    "t": 1792793033531
+    "t": 1792845234547
    },
    {
     "tipo": "pensiero",
     "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
-    "t": 1792793034531
+    "t": 1792845235547
    },
    {
     "tipo": "strumento",
@@ -68,7 +69,7 @@
      "plan": "Porto la pagina «Sessioni» nel codice, una schermata alla volta.\n1. Leggo token e frame dal disegno\n2. Scrivo barra laterale e conversazione\n3. Disegno ogni stato a scala 1 e lo confronto col disegno\n4. Apro la PR verso dev con le prove"
     },
     "esito": null,
-    "t": 1792793048531,
+    "t": 1792845249547,
     "id": "t0"
    }
   ]
@@ -104,21 +105,22 @@
       "domande": []
      }
     ],
-    "battito": 1792793149531,
+    "battito": 1792845350547,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792793169531,
+    "visto": 1792845370547,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
     "quarantena": null,
     "errore": null,
     "rifiuto": null,
-    "persi": 0
+    "persi": 0,
+    "contestoMax": 200000
    }
   },
   "fermoTutto": false,

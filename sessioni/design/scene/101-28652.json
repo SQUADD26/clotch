@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792845250547,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -46,6 +46,7 @@
      "segni": []
     },
     "file": "",
+    "contesto": 124000,
     "icona": "stella"
    }
   ],
@@ -56,13 +57,13 @@
    {
     "tipo": "utente",
     "testo": "Leggi le sessioni dal disco.",
-    "t": 1792778400000
+    "t": 1792789200000
    },
    {
     "tipo": "assistente",
     "testo": "Fatto: 6 cartelle e 312 sessioni.",
     "modello": "claude-opus-5-5",
-    "t": 1792778405000
+    "t": 1792789205000
    },
    {
     "tipo": "strumento",
@@ -75,12 +76,12 @@
      "testo": "Switched to a new branch 'design/332-sessioni-figma'",
      "errore": false
     },
-    "t": 1792789260000
+    "t": 1792800060000
    },
    {
     "tipo": "utente",
     "testo": "Lancia tutte le prove.",
-    "t": 1792789320000
+    "t": 1792800120000
    },
    {
     "tipo": "strumento",
@@ -93,7 +94,7 @@
      "testo": "PASS sessioni/lettore.test.ts (11 test)\nPASS sessioni/cartelle.test.ts (6 test)\nPASS sessioni/filtri.test.ts (9 test)\nok 1 - caso 1\nok 2 - caso 2\nok 3 - caso 3\nok 4 - caso 4\nok 5 - caso 5\nok 6 - caso 6\nok 7 - caso 7\nok 8 - caso 8\nok 9 - caso 9\nok 10 - caso 10\nok 11 - caso 11\nok 12 - caso 12\nok 13 - caso 13\nok 14 - caso 14\nok 15 - caso 15\nok 16 - caso 16\nok 17 - caso 17\nok 18 - caso 18\nok 19 - caso 19\nok 20 - caso 20\nok 21 - caso 21\nok 22 - caso 22\nok 23 - caso 23\nok 24 - caso 24\nok 25 - caso 25\nok 26 - caso 26\nok 27 - caso 27\nok 28 - caso 28\nok 29 - caso 29\nok 30 - caso 30\nok 31 - caso 31\nok 32 - caso 32\nok 33 - caso 33\nok 34 - caso 34\nok 35 - caso 35\nok 36 - caso 36\nok 37 - caso 37\nok 38 - caso 38\nok 39 - caso 39\nok 40 - caso 40\nok 41 - caso 41\nok 42 - caso 42\nok 43 - caso 43\nok 44 - caso 44\nok 45 - caso 45\nok 46 - caso 46\nok 47 - caso 47\nok 48 - caso 48\nok 49 - caso 49\nok 50 - caso 50\nok 51 - caso 51\nok 52 - caso 52\nok 53 - caso 53\nok 54 - caso 54\nok 55 - caso 55\nok 56 - caso 56\nok 57 - caso 57\nok 58 - caso 58\nok 59 - caso 59\nok 60 - caso 60\nok 61 - caso 61\nok 62 - caso 62\nok 63 - caso 63\nok 64 - caso 64\nok 65 - caso 65\nok 66 - caso 66\nok 67 - caso 67\nok 68 - caso 68\nok 69 - caso 69\nok 70 - caso 70\nok 71 - caso 71\nok 72 - caso 72\nok 73 - caso 73\nok 74 - caso 74\nok 75 - caso 75\nok 76 - caso 76\nok 77 - caso 77\nok 78 - caso 78\nok 79 - caso 79\nok 80 - caso 80\nok 81 - caso 81",
      "errore": false
     },
-    "t": 1792789321000
+    "t": 1792800121000
    },
    {
     "tipo": "strumento",
@@ -106,7 +107,7 @@
      "testo": "The user doesn't want to proceed with this tool use.",
      "errore": true
     },
-    "t": 1792789362000
+    "t": 1792800162000
    }
   ]
  },
@@ -116,7 +117,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
@@ -128,5 +138,15 @@
   "impostazioni": null,
   "esiti": {},
   "errori": []
+ },
+ "info": {
+  "s1": {
+   "contesto": null,
+   "file": {
+    "quanti": 3,
+    "aggiunte": 214,
+    "tolte": 12
+   }
+  }
  }
 }
