@@ -227,6 +227,7 @@ export type Token =
   | "misura-visore-alto"
   | "misura-barra-scorrimento"
   | "misura-scorrimento-alto"
+  | "misura-casella-testo-max"
   | "misura-logo"
   | "misura-logo-icona"
   | "misura-barra-uso"
@@ -480,6 +481,7 @@ export const valori: Record<Token, string> = {
   "misura-visore-alto": "600px",
   "misura-barra-scorrimento": "6px",
   "misura-scorrimento-alto": "120px",
+  "misura-casella-testo-max": "240px",
   "misura-logo": "48px",
   "misura-logo-icona": "24px",
   "misura-barra-uso": "6px",
