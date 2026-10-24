@@ -150,7 +150,7 @@ export function lettoreRegistro(home: string, env: NodeJS.ProcessEnv = {}): () =
         } finally { fs.closeSync(fd); }
       } catch (e: any) {
         st.r.errori.push({ percorso: file, messaggio: msgErrore(e) });
-        continue;
+        st.pos.set(m, { ino: -1, fine: 0 }); continue; // quando torna leggibile si riparte da capo: le sue righe vanno prima di quelle dei mesi dopo
       }
       applica(st, testo, home, env);
     }
