@@ -32,15 +32,15 @@ test("info: contesto dell'ultima risposta e file toccati, solo righe nuove al se
     risposta(uso(1, 9999, 1, 1), [{ type: "tool_use", name: "Edit", input: { file_path: "/z.ts", old_string: "a", new_string: "b" } }], { isSidechain: true }) +
     "riga a metà non json\n");
   const s = sessione("a", file);
-  assert.deepEqual(infoSessione(s), { contesto: 1510, file: { quanti: 2, aggiunte: 5, tolte: 1 } });
+  assert.deepEqual(infoSessione(s), { contesto: 1510, file: { quanti: 2, aggiunte: 5, tolte: 1, nomi: ["/a.ts", "/b.ts"] } });
 
   fs.appendFileSync(file, risposta(uso(3, 2000, 0, 7), [
     { type: "tool_use", name: "MultiEdit", input: { file_path: "/a.ts", edits: [{ old_string: "p", new_string: "q" }, { old_string: "", new_string: "r\ns" }] } }, // +1 −1, +2
   ]));
-  assert.deepEqual(infoSessione(s), { contesto: 2010, file: { quanti: 2, aggiunte: 8, tolte: 2 } });
+  assert.deepEqual(infoSessione(s), { contesto: 2010, file: { quanti: 2, aggiunte: 8, tolte: 2, nomi: ["/a.ts", "/b.ts"] } });
 
   fs.writeFileSync(file, risposta(uso(5)));
-  assert.deepEqual(infoSessione(s), { contesto: 5, file: { quanti: 0, aggiunte: 0, tolte: 0 } }, "file accorciato: si riparte da capo");
+  assert.deepEqual(infoSessione(s), { contesto: 5, file: { quanti: 0, aggiunte: 0, tolte: 0, nomi: [] } }, "file accorciato: si riparte da capo");
 });
 
 test("info: sorgenti senza trascrizione Claude e file sparito danno numeri vuoti, non finti", () => {

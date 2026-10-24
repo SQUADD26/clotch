@@ -2,9 +2,12 @@
 // Vuota 101:9841; caricamento ed errore coi pezzi della base. clotch AI monta `FiloClotchAi` e `CasellaClotchAi`.
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { avvisa } from "../base/Avvisi";
+import { Bottone } from "../base/Bottone";
 import { api, useElenco, useMessaggi, usePreferenze } from "../base/dati";
 import { useNavigazione } from "../base/navigazione";
-import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
+import { aggiungi } from "../impostazioni/account";
+import { useImpostazioni } from "../impostazioni/stato";
+import { CartellaNonLeggibile, motivoErrore, MessaggioAlCentro, NessunaSessione, Sagome, StatoErrore } from "../base/Stati";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Casella } from "./Casella";
 import { NotaSchermo } from "./CasellaVoce";
@@ -33,6 +36,14 @@ function useSessione() {
   return { elenco, sezione, s: elenco.dati?.sessioni.find((x) => x.id === sessione) ?? null };
 }
 
+/** Perché il filo è vuoto, secondo lo stato della sessione (la barra laterale dice già lo stesso con l'icona). */
+const corpoVuoto = (stato: string, adesso?: string) =>
+  adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
+  : adesso === "interrotta" ? "La sessione è stata interrotta prima di scrivere."
+  : stato === "lavora" ? "La sessione sta lavorando: i messaggi arrivano tra poco."
+  : stato === "finita" ? "La sessione è finita senza messaggi da mostrare."
+  : "Scrivi per iniziare.";
+
 export function Intestazione() {
   const { s } = useSessione();
   const p = usePreferenze().dati;
@@ -50,6 +61,7 @@ export default function Chat() {
 function ChatSessione() {
   const { elenco, s, sezione } = useSessione();
   const { vista, sessione, apri } = useNavigazione();
+  const impostazioni = useImpostazioni();
   const recente = elenco.dati?.sessioni[0]?.id; // l'elenco è già dalla più recente
   // all'avvio nessuna sessione scelta: si apre la più recente, mai una colonna vuota
   useEffect(() => { if (vista === "sessione" && !sessione && recente) apri("sessione", recente); }, [vista, sessione, recente, apri]);
@@ -69,9 +81,17 @@ function ChatSessione() {
   }, [m.errore, m.altriErrore]);
 
   if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
-  if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={elenco.errore} riprova={elenco.riprova} />;
-  if (!s) return null;
-  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={m.errore ?? ""} riprova={m.riprova} />;
+  if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={`clotch non riesce a leggere l’elenco delle sessioni: ${motivoErrore(elenco.errore)}.`} riprova={elenco.riprova} />;
+  if (!s) {
+    if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errori={elenco.dati.errori} riprova={elenco.riprova} />;
+    if (sessione && elenco.dati) return (
+      <MessaggioAlCentro titolo="Sessione non trovata" corpo="Questa sessione non è più nell’elenco: forse è stata archiviata o il collegamento è vecchio.">
+        {recente && <Bottone onClick={() => apri("sessione", recente)}>Apri la più recente</Bottone>}
+      </MessaggioAlCentro>
+    );
+    return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
+  }
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "")}.`} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
@@ -88,8 +108,9 @@ function ChatSessione() {
   if (!m.messaggi.length) {
     return (
       <>
-        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="La sessione è aperta ma non ha ancora messaggi." /></div>
+        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso)} />{inFondo}</div>
         {casella}
+        <Trova iniziale={provaDi(sezione, "trova")} />
       </>
     );
   }

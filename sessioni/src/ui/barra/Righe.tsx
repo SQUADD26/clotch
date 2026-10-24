@@ -5,8 +5,15 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { SegnoStato } from "../base/SegnoStato";
+import { STATI } from "./elenco";
 import { IndicatorePr } from "./Pr";
 import "./barra.css";
+
+/** Suggerimento 101:24382: solo se il `.testo` della riga è troncato (#638), al passaggio e da tastiera. */
+const suggerisci = (riga: HTMLElement, titolo: string, onTroncato: (titolo: string | null, el?: HTMLElement) => void) => {
+  const t = riga.querySelector<HTMLElement>(".testo");
+  onTroncato(t && t.scrollWidth > t.clientWidth ? titolo : null, t ?? undefined);
+};
 
 /** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
 export function RigaComando({ icona, etichetta, lato, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
@@ -24,9 +31,10 @@ export function TitoloSezione({ children }: { children: ReactNode }) {
 }
 
 /** Memo come RigaSessione: le funzioni non contano (Barra le fa chiamare sempre l'ultima versione). */
-export const RigaCartella = memo(function RigaCartella({ nome, conteggio, aperta, onClick, onMenu }: { nome: string; conteggio: number; aperta: boolean; onClick(): void; onMenu(e: MouseEvent): void }) {
+export const RigaCartella = memo(function RigaCartella({ nome, conteggio, aperta, onClick, onMenu, onTroncato }: { nome: string; conteggio: number; aperta: boolean; onClick(): void; onMenu(e: MouseEvent): void; onTroncato(titolo: string | null, el?: HTMLElement): void }) {
   return (
-    <button type="button" className="riga" aria-expanded={aperta} onClick={onClick} onContextMenu={onMenu}>
+    <button type="button" className="riga" aria-expanded={aperta} onClick={onClick} onContextMenu={onMenu}
+      onMouseEnter={(e) => suggerisci(e.currentTarget, nome, onTroncato)} onFocus={(e) => suggerisci(e.currentTarget, nome, onTroncato)} onMouseLeave={() => onTroncato(null)} onBlur={() => onTroncato(null)}>
       <Icona nome={aperta ? "cartella-aperta" : "cartella"} />
       <span className="testo">{nome}</span>
       <span className="lato t-sm secondario">{conteggio}</span>
@@ -69,22 +77,22 @@ interface PropsSessione {
 const stessiDati = (a: PropsSessione, b: PropsSessione) =>
   (Object.keys({ ...a, ...b }) as (keyof PropsSessione)[]).every((k) => typeof a[k] === "function" || a[k] === b[k]);
 export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
-  const entra = (e: MouseEvent<HTMLElement>) => {
-    const t = e.currentTarget.querySelector<HTMLElement>(".testo");
-    onTroncato(t && t.scrollWidth > t.clientWidth ? s.titolo : null, t ?? undefined);
-  };
+  const entra = (e: { currentTarget: HTMLElement }) => suggerisci(e.currentTarget, s.titolo, onTroncato);
+  const stato = s.situazione?.adesso === "errore" ? "errore" : s.stato;
   return (
     <div
       role="button" tabIndex={0} aria-current={scelta || undefined}
       className={`riga riga-sessione ${scelta ? "scelta" : ""} ${passaggio ? "passaggio" : ""}`}
       onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
-      onKeyDown={(e) => { if (e.key === "Enter") onApri(); }}
+      onFocus={(e) => { if (e.target === e.currentTarget) entra(e); }} onBlur={(e) => { if (e.target === e.currentTarget) onTroncato(null); }}
+      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onApri(); } }}
     >
       {figlia && <Icona nome="figlia" colore="terziaria" />}
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>
+      {pref?.nonLetta && <span className="pallino-non-letta" role="img" aria-label="Non letta" />}
+      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""} ${pref?.nonLetta ? "medio" : ""}`}>
         {s.titolo}
         {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia" data-titolo={s.titolo} /></span></span>}
       </span>
@@ -95,7 +103,9 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
         </button>
       )}
       {s.app?.prs.length ? <IndicatorePr pr={s.app.prs[s.app.prs.length - 1]} /> : null}
-      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.situazione?.adesso === "errore" ? "errore" : s.stato} />}</span>
+      <span className="segno" role="img" aria-label={STATI.find((x) => x.chiave === stato)!.voce}>
+        <SegnoStato stato={stato} />{fissata && <Icona nome="spillo" colore="terziaria" />}
+      </span>
       <span className="azioni" onClick={(e) => e.stopPropagation()}>
         <BottoneIcona icona="spillo" etichetta="Fissa in alto" onClick={onFissa} />
         <BottoneIcona icona="altro" etichetta="Altre azioni" onClick={onMenu} />

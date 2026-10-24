@@ -20,9 +20,9 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { const c = s.registro.chat.s1; c.stato = 'serve_roberto'; c.richieste = [{ rid: 'r1', genere: 'permesso', strumento: 'Bash', ingresso: { command: 'ls' }, domande: [] }];
       s.registro.chat.c2 = { ...c, chat: 'c2', titolo: 'Seconda', richieste: [] }; });
     await caricaChat(); await wait(() => document.querySelector('.bottone-attivita .contatore')?.textContent === '2');
-    await clicca('button', 'Attività'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
+    await clicca('button', 'Mostra attività'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
     await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.popover-attivita'));
-    await clicca('button', 'Attività'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
+    await clicca('button', 'Mostra attività'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
   });
 
   await req('A25', async () => {
@@ -44,9 +44,9 @@ H.avvia('requisiti-a', async () => {
     d = await dati(); assert.equal(d.titolo, 'Beta due'); assert.ok(d.dati.includes('Codex') && d.dati.includes('beta-app'), d.dati);
     assert.equal(await run(() => !!document.querySelector('.pannello')), true);
     // il bottone gira: obiettivo -> Info sessione (schede, bottone premuto) -> chiuso (#437)
-    await clicca('button', 'Pannello'); await wait(() => document.querySelector('button[aria-label="Pannello"]')?.getAttribute('aria-expanded') === 'true' && !!document.querySelector('.pannello'));
-    await clicca('button', 'Pannello'); await wait(() => !document.querySelector('.pannello'));
-    await clicca('button', 'Pannello'); await wait(() => !!document.querySelector('.pannello'));
+    await clicca('button', 'Mostra pannello'); await wait(() => document.querySelector('button[aria-label="Mostra pannello"]')?.getAttribute('aria-expanded') === 'true' && !!document.querySelector('.pannello'));
+    await clicca('button', 'Mostra pannello'); await wait(() => !document.querySelector('.pannello'));
+    await clicca('button', 'Mostra pannello'); await wait(() => !!document.querySelector('.pannello'));
   });
 
   await req('D1', async () => {
@@ -61,7 +61,7 @@ H.avvia('requisiti-a', async () => {
   await req('E1', async () => {
     nuova(); await caricaChat('s2');
     const st = () => run(() => ({ c: document.querySelector('.casella').className, off: document.querySelector('.bottone-invia').disabled, a: document.querySelector('.bottone-invia').getAttribute('aria-label'), ph: document.querySelector('textarea').placeholder }));
-    let s = await st(); assert.deepEqual([/vuota/.test(s.c), s.off, s.a, s.ph], [true, true, 'Invia', 'Scrivi alla sessione']);
+    let s = await st(); assert.deepEqual([/vuota/.test(s.c), s.off, s.a, s.ph], [true, true, 'Invia', 'Chiedi alla sessione']);
     await scrivi('textarea', 'ciao'); s = await st(); assert.deepEqual([/scritta/.test(s.c), s.off], [true, false]);
     await scrivi('textarea', '   '); s = await st(); assert.deepEqual([s.off], [true], 'solo spazi: invio spento');
     await scrivi('textarea', ''); s = await st(); assert.ok(/vuota/.test(s.c));
@@ -126,14 +126,14 @@ H.avvia('requisiti-a', async () => {
     const md = '## Titolo\n**grassetto** e `codice`';
     nuova((s) => { s.messaggi.s1 = [U('domanda'), AS(md, 1000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat(); await copiaFinta();
     await wait(() => !!document.querySelector('.risposta .azioni'));
-    await clicca('.risposta .azioni button', 'Altro'); await wait(() => !!document.querySelector('.risposta .menu'));
-    assert.deepEqual(await testo('.risposta .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Leggi con clotch AI', 'Mostra nel file della sessione']);
-    await clicca('.risposta .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
-    await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
+    await clicca('.risposta .azioni button', 'Altre azioni'); await wait(() => !!document.querySelector('.pezzo-chat .menu'));
+    assert.deepEqual(await testo('.pezzo-chat .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Leggi con clotch AI', 'Mostra nel file della sessione']);
+    await clicca('.pezzo-chat .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
+    await clicca('.risposta .azioni button', 'Altre azioni'); await clicca('.pezzo-chat .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
     assert.deepEqual(await run(() => window.__copiato), [md, 'Titolo\n\ngrassetto e codice']); // blocchi separati da riga vuota (#440)
-    await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Mostra nel file della sessione'); await attesa(50);
+    await clicca('.risposta .azioni button', 'Altre azioni'); await clicca('.pezzo-chat .menu .voce', 'Mostra nel file della sessione'); await attesa(50);
     assert.deepEqual(fatte('sessioni:azione'), [['s1', 'mostra-nel-finder']]);
-    await clicca('.risposta .azioni button', 'Altro'); await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.risposta .menu'));
+    await clicca('.risposta .azioni button', 'Altre azioni'); await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.pezzo-chat .menu'));
   });
 
   await req('K2', async () => {
@@ -174,7 +174,7 @@ H.avvia('requisiti-a', async () => {
   await req('F2', async () => {
     nuova((s) => { s.messaggi.s2 = []; }); await carica({ vista: 'sessione', sessione: 's2' });
     await wait(() => !!document.querySelector('.filo.vuoto .messaggio-al-centro'));
-    assert.deepEqual(await testo('.filo.vuoto .messaggio-al-centro > div'), ['Nessun messaggio', 'La sessione è aperta ma non ha ancora messaggi.']);
+    assert.deepEqual(await testo('.filo.vuoto .messaggio-al-centro > div'), ['Nessun messaggio', 'Scrivi per iniziare.']);
     assert.equal(await run(() => !!document.querySelector('textarea')), true, 'la casella c\'è anche senza messaggi');
   });
 

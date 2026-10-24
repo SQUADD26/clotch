@@ -5,8 +5,19 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const scena = (id) => new URL(`../design/scene/${id.includes("-") ? id : `101-${id}`}.json`, import.meta.url);
 const base = readFileSync(scena("8036"));
-for (const id of ["10017", "10297", "12118", "16818", "21061", "21257", "21376", "23003", "23248", "24007", "24127", "28289",
-  "30238", "35109", "48405", "148-62026", "148-62191", "148-62379", "148-62621", "148-62813"]) writeFileSync(scena(id), base);
+for (const id of ["10017", "10297", "12118", "16818", "21061", "21257", "21376", "23003", "23248", "24127", "28289",
+  "30238", "35109", "148-62026", "148-62191", "148-62379", "148-62621", "148-62813"]) writeFileSync(scena(id), base);
+
+// 24007: gli avvisi a comparsa del disegno (uno per tipo) partono dalla sezione «avvisi»
+const scena24007 = JSON.parse(base);
+scena24007.navigazione.sezione = "avvisi";
+writeFileSync(scena("24007"), JSON.stringify(scena24007, null, 1) + "\n");
+
+// 9090: nessuna sessione si legge perché una cartella dà «permesso negato»: al centro l'errore con «Apri Impostazioni di Sistema» (la barra sta in prova.ts)
+const scena9090 = JSON.parse(base);
+scena9090.navigazione = { vista: "sessione" };
+scena9090.elenco = { sessioni: [], errori: [{ percorso: "~/.claude-friday/projects", messaggio: "permesso negato" }] };
+writeFileSync(scena("9090"), JSON.stringify(scena9090, null, 1) + "\n");
 
 // 30172: la campana «Attività» con due sessioni che aspettano te (la scena vecchia aveva solo il registro, senza elenco né filo)
 const ORA = Date.now();

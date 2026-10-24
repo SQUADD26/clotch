@@ -1,5 +1,5 @@
 // Processo main: canali IPC verso il renderer (src/ui) e la finestra. `--parita <node-id>` disegna e salva la prova di parità.
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
 import { impostaIdentita, impostaNome } from "./branding";
@@ -43,6 +43,10 @@ const scena = (() => {
   catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
 })();
 
+// beta tester (#518): `--scena <file>` apre la finestra vera, cliccabile, coi dati della scena; solo in prova silenziosa
+const iProva = process.argv.indexOf("--scena");
+const scenaProva = iProva > 0 && provaSilenziosa() ? leggiScena(process.argv[iProva + 1]) : null;
+
 const sessioni = new Sessioni();
 
 // impostazioni lette dal file a ogni uso (così seguono i cambi); file rotto = valori di partenza
@@ -65,6 +69,7 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  nativeTheme.themeSource = "dark"; // l'app è solo scura: menu nativi e controlli del motore non seguono il Mac (#642)
   if (iParita > 0 && !scena) {
     console.error(`parità: scena non disponibile per ${idParita || "nessun frame"}; servizi dal vivo disattivati`);
     app.exit(1);
@@ -72,6 +77,7 @@ app.whenReady().then(() => {
   }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
+  if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
   // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
   let apri!: () => void;

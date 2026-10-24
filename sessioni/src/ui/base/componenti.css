@@ -1,7 +1,7 @@
 /* figma: 101-12461 — componenti comuni dal frame «Varianti»: icona, bottoni, pillola, campo, segno stato */
 .icona { width: var(--misura-icona); height: var(--misura-icona); flex: none; display: block; }
-/* rotazione dello spinner: «spin» lineare del vault (ui-ux-animazioni.md § Catalogo @keyframes), 1.2s tra le durate osservate */
-.gira { animation: gira 1.2s linear infinite; }
+/* rotazione dello spinner: «spin» lineare del vault (ui-ux-animazioni.md § Catalogo @keyframes) */
+.gira { animation: gira var(--tempo-giro) linear infinite; }
 @keyframes gira { to { transform: rotate(360deg); } }
 
 /* Bottone: Tipo=Primario | Secondario */
@@ -14,6 +14,13 @@
 .bottone.primario { background: var(--colore-fondo-bottone-primario); color: var(--colore-testo-su-primario); }
 .bottone.secondario { background: var(--colore-fondo-bottone-secondario); color: var(--colore-testo-primario); }
 .bottone.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); font-weight: 400; }
+/* passaggio e premuto (153:71039, 153:71045, 153:71111, 155:75285): velatura dei token «riga» sopra il fondo; il primario pieno si schiarisce con opacita-* */
+.bottone.primario:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+.bottone.primario:active:not(:disabled) { opacity: var(--opacita-premuto); }
+.bottone.secondario:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+/* sul rosso al 16% il velo bianco al 5% non si vede: il passaggio e il premuto scaldano il rosso con il suo colore di testo */
+.bottone.pericolo:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--colore-testo-errore) 14%, transparent); }
+.bottone.pericolo:active:not(:disabled) { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--colore-testo-errore) 24%, transparent); }
 .bottone.piccolo { height: var(--misura-bottone); -webkit-app-region: no-drag; }
 
 /* Bottone icona: Stato=Riposo | Passaggio */
@@ -42,9 +49,14 @@
   border-bottom: var(--misura-tratto) solid var(--colore-bordo-leggero);
 }
 .campo.grande input { font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); }
-.campo.grande .tasto { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .campo.piccolo {
   height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);
   border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
 }
 .campo.piccolo input { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
+
+/* Bottone icona, stato Fuoco (153:71027): bordo da misura-tratto-forte, dentro il bottone */
+.bottone-icona:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
+
+/* Bottone, Caricamento (158:82182): non è «spento» come un disabilitato, resta leggibile */
+.bottone.caricamento:disabled { opacity: 1; }

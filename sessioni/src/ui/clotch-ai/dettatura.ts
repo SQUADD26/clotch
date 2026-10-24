@@ -5,8 +5,10 @@ import { useEffect } from "react";
 import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { useClotchAcceso } from "../pannello/Pillole";
+import { chiediA } from "../chat/chiedi";
 import { comanda } from "../chat/clotch-ai";
 import { clotchAi, negozio, useRegistro } from "./dati";
+import { useVoceApp } from "./Voce";
 
 export type Voce = { chi: "clotch" | "app"; cosa: "parla" | "ascolta" } | null;
 
@@ -17,12 +19,13 @@ export function useVoce(): Voce {
   const { dati: r } = useRegistro();
   const clotch = useClotchAcceso();
   const d = dettatura.usa();
+  const parlaApp = useVoceApp(); // una sola fonte per «l'app parla», la stessa della riga di stato
   const chi = clotch ? "clotch" : "app";
   // Con Clotch acceso la casella mostra il parziale che il motore scrive nel registro, nella stessa vista della dettatura dell'app.
   const parziale = clotch ? (r?.clotch?.ascolta ? r.clotch.testo ?? "" : "") : null;
   useEffect(() => { if (parziale !== null) dettatura.metti({ ...dettatura.get(), testo: parziale }); }, [parziale]);
   if (d.attiva || (clotch && r?.clotch?.ascolta)) return { chi, cosa: "ascolta" };
-  if (clotch ? r?.clotch?.parla : r?.voceApp) return { chi, cosa: "parla" };
+  if (clotch ? r?.clotch?.parla : parlaApp) return { chi, cosa: "parla" };
   return null;
 }
 
@@ -39,13 +42,33 @@ export function dettaChiTocca(clotch: boolean) {
   // Il microfono lo apre il main con l'eseguibile nativo (dettatura-app.ts): la pagina non ha il permesso «media» e il webkitSpeechRecognition di Electron non ha il servizio di Google.
   ascolto = clotchAi().onDettatura((e) => {
     if ("testo" in e) return dettatura.metti({ attiva: true, testo: e.testo });
-    if (e.errore) { errore(e.errore); chiudi(); } else void fineDettatura();
+    if (e.errore) { errore(e.errore); salvaEChiudi(); } else void fineDettatura();
   });
   dettatura.metti({ attiva: true, testo: "" });
-  clotchAi().dettatura(true).catch(() => { errore("Dettatura non disponibile"); chiudi(); });
+  clotchAi().dettatura(true).catch(() => { errore("Dettatura non disponibile"); salvaEChiudi(); });
 }
 
 function chiudi() { ascolto?.(); ascolto = null; dettatura.metti({ attiva: false, testo: "" }); }
+
+/** Il testo già detto non si butta: va nella casella di scrittura (la prende `CasellaClotchAi`, che si riapre al posto della voce). */
+function salvaEChiudi() {
+  const testo = dettatura.get().testo.trim();
+  if (testo) chiediA(testo);
+  chiudi();
+}
+
+/** «Annulla» ed Esc: il microfono si ferma e quello che ha capito si butta. */
+export function annullaDettatura() {
+  void clotchAi().dettatura(false).catch(() => {});
+  chiudi();
+}
+
+/** Si lascia la vista col microfono aperto: si ferma e il testo va nella casella. */
+export function fermaPerUscita() {
+  if (!ascolto) return;
+  void clotchAi().dettatura(false).catch(() => {});
+  salvaEChiudi();
+}
 
 /** «Fine»: il testo capito va a clotch AI come `parla` (da: app). */
 export async function fineDettatura() {
@@ -53,6 +76,7 @@ export async function fineDettatura() {
   void clotchAi().dettatura(false).catch(() => {});
   chiudi();
   if (testo) await comanda("parla", { testo });
+  else avvisa({ tipo: "info", messaggio: "Nessuna parola sentita" });
 }
 
 /** «Fine» con Clotch: stessa pressione di ⌥Spazio, il testo lo manda Clotch. */

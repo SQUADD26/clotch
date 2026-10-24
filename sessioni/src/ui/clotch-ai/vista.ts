@@ -1,5 +1,6 @@
 // Dal registro di clotch AI ai dati delle schermate clotch AI (#352). Puro: nessun file, nessun DOM.
 import type { ChatClotchAi, Registro } from "../../clotch-ai";
+import { giornoRelativo } from "../base/formato";
 
 /** Contratto: clotch AI manda un battito ogni 60 s; `friday stato` la dà spenta dopo 180 s senza battito. */ // nome del protocollo del motore
 const CLOTCH_AI_MUTA_MS = 180_000;
@@ -58,9 +59,7 @@ export function casella(r: Registro, ora: number) {
 
 /** Decisioni dalla più nuova, a gruppi per giorno («Oggi», «Ieri» o la data). */
 export function decisioniPerGiorno(r: Registro, ora: number) {
-  const ieri = ora - 86_400_000;
-  const giorno = (t: number | null) => t === null ? "" : stessoGiorno(t, ora) ? "Oggi" : stessoGiorno(t, ieri) ? "Ieri"
-    : new Date(t).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+  const giorno = (t: number | null) => t === null ? "" : giornoRelativo(t, ora);
   const annullate = new Set(r.decisioni.filter((d) => d.cosa.startsWith("annullata ")).map((d) => d.cosa.slice(10)));
   const gruppi = new Map<string, Registro["decisioni"]>();
   for (const d of [...r.decisioni].reverse()) {

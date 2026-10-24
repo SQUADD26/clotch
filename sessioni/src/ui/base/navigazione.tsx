@@ -2,6 +2,7 @@
 // Si parte da ?vista=&sessione=&sezione= (nuova finestra, scene di prova di scena.ts).
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "./dati";
+import { conTransizione } from "./movimento";
 
 /** «nuova-sessione» (148:51982): la vista per aprire una sessione, montata dalla chat, senza pannello. */
 export type Vista = "sessione" | "nuova-sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
@@ -25,6 +26,8 @@ export interface Navigazione extends Passo {
   pannelloInfo: boolean;
   /** Il bottone «Pannello» gira: obiettivo -> Info sessione -> chiuso -> obiettivo. */
   alternaPannello(): void;
+  /** Chiude il pannello da qualunque stato (Esc quando sta sopra la colonna). */
+  chiudiPannello(): void;
   /** Finestra stretta: la barra non sta accanto alla colonna ma sopra, con il velo. */
   sovrapposta: boolean;
   /** Lo dice la cornice, dopo aver misurato: `stretta` = la barra va sopra; `largo` = il pannello sta accanto alla colonna (se no, sopra). */
@@ -33,6 +36,14 @@ export interface Navigazione extends Passo {
 
 /** Vero se `sezione` dell'indirizzo ha la chiave (formato delle scene di prova: «chiave:valore|chiave»). */
 const chiaveDi = (chiave: string) => new RegExp(`(^|\\|)${chiave}(\\||:|$)`).test(new URLSearchParams(location.search).get("sezione") ?? "");
+
+/** Dopo un cambio di vista il fuoco non resta su <body> (l'elemento che lo aveva è sparito): va alla casella della vista, se c'è, altrimenti alla superficie. */
+const daiFuoco = () => {
+  const a = document.activeElement;
+  if (a && a !== document.body && a.isConnected && !a.matches(".area-principale")) return;
+  (document.querySelector<HTMLElement>(".area-principale textarea:not([disabled])") ?? document.querySelector<HTMLElement>(".area-principale"))?.focus({ preventScroll: true });
+};
+const cambia = (fai: () => void) => conTransizione(fai).then(() => void [0, 300].forEach((ms) => setTimeout(daiFuoco, ms))); // la casella della chat compare dopo i messaggi: un secondo giro
 
 const Contesto = createContext<Navigazione | null>(null);
 
@@ -63,24 +74,25 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
       return { passi: [...passi.slice(0, i), passo], i };
     return { passi: [...passi.slice(0, i + 1), passo], i: i + 1 };
   }), []);
-  const apri = useCallback((...a: Parameters<typeof vai>) => { setBarraStretta(false); vai(...a); }, [vai]); // scelta una sessione la barra sopra si richiude
+  const apri = useCallback((...a: Parameters<typeof vai>) => cambia(() => { setBarraStretta(false); vai(...a); }), [vai]); // scelta una sessione la barra sopra si richiude
   const pannelloAperto = misura.largo ? pannelloLargo : pannelloStretto;
   const nav = useMemo<Navigazione>(() => ({
     ...storia.passi[storia.i],
     apri,
-    indietro: () => setStoria((s) => ({ ...s, i: Math.max(0, s.i - 1) })),
-    avanti: () => setStoria((s) => ({ ...s, i: Math.min(s.passi.length - 1, s.i + 1) })),
+    indietro: () => cambia(() => setStoria((s) => ({ ...s, i: Math.max(0, s.i - 1) }))),
+    avanti: () => cambia(() => setStoria((s) => ({ ...s, i: Math.min(s.passi.length - 1, s.i + 1) }))),
     puoIndietro: storia.i > 0,
     puoAvanti: storia.i < storia.passi.length - 1,
     barraAperta: misura.stretta ? barraStretta : barraLarga,
-    alternaBarra: () => (misura.stretta ? setBarraStretta : setBarraLarga)((x) => !x),
+    alternaBarra: () => conTransizione(() => (misura.stretta ? setBarraStretta : setBarraLarga)((x) => !x)),
     pannelloAperto, pannelloInfo,
-    alternaPannello: () => {
+    alternaPannello: () => conTransizione(() => {
       const imposta = misura.largo ? setPannelloLargo : setPannelloStretto;
       if (!pannelloAperto) imposta(true);
       else if (!pannelloInfo) setInfo(true);
       else { setInfo(false); imposta(false); }
-    },
+    }),
+    chiudiPannello: () => { setInfo(false); (misura.largo ? setPannelloLargo : setPannelloStretto)(false); },
     sovrapposta: misura.stretta, adatta,
   }), [storia, apri, misura, adatta, barraLarga, barraStretta, pannelloAperto, pannelloInfo]);
   return <Contesto.Provider value={nav}>{children}</Contesto.Provider>;

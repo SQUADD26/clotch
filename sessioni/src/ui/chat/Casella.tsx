@@ -14,8 +14,9 @@ import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
 import { ALLEGATI_PROVA, AllegatiCasella, type AllegatoCasella } from "./Allegati";
-import { ChipContesto, ChipPermessi, impostaDi } from "./Chip";
+import { ChipContesto, ChipPermessi, impostaDi, NomeSopra } from "./Chip";
 import { ChipModello } from "./ChipModello";
+import { Coda, mandaOra } from "./Coda";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
@@ -24,44 +25,20 @@ import { MAX_ALLEGATI, MAX_TOTALE_BYTE, limiteAllegato } from "../../allegati-li
 import { casella, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
 import { etichettaModello, motivoNonInviato } from "./scelte";
 import { useBozza } from "./bozze";
-import { argsManda, idModello, provaDi, quanti } from "./testi";
+import { argsManda, idModello, provaDi } from "./testi";
 import "./casella.css";
 
 export interface VoceCoda { voce: string; testo: string }
 
 export { nomeModello } from "./scelte";
 
-const Tasto = ({ t }: { t: string }) => <span className="tasto">{t}</span>;
-
-function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, preferenza, pref }: {
-  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean; attuale: string | null; preferenza: string; pref?: PreferenzeSessione;
-}) {
-  const subito = async (v: VoceCoda) => { if (await comanda("manda", argsManda(chat, v.testo, "subito", preferenza, attuale, pref))) await comanda("coda_togli", { chat, voce: v.voce }); };
-  return (
-    <div className="coda">
-      {voci.map((v, i) => (
-        <div key={v.voce} className={modifica === v.voce ? "messaggio-in-coda in-modifica" : "messaggio-in-coda"}>
-          {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
-          <span className="testo">{v.testo}</span>
-          <div className="azioni">
-            <span className={suggerimento && i === 0 ? "con-suggerimento sopra visibile" : "con-suggerimento sopra"}>
-              <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
-              <span className="suggerimento">Interrompi e manda ora <Tasto t="↵" /></span>
-            </span>
-            <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
-            <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+const Tasto = ({ t }: { t: string }) => <span className="tasto-chip">{t}</span>;
 
 /** `segnaposto`: «In attesa della sessione» (101:15993), «Riparte alle 18:00» (101:16211); di solito «Scrivi alla sessione». */
 /** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945),
  *  «menu-aggiungi» (101:25845), «rilascio» (101:27294), «menu:permessi» / «menu:modello» e «impegno» (101:26140, 148:28674, 148:28740), «tooltip» del contesto (101:26140), «errore:<perché>» (101:27528).
  *  `account`: la cartella dell'account della sessione, per le sue skill. */
-export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false, account = "" }: {
+export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Chiedi alla sessione", prova = null, appenaMandato = false, account = "" }: {
   chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; permessi?: string | null; contesto?: number | null; disabilitata: boolean; segnaposto?: string; prova?: string | null; account?: string;
   /** Roberto ha appena interrotto e mandato (101:43535): i tasti restano sotto la casella. */
   appenaMandato?: boolean;
@@ -94,7 +71,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const [caret, setCaret] = useState<number | null>(null), [chiuso, setChiuso] = useState(false), [scelta, setScelta] = useState(0);
   const poi = useRef<number | null>(null);
   const cerca = chiuso || disabilitata ? null : cercaDi(testo, Math.min(caret ?? testo.length, testo.length));
-  const voci = useVoci(chat, cerca);
+  const { voci, stato: statoVoci } = useVoci(chat, cerca);
 
   // scelta fatta in un menu dei chip: il fuoco torna al testo, se è caduto sul fondo della pagina
   const eraAperto = useRef(false);
@@ -102,6 +79,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     if (menu === null && eraAperto.current && document.activeElement === document.body) area.current?.focus();
     eraAperto.current = menu !== null;
   }, [menu]);
+
+  // la voce in modifica è già partita: il testo resta nella casella come messaggio nuovo
+  useEffect(() => {
+    if (modifica && !coda.some((v) => v.voce === modifica.voce)) { bozza.esci(true); avvisa({ tipo: "info", messaggio: "Il messaggio è già partito" }); }
+  }, [coda, modifica]);
 
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
@@ -183,19 +165,24 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     if (caricando || grandi.length) return;
     if (pronti.reduce((n, a) => n + (a.byte ?? 0), 0) > MAX_TOTALE_BYTE) { setErrore(`Gli allegati pesano più di ${peso(MAX_TOTALE_BYTE)} in tutto: togline qualcuno.`); return; }
     const richiesta = bozza.inizia(pronti.length > 0);
-    if (!richiesta) return;
+    if (!richiesta) { if (modo === "subito" && !modifica && coda[0]) void mandaOra(chat, coda[0], preferenza, modello, pref); return; } // ↵ a casella vuota: la prima della coda parte, come il suo bottone
     ultimo.current = modo; setErrore(null);
-    const t = richiesta.testo.trim(), modifica = richiesta.modifica;
+    const t = richiesta.testo.trim(), daModifica = richiesta.modifica;
     const con = pronti.length ? { allegati: pronti.map((a) => a.percorso) } : {}; // i percorsi vanno nel campo `allegati`, il testo può essere vuoto
     let ok = false;
     try {
-      ok = modifica
+      ok = daModifica
         ? modo === "coda"
-          ? await invia("coda_modifica", { chat, voce: modifica.voce, testo: t, ...con })
-          : (await invia("manda", { ...argsManda(chat, t, "subito", preferenza, modello, pref), ...con })) && (await invia("coda_togli", { chat, voce: modifica.voce }))
+          ? await invia("coda_modifica", { chat, voce: daModifica.voce, testo: t, ...con })
+          : (await invia("manda", { ...argsManda(chat, t, "subito", preferenza, modello, pref), ...con })) && (await invia("coda_togli", { chat, voce: daModifica.voce }))
         : await invia("manda", { ...argsManda(chat, t, lavora ? modo : "subito", preferenza, modello, pref), ...con });
     } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
+
+  useEffect(() => { // ⌘U e ⇧⌘P: azioni del gestore unico, valgono anche col fuoco fuori dalla casella
+    const fuori = [registraAzione("allega", () => void allega()), registraAzione("piano", () => comando("/plan "))];
+    return () => fuori.forEach((f) => f());
+  });
 
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (voci.length && !e.nativeEvent.isComposing) {
@@ -204,12 +191,10 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       if (e.key === "Escape") { e.preventDefault(); setChiuso(true); return; }
       // un comando scritto per intero e Invio: parte, non si riscrive
       const intero = cerca?.tipo === "comando" && testo.trim() === scelto.nome;
-      if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
+      if ((e.key === "Tab" && !e.shiftKey) || (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !intero)) { e.preventDefault(); scegli(scelto.nome); return; }
     }
     if (e.key === "Escape" && modifica) { bozza.esci(); return; }
     if (e.nativeEvent.isComposing) return;
-    if (e.metaKey && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "u") { e.preventDefault(); void allega(); return; } // «Allega file o cartelle…» ⌘U
-    if (e.key === "Tab" && e.shiftKey) { e.preventDefault(); comando("/plan "); return; } // «Modalità piano» ⇧⇥
     const azione = azioneDi(tastiDi(e.nativeEvent), scorciatoie);
     if (azione !== "inviaInterrompi" && azione !== "coda") return;
     e.preventDefault();
@@ -219,16 +204,17 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const ferma = lavora && !testo.trim() && !allegati.length;
   const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo || allegati.length ? "scritta" : "vuota";
+  const spento = stato === "vuota" || stato === "disabilitata" || invio; // il messaggio aspetta il motore: il bottone sembra spento, come quando non si può inviare
   return (
     <div className="area-casella con-menu" ref={areaCasella}>
-      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
+      {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} stato={statoVoci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
       {altre.length > 0 && <Coda voci={altre} chat={chat} attuale={modello} preferenza={preferenza} pref={pref} suggerimento={provaDi(prova, "suggerimento") !== null} modifica={modifica?.voce ?? null} onModifica={(v) => { bozza.modifica(v); area.current?.focus(); }} />}
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
       <div className={`casella ${stato}${modifica || menu === "permessi" || menuAggiungi ? " fuoco" : ""}${errore ? " errore" : ""}${trascina && !disabilitata ? " trascina" : ""}`}>
         {(allegati.length > 0 || (trascina && !disabilitata)) && (
-          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => setAllegati((x) => x.filter((y) => y !== a))} />
+          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => { setAllegati((x) => x.filter((y) => y !== a)); if (allegati.length === 1) area.current?.focus(); }} />
         )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}
@@ -241,12 +227,14 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <span className="spinta" />
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} predefinito={idModello(globale)} impegnoAperto={provaDi(prova, "impegno") !== null} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
-          <BottoneIcona icona="microfono" etichetta="Detta" disabled />
-          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
-            aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
+          <NomeSopra testo="Detta"><BottoneIcona icona="microfono" etichetta="Detta" title={undefined} disabled /></NomeSopra>
+          <NomeSopra testo={ferma ? "Interrompi" : "Invia"}>
+          <button type="button" className={invio ? "bottone-invia spento" : "bottone-invia"} aria-busy={invio} disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
+            aria-label={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
-            <Icona nome={ferma ? "stop" : "invia"} colore={stato === "vuota" || stato === "disabilitata" ? "terziaria" : "su-accento"} />
+            <Icona nome={ferma ? "stop" : "invia"} colore={spento ? "terziaria" : "su-accento"} />
           </button>
+          </NomeSopra>
         </div>
       </div>
       {grandi.length > 0 && (

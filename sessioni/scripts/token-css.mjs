@@ -18,17 +18,25 @@ export function voci(tokens) {
   const out = new Map(); // nome CSS -> {tipo, valore}
   for (const [col, modi] of Object.entries(tokens)) {
     if (col.startsWith('$')) continue;
-    const modo = Object.keys(modi).find((m) => !m.startsWith('$')); // un solo tema: lo scuro
+    const modi_ = Object.keys(modi).filter((m) => !m.startsWith('$'));
+    if (modi_.length !== 1) throw new Error(`tokens.json: «${col}» ha ${modi_.length} modi (${modi_.join(', ')}); l'app è solo scura, ne serve uno`);
+    const modo = modi_[0];
     const giu = (nodo, via) => {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
         const p = [...via, k];
+        // Figma salva i numeri in float32 (0.215 -> 0.2150000035762787): 4 decimali bastano.
         // le variabili d'opacità (gruppo «opacita», ambito OPACITY) in Figma sono percentuali: nel CSS 40 -> 0.4
-        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: p[0] === 'opacita' && typeof f.$value === 'number' ? f.$value / 100 : f.$value });
+        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: typeof f.$value !== 'number' ? f.$value : +(p[0] === 'opacita' ? f.$value / 100 : f.$value).toFixed(4) });
         giu(f, p);
       }
     };
     giu(modi[modo], []);
+  }
+  // una curva in Figma sono quattro numeri (curva/<nome>/x1…y2): il CSS ne vuole una sola, --curva-<nome>: cubic-bezier(…)
+  for (const n of [...out.keys()].filter((k) => /^curva-.+-x1$/.test(k))) {
+    const base = n.slice(0, -3), p = ['x1', 'y1', 'x2', 'y2'].map((c) => out.get(`${base}-${c}`)?.valore);
+    if (p.every((x) => typeof x === 'number')) out.set(base, { tipo: 'cubicBezier', valore: `cubic-bezier(${p.join(', ')})` });
   }
   return out;
 }

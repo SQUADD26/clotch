@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792846084306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,7 +44,8 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": ""
+    "file": "",
+    "contesto": 124000
    }
   ],
   "errori": []
@@ -54,7 +55,7 @@
    {
     "tipo": "utente",
     "testo": "Porta il disegno Sessioni nel codice, pari pari.",
-    "t": 1792792984531
+    "t": 1792846019306
    },
    {
     "tipo": "strumento",
@@ -66,7 +67,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792792985531,
+    "t": 1792846020306,
     "id": "t0"
    },
    {
@@ -100,7 +101,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792792986531,
+    "t": 1792846021306,
     "id": "t1"
    },
    {
@@ -111,7 +112,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792792987531,
+    "t": 1792846022306,
     "id": "t2"
    },
    {
@@ -122,7 +123,7 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792792999531,
+    "t": 1792846034306,
     "id": "t3"
    },
    {
@@ -133,13 +134,13 @@
      "subagent_type": "general-purpose"
     },
     "esito": null,
-    "t": 1792793007531,
+    "t": 1792846042306,
     "id": "t4"
    },
    {
     "tipo": "pensiero",
     "testo": "…",
-    "t": 1792793048531
+    "t": 1792846083306
    }
   ]
  },
@@ -164,7 +165,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792793149531,
+    "battito": 1792846184306,
     "aiutanti": {
      "a1": {
       "tipo": "general-purpose",
@@ -179,14 +180,15 @@
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792793169531,
+    "visto": 1792846204306,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
     "quarantena": null,
     "errore": null,
     "rifiuto": null,
-    "persi": 0
+    "persi": 0,
+    "contestoMax": 200000
    }
   },
   "fermoTutto": false,

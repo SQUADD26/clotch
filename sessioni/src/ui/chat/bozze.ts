@@ -27,7 +27,8 @@ function nuova(testo: string, modifica: VoceCoda | null) {
       attiva = voce.voce;
       aggiorna();
     },
-    esci: () => { attiva = null; aggiorna(); },
+    // `tieni`: il testo della voce passa alla bozza nuova (la voce non c'è più)
+    esci: (tieni = false) => { if (tieni) voci.set(null, { testo: stato.testo }); attiva = null; aggiorna(); },
     // `conAllegati`: un messaggio con solo file o immagini, senza testo, parte lo stesso
     inizia: (conAllegati = false) => {
       if (invio || (!stato.testo.trim() && !conAllegati)) return null;

@@ -6,6 +6,8 @@ export type StatoProva = "fatta" | "attesa" | "in-corso" | "fallita";
 export interface DatiPannello {
   /** null = nessun obiettivo (stato «Vuoto»). */
   obiettivo: string | null;
+  /** Stato del registro (proposto, raggiunto…); «aperto» e senza obiettivo non portano etichetta. */
+  stato?: string | null;
   prove: { testo: string; stato: StatoProva }[];
   /** null = la sessione non dice quali file ha toccato: la sezione non si mostra. */
   file: { quanti: number; aggiunte: number; tolte: number } | null;
@@ -19,18 +21,28 @@ const PROVA: Record<StatoProva, { icona: NomeIcona; colore: "successo" | "terzia
   fallita: { icona: "avviso", colore: "errore", testo: "errore" },
 };
 
+// etichetta e colore di ogni stato del registro oltre ad «aperto» (stesso significato della chat: raggiunto/passato = finita)
+const STATO: Record<string, { testo: string; colore: "successo" | "errore" | "avviso" | "secondario" }> = {
+  proposto: { testo: "Proposto", colore: "avviso" },
+  raggiunto: { testo: "Raggiunto", colore: "successo" },
+  bloccato: { testo: "Bloccato", colore: "errore" },
+  passato: { testo: "Passato", colore: "secondario" },
+  rifiutato: { testo: "Rifiutato", colore: "secondario" },
+};
+
 export function PannelloObiettivo({ dati }: { dati: DatiPannello }) {
   const { obiettivo, prove, file } = dati;
+  const stato = obiettivo ? STATO[dati.stato ?? ""] : undefined;
   return (
     <section className="pannello-obiettivo">
       <div className="sezione">
-        <div className="t-base medio">Obiettivo</div>
+        <div className="titolo-stato"><span className="t-base medio">Obiettivo</span>{stato && <span className={`t-xs stato-obiettivo ${stato.colore}`}>{stato.testo}</span>}</div>
         <div className="t-sm secondario">{obiettivo ?? "Nessun obiettivo. clotch AI lo propone quando capisce il lavoro della sessione."}</div>
       </div>
       <div className="divisore" />
       <div className="sezione prove">
         <div className="t-base medio">Prove</div>
-        {prove.length === 0 && <div className="t-sm secondario">Nessuna prova ancora</div>}
+        {prove.length === 0 && <div className="t-sm secondario">Nessuna prova</div>}
         {prove.map((p, i) => (
           <div key={i} className="prova">
             <Icona nome={PROVA[p.stato].icona} colore={PROVA[p.stato].colore} gira={p.stato === "in-corso"} />

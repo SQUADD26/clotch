@@ -8,7 +8,6 @@ import { imposta, IN_NUOVA_FINESTRA, useImpostazioni } from "./stato";
 
 const DETTAGLI_MODELLI = Object.fromEntries(Object.entries(MODELLI).map(([k, m]) => [k, m.dettaglio])); // 119:55555
 const APERTURE = ["Nella stessa finestra", IN_NUOVA_FINESTRA]; // 119:55726
-const LINGUE = ["Rilevamento automatico", "Italiano", "English"]; // voci della «tendina lingua» 101:32999
 
 async function cambiaCartella() {
   try {
@@ -28,8 +27,8 @@ export default function Generale() {
         <Riga etichetta="Mostra nella barra dei menu" descrizione="Un’icona con il numero di sessioni in attesa di te">
           <Interruttore etichetta="Mostra nella barra dei menu" acceso={v.barraDeiMenu} onCambia={(x) => imposta("barraDeiMenu", x)} />
         </Riga>
-        <Riga etichetta="Lingua" descrizione="Testi dell’app">
-          <Scelta etichetta="Lingua" valore={v.lingua} voci={LINGUE} onScegli={(x) => imposta("lingua", x)} />
+        <Riga etichetta="Lingua" descrizione="L’app c’è solo in italiano">
+          <Scelta etichetta="Lingua" valore="Italiano" disabled />
         </Riga>
         <Riga etichetta="Modello per i tuoi messaggi" descrizione="Usato quando scrivi a una sessione da qui">
           <Scelta etichetta="Modello per i tuoi messaggi" valore={v.modello} voci={Object.keys(MODELLI)} dettagli={DETTAGLI_MODELLI} onScegli={(x) => imposta("modello", x)} />

@@ -4,7 +4,7 @@ import type { EsitoPasso, PassoMacchina } from "../../macchine-tipi";
 import type { EsitoComando } from "../../comandi";
 
 /** I passi della preparazione, nell'ordine in cui li fa il motore. */
-export const PASSI = [["connessione", "Connessione"], ["python", "Python"], ["cartella", "Cartella"], ["claude", "Claude"], ["motore", "Motore"], ["login", "Login"], ["github", "GitHub"]] as const;
+export const PASSI = [["connessione", "Connessione"], ["python", "Python"], ["cartella", "Cartella"], ["claude", "Claude"], ["motore", "Motore"], ["login", "Accesso"], ["github", "GitHub"]] as const;
 /** I passi fatti dal comando `macchina_aggiungi`, se l'esito li porta. */
 export const passiDi = (e: EsitoComando | null) => (e && "passi" in e ? e.passi : undefined);
 export const etichettaPasso = (passo: string | null) => PASSI.find(([p]) => p === passo)?.[1] ?? passo ?? "";

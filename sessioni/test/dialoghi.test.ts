@@ -22,7 +22,7 @@ test("scorciatoie: i tasti delle voci delle impostazioni sono quelli salvati, i 
   assert.equal(tasti("Ferma la sessione"), "⌘9");
   assert.equal(tasti("Nega"), null, "tolta: «Non assegnata»");
   assert.equal(tasti("Cerca sessioni"), "⌘K");
-  assert.equal(tasti("Scrivi a clotch AI"), "⌘⇧F");
+  assert.equal(tasti("Scrivi a clotch AI"), "⇧⌘F");
   assert.equal(tasti("Archivia"), "⇧⌘A");
   assert.equal(tasti("Mostra scorciatoie"), "⌘/");
   assert.equal(tutte.length, GRUPPI.flatMap((g) => g.righe).length);

@@ -15,6 +15,8 @@ export interface Prova {
   novita?: boolean;
   /** Notifiche: il dialogo «Quando non vuoi ricevere notifiche?» già aperto (149-66688): ore di partenza e segmento col fuoco [riga, segmento]. */
   ore?: { valore: string; attivo: [number, number] };
+  /** Finestra stretta: il menu delle sezioni già aperto (155:74835). */
+  sezioni?: boolean;
   /** Uso: la scheda scelta (119:57613). */
   scheda?: "andamento";
   /** Il testo già scritto nel campo «Cerca» (119:57161 «voce», 119:57301 «tema»). */
@@ -37,11 +39,14 @@ const PROVE: Record<string, Prova> = {
   "101-33015": { registrazione: true },
   "101-10461": { dopoRimuovi: true },
   "101-22095": { rimuovi: "~/.claude-clotch-ai" },
-  "119-56891": { aperta: "Cronologia" },
+  "119-56891": { aperta: "Sessioni finite" },
   "119-57106": { conferma: true },
   "119-57404": { aperta: "Versione" },
   "119-57552": { novita: true },
   "119-57613": { scheda: "andamento" },
+  "155-74835": { sezioni: true },
+  "155-75098": { aperta: "Lingua" },
+  "155-74479": { scheda: "andamento" },
   "119-57161": { cerca: "voce" },
   "119-57301": { cerca: "tema" },
 };

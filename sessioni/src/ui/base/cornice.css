@@ -20,6 +20,7 @@
   width: var(--larghezza-barra, var(--misura-barra-laterale)); flex: none; padding: 0 var(--spazio-2) var(--spazio-2);
   display: flex; flex-direction: column; gap: var(--spazio-0-5); min-height: 0;
 }
+.area-principale:focus { outline: none; } /* riceve il fuoco da programma dopo un cambio di vista, non è un bersaglio da tastiera */
 .area-principale { flex: 1; min-width: 0; display: flex; padding: 0 var(--spazio-2) var(--spazio-2) 0; }
 .superficie {
   flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden;
@@ -36,4 +37,5 @@
 /* contenitore di un pezzo (base/Pezzo.tsx): non è una scatola, i suoi figli stanno nel layout del genitore */
 .pezzo { display: contents; }
 .pannello { width: var(--misura-pannello); flex: none; display: flex; flex-direction: column; }
-.pannello:empty { display: none; }
+/* un pezzo che torna null (nessuna sessione, nessun obiettivo da dire) lascia solo il suo contenitore vuoto: la colonna centrale si allarga */
+.pannello:empty, .pannello:has(> .pezzo:empty) { display: none; }

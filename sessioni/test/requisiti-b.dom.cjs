@@ -53,13 +53,14 @@ H.avvia('requisiti-b', async () => {
   await req('B6', async () => {
     nuova(); await caricaChat(); await riga('beta-app');
     await riga('Filtra'); await voce('Aggiungi filtro'); await voce('Stato');
-    assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In corso', 'In attesa di te', 'Ferma', 'Finita', 'Errore']);
+    assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In corso', 'In attesa di te', 'In pausa', 'Finita', 'Errore']);
     await scrivi('.menu-filtro input', 'att'); assert.deepEqual(await testo('.menu-filtro [role=menuitemcheckbox] .etichetta'), ['In attesa di te'], 'la ricerca nel menu restringe le opzioni');
     await scrivi('.menu-filtro input', ''); await voce('Finita'); await voce('In attesa di te'); await esc(); // la cartella con i risultati si apre da sola (UI-FILTRO-CARTELLA-CHIUSA corretto): nessun clic su «clotch»
     assert.equal(await run(() => [...document.querySelectorAll('.barra-laterale .riga')].find((r) => r.querySelector('.testo')?.textContent === 'clotch')?.getAttribute('aria-expanded')), 'true', 'la cartella con i risultati è aperta da sola');
     assert.deepEqual(await barra(), ['Beta due', 'Gamma tre']); assert.match(await run(() => document.querySelector('.pillola-filtro').innerText), /Stato:\s*Finita, In attesa/); assert.equal((await testo('.titolo-sezione .testo')).at(-1), '2 sessioni');
     await clicca('.pillola-filtro', 'Stato:Finita, In attesa'); await voce('Finita'); await esc(); assert.deepEqual(await barra(), ['Gamma tre']);
     await clicca('.pillola-filtro', 'Stato:In attesa'); await voce('Rimuovi filtro'); await wait(() => !document.querySelector('.pillola-filtro:not(.aggiungi)'));
+    await wait(() => document.querySelectorAll('.riga-sessione').length === 3); // la cartella monta le righe a pezzi, un fotogramma alla volta (APezzi)
     assert.deepEqual(await barra(), ['Beta due', 'Gamma tre', 'Alfa uno']);
   });
 
@@ -91,9 +92,9 @@ H.avvia('requisiti-b', async () => {
     const apriConferma = (cosa) => run((cosa) => [...document.querySelectorAll('.voce-f')].find((v) => v.textContent.includes(cosa)).querySelector('button').click(), cosa);
     await apriConferma('migrazione 0042'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.match(await run(() => document.querySelector('[role=dialog]').innerText), /migrazione inversa/);
-    await clicca('[role=dialog] button', 'Lascia così'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
+    await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
     rispondi['clotch-ai:comando'] = () => ({ esito: 'errore', testo: 'Migrazione inversa non riuscita: niente è cambiato.' });
-    await apriConferma('migrazione 0042'); await clicca('[role=dialog] button', 'Annulla la decisione');
+    await apriConferma('migrazione 0042'); await clicca('[role=dialog] button', 'Revoca decisione');
     await wait(() => /Migrazione inversa non riuscita/.test(document.querySelector('.area-avvisi')?.innerText || '')); assert.deepEqual(fatte('clotch-ai:comando'), [['annulla', { decisione: H.scena.registro.decisioni.find((d) => d.cosa.includes('0042')).id }]]);
     rispondi['clotch-ai:comando'] = () => ({ esito: 'ok', testo: 'Decisione annullata. La sessione aspetta te.' });
     await clicca('.area-avvisi button', 'Riprova'); await wait(() => /Decisione annullata/.test(document.querySelector('.area-avvisi').innerText));
@@ -103,15 +104,15 @@ H.avvia('requisiti-b', async () => {
   await req('CL10', async () => {
     await vai('101-50008'); // con Clotch acceso
     await carica({ vista: 'clotch-ai' }); await wait(() => !!document.querySelector('.comandi-titolo'));
-    await clicca('.comandi-titolo button', 'Non disturbare'); await wait(() => !!document.querySelector('.comandi-titolo .menu'));
-    assert.deepEqual(await testo('.comandi-titolo .menu .voce .etichetta'), ['Per 1 ora', 'Fino alle 18:00', 'Fino a domani mattina', 'Finché non lo tolgo']);
+    await clicca('.comandi-titolo button', 'Non disturbare'); await wait(() => !!document.querySelector('.pezzo-clotch-ai .menu'));
+    assert.deepEqual(await testo('.pezzo-clotch-ai .menu .voce .etichetta'), ['Per 1 ora', 'Fino alle 18:00', 'Fino a domani mattina', 'Finché non lo tolgo']);
     assert.match(await run(() => document.querySelector('.nota-menu').textContent), /Vale anche per clotch: niente voce né microfono/);
-    await clicca('.comandi-titolo .menu .voce', 'Per 1 ora'); await wait(() => !document.querySelector('.comandi-titolo .menu'));
+    await clicca('.pezzo-clotch-ai .menu .voce', 'Per 1 ora'); await wait(() => !document.querySelector('.pezzo-clotch-ai .menu'));
     assert.deepEqual(fatte('clotch-ai:comando'), [['non_disturbare', { acceso: true, minuti: 60 }]]);
     await vai('101-50071'); await carica({ vista: 'clotch-ai' }); await wait(() => !!document.querySelector('.comandi-titolo'));
     await clicca('.comandi-titolo button', 'Non disturbare'); await wait(() => !!document.querySelector('.nota-menu'));
     assert.match(await run(() => document.querySelector('.nota-menu').textContent), /continua a lavorare/);
-    await clicca('.comandi-titolo .menu .voce', 'Finché non lo tolgo'); await attesa(50); assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['non_disturbare', { acceso: true, fino: null }]);
+    await clicca('.pezzo-clotch-ai .menu .voce', 'Finché non lo tolgo'); await attesa(50); assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['non_disturbare', { acceso: true, fino: null }]);
   });
 
   const imp = (id, sezione, mod) => vai(id, mod);
@@ -132,23 +133,20 @@ H.avvia('requisiti-b', async () => {
 
   await req('H32', async () => {
     await imp('101-17193');
-    await clicca('.scelta .valore', 'Lingua: Italiano'); await wait(() => !!document.querySelector('.scelta .menu'));
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.scelta .menu [role=menuitemradio]')].map((b) => [b.textContent.trim(), b.getAttribute('aria-checked')])), [['Rilevamento automatico', 'false'], ['Italiano', 'true'], ['English', 'false']]);
-    await tasto('.scelta .menu', { key: 'ArrowDown' }); assert.equal(await run(() => document.activeElement.textContent.trim()), 'English');
-    await esc(); await wait(() => !document.querySelector('.scelta .menu')); assert.deepEqual(imposta(), []);
-    await clicca('.scelta .valore', 'Modello per i tuoi messaggi: Opus 5.5'); await wait(() => !!document.querySelector('.scelta .menu'));
-    assert.match(await run(() => document.querySelector('.scelta .menu').innerText), /Opus 5\.5\s*Il più capace/);
-    await clicca('.scelta .menu .voce .etichetta', 'Sonnet 5.5'); await wait(() => !document.querySelector('.scelta .menu'));
+    assert.equal(await run(() => document.querySelector('.scelta .valore[aria-label="Lingua: Italiano"]').disabled), true); // non cambia niente: spenta (#534)
+    await clicca('.scelta .valore', 'Modello per i tuoi messaggi: Opus 5.5'); await wait(() => !!document.querySelector('.menu-scelta'));
+    assert.match(await run(() => document.querySelector('.menu-scelta').innerText), /Opus 5\.5\s*Il più capace/);
+    await clicca('.menu-scelta .voce .etichetta', 'Sonnet 5.5'); await wait(() => !document.querySelector('.menu-scelta'));
     assert.deepEqual(imposta(), [{ modello: 'Sonnet 5.5' }]); assert.ok((await etichette('.scelta .valore')).includes('Modello per i tuoi messaggi: Sonnet 5.5'));
   });
 
   await req('H6', async () => {
     await imp('101-31738');
     assert.deepEqual(await etichette('.scelta .valore'), ['Colore principale: Arancione', 'Carattere: Sistema', 'Dimensione del testo: Media', 'Densità dell’elenco: Normale']);
-    await clicca('.scelta .valore', 'Colore principale: Arancione'); await wait(() => !!document.querySelector('.scelta .menu'));
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.scelta .menu .etichetta')].map((e) => e.textContent)), ['Arancione', 'Blu', 'Verde', 'Viola', 'Argento']);
-    await clicca('.scelta .menu .voce .etichetta', 'Blu'); await wait(() => document.documentElement.dataset.colore === 'blu');
-    await clicca('.scelta .valore', 'Densità dell’elenco: Normale'); await clicca('.scelta .menu .voce .etichetta', 'Compatta'); await wait(() => document.documentElement.dataset.densita === 'compatta');
+    await clicca('.scelta .valore', 'Colore principale: Arancione'); await wait(() => !!document.querySelector('.menu-scelta'));
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.menu-scelta .etichetta')].map((e) => e.textContent)), ['Arancione', 'Blu', 'Verde', 'Viola', 'Argento']);
+    await clicca('.menu-scelta .voce .etichetta', 'Blu'); await wait(() => document.documentElement.dataset.colore === 'blu');
+    await clicca('.scelta .valore', 'Densità dell’elenco: Normale'); await clicca('.menu-scelta .voce .etichetta', 'Compatta'); await wait(() => document.documentElement.dataset.densita === 'compatta');
     await clicca('button[role=switch]', 'Icone delle sessioni'); await attesa(60);
     assert.deepEqual(imposta(), [{ colore: 'Blu' }, { densita: 'Compatta' }, { iconeSessioni: false }]);
     await caricaScena(); assert.ok((await etichette('.scelta .valore')).includes('Colore principale: Blu'), 'dopo il riavvio il colore è quello salvato');
@@ -190,7 +188,7 @@ H.avvia('requisiti-b', async () => {
     await imp('101-17893');
     assert.match(await run(() => document.body.innerText), /2 cartelle/);
     await clicca('button[role=switch]', 'Nascondi chiavi e token'); await attesa(60); assert.deepEqual(imposta(), [{ nascondiChiavi: false }]);
-    await clicca('.scelta .valore', 'Cronologia: 30 giorni'); await clicca('.scelta .menu .voce .etichetta', '90 giorni'); await attesa(60); assert.deepEqual(imposta().at(-1), { cronologia: '90 giorni' });
+    await clicca('.scelta .valore', 'Sessioni finite: 30 giorni'); await clicca('.menu-scelta .voce .etichetta', '90 giorni'); await attesa(60); assert.deepEqual(imposta().at(-1), { cronologia: '90 giorni' });
     await clicca('button', 'Elimina dati…'); await wait(() => !!document.querySelector('[role=dialog]'));
     await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('impostazioni:elimina-dati'), []);
     await clicca('button', 'Elimina dati…'); await esc(); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('impostazioni:elimina-dati'), []);
@@ -199,7 +197,7 @@ H.avvia('requisiti-b', async () => {
 
   await req('H36', async () => {
     await imp('101-17893');
-    await run(() => document.querySelector('.valore-scelta').click()); await wait(() => document.querySelector('h1')?.textContent === 'Cartelle escluse');
+    await run(() => document.querySelector('.valore-scelta').click()); await wait(() => document.querySelector('h1')?.textContent === 'Cartelle nascoste');
     assert.deepEqual(await testo('.riga.azione .t-base'), ['~/Repos/vecchi', '~/Downloads']);
     await clicca('.riga.azione button', 'Rimuovi'); await wait(() => document.querySelectorAll('.riga.azione').length === 1); assert.deepEqual(imposta(), [{ cartelleEscluse: ['~/Downloads'] }]);
     await clicca('.indietro', 'Dati'); await wait(() => document.querySelector('h1')?.textContent === 'Dati'); assert.match(await run(() => document.body.innerText), /1 cartella/);
@@ -227,12 +225,12 @@ H.avvia('requisiti-b', async () => {
   await req('F10', async () => {
     await imp('119-57404');
     await wait(() => document.querySelector('.scelta .valore')?.getAttribute('aria-label') === 'Versione: 0.1.0');
-    await clicca('.scelta .valore', 'Versione: 0.1.0'); await wait(() => !!document.querySelector('.scelta .menu'));
-    assert.deepEqual(await testo('.scelta .menu .etichetta'), ['Controlla aggiornamenti', 'Novità della versione 0.1.0', 'Copia versione']);
-    await clicca('.scelta .menu .voce', 'Controlla aggiornamenti'); await attesa(60); assert.deepEqual(fatte('impostazioni:aggiornamenti').at(-1), [true]);
-    await clicca('.scelta .valore', 'Versione: 0.1.0'); await clicca('.scelta .menu .voce', 'Novità della versione 0.1.0'); await wait(() => !!document.querySelector('[role=dialog]'));
+    await clicca('.scelta .valore', 'Versione: 0.1.0'); await wait(() => !!document.querySelector('.menu-scelta'));
+    assert.deepEqual(await testo('.menu-scelta .etichetta'), ['Controlla aggiornamenti', 'Novità della versione 0.1.0', 'Copia versione']);
+    await clicca('.menu-scelta .voce', 'Controlla aggiornamenti'); await attesa(60); assert.deepEqual(fatte('impostazioni:aggiornamenti').at(-1), [true]);
+    await clicca('.scelta .valore', 'Versione: 0.1.0'); await clicca('.menu-scelta .voce', 'Novità della versione 0.1.0'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal((await testo('[role=dialog] .novita li')).length, 4); await clicca('[role=dialog] button', 'Chiudi'); await wait(() => !document.querySelector('[role=dialog]'));
-    await clicca('button[role=switch]', 'Aggiornamenti automatici'); await attesa(60); assert.deepEqual(imposta(), [{ aggiornamentiAutomatici: false }]);
+    assert.equal(await run(() => document.querySelector('button[role=switch][aria-label="Aggiornamenti automatici"]').disabled), true); // nessun server di aggiornamenti: spento (#534)
   });
 
 });

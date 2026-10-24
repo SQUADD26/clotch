@@ -1,7 +1,7 @@
 /* figma: 101-26745 — «menu comandi» 101:27015; 101-27018 — «menu file» 101:27276; 101-26140 — «menu permessi» 101:26398 e «tooltip» 101:26425;
    148-28674 — «menu modello» (148-28740, 148-28806); 101-27528 — «errore invio» 101:27798 e la casella con il bordo d'errore */
 .pezzo-chat .menu-casella {
-  display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-xl); background: var(--colore-fondo-elevato);
+  display: flex; flex-direction: column; padding: var(--spazio-1); border-radius: var(--raggio-sovrapposto); background: var(--colore-fondo-elevato);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pezzo-chat .menu-casella .titolo-gruppo {
@@ -22,10 +22,16 @@
 
 /* comandi con «/» e file con «@»: sopra la casella, larghi quanto lei */
 .pezzo-chat .menu-casella.suggerimenti {
-  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: 3; overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
+  position: absolute; left: 0; right: 0; bottom: calc(100% + var(--spazio-2)); z-index: var(--livello-menu); overflow-x: hidden; overflow-y: auto; max-height: calc(var(--misura-riga) * 9);
 }
-.pezzo-chat .suggerimenti .comando { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
+.pezzo-chat .suggerimenti .comando { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
 .pezzo-chat .suggerimenti .comando + .descrizione { margin-left: var(--spazio-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* file con «@»: la cartella si accorcia per prima, il nome del file resta intero finché c'è posto */
+.pezzo-chat .suggerimenti .etichetta { display: flex; }
+.pezzo-chat .suggerimenti .etichetta .cartella { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--colore-testo-secondario); }
+.pezzo-chat .suggerimenti .etichetta .nome { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pezzo-chat .menu-casella .vuoto-menu { padding: 0 var(--spazio-2); min-height: var(--misura-riga); display: flex; align-items: center; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 
 /* voce con nome e nota, spunta a sinistra */
 .pezzo-chat .menu-casella .voce.doppia { padding: var(--spazio-1-5) var(--spazio-2); }
@@ -34,18 +40,19 @@
 
 /* chip che apre un menu sopra di sé: permessi a sinistra del chip, modello a destra */
 .pezzo-chat .chip-menu { position: relative; display: inline-flex; }
-.pezzo-chat .menu-casella.flottante { position: absolute; bottom: calc(100% + var(--spazio-2)); z-index: 4; }
-.pezzo-chat .menu-casella.flottante.sinistra { left: 0; width: var(--misura-menu-permessi); }
-.pezzo-chat .menu-casella.flottante.destra { right: 0; bottom: calc(100% + var(--spazio-1)); width: var(--misura-menu-modello); }
-.pezzo-chat .casella button.chip:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
+/* posto sopra il chip: base/Sovrapposto (permessi a sinistra, staccato spazio-2; modello a destra, staccato spazio-1) */
+.pezzo-chat .menu-casella.flottante.sinistra { width: var(--misura-menu-permessi); }
+.pezzo-chat .menu-casella.flottante.destra { width: var(--misura-menu-modello); }
+.pezzo-chat .casella .chip:hover:not(:disabled), .pezzo-chat .casella button.chip[aria-expanded="true"] { background: var(--colore-fondo-riga-passaggio); }
 
-/* contesto usato: il suggerimento sta sopra il chip, poco staccato dal bordo della casella */
-.pezzo-chat .con-suggerimento.sopra.contesto .suggerimento { bottom: calc(100% + var(--spazio-3) + var(--spazio-0-5)); }
 
 /* modello (148:28674): nome, «Predefinito» e il numero della scorciatoia o la spunta; «Impegno» si apre a destra, in cima (148:28740); in fondo «Modalità veloce» (148:28806) */
 .pezzo-chat .menu-casella.flottante.destra .titolo-gruppo, .pezzo-chat .menu-casella.impegno .titolo-gruppo { padding: var(--spazio-1-5) var(--spazio-2) var(--spazio-1); }
 .pezzo-chat .menu-casella .voce .testa { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); }
-.pezzo-chat .menu-casella .voce .testa .etichetta { flex: none; }
+.pezzo-chat .menu-casella .voce .testa .etichetta { flex: 0 1 auto; } /* i nomi lunghi finiscono con i puntini; «Predefinito» non si stringe */
+.pezzo-chat .menu-casella .predefinito { flex: none; }
+/* «Altri modelli» scorre oltre le sei voci invece di uscire dalla finestra */
+.pezzo-chat .menu-casella [aria-label="Altri modelli"] { max-height: calc(6 * var(--spazio-8)); overflow-y: auto; }
 .pezzo-chat .menu-casella .predefinito {
   padding: var(--spazio-0-5) var(--spazio-2); border: var(--misura-tratto) solid var(--colore-bordo-forte); border-radius: var(--raggio-pieno);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
@@ -55,7 +62,7 @@
 .pezzo-chat .menu-casella .riga-veloce { display: flex; align-items: center; gap: var(--spazio-2); min-height: var(--spazio-10); padding: 0 var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
 .pezzo-chat .menu-casella .riga-veloce .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pezzo-chat .menu-casella .riga-veloce .descrizione { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
-.pezzo-chat .menu-casella.impegno { position: absolute; top: 0; left: calc(100% + var(--spazio-1)); width: var(--misura-menu-impegno); }
+.pezzo-chat .menu-casella.impegno { width: var(--misura-menu-impegno); }
 .pezzo-chat .interruttore {
   width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
   padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
@@ -64,7 +71,7 @@
 .pezzo-chat .interruttore .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
 
 /* messaggio non inviato: la casella tiene il testo con il bordo d'errore, sotto il perché e «Riprova» */
-.pezzo-chat .casella.errore, .pezzo-chat .casella.errore:focus-within { border-color: var(--colore-testo-errore); }
+.pezzo-chat .casella.errore, .pezzo-chat .casella.errore:focus-within { border-color: var(--colore-bordo-errore); }
 .pezzo-chat .errore-invio {
   display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-1); min-height: var(--misura-bottone-invio);
   margin-inline: calc(-1 * (var(--spazio-4) + var(--spazio-0-5)));

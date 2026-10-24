@@ -89,7 +89,7 @@ app.whenReady().then(async () => {
   await check('AGGIORNAMENTO: nessuna versione nuova = avviso con la versione vera, nessun dialogo', async () => {
     finto.nuova = false; finto.chiamate.length = 0;
     await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
-    await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
+    await clicca('[role=menu] .voce', 'Controlla aggiornamenti');
     await wait(() => document.body.innerText.includes('Già aggiornato · versione 0.1.0'));
     assert.equal(await dialogo(), null);
     assert.deepEqual(finto.chiamate, [true]);
@@ -98,7 +98,7 @@ app.whenReady().then(async () => {
   await check('AGGIORNAMENTO: versione nuova = dialogo; «Più tardi» chiude senza riaprire', async () => {
     finto.nuova = true; finto.chiamate.length = 0;
     await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
-    await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
+    await clicca('[role=menu] .voce', 'Controlla aggiornamenti');
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Aggiornare clotch ora?');
     await clicca('[role=dialog] button', 'Più tardi');
@@ -109,7 +109,7 @@ app.whenReady().then(async () => {
   await check('AGGIORNAMENTO: «Aggiorna» chiede al main di riaprire; se non riapre, lo dice', async () => {
     finto.nuova = true; finto.chiamate.length = 0;
     await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
-    await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
+    await clicca('[role=menu] .voce', 'Controlla aggiornamenti');
     await wait(() => !!document.querySelector('[role=dialog]'));
     await clicca('[role=dialog] button', 'Aggiorna');
     await wait(() => document.body.innerText.includes('Riavvio non riuscito'));
@@ -120,7 +120,7 @@ app.whenReady().then(async () => {
   await check('AGGIORNAMENTO: errore del main = avviso, nessun dialogo', async () => {
     finto.errore = 'Controllo non riuscito. Riprova.';
     await run(() => document.querySelector('.piede-account button[aria-label="Impostazioni"]').click());
-    await clicca('[role=menu] .voce', 'Verifica aggiornamenti…');
+    await clicca('[role=menu] .voce', 'Controlla aggiornamenti');
     await wait(() => document.body.innerText.includes('Controllo non riuscito'));
     assert.equal(await dialogo(), null);
     finto.errore = null;

@@ -8,10 +8,12 @@ import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import "../base/menu.css"; // stile di «menu» della base: qui il menu ha titolo e nota, che Menu non ha
 import { useAvvisoNotch } from "./avvisoNotch";
+import { useEscChiude } from "../base/layout";
 import { useNavigazione } from "../base/navigazione";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
-import { plurale } from "./Intestazione";
+import { plurale } from "../base/formato";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
+import { Sovrapposto } from "../base/Sovrapposto";
 
 // Ore fisse del disegno: «Fino alle 18:00»; «Fino a domani mattina» = domani alle 8:00 (decisione della master, #352).
 const ORA_SERA = 18, ORA_MATTINA = 8;
@@ -27,7 +29,7 @@ export const fermo = negozio<"chiuso" | "conferma" | "in-corso">("chiuso");
 /** Menu di Non disturbare aperto (anche dalla scena di prova 101-38626). */
 export const menuQuiete = negozio(false);
 
-export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", messaggio: `Fermo ${plurale(quante, "sessione", "sessioni")}…` });
+export const avvisoInCorso = (quante: number) => avvisa({ tipo: "caricamento", messaggio: `Fermando ${plurale(quante, "sessione", "sessioni")}…` });
 
 /** Esito di Ferma tutto: `non` = sessioni non ferme (null = clotch AI non ha risposto, col suo testo). */
 export function esitoFermo(id: number, quante: number, non: string[] | null, testo = "") {
@@ -42,13 +44,17 @@ export function esitoFermo(id: number, quante: number, non: string[] | null, tes
 export async function fermaTutto(quante: number) {
   fermo.metti("in-corso");
   const id = avvisoInCorso(quante);
-  const e = await clotchAi().comando("ferma_tutto");
+  const e = await clotchAi().comando("ferma_tutto").catch(() => ({ esito: "errore", nonFermate: undefined, testo: "Non so se le sessioni si sono fermate: controlla" }));
   fermo.metti("chiuso");
   esitoFermo(id, quante, e.esito === "ok" ? e.nonFermate ?? [] : null, e.testo);
 }
 
-function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): void }) {
-  const metti = (args: Record<string, unknown>) => { onChiudi(); clotchAi().comando("non_disturbare", { acceso: true, ...args }); };
+/** La durata scelta l'ultima volta (la spunta del menu da attivo); il registro conosce solo l'ora di fine. */
+const scelta = negozio("");
+
+function MenuNonDisturbare({ clotch, quiete, onChiudi }: { clotch: boolean; quiete: boolean; onChiudi(): void }) {
+  const attuale = scelta.usa();
+  const metti = (etichetta: string, args: Record<string, unknown>) => { scelta.metti(etichetta); onChiudi(); clotchAi().comando("non_disturbare", { acceso: true, ...args }); };
   const voci: [NomeIcona, string, Record<string, unknown>][] = [
     ["orologio", "Per 1 ora", { minuti: 60 }],
     ["orologio", `Fino alle ${ORA_SERA}:00`, { fino: prossima(Date.now(), ORA_SERA) }],
@@ -56,19 +62,26 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
     ["nascondi", "Finché non lo tolgo", { fino: null }],
   ];
   return (
-    <div className="menu" role="menu">
+    <Sovrapposto fine className="menu" role="menu" onChiudi={onChiudi}>
       <div className="titolo-menu t-xs medio secondario">Non disturbare</div>
       {voci.map(([icona, etichetta, args]) => (
-        <button key={etichetta} type="button" role="menuitem" className="voce" onClick={() => metti(args)}>
+        <button key={etichetta} type="button" role="menuitemradio" aria-checked={quiete && attuale === etichetta} className="voce" onClick={() => metti(etichetta, args)}>
           <Icona nome={icona} />
           <span className="etichetta t-sm">{etichetta}</span>
+          {quiete && attuale === etichetta && <Icona nome="spunta" colore="primaria" />}
         </button>
       ))}
+      {quiete && (
+        <button type="button" role="menuitem" className="voce" onClick={() => { scelta.metti(""); onChiudi(); clotchAi().comando("non_disturbare", { acceso: false }); }}>
+          <Icona nome="chiudi" />
+          <span className="etichetta t-sm">Togli</span>
+        </button>
+      )}
       <div className="separatore" role="separator"><div className="linea" /></div>
       <div className="nota-menu t-sm secondario">
-        {clotch ? "Vale anche per clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
+        {clotch ? "Vale anche per Clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
       </div>
-    </div>
+    </Sovrapposto>
   );
 }
 
@@ -79,6 +92,7 @@ export function ComandiTitolo() {
   const stato = fermo.usa();
   const menu = menuQuiete.usa();
   const chiudi = useCallback(() => menuQuiete.metti(false), []);
+  useEscChiude(menu, chiudi);
   const quiete = !!r && statoClotchAi(r, Date.now()).stato === "pausa";
   const quante = r ? sessioniAlLavoro(r) : 0;
   // «L’app prova a riaprirla» (101-42000): una volta per chiusura, mai dopo `spegni` (evento friday «stop») // nome del protocollo del motore
@@ -96,18 +110,18 @@ export function ComandiTitolo() {
   return (
     <div className="comandi-titolo">
       <span className="ancora-menu">
-      <button type="button" aria-label="Non disturbare" title="Non disturbare" aria-expanded={menu}
+      <button type="button" aria-label="Non disturbare" title={quiete ? "Non disturbare: attivo" : "Non disturbare"} aria-expanded={menu} aria-pressed={quiete}
         className={`bottone-icona ${menu || quiete ? "aperto" : ""}`} onClick={() => menuQuiete.metti(!menu)}>
         <Icona nome="luna" colore={quiete ? "accento" : "secondaria"} />
       </button>
-      {menu && <MenuNonDisturbare clotch={!!r && clotchAcceso(r, Date.now())} onChiudi={chiudi} />}
+      {menu && <MenuNonDisturbare clotch={!!r && clotchAcceso(r, Date.now())} quiete={quiete} onChiudi={chiudi} />}
       </span>
-      <Bottone tipo="pericolo" piccolo disabled={stato === "in-corso"} onClick={() => fermo.metti("conferma")}>
+      <Bottone tipo="pericolo" piccolo disabled={stato === "in-corso" || !quante} title={quante ? undefined : "Nessuna sessione al lavoro"} onClick={() => fermo.metti("conferma")}>
         {stato === "in-corso" ? "Fermo…" : "Ferma tutto"}
       </Bottone>
       {stato === "conferma" && (
         <Dialogo titolo="Fermare tutte le sessioni?" onChiudi={() => fermo.metti("chiuso")}
-          corpo={`Le ${quante} sessioni al lavoro si fermano subito. Le riprendi una per una o tutte insieme.`}
+          corpo={`${quante === 1 ? "La sessione al lavoro si ferma" : `Le ${quante} sessioni al lavoro si fermano`} subito. Le riprendi una per una o tutte insieme.`}
           bottoni={<>
             <Bottone tipo="secondario" onClick={() => fermo.metti("chiuso")}>Annulla</Bottone>
             <Bottone tipo="pericolo" onClick={() => fermaTutto(quante)}>Ferma tutto</Bottone>

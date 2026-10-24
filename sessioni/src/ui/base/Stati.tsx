@@ -1,6 +1,7 @@
 // figma: 101-8805 — stati vuoto (101-8805) ed errore (101-9090): «Messaggio al centro»; caricamento (101-8912): sagome.
 import type { CSSProperties, ReactNode } from "react";
 import caricamento from "../../../design/figma/101-8912.json";
+import type { ErroreLettura } from "../../tipi";
 import { Bottone } from "./Bottone";
 import "./stati.css";
 
@@ -20,6 +21,39 @@ export function StatoErrore({ titolo, corpo, riprova, children }: { titolo: stri
   return (
     <MessaggioAlCentro titolo={titolo} corpo={corpo}>
       {children}
+      <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
+    </MessaggioAlCentro>
+  );
+}
+
+/** «Vuoto» (101-8805): l'elenco è arrivato e non ha sessioni. */
+export function NessunaSessione({ aggiungi, impostazioni }: { aggiungi(): void; impostazioni(): void }) {
+  return (
+    <MessaggioAlCentro titolo="Nessuna sessione" corpo={"Qui appaiono le sessioni di Claude Code, Claude, Codex e Cursor di questo Mac.\nApri una sessione in una di queste app, o aggiungi la cartella di un account."}>
+      <Bottone onClick={aggiungi}>Aggiungi cartella</Bottone>
+      <Bottone tipo="secondario" onClick={impostazioni}>Apri impostazioni</Bottone>
+    </MessaggioAlCentro>
+  );
+}
+
+const IMPOSTAZIONI_DI_SISTEMA = "/System/Applications/System Settings.app"; // shortcut: apre l'app, non il pannello «Accesso completo al disco»; da cambiare se serve il pannello
+
+/** Il messaggio del main (jsonl.ts `msgErrore`) in parole semplici: gli errori di sistema, in inglese e con percorsi, non si mostrano. */
+export const motivoErrore = (m: string) => m === "permesso negato" ? "permesso negato" : m === "file sparito" ? "non c’è più" : "non si apre";
+
+const MAX_CARTELLE = 3;
+
+/** «Errore cartella» (101-9090): nessuna sessione da mostrare perché una cartella non si legge. Il permesso negato è quasi sempre l’accesso completo al disco del Mac.
+ *  Con più cartelle le nomina tutte (le prime tre, poi «e altre N»). */
+export function CartellaNonLeggibile({ errori, riprova }: { errori: ErroreLettura[]; riprova(): void }) {
+  const permesso = errori.some((e) => e.messaggio === "permesso negato");
+  const uno = errori.length === 1;
+  const lista = errori.slice(0, MAX_CARTELLE).map((e) => `${e.percorso}: ${motivoErrore(e.messaggio)}`).join("\n");
+  const altre = errori.length > MAX_CARTELLE ? `\ne altre ${errori.length - MAX_CARTELLE}` : "";
+  return (
+    <MessaggioAlCentro titolo={uno ? "Cartella non leggibile" : "Cartelle non leggibili"}
+      corpo={`${uno ? `clotch non può leggere ${lista}.` : `clotch non può leggere ${errori.length} cartelle:\n${lista}${altre}`}${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
+      {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
   );

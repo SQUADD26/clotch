@@ -44,7 +44,7 @@ export const modelloDi = (s: Pick<Sessione, "modello">, p?: PreferenzeSessione) 
   p?.modello ?? MODELLI_MENU.find((m) => s.modello?.startsWith(m.id))?.id ?? s.modello;
 
 /** Etichetta dell'id CLI (`claude-opus-5-5` → «Opus 5.5»); undefined se non è un modello noto. */
-export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => m.id === id)?.etichetta;
+export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => id?.startsWith(m.id))?.etichetta;
 
 /** Impegno in uso: la scelta fatta qui, altrimenti il predefinito del modello (`base`, di solito «medio»). */
 export const sforzoDi = (p?: PreferenzeSessione, base = SFORZO_BASE) =>
@@ -81,6 +81,6 @@ export function motivoNonInviato(e: EsitoComando | null): string {
   const perche = !e ? "la sessione non è raggiungibile"
     : e.esito === "scaduto" ? "la sessione non risponde"
     : e.esito === "non_scritto" ? "il messaggio non si è potuto scrivere"
-    : e.testo.trim() || (e.esito === "rifiutato" ? "il motore l'ha rifiutato" : "il motore ha dato un errore");
+    : e.testo.trim() || (e.esito === "rifiutato" ? "il motore l’ha rifiutato" : "il motore ha dato un errore");
   return `Non inviato: ${perche.replace(/\.$/, "")}.`;
 }

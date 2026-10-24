@@ -15,7 +15,7 @@ export function Campo({ grande = false, icona = "cerca", tasto, className = "", 
     <label className={`campo ${grande ? "grande" : "piccolo"} ${className}`}>
       <Icona nome={icona} colore={grande ? "secondaria" : "terziaria"} />
       <input {...p} />
-      {grande && tasto && <span className="tasto">{tasto}</span>}
+      {grande && tasto && <span className="tasto-chip">{tasto}</span>}
     </label>
   );
 }

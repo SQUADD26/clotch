@@ -2,6 +2,7 @@
 // AFK: `afk.json` e `afk-fatto.jsonl` di Clotch, letti dal main (stato-app.ts) e mandati dentro il registro.
 import type { Registro } from "../../clotch-ai";
 import { Icona } from "../base/Icona";
+import { plurale } from "../base/formato";
 import { durata } from "../chat/testi";
 import { acceso as clotchAcceso } from "../pannello/clotch";
 import "./via.css";
@@ -19,7 +20,7 @@ export function ViaDalMac({ r, adesso, aspettano, inCasella }: { r: Registro | n
           <span className="titolo t-sm medio">Sei via dal Mac da {durata(Math.max(60_000, adesso - r.afk.da))}</span>
         </div>
         <span className="dettaglio t-xs secondario">
-          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${n} ${n === 1 ? "avviso e te lo legge" : "avvisi e te li legge"} al ritorno.`}
+          {n === 0 ? "Nessun avviso da leggere al ritorno." : `clotch tiene ${plurale(n, "avviso", "avvisi")} da leggere al ritorno.`}
         </span>
       </div>
     );

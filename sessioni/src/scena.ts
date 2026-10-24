@@ -104,7 +104,9 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "nuova:cartelle": return { recenti: s.nuova?.recenti ?? [], casa: s.nuova?.casa ?? "/Users/roberto" };
     case "nuova:contesto": return s.nuova?.contesti[String(args[0])] ?? { git: false, rami: [], predefinito: null };
     case "nuova:scegli-chiave": return null;
-    case "clotch-ai:comando": return args[0] === "macchine" ? { id: "c-scena", esito: "ok", testo: "", ...s.macchine } : undefined;
+    // come il main: ogni comando e `avvia` rispondono sempre con un esito, mai undefined
+    case "clotch-ai:comando": return { id: "c-scena", esito: "ok", testo: "", ...(args[0] === "macchine" ? s.macchine : {}) };
+    case "clotch-ai:avvia": return { ok: true, testo: "" };
     case "nuova:scegli-cartella": return null;
     case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
     case "casella:scegli": return [];
@@ -124,7 +126,7 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
-  "nuova:cartelle", "nuova:contesto", "nuova:scegli-chiave", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
+  "nuova:cartelle", "nuova:contesto", "nuova:scegli-chiave", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:mostra", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

@@ -1,15 +1,35 @@
 // figma: 101-17193 — «Gruppo», «Riga impostazione» 101:7584, «Riga scelta» 101:17077, «Interruttore» 101:7467, «tasto», «Campo testo» 101:22042.
-import { useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { Icona } from "../base/Icona";
 import { Menu } from "../base/Menu";
+import { SEZIONI, type Sezione } from "./sezioni";
 import "./impostazioni.css";
 import "./tendine.css";
 
+/** Finestra stretta (155:74691): la navigazione sparisce e il titolo della pagina diventa il selettore della sezione. */
+export const Stretta = createContext<{ sezione: Sezione; scegli(s: Sezione): void } | null>(null);
+
+function TitoloSezione({ titolo, sezione, scegli }: { titolo: string; sezione: Sezione; scegli(s: Sezione): void }) {
+  const [aperto, setAperto] = useState(false);
+  return (
+    <h1 className="titolo-pagina t-xl scelta-sezione">
+      <button type="button" className="valore" aria-haspopup="menu" aria-expanded={aperto} aria-label={`Sezione: ${titolo}`} onClick={() => setAperto((x) => !x)}>
+        {titolo}<Icona nome="giu" />
+      </button>
+      {aperto && (
+        <Menu onChiudi={() => setAperto(false)} classe="menu-scelta"
+          voci={SEZIONI.map(([id, nome]) => ({ etichetta: nome, scelta: id === sezione, fai: () => scegli(id) }))} />
+      )}
+    </h1>
+  );
+}
+
 export function Pagina({ titolo, sopra, children }: { titolo: string; sopra?: ReactNode; children: ReactNode }) {
+  const stretta = useContext(Stretta);
   return (
     <div className="contenuto-impostazioni">
       {sopra}
-      <h1 className="titolo-pagina t-xl">{titolo}</h1>
+      {stretta && !sopra ? <TitoloSezione titolo={titolo} {...stretta} /> : <h1 className="titolo-pagina t-xl">{titolo}</h1>}
       {children}
     </div>
   );
@@ -57,7 +77,7 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
         <Icona nome="giu" />
       </button>
       {aperta && voci && (
-        <Menu onChiudi={chiudi} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }}
+        <Menu onChiudi={chiudi} fine classe="menu-scelta"
           voci={voci.map((v) => ({ etichetta: v, scorciatoia: dettagli?.[v], scelta: v === valore, fai: () => onScegli?.(v) }))} />
       )}
     </div>
@@ -66,7 +86,7 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
 
 /** Tasti di una scorciatoia, come «tasto» del frame Scorciatoie. */
 export const Tasto = ({ tasti, errore = false }: { tasti: string; errore?: boolean }) =>
-  <span className={`tasto t-sm ${errore ? "errore" : ""}`}>{tasti}</span>;
+  <span className={`tasto-chip ${errore ? "errore" : ""}`}>{tasti}</span>;
 
 /** «Campo testo»: un percorso da leggere, si cambia col bottone accanto. */
 export const CampoTesto = ({ valore }: { valore: string }) => <div className="campo-testo t-base" title={valore}>{valore}</div>;

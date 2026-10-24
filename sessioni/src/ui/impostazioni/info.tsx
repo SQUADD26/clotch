@@ -20,7 +20,7 @@ function TendinaVersione({ versione, voci }: { versione: string; voci: VoceMenu[
         <span className="t-sm secondario">{versione}</span>
         <Icona nome="giu" />
       </button>
-      {aperta && <Menu onChiudi={() => setAperta(false)} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }} voci={voci} />}
+      {aperta && <Menu onChiudi={() => setAperta(false)} fine classe="menu-scelta" voci={voci} />}
     </div>
   );
 }
@@ -38,7 +38,7 @@ export default function Info() {
   const apriRegistro = () => window.impostazioni.apri(v.cartellaRegistro).catch(errore);
   const voci: VoceMenu[] = [
     { etichetta: "Controlla aggiornamenti", fai: () => void verificaAggiornamenti() },
-    ...(novita ? [{ etichetta: `Novità della versione ${versione}`, fai: () => void apriNovita() }] : []),
+    ...(novita ? [{ etichetta: `Novità`, fai: () => void apriNovita() }] : []),
     { etichetta: "Copia versione", fai: () => { navigator.clipboard.writeText(versione).catch(errore); } },
   ];
   return (
@@ -47,8 +47,8 @@ export default function Info() {
         <Riga etichetta="Versione" descrizione="Aggiornata">
           <TendinaVersione versione={versione} voci={voci} />
         </Riga>
-        <Riga etichetta="Aggiornamenti automatici" descrizione="Si installano alla prossima apertura">
-          <Interruttore etichetta="Aggiornamenti automatici" acceso={v.aggiornamentiAutomatici} onCambia={(x) => imposta("aggiornamentiAutomatici", x)} />
+        <Riga etichetta="Aggiornamenti automatici" descrizione="Non disponibili: non c’è un server di aggiornamenti">
+          <Interruttore etichetta="Aggiornamenti automatici" acceso={false} disabled onCambia={() => {}} />
         </Riga>
         <Riga etichetta="Registro" descrizione="File con gli errori dell’app">
           <button type="button" className="valore-scelta" onClick={apriRegistro}>
@@ -57,9 +57,9 @@ export default function Info() {
           </button>
         </Riga>
         {novita && (
-          <Riga etichetta="Note di rilascio" azione>
+          <Riga etichetta="Novità" azione>
             <button type="button" className="valore-scelta" onClick={() => void apriNovita()}>
-              <span className="t-sm secondario">Novità della versione {versione}</span>
+              <span className="t-sm secondario">Versione {versione}</span>
               <Icona nome="destra" />
             </button>
           </Riga>

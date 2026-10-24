@@ -10,6 +10,7 @@ export type Token =
   | "primitivo-bianco-a904"
   | "primitivo-bianco-a078"
   | "primitivo-bianco-a498"
+  | "primitivo-bianco-a55"
   | "primitivo-grigio-141414"
   | "primitivo-grigio-181818"
   | "primitivo-grigio-232323"
@@ -26,6 +27,9 @@ export type Token =
   | "primitivo-arancio-fdf5f1"
   | "primitivo-arancio-ff8549"
   | "primitivo-arancio-b9461b"
+  | "primitivo-arancio-c15625"
+  | "primitivo-arancio-7d3b1b"
+  | "primitivo-verde-338554"
   | "primitivo-verde-40c977"
   | "primitivo-verde-40c977-a16"
   | "primitivo-verde-37915b"
@@ -35,6 +39,7 @@ export type Token =
   | "primitivo-rosso-ff6764"
   | "primitivo-rosso-fa423e-a16"
   | "primitivo-rosso-c8312d"
+  | "primitivo-rosso-ff7673"
   | "primitivo-semaforo-rosso"
   | "primitivo-semaforo-giallo"
   | "primitivo-semaforo-verde"
@@ -55,12 +60,18 @@ export type Token =
   | "primitivo-blu-1982e5"
   | "primitivo-blu-f0f7fe"
   | "primitivo-blu-0a66d6"
+  | "primitivo-blu-4aa6ff"
+  | "primitivo-blu-1778d3"
+  | "primitivo-blu-124d85"
   | "primitivo-viola-ad7bf9"
   | "primitivo-viola-ad7bf9-a16"
   | "primitivo-viola-9965e8"
   | "primitivo-viola-6925d0"
   | "primitivo-viola-f6f1fd"
   | "primitivo-viola-6f2fd6"
+  | "primitivo-viola-8f56e6"
+  | "primitivo-viola-5b20b4"
+  | "primitivo-argento-707783"
   | "primitivo-argento-c4c8ce"
   | "primitivo-argento-c4c8ce-a16"
   | "primitivo-argento-7a818d"
@@ -135,6 +146,7 @@ export type Token =
   | "colore-bordo-fuoco-verde"
   | "colore-bordo-fuoco-viola"
   | "colore-bordo-fuoco-argento"
+  | "colore-bordo-errore"
   | "colore-ombra-colore"
   | "colore-semaforo-rosso"
   | "colore-semaforo-giallo"
@@ -171,6 +183,7 @@ export type Token =
   | "raggio-2xl"
   | "raggio-casella"
   | "raggio-pieno"
+  | "raggio-sovrapposto"
   | "testo-dimensione-xs"
   | "testo-dimensione-sm"
   | "testo-dimensione-base"
@@ -250,13 +263,51 @@ export type Token =
   | "misura-menu-avvio-largo"
   | "misura-campo-porta"
   | "misura-riga-menu-larga"
+  | "misura-margine-finestra"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
   | "tempo-breve"
   | "tempo-normale"
   | "tempo-lento"
-  | "opacita-spento";
+  | "tempo-entrata"
+  | "tempo-uscita"
+  | "tempo-pressione"
+  | "tempo-spostamento"
+  | "tempo-avviso"
+  | "tempo-giro"
+  | "tempo-luccica"
+  | "tempo-cursore"
+  | "opacita-spento"
+  | "opacita-passaggio"
+  | "opacita-premuto"
+  | "curva-entrata-x1"
+  | "curva-entrata-y1"
+  | "curva-entrata-x2"
+  | "curva-entrata-y2"
+  | "curva-uscita-x1"
+  | "curva-uscita-y1"
+  | "curva-uscita-x2"
+  | "curva-uscita-y2"
+  | "curva-spostamento-x1"
+  | "curva-spostamento-y1"
+  | "curva-spostamento-x2"
+  | "curva-spostamento-y2"
+  | "scala-premuto"
+  | "scala-entrata"
+  | "livello-base"
+  | "livello-barra-sovrapposta"
+  | "livello-velo"
+  | "livello-dialogo"
+  | "livello-menu"
+  | "livello-avviso"
+  | "livello-tooltip"
+  | "livello-sopra"
+  | "livello-sopra-2"
+  | "livello-sopra-3"
+  | "curva-entrata"
+  | "curva-uscita"
+  | "curva-spostamento";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -273,6 +324,7 @@ export const valori: Record<Token, string> = {
   "primitivo-bianco-a904": "#ffffffe7",
   "primitivo-bianco-a078": "#ffffff14",
   "primitivo-bianco-a498": "#ffffff7f",
+  "primitivo-bianco-a55": "#ffffff8c",
   "primitivo-grigio-141414": "#141414",
   "primitivo-grigio-181818": "#181818",
   "primitivo-grigio-232323": "#232323",
@@ -289,6 +341,9 @@ export const valori: Record<Token, string> = {
   "primitivo-arancio-fdf5f1": "#fdf5f1",
   "primitivo-arancio-ff8549": "#ff8549",
   "primitivo-arancio-b9461b": "#b9461b",
+  "primitivo-arancio-c15625": "#c15625",
+  "primitivo-arancio-7d3b1b": "#7d3b1b",
+  "primitivo-verde-338554": "#338554",
   "primitivo-verde-40c977": "#40c977",
   "primitivo-verde-40c977-a16": "#40c97729",
   "primitivo-verde-37915b": "#37915b",
@@ -298,6 +353,7 @@ export const valori: Record<Token, string> = {
   "primitivo-rosso-ff6764": "#ff6764",
   "primitivo-rosso-fa423e-a16": "#fa423e29",
   "primitivo-rosso-c8312d": "#c8312d",
+  "primitivo-rosso-ff7673": "#ff7673",
   "primitivo-semaforo-rosso": "#ff5f57",
   "primitivo-semaforo-giallo": "#febc2e",
   "primitivo-semaforo-verde": "#28c840",
@@ -318,12 +374,18 @@ export const valori: Record<Token, string> = {
   "primitivo-blu-1982e5": "#1982e5",
   "primitivo-blu-f0f7fe": "#f0f7fe",
   "primitivo-blu-0a66d6": "#0a66d6",
+  "primitivo-blu-4aa6ff": "#4aa6ff",
+  "primitivo-blu-1778d3": "#1778d3",
+  "primitivo-blu-124d85": "#124d85",
   "primitivo-viola-ad7bf9": "#ad7bf9",
   "primitivo-viola-ad7bf9-a16": "#ad7bf929",
   "primitivo-viola-9965e8": "#9965e8",
   "primitivo-viola-6925d0": "#6925d0",
   "primitivo-viola-f6f1fd": "#f6f1fd",
   "primitivo-viola-6f2fd6": "#6f2fd6",
+  "primitivo-viola-8f56e6": "#8f56e6",
+  "primitivo-viola-5b20b4": "#5b20b4",
+  "primitivo-argento-707783": "#707783",
   "primitivo-argento-c4c8ce": "#c4c8ce",
   "primitivo-argento-c4c8ce-a16": "#c4c8ce29",
   "primitivo-argento-7a818d": "#7a818d",
@@ -337,12 +399,12 @@ export const valori: Record<Token, string> = {
   "colore-fondo-codice": "#141414",
   "colore-fondo-elevato": "#2d2d2d",
   "colore-fondo-casella": "#363636",
-  "colore-fondo-bolla": "#87401d",
+  "colore-fondo-bolla": "#7d3b1b",
   "colore-fondo-riga-passaggio": "#ffffff0d",
   "colore-fondo-riga-scelta": "#ffffff14",
   "colore-fondo-bottone-secondario": "#ffffff0d",
   "colore-fondo-bottone-primario": "#ffffff",
-  "colore-fondo-accento": "#d25e28",
+  "colore-fondo-accento": "#c15625",
   "colore-fondo-errore": "#fa423e29",
   "colore-fondo-sagoma": "#ffffff14",
   "colore-fondo-velo": "#00000080",
@@ -350,27 +412,27 @@ export const valori: Record<Token, string> = {
   "colore-fondo-manopola": "#ffffff",
   "colore-fondo-aggiunta": "#40c97729",
   "colore-fondo-attesa": "#ee7c3729",
-  "colore-fondo-accento-blu": "#1982e5",
-  "colore-fondo-bolla-blu": "#145694",
+  "colore-fondo-accento-blu": "#1778d3",
+  "colore-fondo-bolla-blu": "#124d85",
   "colore-fondo-attesa-blu": "#339cff29",
-  "colore-fondo-accento-verde": "#37915b",
+  "colore-fondo-accento-verde": "#338554",
   "colore-fondo-bolla-verde": "#265f3d",
   "colore-fondo-attesa-verde": "#40c97729",
-  "colore-fondo-accento-viola": "#9965e8",
-  "colore-fondo-bolla-viola": "#6925d0",
+  "colore-fondo-accento-viola": "#8f56e6",
+  "colore-fondo-bolla-viola": "#5b20b4",
   "colore-fondo-attesa-viola": "#ad7bf929",
-  "colore-fondo-accento-argento": "#7a818d",
+  "colore-fondo-accento-argento": "#707783",
   "colore-fondo-bolla-argento": "#50555c",
   "colore-fondo-attesa-argento": "#c4c8ce29",
   "colore-fondo-tabella-intestazione": "#ffffff14",
   "colore-testo-primario": "#ffffff",
   "colore-testo-secondario": "#ffffffb5",
   "colore-testo-su-primario": "#2d2d2d",
-  "colore-testo-errore": "#ff6764",
+  "colore-testo-errore": "#ff7673",
   "colore-testo-successo": "#40c977",
   "colore-testo-bolla": "#fdf5f1",
-  "colore-testo-terziario": "#ffffff7f",
-  "colore-testo-link": "#339cff",
+  "colore-testo-terziario": "#ffffff8c",
+  "colore-testo-link": "#4aa6ff",
   "colore-testo-lavoro": "#f2c14e",
   "colore-testo-lavoro-luce": "#fff1c2",
   "colore-testo-bolla-blu": "#f0f7fe",
@@ -398,6 +460,7 @@ export const valori: Record<Token, string> = {
   "colore-bordo-fuoco-verde": "#40c977",
   "colore-bordo-fuoco-viola": "#ad7bf9",
   "colore-bordo-fuoco-argento": "#c4c8ce",
+  "colore-bordo-errore": "#ff7673",
   "colore-ombra-colore": "#00000030",
   "colore-semaforo-rosso": "#ff5f57",
   "colore-semaforo-giallo": "#febc2e",
@@ -434,6 +497,7 @@ export const valori: Record<Token, string> = {
   "raggio-2xl": "20px",
   "raggio-casella": "22px",
   "raggio-pieno": "9999px",
+  "raggio-sovrapposto": "15px",
   "testo-dimensione-xs": "12px",
   "testo-dimensione-sm": "13px",
   "testo-dimensione-base": "14px",
@@ -513,13 +577,51 @@ export const valori: Record<Token, string> = {
   "misura-menu-avvio-largo": "320px",
   "misura-campo-porta": "96",
   "misura-riga-menu-larga": "312",
+  "misura-margine-finestra": "8px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
   "tempo-breve": "150ms",
   "tempo-normale": "200ms",
   "tempo-lento": "400ms",
+  "tempo-entrata": "150ms",
+  "tempo-uscita": "100ms",
+  "tempo-pressione": "75ms",
+  "tempo-spostamento": "200ms",
+  "tempo-avviso": "4000ms",
+  "tempo-giro": "1200ms",
+  "tempo-luccica": "1800ms",
+  "tempo-cursore": "1000ms",
   "opacita-spento": "0.4",
+  "opacita-passaggio": "0.88",
+  "opacita-premuto": "0.76",
+  "curva-entrata-x1": "0.215",
+  "curva-entrata-y1": "0.61",
+  "curva-entrata-x2": "0.355",
+  "curva-entrata-y2": "1",
+  "curva-uscita-x1": "0.55",
+  "curva-uscita-y1": "0.055",
+  "curva-uscita-x2": "0.675",
+  "curva-uscita-y2": "0.19",
+  "curva-spostamento-x1": "0.645",
+  "curva-spostamento-y1": "0.045",
+  "curva-spostamento-x2": "0.355",
+  "curva-spostamento-y2": "1",
+  "scala-premuto": "0.98",
+  "scala-entrata": "0.96",
+  "livello-base": "0",
+  "livello-barra-sovrapposta": "20",
+  "livello-velo": "30",
+  "livello-dialogo": "40",
+  "livello-menu": "50",
+  "livello-avviso": "60",
+  "livello-tooltip": "70",
+  "livello-sopra": "1",
+  "livello-sopra-2": "2",
+  "livello-sopra-3": "3",
+  "curva-entrata": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+  "curva-uscita": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
+  "curva-spostamento": "cubic-bezier(0.645, 0.045, 0.355, 1)",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);

@@ -6,7 +6,7 @@ import type { QuotaUso } from "../../tipi";
 import { fa } from "../../uso-testi";
 import { Icona } from "../base/Icona";
 import { useClotchAcceso } from "../pannello/Pillole";
-import { Gruppo, Pagina } from "./controlli";
+import { Gruppo, Pagina, VuotoLista } from "./controlli";
 import { prova } from "./prova";
 import "./uso.css";
 
@@ -43,7 +43,7 @@ function Panoramica({ quote }: { quote: QuotaUso[] }) {
 
 function Andamento({ quote }: { quote: QuotaUso[] }) {
   const giorni = quote[0]?.giorni ?? [];
-  if (!giorni.length) return null;
+  if (!giorni.length) return <Gruppo><VuotoLista titolo="Nessun uso registrato" corpo="L’andamento compare quando un account lavora in una sessione." /></Gruppo>;
   const totale = giorni.map((_, i) => quote.reduce((s, q) => s + (q.giorni?.[i]?.v ?? 0), 0));
   const massimo = Math.max(...totale, 1);
   return (
@@ -83,9 +83,14 @@ export default function Uso() {
   useEffect(() => { window.impostazioni.uso().then(setQuote, () => setQuote(null)); }, []);
   return (
     <Pagina titolo="Uso">
-      <div className="schede" role="tablist">
+      <div className="schede" role="tablist" onKeyDown={(e) => {
+        const i = SCHEDE.findIndex(([id]) => id === scheda), d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault(); setScheda(SCHEDE[(i + d + SCHEDE.length) % SCHEDE.length][0]);
+        queueMicrotask(() => document.querySelector<HTMLElement>('[role=tab][aria-selected=true]')?.focus());
+      }}>
         {SCHEDE.map(([id, nome]) => (
-          <button key={id} type="button" role="tab" aria-selected={scheda === id} className={`tab-uso t-sm ${scheda === id ? "scelta" : "secondario"}`}
+          <button key={id} type="button" role="tab" aria-selected={scheda === id} tabIndex={scheda === id ? 0 : -1} className={`tab-uso t-sm ${scheda === id ? "scelta" : "secondario"}`}
             onClick={() => setScheda(id)}>{nome}</button>
         ))}
       </div>

@@ -2,8 +2,11 @@
 .pezzo-chat .filo-area { position: relative; flex: 1; min-height: 0; display: flex; }
 .pezzo-chat .filo-area > .filo { flex: 1; min-width: 0; }
 .pezzo-chat .nuovi-messaggi {
-  position: absolute; left: 50%; bottom: calc(var(--spazio-3) - var(--spazio-4)); transform: translateX(-50%); z-index: 2;
+  position: absolute; left: 50%; bottom: calc(var(--spazio-3) - var(--spazio-4)); transform: translateX(-50%); z-index: var(--livello-sopra);
   display: flex; align-items: center; gap: var(--spazio-1); height: var(--misura-bottone); padding: 0 var(--spazio-3);
   border-radius: var(--raggio-pieno); background: var(--colore-fondo-elevato);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
 }
+/* passaggio e premuto: velatura sopra il fondo pieno (come i bottoni, componenti.css) */
+.pezzo-chat .nuovi-messaggi:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .nuovi-messaggi:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }

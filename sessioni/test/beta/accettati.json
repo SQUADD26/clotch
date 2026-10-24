@@ -1,0 +1,4 @@
+{
+  "$nota": "Difetti noti con issue `beta-tester` aperta: il giudice non li conta. Campi: voce (criterio della sonda), area (o *), dove (pezzo del selettore, facoltativo), issue. Issue chiusa = il difetto torna a contare.",
+  "accettati": []
+}

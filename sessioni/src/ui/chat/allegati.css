@@ -4,6 +4,13 @@
   display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; max-width: 100%; padding: var(--spazio-1) var(--spazio-2);
   background: var(--colore-fondo-bottone-secondario); border-radius: var(--raggio-lg);
 }
+.pezzo-chat .chip-allegato:has(button.apri):hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .chip-allegato:has(button.apri:active) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-chat .chip-allegato:has(button.apri:focus-visible) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .chip-allegato.mancante { opacity: var(--opacita-spento); }
+.pezzo-chat .chip-allegato button.apri, .pezzo-chat .miniatura { cursor: pointer; }
+.pezzo-chat .miniatura:hover, .pezzo-chat .miniatura:focus-visible { border-color: var(--colore-bordo-forte); }
+.pezzo-chat .miniatura.carico { background: var(--colore-fondo-sagoma); }
 .pezzo-chat .chip-allegato .apri { display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; text-align: left; }
 .pezzo-chat .chip-allegato .testi { display: flex; flex-direction: column; min-width: 0; }
 .pezzo-chat .chip-allegato .nome {
@@ -71,4 +78,4 @@
 .pezzo-chat .avviso-allegato .titolo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
 .pezzo-chat .avviso-allegato .corpo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .pezzo-chat .aggiungi { position: relative; display: inline-flex; }
-.pezzo-chat .aggiungi .menu { left: 0; bottom: calc(100% + var(--spazio-2)); max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }
+.pezzo-chat .menu-aggiungi { max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }
