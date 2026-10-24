@@ -184,7 +184,7 @@ export default function Barra() {
           a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />
       )}
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
-      {suggerimento && <Sovrapposto passivo ancora={suggerimento.a} className="suggerimento t-xs" role="tooltip">{suggerimento.testo}</Sovrapposto>}
+      {suggerimento && !aperto && !ricerca && <Sovrapposto passivo ancora={suggerimento.a} className="suggerimento t-xs" role="tooltip">{suggerimento.testo}</Sovrapposto>}
       {ricerca && (
         <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
           onApri={apriSessione} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />
