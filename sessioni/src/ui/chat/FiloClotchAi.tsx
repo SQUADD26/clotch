@@ -120,7 +120,6 @@ export function CasellaClotchAi({ microfono, spenta = false }: { microfono?: Rea
         </div>
         <div className="azioni">
           <BottoneIcona icona="piu" etichetta="Allega" disabled />
-          <span className="chip"><Icona nome="mano" /><span className="etichetta">Chiedi approvazione</span><Icona nome="giu" /></span>
           <span className="spinta" />
           {microfono ?? <BottoneIcona icona="microfono" etichetta="Detta" disabled />}
           <button type="button" className="bottone-invia" disabled={spenta || invio || !testo.trim()} aria-label="Invia" title="Invia" onClick={() => void manda()}>
