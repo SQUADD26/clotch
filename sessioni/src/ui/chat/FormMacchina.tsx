@@ -14,7 +14,7 @@ export const VUOTI: ValoriMacchina = { host: "", porta: "", utente: "", chiave: 
 /** I campi che il motore vuole, o il perché non vanno: `host` e `cartella` (assoluta) servono sempre, il nome ha la sua regola. */
 export const mancano = (v: ValoriMacchina) => ({
   host: !v.host.trim() || /\s/.test(v.host.trim()), nome: !nomeValido(v.nome), cartella: !v.cartella.trim().startsWith("/"),
-  porta: v.porta !== "" && (Number(v.porta) < 1 || Number(v.porta) > 65535), // vuota = 22 (#1117)
+  porta: v.porta !== "" && (Number(v.porta) < 1 || Number(v.porta) > 65535), // vuota = 22
 });
 
 /** Il form riempito da una connessione di Claude Desktop; la cartella la propone solo se è vuota. */

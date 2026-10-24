@@ -64,7 +64,7 @@ export function chiudiAvviso(id: number) {
   if (avvisi.some((x) => x.id === id)) cambia(avvisi.filter((x) => x.id !== id));
 }
 
-/** La pila sta in fondo al body (come ogni sovrapposto): a finestra stretta la barra laterale sopra e il suo velo non la coprono (#1131). Si centra sulla colonna in cui è scritta. */
+/** La pila sta in fondo al body (come ogni sovrapposto): a finestra stretta la barra laterale sopra e il suo velo non la coprono. Si centra sulla colonna in cui è scritta. */
 function useColonna() {
   const segno = useRef<HTMLSpanElement>(null);
   const [stile, setStile] = useState<CSSProperties | null>(null);

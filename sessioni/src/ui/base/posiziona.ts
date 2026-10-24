@@ -12,7 +12,7 @@ export function posiziona(a: Rett, w: number, h: number, lato: Lato, allinea: Al
     x = a.right + scarto; y = allinea === "fine" ? a.bottom - h : allinea === "centro" ? (a.top + a.bottom - h) / 2 : a.top;
     if (x + w > W - m) {
       if (a.left - scarto - w >= m) x = a.left - scarto - w;
-      // né a destra né a sinistra c'è posto: sotto o sopra l'ancora, mai sopra di lei (#1113)
+      // né a destra né a sinistra c'è posto: sotto o sopra l'ancora, mai sopra di lei
       else return posiziona(a, w, h, "sotto", "inizio", scarto, m, W, H);
     }
   } else {

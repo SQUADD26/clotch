@@ -41,7 +41,7 @@ export function useStrato(ref: RefObject<HTMLElement | null>, onChiudi: () => vo
       }
       if (e.key !== "Tab" || !trappola || !ref.current) return;
       const f = [...ref.current.querySelectorAll<HTMLElement>(FOCALIZZABILI)];
-      if (!f.length) { if (ref.current.querySelector(".dialogo")) e.preventDefault(); return; } // dialogo senza controlli: Tab non esce (#1115)
+      if (!f.length) { if (ref.current.querySelector(".dialogo")) e.preventDefault(); return; } // dialogo senza controlli: Tab non esce
       const [primo, ultimo] = [f[0], f[f.length - 1]];
       const fuoriDa = !ref.current.contains(document.activeElement);
       if (fuoriDa || document.activeElement === (e.shiftKey ? primo : ultimo)) {
@@ -166,7 +166,7 @@ function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, centro = false
   useEffect(() => {
     const o = new ResizeObserver(metti);
     if (ref.current) o.observe(ref.current);
-    // l'ancora (un altro sovrapposto) si risistema nello stesso evento ma dopo di noi: si rimisura al fotogramma dopo (#1113)
+    // l'ancora (un altro sovrapposto) si risistema nello stesso evento ma dopo di noi: si rimisura al fotogramma dopo
     let f = 0;
     const alResize = () => { metti(); cancelAnimationFrame(f); f = requestAnimationFrame(metti); };
     addEventListener("resize", alResize);
