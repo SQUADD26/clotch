@@ -7,7 +7,7 @@ import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { conTransizione } from "../base/movimento";
 import { Miniature } from "./Allegati";
-import { compito, esitoErrore, fraseDi, type BloccoStrumento, type Gruppo as DatiGruppo } from "./gruppi";
+import { esitoErrore, fraseDi, type BloccoStrumento, type Gruppo as DatiGruppo } from "./gruppi";
 import type { Aiutante, Blocco } from "./modello";
 import { durata, quanti } from "./testi";
 import { useRiserva } from "./riserva";
@@ -38,11 +38,11 @@ const Rientrato = ({ testo }: { testo: string }) => <div className="rientrato"><
 export function Ragionamento({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "pensiero" }>; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
   const r = useRiserva();
-  if (b.inCorso) return <div className="compatto pensiero"><div className="riga-compatta in-corso"><Luccica testo="Sto ragionando…" /></div></div>;
+  if (b.inCorso) return <div className="compatto pensiero"><div className="riga-compatta in-corso"><Luccica testo="Ragionamento…" /></div></div>;
   return (
     <div className="compatto pensiero">
       <button type="button" className="riga-compatta" aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
-        <span className="titolo">Ho ragionato per {durata(b.durata ?? 0)}</span>
+        <span className="titolo">Ragionamento</span>{" "}<span className="conto">· {durata(b.durata ?? 0)}</span>
         <Freccia aperta={aperto} />
       </button>
       {aperto && <Rientrato testo={r.testo(b.testo)} />}
@@ -99,7 +99,7 @@ export function RigaStrumento({ b, aperta: iniziale = false }: { b: BloccoStrume
   );
 }
 
-/** «Ho usato 12 strumenti · 48 s», chiuso. Mentre una chiamata gira, la testata è la riga in corso: «Leggo Filo.tsx… · 3 strumenti». */
+/** «12 strumenti · 48 s», chiuso. Mentre una chiamata gira, la testata è la riga in corso: «Lettura Filo.tsx… · 3 strumenti». */
 /** `riga`: nelle scene di prova, la riga che parte aperta (163:87853). */
 export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; aperto?: boolean; riga?: number }) {
   const [aperto, setAperto] = useState(iniziale);
@@ -114,7 +114,7 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
           </Luccica>
         ) : (
           <>
-            <span className="titolo">Ho usato {quanti(n, "strumento", "strumenti")}</span>
+            <span className="titolo">{quanti(n, "strumento", "strumenti")}</span>
             {g.durata > 0 && <>{" "}<span className="conto">· {tempo(g.durata)}</span></>}
           </>
         )}
@@ -130,14 +130,14 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
   );
 }
 
-/** Un aiutante in una riga: «L'aiutante controlla i tipi · nessun errore», aperto col suo rapporto. */
+/** Un aiutante in una riga: «Aiutante · Controlla i tipi · nessun errore», aperto col suo rapporto. */
 function RigaAiutante({ a, aperto: iniziale = false }: { a: Aiutante; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
   const r = useRiserva();
   if (!a.finito) return (
     <div className="riga-strumento"><div className="riga in-corso">
       <span className="segno-aiutante"><Icona nome="figlia" colore="terziaria" /></span>
-      <span className="azione"><span className="verbo">L'aiutante</span>{" "}<Luccica testo={`${compito(r.testo(a.nome))}…`} /></span>
+      <span className="azione"><span className="verbo">Aiutante ·</span>{" "}<Luccica testo={`${r.testo(a.nome)}…`} /></span>
       {a.durata != null && <span className="durata">{tempo(a.durata)}</span>}
     </div></div>
   );
@@ -147,7 +147,7 @@ function RigaAiutante({ a, aperto: iniziale = false }: { a: Aiutante; aperto?: b
         <button type="button" className="apri" aria-expanded={a.rapporto ? aperto : undefined} disabled={!a.rapporto} onClick={() => conTransizione(() => setAperto(!aperto))}>
           <Icona nome={a.errore ? "avviso" : "spunta"} colore={a.errore ? "errore" : "successo"} />
           <span className="azione">
-            <span className="verbo">L'aiutante</span>{" "}<span className="oggetto">{compito(r.testo(a.nome))}</span>{" "}
+            <span className="verbo">Aiutante ·</span>{" "}<span className="oggetto">{r.testo(a.nome)}</span>{" "}
             <span className={a.errore ? "esito errore" : "esito"}>{a.errore ? "· 1 errore" : "· nessun errore"}</span>
           </span>
           {a.rapporto && <Freccia aperta={aperto} />}

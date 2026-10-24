@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792851470046,
+    "ultimaAttivita": 1792851944981,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -55,12 +55,12 @@
    {
     "tipo": "utente",
     "testo": "Perché la voce «Assistenza» non si vede nella barra?",
-    "t": 1792851520272
+    "t": 1792851995206
    },
    {
     "tipo": "pensiero",
     "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
-    "t": 1792851521272
+    "t": 1792851996206
    },
    {
     "tipo": "strumento",
@@ -73,7 +73,7 @@
      "testo": "Found 4 files\na\nb\nc\nd",
      "errore": false
     },
-    "t": 1792851535272,
+    "t": 1792852010206,
     "id": "t0"
    },
    {
@@ -86,7 +86,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851535472,
+    "t": 1792852010406,
     "id": "t1"
    },
    {
@@ -99,7 +99,7 @@
      "testo": "",
      "errore": false
     },
-    "t": 1792851535772,
+    "t": 1792852010706,
     "id": "t2"
    },
    {
@@ -112,7 +112,7 @@
      "testo": "Exit code 1",
      "errore": true
     },
-    "t": 1792851538772,
+    "t": 1792852013706,
     "id": "t3"
    },
    {
@@ -125,7 +125,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792851543772,
+    "t": 1792852018706,
     "id": "t4"
    },
    {
@@ -138,7 +138,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851566772,
+    "t": 1792852041706,
     "id": "t5"
    },
    {
@@ -151,7 +151,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851567172,
+    "t": 1792852042106,
     "id": "t6"
    },
    {
@@ -164,7 +164,7 @@
      "testo": "src/a.ts:1:x",
      "errore": false
     },
-    "t": 1792851567472,
+    "t": 1792852042406,
     "id": "t7"
    },
    {
@@ -177,7 +177,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851567672,
+    "t": 1792852042606,
     "id": "t8"
    },
    {
@@ -190,7 +190,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851567972,
+    "t": 1792852042906,
     "id": "t9"
    },
    {
@@ -203,7 +203,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792851568472,
+    "t": 1792852043406,
     "id": "t10"
    },
    {
@@ -216,7 +216,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851577472,
+    "t": 1792852052406,
     "id": "t11"
    },
    {
@@ -230,14 +230,14 @@
      "testo": "Ho trovato 3 ruoli: admin, supporto, ospite.",
      "errore": false
     },
-    "t": 1792851583072,
+    "t": 1792852058006,
     "id": "t12"
    },
    {
     "tipo": "assistente",
     "testo": "La voce «Assistenza» c’è, ma la barra la nasconde a chi non ha il ruolo «supporto». Il controllo sta in useRoleAccess.ts. Ti propongo di mostrarla a tutti gli admin.",
     "modello": "claude-opus-5-5",
-    "t": 1792851587072
+    "t": 1792852062006
    },
    {
     "tipo": "strumento",
@@ -249,7 +249,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851588072,
+    "t": 1792852063006,
     "id": "t13"
    },
    {
@@ -262,7 +262,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792851589072,
+    "t": 1792852064006,
     "id": "t14"
    },
    {
@@ -272,7 +272,7 @@
      "file_path": "sessioni/src/ui/chat/Filo.tsx"
     },
     "esito": null,
-    "t": 1792851590072,
+    "t": 1792852065006,
     "id": "t15"
    }
   ]
