@@ -12,6 +12,7 @@ FAMIGLIE['cerca-dialoghi'] = 'CDI';
 FAMIGLIE['cerca-account'] = 'CAC';
 const GRAVITA = ['bloccante', 'alta', 'media', 'bassa'], PROVA = ['auto', 'occhio', 'fotogrammi'];
 FAMIGLIE['cerca-tastiera'] = 'CTS';
+FAMIGLIE['cerca-icona-viadalmac'] = 'CIV';
 // parole di gusto: «vedi» dice un sì/no che si osserva, mai un giudizio
 const GUSTO = /\b(bell[oaie]|brutt[oaie]|piacevol\w*|adeguat\w*|sembr\w*|elegant\w*|curat\w*|fluid[oaie]|naturale|intuitiv\w*|ragionevol\w*|opportun\w*|buon[oaie])\b/i;
 const opt = (k) => (process.argv.includes(k) ? process.argv[process.argv.indexOf(k) + 1] : undefined);
