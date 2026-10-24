@@ -43,9 +43,6 @@
 }
 .pezzo-chat .nota-casella { justify-content: center; }
 
-/* suggerimento sopra il bottone, al passaggio (101:43945) */
-.pezzo-chat .con-suggerimento.sopra .suggerimento { display: none; top: auto; bottom: calc(100% + var(--spazio-1)); align-items: center; gap: var(--spazio-2); }
-.pezzo-chat .con-suggerimento.sopra:hover .suggerimento, .pezzo-chat .con-suggerimento.sopra.visibile .suggerimento { display: inline-flex; }
 
 /* «menu sessioni» sopra la casella, dopo @ (101:45260) */
 .pezzo-chat .area-casella.con-menu { position: relative; }

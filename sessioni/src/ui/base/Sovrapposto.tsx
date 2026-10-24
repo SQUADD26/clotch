@@ -3,11 +3,11 @@
 // Esc e clic fuori chiudono solo quello in cima; alla chiusura il fuoco torna a chi lo aveva; i dialoghi tengono il Tab dentro.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { posiziona, type Lato, type Punto } from "./posiziona";
+import { posiziona, type Allinea, type Lato, type Punto } from "./posiziona";
 import { numero } from "./token";
 import "./sovrapposto.css";
 
-export type { Lato, Punto };
+export type { Allinea, Lato, Punto };
 /** Dove si appoggia: un elemento (il bottone che lo apre) o un punto (il clic destro). */
 export type Ancora = Element | Punto;
 
@@ -18,8 +18,10 @@ const FOCALIZZABILI = "button:not(:disabled), [href], input:not(:disabled), text
 export function useStrato(ref: RefObject<HTMLElement | null>, onChiudi: () => void, { ancora, trappola = false }: { ancora?: Ancora | null; trappola?: boolean } = {}) {
   const chiudi = useRef(onChiudi);
   chiudi.current = onChiudi;
+  // chi aveva il fuoco, letto al primo disegno: prima che un campo con autoFocus dentro lo prenda (Cerca sessioni)
+  const [prima] = useState(() => document.activeElement as HTMLElement | null);
   useEffect(() => {
-    const io = {}, prima = document.activeElement as HTMLElement | null;
+    const io = {};
     pila.push(io);
     const cima = () => pila[pila.length - 1] === io;
     const tasto = (e: KeyboardEvent) => {
@@ -62,6 +64,8 @@ interface Props {
   lato?: Lato;
   /** Allineato al bordo finale dell'ancora: il destro sotto e sopra, quello in basso a destra. */
   fine?: boolean;
+  /** Centrato sull'ancora (tooltip della chat). */
+  centro?: boolean;
   /** Distanza dall'ancora; di serie `spazio-1-5` da un elemento, 0 da un punto. */
   scarto?: number;
   /** Tooltip: niente tastiera né clic fuori, non prende il fuoco. */
@@ -126,24 +130,24 @@ export function Sovrapposto(p: Props) {
   return <>{segno}{luogo && <Galleggia {...p} ancora={p.ancora ?? luogo.genitore} pezzo={luogo.pezzo} />}</>;
 }
 
-function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, scarto, passivo, className, role, label, style, onChiudi, rif, children }: Props & { ancora: Ancora; pezzo: string }) {
+function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, centro = false, scarto, passivo, className, role, label, style, onChiudi, rif, children }: Props & { ancora: Ancora; pezzo: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<(Punto & { lato: Lato }) | null>(null);
   const metti = () => {
     const el = ref.current;
     if (!el) return;
-    const n = posiziona(rett(ancora), el.offsetWidth, el.offsetHeight, lato, fine, scarto ?? (ancora instanceof Element ? numero("spazio-1-5") : 0), numero("misura-margine-finestra"), innerWidth, innerHeight);
+    const n = posiziona(rett(ancora), el.offsetWidth, el.offsetHeight, lato, centro ? "centro" : fine ? "fine" : "inizio", scarto ?? (ancora instanceof Element ? numero("spazio-1-5") : 0), numero("misura-margine-finestra"), innerWidth, innerHeight);
     setPos((v) => (v && v.x === n.x && v.y === n.y && v.lato === n.lato ? v : n));
   };
   // un punto arriva nuovo a ogni render: conta dove sta, non l'oggetto
   const dove = ancora instanceof Element ? ancora : `${ancora.x},${ancora.y}`;
-  useLayoutEffect(metti, [dove, lato, fine, scarto]);
+  useLayoutEffect(metti, [dove, lato, fine, centro, scarto]);
   useEffect(() => {
     const o = new ResizeObserver(metti);
     if (ref.current) o.observe(ref.current);
     addEventListener("resize", metti);
     return () => { o.disconnect(); removeEventListener("resize", metti); };
-  }, [dove, lato, fine, scarto]);
+  }, [dove, lato, fine, centro, scarto]);
   if (!passivo) useStrato(ref, () => onChiudi?.(), { ancora }); // passivo non cambia nella vita del componente
   useUscita(ref);
   useLayoutEffect(() => { rif?.(ref.current); return () => rif?.(null); }, []);

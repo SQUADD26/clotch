@@ -4,7 +4,7 @@
   --curva-out: cubic-bezier(var(--curva-uscita-x1), var(--curva-uscita-y1), var(--curva-uscita-x2), var(--curva-uscita-y2));
 }
 
-.sovrapposto { position: fixed; z-index: var(--livello-menu); }
+.sovrapposto { position: fixed; z-index: var(--livello-menu); max-width: calc(100vw - 2 * var(--misura-margine-finestra)); }
 .sovrapposto[role="tooltip"] { z-index: var(--livello-tooltip); }
 .velo { z-index: var(--livello-dialogo); }
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
 import { Menu } from "../base/Menu";
+import { Sovrapposto } from "../base/Sovrapposto";
 import { comanda } from "./clotch-ai";
 import { Markdown, senzaMarkdown } from "./Markdown";
 import { useRiserva } from "./riserva";
@@ -25,7 +26,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
         <div className={menu ? "azioni fisse" : "azioni"}>
           <span className="con-suggerimento">
             <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta="Copia" onClick={() => copia(senzaMarkdown(testo))} />
-            {copiato && <span className="suggerimento">Copiato</span>}
+            {copiato && <Sovrapposto passivo centro className="suggerimento" role="tooltip">Copiato</Sovrapposto>}
           </span>
           {/* shortcut: legge la voce dell'app (`say`), non quella di Clotch: il motore non ha un comando che legga un testo (proposta: `leggi {testo}`) */}
           <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" onClick={leggi} />

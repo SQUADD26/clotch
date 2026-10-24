@@ -4,6 +4,7 @@ import type { PreferenzeSessione, Sessione } from "../../tipi";
 import { api } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { Sovrapposto } from "../base/Sovrapposto";
+import { Suggerimento } from "../base/Suggerimento";
 import { numero } from "../base/token";
 import { comanda } from "./clotch-ai";
 import { impostazioneMotore, PERMESSI, permessiDi, percentoContesto, type Scelta } from "./scelte";
@@ -78,10 +79,9 @@ export function ChipContesto({ s, visibile }: { s: Dati["s"]; visibile: boolean 
   const percento = percentoContesto(s.contesto, useContext(ContestoMax));
   if (percento == null) return null;
   return (
-    <span className={visibile ? "con-suggerimento sopra contesto visibile" : "con-suggerimento sopra contesto"}>
+    <Suggerimento testo={`Contesto usato: ${percento}%`} classe="suggerimento" lato="sopra" allinea="centro" scarto={numero("spazio-3") + numero("spazio-0-5")} forzato={visibile}>
       <span className="chip" tabIndex={0} aria-label={`Contesto usato: ${percento}%`}><Icona nome="indicatore" /><span>{percento}%</span></span>
-      <span className="suggerimento" role="tooltip">Contesto usato: {percento}%</span>
-    </span>
+    </Suggerimento>
   );
 }
 

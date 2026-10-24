@@ -39,8 +39,6 @@
 .pezzo-chat .menu-casella.flottante.destra { width: var(--misura-menu-modello); }
 .pezzo-chat .casella button.chip:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
 
-/* contesto usato: il suggerimento sta sopra il chip, poco staccato dal bordo della casella */
-.pezzo-chat .con-suggerimento.sopra.contesto .suggerimento { bottom: calc(100% + var(--spazio-3) + var(--spazio-0-5)); }
 
 /* modello (148:28674): nome, «Predefinito» e il numero della scorciatoia o la spunta; «Impegno» si apre a destra, in cima (148:28740); in fondo «Modalità veloce» (148:28806) */
 .pezzo-chat .menu-casella.flottante.destra .titolo-gruppo, .pezzo-chat .menu-casella.impegno .titolo-gruppo { padding: var(--spazio-1-5) var(--spazio-2) var(--spazio-1); }
@@ -55,7 +53,7 @@
 .pezzo-chat .menu-casella .riga-veloce { display: flex; align-items: center; gap: var(--spazio-2); min-height: var(--spazio-10); padding: 0 var(--spazio-2); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); }
 .pezzo-chat .menu-casella .riga-veloce .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pezzo-chat .menu-casella .riga-veloce .descrizione { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
-.pezzo-chat .menu-casella.impegno { position: absolute; top: 0; left: calc(100% + var(--spazio-1)); width: var(--misura-menu-impegno); }
+.pezzo-chat .menu-casella.impegno { width: var(--misura-menu-impegno); }
 .pezzo-chat .interruttore {
   width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
   padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);

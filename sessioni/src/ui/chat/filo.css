@@ -31,7 +31,7 @@
 /* suggerimento sotto un bottone (frame 101:23727, «tooltip») */
 .pezzo-chat .con-suggerimento { position: relative; display: inline-flex; }
 .pezzo-chat .suggerimento {
-  position: absolute; top: calc(100% + var(--spazio-1-5)); left: 50%; transform: translateX(-50%); z-index: var(--livello-tooltip);
+  display: flex; align-items: center; gap: var(--spazio-2); pointer-events: none;
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); white-space: nowrap;
   background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
