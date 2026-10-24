@@ -257,5 +257,49 @@ H.avvia('requisiti-b', async () => {
     assert.match(await run(() => document.querySelector('.andamento .testata').innerText), new RegExp(`Ultimi ${giorni} giorni`));
     await clicca('.tab-uso', 'Panoramica'); await wait(() => !document.querySelector('.andamento') && document.querySelectorAll('.barra-uso').length === 4);
   });
+  // Collegamenti di clotch AI (#456, qa/456-clotch-ai): registro, «Fatto oggi», avvio all'apertura, «Scarica clotch» e interruttori.
+  await req('FR1', async () => {
+    await vai('101-36225'); // registro non leggibile
+    await clicca('button', 'Apri il registro'); await attesa(80); assert.deepEqual(fatte('impostazioni:apri'), [['~/.claude/registro']]);
+    rispondi['impostazioni:apri'] = () => { throw new Error('cartella assente'); };
+    await clicca('button', 'Apri il registro'); await wait(() => /cartella assente/.test(document.querySelector('.area-avvisi')?.innerText || ''));
+    await vai('101-35494');
+    const elenco = () => run(() => document.querySelector('.vista-clotch-ai').innerText.includes('Notch: avviso schermo'));
+    assert.equal(await elenco(), false, '«Fatto oggi» parte chiuso');
+    await clicca('button', 'Fatto oggi: 4'); await wait(() => document.querySelector('button[aria-expanded=true]'));
+    assert.equal(await elenco(), true, '«Fatto oggi» mostra le sessioni finite oggi');
+    await clicca('button', 'Fatto oggi: 4'); assert.equal(await elenco(), false);
+  }, { consenti: /cartella assente|Error occurred in handler/ });
+
+  await req('FR7', async () => {
+    const avvio = async (registro, attesi, nota) => {
+      H.azzera(); rispondi['clotch-ai:avvia'] = () => ({ ok: true, testo: '' });
+      H.daScena('101-42000', (s) => { delete s.registro.chat.friday; Object.assign(s.registro, registro); }); await caricaScena(); await attesa(250);
+      assert.deepEqual(fatte('clotch-ai:avvia').length, attesi, nota);
+    };
+    await avvio({ clotchAi: null, impostazioni: { attiva: true } }, 1, 'impostazioni accese, nessun evento: parte una volta');
+    assert.match(await run(() => document.body.innerText), /Avvio…/);
+    await avvio({ clotchAi: null, impostazioni: { attiva: false } }, 0, 'impostazioni spente: non parte');
+    await avvio({ clotchAi: { evento: 'stop', t: H.ora - 60000 }, impostazioni: { attiva: true } }, 0, 'spenta da Roberto: non parte');
+    await avvio({ clotchAi: null, impostazioni: null }, 0, 'senza impostazioni: non parte');
+  });
+
+  await req('CL1', async () => {
+    await vai('101-45993'); // Clotch assente
+    await run(() => { window.__aperti = []; window.open = (u) => { __aperti.push(u); return null; }; });
+    await clicca('button', 'Scarica clotch'); assert.deepEqual(await run(() => __aperti), ['https://github.com/SQUADD26/clotch/releases/latest']);
+    await vai('101-45956'); await wait(() => !!document.querySelector('button[role=switch]'));
+    for (const v of ['Voce dal notch', 'Dettatura dal notch', 'Avvisi nel notch', 'Obiettivi anche nel notch']) await clicca('button[role=switch]', v);
+    await attesa(80); assert.deepEqual(imposta(), [{ clotchVoce: false }, { clotchDettatura: false }, { clotchAvvisi: false }, { clotchObiettivi: false }]);
+    // effetto: obiettivo proposto con Clotch acceso, nota «anche dal notch» solo con l'interruttore acceso
+    const nota = () => run(() => /decidere anche dal notch/.test(document.body.innerText));
+    for (const acceso of [true, false]) { await vai('101-47170', (s) => { s.impostazioni = { clotchObiettivi: acceso }; }); await wait(() => /Obiettivo proposto/.test(document.body.innerText)); assert.equal(await nota(), acceso); }
+    // effetto: avviso detto da Clotch, toast «anche al notch» solo con l'interruttore acceso
+    for (const acceso of [true, false]) {
+      await vai('101-35494', (s) => { s.impostazioni = { clotchAvvisi: acceso }; }); await attesa(150);
+      H.win.webContents.send('clotch-ai:registro', { ...H.scena.registro, avvisi: [{ id: 'n1', t: H.ora, testo: 'x', livello: 'normale', motivo: 'chiesto', dettoDa: 'clotch', sessioni: [] }] }); await attesa(200);
+      assert.equal(await run(() => /Avviso mandato anche al notch/.test(document.querySelector('.area-avvisi')?.innerText || '')), acceso);
+    }
+  });
 
 });
