@@ -124,7 +124,13 @@ app.whenReady().then(() => {
   if (finestra) finestra.once("ready-to-show", () => setImmediate(apri)); else apri();
   setTimeout(apri, 10_000).unref();
   const caricaSessioni = async () => {
-    await sessioni.osservaInWorker((a) => {
+    // un giro dà più aggiornamenti nello stesso momento (un delta di cronologia per file, poi l'elenco): partono insieme, un messaggio per giro (#474)
+    let raccolto: Required<Pick<Aggiornamento, "sessioni" | "nuoviMessaggi" | "cronologia">> | null = null;
+    const raccogli = (a: Aggiornamento) => {
+      if (!raccolto) { raccolto = { sessioni: [], nuoviMessaggi: [], cronologia: [] }; setImmediate(() => { const r = raccolto!; raccolto = null; manda({ ...r, sessioni: [...new Set(r.sessioni)] }); }); }
+      raccolto.sessioni.push(...a.sessioni); raccolto.nuoviMessaggi.push(...a.nuoviMessaggi); raccolto.cronologia.push(...(a.cronologia ?? []));
+    };
+    const manda = (a: Aggiornamento) => {
       barraMenu();
       const el = sessioni.elencoSessioni().sessioni, per = new Map(el.map((s) => [s.id, s]));
       // le sessioni cambiate viaggiano con l'evento: il renderer non rilegge l'elenco intero (#474)
@@ -134,7 +140,8 @@ app.whenReady().then(() => {
       const sparite = [...ids].some((id) => !per.has(id)); // fuori dall'elenco = fuori dall'indice
       if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
       avvisa(a);
-    }, fileCache);
+    };
+    await sessioni.osservaInWorker(raccogli, fileCache);
     // dopo l'osservatore: da qui l'elenco è il suo
     avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();
