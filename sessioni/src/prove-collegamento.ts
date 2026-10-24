@@ -132,10 +132,10 @@ async function main() {
   const tutte: Record<string, () => Prova[] | Promise<Prova[]>> = { claude, "clotch-ai": clotchAi, clotch, codex };
   const prove: Prova[] = [];
   for (const [k, f] of Object.entries(tutte)) if (!scelta || scelta === k) prove.push(...(await f()));
-  const w = Math.max(...prove.map((x) => `${x.coppia} · ${x.nome}`.length));
-  for (const x of prove) console.log(`${x.esito.toUpperCase().padEnd(8)} ${`${x.coppia} · ${x.nome}`.padEnd(w)}  ${x.prova}`);
+  const w = Math.max(...prove.map((x) => `${x.coppia} / ${x.nome}`.length));
+  for (const x of prove) console.log(`${x.esito.toUpperCase().padEnd(8)} ${`${x.coppia} / ${x.nome}`.padEnd(w)}  ${x.prova}`);
   const n = (e: Esito) => prove.filter((x) => x.esito === e).length;
-  console.log(`\nverdi ${n("verde")} · fallite ${n("fallita")} · in attesa ${n("attesa")} · macchina ${os.hostname()}`);
+  console.log(`\nverdi ${n("verde")}, fallite ${n("fallita")}, in attesa ${n("attesa")}, macchina ${os.hostname()}`);
   process.exitCode = n("fallita") ? 1 : n("attesa") ? 3 : 0;
 }
 

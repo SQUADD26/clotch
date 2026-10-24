@@ -63,7 +63,7 @@ export type AllegatoCasella = FileAllegato & { carico?: boolean };
 
 const sigla = (nome: string) => /\.([^.]+)$/.exec(nome)?.[1].toUpperCase();
 const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Caricando…" : statoAllegato(a) === "grande" ? "Troppo grande"
-  : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(" · "));
+  : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(", "));
 
 /** La miniatura di un allegato, sopra il testo della casella (148:43692 «Allegato nella casella»): immagine quadrata o riquadro col nome. */
 export function Allegato({ a, onRimuovi }: { a: AllegatoCasella; onRimuovi(): void }) {
@@ -163,7 +163,7 @@ function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(
   const mancante = url === null || rotta;
   return (
     <button type="button" className={`miniatura${url === undefined ? " carico" : ""}`} onClick={mancante ? riprova : onApri} aria-label={mancante ? `Riprova a leggere ${nome}` : `Apri ${nome}`}>
-      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : mancante ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta · Riprova</span> : null}
+      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : mancante ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta. Riprova</span> : null}
     </button>
   );
 }

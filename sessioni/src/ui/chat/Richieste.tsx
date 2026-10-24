@@ -123,7 +123,7 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
   }));
   const manca = risposte.findIndex((r) => !r.scelta && !r.testo);
   const pronta = !!rid && !inCorso && manca < 0;
-  const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta({ testo: risposte.map((r) => r.testo || r.scelta).join(" · "), saltata: false }); }) : undefined;
+  const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta({ testo: risposte.map((r) => r.testo || r.scelta).join(", "), saltata: false }); }) : undefined;
   const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta({ testo: "", saltata: true }); }) : undefined;
   return (
     <>

@@ -39,7 +39,7 @@ export function CasellaVoce({ voce }: { voce: NonNullable<Voce> }) {
       {ascolta && (
         <div className="nota-voce-casella">
           <Icona nome="microfono" />
-          <span>Ti ascolta il microfono {clotch ? "di clotch" : "del Mac"} · ⌥Spazio</span>
+          <span>Ti ascolta il microfono {clotch ? "di clotch" : "del Mac"}, ⌥Spazio</span>
         </div>
       )}
       <div className={`casella-voce ${voce.cosa}`} >

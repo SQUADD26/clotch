@@ -38,7 +38,7 @@ test("quoteDalFeed: una riga per account, 7 giorni; 5 ore piene = limite raggiun
   assert.equal(per("accountmanager").ripartenza, "Riparte tra 6 giorni e 22 ore");
   assert.equal(per("accountmanager").letto, ORA - 60_000);
   assert.equal(per("clotch-ai").usato, 100);
-  assert.match(per("clotch-ai").ripartenza, /^Limite raggiunto · riparte alle \d\d:\d\d$/);
+  assert.match(per("clotch-ai").ripartenza, /^Limite raggiunto, riparte alle \d\d:\d\d$/);
   assert.deepEqual([per("ripartito").usato, per("ripartito").ripartenza], [0, ""]);
 });
 

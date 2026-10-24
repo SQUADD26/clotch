@@ -92,7 +92,7 @@ export function quoteDalFeed(json: unknown, oraMs: number, mio: string | null = 
     const account = a.email.split("@")[0], letto = a.ts! * 1000;
     const finestre = { email: a.email, cinque: pct(a.cinque, ora), cinqueFine: fine(a.cinque, ora), sette: pct(a.sette, ora), setteFine: fine(a.sette, ora) };
     if ((usatoOra(a.cinque, ora) ?? 0) >= 100) {
-      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto · riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });
+      uso.push({ account, usato: 100, ripartenza: `Limite raggiunto, riparte alle ${orario(a.cinque.reset! * 1000)}`, letto, ...finestre });
       continue;
     }
     const sette = usatoOra(a.sette, ora);

@@ -67,7 +67,7 @@ const domandeDi = (ingresso: unknown) => {
 };
 
 /** «User has answered your questions: "D"="R"» -> «R» (una o più risposte, separate da « · »). */
-const rispostaDi = (esito: string) => [...esito.matchAll(/"[^"]*"="([^"]*)"/g)].map((m) => m[1]).join(" · ") || null;
+const rispostaDi = (esito: string) => [...esito.matchAll(/"[^"]*"="([^"]*)"/g)].map((m) => m[1]).join(", ") || null;
 
 const passiDi = (ingresso: unknown): Passo[] => {
   const t = (ingresso as { todos?: unknown[] })?.todos;
