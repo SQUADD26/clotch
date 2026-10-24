@@ -81,8 +81,8 @@ test("#484 messaggio da un'altra sessione: riga evento «Messaggio da <nome>», 
   const msg = (attr: string) => `Another Claude session sent a message:\n<cross-session-message ${attr}>\nCiao dal fratello\n</cross-session-message>`;
   assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock" from-name="H-331 - Orchestratore" from-mode="bypass"')), ["Messaggio da H-331 - Orchestratore"]);
   assert.deepEqual(eventi(msg('from="local_4caf" name="★ MENU BAR" encoded="1"')), ["Messaggio da ★ MENU BAR"]);
-  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock"')), ["Messaggio da un'altra sessione"]);
-  assert.deepEqual(eventi('<relay from="coordinator" session="s1">\n  nota\n</relay>'), ["Messaggio da un'altra sessione"]);
+  assert.deepEqual(eventi(msg('from="uds:/tmp/x.sock"')), ["Messaggio da un’altra sessione"]);
+  assert.deepEqual(eventi('<relay from="coordinator" session="s1">\n  nota\n</relay>'), ["Messaggio da un’altra sessione"]);
   // un reminder fra due messaggi: solo gli eventi, nessuna bolla
   const due = `${msg('name="A"')}\n<system-reminder>\nnota\n</system-reminder>\n${msg('name="B"')}`;
   assert.deepEqual(eventi(due), ["Messaggio da A", "Messaggio da B"]);
