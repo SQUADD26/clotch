@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792844469006,
     "obiettivo": {
      "testo": "Policy RLS di «sessioni» per ogni studio, provate sul database di sviluppo e promosse su main.",
      "stato": "aperto",
@@ -46,6 +46,7 @@
      "segni": []
     },
     "file": "",
+    "contesto": 124000,
     "icona": "database"
    }
   ],
@@ -56,7 +57,7 @@
    {
     "tipo": "utente",
     "testo": "Applica le policy RLS di «sessioni» e promuovi su main.",
-    "t": 1792793041531
+    "t": 1792844461006
    },
    {
     "tipo": "strumento",
@@ -68,14 +69,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793042531,
+    "t": 1792844462006,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "I controlli della PR sono verdi: 14 su 14. La migrazione 0042 cambia le policy di «sessioni» in produzione. Vuoi che promuova adesso?",
     "modello": "claude-opus-5-5",
-    "t": 1792793048531
+    "t": 1792844468006
    }
   ]
  },
@@ -85,7 +86,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

@@ -132,10 +132,7 @@ H.avvia('requisiti-b', async () => {
 
   await req('H32', async () => {
     await imp('101-17193');
-    await clicca('.scelta .valore', 'Lingua: Italiano'); await wait(() => !!document.querySelector('.scelta .menu'));
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.scelta .menu [role=menuitemradio]')].map((b) => [b.textContent.trim(), b.getAttribute('aria-checked')])), [['Rilevamento automatico', 'false'], ['Italiano', 'true'], ['English', 'false']]);
-    await tasto('.scelta .menu', { key: 'ArrowDown' }); assert.equal(await run(() => document.activeElement.textContent.trim()), 'English');
-    await esc(); await wait(() => !document.querySelector('.scelta .menu')); assert.deepEqual(imposta(), []);
+    assert.equal(await run(() => document.querySelector('.scelta .valore[aria-label="Lingua: Italiano"]').disabled), true); // non cambia niente: spenta (#534)
     await clicca('.scelta .valore', 'Modello per i tuoi messaggi: Opus 5.5'); await wait(() => !!document.querySelector('.scelta .menu'));
     assert.match(await run(() => document.querySelector('.scelta .menu').innerText), /Opus 5\.5\s*Il più capace/);
     await clicca('.scelta .menu .voce .etichetta', 'Sonnet 5.5'); await wait(() => !document.querySelector('.scelta .menu'));
@@ -232,7 +229,7 @@ H.avvia('requisiti-b', async () => {
     await clicca('.scelta .menu .voce', 'Controlla aggiornamenti'); await attesa(60); assert.deepEqual(fatte('impostazioni:aggiornamenti').at(-1), [true]);
     await clicca('.scelta .valore', 'Versione: 0.1.0'); await clicca('.scelta .menu .voce', 'Novità della versione 0.1.0'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal((await testo('[role=dialog] .novita li')).length, 4); await clicca('[role=dialog] button', 'Chiudi'); await wait(() => !document.querySelector('[role=dialog]'));
-    await clicca('button[role=switch]', 'Aggiornamenti automatici'); await attesa(60); assert.deepEqual(imposta(), [{ aggiornamentiAutomatici: false }]);
+    assert.equal(await run(() => document.querySelector('button[role=switch][aria-label="Aggiornamenti automatici"]').disabled), true); // nessun server di aggiornamenti: spento (#534)
   });
 
 });

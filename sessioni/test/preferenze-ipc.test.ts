@@ -15,6 +15,8 @@ function azione(scrivi: (testo: string) => Promise<void>, idApp: string | null =
     "node:fs": fs,
     "node:child_process": { execFile: vietato },
     electron: { app: { getPath: () => "/fixture-no-write" }, clipboard: { writeText: scrivi }, shell: { showItemInFolder: mostra } },
+    "./impostazioni-motore": { applicaMotore: vietato },
+    "./modalita-prova": { provaSilenziosa: () => true },
     "./finestra": { apriFinestra: vietato },
     "./preferenze": { leggiImpostazioni: () => ({}), leggiPreferenze: vietato, impostaImpostazioni: vietato, impostaPreferenze: vietato },
   };

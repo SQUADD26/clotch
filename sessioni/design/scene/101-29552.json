@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792844469006,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -46,6 +46,7 @@
      "segni": []
     },
     "file": "",
+    "contesto": 124000,
     "icona": "stella"
    }
   ],
@@ -56,23 +57,23 @@
    {
     "tipo": "utente",
     "testo": "Fammi l'app Sessioni in Electron con l'aspetto di ChatGPT.",
-    "t": 1792793028531
+    "t": 1792844448006
    },
    {
     "tipo": "pensiero",
     "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
-    "t": 1792793029531
+    "t": 1792844449006
    },
    {
     "tipo": "assistente",
     "testo": "Leggo il riferimento di ChatGPT e creo le variabili con i colori scuri.",
     "modello": "claude-opus-5-5",
-    "t": 1792793043531
+    "t": 1792844463006
    },
    {
     "tipo": "utente",
     "testo": "Aggiungi lo stato con 200 sessioni.",
-    "t": 1792793044531
+    "t": 1792844464006
    },
    {
     "tipo": "strumento",
@@ -86,7 +87,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793045531,
+    "t": 1792844465006,
     "id": "t0"
    },
    {
@@ -101,7 +102,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793046531,
+    "t": 1792844466006,
     "id": "t1"
    },
    {
@@ -116,14 +117,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793047531,
+    "t": 1792844467006,
     "id": "t2"
    },
    {
     "tipo": "assistente",
     "testo": "Fatto. Manca solo il tuo sì sul disegno.",
     "modello": "claude-opus-5-5",
-    "t": 1792793048531
+    "t": 1792844468006
    }
   ]
  },
@@ -133,7 +134,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
