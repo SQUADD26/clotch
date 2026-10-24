@@ -1,7 +1,7 @@
 // Cerca nelle impostazioni (issue 351): l'elenco delle voci con i testi delle sezioni, e la ricerca.
-// shortcut: i testi sono copiati dalle sezioni (non c'è un elenco unico), se una sezione cambia un'etichetta qui va rifatta a mano;
-// mancano le voci che nascono dai dati (cartelle degli account, quote d'uso, sessioni archiviate).
-import type { Sezione } from "./sezioni";
+// I testi delle righe sono copiati dalle pagine: test/voci-ricerca.test.ts fallisce se una riga di una pagina manca qui (#837).
+// Ogni sezione è anche una voce col suo nome. Le righe che nascono dai dati (cartelle, account, sessioni archiviate) non sono voci: si trova la sezione.
+import { SEZIONI, type Sezione } from "./sezioni";
 import { AZIONI } from "./tasti";
 
 export interface Voce { sezione: Sezione; etichetta: string; descrizione?: string }
@@ -10,6 +10,7 @@ const v = (sezione: Sezione, etichetta: string, descrizione?: string): Voce => (
 
 /** Nell'ordine delle sezioni nella navigazione e delle righe nella pagina. */
 export const VOCI: Voce[] = [
+  ...SEZIONI.map(([id, nome]) => v(id, nome)),
   v("generale", "Apri all’avvio del Mac", "clotch parte quando accendi il Mac"),
   v("generale", "Mostra nella barra dei menu", "Un’icona con il numero di sessioni in attesa di te"),
   v("generale", "Lingua", "Testi dell’app"),
@@ -46,7 +47,11 @@ export const VOCI: Voce[] = [
   v("dati", "Cartelle nascoste", "Le sessioni in queste cartelle non si leggono"),
   v("dati", "Sessioni finite", "Per quanto tempo restano le sessioni finite"),
   v("dati", "Dati di clotch", "Indice e impostazioni. Le sessioni originali non si toccano."),
-  v("info", "Versione", "Aggiornata"),
+  v("dati", "Elimina dati…", "Indice, cache e impostazioni di clotch"),
+  v("account", "Aggiungi cartella", "Le cartelle degli account da cui leggere le sessioni di Claude Code"),
+  v("uso", "Panoramica", "Quanto hai usato di ogni account"),
+  v("uso", "Andamento", "Uso al giorno per account"),
+  v("info", "Versione", "Controlla aggiornamenti, copia versione"),
   v("info", "Aggiornamenti automatici", "Si installano alla prossima apertura"),
   v("info", "Registro", "File con gli errori dell’app"),
   v("info", "Novità"),

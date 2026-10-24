@@ -60,7 +60,7 @@ export function Ricerca({ testo, onTesto, sezione }: { testo: string; onTesto(t:
                   <Icona nome={sezioneDi(v)[2]} />
                   <span className="testi-risultato">
                     <span className="t-sm">{v.etichetta}</span>
-                    <span className="t-xs secondario">{sezioneDi(v)[1]}</span>
+                    <span className="t-xs secondario">{v.etichetta === sezioneDi(v)[1] ? "Sezione" : sezioneDi(v)[1]}</span>
                   </span>
                 </button>
               ))}

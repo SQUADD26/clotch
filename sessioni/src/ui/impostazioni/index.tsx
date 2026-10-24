@@ -1,5 +1,5 @@
 // figma: 101-17193 — pagina Impostazioni (#351): «Navigazione impostazioni» a sinistra, la sezione scelta nella «Superficie».
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent } from "react";
 import { AreaAvvisi } from "../base/Avvisi";
 import { Superficie } from "../base/Cornice";
 import { Icona } from "../base/Icona";
@@ -48,9 +48,18 @@ export default function Impostazioni() {
   const [prima, sotto] = (n.sezione ?? "generale").split("/");
   const sezione: Sezione = Object.hasOwn(PAGINE, prima) ? (prima as Sezione) : "generale";
   const Pagina = PAGINE[sezione];
+  // ↑ ↓ Home Fine tra le sezioni come nei menu (base/Menu); ↓ dal campo Cerca vuoto entra nell'elenco (#844)
+  const frecce = (e: KeyboardEvent<HTMLElement>) => {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
+    const b = [...e.currentTarget.querySelectorAll<HTMLElement>("button.voce")];
+    const i = b.indexOf(e.target as HTMLElement);
+    if (i < 0 && !(e.target instanceof HTMLInputElement && !cerca && e.key === "ArrowDown")) return;
+    e.preventDefault();
+    b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : i < 0 ? 0 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
+  };
   return (
     <div ref={ref} className={stretta ? "impostazioni stretta" : "impostazioni"}>
-      <nav className="nav-impostazioni" aria-label="Impostazioni">
+      <nav className="nav-impostazioni" aria-label="Impostazioni" onKeyDown={frecce}>
         <div className="titolo t-lg">Impostazioni</div>
         <Ricerca testo={cerca} onTesto={setCerca} sezione={sezione} />
         {!cerca.trim() && SEZIONI.map(([id, nome, icona]) => (
