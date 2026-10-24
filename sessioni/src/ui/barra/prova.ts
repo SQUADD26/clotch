@@ -90,7 +90,7 @@ const FRAME: Record<string, () => Prova> = {
     return { ...b, passaggio: ids[1], aperto: { tipo: "riga", id: ids[1], a: { x: 282, y: 408 } }, voce: 2 }; // «Archivia» evidenziata
   },
   "101-21257": () => { const b = base(); return { ...b, aperto: { tipo: "cartella", chiave: "squadd-v2", a: { x: 286, y: 460 } }, voce: 1 }; }, // «Copia percorso» evidenziata
-  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 672 } }, voce: 1 }), // «Scorciatoie da tastiera» evidenziata
+  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 900 } }, voce: 1 }), // «Scorciatoie da tastiera» evidenziata
   "101-24127": () => {
     const b = base();
     b.elenco.dati!.sessioni[0].titolo = "Clotch: sessioni in Electron con lettura dal disco e filtri";

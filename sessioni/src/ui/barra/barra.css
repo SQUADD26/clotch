@@ -73,6 +73,6 @@
 
 /* suggerimento su titolo troncato 101:24382 */
 .pezzo-barra .suggerimento {
-  position: fixed; z-index: 20; padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); pointer-events: none;
+  padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); pointer-events: none;
   background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero); white-space: nowrap;
 }

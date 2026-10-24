@@ -20,7 +20,7 @@ function TendinaVersione({ versione, voci }: { versione: string; voci: VoceMenu[
         <span className="t-sm secondario">{versione}</span>
         <Icona nome="giu" />
       </button>
-      {aperta && <Menu onChiudi={() => setAperta(false)} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }} voci={voci} />}
+      {aperta && <Menu onChiudi={() => setAperta(false)} fine classe="menu-scelta" voci={voci} />}
     </div>
   );
 }
