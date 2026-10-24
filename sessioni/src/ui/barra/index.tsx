@@ -105,7 +105,8 @@ export default function Barra() {
   const filtri = vista.filtri;
   const aggiungiFiltro = (prop: Proprieta) => {
     const i = filtri.findIndex((f) => f.proprieta === prop);
-    if (i < 0) setVista({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
+    // subito, senza transizione: il filtro è vuoto (le righe non cambiano) e il suo menu delle opzioni lo legge ora
+    if (i < 0) setVistaSubito({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
     setAperto({ tipo: "opzioni", i: i < 0 ? filtri.length : i, a: aperto!.a });
   };
   const suTroncato = (testo: string | null, el?: HTMLElement) => {
@@ -149,7 +150,7 @@ export default function Barra() {
       ) : !sessioni.length && !elenco.errore ? (
         <div className="elenco vuoto t-sm secondario">Le sessioni appaiono qui</div>
       ) : (
-        <div className="elenco">
+        <div className="elenco" onScroll={() => setSuggerimento(null)}>
           {elenco.errore && !elenco.dati && (
             <div className="avviso-cartella">
               <Icona nome="avviso" colore="errore" />
@@ -170,7 +171,7 @@ export default function Barra() {
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
               <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
-                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
+                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} onTroncato={suTroncato} />
               {aperta(g.chiave) && <div className="sessioni-gruppo"><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>}
             </div>
           ) : (

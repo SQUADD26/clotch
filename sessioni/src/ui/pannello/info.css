@@ -12,6 +12,7 @@
 .pezzo-pannello .scheda .spazio { flex: 1; }
 /* passaggio e premuto della testata (158:82230: il bottone sporge di spazio/2 per lato e spazio/1 sopra e sotto, il testo resta dov'era) */
 .pezzo-pannello .scheda .testata { width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2)); padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); }
+.pezzo-pannello .scheda .testata:active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-pannello .scheda .testata:hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-pannello .riga-info { display: flex; align-items: center; gap: var(--spazio-2); }
 .pezzo-pannello .riga-info .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -30,6 +31,10 @@
   height: var(--misura-barra-uso); display: flex; overflow: hidden; border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma);
 }
 .pezzo-pannello .barra-contesto .parte { height: 100%; background: var(--colore-sessione-blu); }
+.pezzo-pannello .barra-contesto .parte.quasi { background: var(--colore-sessione-arancione); }
+.pezzo-pannello .barra-contesto .parte.pieno { background: var(--colore-sessione-rosso); }
+.pezzo-pannello .uso .t-sm.quasi { color: var(--colore-sessione-arancione); }
+.pezzo-pannello .uso .t-sm.pieno { color: var(--colore-testo-errore); }
 .pezzo-pannello .voci-contesto { display: flex; flex-direction: column; gap: var(--spazio-1); }
 .pezzo-pannello .voce { display: flex; align-items: center; gap: var(--spazio-2); }
 .pezzo-pannello .voce .nome { flex: 1; }
