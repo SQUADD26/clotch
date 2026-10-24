@@ -106,6 +106,9 @@
 .pezzo-impostazioni .impostazioni.stretta .nav-impostazioni { display: none; }
 .pezzo-impostazioni .scelta-sezione { position: relative; align-self: flex-start; }
 .pezzo-impostazioni .scelta-sezione .valore { display: flex; align-items: center; gap: var(--spazio-1); font: inherit; }
+.pezzo-impostazioni .scelta-sezione .valore { padding: 0 var(--spazio-2); margin: 0 calc(-1 * var(--spazio-2)); border-radius: var(--raggio-md); }
+.pezzo-impostazioni .scelta-sezione .valore:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .scelta-sezione .valore:active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) { flex-wrap: wrap; }
 .pezzo-impostazioni .impostazioni.stretta .riga.azione:has(.campo-testo) .testi { flex-basis: 100%; }
 .pezzo-impostazioni .impostazioni.stretta .campo-testo { flex: 1; max-width: none; }
