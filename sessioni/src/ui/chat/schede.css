@@ -7,8 +7,9 @@
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
 .pezzo-chat .scheda-sessione.sospesa {
-  position: absolute; bottom: calc(100% + var(--spazio-1-5)); left: 0; z-index: var(--livello-menu); border-color: transparent; background: var(--colore-fondo-elevato);
+  max-width: calc(100vw - 2 * var(--misura-margine-finestra)); border-color: transparent; background: var(--colore-fondo-elevato);
 }
+.pezzo-chat .ponte-scheda { position: absolute; bottom: 100%; left: 0; z-index: var(--livello-menu); padding-bottom: var(--spazio-1-5); }
 .pezzo-chat .scheda-sessione .testata, .pezzo-chat .scheda-sessione .stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
 .pezzo-chat .scheda-sessione .stato { gap: var(--spazio-1); color: var(--colore-testo-primario); }
 .pezzo-chat .scheda-sessione .titolo {

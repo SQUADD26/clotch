@@ -77,7 +77,7 @@ export interface PrInfo { numero: number; url: string; stato: PrSessione["stato"
 export interface InfoSessione {
   /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
   contesto: number | null;
-  file: { quanti: number; aggiunte: number; tolte: number };
+  file: { quanti: number; aggiunte: number; tolte: number; nomi?: string[] };
   /** Tutte le PR della sessione (file dell'app + `pr-link` della trascrizione); assente = nessuna. */
   prs?: PrInfo[];
 }
@@ -231,6 +231,8 @@ export interface CasellaApi {
   copiaImmagine(da: DaImmagine): Promise<boolean>;
   /** Finestra «Salva con nome»; false se annullata. */
   salvaImmagine(da: DaImmagine, nome: string): Promise<boolean>;
+  /** Mostra il file nel Finder. */
+  mostra(percorso: string): Promise<void>;
   /** Le skill dell'account della sessione, in ordine alfabetico. */
   skill(account: string): Promise<SkillNome[]>;
 }

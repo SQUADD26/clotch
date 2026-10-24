@@ -13,6 +13,7 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
   const o = s.obiettivo?.valido ? s.obiettivo : null;
   return {
     obiettivo: o?.testo ?? null,
+    stato: o?.stato ?? null,
     // shortcut: «in corso» il registro non lo scrive (le prove girano senza segno): compare quando lo scriverà (`provando` in obiettivo_vivo.riprova).
     prove: (o?.prove ?? []).map((p) => ({ testo: p.testo, stato: p.fatta ? "fatta" : p.fallita ? "fallita" : "attesa" })),
     file: info?.file ?? null,
@@ -21,7 +22,7 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
 
 /** `esteso`: il bottone «Pannello» è premuto e sotto l'obiettivo ci sono le schede di Info sessione. */
 export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
-  const info = useInfo(s.id);
+  const { info, errore, riprova } = useInfo(s.id);
   const max = useChatClotchAi(s.id)?.contestoMax ?? null;
   const prs = info?.prs ?? s.app?.prs ?? [];
   // scena di prova «scorrendo» (101:34190): il pannello parte già scorso di tanti px
@@ -33,6 +34,8 @@ export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
       <PannelloObiettivo dati={datiPannello(s, info)} />
       {esteso && <>
         <Ambiente s={s} />
+        {errore && !info && <div className="scheda errore-info" role="alert"><span className="t-sm errore">Non riesco a leggere contesto e modifiche.</span><button type="button" className="bottone secondario" onClick={riprova}>Riprova</button></div>}
+        {!errore && !info && <div className="scheda scheletro" aria-busy="true" aria-label="Carico contesto e modifiche"><span className="riga-sagoma" /><span className="riga-sagoma corta" /></div>}
         {info?.contesto != null && <Contesto usati={info.contesto} max={max} mcp={s.app?.strumentiMcp ?? 0} />}
         {!!s.app?.connettori.length && <Connettori nomi={s.app.connettori} />}
         {info && (info.file.quanti > 0 || prs.length > 0) && <Modifiche file={info.file} prs={prs} />}

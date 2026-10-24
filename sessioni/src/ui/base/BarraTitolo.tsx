@@ -16,13 +16,13 @@ const comandi = (m: object) => (m as { ComandiTitolo?: ComponentType }).ComandiT
 const ComandiPannello = comandi(pannello), ComandiClotchAi = comandi(clotchAi);
 const CentroPannello = (pannello as { CentroTitolo?: ComponentType }).CentroTitolo; // pillola «schermo occupato» (101-49592)
 
-export function BarraTitolo() {
+export function BarraTitolo({ inerte = false }: { inerte?: boolean }) {
   const n = useNavigazione();
   const { scorciatoie } = useImpostazioni();
   // il suggerimento sostituisce quello nativo (title); «suggerimento-barra» nella sezione di una scena di prova lo tiene aperto (101-24069)
   const nuda = { title: undefined };
   return (
-    <div className="barra-titolo">
+    <div className="barra-titolo" inert={inerte || undefined}>
       {/* il semaforo vero è del Mac (trafficLightPosition in finestra.ts); le luci si disegnano solo nella prova di parità */}
       <div className="semaforo" aria-hidden>
         <span className="luce rosso" /><span className="luce giallo" /><span className="luce verde" />

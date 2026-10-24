@@ -19,7 +19,7 @@ export function PannelloSsh({ mac, ambiente, mostraBase = null, onScegli, onAggi
     <>
       {vuoto && (
         <div className="vuoto-ssh">
-          <span className="titolo">{mac.carica ? "Cerco le macchine…" : mac.errore ? "Macchine non raggiungibili" : "Nessuna macchina SSH"}</span>
+          <span className="titolo">{mac.carica ? "Cercando le macchine…" : mac.errore ? "Macchine non raggiungibili" : "Nessuna macchina SSH"}</span>
           <span className="corpo">{mac.errore ?? "Aggiungi una macchina per aprirci sessioni."}</span>
         </div>
       )}

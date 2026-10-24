@@ -37,7 +37,7 @@ export function daAvvisare(prima: Sessione | undefined, dopo: Sessione, imp: Imp
   else if (errore) corpo = errore;
   else if (imp.avvisoAttesa !== false && nuovo((s) => s.stato === "aspetta")) {
     attesa = true;
-    corpo = adesso(dopo) === "domanda" ? "Domanda per te" : adesso(dopo) === "piano" ? "Piano da approvare" : "Aspetta un permesso";
+    corpo = adesso(dopo) === "domanda" ? "Domanda per te" : adesso(dopo) === "piano" ? "Piano da approvare" : "Permesso richiesto";
   } else if (imp.avvisoFinita !== false && nuovo((s) => s.stato === "finita") && (prima.stato === "lavora" || prima.stato === "aspetta")) corpo = "Finita";
   if (!corpo) return null;
   // il suono è «per le sessioni in attesa di te» (frame 101:17363): gli altri avvisi arrivano muti

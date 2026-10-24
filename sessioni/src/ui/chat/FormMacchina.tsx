@@ -56,12 +56,12 @@ export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChi
       )}
       <div className="campi-macchina">
         <div className="riga-campi">
-          <div className="campo-largo"><Campo etichetta="Host" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} onCambia={(host) => onCambia({ host })} /></div>
+          <div className="campo-largo"><Campo etichetta="Indirizzo" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} onCambia={(host) => onCambia({ host })} /></div>
           <Campo etichetta="Porta" valore={v.porta} segnaposto="22" larghezza={numero("misura-campo-porta")} onCambia={(porta) => onCambia({ porta: porta.replace(/\D/g, "").slice(0, 5) })} />
         </div>
         <Campo etichetta="Utente" valore={v.utente} segnaposto="utente" onCambia={(utente) => onCambia({ utente })} />
         <div className="riga-campi allinea-fondo">
-          <div className="campo-largo"><Campo etichetta="Chiave" valore={v.chiave} segnaposto="Nessun file scelto" sola /></div>
+          <div className="campo-largo"><Campo etichetta="Chiave di accesso" valore={v.chiave} segnaposto="Nessun file scelto" sola /></div>
           <Bottone tipo="secondario" onClick={onChiave}>Scegli file</Bottone>
         </div>
         <div className="riga-campi">

@@ -2,11 +2,11 @@
 import type { InfoSessione, PrSessione } from "../../tipi";
 import { api, useAggiornamenti, useChiamata } from "../base/dati";
 
-/** Numeri della trascrizione per la sessione aperta; null finché il main non risponde. Si rifà quando la sessione cambia. */
-export function useInfo(id: string): InfoSessione | null {
+/** Numeri della trascrizione per la sessione aperta; `info` null finché il main non risponde o se la chiamata fallisce (`errore`). Si rifà quando la sessione cambia. */
+export function useInfo(id: string) {
   const c = useChiamata<InfoSessione>(() => api().info(id), [id]);
   useAggiornamenti((a) => { if (a.sessioni.includes(id)) c.ricarica(); });
-  return c.dati ?? null;
+  return { info: c.dati ?? null, errore: c.stato === "errore" ? c.errore ?? "Errore" : null, riprova: c.riprova };
 }
 
 const num = (n: number, dec = 1) => n.toLocaleString("it-IT", { maximumFractionDigits: dec });

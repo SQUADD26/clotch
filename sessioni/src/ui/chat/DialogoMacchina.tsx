@@ -80,7 +80,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
     <Dialogo largo centrato titolo={titolo} corpo={corpo} onChiudi={chiudi}
       bottoni={lavora ? undefined : pronta
         ? <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => onNuovaSessione(v.nome)}>Nuova sessione</Bottone></>
-        : <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => void avvia(ripartiDa)}>{mano ? "Ho fatto, riprova" : "Riprova"}</Bottone></>}>
+        : <><Bottone tipo="secondario" onClick={onChiudi}>Chiudi</Bottone><Bottone tipo="primario" onClick={() => void avvia(ripartiDa)}>Riprova</Bottone></>}>
       <Passi righe={righe} />
       {github ? <BloccoCodice riga={github} />
         : !lavora && mano?.comando ? <BloccoComando riga={mano} />

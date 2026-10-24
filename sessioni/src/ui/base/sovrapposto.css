@@ -28,4 +28,4 @@
 .sovrapposto .voce:disabled { opacity: var(--opacita-spento); background: none; }
 /* finestra stretta o bassa: dialoghi e ricerca restano dentro, col margine */
 .velo > * { max-width: calc(100vw - 2 * var(--misura-margine-finestra)); }
-.velo > .dialogo { max-height: calc(100vh - 2 * var(--misura-margine-finestra)); overflow-y: auto; }
+.velo > .dialogo { max-height: calc(100vh - 2 * var(--misura-margine-finestra)); overflow: hidden; }

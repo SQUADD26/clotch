@@ -1,11 +1,21 @@
 /* figma: 101-28232 — «Visore immagine»: colonna 960 al centro del velo, frecce a 24 dai lati */
 .pezzo-chat .velo.visore-velo { gap: var(--spazio-6); }
-.pezzo-chat .visore { width: var(--misura-visore-largo); flex: none; display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-chat .visore { flex: 0 1 var(--misura-visore-largo); min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-chat .barra-visore { display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone-invio); }
 .pezzo-chat .barra-visore .nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--colore-testo-primario); }
-.pezzo-chat .barra-visore .chiudi, .pezzo-chat .freccia { display: inline-flex; flex: none; }
+.pezzo-chat .barra-visore .chiudi, .pezzo-chat .freccia {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; cursor: pointer;
+  width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-md);
+}
+.pezzo-chat .barra-visore .chiudi:hover, .pezzo-chat .freccia:hover, .pezzo-chat .barra-visore .chiudi:focus-visible, .pezzo-chat .freccia:focus-visible { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .barra-visore .chiudi:active, .pezzo-chat .freccia:active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-chat .immagine-visore {
-  width: var(--misura-visore-largo); height: var(--misura-visore-alto); display: flex; align-items: center; justify-content: center; overflow: hidden;
+  width: 100%; height: min(var(--misura-visore-alto), calc(100vh - 12 * var(--spazio-6))); display: flex; align-items: center; justify-content: center; overflow: hidden;
   border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl);
 }
 .pezzo-chat .immagine-visore img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.pezzo-chat .immagine-visore[data-zoom="giu"] img { cursor: zoom-in; }
+.pezzo-chat .immagine-visore[data-zoom="su"] { cursor: grab; touch-action: none; }
+.pezzo-chat .immagine-visore[data-zoom="su"]:active { cursor: grabbing; }
+.pezzo-chat .immagine-visore.carico { background: var(--colore-fondo-sagoma); }
+.pezzo-chat .immagine-visore .non-letta { display: flex; flex-direction: column; align-items: center; gap: var(--spazio-3); }
