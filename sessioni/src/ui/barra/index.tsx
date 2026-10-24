@@ -74,12 +74,11 @@ export default function Barra() {
   // la cartella della sessione scelta, calcolata una volta per render (prima: ogni cartella riscorreva tutte le cartelle, #474)
   const conScelta = useMemo(() => barra.gruppi.find((g) => g.sessioni.some((s) => s.id === scelta))?.chiave, [barra, scelta]);
   const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || chiave === conScelta);
+  // senza View Transition: il clic cambia lo stato subito (la transizione aspetta due fotogrammi e a clic di fila perdeva i clic, #1144)
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
-    conTransizione(() => {
-      setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
-      setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
-    });
+    setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
+    setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
   };
 
   useEffect(() => { // ⇧⌘A e ⇧⌘;: azioni del gestore unico (base/scorciatoie), con le sue regole

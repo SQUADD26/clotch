@@ -65,6 +65,9 @@ jobs:
       - run: npm run build && npm run scene
       - name: Clicca tutto (${{ matrix.area }}, matrice completa)
         run: node test/beta/clicca.mjs --area ${{ matrix.area }} --matrice --video --out beta-giro
+      - name: Ritardo della ricerca con 3000 sessioni (#1150)
+        if: matrix.area == 'barra'
+        run: node test/beta/ritardo.mjs
       - name: Giudica
         env:
           GH_TOKEN: ${{ github.token }}

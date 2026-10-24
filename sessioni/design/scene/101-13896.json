@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792845904306,
+    "ultimaAttivita": 1792871026288,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -55,7 +55,7 @@
    {
     "tipo": "utente",
     "testo": "Fai la prova di parità di tutte le schermate.",
-    "t": 1792846040306
+    "t": 1792871162288
    },
    {
     "tipo": "strumento",
@@ -67,14 +67,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792846041306,
+    "t": 1792871163288,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Le 14 immagini sono pronte. Prima di salvarle ho un dubbio.",
     "modello": "claude-opus-5-5",
-    "t": 1792846082306
+    "t": 1792871204288
    },
    {
     "tipo": "strumento",
@@ -98,7 +98,7 @@
      ]
     },
     "esito": null,
-    "t": 1792846083306,
+    "t": 1792871205288,
     "id": "t1"
    }
   ]
@@ -149,14 +149,14 @@
       "domande": []
      }
     ],
-    "battito": 1792846184306,
+    "battito": 1792871306288,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792846204306,
+    "visto": 1792871326288,
     "fine": null,
     "chatNuova": null,
     "fermata": false,

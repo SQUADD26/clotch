@@ -1,5 +1,6 @@
 // figma: 101-17193 — Impostazioni · Generale; tendina della lingua aperta: 101-32827.
 import { avvisa } from "../base/Avvisi";
+import { Icona } from "../base/Icona";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
 import { MODELLI } from "../chat/testi";
@@ -24,7 +25,8 @@ export default function Generale() {
         <Riga etichetta="Apri all’avvio del Mac" descrizione="clotch parte quando accendi il Mac">
           <Interruttore etichetta="Apri all’avvio del Mac" acceso={v.apriAllAvvio} onCambia={(x) => imposta("apriAllAvvio", x)} />
         </Riga>
-        <Riga etichetta="Mostra nella barra dei menu" descrizione="Un’icona con il numero di sessioni in attesa di te">
+        <Riga etichetta="Mostra nella barra dei menu" descrizione="In alto sul Mac, accanto all’orologio: l’icona di clotch e quante sessioni aspettano te" azione>
+          <span className="tasto-chip" aria-hidden="true"><Icona nome="schermo" /> 2</span>
           <Interruttore etichetta="Mostra nella barra dei menu" acceso={v.barraDeiMenu} onCambia={(x) => imposta("barraDeiMenu", x)} />
         </Riga>
         <Riga etichetta="Lingua" descrizione="L’app c’è solo in italiano">

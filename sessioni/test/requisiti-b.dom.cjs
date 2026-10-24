@@ -38,7 +38,8 @@ H.avvia('requisiti-b', async () => {
     assert.deepEqual(await testo('.finestra-ricerca .titolo-gruppo, .finestra-ricerca .titolo-sezione .testo'), ['Azioni', 'Sessioni', 'Messaggi']);
     assert.deepEqual(await testo('.voce-azione .etichetta'), ['Copia link alla sessione', 'Copia cartella di lavoro', 'Copia ID sessione', 'Copia ultimo blocco di codice']);
     const r = await run(() => [...document.querySelectorAll('.risultato')].map((b) => [...b.querySelectorAll('.testo, .t-xs')].map((e) => e.textContent)));
-    assert.equal(r.length, 2); assert.deepEqual([r[0][0], r[0][2], r[1]], ['Beta copia', 'Oggi', ['Gamma tre', '… ha detto copia davvero …', 'Ieri']]); assert.match(r[0][1], /^beta-app Codex/);
+    assert.equal(r.length, 2); assert.deepEqual([r[0][0], r[1][0], r[1][1]], ['Beta copia', 'Gamma tre', '… ha detto copia davvero …']);
+    assert.match(r[0][2], /^\d\d:\d\d$/, 'oggi: l\'ora dell\'ultima attività (#1152)'); assert.match(r[1][2], /^(\d\d:\d\d|Ieri|\d+ \S+)$/, 'la data è l\'ultima attività della sessione, non del messaggio (#1152)'); assert.match(r[0][1], /^beta-app Codex/);
     await clicca('.voce-azione', 'Copia ID sessione'); await wait(() => !document.querySelector('.finestra-ricerca')); assert.deepEqual(fatte('sessioni:azione'), [['s1', 'copia-id']]);
   });
 

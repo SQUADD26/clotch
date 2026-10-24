@@ -17,12 +17,12 @@
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
 .pezzo-barra .voce-azione .etichetta { flex: 1; }
-.pezzo-barra .voce-azione.scelta { background: var(--colore-fondo-riga-scelta); box-shadow: inset var(--spazio-0-5) 0 0 var(--colore-fondo-accento); } /* come la riga scelta della barra (#641, #870) */
+.pezzo-barra .voce-azione.scelta { background: var(--colore-fondo-riga-scelta); } /* come la riga scelta della barra, senza barra d'accento (#1144) */
 .pezzo-barra .risultato {
   padding: var(--spazio-2) var(--spazio-3); gap: var(--spazio-3); flex: none;
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
-.pezzo-barra .risultato.scelta { background: var(--colore-fondo-riga-scelta); box-shadow: inset var(--spazio-0-5) 0 0 var(--colore-fondo-accento); }
+.pezzo-barra .risultato.scelta { background: var(--colore-fondo-riga-scelta); }
 .pezzo-barra .finestra-ricerca .trovato { background: none; color: var(--colore-testo-primario); }
 .pezzo-barra .finestra-ricerca .testo-lungo { max-width: 100%; overflow-wrap: anywhere; }
 .pezzo-barra .risultato .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }

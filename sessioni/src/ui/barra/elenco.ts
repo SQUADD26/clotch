@@ -92,7 +92,10 @@ export function componi(sessioni: Sessione[], v: Vista, pref: Preferenze, ora: n
     gruppi.set(titolo, g);
   }
   const attivi = v.filtri.filter((f) => f.valori.length).length;
-  return { fissate, gruppi: [...gruppi.values()], totale: scelte.length, titolo: attivi ? `${scelte.length} ${scelte.length === 1 ? "sessione" : "sessioni"}` : "Progetti" };
+  // cartelle e sorgenti stanno ferme in ordine alfabetico: l'attività cambia ogni secondo e le farebbe saltare (#1144); le date restano dalla più recente
+  const elencoGruppi = [...gruppi.values()];
+  if (v.raggruppa !== "data") elencoGruppi.sort((a, b) => a.titolo.localeCompare(b.titolo));
+  return { fissate, gruppi: elencoGruppi, totale: scelte.length, titolo: attivi ? `${scelte.length} ${scelte.length === 1 ? "sessione" : "sessioni"}` : "Progetti" };
 }
 
 /** Riga sotto il nome nel piede: «6 account · 4 sorgenti» (101:7728), «Nessuna sessione» (101:8772). */

@@ -105,7 +105,7 @@ H.avvia('requisiti-c', async () => {
   await req('CL1', async () => {
     await vai('101-45993'); // Clotch assente
     await run(() => { window.__aperti = []; window.open = (u) => { __aperti.push(u); return null; }; });
-    await clicca('button', 'Scarica clotch'); assert.deepEqual(await run(() => __aperti), ['https://github.com/SQUADD26/clotch/releases/latest']);
+    await clicca('button', 'Ottieni clotch'); assert.deepEqual(await run(() => __aperti), ['https://github.com/SQUADD26/clotch/releases/latest']);
     await vai('101-45956'); await wait(() => !!document.querySelector('button[role=switch]'));
     for (const v of ['Voce dal notch', 'Dettatura dal notch', 'Avvisi nel notch', 'Obiettivi anche nel notch']) await clicca('button[role=switch]', v);
     await attesa(80); assert.deepEqual(imposta(), [{ clotchVoce: false }, { clotchDettatura: false }, { clotchAvvisi: false }, { clotchObiettivi: false }]);
