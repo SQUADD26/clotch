@@ -268,6 +268,7 @@ export type Token =
   | "misura-miniatura-strumento-larga"
   | "misura-miniatura-strumento-alta"
   | "misura-elenco-strumenti-alto"
+  | "misura-bottone-piccolo"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
@@ -586,6 +587,7 @@ export const valori: Record<Token, string> = {
   "misura-miniatura-strumento-larga": "48px",
   "misura-miniatura-strumento-alta": "32px",
   "misura-elenco-strumenti-alto": "240px",
+  "misura-bottone-piccolo": "24px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
