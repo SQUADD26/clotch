@@ -1,0 +1,289 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1",
+  "sezione": "aperti:strumento|riga:2"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792848905114,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "contesto": 124000
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Perché la voce «Assistenza» non si vede nella barra?",
+    "t": 1792848960337
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
+    "t": 1792848961337
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Grep",
+    "ingresso": {
+     "pattern": "canAccess",
+     "path": "src"
+    },
+    "esito": {
+     "testo": "Found 4 files\na\nb\nc\nd",
+     "errore": false
+    },
+    "t": 1792848975337,
+    "id": "t0"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/hooks/useRoleAccess.ts"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792848975537,
+    "id": "t1"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "gh api 'repos/SQUADD26/gestionale-interno/contents/src/hooks/useRoleAccess.ts?ref=dev' --jq .content | base64 -d"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792848975837,
+    "id": "t2"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm run e2e -- assistenza"
+    },
+    "esito": {
+     "testo": "Exit code 1",
+     "errore": true
+    },
+    "t": 1792848978837,
+    "id": "t3"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "mcp__claude-in-chrome__screenshot",
+    "ingresso": {
+     "name": "la pagina Dashboard"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792848983837,
+    "id": "t4"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/components/AppSidebar.tsx"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849006837,
+    "id": "t5"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/components/NavItem.tsx"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849007237,
+    "id": "t6"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Grep",
+    "ingresso": {
+     "pattern": "supporto"
+    },
+    "esito": {
+     "testo": "src/a.ts:1:x",
+     "errore": false
+    },
+    "t": 1792849007537,
+    "id": "t7"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/lib/ruoli.ts"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849007737,
+    "id": "t8"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/pages/Dashboard.tsx"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849008037,
+    "id": "t9"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm run typecheck"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792849008537,
+    "id": "t10"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/hooks/useAuth.ts"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849017537,
+    "id": "t11"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "sessioni/src/ui/chat/Gruppo.tsx"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849023137,
+    "id": "t12"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "sessioni/src/ui/chat/Riga.tsx"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792849024137,
+    "id": "t13"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "sessioni/src/ui/chat/Filo.tsx"
+    },
+    "esito": null,
+    "t": 1792849025137,
+    "id": "t14"
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "clotchAi": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

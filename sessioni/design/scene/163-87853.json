@@ -1,0 +1,168 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1",
+  "sezione": "aperti:pensiero,strumento|riga:2"
+ },
+ "elenco": {
+  "sessioni": [
+   {
+    "id": "s1",
+    "sorgente": "claude-code",
+    "account": ".claude-accountmanager",
+    "email": null,
+    "idApp": null,
+    "titolo": "Sessioni: app Electron",
+    "progetto": "clotch",
+    "cartella": "",
+    "ramo": "feat/333-sessioni-lettura",
+    "modello": "claude-opus-5-5",
+    "stato": "lavora",
+    "perche": null,
+    "ultimaAttivita": 1792848905114,
+    "obiettivo": {
+     "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
+     "stato": "aperto",
+     "valido": true,
+     "prove": [
+      {
+       "testo": "Test del lettore: 11 su 11",
+       "fatta": true
+      },
+      {
+       "testo": "6 cartelle di account trovate",
+       "fatta": true
+      },
+      {
+       "testo": "Revisione della PR",
+       "fatta": false
+      }
+     ]
+    },
+    "situazione": {
+     "adesso": "lavora",
+     "strumento": null,
+     "inCoda": 0,
+     "segni": []
+    },
+    "file": "",
+    "contesto": 124000
+   }
+  ],
+  "errori": []
+ },
+ "messaggi": {
+  "s1": [
+   {
+    "tipo": "utente",
+    "testo": "Perché la voce «Assistenza» non si vede nella barra?",
+    "t": 1792848977637
+   },
+   {
+    "tipo": "pensiero",
+    "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
+    "t": 1792848978637
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Grep",
+    "ingresso": {
+     "pattern": "canAccess",
+     "path": "src"
+    },
+    "esito": {
+     "testo": "Found 4 files\na\nb\nc\nd",
+     "errore": false
+    },
+    "t": 1792848992637,
+    "id": "t0"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Read",
+    "ingresso": {
+     "file_path": "src/hooks/useRoleAccess.ts"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792848992837,
+    "id": "t1"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "gh api 'repos/SQUADD26/gestionale-interno/contents/src/hooks/useRoleAccess.ts?ref=dev' --jq .content | base64 -d"
+    },
+    "esito": {
+     "testo": "…",
+     "errore": false
+    },
+    "t": 1792848993137,
+    "id": "t2"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "Bash",
+    "ingresso": {
+     "command": "npm run e2e -- assistenza"
+    },
+    "esito": {
+     "testo": "Exit code 1",
+     "errore": true
+    },
+    "t": 1792848996137,
+    "id": "t3"
+   },
+   {
+    "tipo": "strumento",
+    "nome": "mcp__claude-in-chrome__screenshot",
+    "ingresso": {
+     "name": "la pagina Dashboard"
+    },
+    "esito": {
+     "testo": "ok",
+     "errore": false
+    },
+    "t": 1792849001137,
+    "id": "t4"
+   },
+   {
+    "tipo": "assistente",
+    "testo": "La voce «Assistenza» c’è, ma la barra la nasconde a chi non ha il ruolo «supporto». Il controllo sta in useRoleAccess.ts. Ti propongo di mostrarla a tutti gli admin.",
+    "modello": "claude-opus-5-5",
+    "t": 1792849024137
+   }
+  ]
+ },
+ "preferenze": {
+  "s1": {
+   "icona": "strati"
+  }
+ },
+ "registro": {
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "clotchAi": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

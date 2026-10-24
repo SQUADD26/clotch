@@ -10,7 +10,7 @@ import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
 
 export interface FileToccato { file: string; aggiunte: number; tolte: number }
-export interface Aiutante { id: string; nome: string; azione: string; durata: number | null; finito: boolean }
+export interface Aiutante { id: string; nome: string; azione: string; durata: number | null; finito: boolean; errore: boolean; rapporto: string }
 export interface Passo { testo: string; stato: "fatto" | "in-corso" | "da-fare" }
 
 export type Blocco = (
@@ -167,6 +167,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
       const a: Aiutante = {
         id: identita?.[i]?.chiave ? `aiutante:${JSON.stringify([sessione, identita[i].chiave])}` : m.id, nome: testoCampo(m.ingresso, "description") || testoCampo(m.ingresso, "subagent_type"),
         azione: esito.split("\n")[0], durata: durata(i), finito: !!m.esito && !/^Async agent launched/.test(esito),
+        errore: !!m.esito?.errore, rapporto: esito,
       };
       const b = tu.blocchi.find((x) => x.tipo === "aiutanti");
       if (b && b.tipo === "aiutanti") b.aiutanti.push(a); else tu.blocchi.push({ tipo: "aiutanti", aiutanti: [a] });

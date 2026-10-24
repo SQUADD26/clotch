@@ -13,7 +13,7 @@ export interface Descrizione {
   /** Riga «$ comando» del blocco aperto (solo i comandi). */
   comando: string | null;
   /** La chiamata in parole semplici, per la riga del gruppo compatto (#876): «Legge Filo.tsx», «Cerca «x» in 4 file». */
-  frase: string;
+  frase: Frase;
 }
 
 const campo = (x: unknown, k: string) => (x && typeof x === "object" && typeof (x as Record<string, unknown>)[k] === "string" ? String((x as Record<string, unknown>)[k]) : "");
@@ -38,23 +38,27 @@ function fileTrovati(uscita: string) {
   return new Set(righe.map((r) => r.replace(/:\d+[:-].*$/, ""))).size;
 }
 
-export function frase(nome: string, ingresso: unknown, uscita = ""): string {
+export interface Frase { verbo: string; oggetto: string }
+
+/** Verbo in grigio e oggetto in chiaro, come «Riga strumento» (163:84207): «Legge» «Ricerca.tsx». */
+export function frase(nome: string, ingresso: unknown, uscita = ""): Frase {
   const file = base(campo(ingresso, "file_path") || campo(ingresso, "path") || campo(ingresso, "notebook_path"));
+  const f = (verbo: string, oggetto = "") => ({ verbo, oggetto });
   switch (nome) {
-    case "Bash": return campo(ingresso, "description") || "Esegue un comando";
-    case "Read": return file ? `Legge ${file}` : "Legge un file";
+    case "Bash": return f(campo(ingresso, "description") || "Esegue un comando");
+    case "Read": return f("Legge", file);
     case "Grep": case "Glob": {
-      const cosa = `«${campo(ingresso, "pattern")}»`, n = uscita ? fileTrovati(uscita) : 0;
-      if (nome === "Glob") return n ? `Trova ${n} file ${cosa}` : `Trova file ${cosa}`;
-      return n ? `Cerca ${cosa} in ${n} file` : campo(ingresso, "path") ? `Cerca ${cosa} in ${file}` : `Cerca ${cosa}`;
+      const cosa = `"${campo(ingresso, "pattern")}"`, n = uscita ? fileTrovati(uscita) : 0;
+      if (nome === "Glob") return f("Trova", n ? `${n} file ${cosa}` : `file ${cosa}`);
+      return f("Cerca", n ? `${cosa} in ${n} file` : campo(ingresso, "path") ? `${cosa} in ${file}` : cosa);
     }
-    case "Write": return `Scrive ${file}`;
-    case "Edit": case "MultiEdit": case "NotebookEdit": return `Modifica ${file}`;
-    case "WebSearch": return `Cerca sul web «${campo(ingresso, "query")}»`;
-    case "WebFetch": { const u = campo(ingresso, "url"); try { return `Apre ${new URL(u).hostname.replace(/^www\./, "")}`; } catch { return "Apre una pagina web"; } }
+    case "Write": return f("Scrive", file);
+    case "Edit": case "MultiEdit": case "NotebookEdit": return f("Modifica", file);
+    case "WebSearch": return f("Cerca sul web", `"${campo(ingresso, "query")}"`);
+    case "WebFetch": { const u = campo(ingresso, "url"); try { return f("Apre", new URL(u).hostname.replace(/^www\./, "")); } catch { return f("Apre una pagina web"); } }
     default:
-      if (/screenshot/i.test(nome)) return "Fa una schermata";
-      return `Usa ${nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " ")}`;
+      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return f("Fotografa", campo(ingresso, "name") || "lo schermo");
+      return f("Usa", nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " "));
   }
 }
 
@@ -70,14 +74,14 @@ function riga(nome: string, ingresso: unknown, stato: StatoStrumento, cartella: 
     case "Grep": case "Glob": {
       const dove = relativo(campo(ingresso, "path"), cartella);
       const cosa = campo(ingresso, "pattern");
-      return { etichetta: "Cercato", icona: "cerca-file", dettaglio: dove ? `${cosa} in ${dove}` : cosa, comando: null };
+      return { etichetta: "Cercato", icona: "cerca", dettaglio: dove ? `${cosa} in ${dove}` : cosa, comando: null };
     }
     case "Edit": case "MultiEdit": case "Write": case "NotebookEdit":
       return { etichetta: "Modificato", icona: "matita", dettaglio: file, comando: null };
     case "WebSearch": case "WebFetch":
       return { etichetta: "Cercato sul web", icona: "globo", dettaglio: campo(ingresso, "query") || campo(ingresso, "url"), comando: null };
     default:
-      if (/screenshot/i.test(nome)) return { etichetta: "Schermata", icona: "immagine", dettaglio: campo(ingresso, "name") || campo(ingresso, "filename"), comando: null };
+      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return { etichetta: "Schermata", icona: "immagine", dettaglio: campo(ingresso, "name") || campo(ingresso, "filename"), comando: null };
       return { etichetta: nome.replace(/^mcp__[^_]+__/, ""), icona: "terminale", dettaglio: file || primoTesto(ingresso), comando: null };
   }
 }
