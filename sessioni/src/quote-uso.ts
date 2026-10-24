@@ -13,6 +13,7 @@ const CACHE_MS = 60_000;
 
 let cache: { quando: number; dati: QuotaUso[] } | null = null;
 let inVolo: Promise<QuotaUso[]> | null = null;
+let giorniInVolo: Promise<void> | null = null;
 let giorniCache: { quando: number; dati: Awaited<ReturnType<typeof usoAlGiorno>> } | null = null;
 
 export async function quoteUso(ora = Date.now(), leggi: () => Promise<unknown> = leggiFeed): Promise<QuotaUso[]> {
@@ -110,12 +111,15 @@ async function vociDi(file: string, st: { ino: number; size: number }, primo: nu
   return c.voci;
 }
 
-/** Le quote del feed con `giorni` per ogni account (zeri se non ha trascrizioni); senza nessun uso nel periodo la serie manca e la scheda resta vuota. */
+/** Le quote del feed con `giorni` per ogni account (zeri se non ha trascrizioni); senza nessun uso nel periodo la serie manca e la scheda resta vuota.
+ *  Le quote non aspettano il conteggio dei giorni (14 s a freddo, #1006): parte in background, e la serie arriva al giro dopo (quella vecchia nel frattempo). */
 /** `contaGiorni`: chi conta i giorni; l'app lo fa fare al worker dei lavori (impostazioni.ts), i test qui. */
 export async function quoteConGiorni(radici: Radice[], ora = Date.now(), contaGiorni: typeof usoAlGiorno = usoAlGiorno): Promise<QuotaUso[]> {
-  if (!(giorniCache && ora - giorniCache.quando < CACHE_MS)) giorniCache = null;
-  const [quote, uso] = await Promise.all([quoteUso(ora), giorniCache?.dati ?? contaGiorni(radici, ora)]);
-  giorniCache ??= { quando: ora, dati: uso };
+  if (!giorniInVolo && !(giorniCache && ora - giorniCache.quando < CACHE_MS)) {
+    giorniInVolo = contaGiorni(radici, ora).then((dati) => { giorniCache = { quando: ora, dati }; }, () => { /* resta la serie vecchia: si riprova al giro dopo */ })
+      .finally(() => { giorniInVolo = null; });
+  }
+  const quote = await quoteUso(ora), uso = giorniCache?.dati ?? new Map<string, { giorno: string; v: number }[]>();
   const vuota = [...uso.values()][0]?.map((g) => ({ ...g, v: 0 }));
   // le cartelle dell'account per email: la sessione porta il nome della cartella, non l'email (#993)
   const conCartelle = quote.map((q) => ({ ...q, cartelle: radici.filter((r) => r.email?.toLowerCase() === q.email?.toLowerCase()).map((r) => r.account) }));
@@ -135,4 +139,4 @@ export function sogliePassate(quote: { account: string; usato: number }[], viste
 }
 
 /** Solo per i test. */
-export const svuotaCache = () => { cache = null; inVolo = null; giorniCache = null; letti.clear(); };
+export const svuotaCache = () => { cache = null; inVolo = null; giorniCache = null; giorniInVolo = null; letti.clear(); };
