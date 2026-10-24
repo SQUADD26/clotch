@@ -12,7 +12,10 @@
   display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left;
 }
 .pezzo-impostazioni .nav-impostazioni .voce:hover { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-impostazioni .nav-impostazioni .voce.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni .nav-impostazioni .voce.scelta, .pezzo-impostazioni .nav-impostazioni button.voce:active { background: var(--colore-fondo-riga-scelta); }
+/* la voce scelta risponde al passaggio e al clic come le righe scelte del resto dell'app (chat/richieste.css, barra/scelta-icona.css) */
+.pezzo-impostazioni .nav-impostazioni .voce.scelta:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .nav-impostazioni .voce.scelta:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
 
 .pezzo-impostazioni .scorre-impostazioni { flex: 1; min-height: 0; overflow-y: auto; }
 .pezzo-impostazioni .contenuto-impostazioni {

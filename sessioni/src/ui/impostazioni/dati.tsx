@@ -20,6 +20,12 @@ async function escludi(escluse: string[]) {
   } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
 }
 
+/** Come «Rimuovi» in Account: subito, con «Annulla» nell'avviso. */
+function rimuovi(p: string, escluse: string[]) {
+  imposta("cartelleEscluse", escluse.filter((x) => x !== p));
+  avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("cartelleEscluse", escluse) } });
+}
+
 function CartelleEscluse() {
   const n = useNavigazione();
   const v = useImpostazioni();
@@ -39,7 +45,7 @@ function CartelleEscluse() {
           )
           : v.cartelleEscluse.map((p) => (
             <Riga key={p} etichetta={p} azione>
-              <Bottone tipo="secondario" onClick={() => imposta("cartelleEscluse", v.cartelleEscluse.filter((x) => x !== p))}>Rimuovi</Bottone>
+              <Bottone tipo="secondario" onClick={() => rimuovi(p, v.cartelleEscluse)}>Rimuovi</Bottone>
             </Riga>
           ))}
       </Gruppo>
@@ -54,7 +60,7 @@ export default function Dati({ sotto }: { sotto?: string }) {
   const [conferma, setConferma] = useState(!!prova?.conferma);
   const elimina = () => {
     setConferma(false);
-    window.impostazioni.eliminaDati().catch((e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
+    window.impostazioni.eliminaDati().then(() => avvisa({ tipo: "info", messaggio: "Dati eliminati" }), (e) => avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }));
   };
   if (sotto === "cartelle") return <CartelleEscluse />;
   const escluse = v.cartelleEscluse.length;

@@ -22,7 +22,9 @@ import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
 export { CasellaClotchAi, FiloClotchAi } from "./FiloClotchAi";
-export { scene } from "./varianti";
+import { scene as varianti } from "./varianti";
+import { scene as compatto } from "./varianti-compatto";
+export const scene = { ...varianti, ...compatto };
 
 /** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
 function dopoInterruzione(voci: Voce[]) {
@@ -91,7 +93,7 @@ function ChatSessione() {
     );
     return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
   }
-  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "")}.`} riprova={m.riprova} />;
+  if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "", s.app?.ospite)}.`} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);
   const limite = s.situazione?.adesso === "limite" || !!c?.limite;
@@ -121,6 +123,8 @@ function ChatSessione() {
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione}
         inCima={!clotch && s.stato === "lavora" ? <NotaSchermo /> : undefined} />
+      {/* VoiceOver dice quando il turno parte e finisce; key: cambiando sessione non si annuncia lo stato dell'altra */}
+      <span key={s.id} className="solo-lettore" role="status">{muta ? "Non risponde" : c?.richieste.length ? "Richiesta per te" : vivo ? "Al lavoro" : "Turno finito"}</span>
       {casella}
       <Trova iniziale={provaDi(sezione, "trova")} />
     </>

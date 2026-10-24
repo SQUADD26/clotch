@@ -1,4 +1,4 @@
-/* figma: 101-30172 — «Bottone attività» 121:58595 e «Popover attività» 121:58601 */
+/* figma: 101-30172 — «Bottone attività» 121:58595 e «Popover attività» 163:83962 (Vuoto 121:58601, Con sessioni 163:83903) */
 .bottone-attivita { position: relative; display: flex; -webkit-app-region: no-drag; }
 .bottone-attivita .aperto { background: var(--colore-fondo-riga-passaggio); }
 /* contatore: sporge di spazio/1 a destra e in alto del bottone */
@@ -16,3 +16,16 @@
 }
 .popover-attivita .testata { display: flex; align-items: center; justify-content: space-between; color: var(--colore-testo-primario); }
 .popover-attivita .testata button { display: flex; }
+/* «Con sessioni» 163:83903: righe «Riga attesa» 163:83900; sei righe, la settima scorre */
+.popover-attivita.con-sessioni { width: var(--misura-menu-modello); }
+.popover-attivita .elenco {
+  display: flex; flex-direction: column; gap: var(--spazio-0-5); overflow-y: auto;
+  max-height: calc(6 * var(--misura-riga) + 5 * var(--spazio-0-5));
+}
+.riga-attesa {
+  flex: none; display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-riga); padding: 0 var(--spazio-2);
+  border-radius: var(--raggio-md); text-align: left; color: var(--colore-testo-primario); white-space: nowrap;
+}
+.riga-attesa:hover { background: var(--colore-fondo-riga-passaggio); }
+.riga-attesa[aria-current] { background: var(--colore-fondo-riga-scelta); }
+.riga-attesa .titolo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }

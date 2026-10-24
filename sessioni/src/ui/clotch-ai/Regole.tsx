@@ -42,13 +42,15 @@ async function salva(vecchia: Regola, testo: string) {
 function Modifica({ regola, nuovo, onChiudi }: { regola: Regola; nuovo?: string; onChiudi(): void }) {
   const [testo, setTesto] = useState(nuovo ?? regola.testo);
   const ok = testo.trim() && testo.trim() !== regola.testo;
+  const salvaEChiudi = () => { onChiudi(); salva(regola, testo.trim()); };
   return (
     <Dialogo titolo="Modifica regola" onChiudi={onChiudi}
       bottoni={<>
         <Bottone tipo="secondario" onClick={onChiudi}>Annulla</Bottone>
-        <Bottone disabled={!ok} onClick={() => { onChiudi(); salva(regola, testo.trim()); }}>Salva</Bottone>
+        <Bottone disabled={!ok} onClick={salvaEChiudi}>Salva</Bottone>
       </>}>
-      <textarea className="testo-regola t-base" value={testo} onChange={(e) => setTesto(e.target.value)} aria-label="Testo della regola" />
+      <textarea className="testo-regola t-base" value={testo} onChange={(e) => setTesto(e.target.value)} aria-label="Testo della regola"
+        onKeyDown={(e) => { if (e.key === "Enter" && e.metaKey && ok) { e.preventDefault(); salvaEChiudi(); } }} />
       <span className="t-sm secondario">{file(regola.dove)} · apre una PR in {repo(regola.dove)}</span>
     </Dialogo>
   );

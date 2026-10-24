@@ -17,6 +17,8 @@ const SENZA_VISTA = {
   "101-19480": "tavola «Varianti della chat»: raccoglie gli altri frame uno accanto all'altro",
   "101-25542": "Casella: chip degli allegati, sostituito da 148-47483 (scene-allegati.mjs)",
   "101-27294": "Casella: zona di rilascio, sostituita da 148-45727 (scene-allegati.mjs)",
+  // filo compatto (#876): i gemelli chiari; l'app è solo scura (#642, nativeTheme.themeSource = "dark"), la prova la fanno i gemelli scuri
+  ...Object.fromEntries(["163-87559", "163-88171", "163-89035", "163-89702", "163-90360", "163-90982"].map((id) => [id, "gemello chiaro: l'app è solo scura (#642)"])),
 };
 const tutti = readdirSync(`${D}figma`).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5));
 // «senza prova»: né scena né genitore da cui ritagliarlo né ragione scritta (una scena `{}` vale: la finestra di base, ma l'immagine si controlla qui sotto)

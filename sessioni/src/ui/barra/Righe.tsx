@@ -16,12 +16,13 @@ const suggerisci = (riga: HTMLElement, titolo: string, onTroncato: (titolo: stri
 };
 
 /** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
-export function RigaComando({ icona, etichetta, lato, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
+export function RigaComando({ icona, etichetta, lato, tasto, scelta, onClick }: { icona: NomeIcona; etichetta: string; lato?: string; tasto?: string; scelta?: boolean; onClick(e: MouseEvent<HTMLElement>): void }) {
   return (
     <button type="button" className={`riga ${scelta ? "scelta" : ""}`} onClick={onClick}>
       <Icona nome={icona} />
       <span className="testo">{etichetta}</span>
       {lato && <span className="lato t-sm secondario">{lato}</span>}
+      {tasto && <span className="tasto-chip">{tasto}</span>}
     </button>
   );
 }
@@ -81,7 +82,7 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
   const stato = s.situazione?.adesso === "errore" ? "errore" : s.stato;
   return (
     <div
-      role="button" tabIndex={0} aria-current={scelta || undefined}
+      role="button" tabIndex={0} aria-current={scelta || undefined} data-figlia={figlia || undefined}
       className={`riga riga-sessione ${scelta ? "scelta" : ""} ${passaggio ? "passaggio" : ""}`}
       onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
       onFocus={(e) => { if (e.target === e.currentTarget) entra(e); }} onBlur={(e) => { if (e.target === e.currentTarget) onTroncato(null); }}
@@ -92,7 +93,7 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
       {pref?.nonLetta && <span className="pallino-non-letta" role="img" aria-label="Non letta" />}
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""} ${pref?.nonLetta ? "medio" : ""}`}>
+      <span className={["testo", s.stato === "lavora" && "lavoro", pref?.nonLetta && "medio"].filter(Boolean).join(" ")}>
         {s.titolo}
         {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia" data-titolo={s.titolo} /></span></span>}
       </span>

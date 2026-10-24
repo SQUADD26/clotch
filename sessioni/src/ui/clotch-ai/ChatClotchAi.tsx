@@ -40,7 +40,7 @@ export function ChatClotchAi() {
   return (
     <>
       {/* chat vuota (101-36642) solo a registro letto: prima non si sa se è vuota */}
-      {vuota && r ? <PrimaApertura /> : <FiloClotchAi>{permessi.length > 0 && <Permessi permessi={permessi} />}</FiloClotchAi>}
+      {vuota && r ? <PrimaApertura spenta={spenta} /> : <FiloClotchAi>{permessi.length > 0 && <Permessi permessi={permessi} />}</FiloClotchAi>}
       {(avvio === "riavvio" || spenta) && <div className="vista-clotch-ai chat-clotch-ai">
         {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Sessioni e avvisi riprendono da dove erano." />}
         {!avvio && st?.stato === "spenta" && (

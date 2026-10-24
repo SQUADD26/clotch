@@ -22,6 +22,13 @@ export const AREE = {
   friday: { scena: '101-16432', radice: '.pezzo-clotch-ai' },
   impostazioni: { scena: '101-17193', radice: '.pezzo-impostazioni' },
   cornice: { scena: '101-8036', radice: '.barra-titolo' },
+  // stati di «Nuova sessione» e delle macchine SSH (#524): una scena per stato, `extra` = fuori da `tutto` per non moltiplicare i giri della CI
+  ...Object.fromEntries(Object.entries({
+    'nuova-cartella': '148-52543', 'nuova-ramo': '148-52864', 'nuova-senza-worktree': '148-53138', 'nuova-senza-git': '148-53399',
+    'nuova-ssh': '149-67470', 'nuova-ssh-vuoto': '149-67503', 'nuova-ssh-base': '149-69920', 'nuova-da-completare': '149-69953', 'nuova-togli': '149-67760',
+    'nuova-dialogo': '149-67536', 'nuova-proposta': '149-67568', 'nuova-nome': '149-67600', 'nuova-preparazione': '149-67632', 'nuova-fallito': '149-67664',
+    'nuova-login': '149-67696', 'nuova-pronta': '149-67728', 'nuova-ripresa': '149-69985', 'nuova-github': '149-70649',
+  }).map(([k, scena]) => [k, { scena, radice: '.nuova-sessione', extra: true }])),
 };
 
 const finestra = (id) => JSON.parse(readFileSync(join(RADICE, 'design/figma', `${id}.json`), 'utf8')).nodi.find((n) => n.nome === 'finestra').box;

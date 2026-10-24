@@ -1,0 +1,648 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "163:84137",
+  "nome": "Riga del gruppo",
+  "w": 792,
+  "h": 272
+ },
+ "variabili": {
+  "colore/fondo/superficie": "#181818",
+  "spazio/4": 16,
+  "raggio/sm": 7.5,
+  "spazio/1-5": 6,
+  "spazio/2": 8,
+  "spazio/1": 4,
+  "misura/colonna": 760,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "colore/testo/terziario": "#ffffff8c",
+  "misura/icona": 16,
+  "colore/icona/terziaria": "#ffffff82",
+  "colore/fondo/riga-passaggio": "#ffffff0d",
+  "colore/testo/primario": "#ffffff",
+  "colore/icona/secondaria": "#ffffffb5",
+  "colore/fondo/riga-scelta": "#ffffff14",
+  "colore/bordo/fuoco": "#ee7c37",
+  "misura/tratto-forte": 2,
+  "colore/icona/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673"
+ },
+ "nodi": [
+  {
+   "id": "163:84137",
+   "nome": "Riga del gruppo",
+   "tipo": "COMPONENT_SET",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 792,
+    "h": 272
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/superficie",
+    "itemSpacing": "spazio/4",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "paddingTop": "spazio/4",
+    "paddingBottom": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84104",
+   "nome": "Stato=Chiuso",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 16,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84105",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 20,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84106",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 164,
+    "y": 20,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84107",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 205,
+    "y": 21,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84107;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 210.33203125,
+    "y": 24.33306121826172,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84109",
+   "nome": "Stato=Passaggio",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 58,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84110",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 62,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84111",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 164,
+    "y": 62,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84112",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 205,
+    "y": 63,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84112;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 210.33203125,
+    "y": 66.33305358886719,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84114",
+   "nome": "Stato=Premuto",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 100,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84115",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 104,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84116",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 164,
+    "y": 104,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84117",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 205,
+    "y": 105,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84117;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 210.33203125,
+    "y": 108.33305358886719,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84119",
+   "nome": "Stato=Fuoco",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 142,
+    "w": 760,
+    "h": 30
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "strokeWeight": "misura/tratto-forte",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84120",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 26,
+    "y": 148,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84121",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 166,
+    "y": 148,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84122",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 207,
+    "y": 149,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84122;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 212.33203125,
+    "y": 152.3330535888672,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84124",
+   "nome": "Stato=Aperto",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 188,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84125",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 192,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84126",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 164,
+    "y": 192,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84127",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 205,
+    "y": 193,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84127;101:6844",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 208.33203125,
+    "y": 198.33306884765625,
+    "w": 9.333883285522461,
+    "h": 5.333883762359619
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84129",
+   "nome": "Stato=Errore",
+   "tipo": "COMPONENT",
+   "box": {
+    "x": 16,
+    "y": 230,
+    "w": 760,
+    "h": 26
+   },
+   "variabili": {
+    "cornerRadius": "raggio/sm",
+    "itemSpacing": "spazio/1-5",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/1",
+    "paddingBottom": "spazio/1",
+    "width": "misura/colonna"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84130",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 24,
+    "y": 234,
+    "w": 134,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Ha usato 12 strumenti",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84131",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 164,
+    "y": 234,
+    "w": 35,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "· 48 s",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84132",
+   "nome": "segno errore",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 205,
+    "y": 235,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84132;101:6930",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 205.66796875,
+    "y": 235.66635131835938,
+    "w": 14.6669921875,
+    "h": 14.6669921875
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "163:84134",
+   "nome": "errori",
+   "tipo": "TEXT",
+   "box": {
+    "x": 227,
+    "y": 234,
+    "w": 47,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "1 errore",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84135",
+   "nome": "freccia",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 280,
+    "y": 235,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84135;101:6895",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 285.33203125,
+    "y": 238.33306884765625,
+    "w": 5.333883762359619,
+    "h": 9.333883285522461
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/terziaria"
+   },
+   "senza": []
+  }
+ ]
+}

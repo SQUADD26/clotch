@@ -85,9 +85,16 @@ export function Trova({ iniziale = null }: { iniziale?: string | null }) {
     scorrere.current = false;
   }, [r, i]);
 
+  const vai = (passo: number) => { if (r.length) { scorrere.current = true; setK((i + passo + r.length) % r.length); } };
+  // ⌘G e ⇧⌘G, tasti fissi del Mac (impostazioni/riservati), valgono con la barra aperta anche col fuoco fuori dal campo
+  useEffect(() => {
+    if (!aperta) return;
+    const fuori = [registraAzione("trovaSuccessivo", () => vai(1)), registraAzione("trovaPrecedente", () => vai(-1))];
+    return () => fuori.forEach((f) => f());
+  });
+
   if (!aperta) return null;
   const chiudi = () => void conTransizione(() => setAperta(false)).then(() => document.querySelector<HTMLTextAreaElement>(".area-casella textarea")?.focus()); // il fuoco torna alla casella, non cade sulla pagina
-  const vai = (passo: number) => { if (r.length) { scorrere.current = true; setK((i + passo + r.length) % r.length); } };
   return (
     <div className="trova" role="search" onKeyDown={(e) => { if (e.key === "Escape") chiudi(); }}>
       <Icona nome="cerca" />
