@@ -106,12 +106,17 @@
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
         T.push(t);
-        for (const a of document.getAnimations()) {
+        // anche le ombre: l'uscita dei sovrapposti è una copia in uno shadow root (base/Sovrapposto.tsx)
+        for (const a of [...document.getAnimations(), ...[...document.body.children].flatMap((e) => e.shadowRoot?.getAnimations() ?? [])]) {
           if (prima.has(a) || !a.effect?.target) continue;
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
+              // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
+              coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
+              // il tooltip compare dopo un'attesa voluta (base/Suggerimento.tsx), non subito al gesto
+              attesa: !!a.effect.target.closest?.('[role=tooltip],.tooltip,.suggerimento'), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
           const e = anim.get(a);
