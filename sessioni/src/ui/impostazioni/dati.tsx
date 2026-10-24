@@ -9,7 +9,7 @@ import { Icona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { Gruppo, Interruttore, Pagina, Riga, Scelta, VuotoLista } from "./controlli";
 import { prova } from "./prova";
-import { imposta, useImpostazioni } from "./stato";
+import { imposta, leggi, useImpostazioni } from "./stato";
 
 const CRONOLOGIA = ["7 giorni", "30 giorni", "90 giorni", "Per sempre"];
 
@@ -21,9 +21,9 @@ async function escludi(escluse: string[]) {
 }
 
 /** Come «Rimuovi» in Account: subito, con «Annulla» nell'avviso. */
-function rimuovi(p: string, escluse: string[]) {
-  imposta("cartelleEscluse", escluse.filter((x) => x !== p));
-  avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("cartelleEscluse", escluse) } });
+function rimuovi(p: string) {
+  imposta("cartelleEscluse", leggi("cartelleEscluse").filter((x) => x !== p));
+  avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("cartelleEscluse", [...leggi("cartelleEscluse"), p]) } });
 }
 
 function CartelleEscluse() {
@@ -45,7 +45,7 @@ function CartelleEscluse() {
           )
           : v.cartelleEscluse.map((p) => (
             <Riga key={p} etichetta={p} azione>
-              <Bottone tipo="secondario" onClick={() => rimuovi(p, v.cartelleEscluse)}>Rimuovi</Bottone>
+              <Bottone tipo="secondario" aria-label={`Rimuovi ${p}`} onClick={() => rimuovi(p)}>Rimuovi</Bottone>
             </Riga>
           ))}
       </Gruppo>
