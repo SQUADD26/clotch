@@ -106,6 +106,7 @@ struct DictationPage: View {
                     CardSwitch(label: "Rispondi a voce", isOn: Binding(get: { config.spoken }, set: { config.spoken = $0; save() }))
                 }
             }
+            VoiceprintSection(microphone: config.microphone)
             if let note { Text(note).font(.settings(T.notchTesto11)).foregroundStyle(T.testoSecondario).frame(maxWidth: .infinity, alignment: .trailing) }
         }
         .onAppear(perform: refresh)

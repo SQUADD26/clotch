@@ -50,6 +50,12 @@ struct VoiceInputPill: View {
             }
         case .thinking:
             row(Image(systemName: "ellipsis").font(.system(size: 15)).foregroundStyle(GoalInk.secondary), "Penso…") { EmptyView() }
+        case .sending where input.awaitingTouch:
+            // #1120: money, production, messages to others, what cannot be undone: nothing leaves without a tap.
+            row(Image(systemName: "hand.tap").font(.system(size: 15)).foregroundStyle(GoalInk.primary), "Conferma con un tocco") {
+                Button("Annulla") { input.cancel() }.buttonStyle(VoicePillButtonStyle(primary: false))
+                Button("Conferma") { input.confirmTouch() }.buttonStyle(VoicePillButtonStyle(primary: true))
+            }
         case .sending:
             row(mic(0.45), "Invio a clotch AI") {
                 CancelButton(since: input.sendingSince, seconds: VoiceInputController.cancelSeconds) { input.cancel() }

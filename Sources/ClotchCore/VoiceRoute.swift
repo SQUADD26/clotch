@@ -33,8 +33,9 @@ public enum VoiceRoute {
     /// One file per order, `<ms>-<id>.json`: atomic write (the caller's `write`), taken by the engine's reader, which says the outcome in `.esiti` (gone = only taken, #262).
     public static func inboxName(id: String, at: Date) -> String { "\(Int(at.timeIntervalSince1970 * 1000))-\(id).json" }
 
-    public static func inboxPayload(id: String, text: String, at: Date) -> Data {
-        let o: [String: Any] = ["v": 1, "id": id, "t": Int(at.timeIntervalSince1970 * 1000), "testo": text, "da": "clotch-voce"]
+    public static func inboxPayload(id: String, text: String, at: Date, voice: [String: Any]? = nil) -> Data {
+        var o: [String: Any] = ["v": 1, "id": id, "t": Int(at.timeIntervalSince1970 * 1000), "testo": text, "da": "clotch-voce"]
+        o["voce"] = voice  // #1120: the voice check (`VoiceTrust.payload`), the engine decides with it
         return (try? JSONSerialization.data(withJSONObject: o, options: [.sortedKeys])) ?? Data()
     }
 

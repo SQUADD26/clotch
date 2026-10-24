@@ -15,7 +15,7 @@ final class VoiceNothingHeardTests: XCTestCase {
     override func tearDown() async throws { try? FileManager.default.removeItem(at: home) }
 
     private func controller() -> VoiceInputController {
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.ask = { _, _ in .success("Risposta finta") }
         return c
     }

@@ -10,7 +10,7 @@ final class VoiceInputShortcutTests: XCTestCase {
         let voce = home.appendingPathComponent(".config/voce")
         try FileManager.default.createDirectory(at: voce, withIntermediateDirectories: true)
         try JSONSerialization.data(withJSONObject: ["ingresso_acceso": enabled]).write(to: voce.appendingPathComponent("config.json"))
-        return (VoiceInputController(files: VoiceFiles(home: home)), home)
+        return (VoiceInputController.trusting(files: VoiceFiles(home: home)), home)
     }
 
     func testPressWithDictationOffShowsThePill() throws {

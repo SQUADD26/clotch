@@ -94,6 +94,19 @@ final class VoiceInputController: ObservableObject {
     var escapeID: UInt32?
     /// Every utterance has its number: a late event of a finished one changes nothing.
     var run = 0
+    // Voce fidata (#1120). The tests hand in a voice check, a lock state and a sound recorder.
+    let samples = UtteranceSamples()
+    var verify: ([Float]) async -> (verdict: VoiceTrust.Verdict, distance: Float) = { await SpeakerVerifier.shared.check($0) }
+    var unlocked: () -> Bool = { !VoiceInputController.macLocked }
+    var soundPlayer: ((String) -> Void)?
+    var trustStore = VoiceTrust.Store()
+    /// Milliseconds from the stop to the «Ho sentito» sound.
+    var heardAfter = 0.0
+    /// The dictation started from the notch's key (or its button); never set by anything else.
+    var fromKey = false
+    @Published var awaitingTouch = false
+    var touched = false
+    static let touchSeconds = 30.0
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
@@ -109,6 +122,7 @@ final class VoiceInputController: ObservableObject {
     /// send: a new utterance too, never silence (#197). «Dettatura accesa» off: the pill says so (#198).
     func press() {
         guard !DoNotDisturb().isOn else { return show(failure: .doNotDisturb) }  // clotch#266: Roberto in a call, the microphone stays closed
+        guard unlocked() else { return show(failure: .locked) }
         let current = VoiceInput.Config((try? files.readConfig()) ?? [:])
         guard current.enabled else { return show(failure: .off) }
         Self.log.notice("press in \(String(describing: self.phase), privacy: .public)")
@@ -116,6 +130,7 @@ final class VoiceInputController: ObservableObject {
         // Thinking: a new utterance is worth more than the answer still coming (it would only block the key).
         case .idle, .result, .failure, .thinking, .finishing, .sending:
             holds = current.mode == .hold
+            fromKey = true
             pressedAt = Date()
             releasedAt = nil
             // At once, not in the task: a second press before the task runs ends this one (finish → abort), never starts a second (#174).
@@ -169,11 +184,11 @@ final class VoiceInputController: ObservableObject {
             s.onEvent = { event in Task { @MainActor [weak self] in self?.scribeEvent(event, run: me) } }
             s.open(key: key ?? "", language: config.language)
             scribe = s
-            capture.onAudio = { buffer, pcm in s.send(pcm); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
+            capture.onAudio = { [samples] buffer, pcm in samples.add(buffer); s.send(pcm); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
         case .local:
             let (stream, continuation) = AsyncStream<AVAudioPCMBuffer>.makeStream()
             feed = continuation
-            capture.onAudio = { buffer, pcm in continuation.yield(buffer); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
+            capture.onAudio = { [samples] buffer, pcm in samples.add(buffer); continuation.yield(buffer); meter(VoiceInput.level(pcm16: pcm)); counted(buffer) }
             feeding = Task { [local] in
                 // The model loads while the microphone already runs: its first buffers wait in the stream.
                 if !(await local.isLoaded) { hint = "Scarico il modello. Succede solo la prima volta." }
@@ -238,6 +253,7 @@ final class VoiceInputController: ObservableObject {
         levels = [Double](repeating: 0, count: levels.count)
         phase = .finishing
         let stopped = Date()
+        acknowledge(stoppedAt: stopped)
         listened = stopped.timeIntervalSince(startedAt)
         Task {
             try? await Task.sleep(nanoseconds: UInt64(VoiceInput.tailSeconds * 1e9))
@@ -258,6 +274,7 @@ final class VoiceInputController: ObservableObject {
         if VoiceInput.heardNothing(seconds: listened, words: said.split(separator: " ").count, peak: peak) { return fail(.nothingHeard, run: me) }
         guard !said.isEmpty else { return abort() }  // not speaking is a choice, not an error (#147)
         (sure, maybe) = (said, "")
+        guard let heard = await admit(run: me) else { return }
         // A short confirmation («va bene», «sì vai») may answer the Friday: only a question is kept out of its chat.
         let isQuestion = VoiceRoute.classify(said) == .question
         let helper = VoiceAsk.helperPrompt(files: files)  // claude-config#2116: the helper answers and acts; an order still waits for «Annulla»
@@ -274,7 +291,12 @@ final class VoiceInputController: ObservableObject {
         }
         sendingSince = Date()
         phase = .sending
-        try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
+        let touch = VoiceTrust.needsTouch(said)  // money, production, messages to others, what cannot be undone: a tap first
+        if touch {
+            guard await waitForTouch(run: me) else { if me == run { show("Non confermato. Non ho fatto niente.") }; return }
+        } else {
+            try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
+        }
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
         if let helper {
@@ -292,7 +314,7 @@ final class VoiceInputController: ObservableObject {
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
         }
-        let outcome = await OverseerDelivery.send(said, files: files)
+        let outcome = await OverseerDelivery.send(said, files: files, voice: VoiceTrust.payload(verdict: heard.verdict, distance: heard.distance, fromKey: fromKey, unlocked: unlocked(), touch: touch))
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
         show(Self.sentence(outcome))
@@ -356,6 +378,8 @@ final class VoiceInputController: ObservableObject {
         (sure, maybe) = ("", "")
         hint = nil
         (listened, peak) = (0, 0)
+        samples.clear()
+        touched = false
         levels = [Double](repeating: 0, count: levels.count)
     }
 
