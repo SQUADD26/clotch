@@ -4,7 +4,8 @@
   "id": "101:24382",
   "nome": "tooltip",
   "w": 326,
-  "h": 26
+  "h": 26,
+  "dentro": "101:24127"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",

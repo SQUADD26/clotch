@@ -127,8 +127,10 @@ FRAME["101-45507"] = () => {
 };
 // «Con e senza Clotch» (#437): la barra dei nove frame; 3 sessioni aspettano te, come la Casella del disegno
 const CON = (pagina: string, f: Parameters<typeof registro>[0] = {}) => () => ({ ...base(), pagina, aperte: ["clotch"], registro: registro({ aspettano: 3, ...f }) });
-for (const id of ["101-46268", "101-46701", "101-48368"]) FRAME[id] = CON("clotch-ai", { clotch: true });
+for (const id of ["101-46268", "101-46701", "101-48368", "101-48405"]) FRAME[id] = CON("clotch-ai", { clotch: true });
 for (const id of ["101-46308", "101-46741"]) FRAME[id] = CON("clotch-ai");
+FRAME["101-47170"] = CON("casella", { clotch: true });
+FRAME["101-47297"] = CON("casella");
 FRAME["101-49067"] = CON("casella", { clotch: true, afk: 4 });
 FRAME["101-49194"] = CON("casella");
 FRAME["101-30172"] = () => ({ ...base(), registro: registro({ aspettano: 3 }) }); // popover Attività
@@ -189,7 +191,7 @@ FRAME["101-23248"] = () => ricerca("kubernetes");
 // allegati e immagini nel filo (#437): la barra di «Sessione aperta», come 101-8036
 for (const id of ["101-25845", "101-28041", "101-28232", "148-46383", "148-47483", "148-49251", "148-45727"]) FRAME[id] = () => base();
 // dialoghi, avvisi, casella e domande di clotch AI: la barra è quella della sessione aperta
-for (const id of ["101-22044", "101-24007", "101-28289", "101-48405"]) FRAME[id] = () => base();
+for (const id of ["101-22044", "101-24007", "101-28289"]) FRAME[id] = () => base();
 // domanda per te (101:47850 con Clotch, 101:47883 senza): «Sessioni: app Electron» aspetta ed è la sessione aperta
 const DOMANDA = (f: Parameters<typeof registro>[0]) => () => {
   const b = base(), x = b.elenco.dati!.sessioni[1];

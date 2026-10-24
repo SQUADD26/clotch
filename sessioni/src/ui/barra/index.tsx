@@ -23,6 +23,7 @@ import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe"
 import { SceltaIcona } from "./SceltaIcona";
 import { APezzi } from "./APezzi";
 import { accanto, type Punto } from "./Sovrapposti";
+import { conTransizione } from "../base/movimento";
 
 export type Aperto =
   | { tipo: "opzioni"; i: number; a: Punto } | { tipo: "proprieta"; a: Punto } | { tipo: "raggruppa"; a: Punto }
@@ -52,7 +53,8 @@ export default function Barra() {
   const adesso = p?.ora ?? ora;
   const sessioni = elenco.dati?.sessioni ?? [];
 
-  const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
+  const [vista, setVistaSubito] = useState<Vista>(p?.vista ?? conservato.vista);
+  const setVista = (v: Vista) => conTransizione(() => setVistaSubito(v)); // filtri, raggruppa, ordina: le righe entrano ed escono (#520)
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
   const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
   const [chiuse, setChiuse] = useState<Set<string>>(conservato.chiuse);
@@ -69,8 +71,10 @@ export default function Barra() {
   const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || chiave === conScelta);
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
-    setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
-    setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
+    conTransizione(() => {
+      setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
+      setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
+    });
   };
 
   useEffect(() => {
@@ -81,6 +85,19 @@ export default function Barra() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [n.sessione]);
+  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
+  useEffect(() => {
+    const frecce = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
+      const t = e.target as HTMLElement;
+      if (!t.matches?.(".pezzo-barra .riga:not(.titolo-sezione)")) return;
+      const righe = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .riga:not(.titolo-sezione)")].filter((x) => x.getClientRects().length);
+      const dopo = righe[righe.indexOf(t) + (e.key === "ArrowDown" ? 1 : -1)];
+      if (dopo) { e.preventDefault(); dopo.focus(); }
+    };
+    addEventListener("keydown", frecce);
+    return () => removeEventListener("keydown", frecce);
+  }, []);
   useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
   const chiudi = () => setAperto(null);
@@ -98,7 +115,7 @@ export default function Barra() {
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
-  const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
+  const alternaFiglie = (id: string) => conTransizione(() => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; }));
   // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
   const vivi = useRef({ apriSessione, pref, alterna });
   vivi.current = { apriSessione, pref, alterna };
