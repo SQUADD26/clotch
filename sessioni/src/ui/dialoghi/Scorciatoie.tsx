@@ -33,7 +33,7 @@ export function DialogoScorciatoie() {
                     {g.righe.map((r) => (
                       <div key={r.etichetta} className="riga-tasto">
                         <span className="t-sm azione">{r.etichetta}</span>
-                        {r.tasti ? <span className="tasto-chip t-sm">{r.tasti}</span> : <span className="t-sm secondario">Non assegnata</span>}
+                        {r.tasti ? <span className="tasto-chip">{r.tasti}</span> : <span className="t-sm secondario">Non assegnata</span>}
                       </div>
                     ))}
                   </section>

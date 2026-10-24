@@ -66,7 +66,7 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
 
 /** Tasti di una scorciatoia, come «tasto» del frame Scorciatoie. */
 export const Tasto = ({ tasti, errore = false }: { tasti: string; errore?: boolean }) =>
-  <span className={`tasto t-sm ${errore ? "errore" : ""}`}>{tasti}</span>;
+  <span className={`tasto-chip ${errore ? "errore" : ""}`}>{tasti}</span>;
 
 /** «Campo testo»: un percorso da leggere, si cambia col bottone accanto. */
 export const CampoTesto = ({ valore }: { valore: string }) => <div className="campo-testo t-base" title={valore}>{valore}</div>;
