@@ -1,9 +1,9 @@
 /* figma: 101-8036 + 101-29399 + 101-19480 — fondo, testo e font di base della finestra */
-/* Tema (#1093): i controlli nativi seguono il tema scelto; i colori li porta token.css con data-tema */
+/* Tema (issue 1093): i controlli nativi seguono il tema scelto; i colori li porta token.css con data-tema */
 html { color-scheme: dark; }
 html[data-tema="chiaro"] { color-scheme: light; }
 @media (prefers-color-scheme: light) { html[data-tema="automatico"] { color-scheme: light; } }
-html.parita { color-scheme: light; } /* i PNG di Figma sono trasparenti e si confrontano sul bianco: la tela dietro i frame trasparenti resta chiara (#437) */
+html.parita { color-scheme: light; } /* i PNG di Figma sono trasparenti e si confrontano sul bianco: la tela dietro i frame trasparenti resta chiara (issue 437) */
 html, body, #radice { height: 100%; margin: 0; }
 body {
   background: var(--colore-fondo-cornice);
