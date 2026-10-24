@@ -1,6 +1,6 @@
 // Mette insieme le sorgenti in un solo elenco di sessioni.
 import * as path from "node:path";
-import { chiaveCartella, leggiRadice, nomeProgetto, progettiDi } from "./claude-code";
+import { chiaveCartella, dimenticaProgetti, leggiRadice, nomeProgetto, progettiDi } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
 import { leggiCodex, leggiCursor } from "./altre-sorgenti";
 import { conPartenza, filtraElenco } from "./filtro-elenco";
@@ -34,13 +34,15 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
 
   const tutte: Sessione[] = [];
   // stessa cartella vera sotto più account: la legge il primo (come prima, a pari attività vinceva il primo)
-  const progetti = new Set<string>();
+  const progetti = new Set<string>(), lette = new Set<string>();
   for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) {
+    lette.add(progettiDi(r.path));
     const p = chiaveCartella(progettiDi(r.path));
     if (progetti.has(p)) continue;
     progetti.add(p);
     tutte.push(...leggiRadice(r, errori, opz.sporchi, opz.soloDopo));
   }
+  if (!opz.soloDopo) dimenticaProgetti(lette);
   const viste = new Set(tutte.map((s) => s.id));
   for (const s of tutte) {
     const a = perCli.get(s.id);

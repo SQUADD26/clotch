@@ -134,9 +134,9 @@ app.whenReady().then(() => {
     };
     const manda = (a: Aggiornamento) => {
       barraMenu();
-      const el = sessioni.elencoSessioni().sessioni, per = new Map(el.map((s) => [s.id, s]));
+      const { sessioni: el, errori } = sessioni.elencoSessioni(), per = new Map(el.map((s) => [s.id, s]));
       // le sessioni cambiate viaggiano con l'evento: il renderer non rilegge l'elenco intero (#474)
-      const elenco = { cambiate: a.sessioni.flatMap((id) => per.get(id) ?? []), tolte: a.sessioni.filter((id) => !per.has(id)) };
+      const elenco = { cambiate: a.sessioni.flatMap((id) => per.get(id) ?? []), tolte: a.sessioni.filter((id) => !per.has(id)), errori };
       BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", { ...a, elenco }));
       const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
       const sparite = [...ids].some((id) => !per.has(id)); // fuori dall'elenco = fuori dall'indice

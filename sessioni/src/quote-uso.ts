@@ -40,7 +40,15 @@ const MS_GIORNO = 86_400_000;
  * Chiave = parte prima della @ dell'email dell'account (come `QuotaUso.account`). Un file illeggibile si salta.
  * shortcut: sono token (input + output + scrittura cache), non la % di quota; senza email nel `.claude.json` l'account non si abbina.
  */
-export async function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<Map<string, { giorno: string; v: number }[]>> {
+export function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<Map<string, { giorno: string; v: number }[]>> {
+  const p = inCoda.then(() => contaUso(radici, ora));
+  inCoda = p.catch(() => {});
+  return p;
+}
+/** Una lettura alla volta: due insieme avanzerebbero due volte lo stesso `fine` di `letti` e perderebbero righe. */
+let inCoda: Promise<unknown> = Promise.resolve();
+
+async function contaUso(radici: Radice[], ora: number): Promise<Map<string, { giorno: string; v: number }[]>> {
   const oggi = Math.floor(ora / MS_GIORNO), primo = oggi - GIORNI + 1, da = primo * MS_GIORNO;
   const out = new Map<string, number[]>(), perCartella = new Map<string, Voce[][]>(), visti = new Set<string>();
   for (const r of radici) {
@@ -59,7 +67,7 @@ export async function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<M
       for (const n of nomi) {
         const file = path.join(reale, n);
         visti.add(file);
-        try { const st = await fs.stat(file); if (st.mtimeMs >= da) liste.push(await vociDi(file, st)); } catch { /* file illeggibile: si salta */ }
+        try { const st = await fs.stat(file); if (st.mtimeMs >= da) liste.push(await vociDi(file, st, primo)); } catch { /* file illeggibile: si salta */ }
       }
     }
     for (const voci of liste) for (const e of voci) {
@@ -77,7 +85,7 @@ type Voce = { id: string | null; g: number; v: number };
 /** Per file: dove si è arrivati e le voci già lette (#474): ogni minuto si leggono solo i byte nuovi, non tutte le trascrizioni dei 14 giorni. */
 const letti = new Map<string, { ino: number; fine: number; voci: Voce[] }>();
 
-async function vociDi(file: string, st: { ino: number; size: number }): Promise<Voce[]> {
+async function vociDi(file: string, st: { ino: number; size: number }, primo: number): Promise<Voce[]> {
   let c = letti.get(file);
   if (!c || c.ino !== st.ino || st.size < c.fine) c = { ino: st.ino, fine: 0, voci: [] }; // sostituito o accorciato: da capo
   letti.set(file, c);
@@ -91,7 +99,7 @@ async function vociDi(file: string, st: { ino: number; size: number }): Promise<
       if (!riga.includes('"usage"')) continue;
       try {
         const o = JSON.parse(riga), u = o.message?.usage, t = Date.parse(o.timestamp);
-        if (o.type !== "assistant" || !u || !Number.isFinite(t)) continue;
+        if (o.type !== "assistant" || !u || !(Math.floor(t / MS_GIORNO) >= primo)) continue; // i giorni fuori finestra non servono più: la finestra va solo avanti
         c.voci.push({ id: o.message?.id && o.requestId ? `${o.message.id}:${o.requestId}` : null, g: Math.floor(t / MS_GIORNO),
           v: (+u.input_tokens || 0) + (+u.output_tokens || 0) + (+u.cache_creation_input_tokens || 0) });
       } catch { /* riga non JSON */ }
