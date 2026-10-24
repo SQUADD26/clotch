@@ -10,7 +10,11 @@ export function posiziona(a: Rett, w: number, h: number, lato: Lato, allinea: Al
   let l = lato, x: number, y: number;
   if (l === "destra") {
     x = a.right + scarto; y = allinea === "fine" ? a.bottom - h : allinea === "centro" ? (a.top + a.bottom - h) / 2 : a.top;
-    if (x + w > W - m && a.left - scarto - w >= m) x = a.left - scarto - w;
+    if (x + w > W - m) {
+      if (a.left - scarto - w >= m) x = a.left - scarto - w;
+      // né a destra né a sinistra c'è posto: sotto o sopra l'ancora, mai sopra di lei (#1113)
+      else return posiziona(a, w, h, "sotto", "inizio", scarto, m, W, H);
+    }
   } else {
     if (l === "sotto" && a.bottom + scarto + h > H - m && a.top - scarto - h >= m) l = "sopra";
     else if (l === "sopra" && a.top - scarto - h < m && a.bottom + scarto + h <= H - m) l = "sotto";

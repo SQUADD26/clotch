@@ -33,3 +33,9 @@ test("più alto della finestra: resta attaccato al margine in alto", () => {
 test("tooltip centrato sul bottone", () => {
   assert.equal(posiziona(r(100, 400, 30, 30), 90, 24, "sopra", "centro", 4, 8, 1440, 900).x, 70);
 });
+
+test("a destra senza posto né a destra né a sinistra: sotto l'ancora, non sopra di lei (#1113)", () => {
+  const a = r(200, 100, 260, 250), p = posiziona(a, 320, 258, "destra", "inizio", 4, 8, 768, 741);
+  assert.equal(p.lato, "sotto");
+  assert.ok(p.y >= a.bottom + 4 || p.y + 258 <= a.top - 4);
+});

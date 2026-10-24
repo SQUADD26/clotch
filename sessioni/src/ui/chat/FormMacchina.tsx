@@ -1,5 +1,6 @@
 // figma: 149-67536 — «Aggiungi macchina»: «Chip proposta» e «Campo macchina» (149:67382, 149:67396); da proposta 149:67568, nome non valido 149:67600.
 // Host, porta, utente, chiave (solo il percorso del file), nome e cartella: sono gli argomenti di `macchina_aggiungi` (contratto v1, sez. 3).
+import { useId } from "react";
 import type { Proposta } from "../../macchine-tipi";
 import { Icona } from "../base/Icona";
 import { numero } from "../base/token";
@@ -11,7 +12,10 @@ export interface ValoriMacchina { host: string; porta: string; utente: string; c
 export const VUOTI: ValoriMacchina = { host: "", porta: "", utente: "", chiave: "", nome: "", cartella: "", desktopId: null };
 
 /** I campi che il motore vuole, o il perché non vanno: `host` e `cartella` (assoluta) servono sempre, il nome ha la sua regola. */
-export const mancano = (v: ValoriMacchina) => ({ host: !v.host.trim(), nome: !nomeValido(v.nome), cartella: !v.cartella.trim().startsWith("/") });
+export const mancano = (v: ValoriMacchina) => ({
+  host: !v.host.trim() || /\s/.test(v.host.trim()), nome: !nomeValido(v.nome), cartella: !v.cartella.trim().startsWith("/"),
+  porta: v.porta !== "" && (Number(v.porta) < 1 || Number(v.porta) > 65535), // vuota = 22 (#1117)
+});
 
 /** Il form riempito da una connessione di Claude Desktop; la cartella la propone solo se è vuota. */
 export const daProposta = (p: Proposta, v: ValoriMacchina): ValoriMacchina => ({
@@ -22,12 +26,13 @@ export const daProposta = (p: Proposta, v: ValoriMacchina): ValoriMacchina => ({
 function Campo({ etichetta, valore, segnaposto, errore = false, messaggio, larghezza, sola = false, onCambia }: {
   etichetta: string; valore: string; segnaposto: string; errore?: boolean; messaggio?: string; larghezza?: number; sola?: boolean; onCambia?(v: string): void;
 }) {
+  const id = useId();
   return (
     <label className="campo-macchina" style={larghezza ? { width: larghezza } : undefined}>
       <span className="etichetta-campo">{etichetta}</span>
-      <input className={`casella-macchina${errore ? " errore" : ""}`} value={valore} placeholder={segnaposto} readOnly={sola} aria-invalid={errore || undefined}
+      <input className={`casella-macchina${errore ? " errore" : ""}`} value={valore} placeholder={segnaposto} readOnly={sola} aria-invalid={errore || undefined} aria-describedby={messaggio ? id : undefined}
         autoCapitalize="off" autoCorrect="off" spellCheck={false} onChange={(e) => onCambia?.(e.target.value)} />
-      {messaggio && <span className="messaggio-campo">{messaggio}</span>}
+      {messaggio && <span id={id} className="messaggio-campo">{messaggio}</span>}
     </label>
   );
 }
@@ -56,8 +61,8 @@ export function FormMacchina({ v, proposte, provato, onCambia, onProposta, onChi
       )}
       <div className="campi-macchina" onKeyDown={(e) => { if (e.key === "Enter" && e.target instanceof HTMLInputElement && !e.nativeEvent.isComposing) { e.preventDefault(); onInvio(); } }}>
         <div className="riga-campi">
-          <div className="campo-largo"><Campo etichetta="Indirizzo" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} messaggio={provato && m.host ? "Serve l’indirizzo della macchina." : undefined} onCambia={(host) => onCambia({ host })} /></div>
-          <Campo etichetta="Porta" valore={v.porta} segnaposto="22" larghezza={numero("misura-campo-porta")} onCambia={(porta) => onCambia({ porta: porta.replace(/\D/g, "").slice(0, 5) })} />
+          <div className="campo-largo"><Campo etichetta="Indirizzo" valore={v.host} segnaposto="server.example.net" errore={provato && m.host} messaggio={provato && m.host ? (v.host.trim() ? "L’indirizzo non può avere spazi." : "Serve l’indirizzo della macchina.") : undefined} onCambia={(host) => onCambia({ host })} /></div>
+          <Campo etichetta="Porta" valore={v.porta} segnaposto="22" larghezza={numero("misura-campo-porta")} errore={m.porta} messaggio={m.porta ? "Da 1 a 65535." : undefined} onCambia={(porta) => onCambia({ porta: porta.replace(/\D/g, "").slice(0, 5) })} />
         </div>
         <Campo etichetta="Utente" valore={v.utente} segnaposto="utente" onCambia={(utente) => onCambia({ utente })} />
         <div className="riga-campi allinea-fondo">

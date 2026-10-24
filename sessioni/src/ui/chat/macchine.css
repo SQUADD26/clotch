@@ -9,10 +9,12 @@
 .pezzo-chat .menu-ssh .valore { flex: none; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .menu-ssh .valore.da-completare { color: var(--colore-testo-lavoro); }
 .pezzo-chat .menu-ssh .riga-macchina { position: relative; cursor: default; }
-.pezzo-chat .menu-ssh .togli { display: none; flex: none; border-radius: var(--raggio-md); }
+.pezzo-chat .menu-ssh .togli { display: none; flex: none; align-items: center; justify-content: center; width: var(--misura-bottone-piccolo); height: var(--misura-bottone-piccolo); border-radius: var(--raggio-md); }
+.pezzo-chat .menu-ssh .togli:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .menu-ssh .togli:active { background: var(--colore-fondo-riga-scelta); } /* #1116 */
 .pezzo-chat .menu-ssh .riga-macchina:hover .togli, .pezzo-chat .menu-ssh .riga-macchina:focus-within .togli { display: flex; }
 .pezzo-chat .menu-ssh .riga-macchina .tooltip { display: none; position: absolute; top: 50%; left: calc(100% + var(--spazio-2)); translate: 0 -50%; }
-.pezzo-chat .menu-ssh .riga-macchina:hover .tooltip, .pezzo-chat .menu-ssh .riga-macchina.mostra .tooltip { display: flex; }
+.pezzo-chat .menu-ssh .riga-macchina:hover .tooltip, .pezzo-chat .menu-ssh .riga-macchina:focus-visible .tooltip, .pezzo-chat .menu-ssh .riga-macchina.mostra .tooltip { display: flex; } /* anche col fuoco da tastiera (#1117) */
 .pezzo-chat .selettore:disabled:hover { background: none; }
 
 /* dialogo: proposte da Claude Desktop e campi */
@@ -24,6 +26,8 @@
   background: var(--colore-fondo-bottone-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
 }
 .pezzo-chat .dialogo .chip-proposta { max-width: 100%; min-width: 0; }
+.pezzo-chat .dialogo .chip-proposta:hover { opacity: var(--opacita-passaggio); } /* come i bottoni pieni (#1116) */
+.pezzo-chat .dialogo .chip-proposta:active { opacity: var(--opacita-premuto); }
 .pezzo-chat .nome-chip, .pezzo-chat .riferimento-sessione .titolo { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* nome lungo: ellissi, non due righe (issue 746) */
 .pezzo-chat .dialogo .chip-proposta.scelta { background: var(--colore-fondo-riga-scelta); border: var(--misura-tratto) solid var(--colore-bordo-forte); }
 .pezzo-chat .dialogo .campi-macchina { display: flex; flex-direction: column; gap: var(--spazio-3); }
@@ -38,6 +42,7 @@
   border: var(--misura-tratto) solid var(--colore-bordo-normale); font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base);
   color: var(--colore-testo-primario); user-select: text;
 }
+.pezzo-chat .dialogo .casella-macchina:hover:not(:focus-visible):not(.errore) { border-color: var(--colore-bordo-forte); }
 .pezzo-chat .dialogo .casella-macchina::placeholder { color: var(--colore-testo-secondario); }
 .pezzo-chat .dialogo .casella-macchina:focus-visible { border-color: var(--colore-bordo-fuoco); }
 .pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-bordo-errore); }
@@ -46,8 +51,8 @@
 /* preparazione */
 .pezzo-chat .dialogo .passi-macchina { display: flex; flex-direction: column; gap: var(--spazio-0-5); }
 .pezzo-chat .dialogo .passo { display: flex; align-items: center; gap: var(--spazio-3); height: var(--misura-riga); }
-.pezzo-chat .dialogo .nome-passo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); }
-.pezzo-chat .dialogo .dettaglio-passo { flex: none; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .nome-passo { flex: none; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); }
+.pezzo-chat .dialogo .dettaglio-passo { flex: 1; min-width: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; /* un dettaglio lungo si accorcia, il nome del passo no (#1114) */ font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .dialogo .passo.attesa .nome-passo { color: var(--colore-testo-secondario); }
 .pezzo-chat .dialogo .passo.no .nome-passo, .pezzo-chat .dialogo .passo.no .dettaglio-passo { color: var(--colore-testo-errore); }
 .pezzo-chat .dialogo .passo.mano .nome-passo { color: var(--colore-testo-primario); }

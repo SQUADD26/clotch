@@ -16,7 +16,7 @@ export const chiedeMano = (r: RigaPasso) => r.stato === "no" && !!r.comando;
 
 export function Passi({ righe }: { righe: RigaPasso[] }) {
   return (
-    <div className="passi-macchina">
+    <div className="passi-macchina" role="status" aria-live="polite">
       {righe.map((r) => {
         const mano = chiedeMano(r);
         const [icona, colore] = mano ? (["avviso", "lavoro"] as const) : SEGNO[r.stato];
@@ -24,7 +24,7 @@ export function Passi({ righe }: { righe: RigaPasso[] }) {
           <div key={r.passo} className={`passo ${r.stato}${mano ? " mano" : ""}`}>
             <Icona nome={icona} colore={colore} gira={r.stato === "corso"} />
             <span className="nome-passo">{r.etichetta}</span>
-            <span className="dettaglio-passo">{r.dettaglio}</span>
+            <span className="dettaglio-passo" title={r.dettaglio || undefined}>{r.dettaglio}</span>
           </div>
         );
       })}
