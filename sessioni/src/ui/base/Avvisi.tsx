@@ -2,7 +2,8 @@
 // Un solo sistema per tutta l'app: `avvisa()` da qualunque pezzo, `<AreaAvvisi/>` lo disegna (la cornice lo monta).
 // Entrata, uscita e pila con le View Transition di base/movimento (#520); Info e Successo si chiudono da soli dopo
 // tempo/avviso. Errore e Caricamento restano finché li chiudi o li aggiorni.
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { provaDi } from "../chat/testi";
 import { taglia, uguale as ugualeA } from "./avvisiPila";
 import { Icona, type NomeIcona } from "./Icona";
@@ -63,8 +64,29 @@ export function chiudiAvviso(id: number) {
   if (avvisi.some((x) => x.id === id)) cambia(avvisi.filter((x) => x.id !== id));
 }
 
+/** La pila sta in fondo al body (come ogni sovrapposto): a finestra stretta la barra laterale sopra e il suo velo non la coprono. Si centra sulla colonna in cui è scritta. */
+function useColonna() {
+  const segno = useRef<HTMLSpanElement>(null);
+  const [stile, setStile] = useState<CSSProperties | null>(null);
+  useLayoutEffect(() => {
+    const c = segno.current?.parentElement;
+    if (!c) return;
+    const misura = () => {
+      const r = c.getBoundingClientRect(), basso = parseFloat(getComputedStyle(c).getPropertyValue("--avvisi-basso")) || numero("spazio-4");
+      setStile((v) => { const n = { left: r.left + r.width / 2, bottom: innerHeight - r.bottom + basso }; return v && v.left === n.left && v.bottom === n.bottom ? v : n; });
+    };
+    misura();
+    const o = new ResizeObserver(misura);
+    o.observe(c);
+    addEventListener("resize", misura);
+    return () => { o.disconnect(); removeEventListener("resize", misura); };
+  }, []);
+  return { segno: <span ref={segno} hidden />, stile };
+}
+
 export function AreaAvvisi() {
   const { sezione } = useNavigazione();
+  const { segno, stile } = useColonna();
   // scena di prova 101:24007: i quattro avvisi del disegno, uno per tipo
   useEffect(() => {
     if (provaDi(sezione, "avvisi") === null) return;
@@ -84,8 +106,8 @@ export function AreaAvvisi() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, []);
-  return (
-    <div className="area-avvisi" role="status" aria-live="polite">
+  return <>{segno}{stile && createPortal(
+    <div className="area-avvisi" role="status" aria-live="polite" style={stile}>
       {lista.map((a) => (
         <div key={a.id} data-avviso={a.id} className="avviso-comparsa" style={{ viewTransitionName: `avviso-${a.id}` }} role={a.tipo === "errore" ? "alert" : undefined}>
           <Icona nome={SEGNO[a.tipo][0]} colore={SEGNO[a.tipo][1]} gira={a.tipo === "caricamento"} />
@@ -94,6 +116,5 @@ export function AreaAvvisi() {
           <button type="button" aria-label="Chiudi" title="Chiudi" onClick={() => chiudiAvviso(a.id)}><Icona nome="chiudi" colore="terziaria" /></button>
         </div>
       ))}
-    </div>
-  );
+    </div>, document.body)}</>;
 }

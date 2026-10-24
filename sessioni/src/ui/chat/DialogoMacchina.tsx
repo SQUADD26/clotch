@@ -50,7 +50,7 @@ export function DialogoMacchina({ proposte, proposta = null, macchina = null, pr
 
   const avvia = async (ripreso: string | null) => {
     const m = mancano(v);
-    if (m.host || m.nome || m.cartella) { setProvato(true); requestAnimationFrame(() => document.querySelector<HTMLElement>(".dialogo input[aria-invalid=true]")?.focus()); return; }
+    if (m.host || m.nome || m.cartella || m.porta) { setProvato(true); requestAnimationFrame(() => document.querySelector<HTMLElement>(".dialogo input[aria-invalid=true]")?.focus()); return; }
     const da = Date.now();
     setCorsa((c) => ({ da: c?.da ?? da, ripreso: ripreso ? { passo: ripreso, t: da } : null })); setEsito(null); setErrore(null); setFase("prep");
     const e = await comandaEsito("macchina_aggiungi", argomentiAggiungi(v));

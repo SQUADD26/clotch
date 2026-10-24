@@ -1,8 +1,7 @@
 /* figma: 101-24007 — pila di avvisi a comparsa al centro della colonna, sopra la casella (101-10457 per l'avviso) */
 .area-avvisi {
-  position: absolute; z-index: var(--livello-avviso); left: 50%; transform: translateX(-50%);
-  /* la chat alza la pila sopra la casella impostando --avvisi-basso sulla colonna */
-  bottom: var(--avvisi-basso, var(--spazio-4));
+  position: fixed; z-index: var(--livello-avviso); transform: translateX(-50%);
+  /* left e bottom li dà AreaAvvisi dalla colonna; la chat la alza sopra la casella con --avvisi-basso sulla colonna */
   display: flex; flex-direction: column; gap: var(--spazio-2); pointer-events: none;
 }
 .avviso-comparsa {

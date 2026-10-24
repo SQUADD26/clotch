@@ -36,6 +36,9 @@
 .pezzo-chat .menu-avvio .valore { min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .menu-avvio .vuoto { padding: var(--spazio-3) var(--spazio-2); text-align: center; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 
+/* ogni selettore ha il premuto, anche l'interruttore «Copia di lavoro» che non è mai «aperto» */
+.pezzo-chat .selettore:active:not(:disabled) { background: var(--colore-fondo-riga-scelta); }
+
 /* selettore aperto: passaggio e premuto si vedono anche con il fondo del «Aperto» (stessi token dei bottoni pieni) */
 .pezzo-chat .selettore.aperto:hover { opacity: var(--opacita-passaggio); }
 .pezzo-chat .selettore.aperto:active { opacity: var(--opacita-premuto); }

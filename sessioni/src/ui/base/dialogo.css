@@ -18,3 +18,4 @@
 .dialogo .chiudi { width: var(--misura-icona); height: var(--misura-icona); display: flex; flex: none; border-radius: var(--raggio-xs); }
 .dialogo .chiudi:hover { background: var(--colore-fondo-riga-passaggio); }
 .velo.alto { align-items: flex-start; padding: calc(2 * var(--spazio-16)) 0 0; }
+.dialogo:focus { outline: none; } /* il fuoco di un dialogo senza controlli sta sul dialogo, senza anello */
