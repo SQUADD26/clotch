@@ -38,9 +38,9 @@ const Rientrato = ({ testo }: { testo: string }) => <div className="rientrato"><
 export function Ragionamento({ b, aperto: iniziale = false }: { b: Extract<Blocco, { tipo: "pensiero" }>; aperto?: boolean }) {
   const [aperto, setAperto] = useState(iniziale);
   const r = useRiserva();
-  if (b.inCorso) return <div className="compatto"><div className="riga-compatta in-corso"><Luccica testo="Sta ragionando…" /></div></div>;
+  if (b.inCorso) return <div className="compatto pensiero"><div className="riga-compatta in-corso"><Luccica testo="Sta ragionando…" /></div></div>;
   return (
-    <div className="compatto">
+    <div className="compatto pensiero">
       <button type="button" className="riga-compatta" aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
         <span className="titolo">Ragionato per {durata(b.durata ?? 0)}</span>
         <Freccia aperta={aperto} />
@@ -57,7 +57,7 @@ function Copia({ testo }: { testo: string }) {
   return <BottoneIcona icona={fatto ? "spunta" : "copia"} etichetta="Copia" onClick={copia} />;
 }
 
-/** Una chiamata del gruppo aperto: frase semplice; il comando grezzo (e l'uscita di un errore) solo aprendo la riga. */
+/** Una chiamata del gruppo aperto: frase semplice; il comando grezzo e la sua uscita solo aprendo la riga. */
 export function RigaStrumento({ b, aperta: iniziale = false }: { b: BloccoStrumento; aperta?: boolean }) {
   const [aperta, setAperta] = useState(iniziale);
   const r = useRiserva();
@@ -73,9 +73,9 @@ export function RigaStrumento({ b, aperta: iniziale = false }: { b: BloccoStrume
           <Icona nome={errore ? "avviso" : b.tipo === "web" ? "globo" : b.icona} colore={errore ? "errore" : "secondaria"} />
           <span className="azione">
             <span className="verbo">{r.testo(f.verbo)}</span>
-            {f.oggetto && <span className="oggetto">{r.testo(f.oggetto)}</span>}
-            {errore && <span className="esito errore">{esitoErrore(b.uscita)}</span>}
-            {fonti.length > 0 && <span className="esito">· {quanti(fonti.length, "fonte", "fonti")}</span>}
+            {f.oggetto && <>{" "}<span className="oggetto">{r.testo(f.oggetto)}</span></>}
+            {errore && <>{" "}<span className="esito errore">{esitoErrore(b.uscita)}</span></>}
+            {fonti.length > 0 && <>{" "}<span className="esito">· {quanti(fonti.length, "fonte", "fonti")}</span></>}
           </span>
           {apribile && <Freccia aperta={aperta} />}
         </button>
@@ -85,7 +85,7 @@ export function RigaStrumento({ b, aperta: iniziale = false }: { b: BloccoStrume
       {aperta && grezzo && (
         <div className="dettaglio-strumento">
           <div className="comando-grezzo">
-            <div className="testo">{grezzo}{errore && b.uscita && <span className="uscita">{"\n"}{r.testo(b.uscita.trim())}</span>}</div>
+            <div className="testo">{grezzo}{b.tipo === "strumento" && b.uscita.trim() && <span className={errore ? "uscita errore" : "uscita"}>{"\n"}{r.testo(b.uscita.trim())}</span>}</div>
             <Copia testo={grezzo} />
           </div>
         </div>
@@ -110,15 +110,15 @@ export function Gruppo({ g, aperto: iniziale = false, riga }: { g: DatiGruppo; a
       <button type="button" className={ora ? "riga-compatta in-corso" : "riga-compatta"} aria-expanded={aperto} onClick={() => conTransizione(() => setAperto(!aperto))}>
         {ora ? (
           <Luccica testo={`${r.testo([ora.verbo, ora.oggetto].filter(Boolean).join(" "))}…`}>
-            {n > 1 && <span className="conto">· {quanti(n, "strumento", "strumenti")}</span>}
+            {n > 1 && <>{" "}<span className="conto">· {quanti(n, "strumento", "strumenti")}</span></>}
           </Luccica>
         ) : (
           <>
             <span className="titolo">Ha usato {quanti(n, "strumento", "strumenti")}</span>
-            {g.durata > 0 && <span className="conto">· {tempo(g.durata)}</span>}
+            {g.durata > 0 && <>{" "}<span className="conto">· {tempo(g.durata)}</span></>}
           </>
         )}
-        {g.errori.length > 0 && <><Icona nome="avviso" colore="errore" /><span className="errori">{quanti(g.errori.length, "errore", "errori")}</span></>}
+        {g.errori.length > 0 && <>{" "}<Icona nome="avviso" colore="errore" /><span className="errori">{quanti(g.errori.length, "errore", "errori")}</span></>}
         {!ora && <Freccia aperta={aperto} />}
       </button>
       {aperto && (
@@ -147,7 +147,7 @@ function RigaAiutante({ a, aperto: iniziale = false }: { a: Aiutante; aperto?: b
         <button type="button" className="apri" aria-expanded={a.rapporto ? aperto : undefined} disabled={!a.rapporto} onClick={() => conTransizione(() => setAperto(!aperto))}>
           <Icona nome={a.errore ? "avviso" : "spunta"} colore={a.errore ? "errore" : "successo"} />
           <span className="azione">
-            <span className="verbo">Aiutante ·</span><span className="oggetto">{r.testo(a.nome)}</span>
+            <span className="verbo">Aiutante ·</span>{" "}<span className="oggetto">{r.testo(a.nome)}</span>{" "}
             <span className={a.errore ? "esito errore" : "esito"}>{a.errore ? "· 1 errore" : "· nessun errore"}</span>
           </span>
           {a.rapporto && <Freccia aperta={aperto} />}

@@ -20,7 +20,7 @@ const st = (nome, ingresso, esito, s, errore = false) => [{ tipo: "strumento", n
 const GH = "gh api 'repos/SQUADD26/gestionale-interno/contents/src/hooks/useRoleAccess.ts?ref=dev' --jq .content | base64 -d";
 const CINQUE = [
   st("Grep", { pattern: "canAccess", path: "src" }, "Found 4 files\na\nb\nc\nd", 0.2), st("Read", { file_path: "src/hooks/useRoleAccess.ts" }, "…", 0.3),
-  st("Bash", { command: GH }, "…", 3), st("Bash", { command: "npm run e2e -- assistenza" }, "Exit code 1", 5, true),
+  st("Bash", { command: GH }, "", 3), st("Bash", { command: "npm run e2e -- assistenza" }, "Exit code 1", 5, true),
   st("mcp__claude-in-chrome__screenshot", { name: "la pagina Dashboard" }, "ok", 23),
 ];
 const leggi = (f, s = 0.4) => st("Read", { file_path: f }, "…", s);

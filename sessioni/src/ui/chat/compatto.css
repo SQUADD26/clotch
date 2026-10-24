@@ -57,7 +57,8 @@
   flex: 1; min-width: 0; font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs);
   color: var(--colore-testo-secondario); white-space: pre-wrap; overflow-wrap: anywhere; max-height: calc(var(--misura-riga) * 8); overflow-y: auto;
 }
-.pezzo-chat .comando-grezzo .uscita { color: var(--colore-testo-errore); }
+.pezzo-chat .comando-grezzo .uscita { color: var(--colore-testo-terziario); }
+.pezzo-chat .comando-grezzo .uscita.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .comando-grezzo .bottone-icona { flex: none; margin: calc(-1 * var(--spazio-1)); }
 .pezzo-chat .dettaglio-strumento.fonti { display: flex; flex-direction: column; gap: var(--spazio-1); }
 

@@ -53,17 +53,15 @@ app.whenReady().then(async () => {
     // giorni ed eventi: «Ieri» in cima, «Oggi» dove cambia, «Ramo creato» al posto del comando
     const righeEvento = await run(() => [...document.querySelectorAll('.riga-evento .testo')].map((e) => e.textContent));
     assert.deepEqual(righeEvento, ['Ieri', 'Oggi', 'Ramo creato: feat/9-prova']);
-    assert.equal(await run(() => [...document.querySelectorAll('.filo .strumento .dettaglio')].some((e) => /checkout/.test(e.textContent))), false);
+    // filo compatto (#876): si apre il gruppo e ogni sua riga; il checkout è diventato l'evento, non una riga
+    for (let i = 0; i < 2; i++) { await run(() => document.querySelectorAll('.filo button[aria-expanded="false"]').forEach((b) => b.click())); await new Promise((r) => setTimeout(r, 300)); }
+    await ready('.comando-grezzo');
+    assert.equal(await run(() => [...document.querySelectorAll('.filo .comando-grezzo')].some((e) => /checkout/.test(e.textContent))), false);
     console.log('FILO_EVENTI_OK');
 
-    // «Mostra tutto (21 righe)»: tre righe finché non si apre, poi tutte; «Mostra meno» le richiude
-    await run(() => document.querySelector('.filo .strumento .testata:not(:disabled)').click());
-    await ready('.mostra-tutto');
-    assert.equal(await run(() => document.querySelector('.mostra-tutto').textContent), 'Mostra tutto (21 righe)');
-    assert.equal(await run(() => document.querySelector('.blocco-codice .uscita').textContent.split('\n').length), 3);
-    await run(() => document.querySelector('.mostra-tutto').click());
-    assert.equal(await run(() => document.querySelector('.blocco-codice .uscita').textContent.split('\n').length), 21);
-    assert.equal(await run(() => document.querySelector('.mostra-tutto').textContent), 'Mostra meno');
+    // uscita lunga: tutte le 21 righe nel blocco del comando aperto, che scorre dentro di sé
+    assert.equal(await run(() => document.querySelector('.comando-grezzo .uscita').textContent.trim().split('\n').length), 21);
+    assert.equal(await run(() => { const t = document.querySelector('.comando-grezzo .testo'); return t.scrollHeight > t.clientHeight && getComputedStyle(t).overflowY === 'auto'; }), true);
     console.log('FILO_MOSTRA_TUTTO_OK');
 
     // ⌘F apre la barra; tre «controllo» (due risposte e il pannello), il contatore dice «1 di 2»; Invio passa al secondo; Esc chiude e toglie le evidenziazioni
