@@ -4,6 +4,7 @@ import type { AzioneSessione, PreferenzeSessione, RisultatoRicerca, Sessione } f
 import { Campo } from "../base/Campo";
 import { api } from "../base/dati";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { Velo } from "../base/Sovrapposto";
 import { giorno, nomeSorgente } from "./elenco";
 import { IconaRiga } from "./Righe";
 import "./ricerca.css";
@@ -72,8 +73,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
     else if (aperta) v.a.azione === "copia-blocco" ? void copiaUltimoBlocco(aperta) : onAzione(aperta, v.a.azione);
   };
   const tasto = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") onChiudi();
-    else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       setI((x) => (x + (e.key === "ArrowDown" ? 1 : voci.length - 1)) % Math.max(voci.length, 1));
     } else if (e.key === "Enter" && voci[i]) scegli(voci[i]);
@@ -83,7 +83,7 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
   const messaggi = voci.filter((v) => v.tipo === "messaggio");
 
   return (
-    <div className="velo" onMouseDown={(e) => { if (e.target === e.currentTarget) onChiudi(); }}>
+    <Velo onChiudi={onChiudi}>
       <div className="finestra-ricerca" role="dialog" aria-label="Cerca sessioni" onKeyDown={tasto}>
         <Campo grande tasto="esc" placeholder="Cerca sessioni" value={q} autoFocus onChange={(e) => setQ(e.target.value)} />
         <div className="risultati">
@@ -126,6 +126,6 @@ export function Ricerca({ sessioni, pref, aperta, ora, iniziale = "", cerca = (t
           ))}
         </div>
       </div>
-    </div>
+    </Velo>
   );
 }

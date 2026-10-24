@@ -17,16 +17,14 @@
   const dentro = (a, b, m = 1) => a.left >= b.left - m && a.top >= b.top - m && a.right <= b.right + m && a.bottom <= b.bottom + m;
   const sopra = () => [...document.querySelectorAll(SOPRA)].filter(vis).filter((e, _, t) => !t.some((o) => o !== e && o.contains(e)));
 
-  // margine nato da `auto` (il valore calcolato non è scritto a mano): centrato (uguale ai due lati) o che spinge il pezzo al bordo del genitore
-  function auto(e, s, p) {
-    const o = { marginLeft: 'marginRight', marginRight: 'marginLeft', marginTop: 'marginBottom', marginBottom: 'marginTop' }[p];
-    if (Math.abs(parseFloat(s[p]) - parseFloat(s[o])) < 1) return true;
-    const g = e.parentElement; if (!g) return false;
-    const r = e.getBoundingClientRect(), q = g.getBoundingClientRect(), z = getComputedStyle(g);
-    if (p === 'marginLeft') return Math.abs(r.right + parseFloat(s.marginRight) - (q.right - parseFloat(z.paddingRight) - parseFloat(z.borderRightWidth))) < 1;
-    if (p === 'marginRight') return Math.abs(r.left - parseFloat(s.marginLeft) - (q.left + parseFloat(z.paddingLeft) + parseFloat(z.borderLeftWidth))) < 1;
-    if (p === 'marginTop') return Math.abs(r.bottom + parseFloat(s.marginBottom) - (q.bottom - parseFloat(z.paddingBottom) - parseFloat(z.borderBottomWidth))) < 1;
-    return Math.abs(r.top - parseFloat(s.marginTop) - (q.top + parseFloat(z.paddingTop) + parseFloat(z.borderTopWidth))) < 1;
+  // spazio scritto con un token (`var(--spazio-*)`, anche dentro calc) o nato da `auto`: il numero calcolato non è a mano.
+  // Lo dicono le regole del CSS costruito che toccano l'elemento (da file:// la pagina non legge i suoi fogli).
+  const regole = (css) => (window.__regole ??= (function giu(l) { return [...l].flatMap((r) => (r.selectorText ? [r] : []).concat(r.cssRules ? giu(r.cssRules) : [])); })((() => { const f = new CSSStyleSheet(); f.replaceSync(css); return f.cssRules; })()));
+  const CORTA = { margin: 'margin', padding: 'padding', row: 'gap', column: 'gap' };
+  function scritto(e, p, css) {
+    const k = p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), corta = CORTA[k.split('-')[0]];
+    const vale = (st) => { const v = st.getPropertyValue(k); return v === 'auto' || v.includes('var(--') || (!v && /var\(--|auto/.test(st.getPropertyValue(corta))); };
+    return vale(e.style) || regole(css).some((r) => { try { return e.matches(r.selectorText) && vale(r.style); } catch { return false; } });
   }
 
   function statiche(radice, tok, d) {
@@ -42,7 +40,7 @@
         const v = parseFloat(r); if (v && !r.includes('%') && v < 999 && !tok.raggi.includes(v)) una('RAGGIO', e, r);
       }
       for (const p of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft']) {
-        const v = Math.abs(parseFloat(s[p])); if (v && !tok.spazi.includes(v) && !(p.startsWith('margin') && auto(e, s, p))) una('SPAZIO', e, `${p} ${s[p]}`);
+        const v = Math.abs(parseFloat(s[p])); if (v && !tok.spazi.includes(v) && !scritto(e, p, tok.css)) una('SPAZIO', e, `${p} ${s[p]}`);
       }
       const p = e.parentElement, ps = p && getComputedStyle(p);
       if (p && p !== document.body && ps.overflow === 'visible' && (ps.backgroundColor !== 'rgba(0, 0, 0, 0)' || parseFloat(ps.borderTopWidth) > 0)) {
@@ -69,7 +67,8 @@
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) {
         if (/hidden|clip|auto|scroll/.test(getComputedStyle(p).overflow) && !dentro(r, p.getBoundingClientRect())) { una('TAGLIATO', e, `tagliato da ${sel(p)}`); break; }
       }
-      const coperti = [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
+      // chi non prende il mouse (tooltip, pointer-events: none) non si vede con elementFromPoint: non si misura
+      const coperti = getComputedStyle(e).pointerEvents === 'none' ? [] : [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
         .filter(([x, y]) => x >= 0 && y >= 0 && x < innerWidth && y < innerHeight).filter(([x, y]) => { const t = document.elementFromPoint(x, y); return t && !e.contains(t); });
       if (coperti.length) una('COPERTO', e, `${coperti.length}/5 punti coperti da ${sel(document.elementFromPoint(...coperti[0]))}`);
     }
@@ -78,6 +77,9 @@
 
   // Anello del fuoco: c'è (outline o box-shadow) e segue la forma (stesso raggio del pezzo che si vede, se il fuoco è su un figlio o un genitore).
   function anello(e) {
+    // un campo non disegna l'anello: lo disegna il contenitore (#521), il primo antenato col fuoco dentro che ha outline
+    const nudo = (x) => { const z = getComputedStyle(x); return z.outlineStyle !== 'none' && parseFloat(z.outlineWidth) > 0; };
+    if (e.matches('input,textarea') && !nudo(e)) { for (let p = e.parentElement, n = 0; p && n < 4; p = p.parentElement, n++) if (nudo(p)) return null; }
     const s = getComputedStyle(e), r = e.getBoundingClientRect();
     const c = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0, o = s.boxShadow !== 'none';
     if (!c && !o) return { criterio: 'FOCUS', dove: sel(e), valore: 'nessun anello del fuoco' };
@@ -90,8 +92,9 @@
 
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
-    let ev = null; const l = () => (ev ??= performance.now());
-    addEventListener('pointerdown', l, { capture: true, once: true }); addEventListener('keydown', l, { capture: true, once: true });
+    // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
+    let ev = null; const eventi = [], l = () => { const t = performance.now(); ev ??= t; eventi.push(t); }, GESTI = ['pointerdown', 'pointerup', 'keydown'];
+    GESTI.forEach((g) => addEventListener(g, l, { capture: true }));
     const prima = new Set(document.getAnimations()), anim = new Map(), T = [];
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
@@ -101,12 +104,17 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]'), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
+              durata: tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''), infinita: tim.iterations === Infinity, curva: k[0]?.easing && k[0].easing !== 'linear' ? k[0].easing : a.effect.getTiming().easing, serie: [] });
           }
           const s = getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null), m = s.transform === 'none' ? [1, 0, 0, 1, 0, 0] : num(s.transform);
-          anim.get(a).serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
+          const e = anim.get(a);
+          // inizio vero dalla linea del tempo: il primo campione può arrivare tardi se uno screenshot ferma i fotogrammi
+          if (e.inizio == null && a.startTime != null) e.inizio = a.startTime;
+          e.serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
-        t - t0 < ms ? requestAnimationFrame(passo) : ok({ evento: ev, T, animazioni: [...anim.values()] });
+        if (t - t0 < ms) return requestAnimationFrame(passo);
+        GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));
+        ok({ evento: ev, eventi, T, animazioni: [...anim.values()] });
       };
       requestAnimationFrame(passo);
     });

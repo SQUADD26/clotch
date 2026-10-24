@@ -6,6 +6,8 @@ import { app, clipboard, shell, type IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import { apriFinestra } from "./finestra";
 import { impostaImpostazioni, impostaPreferenze, leggiImpostazioni, leggiPreferenze } from "./preferenze";
+import { applicaMotore } from "./impostazioni-motore";
+import { provaSilenziosa } from "./modalita-prova";
 import type { AzioneSessione } from "./tipi";
 
 export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: unknown) => void, sessioni: Sessioni) {
@@ -16,6 +18,7 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
   try { sessioni.impostazioni(leggiImpostazioni(file)); } catch { /* file rotto: elenco senza filtro, il file non si tocca */ }
   ipc.handle("sessioni:imposta-impostazioni", (_e, parte) => {
     const salvate = impostaImpostazioni(file, parte ?? {});
+    if (!provaSilenziosa()) applicaMotore(parte ?? {}); // voce e dettatura del notch: i file che il notch legge (#534)
     invia("sessioni:impostazioni", salvate);
     sessioni.impostazioni(salvate); // l'elenco segue le impostazioni (#404)
   });
@@ -27,7 +30,7 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
       case "copia-id": return clipboard.writeText(s.id);
       case "copia-cartella": return clipboard.writeText(s.cartella);
       case "copia-link":
-        if (!s.idApp) throw new Error("questa sessione non è dell'app Claude: nessun link");
+        if (!s.idApp) throw new Error("questa sessione non è dell’app Claude: nessun link");
         return clipboard.writeText(`claude://code/continue?session=${s.idApp}`);
       case "mostra-nel-finder": shell.showItemInFolder(s.file && fs.existsSync(s.file) ? s.file : s.cartella); return; // il file della sessione, se c'è
       case "apri-terminale":

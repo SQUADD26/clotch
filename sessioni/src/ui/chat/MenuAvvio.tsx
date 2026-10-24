@@ -1,8 +1,9 @@
 // figma: 148-52243 — «menu ambiente» (Questo computer, Cloud, Remote Control, SSH); 148-52543 — «menu cartella» (recenti, Apri cartella…, Ramo, Worktree);
 // 148-52864 — «menu ramo» (Predefiniti, Altri rami, ricerca); i selettori «Selettore avvio» (Riposo, Passaggio, Aperto, Spento, Errore).
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { CartellaAvvio, ContestoCartella } from "../../tipi";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { Sovrapposto } from "../base/Sovrapposto";
 import { numero } from "../base/token";
 import { Interruttore } from "../impostazioni/controlli";
 import type { Macchina, Proposta } from "../../macchine-tipi";
@@ -25,31 +26,30 @@ export function Selettore({ icona, etichetta, aperto = false, stato, avviso = fa
   );
 }
 
-/** Menu sopra il suo selettore: ricerca in cima, frecce tra le voci, Esc o un clic fuori lo chiudono. */
-function Menu({ segnaposto, cerca, onCerca, larga = false, onChiudi, children }: {
-  segnaposto: string; cerca: string; onCerca(t: string): void; larga?: boolean; onChiudi(): void; children: ReactNode;
+/** Menu sopra il suo selettore (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al selettore): ricerca in cima, frecce tra le voci.
+ *  `rif`: il menu, per il pannello SSH che gli sta a destra. */
+function Menu({ segnaposto, cerca, onCerca, larga = false, rif, onChiudi, children }: {
+  segnaposto: string; cerca: string; onCerca(t: string): void; larga?: boolean; rif?(el: HTMLDivElement | null): void; onChiudi(): void; children: ReactNode;
 }) {
-  const ref = useRef<HTMLDivElement>(null), chiudi = useRef(onChiudi);
-  chiudi.current = onChiudi;
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    ref.current?.querySelector("input")?.focus();
+    if (!el) return;
+    el.querySelector("input")?.focus();
     const tasto = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.preventDefault(); chiudi.current(); }
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      const v = [...(ref.current?.querySelectorAll<HTMLElement>("input, button.voce:not(:disabled)") ?? [])], i = v.indexOf(document.activeElement as HTMLElement);
+      const v = [...el.querySelectorAll<HTMLElement>("input, button.voce:not(:disabled)")], i = v.indexOf(document.activeElement as HTMLElement);
       v[(i + (e.key === "ArrowDown" ? 1 : v.length - 1)) % v.length]?.focus();
       e.preventDefault();
     };
-    const fuori = (e: MouseEvent) => { if (!ref.current?.parentElement?.contains(e.target as Node)) chiudi.current(); }; // il selettore stesso lo chiude da sé
-    addEventListener("keydown", tasto);
-    addEventListener("mousedown", fuori);
-    return () => { removeEventListener("keydown", tasto); removeEventListener("mousedown", fuori); };
-  }, []);
+    el.addEventListener("keydown", tasto);
+    return () => el.removeEventListener("keydown", tasto);
+  }, [el]);
   return (
-    <div ref={ref} className="menu-casella menu-avvio" role="menu" style={larga ? { width: numero("misura-menu-avvio-largo") } : undefined}>
+    <Sovrapposto lato="sopra" scarto={numero("spazio-1")} className="menu-casella menu-avvio" role="menu" style={larga ? { width: numero("misura-menu-avvio-largo") } : undefined}
+      rif={(x) => { setEl(x); rif?.(x); }} onChiudi={onChiudi}>
       <label className="ricerca-avvio"><Icona nome="cerca" /><input value={cerca} placeholder={segnaposto} aria-label={segnaposto} onChange={(e) => onCerca(e.target.value)} /></label>
       {children}
-    </div>
+    </Sovrapposto>
   );
 }
 
@@ -73,14 +73,14 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
   ambiente: Ambiente; mac: ElencoMacchine; ssh?: boolean; mostraBase?: string | null;
   onScegli(a: Ambiente): void; onAggiungi(p?: Proposta): void; onTogli(m: Macchina): void; onChiudi(): void;
 }) {
-  const [cerca, setCerca] = useState(""), [host, setHost] = useState(ssh);
+  const [cerca, setCerca] = useState(""), [host, setHost] = useState(ssh), [menu, setMenu] = useState<HTMLDivElement | null>(null);
   const q = cerca.trim().toLowerCase(), trova = (t: string) => t.toLowerCase().includes(q);
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
   const voci: Ambiente[] = [{ tipo: "locale" }, { tipo: "cloud" }, { tipo: "remote_control" }, ...mac.macchine.filter((m) => !m.locale).map((m) => ({ tipo: "ssh" as const, host: m.nome }))];
   return (
-    <div className="menu-doppio">
-      <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} onChiudi={onChiudi}>
+    <>
+      <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} rif={setMenu} onChiudi={onChiudi}>
         {q ? voci.filter((a) => trova(nomeAmbiente(a))).map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />) : (
           <>
             <Titolo>Locale</Titolo>
@@ -95,8 +95,12 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
           </>
         )}
       </Menu>
-      {host && !q && <PannelloSsh mac={mac} ambiente={ambiente} mostraBase={mostraBase} onScegli={scegli} onAggiungi={(p) => { onChiudi(); onAggiungi(p); }} onTogli={(m) => { onChiudi(); onTogli(m); }} />}
-    </div>
+      {host && !q && menu && (
+        <Sovrapposto ancora={menu} lato="destra" scarto={numero("spazio-1")} className="menu-casella menu-ssh" role="menu" label="Macchine SSH" onChiudi={() => setHost(false)}>
+          <PannelloSsh mac={mac} ambiente={ambiente} mostraBase={mostraBase} onScegli={scegli} onAggiungi={(p) => { onChiudi(); onAggiungi(p); }} onTogli={(m) => { onChiudi(); onTogli(m); }} />
+        </Sovrapposto>
+      )}
+    </>
   );
 }
 

@@ -1,5 +1,5 @@
 // Avvio dell'app vera per il beta tester (#518): Electron di sessioni/ con Playwright `_electron`, una scena di prova al posto dei dati del Mac.
-// Come prove-dom.mjs: CLOTCH_TEST_SILENT=1, HOME temporanea dalle fixture, un solo Electron alla volta (lock condiviso /tmp/clotch-electron.lock).
+// Come prove-dom.mjs: CLOTCH_TEST_SILENT=1, HOME temporanea dalle fixture, al massimo N Electron insieme (scripts/posti.mjs).
 // La finestra si mostra (CLOTCH_TEST_ANTEPRIMA=1, come budget-avvio.cjs): nascosta non avrebbe fotogrammi né foto vere. Va sotto xvfb.
 import { spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -8,9 +8,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { _electron } from 'playwright';
+import { prendiPosto } from '../../scripts/posti.mjs';
 
 export const RADICE = fileURLToPath(new URL('../../', import.meta.url));
-const LOCK = '/tmp/clotch-electron.lock';
 // sandbox senza GTK di sistema: le librerie estratte stanno qui (in CI ci sono già)
 const GTK = '/work/r.bondici/gtk/root/usr/lib/x86_64-linux-gnu';
 
@@ -54,13 +54,8 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
 }
 
 const pausa = (ms) => new Promise((ok) => setTimeout(ok, ms));
-async function prendiLock() {
-  for (let i = 0; ; i++) {
-    try { mkdirSync(LOCK); return; } catch { if (i % 30 === 0 && i) console.log(`aspetto ${LOCK} (un altro Electron di prova sta girando)`); await pausa(2000); }
-  }
-}
-const rilasciaLock = () => { try { rmSync(LOCK, { recursive: true }); } catch { /* già rilasciato */ } };
-for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { rilasciaLock(); process.exit(130); });
+let libera = () => {};
+for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { libera(); process.exit(130); });
 
 /** Senza DISPLAY (sandbox, CI) avvia un Xvfb proprio su un numero libero (-displayfd) e lo chiude all'uscita. */
 export async function schermo() {
@@ -75,7 +70,7 @@ export async function schermo() {
 /** Lancia l'app sulla scena; torna { app, pagina, chiudi }. `video`: cartella dove Playwright registra la finestra. */
 export async function avvia(fileScena, { video } = {}) {
   for (const f of ['dist/src/main.js', 'renderer/index.html']) if (!existsSync(join(RADICE, f))) throw new Error(`Manca ${f}: prima npm ci e npm run build.`);
-  await prendiLock();
+  libera = prendiPosto();
   const home = mkdtempSync(join(tmpdir(), 'clotch-beta-'));
   cpSync(join(RADICE, 'test/fixtures/home'), home, { recursive: true });
   try {
@@ -90,8 +85,8 @@ export async function avvia(fileScena, { video } = {}) {
     const pagina = await app.firstWindow();
     await pagina.waitForLoadState('domcontentloaded');
     await pagina.waitForSelector('.cornice:not(.in-avvio)', { timeout: 20000 }).catch(() => {});
-    return { app, pagina, chiudi: async () => { await app.close().catch(() => {}); rmSync(home, { recursive: true, force: true }); rilasciaLock(); } };
-  } catch (e) { rmSync(home, { recursive: true, force: true }); rilasciaLock(); throw e; }
+    return { app, pagina, chiudi: async () => { await app.close().catch(() => {}); rmSync(home, { recursive: true, force: true }); libera(); } };
+  } catch (e) { rmSync(home, { recursive: true, force: true }); libera(); throw e; }
 }
 
 /** Porta la finestra alla misura (contenuto), tema e movimento ridotto; aspetta due fotogrammi. */

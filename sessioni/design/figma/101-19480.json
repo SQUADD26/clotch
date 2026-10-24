@@ -12574,11 +12574,81 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "158:82202",
+   "nome": "Bottone pericolo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 399,
+    "y": 2019,
+    "w": 109,
+    "h": 32
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/errore",
+    "cornerRadius": "raggio/pieno",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/4",
+    "paddingRight": "spazio/4",
+    "height": "misura/bottone-invio"
+   },
+   "senza": []
+  },
+  {
+   "id": "I158:82202;158:82192",
+   "nome": "spinner",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 415,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I158:82202;158:82192;101:20032",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 416.3330078125,
+    "y": 2028.3330078125,
+    "w": 13.333984375,
+    "h": 13.333564758300781
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore"
+   },
+   "senza": []
+  },
+  {
+   "id": "I158:82202;158:82191",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 439,
+    "y": 2025,
+    "w": 53,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/errore",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Rimuovi",
+   "font": "SF Pro Regular"
+  },
+  {
    "id": "153:71293",
    "nome": "Campo testo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 399,
+    "x": 556,
     "y": 2019,
     "w": 173,
     "h": 32
@@ -12600,7 +12670,7 @@
    "nome": "valore",
    "tipo": "TEXT",
    "box": {
-    "x": 412,
+    "x": 569,
     "y": 2025,
     "w": 147,
     "h": 20
@@ -12619,7 +12689,7 @@
    "nome": "Campo testo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 620,
+    "x": 777,
     "y": 2019,
     "w": 173,
     "h": 32
@@ -12641,7 +12711,7 @@
    "nome": "valore",
    "tipo": "TEXT",
    "box": {
-    "x": 633,
+    "x": 790,
     "y": 2025,
     "w": 147,
     "h": 20
@@ -12660,7 +12730,7 @@
    "nome": "Campo testo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 841,
+    "x": 998,
     "y": 2019,
     "w": 173,
     "h": 32
@@ -12682,7 +12752,7 @@
    "nome": "valore",
    "tipo": "TEXT",
    "box": {
-    "x": 854,
+    "x": 1011,
     "y": 2025,
     "w": 147,
     "h": 20
@@ -12701,7 +12771,7 @@
    "nome": "Campo testo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1062,
+    "x": 1219,
     "y": 2019,
     "w": 173,
     "h": 32
@@ -12724,7 +12794,7 @@
    "nome": "valore",
    "tipo": "TEXT",
    "box": {
-    "x": 1075,
+    "x": 1232,
     "y": 2025,
     "w": 147,
     "h": 20
@@ -12743,7 +12813,7 @@
    "nome": "Chip modello",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1283,
+    "x": 1440,
     "y": 2019,
     "w": 134,
     "h": 28
@@ -12762,7 +12832,7 @@
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 1291,
+    "x": 1448,
     "y": 2024,
     "w": 56,
     "h": 18
@@ -12781,7 +12851,7 @@
    "nome": "sforzo",
    "tipo": "TEXT",
    "box": {
-    "x": 1351,
+    "x": 1508,
     "y": 2024,
     "w": 38,
     "h": 18
@@ -12800,7 +12870,7 @@
    "nome": "icona giu",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1393,
+    "x": 1550,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -12816,7 +12886,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1396.3330078125,
+    "x": 1553.3330078125,
     "y": 2030.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -12831,7 +12901,7 @@
    "nome": "Chip modello",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1465,
+    "x": 1622,
     "y": 2019,
     "w": 134,
     "h": 28
@@ -12851,7 +12921,7 @@
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 1473,
+    "x": 1630,
     "y": 2024,
     "w": 56,
     "h": 18
@@ -12870,7 +12940,7 @@
    "nome": "sforzo",
    "tipo": "TEXT",
    "box": {
-    "x": 1533,
+    "x": 1690,
     "y": 2024,
     "w": 38,
     "h": 18
@@ -12889,7 +12959,7 @@
    "nome": "icona giu",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1575,
+    "x": 1732,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -12905,7 +12975,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1578.3330078125,
+    "x": 1735.3330078125,
     "y": 2030.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -12920,7 +12990,7 @@
    "nome": "Chip permessi",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1647,
+    "x": 1804,
     "y": 2019,
     "w": 181,
     "h": 28
@@ -12939,7 +13009,7 @@
    "nome": "icona mano",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1655,
+    "x": 1812,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -12955,7 +13025,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1655.59619140625,
+    "x": 1812.59619140625,
     "y": 2025.666015625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
@@ -12970,7 +13040,7 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1675,
+    "x": 1832,
     "y": 2024,
     "w": 125,
     "h": 18
@@ -12989,7 +13059,7 @@
    "nome": "icona giu",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1804,
+    "x": 1961,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -13005,7 +13075,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1807.3330078125,
+    "x": 1964.3330078125,
     "y": 2030.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -13020,7 +13090,7 @@
    "nome": "Chip permessi",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1876,
+    "x": 2033,
     "y": 2019,
     "w": 181,
     "h": 28
@@ -13040,7 +13110,7 @@
    "nome": "icona mano",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1884,
+    "x": 2041,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -13056,7 +13126,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1884.59619140625,
+    "x": 2041.59619140625,
     "y": 2025.666015625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
@@ -13071,7 +13141,7 @@
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
-    "x": 1904,
+    "x": 2061,
     "y": 2024,
     "w": 125,
     "h": 18
@@ -13090,7 +13160,7 @@
    "nome": "icona giu",
    "tipo": "INSTANCE",
    "box": {
-    "x": 2033,
+    "x": 2190,
     "y": 2025,
     "w": 16,
     "h": 16
@@ -13106,7 +13176,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 2036.3330078125,
+    "x": 2193.3330078125,
     "y": 2030.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619

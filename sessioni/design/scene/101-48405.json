@@ -1,6 +1,7 @@
 {
  "navigazione": {
-  "vista": "clotch-ai"
+  "vista": "clotch-ai",
+  "sezione": "avviso-chiesto"
  },
  "elenco": {
   "sessioni": [],
@@ -24,14 +25,14 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792845189218,
+    "battito": 1792845701983,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845189218,
+    "visto": 1792845701983,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -53,14 +54,14 @@
     "aspetto": null,
     "domanda": null,
     "limite": null,
-    "battito": 1792845169218,
+    "battito": 1792845681983,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845069218,
+    "visto": 1792845581983,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -73,7 +74,7 @@
       "rid": "p1",
       "genere": "permesso",
       "strumento": "Bash",
-      "t": 1792845069218,
+      "t": 1792845581983,
       "domande": [],
       "ingresso": {
        "command": "supabase db push --db-url $DEV",
@@ -84,7 +85,19 @@
    }
   },
   "fermoTutto": false,
-  "avvisi": [],
+  "avvisi": [
+   {
+    "id": "a0",
+    "t": 1792844981983,
+    "testo": "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti.",
+    "livello": "normale",
+    "motivo": "chiesto",
+    "dettoDa": null,
+    "sessioni": [
+     "c-backend"
+    ]
+   }
+  ],
   "clotch": null,
   "clotchAi": null,
   "comandi": [],

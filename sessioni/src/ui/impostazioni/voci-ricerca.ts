@@ -36,7 +36,7 @@ export const VOCI: Voce[] = [
   ...["Cerca sessioni", "Scrivi a clotch AI", "Prossima sessione in attesa", "Consenti", "Nega", "Ferma la sessione",
     "Mostra barra laterale", "Apri impostazioni", "Invia e interrompi la sessione", "Metti in coda", "Trova nella sessione"].map((e) => v("scorciatoie", e)),
   v("sorgenti", "Claude Code", "Sessioni da terminale, da tutte le cartelle degli account"),
-  v("sorgenti", "Claude", "Sessioni dell'app Claude per Mac"),
+  v("sorgenti", "Claude", "Sessioni dell’app Claude per Mac"),
   v("sorgenti", "Codex", "Sessioni di Codex in ~/.codex"),
   v("sorgenti", "Cursor", "Chat di Cursor. Si leggono, ma non ricevono messaggi"),
   v("archiviazione", "Indice delle sessioni", "Ricostruiscilo se l’elenco non torna"),

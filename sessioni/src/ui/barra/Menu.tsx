@@ -10,11 +10,11 @@ import { useNavigazione } from "../base/navigazione";
 import { imposta, useImpostazioni } from "../impostazioni/stato";
 import { conEtichetta, nuoveEscluse } from "./elenco";
 import { useProfilo } from "./Righe";
-import type { Punto } from "./Sovrapposti";
+import type { Ancora } from "../base/Sovrapposto";
+import { numero } from "../base/token";
 
 const azione = (id: string, a: AzioneSessione) => () => { void api().azione(id, a); };
 const archivia = (id: string) => window.clotchAi.comando("archivia", { chat: id });
-const posto = (a: Punto) => ({ position: "fixed" as const, left: a.x, top: a.y });
 
 /** «Menu della sessione» (101:21206, 101:20859): lo stesso sulla riga della barra e sul «…» dell'intestazione della chat. */
 export function vociMenuSessione(s: Sessione, pref?: PreferenzeSessione): VoceMenu[] {
@@ -36,12 +36,12 @@ export function vociMenuSessione(s: Sessione, pref?: PreferenzeSessione): VoceMe
   ];
 }
 
-export function MenuRiga({ s, pref, a, inizio, onChiudi }: { s: Sessione; pref?: PreferenzeSessione; a: Punto; inizio?: number; onChiudi(): void }) {
-  return <Menu voci={vociMenuSessione(s, pref)} inizio={inizio} onChiudi={onChiudi} style={posto(a)} />;
+export function MenuRiga({ s, pref, a, inizio, onChiudi }: { s: Sessione; pref?: PreferenzeSessione; a: Ancora; inizio?: number; onChiudi(): void }) {
+  return <Menu voci={vociMenuSessione(s, pref)} inizio={inizio} onChiudi={onChiudi} ancora={a} />;
 }
 
 /** `chiave` e `etichetta`: il nome della cartella nella barra e quello mostrato (con «Rinomina etichetta…»). */
-export function MenuCartella({ sessioni, chiave, etichetta, a, inizio, onChiudi }: { sessioni: Sessione[]; chiave: string; etichetta: string; a: Punto; inizio?: number; onChiudi(): void }) {
+export function MenuCartella({ sessioni, chiave, etichetta, a, inizio, onChiudi }: { sessioni: Sessione[]; chiave: string; etichetta: string; a: Ancora; inizio?: number; onChiudi(): void }) {
   const prima = sessioni[0]?.id;
   const { etichetteCartelle, cartelleEscluse } = useImpostazioni();
   const nascondi = () => {
@@ -61,10 +61,10 @@ export function MenuCartella({ sessioni, chiave, etichetta, a, inizio, onChiudi 
     "separatore",
     { icona: "nascondi", etichetta: "Nascondi cartella", pericolo: true, fai: nascondi },
   ];
-  return <Menu voci={voci} inizio={inizio} onChiudi={onChiudi} style={posto(a)} />;
+  return <Menu voci={voci} inizio={inizio} onChiudi={onChiudi} ancora={a} />;
 }
 
-export function MenuProfilo({ dettaglio, a, inizio, onImpostazioni, onChiudi }: { dettaglio: string; a: Punto; inizio?: number; onImpostazioni(): void; onChiudi(): void }) {
+export function MenuProfilo({ dettaglio, a, inizio, onImpostazioni, onChiudi }: { dettaglio: string; a: Ancora; inizio?: number; onImpostazioni(): void; onChiudi(): void }) {
   const n = useNavigazione();
   const { nome } = useProfilo();
   const voci: VoceMenu[] = [
@@ -75,5 +75,5 @@ export function MenuProfilo({ dettaglio, a, inizio, onImpostazioni, onChiudi }: 
     "separatore",
     { icona: "info", etichetta: "Info su clotch", fai: () => n.apri("impostazioni", undefined, "info") },
   ];
-  return <Menu testata={{ titolo: nome, dettaglio }} voci={voci} inizio={inizio} onChiudi={onChiudi} style={posto(a)} />;
+  return <Menu testata={{ titolo: nome, dettaglio }} voci={voci} inizio={inizio} onChiudi={onChiudi} ancora={a} lato="sopra" scarto={numero("spazio-1")} />;
 }

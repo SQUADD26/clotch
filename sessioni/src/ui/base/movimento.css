@@ -1,0 +1,55 @@
+/* Sistema di movimento di tutta l'app (issue 520): durate e curve solo da token (tempo/*, curva/*, scala/*, spostamento/*).
+   Regole: entrata tempo-entrata con curva-entrata; uscita più breve, tempo-uscita con curva-uscita; si muovono solo transform e opacità;
+   le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (issue 519), con gli stessi token. */
+
+/* hover e pressione: colore e fondo seguono il passaggio, i premibili piccoli si riducono a scala-premuto */
+button, [role="button"], .pillola, .pillola-filtro, .riga {
+  transition: background-color var(--tempo-pressione) var(--curva-entrata), color var(--tempo-pressione) var(--curva-entrata),
+    opacity var(--tempo-pressione) var(--curva-entrata), transform var(--tempo-pressione) var(--curva-entrata);
+}
+:is(.bottone, .bottone-icona, .pillola, .pillola-filtro, .chip):active:not(:disabled) { transform: scale(var(--scala-premuto)); }
+/* bottoni pieni (primario, invio): al passaggio e premuti schiariscono con opacita-passaggio e opacita-premuto */
+:is(.bottone.primario, .bottone-invia):hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+:is(.bottone.primario, .bottone-invia):active:not(:disabled) { opacity: var(--opacita-premuto); }
+
+/* fine dell'avvio (101-30345): il corpo compare con dissolvenza quando arriva l'elenco */
+.cornice .corpo { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
+.cornice.in-avvio .corpo { opacity: 0; }
+
+/* View Transition (base/movimento.ts): ogni gruppo con nome si sposta e ridimensiona, il resto dissolve */
+:root { --scivola-barra: -100%; --scivola-pannello: 100%; --sposta-entrata: var(--spazio-1); }
+:root::view-transition { pointer-events: none; } /* i clic passano: la transizione si interrompe con il clic dopo */
+::view-transition-old(*), ::view-transition-new(*) { animation-duration: var(--tempo-entrata); animation-timing-function: var(--curva-entrata); }
+/* un gruppo che cambia posto o misura (superficie, pannello, avvisi della pila) si sposta con tempo-spostamento */
+::view-transition-group(*) { animation-duration: var(--tempo-spostamento); animation-timing-function: var(--curva-spostamento); }
+::view-transition-old(*):only-child { animation-duration: var(--tempo-uscita); animation-timing-function: var(--curva-uscita); }
+/* la superficie cambia larghezza quando la barra o il pannello entrano: le foto si tagliano, non si stirano */
+::view-transition-old(superficie), ::view-transition-new(superficie) { height: 100%; object-fit: none; object-position: left top; }
+.superficie { view-transition-name: superficie; }
+.barra-laterale { view-transition-name: barra; }
+.pannello { view-transition-name: pannello; }
+.velo-barra { view-transition-name: velo; }
+.avviso-comparsa { view-transition-class: avviso; }
+
+@keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
+@keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
+@keyframes compare { from { opacity: 0; transform: translateY(var(--sposta-entrata)) scale(var(--scala-entrata)); } }
+@keyframes dissolve { from { opacity: 0; } }
+::view-transition-new(barra):only-child { animation-name: scivola-barra; }
+::view-transition-old(barra):only-child { animation-name: scivola-barra; animation-direction: reverse; }
+::view-transition-new(pannello):only-child { animation-name: scivola-pannello; }
+::view-transition-old(pannello):only-child { animation-name: scivola-pannello; animation-direction: reverse; }
+::view-transition-new(*.avviso):only-child { animation-name: compare; }
+::view-transition-old(*.avviso):only-child { animation-name: compare; animation-direction: reverse; }
+::view-transition-new(velo):only-child { animation-name: dissolve; }
+::view-transition-old(velo):only-child { animation-name: dissolve; animation-direction: reverse; }
+
+/* riduci movimento del Mac: niente spostamenti né scale, solo dissolvenza breve; nessuna animazione infinita */
+@media (prefers-reduced-motion: reduce) {
+  :root { --scivola-barra: 0%; --scivola-pannello: 0%; --sposta-entrata: 0px; --scala-entrata: 1; --scala-premuto: 1; }
+  ::view-transition-group(*) { animation: none; }
+  .gira, .luccica-finestra, .luccica-copia, .pezzo-chat .cursore { animation: none !important; }
+}
+
+/* parità: il disegno è un fotogramma fermo */
+.parita *, .parita *::before, .parita *::after { transition: none !important; }

@@ -1,12 +1,12 @@
 /* figma: 101-37696 — «velo» sulla finestra e «dialogo» al centro */
-/* In Figma il centro del dialogo sta spazio-10 sopra il centro della finestra (101-37696, 101-22044, 101-39512): il fondo del velo ne tiene il doppio. */
-.velo { position: fixed; inset: 0; z-index: 30; padding-bottom: calc(2 * var(--spazio-10)); display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-velo); }
+/* In Figma il centro del dialogo sta spazio-10 sopra il centro della finestra (101-37696, 101-22044, 101-39512): lo sposta `translate`, non un margine (#725). */
+.velo { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--colore-fondo-velo); }
 .parita .velo { inset: var(--spazio-16); border-radius: var(--raggio-md); }
 .dialogo {
   width: var(--misura-dialogo); padding: var(--spazio-5); gap: var(--spazio-4);
-  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
-.velo.centrato { padding-bottom: 0; }
+.velo:not(.centrato) > .dialogo { translate: 0 calc(-1 * var(--spazio-10)); }
 .dialogo.largo { width: var(--misura-dialogo-largo); }
 .dialogo .bottoni { display: flex; justify-content: flex-end; gap: var(--spazio-2); }

@@ -90,7 +90,7 @@ const FRAME: Record<string, () => Prova> = {
     return { ...b, passaggio: ids[1], aperto: { tipo: "riga", id: ids[1], a: { x: 282, y: 408 } }, voce: 2 }; // «Archivia» evidenziata
   },
   "101-21257": () => { const b = base(); return { ...b, aperto: { tipo: "cartella", chiave: "squadd-v2", a: { x: 286, y: 460 } }, voce: 1 }; }, // «Copia percorso» evidenziata
-  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 672 } }, voce: 1 }), // «Scorciatoie da tastiera» evidenziata
+  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 900 } }, voce: 1 }), // «Scorciatoie da tastiera» evidenziata
   "101-24127": () => {
     const b = base();
     b.elenco.dati!.sessioni[0].titolo = "Clotch: sessioni in Electron con lettura dal disco e filtri";
@@ -127,8 +127,10 @@ FRAME["101-45507"] = () => {
 };
 // «Con e senza Clotch» (#437): la barra dei nove frame; 3 sessioni aspettano te, come la Casella del disegno
 const CON = (pagina: string, f: Parameters<typeof registro>[0] = {}) => () => ({ ...base(), pagina, aperte: ["clotch"], registro: registro({ aspettano: 3, ...f }) });
-for (const id of ["101-46268", "101-46701", "101-48368"]) FRAME[id] = CON("clotch-ai", { clotch: true });
-for (const id of ["101-46308", "101-46741", "101-48405"]) FRAME[id] = CON("clotch-ai");
+for (const id of ["101-46268", "101-46701", "101-48368", "101-48405"]) FRAME[id] = CON("clotch-ai", { clotch: true });
+for (const id of ["101-46308", "101-46741"]) FRAME[id] = CON("clotch-ai");
+FRAME["101-47170"] = CON("casella", { clotch: true });
+FRAME["101-47297"] = CON("casella");
 FRAME["101-49067"] = CON("casella", { clotch: true, afk: 4 });
 FRAME["101-49194"] = CON("casella");
 FRAME["101-30172"] = () => ({ ...base(), registro: registro({ aspettano: 3 }) }); // popover Attività

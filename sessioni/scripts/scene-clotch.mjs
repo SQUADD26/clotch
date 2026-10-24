@@ -40,9 +40,11 @@ scrivi("48368", con(clotchAi, {
   avvisi: [{ id: "a0", t: ORA - 12 * MIN, testo: "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti.", livello: "normale", motivo: "chiesto", dettoDa: "clotch", sessioni: [] }],
 }, { sezione: "avviso-notch" }));
 
-// 48405: gli stessi avvisi senza Clotch (nessun avviso detto da lui, niente toast «mandato al notch»): resta la sessione che chiede il permesso
-const scena48368 = JSON.parse(readFileSync(new URL("101-48368.json", DIR), "utf8"));
-scrivi("48405", con(scena48368, { clotch: null, avvisi: [] }, { sezione: undefined }));
+// 48405: lo stesso permesso senza Clotch: l'avviso di clotch AI resta in app e compare un toast «aspetta un permesso» con «Apri»
+scrivi("48405", con(clotchAi, {
+  clotch: null, comandi: [], chat: { ...clotchAi.registro.chat, "c-backend": backend },
+  avvisi: [{ id: "a0", t: ORA - 12 * MIN, testo: "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti.", livello: "normale", motivo: "chiesto", dettoDa: null, sessioni: ["c-backend"] }],
+}, { sezione: "avviso-chiesto" }));
 
 // 49067: AFK acceso da 20 min con 4 cose registrate; 49194: senza Clotch (3 sessioni aspettano te)
 scrivi("49067", con(casella, { clotch: CLOTCH, afk: { da: -20 * MIN, avvisi: 4 } }));

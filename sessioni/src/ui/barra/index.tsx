@@ -22,12 +22,14 @@ import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { APezzi } from "./APezzi";
-import { accanto, type Punto } from "./Sovrapposti";
+import { accanto } from "./Sovrapposti";
+import { Sovrapposto, type Ancora, type Punto } from "../base/Sovrapposto";
+import { conTransizione } from "../base/movimento";
 
 export type Aperto =
-  | { tipo: "opzioni"; i: number; a: Punto } | { tipo: "proprieta"; a: Punto } | { tipo: "raggruppa"; a: Punto }
-  | { tipo: "icona"; id: string; a: Punto } | { tipo: "riga"; id: string; a: Punto }
-  | { tipo: "cartella"; chiave: string; a: Punto } | { tipo: "profilo"; a: Punto };
+  | { tipo: "opzioni"; i: number; a: Ancora } | { tipo: "proprieta"; a: Ancora } | { tipo: "raggruppa"; a: Ancora }
+  | { tipo: "icona"; id: string; a: Ancora } | { tipo: "riga"; id: string; a: Ancora }
+  | { tipo: "cartella"; chiave: string; a: Ancora } | { tipo: "profilo"; a: Ancora };
 
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
 const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
@@ -52,7 +54,8 @@ export default function Barra() {
   const adesso = p?.ora ?? ora;
   const sessioni = elenco.dati?.sessioni ?? [];
 
-  const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
+  const [vista, setVistaSubito] = useState<Vista>(p?.vista ?? conservato.vista);
+  const setVista = (v: Vista) => conTransizione(() => setVistaSubito(v)); // filtri, raggruppa, ordina: le righe entrano ed escono (#520)
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
   const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
   const [chiuse, setChiuse] = useState<Set<string>>(conservato.chiuse);
@@ -69,8 +72,10 @@ export default function Barra() {
   const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || chiave === conScelta);
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
-    setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
-    setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
+    conTransizione(() => {
+      setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
+      setAperteAMano((c) => { const x = new Set(c); if (ora) x.delete(chiave); else x.add(chiave); return x; });
+    });
   };
 
   useEffect(() => {
@@ -81,13 +86,27 @@ export default function Barra() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [n.sessione]);
+  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
+  useEffect(() => {
+    const frecce = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
+      const t = e.target as HTMLElement;
+      if (!t.matches?.(".pezzo-barra .riga:not(.titolo-sezione)")) return;
+      const righe = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .riga:not(.titolo-sezione)")].filter((x) => x.getClientRects().length);
+      const dopo = righe[righe.indexOf(t) + (e.key === "ArrowDown" ? 1 : -1)];
+      if (dopo) { e.preventDefault(); dopo.focus(); }
+    };
+    addEventListener("keydown", frecce);
+    return () => removeEventListener("keydown", frecce);
+  }, []);
   useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
   const chiudi = () => setAperto(null);
   const filtri = vista.filtri;
   const aggiungiFiltro = (prop: Proprieta) => {
     const i = filtri.findIndex((f) => f.proprieta === prop);
-    if (i < 0) setVista({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
+    // subito, senza transizione: il filtro è vuoto (le righe non cambiano) e il suo menu delle opzioni lo legge ora
+    if (i < 0) setVistaSubito({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
     setAperto({ tipo: "opzioni", i: i < 0 ? filtri.length : i, a: aperto!.a });
   };
   const suTroncato = (testo: string | null, el?: HTMLElement) => {
@@ -98,7 +117,7 @@ export default function Barra() {
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
-  const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
+  const alternaFiglie = (id: string) => conTransizione(() => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; }));
   // le righe sono memo (Righe.tsx) e ignorano le funzioni: queste chiamano sempre l'ultima versione, via ref
   const vivi = useRef({ apriSessione, pref, alterna });
   vivi.current = { apriSessione, pref, alterna };
@@ -131,7 +150,7 @@ export default function Barra() {
       ) : !sessioni.length && !elenco.errore ? (
         <div className="elenco vuoto t-sm secondario">Le sessioni appaiono qui</div>
       ) : (
-        <div className="elenco">
+        <div className="elenco" onScroll={() => setSuggerimento(null)}>
           {elenco.errore && !elenco.dati && (
             <div className="avviso-cartella">
               <Icona nome="avviso" colore="errore" />
@@ -152,7 +171,7 @@ export default function Barra() {
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
               <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
-                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
+                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} onTroncato={suTroncato} />
               {aperta(g.chiave) && <div className="sessioni-gruppo"><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>}
             </div>
           ) : (
@@ -163,7 +182,7 @@ export default function Barra() {
 
       <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
         daDisco={sessione(p ? p.scelta ?? "" : n.sessione ?? "")?.account}
-        onAltro={(e) => { const r = e.currentTarget.closest(".piede-account")!.getBoundingClientRect(); setAperto({ tipo: "profilo", a: { x: r.left, y: r.top } }); }} />
+        onAltro={(e) => setAperto({ tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
@@ -183,7 +202,7 @@ export default function Barra() {
           a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />
       )}
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
-      {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
+      {suggerimento && !aperto && !ricerca && <Sovrapposto passivo ancora={suggerimento.a} className="suggerimento t-xs" role="tooltip">{suggerimento.testo}</Sovrapposto>}
       {ricerca && (
         <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
           onApri={apriSessione} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />
