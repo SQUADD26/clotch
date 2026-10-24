@@ -41,7 +41,7 @@ export function ChatClotchAi() {
       {/* chat vuota (101-36642) solo a registro letto: prima non si sa se è vuota */}
       {vuota && r ? <PrimaApertura /> : <FiloClotchAi>{permessi.length > 0 && <Permessi permessi={permessi} />}</FiloClotchAi>}
       {(avvio === "riavvio" || spenta) && <div className="vista-clotch-ai chat-clotch-ai">
-        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Riprendo le sessioni e gli avvisi da dove erano." />}
+        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Sessioni e avvisi riprendono da dove erano." />}
         {!avvio && st?.stato === "spenta" && (
           <>
             <AvvisoRosso titolo={st.da ? `clotch AI si è chiusa alle ${orario(st.da)}` : "clotch AI si è chiusa"} corpo="L’app prova a riaprirla. Se non riparte, riavviala tu." />
