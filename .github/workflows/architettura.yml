@@ -1,5 +1,6 @@
 # ARCHITECTURE.md obbligatorio (SQUADD26/claude-config#982). Copia in linea del controllo riusabile:
-# questa repo è pubblica e non può chiamare un workflow della repo privata claude-config, né usare i runner self-hosted.
+# questa repo è pubblica e non può chiamare un workflow della repo privata claude-config.
+# Runner clotch-ci su squaddv2 (#504, claude-config#2657); una PR da fork gira sulle macchine di GitHub, mai sulle nostre.
 name: architettura
 on:
   pull_request:
@@ -12,7 +13,7 @@ concurrency:
 
 jobs:
   architettura:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || fromJSON('["self-hosted","clotch-ci"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
