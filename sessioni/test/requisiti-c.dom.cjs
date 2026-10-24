@@ -24,7 +24,7 @@ H.avvia('requisiti-c', async () => {
     assert.equal(m[0].label, 'clotch');
     assert.deepEqual(m[0].submenu.map((v) => v.role).filter(Boolean), ['about', 'services', 'hide', 'hideOthers', 'unhide', 'quit']);
     assert.equal(app[0], 'Informazioni su clotch'); assert.equal(app.at(-1), 'Esci da clotch');
-    assert.deepEqual(m.slice(1).map((v) => v.role), ['fileMenu', 'editMenu', 'viewMenu', 'windowMenu']);
+    assert.deepEqual(m.slice(1).map((v) => v.label), ['File', 'Modifica', 'Vista', 'Finestra']);
   });
 
 

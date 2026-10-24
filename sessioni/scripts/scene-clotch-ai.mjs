@@ -34,7 +34,7 @@ const casella = [
   ...chat("c-disegno", "Sessioni: disegno e app Electron", "clotch", "m-clotch", "aspetta", [["richiesta", { genere: "permesso", rid: "q1", strumento: "Bash", ingresso: {}, domande: [] }]]),
   ...chat("c-figma", "Figma: schermate app Sessioni", "clotch", "m-clotch", "serve_roberto"),
   ...chat("c-lettura", "Sessioni: lettura dal disco", "clotch", "m-clotch", "lavora"),
-  ...["Notch: avviso schermo", "Voce: parole inglesi", "Clotch: prova 1", "Clotch: prova 2"].flatMap((t, i) => chat(`c-fatta-${i}`, t, "clotch", "m-clotch", "finito")),
+  ...["Notch: avviso schermo", "Voce: parole inglesi", "Casella: scorrimento premuto", "Selettore modello"].flatMap((t, i) => chat(`c-fatta-${i}`, t, "clotch", "m-clotch", "finito")),
   ...chat("m-squadd", "Squadd: policy RLS", "squadd-v2", "", "aspetta", [
     ["obiettivo", { stato: "aperto", testo: "Policy RLS su «sessioni» in produzione", versione: 1 }],
     ["passi", { agente: "", passi: passi(["a", "b", "c", "d"], [], ["e"]) }],
@@ -109,6 +109,8 @@ const SCENE = {
   "101-41834": ["clotch-ai", "avvio", [...tutto]],
   "101-42000": ["clotch-ai", null, primaDellaChiusura([...tutto, ...spenta, ...filo])],
   "101-42245": ["clotch-ai", "riavvio", primaDellaChiusura([...tutto, ...spenta, ...filo])],
+  "148-63870": ["casella", "fatto:clotch", [...tutto, ...viva]],
+  "148-63992": ["casella", null, [...tutto, ...viva].filter(([, c]) => !/-fatta/.test(c))], // nessuna sessione finita oggi
   "101-47170": ["casella", null, [...tutto, ...viva, ...proposto, ...clotch]],
   "101-47297": ["casella", null, [...tutto, ...viva, ...proposto]],
 };

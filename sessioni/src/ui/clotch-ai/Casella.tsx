@@ -1,4 +1,4 @@
-// figma: 101-35494 — «vista Casella»: obiettivi e chat in attesa per progetto. Stati: vuota 101-35803, caricamento 101-36010,
+// figma: 148-63870 — «Fatto oggi» aperto (a zero: 148-63992) nella «vista Casella» 101-35494: obiettivi e chat in attesa per progetto. Stati: vuota 101-35803, caricamento 101-36010,
 // registro non leggibile 101-36225, obiettivo proposto 101-47170 (con Clotch) e 101-47297 (senza).
 import { useEffect, useState } from "react";
 import type { Registro } from "../../clotch-ai";
@@ -26,7 +26,7 @@ const fatteOggi = (r: Registro, progetto: string) => [...r.chat.values()]
 
 function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
   const n = useNavigazione();
-  const [aperto, setAperto] = useState(false);
+  const [aperto, setAperto] = useState(n.sezione === `fatto:${p.nome}`); // scena 148-63870: «Fatto oggi» già aperto
   const dettaglio = p.aspettano.length ? (p.aspettano.length === 1 ? "1 aspetta te" : `${p.aspettano.length} aspettano te`) : "al lavoro";
   const o = p.obiettivo;
   // nel disegno (101-35494) i passi si vedono solo per il progetto la cui sessione madre è al lavoro
@@ -73,7 +73,6 @@ function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
           ))}
         </div>
       )}
-      {/* manca-disegno: Figma non ha «Fatto oggi» aperto; l'elenco usa le righe dei passi (spunta + titolo) finché non c'è */}
       <button type="button" className="riga-f" aria-expanded={aperto} disabled={!fatte.length} onClick={() => setAperto(!aperto)}>
         <Icona nome={aperto ? "giu" : "destra"} />
         <span className="t-sm secondario">Fatto oggi: {fatte.length}</span>

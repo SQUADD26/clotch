@@ -44,15 +44,32 @@ export function impostaIdentita() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuApp()));
 }
 
-/** Menu di un'app macOS: il primo è quello dell'app, con «Informazioni su clotch» (il pannello di sistema: nome, versione, icona). */
+type Ruolo = NonNullable<Electron.MenuItemConstructorOptions["role"]>;
+const voce = (role: Ruolo, label: string, accelerator?: string): Electron.MenuItemConstructorOptions => ({ role, label, ...(accelerator && { accelerator }) });
+const sep: Electron.MenuItemConstructorOptions = { type: "separator" };
+
+/** Menu di un'app macOS, voci e scorciatoie dei frame Figma 148:63680 (clotch), 148:63718 (File), 148:63756 (Modifica), 148:63794 (Vista), 148:63832 (Finestra).
+ *  Electron scrive i ruoli in inglese: ogni voce porta etichetta e scorciatoia sue, così il template si verifica (test/menu.test.ts). */
 export function menuApp(): Electron.MenuItemConstructorOptions[] {
   return [
     ...(process.platform === "darwin" ? [{ label: NOME_APP, submenu: [
-      { role: "about" as const, label: `Informazioni su ${NOME_APP}` }, { type: "separator" as const },
-      { role: "services" as const, label: "Servizi" }, { type: "separator" as const },
-      { role: "hide" as const, label: `Nascondi ${NOME_APP}` }, { role: "hideOthers" as const, label: "Nascondi altre" }, { role: "unhide" as const, label: "Mostra tutto" },
-      { type: "separator" as const }, { role: "quit" as const, label: `Esci da ${NOME_APP}` },
+      voce("about", `Informazioni su ${NOME_APP}`), sep, voce("services", "Servizi"), sep,
+      voce("hide", `Nascondi ${NOME_APP}`, "Command+H"), voce("hideOthers", "Nascondi altre", "Alt+Command+H"), voce("unhide", "Mostra tutto"),
+      sep, voce("quit", `Esci da ${NOME_APP}`, "Command+Q"),
     ] }] : []),
-    { role: "fileMenu" }, { role: "editMenu", label: "Modifica" }, { role: "viewMenu", label: "Vista" }, { role: "windowMenu", label: "Finestra" },
+    { label: "File", submenu: [voce("close", "Chiudi finestra", "CommandOrControl+W")] },
+    { label: "Modifica", submenu: [
+      voce("undo", "Annulla", "CommandOrControl+Z"), voce("redo", "Ripeti", "Shift+CommandOrControl+Z"), sep,
+      voce("cut", "Taglia", "CommandOrControl+X"), voce("copy", "Copia", "CommandOrControl+C"), voce("paste", "Incolla", "CommandOrControl+V"),
+      voce("pasteAndMatchStyle", "Incolla e adatta stile", "Alt+Shift+CommandOrControl+V"), voce("delete", "Elimina"), voce("selectAll", "Seleziona tutto", "CommandOrControl+A"), sep,
+      { label: "Voce", submenu: [voce("startSpeaking", "Inizia a parlare"), voce("stopSpeaking", "Interrompi")] },
+    ] },
+    { label: "Vista", submenu: [
+      voce("reload", "Ricarica", "CommandOrControl+R"), voce("forceReload", "Forza ricarica", "Shift+CommandOrControl+R"),
+      voce("toggleDevTools", "Attiva/disattiva strumenti sviluppatore", "Alt+CommandOrControl+I"), sep,
+      voce("resetZoom", "Dimensione reale", "CommandOrControl+0"), voce("zoomIn", "Ingrandisci", "CommandOrControl+Plus"), voce("zoomOut", "Riduci", "CommandOrControl+-"), sep,
+      voce("togglefullscreen", "Attiva/disattiva schermo intero", "Control+Command+F"),
+    ] },
+    { label: "Finestra", role: "windowMenu", submenu: [voce("minimize", "Riduci a icona", "CommandOrControl+M"), voce("zoom", "Zoom"), sep, voce("front", "Porta tutto in primo piano")] },
   ];
 }
