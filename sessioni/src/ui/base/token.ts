@@ -264,8 +264,12 @@ export type Token =
   | "tempo-pressione"
   | "tempo-spostamento"
   | "tempo-avviso"
+  | "tempo-giro"
+  | "tempo-luccica"
+  | "tempo-cursore"
   | "opacita-spento"
   | "opacita-passaggio"
+  | "opacita-premuto"
   | "curva-entrata-x1"
   | "curva-entrata-y1"
   | "curva-entrata-x2"
@@ -279,13 +283,17 @@ export type Token =
   | "curva-spostamento-x2"
   | "curva-spostamento-y2"
   | "scala-premuto"
+  | "scala-entrata"
   | "livello-base"
   | "livello-barra-sovrapposta"
   | "livello-velo"
   | "livello-dialogo"
   | "livello-menu"
   | "livello-avviso"
-  | "livello-tooltip";
+  | "livello-tooltip"
+  | "livello-sopra"
+  | "livello-sopra-2"
+  | "livello-sopra-3";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -556,8 +564,12 @@ export const valori: Record<Token, string> = {
   "tempo-pressione": "75ms",
   "tempo-spostamento": "200ms",
   "tempo-avviso": "4000ms",
+  "tempo-giro": "1200ms",
+  "tempo-luccica": "1800ms",
+  "tempo-cursore": "1000ms",
   "opacita-spento": "0.4",
   "opacita-passaggio": "0.88",
+  "opacita-premuto": "0.76",
   "curva-entrata-x1": "0.215",
   "curva-entrata-y1": "0.61",
   "curva-entrata-x2": "0.355",
@@ -571,6 +583,7 @@ export const valori: Record<Token, string> = {
   "curva-spostamento-x2": "0.355",
   "curva-spostamento-y2": "1",
   "scala-premuto": "0.98",
+  "scala-entrata": "0.96",
   "livello-base": "0",
   "livello-barra-sovrapposta": "20",
   "livello-velo": "30",
@@ -578,6 +591,9 @@ export const valori: Record<Token, string> = {
   "livello-menu": "50",
   "livello-avviso": "60",
   "livello-tooltip": "70",
+  "livello-sopra": "1",
+  "livello-sopra-2": "2",
+  "livello-sopra-3": "3",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);
