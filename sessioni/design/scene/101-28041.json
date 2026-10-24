@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792845652360,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -45,6 +45,7 @@
      "segni": []
     },
     "file": "",
+    "contesto": 124000,
     "icona": "stella"
    }
   ],
@@ -55,7 +56,7 @@
    {
     "tipo": "utente",
     "testo": "Guarda la schermata: il notch copre il titolo della sessione.\n@/Users/privato/Desktop/schermata-notch.png\n@/Users/privato/Desktop/lettore.ts",
-    "t": 1792792988531
+    "t": 1792845591360
    },
    {
     "tipo": "strumento",
@@ -64,7 +65,7 @@
     "ingresso": {
      "name": "notch-sopra-il-titolo.png"
     },
-    "t": 1792792989531,
+    "t": 1792845592360,
     "esito": {
      "testo": "",
      "errore": false,
@@ -82,7 +83,7 @@
     "tipo": "assistente",
     "testo": "Il notch copre i primi 40 px della barra del titolo. Sposto il titolo sotto i semafori.",
     "modello": "claude-opus-5-5",
-    "t": 1792792991531
+    "t": 1792845594360
    }
   ]
  },
@@ -92,7 +93,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 200000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
@@ -104,6 +114,16 @@
   "impostazioni": null,
   "esiti": {},
   "errori": []
+ },
+ "info": {
+  "s1": {
+   "contesto": null,
+   "file": {
+    "quanti": 3,
+    "aggiunte": 214,
+    "tolte": 12
+   }
+  }
  },
  "allegati": [
   {

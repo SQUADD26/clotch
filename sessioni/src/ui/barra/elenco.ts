@@ -44,12 +44,17 @@ export function giorno(t: number, ora: number) {
   return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" }).replace(".", "");
 }
 
+/** Chiave vera del giorno (con l'anno): «2026-10-12»; l'etichetta («Oggi», «12 ott») si ricava a parte. */
+const chiaveGiorno = (t: number) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const daChiave = (k: string) => { const [a, m, g] = k.split("-").map(Number); return new Date(a, m - 1, g).getTime(); };
+
 /** Valore di una proprietà per filtri e menu delle opzioni. */
 export function valore(s: Sessione, p: Proprieta, ora: number): string {
   switch (p) {
     case "sorgente": return nomeSorgente(s.sorgente);
-    case "stato": return s.stato;
-    case "attivita": return giorno(s.ultimaAttivita, ora);
+    // la riga mostra l'errore quando la coda della trascrizione lo dice: il filtro usa la stessa definizione (#636)
+    case "stato": return s.situazione?.adesso === "errore" ? "errore" : s.stato;
+    case "attivita": return chiaveGiorno(s.ultimaAttivita);
     default: return s[p] ?? "";
   }
 }
@@ -59,13 +64,16 @@ export interface Opzione { chiave: string; voce: string; icona?: NomeIcona; colo
 export function opzioni(sessioni: Sessione[], p: Proprieta, ora: number): Opzione[] {
   if (p === "stato") return STATI;
   const visti = [...new Set(sessioni.map((s) => valore(s, p, ora)).filter(Boolean))];
+  // le date dalla più recente, con l'etichetta del giorno; le altre in ordine alfabetico
+  if (p === "attivita") return visti.sort((a, b) => daChiave(b) - daChiave(a)).map((k) => ({ chiave: k, voce: giorno(daChiave(k), ora) }));
   return visti.sort((a, b) => a.localeCompare(b)).map((v) => ({ chiave: v, voce: v }));
 }
 
 /** Testo della pillola: «Stato:» e «In attesa» (101:9860). */
 export function pillola(f: Filtro) {
   const etichetta = PROPRIETA.find((p) => p.chiave === f.proprieta)!.etichetta;
-  const valori = f.proprieta === "stato" ? f.valori.map((v) => STATI.find((s) => s.chiave === v)?.corta ?? v) : f.valori;
+  const valori = f.proprieta === "stato" ? f.valori.map((v) => STATI.find((s) => s.chiave === v)?.corta ?? v)
+    : f.proprieta === "attivita" ? f.valori.map((k) => giorno(daChiave(k), Date.now())) : f.valori;
   return { proprieta: `${etichetta}:`, valore: valori.join(", ") };
 }
 
@@ -90,7 +98,7 @@ export function componi(sessioni: Sessione[], v: Vista, pref: Preferenze, ora: n
     gruppi.set(titolo, g);
   }
   const attivi = v.filtri.filter((f) => f.valori.length).length;
-  return { fissate, gruppi: [...gruppi.values()], totale: scelte.length, titolo: attivi ? `${scelte.length} sessioni` : "Progetti" };
+  return { fissate, gruppi: [...gruppi.values()], totale: scelte.length, titolo: attivi ? `${scelte.length} ${scelte.length === 1 ? "sessione" : "sessioni"}` : "Progetti" };
 }
 
 /** Riga sotto il nome nel piede: «6 account · 4 sorgenti» (101:7728), «Nessuna sessione» (101:8772). */
