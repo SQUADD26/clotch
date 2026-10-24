@@ -30,7 +30,7 @@ export function Avvio({ fine }: { fine: boolean }) {
       <span className="logo"><Icona nome="strati" colore="su-accento" /></span>
       {lento && !fine && (
         <div className="lento">
-          <div className="t-base secondario">L'apertura sta durando più del solito.</div>
+          <div className="t-base secondario">L’apertura sta durando più del solito.</div>
           <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
         </div>
       )}
