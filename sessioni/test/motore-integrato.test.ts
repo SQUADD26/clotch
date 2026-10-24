@@ -98,7 +98,8 @@ test("giro vero: annulla, doppio clic, rifiuti e errori del motore, riavvio", { 
   assert.equal((await manda(h, "annulla", { decisione: "r-000000000000" })).esito, "rifiutato");
   assert.equal(JSON.parse(py(h, "terminale", "0", ids.terminale))[0], "ok"); // annullata dal terminale
   assert.deepEqual([dec(h, ids.terminale).annullata, dec(h, ids.terminale).annullabile], [true, false]);
-  assert.equal((await manda(h, "ripristina", { chat: "s-1" })).esito, "rifiutato"); // il motore non ha «ripristina»
+  const ripr = await manda(h, "ripristina", { chat: "s-1" }); // il motore installato non ha «ripristina»: archiviate.tsx ne riconosce il rifiuto da «sconosciuto»
+  assert.deepEqual([ripr.esito, /sconosciuto/i.test(ripr.testo)], ["rifiutato", true]);
   const senza = await manda(h, "manda", { chat: "s-1" });
   assert.deepEqual([senza.esito, senza.testo], ["rifiutato", "manca testo"]);
   assert.equal((await manda(h, "obiettivo", { chat: "s-1", esito: "accetta" })).esito, "ok");
