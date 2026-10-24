@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 const scena = (id) => new URL(`../design/scene/${id.includes("-") ? id : `101-${id}`}.json`, import.meta.url);
 const base = readFileSync(scena("8036"));
 for (const id of ["10017", "10297", "12118", "16818", "21061", "21257", "21376", "23003", "23248", "24127", "28289",
-  "30238", "35109", "48405", "148-62026", "148-62191", "148-62379", "148-62621", "148-62813"]) writeFileSync(scena(id), base);
+  "30238", "35109", "148-62026", "148-62191", "148-62379", "148-62621", "148-62813"]) writeFileSync(scena(id), base);
 
 // 24007: gli avvisi a comparsa del disegno (uno per tipo) partono dalla sezione «avvisi»
 const scena24007 = JSON.parse(base);
