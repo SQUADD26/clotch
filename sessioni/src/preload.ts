@@ -84,6 +84,7 @@ const casella: CasellaApi = {
   immagine: (da) => ipcRenderer.invoke("casella:immagine", da),
   copiaImmagine: (da) => ipcRenderer.invoke("casella:copia-immagine", da),
   salvaImmagine: (da, nome) => ipcRenderer.invoke("casella:salva-immagine", da, nome),
+  mostra: (percorso) => ipcRenderer.invoke("casella:mostra", percorso),
   skill: (account) => ipcRenderer.invoke("casella:skill", account),
 };
 contextBridge.exposeInMainWorld("casella", casella);
