@@ -2536,7 +2536,7 @@
    "box": {
     "x": 347,
     "y": 118,
-    "w": 1062,
+    "w": 1092,
     "h": 38
    },
    "variabili": {
@@ -2551,7 +2551,7 @@
    "box": {
     "x": 347,
     "y": 118,
-    "w": 1062,
+    "w": 1092,
     "h": 20
    },
    "variabili": {
@@ -2613,7 +2613,7 @@
    "box": {
     "x": 371,
     "y": 118,
-    "w": 1038,
+    "w": 1068,
     "h": 20
    },
    "variabili": {
@@ -2632,7 +2632,7 @@
    "box": {
     "x": 347,
     "y": 140,
-    "w": 1062,
+    "w": 1092,
     "h": 16
    },
    "variabili": {
@@ -2760,9 +2760,9 @@
    "nome": "azioni",
    "tipo": "FRAME",
    "box": {
-    "x": 1421,
+    "x": 1451,
     "y": 123,
-    "w": 58,
+    "w": 28,
     "h": 28
    },
    "variabili": {
@@ -2771,28 +2771,11 @@
    "senza": []
   },
   {
-   "id": "I101:48393;101:7429",
-   "nome": "bottone obiettivo",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 1421,
-    "y": 123,
-    "w": 28,
-    "h": 28
-   },
-   "variabili": {
-    "cornerRadius": "raggio/md",
-    "width": "misura/bottone",
-    "height": "misura/bottone"
-   },
-   "senza": []
-  },
-  {
    "id": "I101:48393;101:7429;101:7139",
    "nome": "icona pannello",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1427,
+    "x": 1457,
     "y": 129,
     "w": 16,
     "h": 16
@@ -2808,7 +2791,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1428.3330078125,
+    "x": 1458.3330078125,
     "y": 130.3359375,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2819,28 +2802,11 @@
    "senza": []
   },
   {
-   "id": "I101:48393;101:7433",
-   "nome": "bottone altro",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 1451,
-    "y": 123,
-    "w": 28,
-    "h": 28
-   },
-   "variabili": {
-    "cornerRadius": "raggio/md",
-    "width": "misura/bottone",
-    "height": "misura/bottone"
-   },
-   "senza": []
-  },
-  {
    "id": "I101:48393;101:7433;101:7139",
    "nome": "icona altro",
    "tipo": "INSTANCE",
    "box": {
-    "x": 1457,
+    "x": 1487,
     "y": 129,
     "w": 16,
     "h": 16
@@ -2856,7 +2822,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 1458.99951171875,
+    "x": 1488.99951171875,
     "y": 135.6640625,
     "w": 12.000325202941895,
     "h": 2.6669921875
@@ -3451,25 +3417,6 @@
    "senza": []
   },
   {
-   "id": "I101:48399;101:24789",
-   "nome": "chip permessi",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 582,
-    "y": 898,
-    "w": 181,
-    "h": 28
-   },
-   "variabili": {
-    "cornerRadius": "raggio/pieno",
-    "itemSpacing": "spazio/1",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/bottone"
-   },
-   "senza": []
-  },
-  {
    "id": "I101:48399;101:24789;101:24774",
    "nome": "icona mano",
    "tipo": "INSTANCE",
@@ -3555,31 +3502,12 @@
    "nome": "spinta",
    "tipo": "FRAME",
    "box": {
-    "x": 771,
+    "x": 582,
     "y": 911.5,
-    "w": 221,
+    "w": 622,
     "h": 1
    },
    "variabili": {},
-   "senza": []
-  },
-  {
-   "id": "I101:48399;101:24795",
-   "nome": "contesto",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 1000,
-    "y": 898,
-    "w": 62,
-    "h": 28
-   },
-   "variabili": {
-    "cornerRadius": "raggio/pieno",
-    "itemSpacing": "spazio/1",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/bottone"
-   },
    "senza": []
   },
   {
@@ -3631,25 +3559,6 @@
    "senza": [],
    "testo": "62%",
    "font": "SF Pro Regular"
-  },
-  {
-   "id": "I101:48399;101:24799",
-   "nome": "chip modello",
-   "tipo": "INSTANCE",
-   "box": {
-    "x": 1070,
-    "y": 898,
-    "w": 134,
-    "h": 28
-   },
-   "variabili": {
-    "cornerRadius": "raggio/pieno",
-    "itemSpacing": "spazio/1",
-    "paddingLeft": "spazio/2",
-    "paddingRight": "spazio/2",
-    "height": "misura/bottone"
-   },
-   "senza": []
   },
   {
    "id": "I101:48399;101:24799;101:24780",
