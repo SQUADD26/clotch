@@ -152,6 +152,8 @@ export interface SessioniApi {
   cerca(testo: string): Promise<RisultatoRicerca[]>;
   /** Comandi con «/» che la sessione conosce (suoi, dell'account e del progetto). */
   comandi(id: string): Promise<VoceComando[]>;
+  /** Catalogo dei modelli del motore (`~/.claude/hooks/friday/modelli.json`, sola lettura); null se manca o non si legge. */
+  modelli(): Promise<ModelloMotore[] | null>;
   /** File della cartella della sessione che contengono `testo` nel percorso (al massimo 8), per «@». */
   file(id: string, testo: string): Promise<string[]>;
   /** Byte su disco dell'indice e delle cache dell'app. */
@@ -175,6 +177,8 @@ export interface RisultatoRicerca {
 }
 
 /** Un comando con «/» nel menu della casella; `gruppo`: «Comandi» o «Skill». */
+/** Un modello del catalogo del motore: gli sforzi che accetta (`[]` = nessuno), se ha la modalità veloce, il predefinito. Un campo che il catalogo non dice manca. */
+export interface ModelloMotore { modello: string; sforzi?: string[]; rapida?: boolean; contesto_max?: number; sforzo_default?: string }
 export interface VoceComando { nome: string; descrizione: string; gruppo: "Comandi" | "Skill" }
 
 export interface PreferenzeSessione {

@@ -3,7 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import type { IpcMain } from "electron";
 import type { Sessioni } from "./api";
-import { cercaFile, comandiDi } from "./casella-dati";
+import { cercaFile, comandiDi, leggiModelli } from "./casella-dati";
 
 export function collegaCasella(ipc: IpcMain, sessioni: Sessioni, home = os.homedir()) {
   const sessione = (id: unknown) => {
@@ -15,5 +15,6 @@ export function collegaCasella(ipc: IpcMain, sessioni: Sessioni, home = os.homed
     const s = sessione(id);
     return comandiDi(/^\.claude(-[\w.-]+)?$/.test(s.account) ? path.join(home, s.account) : null, s.cartella);
   });
+  ipc.handle("sessioni:modelli", () => leggiModelli(home));
   ipc.handle("sessioni:file", (_e, id: string, testo: string) => cercaFile(sessione(id).cartella, String(testo ?? "")));
 }

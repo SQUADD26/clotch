@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./clotch-ai";
 import { piano } from "./clotch-ai-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
+import type { Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, ModelloMotore, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -33,6 +33,8 @@ export interface Scena {
   /** Menu della casella (#437): comandi con «/» e file con «@» che il main darebbe a quella sessione. */
   comandi?: VoceComando[];
   file?: string[];
+  /** Catalogo dei modelli del motore come lo dà `sessioni:modelli` (assente = il file non c'è). */
+  modelli?: ModelloMotore[];
   /** Registro di clotch AI come lo dà `clotch-ai:registro`. */
   registro?: unknown;
   /** Allegati e immagini (#437): i file che `casella:descrivi` trova, le immagini (file PNG del repo, per «<uuid riga>:<n>» o per percorso) e le skill. */
@@ -77,6 +79,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
     case "sessioni:comandi": return s.comandi ?? [];
+    case "sessioni:modelli": return s.modelli ?? null;
     case "sessioni:file": return (s.file ?? []).filter((f) => f.toLowerCase().includes(String(args[1] ?? "").toLowerCase()));
     case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
     case "impostazioni:radici": return (s.cartelle ?? []).map((c) => c.percorso);
@@ -103,7 +106,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
-  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
+  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:modelli", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
   "clotch-ai:registro", "clotch-ai:comando", "clotch-ai:avvia", "clotch-ai:voce", "clotch-ai:dettatura", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
