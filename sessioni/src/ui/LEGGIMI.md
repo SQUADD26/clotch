@@ -36,7 +36,7 @@ Prima riga di ogni file di interfaccia: `// figma: <node-id>` del frame approvat
 
 - Un solo sistema, `base/movimento.css` e `base/movimento.ts`; durate e curve solo da token: `tempo/entrata` (comparse), `tempo/uscita` (chiusure, più brevi), `tempo/pressione`, `tempo/spostamento` (gruppi che cambiano posto o misura), `curva/entrata`, `curva/uscita`, `curva/spostamento`, `scala/premuto`, `scala/entrata`, `spostamento/entrata`. Nei CSS dei pezzi nessuna durata o curva a mano.
 - Cambio di struttura (vista, barra, pannello, righe che entrano o escono, avvisi): `conTransizione(() => setStato(...))` da `base/movimento`. È una View Transition: le uscite non chiedono di tenere montato niente. Un contenitore che deve scivolare per conto suo ha un `view-transition-name` e le sue regole in `movimento.css`.
-- Menu, popup, tooltip, popover, dialoghi: classe `entra-sovrapposto` sul contenitore.
+- Menu, popup, tooltip, popover, dialoghi: `base/sovrapposto.css` (#519), con gli stessi token.
 - Solo transform e opacità; animazioni infinite solo nei caricamenti (`tempo/giro`, `tempo/luccica`, `tempo/cursore`, lineari). «Riduci movimento» del Mac: solo dissolvenze, niente infinite. Prova: `test/movimento.dom.cjs`, voci `test/beta/checklist/movimento.jsonl`.
 
 ## Dati dal processo main
