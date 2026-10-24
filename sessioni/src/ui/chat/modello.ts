@@ -193,7 +193,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
     const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
     const stRiga = bloccato ? "chiusa" : st;
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella, esito) });
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 
