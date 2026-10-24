@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792820578439,
+    "ultimaAttivita": 1792822818621,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Lancia tutte le prove.",
-    "t": 1792820336439
+    "t": 1792822576621
    },
    {
     "tipo": "strumento",
@@ -63,7 +63,7 @@
      "command": "npm test"
     },
     "esito": null,
-    "t": 1792820337439,
+    "t": 1792822577621,
     "id": "t0"
    }
   ]
@@ -89,14 +89,14 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792819438439,
+    "battito": 1792821678621,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792820698439,
+    "visto": 1792822938621,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
