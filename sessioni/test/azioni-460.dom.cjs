@@ -87,7 +87,7 @@ app.whenReady().then(async () => {
     assert.ok(!(await run(() => [...document.querySelectorAll('.riga-sessione .testo')].some((e) => e.textContent === 'Sessione b'))));
   });
 
-  await check('RINOMINA: Annulla non cambia niente; un nome vuoto non si salva', async () => {
+  await check('RINOMINA: Annulla non cambia niente; un nome vuoto toglie il nome scelto', async () => {
     const prima = finto.chiamatePref.length;
     await menuDi('.riga-sessione', 'Lavoro nuovo');
     await clicca('[role=menu] .voce', 'Rinomina…');
@@ -100,12 +100,13 @@ app.whenReady().then(async () => {
     await clicca('[role=menu] .voce', 'Rinomina…');
     await wait(() => !!document.querySelector('[role=dialog]'));
     await scrivi('   ');
-    // un nome vuoto non si salva (#786): «Salva» spento, «Scrivi un nome.», la sessione resta com'era
-    assert.equal(await run(() => [...document.querySelectorAll('[role=dialog] button')].find((e) => e.textContent === 'Salva').disabled), true);
-    await wait(() => document.querySelector('[role=dialog] [role=alert]')?.textContent === 'Scrivi un nome.');
-    await clicca('[role=dialog] button', 'Annulla');
+    // un nome vuoto toglie il nome scelto (#1080): «Salva» attivo, la nota dice cosa torna, e la preferenza si azzera
+    assert.equal(await run(() => [...document.querySelectorAll('[role=dialog] button')].find((e) => e.textContent === 'Salva').disabled), false);
+    await wait(() => document.querySelector('[role=dialog]')?.textContent.includes('Torna al titolo della sessione.'));
+    await clicca('[role=dialog] button', 'Salva');
     await wait(() => !document.querySelector('[role=dialog]'));
-    assert.equal(finto.chiamatePref.length, prima);
+    assert.equal(finto.chiamatePref.length, prima + 1);
+    assert.equal(finto.chiamatePref.at(-1)[1].nome, null);
   });
 
   await check('CARTELLA: «Rinomina etichetta…» salva l’etichetta nelle impostazioni e la barra la mostra', async () => {

@@ -8,8 +8,8 @@ import type { Sessione } from "./tipi";
 export interface ImpostazioniAvvisi { avvisoAttesa?: boolean; avvisoFinita?: boolean; avvisoErrori?: boolean; avvisoLimite?: boolean; suono?: string; silenzio?: string }
 export interface Avviso { titolo: string; corpo: string; silenzioso: boolean; suono?: string }
 
-// shortcut: «Campanello» non ha un suono di sistema omonimo, quindi suona quello predefinito del Mac; se ne sceglie uno, aggiungerlo qui
-const SUONI: Record<string, string> = { Vetro: "Glass", Pop: "Pop" };
+/** Suoni della tendina (119:56546) -> suoni di sistema del Mac; «Campanello» è «Ping», il rintocco di sistema (#1098). */
+export const SUONI: Record<string, string> = { Vetro: "Glass", Campanello: "Ping", Pop: "Pop" };
 
 /** «22:00–8:00» attraversa la mezzanotte; «Mai» o un testo che non è un intervallo = mai in silenzio. */
 export function inSilenzio(silenzio: string, ora: Date): boolean {

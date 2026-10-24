@@ -63,12 +63,6 @@
 .pezzo-chat .menu-casella .riga-veloce .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pezzo-chat .menu-casella .riga-veloce .descrizione { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
 .pezzo-chat .menu-casella.impegno { width: var(--misura-menu-impegno); }
-.pezzo-chat .interruttore {
-  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none; display: flex;
-  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta);
-}
-.pezzo-chat .interruttore.acceso { background: var(--colore-fondo-accento); justify-content: flex-end; }
-.pezzo-chat .interruttore .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
 
 /* messaggio non inviato: la casella tiene il testo con il bordo d'errore, sotto il perché e «Riprova» */
 .pezzo-chat .casella.errore, .pezzo-chat .casella.errore:focus-within { border-color: var(--colore-bordo-errore); }

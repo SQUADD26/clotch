@@ -1,7 +1,7 @@
 // Canali delle impostazioni (#351) che non sono valori salvati: i valori stanno nel file delle preferenze (#368,
 // `sessioni:impostazioni`). Qui: cartelle degli account, scelta e apertura di cartelle, versione, avvio col Mac.
 // Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -14,6 +14,7 @@ import { leggiRegistro, type Registro } from "./clotch-ai";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { creaAggiornamenti } from "./aggiornamento";
 import { provaSilenziosa } from "./modalita-prova";
+import { SUONI } from "./avvisi";
 import { quoteConGiorni } from "./quote-uso";
 import { lavoro } from "./lavori";
 import { accorcia, espandi, trovaRadici } from "./radici";
@@ -107,6 +108,11 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   ipc.handle("impostazioni:profilo", () => profiloUtente(home));
   const aggiornamenti = creaAggiornamenti({ dir: app.getAppPath(), silenzioso: provaSilenziosa(), riapri: () => { app.relaunch(); app.exit(0); } });
   ipc.handle("impostazioni:avvio", (_e, acceso: boolean) => app.setLoginItemSettings({ openAtLogin: acceso === true }));
+  // anteprima del suono scelto in Notifiche (#1098): solo un nome della tendina, mai un percorso dal renderer
+  ipc.handle("impostazioni:prova-suono", (_e, scelto: string) => {
+    const s = SUONI[scelto];
+    if (s && !provaSilenziosa() && process.platform === "darwin") execFile("afplay", [`/System/Library/Sounds/${s}.aiff`], () => {});
+  });
   ipc.handle("impostazioni:elimina-dati", () => {
     eliminaDati(indice, path.join(app.getPath("userData"), "preferenze.json"));
     invia("sessioni:impostazioni", {});

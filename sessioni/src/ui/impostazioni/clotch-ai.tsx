@@ -35,7 +35,8 @@ export default function ClotchAi() {
   const v: Valori = { ...letti, ...inViaggio };
   const manda = async (chiave: string, valore: unknown, fai: () => Promise<EsitoComando | { ok: boolean; testo: string }>) => {
     setInViaggio((x) => ({ ...x, [chiave]: valore }));
-    const e = await fai().catch((err) => ({ ok: false, testo: String(err?.message ?? err) }));
+    // un comando può tornare senza risposta: è un errore da dire, non un'eccezione della pagina (#1099)
+    const e = (await fai().catch((err) => ({ ok: false, testo: String(err?.message ?? err) }))) ?? { ok: false, testo: "clotch AI non risponde" };
     const ok = "esito" in e ? e.esito === "ok" : e.ok;
     if (ok) return;
     setInViaggio(({ [chiave]: _, ...resto }) => resto);

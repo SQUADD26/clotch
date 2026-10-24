@@ -7,7 +7,8 @@ import type { Novita } from "../../tipi";
 
 /** Dati dei dialoghi che ne hanno: «rinomina» (sessione e etichetta di una cartella) e «novita». */
 export interface DatiDialoghi {
-  rinomina: { titolo: string; valore: string; nota: string; salva(nome: string): void };
+  /** `nota`: sotto il campo; `vuoto`: cosa succede col campo vuoto («Torna al titolo della sessione»), vuoto = si toglie il nome scelto. */
+  rinomina: { titolo: string; valore: string; nota: string; vuoto?: string; salva(nome: string): void };
   novita: { versione: string; novita: Novita };
   /** «Scegli le ore…» del silenzio (149-66688): `valore` «22:00–7:00»; `attivo` = [riga, segmento] col fuoco. */
   ore: { valore: string; attivo?: [number, number]; salva(ore: string): void };

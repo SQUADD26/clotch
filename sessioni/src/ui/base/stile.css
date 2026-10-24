@@ -38,5 +38,5 @@ button { cursor: default; }
 ::-webkit-scrollbar-thumb { background: var(--colore-bordo-forte); border-radius: var(--raggio-pieno); min-height: var(--misura-scorrimento-alto); min-width: var(--misura-scorrimento-alto); }
 
 /* bottone premuto (101:19480, «Bottone» 101:35385): fondo riga-scelta; primario, pericolo e invio non hanno variante disegnata */
-button:active:not(:disabled):not(.bottone):not(.pillola):not(.primario):not(.pericolo):not(.attiva):not(.bottone-invia):not(.nuovi-messaggi) { background: var(--colore-fondo-riga-scelta); }
+button:active:not(:disabled):not(.bottone):not(.pillola):not(.primario):not(.pericolo):not(.attiva):not(.bottone-invia):not(.nuovi-messaggi):not([role="switch"], [aria-pressed="true"]) { background: var(--colore-fondo-riga-scelta); }
 .pezzi > span + span { margin-left: var(--spazio-2); }

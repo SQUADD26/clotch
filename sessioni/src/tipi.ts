@@ -301,6 +301,8 @@ export interface ImpostazioniApi {
   profilo(): Promise<Profilo>;
   /** «Apri all'avvio del Mac»: voce degli elementi di login. */
   avvio(acceso: boolean): Promise<void>;
+  /** Fa sentire il suono di sistema di una voce di «Suono» (Notifiche); in prova tace. */
+  provaSuono(scelto: string): Promise<void>;
   /** Quote d'uso per account, dal feed di Clotch (cache 60 s nel main); lancia se il feed non risponde. */
   uso(): Promise<QuotaUso[] | null>;
   /** Sessioni archiviate (#375). */

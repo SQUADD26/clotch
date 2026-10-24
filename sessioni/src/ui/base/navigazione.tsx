@@ -1,8 +1,8 @@
 // Stato condiviso della cornice: vista aperta, sessione scelta, sezione, cronologia (indietro/avanti), barra e pannello aperti.
 // Si parte da ?vista=&sessione=&sezione= (nuova finestra, scene di prova di scena.ts).
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { api } from "./dati";
 import { conTransizione } from "./movimento";
+import { useImpostazioni } from "../impostazioni/stato";
 
 /** «nuova-sessione» (148:51982): la vista per aprire una sessione, montata dalla chat, senza pannello. */
 export type Vista = "sessione" | "nuova-sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
@@ -62,8 +62,9 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
   const [pannelloStretto, setPannelloStretto] = useState(false);
   // le scene di prova aprono Info sessione con `sezione` = «info|…»
   const [pannelloInfo, setInfo] = useState(() => chiaveDi("info"));
-  // «Pannello obiettivo» (Aspetto): com'è all'avvio; valore mancante nel file = aperto
-  useEffect(() => { api().impostazioni().then((v) => setPannelloLargo(v.pannelloAperto !== false), () => {}); }, []);
+  // «Pannello obiettivo» (Aspetto): vale a ogni sessione che si apre e appena cambia, non solo all'avvio (#1097); mancante = aperto
+  const { pannelloAperto: pannelloScelto } = useImpostazioni(), sessioneAperta = storia.passi[storia.i].sessione;
+  useEffect(() => setPannelloLargo(pannelloScelto !== false), [pannelloScelto, sessioneAperta]);
   const adatta = useCallback((stretta: boolean, largo: boolean) => setMisura((m) => (m.stretta === stretta && m.largo === largo ? m : { stretta, largo })), []);
   const vai = useCallback((vista: Vista, sessione?: string | null, sezione?: string | null) => setStoria(({ passi, i }) => {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null,

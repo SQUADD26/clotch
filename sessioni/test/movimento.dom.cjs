@@ -22,7 +22,7 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
     for (const a of [...document.getAnimations(), ...[...document.body.children].flatMap((e) => e.shadowRoot?.getAnimations() ?? [])]) if (!viste.has(a)) {
       const tempi = a.effect.getTiming(), chiavi = a.effect.getKeyframes();
       viste.set(a, { nome: a.animationName ?? a.transitionProperty, pseudo: a.effect.pseudoElement ?? '', classe: String(a.effect.target?.className ?? ''),
-        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations, primo: a.effect.target ? Number(getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null).opacity) : null });
+        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations, parte: Math.round((a.startTime ?? t) - t0), primo: a.effect.target ? Number(getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null).opacity) : null });
     }
     if (t - t0 < ms) requestAnimationFrame(tick); else fine({ animazioni: [...viste.values()], passi: passi.slice(1) });
   };
@@ -50,7 +50,7 @@ app.whenReady().then(async () => {
       for (const [pseudo, tempo, curvaTok] of attese) {
         const a = r.animazioni.find((x) => x.pseudo === pseudo || (pseudo.startsWith('.') && String(x.classe).includes(pseudo.slice(1))));
         assert.ok(a, `${id}: manca l'animazione ${pseudo} (viste: ${r.animazioni.map((x) => x.pseudo || x.nome).join(', ')})`);
-        console.log(`MOV ${id} ${cosa} ${pseudo} durata=${a.durata}ms curva=${curva(a.curva)} fotogrammi=${r.passi.length} persi=${persi} lenti=[${r.passi.filter((p) => p > 25).map((p) => p.toFixed(0))}] mediana=${mediana.toFixed(1)}ms`);
+        console.log(`MOV ${id} ${cosa} ${pseudo} parte=${a.parte}ms durata=${a.durata}ms curva=${curva(a.curva)} fotogrammi=${r.passi.length} persi=${persi} lenti=[${r.passi.filter((p) => p > 25).map((p) => p.toFixed(0))}] mediana=${mediana.toFixed(1)}ms`);
         assert.equal(a.durata, ms(tok[tempo]), `${id} ${pseudo}: durata`);
         assert.equal(curva(a.curva), curva(tok[curvaTok]), `${id} ${pseudo}: curva`);
       }
@@ -139,6 +139,30 @@ app.whenReady().then(async () => {
       setTimeout(() => { removeEventListener('unhandledrejection', f); fine(r); }, 400); })`);
     assert.deepEqual(rifiuti, [], '#750: promesse di View Transition rifiutate senza gestore');
     console.log('MOV-023 due transizioni nello stesso fotogramma: 0 errori');
+
+    // interruttore (#1075): la manopola scorre con transform in tempo-entrata e curva-spostamento, il fondo cambia insieme
+    await run(() => { const i = document.createElement('span'); i.className = 'interruttore prova-int'; i.innerHTML = '<span class="manopola"></span>'; document.body.append(i); return 0; });
+    const int = await run(`window.registra(() => document.querySelector('.prova-int').classList.add('acceso'), 300)`);
+    const man = int.animazioni.find((a) => a.classe === 'manopola' && a.nome === 'transform'), fondo = int.animazioni.find((a) => a.classe.includes('interruttore') && a.nome === 'background-color');
+    const fine = await run(() => getComputedStyle(document.querySelector('.prova-int .manopola')).transform);
+    console.log(`MOV MOV-024 interruttore manopola durata=${man?.durata}ms curva=${man && curva(man.curva)} fondo=${fondo?.durata}ms fine=${fine}`);
+    assert.ok(man && man.durata === ms(tok['tempo-entrata']) && curva(man.curva) === curva(tok['curva-spostamento']), 'MOV-024: la manopola scorre da token');
+    assert.ok(fondo, 'MOV-024: il fondo cambia con una transizione');
+    assert.match(fine, /^matrix\(1, 0, 0, 1, 12, 0\)$/, 'MOV-024: acceso = manopola a destra (32 - 16 - 2×2 = 12 px)');
+    // passaggio (#1074): le azioni della riga compaiono con una dissolvenza; bordi e ombre hanno la transizione
+    win.setSize(1440, 900);
+    await wait(() => innerWidth === 1440 && !!document.querySelector('.riga-sessione'));
+    await new Promise((r) => setTimeout(r, 300));
+    const riga = await run(() => { const r = document.querySelector('.riga-sessione').getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; });
+    const pass = run(`window.registra(() => 0, 250)`);
+    win.webContents.sendInputEvent({ type: 'mouseMove', x: riga.x, y: riga.y });
+    const hov = await pass;
+    const diss = hov.animazioni.find((a) => a.classe.includes('azioni') && a.nome === 'dissolve');
+    const props = await run(() => getComputedStyle(document.querySelector('.casella') ?? document.querySelector('.riga')).transitionProperty);
+    console.log(`MOV MOV-025 passaggio azioni=${diss ? diss.durata + 'ms' : 'nessuna'} transizioni=${props}`);
+    assert.ok(diss && diss.durata === ms(tok['tempo-pressione']), 'MOV-025: le azioni della riga compaiono con dissolvenza in tempo-pressione');
+    assert.match(props, /border-color/); assert.match(props, /box-shadow/);
+    win.webContents.sendInputEvent({ type: 'mouseMove', x: 1, y: 1 });
 
     // riduci movimento: niente gruppi che si spostano, niente scale né infinite
     // controllo positivo: uno spinner gira (infinito, tempo-giro) finché il movimento non è ridotto
