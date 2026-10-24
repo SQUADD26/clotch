@@ -133,7 +133,8 @@ scena("15577", FINITO, messaggi([u("Come si fa la barra laterale trasparente su 
   a("Con vibrancy «sidebar» sulla finestra e lo sfondo della barra trasparente. Lo provo adesso.")]));
 scena("15790", FINITO, messaggi([u("Spedisci tutto in produzione."), bash("git push origin main", "PreToolUse:Bash git push su main non è permesso. La sessione prova un’altra strada.", 0.4, true),
   a("Apro la PR verso dev: la promozione a main parte da lì.")]));
-scena("15993", {}, messaggi([u("Lancia tutte le prove."), bash("npm test", null, 1)], 6 * MIN), { c: chat({ battito: ORA - 6 * MIN }) });
+// oltre i 20 minuti del contratto (NON_RISPONDE_MS): il frame mostra «6 min», qui è «21 min»
+scena("15993", {}, messaggi([u("Lancia tutte le prove."), bash("npm test", null, 1)], 6 * MIN), { c: chat({ battito: ORA - 21 * MIN }) });
 scena("16211", { ...FERMA, situazione: { adesso: "limite", strumento: null, inCoda: 0, segni: [] } },
   messaggi([u("Continua con le schermate degli stati."), a("Ho finito 9 schermate su 14.")]), { c: chat(LIMITE) });
 scena("45507", { ...ASPETTA, titolo: "Backend: auth e RLS", icona: "database", progetto: "squadd-v2", ramo: "feat/2412-rls-sessioni", account: ".claude-squadd",

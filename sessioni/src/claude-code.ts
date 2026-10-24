@@ -7,7 +7,7 @@ import { Radice } from "./radici";
 import { situazioneClaude } from "./situazione";
 import { ErroreLettura, Sessione } from "./tipi";
 
-/** Esportata: il worker d'avvio la riempie e il main la copia (cache.ts). */
+/** Esportata: il worker d'avvio la riempie e il main la copia (api.ts). Per file; a ogni giro quelli spariti escono (leggiRadice). */
 export const cache = new Map<string, { chiave: string; s: Sessione | null }>();
 
 /** Ultimo pezzo della cartella: il nome del progetto. */
@@ -57,16 +57,22 @@ function daFile(file: string, radice: Radice, size: number, mtime: number): Sess
   };
 }
 
+/** Un file sparito esce dalla cache (era per radice: ora per file, perché il worker d'avvio la copia così). */
+function sfoltisci(progetti: string, viste: Set<string>) {
+  for (const k of cache.keys()) if (k.startsWith(progetti + path.sep) && !viste.has(k)) cache.delete(k);
+}
+
 export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[] {
   const progetti = path.join(radice.path, "projects");
   let cartelle: string[];
   try {
     cartelle = fs.readdirSync(progetti);
   } catch (e: any) {
+    sfoltisci(progetti, new Set());
     if (e.code !== "ENOENT") errori.push({ percorso: progetti, messaggio: msgErrore(e) });
     return [];
   }
-  const out: Sessione[] = [];
+  const viste = new Set<string>(), out: Sessione[] = [];
   for (const c of cartelle) {
     let files: string[];
     try {
@@ -79,17 +85,19 @@ export function leggiRadice(radice: Radice, errori: ErroreLettura[]): Sessione[]
       const file = path.join(progetti, c, n);
       try {
         const st = fs.statSync(file);
-        const chiave = `${st.mtimeMs}:${st.size}`;
+        const chiave = `${st.ino}:${st.mtimeMs}:${st.ctimeMs}:${st.size}`; // come altre-sorgenti.ts: riscritto a pari mtime e misura = riletto
         let e = cache.get(file);
         if (!e || e.chiave !== chiave) {
           e = { chiave, s: daFile(file, radice, st.size, st.mtimeMs) };
           cache.set(file, e);
         }
+        viste.add(file);
         if (e.s) out.push({ ...e.s });
       } catch (err: any) {
         errori.push({ percorso: file, messaggio: msgErrore(err) });
       }
     }
   }
+  sfoltisci(progetti, viste);
   return out;
 }

@@ -296,5 +296,3 @@ test("casella senza permessi di scrittura: non_scritto, senza .tmp lasciati", as
   const e = await inviaComando(h, "ferma_tutto", {}, opz);
   assert.deepEqual([e.esito, e.id, fs.readdirSync(casella(h))], ["non_scritto", null, []]);
 });
-
-test("non risponde: soglia dell'app diversa da quella del motore (20 min)", { todo: "aperto-codex: src/ui/chat/clotch-ai.ts e NON_RISPONDE_MS usano 180 s, il contratto e friday_triage.FERMO_S 20 min" }, () => {}); // nome del protocollo del motore

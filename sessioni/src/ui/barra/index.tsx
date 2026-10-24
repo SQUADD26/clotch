@@ -29,8 +29,8 @@ export type Aperto =
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
 const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
 
-// La vista (filtri, raggruppa, ordina) vive quanto la finestra: la barra si smonta nelle impostazioni e deve ritrovarla.
-let vistaRicordata: Vista | null = null;
+// Lo stato di elenco sopravvive allo smontaggio della Barra (impostazioni, barra laterale chiusa).
+const conservato = { vista: { filtri: [], raggruppa: "cartella", ordina: "attivita" } as Vista, chiuse: new Set<string>(), aperteAMano: new Set<string>() };
 
 export default function Barra() {
   const n = useNavigazione();
@@ -47,22 +47,19 @@ export default function Barra() {
   const adesso = p?.ora ?? Date.now();
   const sessioni = elenco.dati?.sessioni ?? [];
 
-  const [vista, setVistaLocale] = useState<Vista>(p?.vista ?? vistaRicordata ?? { filtri: [], raggruppa: "cartella", ordina: "attivita" });
-  const setVista = (v: Vista) => { if (!p) vistaRicordata = v; setVistaLocale(v); };
+  const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
   const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
-  const [chiuse, setChiuse] = useState<Set<string>>(new Set());
+  const [chiuse, setChiuse] = useState<Set<string>>(conservato.chiuse);
   const [suggerimento, setSuggerimento] = useState<{ testo: string; a: Punto } | null>(p?.suggerimento ?? null);
   const barra = useMemo(() => componi(sessioni, vista, pref, adesso), [sessioni, vista, pref, adesso]);
   const pagina = p?.pagina ?? n.vista;
   const scelta = pagina === "sessione" ? (p?.scelta ?? n.sessione) : null;
-  // aperta: la cartella della sessione scelta, quelle aperte a mano e, con un filtro attivo, tutte (i risultati si vedono);
-  // chiuse a mano restano chiuse, finché il filtro non cambia
+  // aperta: la cartella della sessione scelta, quelle aperte a mano e (con un filtro attivo) quelle con i risultati; chiuse a mano restano chiuse
   const filtrato = vista.filtri.some((f) => f.valori.length);
-  const firmaFiltri = JSON.stringify(vista.filtri);
-  useEffect(() => setChiuse(new Set()), [firmaFiltri]);
-  const [aperteAMano, setAperteAMano] = useState<Set<string>>(new Set(p?.aperte ?? []));
-  const aperta = (chiave: string) => !chiuse.has(chiave) && (filtrato || aperteAMano.has(chiave) || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
+  const [aperteAMano, setAperteAMano] = useState<Set<string>>(p ? new Set(p.aperte ?? []) : conservato.aperteAMano);
+  useEffect(() => { if (!p) Object.assign(conservato, { vista, chiuse, aperteAMano }); }, [p, vista, chiuse, aperteAMano]);
+  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
     setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });

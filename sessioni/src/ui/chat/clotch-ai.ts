@@ -20,8 +20,8 @@ export function useOra(ogniMs = 30_000) {
   return ora;
 }
 
-// stessa regola di `nonRisponde` in src/clotch-ai.ts (lì non si importa: quel file usa node:fs)
-const NON_RISPONDE_MS = 180_000;
+// stessa regola e stessa soglia (20 minuti) di `nonRisponde` in src/clotch-ai.ts (lì non si importa: quel file usa node:fs); un test le confronta
+const NON_RISPONDE_MS = 1_200_000;
 export const nonRisponde = (c: ChatClotchAi, ora: number) => c.stato === "lavora" && !c.fine && ora - (c.battito ?? 0) > NON_RISPONDE_MS;
 
 /** Manda un comando a clotch AI e dà l'esito intero (null = il canale verso il motore è caduto), senza avvisi: chi lo usa mostra il perché da sé. */
