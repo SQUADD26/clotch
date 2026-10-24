@@ -84,8 +84,8 @@ app.whenReady().then(async () => {
   await check('MESSAGGI_OSTILI_SONO_SOLO_TESTO', async () => {
     await carica({ vista: 'sessione', sessione: 's1' });
     await wait(() => document.querySelector('.messaggio-roberto .bolla')?.textContent.includes('<script>window.__pwn=1</script>'));
-    await run(() => document.querySelectorAll('.filo button.testata').forEach((b) => b.getAttribute('aria-expanded') === 'false' && b.click()));
-    await attesa(300);
+    // tutto aperto: gruppi, righe e ragionamento del filo compatto (#876) si aprono a strati
+    for (let i = 0; i < 3; i++) { await run(() => document.querySelectorAll('.filo button[aria-expanded="false"]').forEach((b) => b.click())); await attesa(300); }
     const r = await run(() => { const f = document.querySelector('.filo');
       return { vivi: f.querySelectorAll('img,iframe,object,embed,a,script,style,form,video,audio,[onerror],[onload],[onclick],[href]').length,
         testo: f.innerText, pwn: !!window.__pwn, corpo: getComputedStyle(document.body).display }; });
