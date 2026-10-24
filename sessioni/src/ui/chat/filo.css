@@ -15,6 +15,8 @@
 }
 
 .pezzo-chat .risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }
+/* risposta con titoli, elenchi, codice o tabelle: 12 px tra testo e azioni (131:59867 -> 131:59889); il solo paragrafo resta a 8 */
+.pezzo-chat .risposta:has(.markdown > :not(p)) { gap: var(--spazio-3); }
 .pezzo-chat .testo-risposta {
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); color: var(--colore-testo-primario);
   white-space: normal; overflow-wrap: anywhere;
@@ -111,20 +113,3 @@
 .pezzo-chat .turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
 /* avvisi e modifiche aperte stanno a spazio/6 dai vicini del turno (101:15790, 101:14631) */
 .pezzo-chat .turno > .avviso-filo, .pezzo-chat .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }
-
-/* Stessa pelle e stessi token del testo/codice approvati; nuove gerarchie in review Figma. */
-.pezzo-chat .testo-risposta > :first-child { margin-top: 0; }
-.pezzo-chat .testo-risposta > :last-child { margin-bottom: 0; }
-.pezzo-chat .testo-risposta p, .pezzo-chat .testo-risposta ul, .pezzo-chat .testo-risposta ol,
-.pezzo-chat .testo-risposta blockquote, .pezzo-chat .testo-risposta .markdown-codice,
-.pezzo-chat .testo-risposta .tabella-markdown { margin: var(--spazio-3) 0; }
-.pezzo-chat .testo-risposta :is(h1,h2,h3,h4,h5,h6) { font-size: inherit; margin: var(--spazio-4) 0 var(--spazio-2); }
-.pezzo-chat .testo-risposta :is(ul,ol) { padding-left: var(--spazio-6); }
-.pezzo-chat .testo-risposta a { color: var(--colore-testo-link); text-decoration: underline; }
-.pezzo-chat .testo-risposta code { font-family: var(--testo-famiglia-codice); }
-.pezzo-chat .testo-risposta pre { margin: 0; overflow-x: auto; white-space: pre; }
-.pezzo-chat .testata-codice { display: flex; align-items: center; justify-content: space-between; color: var(--colore-testo-secondario); }
-.pezzo-chat .tabella-markdown { overflow-x: auto; }
-.pezzo-chat .tabella-markdown table { border-collapse: collapse; }
-.pezzo-chat .tabella-markdown :is(th,td) { text-align: start; padding: var(--spazio-2) var(--spazio-3); border-bottom: var(--misura-tratto) solid var(--colore-bordo-normale); }
-.pezzo-chat .testo-risposta blockquote { margin-left: 0; padding-left: var(--spazio-3); border-left: var(--misura-tratto) solid var(--colore-bordo-normale); }

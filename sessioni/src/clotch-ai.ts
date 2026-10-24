@@ -12,7 +12,7 @@ export const STATI_CLOTCH_AI = ["lavora", "aspetta", "finito", "serve_roberto", 
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta", "zitto",
+  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 20 minuti», come friday_triage.FERMO_S (la copia della UI è in ui/chat/clotch-ai.ts). Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 1_200_000;
@@ -65,9 +65,7 @@ export interface Registro {
   fermoTutto: boolean;
   avvisi: { id: string; t: number | null; testo: string; livello: string; motivo: string; dettoDa: string | null; sessioni: string[] }[];
   /** `versione`: CFBundleShortVersionString di Clotch, se l'evento la porta (#344). */
-  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number;
-    /** Parziale di quello che Clotch capisce mentre Roberto parla (claude-config#2572): assente se non parla o se più vecchio di 10 s. */
-    testo?: string } | null;
+  clotch: { voce: string; parla: boolean; ascolta: boolean; versione?: string | null; t: number } | null;
   /** Ultimo evento `friday` (avvio, stop, …): dice se il motore è acceso. */ // nome del protocollo del motore
   clotchAi: { evento: string; t: number } | null;
   /** Comandi presi dalla casella, in ordine. */
@@ -184,10 +182,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
           c.obiettivo = { stato: String(d.stato ?? ""), testo: String(d.testo ?? "") };
           break;
         }
-        case "clotch": if (t !== null) {
-          const testo = d.ascolta === true && typeof d.testo === "string" && d.testo && Date.now() - t <= 10_000 ? d.testo.slice(0, 2000) : undefined;
-          r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t, ...(testo ? { testo } : {}) };
-        } break;
+        case "clotch": if (t !== null) r.clotch = { voce: String(d.voce ?? "spenta"), parla: d.parla === true, ascolta: d.ascolta === true, versione: s(d.versione), t }; break;
         case "fermo":
           if (d.ambito === "tutto") r.fermoTutto = d.acceso === true;
           else if (d.ambito === "chat" && s(d.chi)) {

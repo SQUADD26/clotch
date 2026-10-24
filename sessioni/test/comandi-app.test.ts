@@ -15,5 +15,5 @@ test("voce_ferma senza frasi in corso è ok; in prova silenziosa il segnale a Cl
   assert.equal(staParlando(), false);
   fermaVoce();
   assert.equal((await eseguiComandoApp("voce_ferma")).esito, "ok");
-  assert.equal((await eseguiComandoApp("clotch_dettatura")).esito, "non_scritto");
+  for (const c of ["clotch_dettatura", "clotch_interrompi_voce"] as const) assert.equal((await eseguiComandoApp(c)).esito, "non_scritto");
 });
