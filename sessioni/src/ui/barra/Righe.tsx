@@ -1,6 +1,6 @@
 // figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta), «Piede barra laterale».
-import type { MouseEvent, ReactNode } from "react";
-import type { PreferenzeSessione, Sessione } from "../../tipi";
+import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import type { PreferenzeSessione, Profilo, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
@@ -97,12 +97,24 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figl
   );
 }
 
+let letto: Promise<Profilo> | undefined;
+/** Nome e iniziali dell'utente, dal main (account Claude o macOS); vuoti finché non arrivano. */
+export function useProfilo(): Profilo {
+  const [p, setP] = useState<Profilo>({ nome: "", iniziali: "" });
+  useEffect(() => {
+    letto ??= window.impostazioni.profilo();
+    letto.then(setP, () => { letto = undefined; });
+  }, []);
+  return p;
+}
+
 export function Piede({ dettaglio, onMenu, onImpostazioni }: { dettaglio: string; onMenu(e: MouseEvent): void; onImpostazioni(): void }) {
+  const { nome, iniziali } = useProfilo();
   return (
     <div className="piede">
-      <button type="button" className="avatar" onClick={onMenu}><span className="t-xs medio">RB</span></button>
+      <button type="button" className="avatar" onClick={onMenu}><span className="t-xs medio">{iniziali}</span></button>
       <button type="button" className="testi" onClick={onMenu}>
-        <span>Roberto Bondici</span>
+        <span>{nome}</span>
         <span className="t-xs secondario">{dettaglio}</span>
       </button>
       <BottoneIcona icona="impostazioni" etichetta="Impostazioni" onClick={onImpostazioni} />

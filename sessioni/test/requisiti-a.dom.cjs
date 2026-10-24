@@ -278,4 +278,22 @@ H.avvia('requisiti-a', async () => {
     assert.equal(await run(() => document.querySelector('textarea').value), 'bozza che resta');
   });
 
+  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Info su clotch» apre Info
+    nuova(); rispondi['impostazioni:profilo'] = () => ({ nome: 'Anna Verdi', iniziali: 'AV' }); await caricaChat();
+    await wait(() => document.querySelector('.piede .avatar')?.textContent === 'AV');
+    assert.equal((await testo('.piede .testi span'))[0], 'Anna Verdi');
+    await run(() => document.querySelector('.piede .avatar').click()); await wait(() => !!document.querySelector('[role=menu] .testata'));
+    assert.equal((await testo('[role=menu] .testata .medio'))[0], 'Anna Verdi');
+    await clicca('[role=menu] .voce', 'Info su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
+  });
+
+  await req('A27', async () => { // il menu dell'app macOS: «Informazioni su clotch» e le voci standard
+    const { menuApp } = require(H.root + '/dist/src/branding.js');
+    const m = menuApp(), app = m[0].submenu.map((v) => v.label || v.type);
+    assert.equal(m[0].label, 'clotch');
+    assert.deepEqual(m[0].submenu.map((v) => v.role).filter(Boolean), ['about', 'services', 'hide', 'hideOthers', 'unhide', 'quit']);
+    assert.equal(app[0], 'Informazioni su clotch'); assert.equal(app.at(-1), 'Esci da clotch');
+    assert.deepEqual(m.slice(1).map((v) => v.role), ['fileMenu', 'editMenu', 'viewMenu', 'windowMenu']);
+  });
+
 });

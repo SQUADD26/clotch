@@ -259,6 +259,9 @@ export interface QuotaUso { account: string; usato: number; ripartenza: string; 
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }
 
+/** Chi usa l'app: nome intero e iniziali, per il piede della barra e il menu del profilo. */
+export interface Profilo { nome: string; iniziali: string }
+
 /** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
 export interface ImpostazioniApi {
   /** Cartelle ~/.claude* trovate nella home. */
@@ -268,6 +271,8 @@ export interface ImpostazioniApi {
   scegliCartella(): Promise<string | null>;
   apri(percorso: string): Promise<void>;
   versione(): Promise<string>;
+  /** Nome e iniziali dell'utente: dall'account Claude, se no da macOS. */
+  profilo(): Promise<Profilo>;
   /** «Apri all'avvio del Mac»: voce degli elementi di login. */
   avvio(acceso: boolean): Promise<void>;
   /** Quote d'uso per account, dal feed di Clotch (cache 60 s nel main); lancia se il feed non risponde. */

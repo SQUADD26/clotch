@@ -6,8 +6,10 @@ import { api } from "../base/dati";
 import { avvisa } from "../base/Avvisi";
 import { apriDialogo, apriNovita, verificaAggiornamenti } from "../base/dialoghi";
 import { Menu, type VoceMenu } from "../base/Menu";
+import { useNavigazione } from "../base/navigazione";
 import { imposta, useImpostazioni } from "../impostazioni/stato";
 import { conEtichetta, nuoveEscluse } from "./elenco";
+import { useProfilo } from "./Righe";
 import type { Punto } from "./Sovrapposti";
 
 const azione = (id: string, a: AzioneSessione) => () => { void api().azione(id, a); };
@@ -63,13 +65,15 @@ export function MenuCartella({ sessioni, chiave, etichetta, a, inizio, onChiudi 
 }
 
 export function MenuProfilo({ dettaglio, a, inizio, onImpostazioni, onChiudi }: { dettaglio: string; a: Punto; inizio?: number; onImpostazioni(): void; onChiudi(): void }) {
+  const n = useNavigazione();
+  const { nome } = useProfilo();
   const voci: VoceMenu[] = [
     { icona: "impostazioni", etichetta: "Impostazioni", scorciatoia: "⌘,", fai: onImpostazioni },
     { icona: "tastiera", etichetta: "Scorciatoie da tastiera", scorciatoia: "⌘/", fai: () => apriDialogo("scorciatoie") },
     { icona: "scintille", etichetta: "Novità", fai: () => void apriNovita() },
     { icona: "aggiorna", etichetta: "Verifica aggiornamenti…", fai: () => void verificaAggiornamenti() },
     "separatore",
-    { icona: "info", etichetta: "Info su clotch", fai: onImpostazioni },
+    { icona: "info", etichetta: "Info su clotch", fai: () => n.apri("impostazioni", undefined, "info") },
   ];
-  return <Menu testata={{ titolo: "Roberto Bondici", dettaglio }} voci={voci} inizio={inizio} onChiudi={onChiudi} style={posto(a)} />;
+  return <Menu testata={{ titolo: nome, dettaglio }} voci={voci} inizio={inizio} onChiudi={onChiudi} style={posto(a)} />;
 }
