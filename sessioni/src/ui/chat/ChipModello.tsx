@@ -1,5 +1,5 @@
 // figma: 148-28674 — «Selettore modello · Menu aperto» (148-28740 con «Impegno» a destra, 148-28806 «Modalità veloce»); chip modello 101:24829.
-import { useEffect, useState, type KeyboardEvent as TastoReact } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as TastoReact } from "react";
 import type { ModelloMotore } from "../../tipi";
 import { api } from "../base/dati";
 import { Icona } from "../base/Icona";
@@ -9,6 +9,8 @@ import { Interruttore } from "../impostazioni/controlli";
 import { ChipMenu, type Dati, type Imposta } from "./Chip";
 import { haRapida, modelliMenu, modelloDi, nomeModello, etichettaModello, sforziDi, sforzoDi, SFORZO_BASE, voceCatalogo, type Scelta } from "./scelte";
 
+let catalogo: ModelloMotore[] | null = null; // l'ultimo letto: il menu si apre già con l'elenco giusto, senza saltare quando arriva
+
 /** Modello e impegno in un giro solo (148:28674): scegliere o passare su un modello apre il suo «Impegno» a destra (148:28740), e scegliere l'impegno sceglie anche il modello;
  *  in fondo «Modalità veloce» (148:28806). Le scorciatoie 1-4 scelgono il modello. Dal catalogo del motore (`modelli.json`): modelli, impegni di ogni modello (`[]` = nessun
  *  «Impegno»), interruttore veloce solo se `rapida`, impegno predefinito `sforzo_default`, «Altri modelli» oltre ai quattro principali; senza catalogo vale la lista fissa.
@@ -16,12 +18,13 @@ import { haRapida, modelliMenu, modelloDi, nomeModello, etichettaModello, sforzi
 export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefinito, impegnoAperto = false }: Dati & {
   imposta: Imposta; aperto: boolean; onAperto(a: boolean): void; disabled: boolean; predefinito?: string; impegnoAperto?: boolean;
 }) {
-  const [cat, setCat] = useState<ModelloMotore[] | null>(null);
-  useEffect(() => { void api().modelli().then(setCat, () => setCat(null)); }, [aperto]);
+  const [cat, setCat] = useState<ModelloMotore[] | null>(catalogo);
+  useEffect(() => { void api().modelli().then((c) => setCat(catalogo = c), () => setCat(null)); }, [aperto]);
   const modello = modelloDi(s, p), base = (id: string | null | undefined) => voceCatalogo(cat, id)?.sforzo_default ?? SFORZO_BASE;
   const sforzo = sforzoDi(p, base(modello)), rapida = p?.rapida === true && haRapida(cat, modello), conImpegno = sforziDi(cat, modello).length > 0;
   const nome = etichettaModello(modello) ?? nomeModello(modello ?? null);
   const { principali, altri } = modelliMenu(cat);
+  const partenza = useRef<HTMLElement | null>(null);
   const [impegno, setImpegno] = useState(impegnoAperto), [anteprima, setAnteprima] = useState<string | null>(null), [altriAperti, setAltriAperti] = useState(false);
   const mostrato = anteprima ?? modello, sforzi = sforziDi(cat, mostrato);
   const apri = (a: boolean) => { setImpegno(false); setAnteprima(null); setAltriAperti(false); onAperto(a); };
@@ -36,17 +39,19 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
   /** Frecce dentro «Impegno»: su e giù tra le voci, ← torna al modello. */
   const frecce = (e: TastoReact<HTMLElement>, modello: () => HTMLElement | null) => {
     const b = [...e.currentTarget.querySelectorAll<HTMLElement>("button")], i = b.indexOf(document.activeElement as HTMLElement);
-    if (e.key === "ArrowLeft") modello()?.focus();
+    if (e.key === "Tab") apri(false);
+    else if (e.key === "ArrowLeft") modello()?.focus();
     else if (e.key === "ArrowDown" || e.key === "ArrowUp") b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
     else return;
     e.preventDefault();
     e.stopPropagation();
   };
+  const uso = (id: string) => !!modello?.startsWith(id); // l'id in uso può avere il suffisso di data
   const voce = (m: Scelta, numero?: number) => (
-    <button key={m.id} type="button" role="menuitemradio" aria-checked={m.id === modello} className={m.id === modello ? "voce scelta" : "voce"}
+    <button key={m.id} type="button" role="menuitemradio" aria-checked={uso(m.id)} className={uso(m.id) ? "voce scelta" : "voce"}
       onClick={() => scegliModello(m.id)} onMouseEnter={() => { setImpegno(true); setAnteprima(m.id); }} onFocus={() => setAnteprima(m.id)} onKeyDown={(e) => { if (e.key === "ArrowRight") { setImpegno(true); setTimeout(() => document.querySelector<HTMLElement>(".sovrapposto.impegno button")?.focus()); } }}>
-      <span className="testa"><span className="etichetta">{m.etichetta}</span>{m.id === predefinito && <span className="predefinito">Predefinito</span>}</span>
-      {m.id === modello ? <Icona nome="spunta" /> : numero ? <span className="numero">{numero}</span> : null}
+      <span className="testa"><span className="etichetta">{m.etichetta}</span>{!!predefinito?.startsWith(m.id) && <span className="predefinito">Predefinito</span>}</span>
+      {uso(m.id) ? <Icona nome="spunta" /> : numero ? <span className="numero">{numero}</span> : null}
     </button>
   );
   return (
@@ -75,7 +80,7 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
       {impegno && sforzi.length > 0 && (
         // a destra del menu, in cima; a sinistra se a destra non c'è posto (base/Sovrapposto); ← torna al modello
         <Sovrapposto lato="destra" scarto={misura("spazio-1")} className="menu-casella impegno" role="group" label="Impegno" onChiudi={() => setImpegno(false)}>
-          <div onKeyDown={(e) => frecce(e, () => document.querySelector<HTMLElement>(".menu-casella.flottante.destra button.scelta, .menu-casella.flottante.destra button"))}>
+          <div onKeyDown={(e) => frecce(e, () => partenza.current ?? document.querySelector<HTMLElement>(".menu-casella.flottante.destra button.scelta, .menu-casella.flottante.destra button"))}>
           <div className="titolo-gruppo">Impegno</div>
           {sforzi.map((x) => {
             const scelto = x.id === sforzoDi(p, base(mostrato)).id; // l'impegno scelto vale per ogni modello
