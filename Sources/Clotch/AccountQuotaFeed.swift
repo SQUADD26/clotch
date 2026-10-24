@@ -42,13 +42,18 @@ import ClotchCore
 
     private func apply(_ data: Data?) {
         let now = Date()
-        if let data, let list = AccountQuotas.parse(data, now: now) {
+        if let data, let list = AccountQuotas.parse(data, now: now, registered: Self.registered()) {
             if list != accounts { accounts = list }
             fetchedAt = now
             lastFetchFailed = false
         } else {
             lastFetchFailed = true
         }
+    }
+
+    private static func registered() -> [String] {
+        let file = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/claude-accounts/accounts.json")
+        return (try? Data(contentsOf: file)).map(RegisteredAccounts.emails(from:)) ?? []
     }
 
     private nonisolated static func request() -> URLRequest {
