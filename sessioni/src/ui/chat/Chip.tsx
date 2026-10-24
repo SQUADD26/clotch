@@ -20,8 +20,8 @@ export function NomeSopra({ testo, nascosto, children }: { testo: string; nascos
 }
 
 /** Un chip che apre il suo menu sopra di sé (base/Sovrapposto: Esc o un clic fuori lo chiudono, il fuoco torna al chip); le frecce passano da una voce all'altra. */
-export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, children }: {
-  aperto: boolean; onAperto(a: boolean): void; lato: "sinistra" | "destra"; etichetta: string; disabled?: boolean; chip: ReactNode; children: ReactNode;
+export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, pericolo, children }: {
+  pericolo?: boolean; aperto: boolean; onAperto(a: boolean): void; lato: "sinistra" | "destra"; etichetta: string; disabled?: boolean; chip: ReactNode; children: ReactNode;
 }) {
   const [menu, setMenu] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -41,7 +41,7 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
   return (
     <span className="chip-menu">
       <NomeSopra testo={etichetta} nascosto={aperto}>
-        <button type="button" className="chip" aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
+        <button type="button" className={pericolo ? "chip pericolo" : "chip"} aria-haspopup="menu" aria-expanded={aperto} aria-label={etichetta} disabled={disabled} onClick={() => onAperto(!aperto)}>{chip}</button>
       </NomeSopra>
       {aperto && (
         <Sovrapposto lato="sopra" fine={lato === "destra"} scarto={numero(lato === "destra" ? "spazio-1" : "spazio-2")} className={`menu-casella flottante ${lato}`} role="menu"
@@ -70,10 +70,10 @@ function ListaScelta({ titolo, voci, scelto, onScegli }: { titolo: string; voci:
 }
 
 export function ChipPermessi({ s, p, imposta, aperto, onAperto, disabled }: Dati & { imposta: Imposta; aperto: boolean; onAperto(a: boolean): void; disabled: boolean }) {
-  const id = permessiDi(s, p);
+  const id = permessiDi(s, p), voce = PERMESSI.find((v) => v.id === id)!;
   return (
-    <ChipMenu aperto={aperto} onAperto={onAperto} lato="sinistra" etichetta="Permessi" disabled={disabled}
-      chip={<><Icona nome="mano" /><span className="etichetta">{PERMESSI.find((v) => v.id === id)!.etichetta}</span><Icona nome="giu" /></>}>
+    <ChipMenu aperto={aperto} onAperto={onAperto} lato="sinistra" etichetta="Permessi" disabled={disabled} pericolo={voce.pericolo}
+      chip={<><Icona nome="mano" colore={voce.pericolo ? "errore" : undefined} /><span className="etichetta">{voce.etichetta}</span><Icona nome="giu" /></>}>
       <ListaScelta titolo="Permessi" voci={PERMESSI} scelto={id} onScegli={(permessi) => { onAperto(false); imposta({ permessi }); }} />
     </ChipMenu>
   );

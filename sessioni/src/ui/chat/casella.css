@@ -23,6 +23,8 @@
 }
 /* fuoco da tastiera come il Bottone icona (153:71027): 2 px dentro, su ogni controllo della riga */
 .pezzo-chat .casella .chip:focus-visible, .pezzo-chat .bottone-invia:focus-visible { outline-width: var(--misura-tratto-forte); outline-offset: calc(-1 * var(--misura-tratto-forte)); }
+.pezzo-chat .casella .chip.pericolo { background: var(--colore-fondo-errore); color: var(--colore-testo-errore); } /* «Tutto senza chiedere»: piccolo avviso rosso, niente di allarmante (#1166) */
+.pezzo-chat .casella button.chip.pericolo:hover:not(:disabled), .pezzo-chat .casella button.chip.pericolo[aria-expanded="true"] { background: var(--colore-fondo-errore); box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--colore-testo-errore) 14%, transparent); }
 .pezzo-chat .casella .chip .modello { color: var(--colore-testo-primario); }
 .pezzo-chat .bottone-invia {
   width: var(--misura-bottone-invio); height: var(--misura-bottone-invio); flex: none; border-radius: var(--raggio-pieno);
