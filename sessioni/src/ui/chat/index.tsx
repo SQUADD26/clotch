@@ -11,6 +11,7 @@ import { NotaSchermo } from "./CasellaVoce";
 import { Filo } from "./Filo";
 import { nonRisponde, useChatClotchAi, useOra } from "./clotch-ai";
 import { TestaSessione } from "./Intestazione";
+import { IntestazioneNuovaSessione, NuovaSessione } from "./NuovaSessione";
 import { Trova } from "./Trova";
 import { Limite, NonRisponde } from "./Lavoro";
 import { voci as daMessaggi, type Voce } from "./modello";
@@ -36,11 +37,16 @@ export function Intestazione() {
   const p = usePreferenze().dati;
   const c = useChatClotchAi(s?.id ?? null);
   const adesso = useOra();
+  if (useNavigazione().vista === "nuova-sessione") return <IntestazioneNuovaSessione />;
   if (!s) return null;
   return <TestaSessione s={s} nonRisponde={!!c && nonRisponde(c, adesso)} pref={p[s.id]} />;
 }
 
 export default function Chat() {
+  return useNavigazione().vista === "nuova-sessione" ? <NuovaSessione /> : <ChatSessione />;
+}
+
+function ChatSessione() {
   const { elenco, s, sezione } = useSessione();
   const { vista, sessione, apri } = useNavigazione();
   const recente = elenco.dati?.sessioni[0]?.id; // l'elenco è già dalla più recente

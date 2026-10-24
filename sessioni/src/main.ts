@@ -27,6 +27,7 @@ import { apriFinestra, parita } from "./finestra";
 import { infoSessione } from "./info-sessione";
 import { collegaClotchAi } from "./clotch-ai-ipc";
 import { collegaImpostazioni } from "./impostazioni";
+import { collegaNuovaSessione } from "./nuova-sessione";
 import { collegaIndice } from "./indice-ipc";
 import { leggiImpostazioni } from "./preferenze";
 import { collegaCasella } from "./casella-ipc";
@@ -105,6 +106,7 @@ app.whenReady().then(() => {
   };
   collegaPreferenze(ipcMain, invia, sessioni);
   collegaCasella(ipcMain, sessioni);
+  collegaNuovaSessione(ipcMain, () => sessioni.elencoSessioni().sessioni);
   collegaImpostazioni(ipcMain, sessioni, indice, invia);
   collegaAllegati(ipcMain, os.homedir(), (id) => sessioni.elencoSessioni().sessioni.find((x) => x.id === id)?.file ?? null);
   let avvisa = (_a: Aggiornamento) => {}; // diventa quello vero dopo la prima finestra

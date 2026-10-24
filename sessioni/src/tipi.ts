@@ -284,3 +284,18 @@ export interface ImpostazioniApi {
 }
 
 export interface Novita { data: string; voci: string[] }
+
+/** Una cartella dove aprire una sessione: percorso assoluto e nome corto. */
+export interface CartellaAvvio { percorso: string; nome: string }
+/** Cosa c'è in una cartella: se è un repo git, i suoi rami locali e quello di partenza («dev», poi «main», poi quello attuale). */
+export interface ContestoCartella { git: boolean; rami: string[]; predefinito: string | null }
+/** `window.nuovaSessione`: le scelte di «Nuova sessione» che servono dati del Mac. Solo letture, più il dialogo di scelta. */
+export interface NuovaSessioneApi {
+  /** Le cartelle delle sessioni già lette, dalla più recente, e la cartella di casa (per «Nessuna cartella»). */
+  cartelle(): Promise<{ recenti: CartellaAvvio[]; casa: string }>;
+  contesto(cartella: string): Promise<ContestoCartella>;
+  /** Gli `Host` di ~/.ssh/config, senza caratteri jolly. */
+  ssh(): Promise<string[]>;
+  /** Dialogo nativo «Apri cartella…»; null se annullato. */
+  scegliCartella(): Promise<CartellaAvvio | null>;
+}

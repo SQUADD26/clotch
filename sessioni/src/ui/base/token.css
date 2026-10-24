@@ -241,6 +241,13 @@
   --misura-menu-modello: 320px;
   --misura-onda-barra: 3px;
   --misura-menu-permessi: 336px;
+  --misura-casella-testo-max: 240px;
+  --misura-menu-impegno: 200;
+  --misura-allegato-lato: 120;
+  --misura-allegato-x: 20;
+  --misura-finestra-stretta: 480;
+  --misura-allegato-avviso-largo: 734;
+  --misura-menu-avvio-largo: 320;
   --ombra-raggio: 32px;
   --ombra-y: 16px;
   --ombra-espansione: -8px;

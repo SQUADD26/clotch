@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
-import type { Aggiornamento, CasellaApi, ClotchAiApi, ImpostazioniApi, PreferenzeSessione, SessioniApi } from "./tipi";
+import type { Aggiornamento, CasellaApi, ClotchAiApi, ImpostazioniApi, NuovaSessioneApi, PreferenzeSessione, SessioniApi } from "./tipi";
 
 const api: SessioniApi = {
   elencoSessioni: () => ipcRenderer.invoke("sessioni:elenco"),
@@ -83,3 +83,11 @@ const casella: CasellaApi = {
   skill: (account) => ipcRenderer.invoke("casella:skill", account),
 };
 contextBridge.exposeInMainWorld("casella", casella);
+
+const nuovaSessione: NuovaSessioneApi = {
+  cartelle: () => ipcRenderer.invoke("nuova:cartelle"),
+  contesto: (cartella) => ipcRenderer.invoke("nuova:contesto", cartella),
+  ssh: () => ipcRenderer.invoke("nuova:ssh"),
+  scegliCartella: () => ipcRenderer.invoke("nuova:scegli-cartella"),
+};
+contextBridge.exposeInMainWorld("nuovaSessione", nuovaSessione);
