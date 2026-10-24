@@ -82,12 +82,15 @@ export function ComandiTitolo() {
   const quiete = !!r && statoClotchAi(r, Date.now()).stato === "pausa";
   const quante = r ? sessioniAlLavoro(r) : 0;
   // «L’app prova a riaprirla» (101-42000): una volta per chiusura, mai dopo `spegni` (evento friday «stop») // nome del protocollo del motore
+  // Mai se le impostazioni di clotch AI dicono spenta; all'apertura, senza nessun evento ma con `attiva` vero, la accende («Avvio…»).
   const riaperta = useRef<number | null>(null);
-  const chiusa = !!r && statoClotchAi(r, Date.now()).stato === "spenta" && !!r.clotchAi && r.clotchAi.evento !== "stop";
+  const attiva = r?.impostazioni?.attiva;
+  const chiusa = !!r && statoClotchAi(r, Date.now()).stato === "spenta" && (r.clotchAi ? r.clotchAi.evento !== "stop" && attiva !== false : attiva === true);
   useEffect(() => {
-    if (!chiusa || riaperta.current === r!.clotchAi!.t || new URLSearchParams(location.search).has("parita")) return;
-    riaperta.current = r!.clotchAi!.t;
-    avviaClotchAi("riavvio");
+    const t = r?.clotchAi?.t ?? 0;
+    if (!chiusa || riaperta.current === t || new URLSearchParams(location.search).has("parita")) return;
+    riaperta.current = t;
+    avviaClotchAi(r!.clotchAi ? "riavvio" : "avvio");
   }, [chiusa]); // eslint-disable-line react-hooks/exhaustive-deps
   if (sessione) return null;
   return (

@@ -69,7 +69,7 @@ export function leggiObiettivi(radice: string, errori: ErroreLettura[]): Map<str
   for (const { chiave, dati } of leggiCartella(path.join(radice, "obiettivi"), errori)) {
     if (!dati || typeof dati !== "object") continue;
     const prove = Array.isArray(dati.prove)
-      ? dati.prove.filter((p: any) => p && typeof p.testo === "string").map((p: any) => ({ testo: p.testo, fatta: p.fatta === true }))
+      ? dati.prove.filter((p: any) => p && typeof p.testo === "string").map((p: any) => ({ testo: p.testo, fatta: p.fatta === true, fallita: p.fatta !== true && typeof p.nota === "string" && p.nota !== "" }))
       : [];
     m.set(String(dati.cli ?? chiave), {
       testo: String(dati.obiettivo ?? dati.titolo ?? ""),

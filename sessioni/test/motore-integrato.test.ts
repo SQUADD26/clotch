@@ -98,9 +98,11 @@ test("giro vero: annulla, doppio clic, rifiuti e errori del motore, riavvio", { 
   assert.equal((await manda(h, "annulla", { decisione: "r-000000000000" })).esito, "rifiutato");
   assert.equal(JSON.parse(py(h, "terminale", "0", ids.terminale))[0], "ok"); // annullata dal terminale
   assert.deepEqual([dec(h, ids.terminale).annullata, dec(h, ids.terminale).annullabile], [true, false]);
-  assert.equal((await manda(h, "ripristina", { chat: "s-1" })).esito, "rifiutato"); // il motore non ha «ripristina»
+  // s-1 non è archiviata: rifiutata sia dal motore vecchio («sconosciuto», che archiviate.tsx riconosce) sia da quello con «ripristina» (claude-config#2513)
+  const ripr = await manda(h, "ripristina", { chat: "s-1" });
+  assert.deepEqual([ripr.esito, /sconosciuto|non e' archiviata|non è archiviata|non del motore/i.test(ripr.testo)], ["rifiutato", true], ripr.testo);
   const senza = await manda(h, "manda", { chat: "s-1" });
-  assert.deepEqual([senza.esito, senza.testo], ["rifiutato", "manca testo"]);
+  assert.deepEqual([senza.esito, /test/.test(senza.testo ?? "")], ["rifiutato", true], senza.testo); // il testo esatto è del motore installato e cambia fra versioni
   assert.equal((await manda(h, "obiettivo", { chat: "s-1", esito: "accetta" })).esito, "ok");
   assert.equal((await manda(h, "obiettivo", { chat: "s-9", esito: "accetta" })).esito, "rifiutato"); // nessuna proposta
   const prima = JSON.stringify([...leggiRegistro(h).esiti]);

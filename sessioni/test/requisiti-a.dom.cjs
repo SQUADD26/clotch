@@ -127,7 +127,7 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), AS(md, 1000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat(); await copiaFinta();
     await wait(() => !!document.querySelector('.risposta .azioni'));
     await clicca('.risposta .azioni button', 'Altro'); await wait(() => !!document.querySelector('.risposta .menu'));
-    assert.deepEqual(await testo('.risposta .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Mostra nel file della sessione']);
+    assert.deepEqual(await testo('.risposta .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Leggi con clotch AI', 'Mostra nel file della sessione']);
     await clicca('.risposta .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
     await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
     assert.deepEqual(await run(() => window.__copiato), [md, 'Titolo\n\ngrassetto e codice']); // blocchi separati da riga vuota (#440)

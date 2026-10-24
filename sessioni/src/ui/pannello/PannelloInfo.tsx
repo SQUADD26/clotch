@@ -13,8 +13,8 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
   const o = s.obiettivo?.valido ? s.obiettivo : null;
   return {
     obiettivo: o?.testo ?? null,
-    // shortcut: il lettore dà solo `fatta`; «in corso» e «fallita» compaiono quando il registro li scrive (tipi.ts Prova).
-    prove: (o?.prove ?? []).map((p) => ({ testo: p.testo, stato: p.fatta ? "fatta" : "attesa" })),
+    // shortcut: «in corso» il registro non lo scrive (le prove girano senza segno): compare quando lo scriverà (`provando` in obiettivo_vivo.riprova).
+    prove: (o?.prove ?? []).map((p) => ({ testo: p.testo, stato: p.fatta ? "fatta" : p.fallita ? "fallita" : "attesa" })),
     file: info?.file ?? null,
   };
 }
@@ -23,7 +23,7 @@ export function datiPannello(s: Sessione, info: InfoSessione | null): DatiPannel
 export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
   const info = useInfo(s.id);
   const max = useChatClotchAi(s.id)?.contestoMax ?? null;
-  const pr = s.app?.prs.at(-1);
+  const prs = info?.prs ?? s.app?.prs ?? [];
   // scena di prova «scorrendo» (101:34190): il pannello parte già scorso di tanti px
   const scorri = Number(provaDi(useNavigazione().sezione, "scorri"));
   const colonna = useRef<HTMLDivElement>(null);
@@ -35,7 +35,7 @@ export function PannelloInfo({ s, esteso }: { s: Sessione; esteso: boolean }) {
         <Ambiente s={s} />
         {info?.contesto != null && <Contesto usati={info.contesto} max={max} mcp={s.app?.strumentiMcp ?? 0} />}
         {!!s.app?.connettori.length && <Connettori nomi={s.app.connettori} />}
-        {info && (info.file.quanti > 0 || pr) && <Modifiche file={info.file} pr={pr} />}
+        {info && (info.file.quanti > 0 || prs.length > 0) && <Modifiche file={info.file} prs={prs} />}
       </>}
     </div>
   );

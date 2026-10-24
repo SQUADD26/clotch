@@ -8,6 +8,8 @@ export type Stato = "lavora" | "aspetta" | "ferma" | "finita";
 export interface Prova {
   testo: string;
   fatta: boolean;
+  /** Non fatta e l'ultimo tentativo del registro è rosso (`nota`). «In corso» il registro non lo scrive: non si mostra. */
+  fallita?: boolean;
 }
 
 export interface Obiettivo {
@@ -68,11 +70,16 @@ export interface AppSessione {
   remoto: boolean;
 }
 
+/** Una PR della sessione; `stato` null = la trascrizione dà solo il link (`pr-link`), non lo stato. */
+export interface PrInfo { numero: number; url: string; stato: PrSessione["stato"] | null; verso: string | null }
+
 /** Numeri che la trascrizione dà (`info-sessione.ts`): pannello «Info sessione». */
 export interface InfoSessione {
   /** Token nel contesto dopo l'ultima risposta; null = nessuna risposta con il conteggio. */
   contesto: number | null;
   file: { quanti: number; aggiunte: number; tolte: number };
+  /** Tutte le PR della sessione (file dell'app + `pr-link` della trascrizione); assente = nessuna. */
+  prs?: PrInfo[];
 }
 
 export interface ErroreLettura {
@@ -267,6 +274,9 @@ export interface QuotaUso { account: string; usato: number; ripartenza: string; 
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }
 
+/** Chi usa l'app: nome intero e iniziali, per il piede della barra e il menu del profilo. */
+export interface Profilo { nome: string; iniziali: string }
+
 /** `window.impostazioni` (#351): tutto quello che le impostazioni chiedono al Mac, tranne i valori salvati. */
 export interface ImpostazioniApi {
   /** Cartelle ~/.claude* trovate nella home. */
@@ -276,6 +286,8 @@ export interface ImpostazioniApi {
   scegliCartella(): Promise<string | null>;
   apri(percorso: string): Promise<void>;
   versione(): Promise<string>;
+  /** Nome e iniziali dell'utente: dall'account Claude, se no da macOS. */
+  profilo(): Promise<Profilo>;
   /** «Apri all'avvio del Mac»: voce degli elementi di login. */
   avvio(acceso: boolean): Promise<void>;
   /** Quote d'uso per account, dal feed di Clotch (cache 60 s nel main); lancia se il feed non risponde. */

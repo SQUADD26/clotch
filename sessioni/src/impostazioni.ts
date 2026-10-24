@@ -1,6 +1,8 @@
 // Canali delle impostazioni (#351) che non sono valori salvati: i valori stanno nel file delle preferenze (#368,
 // `sessioni:impostazioni`). Qui: cartelle degli account, scelta e apertura di cartelle, versione, avvio col Mac.
 // Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
+import { execFileSync } from "node:child_process";
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import type { IpcMain } from "electron";
@@ -12,9 +14,30 @@ import { leggiRegistro, type Registro } from "./clotch-ai";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { creaAggiornamenti } from "./aggiornamento";
 import { provaSilenziosa } from "./modalita-prova";
-import { quoteUso } from "./quote-uso";
+import { quoteConGiorni } from "./quote-uso";
 import { accorcia, espandi, trovaRadici } from "./radici";
-import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
+import type { Archiviata, CartellaAccount, Elenco, Profilo } from "./tipi";
+
+/** Nome di macOS dell'utente (`id -F`), o il nome di accesso. */
+const nomeMac = () => {
+  try { return execFileSync("id", ["-F"], { encoding: "utf8", timeout: 2000 }).trim() || os.userInfo().username; } catch { return os.userInfo().username; }
+};
+
+/** Chi usa l'app (A16/G19): il nome dell'account Claude (`fullName`, se no `displayName`, in `.claude.json`); senza, quello di macOS.
+ *  shortcut: il primo account con un nome (il predefinito per primo), non quello attivo adesso; quando serve, scegliere quello della sessione più recente. */
+export function profiloUtente(home: string, mac: () => string = nomeMac): Profilo {
+  const files = trovaRadici(home).flatMap((r) => [path.join(r.path, ".claude.json"), ...(r.account === ".claude" ? [path.join(home, ".claude.json")] : [])]);
+  let nome = "";
+  for (const f of files) {
+    try {
+      const o = JSON.parse(fs.readFileSync(f, "utf8"))?.oauthAccount;
+      nome = [o?.fullName, o?.displayName].find((x): x is string => typeof x === "string" && !!x.trim())?.trim() ?? "";
+    } catch { /* manca o non si legge: prossimo account */ }
+    if (nome) break;
+  }
+  nome ||= mac().trim();
+  return { nome, iniziali: nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join("") };
+}
 
 /** Una riga per cartella: sessioni lette di quell'account, o il perché non si legge (testi del frame 101:10369). */
 export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAccount[] {
@@ -80,6 +103,7 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
   // shell.openPath torna "" se riesce, se no il perché
   ipc.handle("impostazioni:apri", async (_e, p: string) => { const err = await shell.openPath(espandi(String(p), home)); if (err) throw new Error(err); });
   ipc.handle("impostazioni:versione", () => app.getVersion());
+  ipc.handle("impostazioni:profilo", () => profiloUtente(home));
   const aggiornamenti = creaAggiornamenti({ dir: app.getAppPath(), silenzioso: provaSilenziosa(), riapri: () => { app.relaunch(); app.exit(0); } });
   ipc.handle("impostazioni:avvio", (_e, acceso: boolean) => app.setLoginItemSettings({ openAtLogin: acceso === true }));
   ipc.handle("impostazioni:elimina-dati", () => {
@@ -88,7 +112,8 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     sessioni.impostazioni({});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  ipc.handle("impostazioni:uso", () => quoteUso());
+  // shortcut: gli account sono quelli trovati nella home (non conta accountAggiunti/accountTolti); le trascrizioni si leggono qui, nel main
+  ipc.handle("impostazioni:uso", () => quoteConGiorni(trovaRadici(home)));
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
