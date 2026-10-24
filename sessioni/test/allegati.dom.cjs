@@ -76,10 +76,10 @@ app.whenReady().then(async () => {
     })()`));
     const aspetta = (ms = 150) => new Promise((r) => setTimeout(r, ms));
     await run(() => document.querySelector('button[aria-label="Aggiungi"]').click());
-    await ready('.aggiungi .menu');
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.aggiungi .menu .voce .etichetta')].map((e) => e.textContent)).then((x) => x.slice(0, 3)),
+    await ready('.menu-aggiungi');
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.menu-aggiungi .voce .etichetta')].map((e) => e.textContent)).then((x) => x.slice(0, 3)),
       ['Allega file…', 'Imposta obiettivo', 'Modalità piano']);
-    await run(() => document.querySelector('.aggiungi .menu .voce').click());
+    await run(() => document.querySelector('.menu-aggiungi .voce').click());
     await ready('.allegati-casella .allegato');
     assert.equal(await run(() => document.querySelector('.allegati-casella .allegato').title), 'prova.png');
     await scrivi('Controlla questa');
@@ -112,8 +112,8 @@ app.whenReady().then(async () => {
     ipcMain.removeHandler('casella:scegli');
     ipcMain.handle('casella:scegli', () => [{ percorso: '/tmp/prova.mov', nome: 'prova.mov', tipo: 'file', byte: 480000000 }]);
     await run(() => document.querySelector('button[aria-label="Aggiungi"]').click());
-    await ready('.aggiungi .menu');
-    await run(() => document.querySelector('.aggiungi .menu .voce').click());
+    await ready('.menu-aggiungi');
+    await run(() => document.querySelector('.menu-aggiungi .voce').click());
     await ready('.avviso-allegato');
     assert.equal(await run(() => document.querySelector('.avviso-allegato').textContent),
       'File troppo grandeprova.mov non parte: pesa 480 MB e il limite è 200 KB. Rimuovilo o allega un file più piccolo.Rimuovi file');

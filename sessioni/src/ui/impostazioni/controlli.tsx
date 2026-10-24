@@ -17,7 +17,7 @@ function TitoloSezione({ titolo, sezione, scegli }: { titolo: string; sezione: S
         {titolo}<Icona nome="giu" />
       </button>
       {aperto && (
-        <Menu onChiudi={() => setAperto(false)} style={{ left: 0, top: "calc(100% + var(--spazio-1-5))" }}
+        <Menu onChiudi={() => setAperto(false)} classe="menu-scelta"
           voci={SEZIONI.map(([id, nome]) => ({ etichetta: nome, scelta: id === sezione, fai: () => scegli(id) }))} />
       )}
     </h1>
@@ -77,7 +77,7 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
         <Icona nome="giu" />
       </button>
       {aperta && voci && (
-        <Menu onChiudi={chiudi} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }}
+        <Menu onChiudi={chiudi} fine classe="menu-scelta"
           voci={voci.map((v) => ({ etichetta: v, scorciatoia: dettagli?.[v], scelta: v === valore, fai: () => onScegli?.(v) }))} />
       )}
     </div>

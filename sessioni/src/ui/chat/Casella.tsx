@@ -10,6 +10,8 @@ import { BottoneIcona, Bottone } from "../base/Bottone";
 import { usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
+import { Suggerimento } from "../base/Suggerimento";
+import { numero } from "../base/token";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
@@ -44,10 +46,9 @@ function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, prefere
           {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
           <span className="testo">{v.testo}</span>
           <div className="azioni">
-            <span className={suggerimento && i === 0 ? "con-suggerimento sopra visibile" : "con-suggerimento sopra"}>
+            <Suggerimento testo="Interrompi e manda ora" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
               <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
-              <span className="suggerimento">Interrompi e manda ora <Tasto t="↵" /></span>
-            </span>
+            </Suggerimento>
             <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
             <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
           </div>

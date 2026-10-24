@@ -27,14 +27,13 @@
 .pezzo-barra .barra-account .pieno.l-giallo { background: var(--colore-semaforo-giallo); }
 .pezzo-barra .barra-account .pieno.l-pieno { background: var(--colore-testo-errore); }
 
-/* i due menu galleggiano sopra il bottone, appoggiati sopra di lui; il secondo sta a destra del primo (--x, --y: dal bottone) */
+/* i due menu galleggiano sopra il bottone, appoggiati sopra di lui; il secondo sta a destra del primo (base/Sovrapposto) */
 .pezzo-barra .menu-account {
-  position: fixed; left: var(--x); bottom: var(--y); z-index: 10; width: var(--misura-menu-modello); padding: var(--spazio-1);
+  width: var(--misura-menu-modello); padding: var(--spazio-1);
   display: flex; flex-direction: column;
-  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
-.pezzo-barra .menu-account.secondo { left: calc(var(--x) + var(--misura-menu-modello) + var(--spazio-2)); }
 .pezzo-barra .menu-account .linea { height: var(--misura-tratto); background: var(--colore-bordo-leggero); }
 .pezzo-barra .uso-attuale { padding: var(--spazio-2); display: flex; flex-direction: column; gap: var(--spazio-4); }
 .pezzo-barra .blocco-uso { display: flex; flex-direction: column; gap: var(--spazio-2); }

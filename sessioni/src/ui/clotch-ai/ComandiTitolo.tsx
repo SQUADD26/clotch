@@ -1,7 +1,6 @@
 // figma: 101-37879 — «comandi globali» della barra del titolo: luna di Non disturbare (menu 101-38626, con Clotch 101-50008,
 // senza 101-50071, attivo 101-38897) e «Ferma tutto» (conferma 101-37696, in corso 101-37879, fatto 101-38124, errore 101-38374).
 import { useCallback, useEffect, useRef } from "react";
-import { useTastiMenu } from "../base/Menu";
 import { acceso as clotchAcceso } from "../pannello/clotch";
 import { aggiornaAvviso, avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
@@ -13,6 +12,7 @@ import { useNavigazione } from "../base/navigazione";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
 import { plurale } from "./Intestazione";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
+import { Sovrapposto } from "../base/Sovrapposto";
 
 // Ore fisse del disegno: «Fino alle 18:00»; «Fino a domani mattina» = domani alle 8:00 (decisione della master, #352).
 const ORA_SERA = 18, ORA_MATTINA = 8;
@@ -56,13 +56,11 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
     ["luna", "Fino a domani mattina", { fino: prossima(Date.now(), ORA_MATTINA, true) }],
     ["nascondi", "Finché non lo tolgo", { fino: null }],
   ];
-  const ref = useRef<HTMLDivElement>(null);
-  useTastiMenu(ref, onChiudi);
   return (
-    <div ref={ref} className="menu" role="menu">
+    <Sovrapposto fine className="menu" role="menu" onChiudi={onChiudi}>
       <div className="titolo-menu t-xs medio secondario">Non disturbare</div>
       {voci.map(([icona, etichetta, args]) => (
-        <button key={etichetta} type="button" role="menuitem" className="voce" onMouseEnter={(e) => e.currentTarget.focus()} onClick={() => metti(args)}>
+        <button key={etichetta} type="button" role="menuitem" className="voce" onClick={() => metti(args)}>
           <Icona nome={icona} />
           <span className="etichetta t-sm">{etichetta}</span>
         </button>
@@ -71,7 +69,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
       <div className="nota-menu t-sm secondario">
         {clotch ? "Vale anche per clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
       </div>
-    </div>
+    </Sovrapposto>
   );
 }
 
