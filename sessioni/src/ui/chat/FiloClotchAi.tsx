@@ -73,10 +73,17 @@ export function CasellaClotchAi({ microfono, spenta = false }: { microfono?: Rea
   useEffect(() => { const a = area.current; if (a && chiesta) { a.focus(); a.setSelectionRange(a.value.length, a.value.length); } }, []);
 
   const cerca = testo.match(MENZIONE)?.[1].toLowerCase();
-  const trovate = cerca == null ? [] : elenco.filter((s) => s.titolo.toLowerCase().includes(cerca)).slice(0, 5);
+  const [chiuso, setChiuso] = useState(false); // Esc o clic fuori chiudono l'elenco finché non cambia il testo
+  const trovate = cerca == null || chiuso ? [] : elenco.filter((s) => s.titolo.toLowerCase().includes(cerca)).slice(0, 5);
 
   useLayoutEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
 
+  useEffect(() => {
+    if (!trovate.length) return;
+    const fuori = (e: MouseEvent) => { if (!areaCasella.current?.contains(e.target as Node)) setChiuso(true); };
+    addEventListener("mousedown", fuori);
+    return () => removeEventListener("mousedown", fuori);
+  }, [trovate.length]);
   const cita = (titolo: string) => { setTesto(testo.replace(MENZIONE, `@${titolo} `)); setScelta(0); area.current?.focus(); };
   const manda = async () => {
     const t = testo.trim();
@@ -86,6 +93,7 @@ export function CasellaClotchAi({ microfono, spenta = false }: { microfono?: Rea
     setInvio(false);
   };
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Escape" && trovate.length) { e.preventDefault(); e.stopPropagation(); setChiuso(true); return; }
     if (trovate.length && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
       e.preventDefault();
       setScelta((scelta + (e.key === "ArrowDown" ? 1 : trovate.length - 1)) % trovate.length);
@@ -115,7 +123,7 @@ export function CasellaClotchAi({ microfono, spenta = false }: { microfono?: Rea
       )}
       <div className={`casella ${stato}`}>
         <div className="area-testo">
-          <textarea ref={area} rows={1} value={testo} disabled={spenta} onChange={(e) => { setTesto(e.target.value); setScelta(0); }} onKeyDown={tasti}
+          <textarea ref={area} rows={1} value={testo} disabled={spenta} onChange={(e) => { setTesto(e.target.value); setScelta(0); setChiuso(false); }} onKeyDown={tasti}
             placeholder={spenta ? "clotch AI non risponde" : "Chiedi a clotch AI"} aria-label="Chiedi a clotch AI" />
         </div>
         <div className="azioni">
