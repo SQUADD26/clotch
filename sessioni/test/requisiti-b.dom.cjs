@@ -66,51 +66,52 @@ H.avvia('requisiti-b', async () => {
   await req('FR3', async () => {
     await vai('101-37879'); // registro con sessioni al lavoro; la scena parte senza dialogo
     const n = Object.values(H.scena.registro.chat).filter((c) => c.stato === 'lavora' && c.chat !== 'friday' && !c.fine && !c.fermata).length;
-    await carica({ vista: 'friday' }); await wait(() => !!document.querySelector('.comandi-titolo'));
+    await carica({ vista: 'clotch-ai' }); await wait(() => !!document.querySelector('.comandi-titolo'));
     await clicca('.comandi-titolo button', 'Ferma tutto'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.match(await run(() => document.querySelector('[role=dialog]').innerText), new RegExp(`Le ${n} sessioni al lavoro`));
-    await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('friday:comando'), []);
-    rispondi['friday:comando'] = (c) => (c === 'ferma_tutto' ? { esito: 'ok', testo: '', nonFermate: ['c-lettura', 'm-clotch'] } : { esito: 'ok', testo: '' });
+    await clicca('[role=dialog] button', 'Annulla'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
+    rispondi['clotch-ai:comando'] = (c) => (c === 'ferma_tutto' ? { esito: 'ok', testo: '', nonFermate: ['c-lettura', 'm-clotch'] } : { esito: 'ok', testo: '' });
     await clicca('.comandi-titolo button', 'Ferma tutto'); await clicca('[role=dialog] button', 'Ferma tutto');
     await wait(() => /2 sessioni non si sono fermate/.test(document.querySelector('.area-avvisi').innerText));
-    rispondi['friday:comando'] = () => ({ esito: 'ok', testo: '', nonFermate: [] }); H.azzera();
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'ok', testo: '', nonFermate: [] }); H.azzera();
     await clicca('.area-avvisi button', 'Riprova'); await wait(() => /sessioni ferme/.test(document.querySelector('.area-avvisi').innerText));
-    assert.deepEqual(fatte('friday:comando')[0], ['ferma_tutto', undefined]);
-    await clicca('.area-avvisi button', 'Riprendi tutte'); await attesa(60); assert.deepEqual(fatte('friday:comando').at(-1), ['riprendi_tutto', undefined]);
-    rispondi['friday:comando'] = () => ({ esito: 'errore', testo: 'clotch AI non risponde' });
+    assert.deepEqual(fatte('clotch-ai:comando')[0], ['ferma_tutto', undefined]);
+    await clicca('.area-avvisi button', 'Riprendi tutte'); await attesa(60); assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['riprendi_tutto', undefined]);
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'errore', testo: 'clotch AI non risponde' });
     await clicca('.comandi-titolo button', 'Ferma tutto'); await clicca('[role=dialog] button', 'Ferma tutto'); await wait(() => /clotch AI non risponde/.test(document.querySelector('.area-avvisi').innerText));
   });
 
   await req('FR5', async () => {
-    await vai('101-39266');
+    // il lettore offre «Annulla» solo con la ricevuta locale del motore (#454): la scena non ne ha, qui la decisione ce l'ha
+    await vai('101-39266', (s) => { s.registro.decisioni.find((d) => d.cosa.includes('0042')).annullabile = true; });
     assert.ok((await testo('.titolo-gruppo')).length >= 1);
-    assert.match(await run(() => document.querySelector('.vista-friday').innerText), /Già su main: non si annulla/);
+    assert.match(await run(() => document.querySelector('.vista-clotch-ai').innerText), /Già su main: non si annulla/);
     const annullabili = await run(() => [...document.querySelectorAll('.voce-f')].filter((v) => v.querySelector('button')).map((v) => v.querySelector('.t-sm').textContent));
     assert.ok(annullabili.includes('Consentita la migrazione 0042 su dev'), annullabili.join('|'));
     const apriConferma = (cosa) => run((cosa) => [...document.querySelectorAll('.voce-f')].find((v) => v.textContent.includes(cosa)).querySelector('button').click(), cosa);
     await apriConferma('migrazione 0042'); await wait(() => !!document.querySelector('[role=dialog]'));
     assert.match(await run(() => document.querySelector('[role=dialog]').innerText), /migrazione inversa/);
-    await clicca('[role=dialog] button', 'Lascia così'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('friday:comando'), []);
-    rispondi['friday:comando'] = () => ({ esito: 'errore', testo: 'Migrazione inversa non riuscita: niente è cambiato.' });
+    await clicca('[role=dialog] button', 'Lascia così'); await wait(() => !document.querySelector('[role=dialog]')); assert.deepEqual(fatte('clotch-ai:comando'), []);
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'errore', testo: 'Migrazione inversa non riuscita: niente è cambiato.' });
     await apriConferma('migrazione 0042'); await clicca('[role=dialog] button', 'Annulla la decisione');
-    await wait(() => /Migrazione inversa non riuscita/.test(document.querySelector('.area-avvisi')?.innerText || '')); assert.deepEqual(fatte('friday:comando'), [['annulla', { decisione: 'r-000000000007' }]]);
-    rispondi['friday:comando'] = () => ({ esito: 'ok', testo: 'Decisione annullata. La sessione aspetta te.' });
+    await wait(() => /Migrazione inversa non riuscita/.test(document.querySelector('.area-avvisi')?.innerText || '')); assert.deepEqual(fatte('clotch-ai:comando'), [['annulla', { decisione: H.scena.registro.decisioni.find((d) => d.cosa.includes('0042')).id }]]);
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'ok', testo: 'Decisione annullata. La sessione aspetta te.' });
     await clicca('.area-avvisi button', 'Riprova'); await wait(() => /Decisione annullata/.test(document.querySelector('.area-avvisi').innerText));
-    assert.equal(fatte('friday:comando').length, 2);
+    assert.equal(fatte('clotch-ai:comando').length, 2);
   });
 
   await req('CL10', async () => {
     await vai('101-50008'); // con Clotch acceso
-    await carica({ vista: 'friday' }); await wait(() => !!document.querySelector('.comandi-titolo'));
+    await carica({ vista: 'clotch-ai' }); await wait(() => !!document.querySelector('.comandi-titolo'));
     await clicca('.comandi-titolo button', 'Non disturbare'); await wait(() => !!document.querySelector('.comandi-titolo .menu'));
     assert.deepEqual(await testo('.comandi-titolo .menu .voce .etichetta'), ['Per 1 ora', 'Fino alle 18:00', 'Fino a domani mattina', 'Finché non lo tolgo']);
     assert.match(await run(() => document.querySelector('.nota-menu').textContent), /Vale anche per clotch: niente voce né microfono/);
     await clicca('.comandi-titolo .menu .voce', 'Per 1 ora'); await wait(() => !document.querySelector('.comandi-titolo .menu'));
-    assert.deepEqual(fatte('friday:comando'), [['non_disturbare', { acceso: true, minuti: 60 }]]);
-    await vai('101-50071'); await carica({ vista: 'friday' }); await wait(() => !!document.querySelector('.comandi-titolo'));
+    assert.deepEqual(fatte('clotch-ai:comando'), [['non_disturbare', { acceso: true, minuti: 60 }]]);
+    await vai('101-50071'); await carica({ vista: 'clotch-ai' }); await wait(() => !!document.querySelector('.comandi-titolo'));
     await clicca('.comandi-titolo button', 'Non disturbare'); await wait(() => !!document.querySelector('.nota-menu'));
     assert.match(await run(() => document.querySelector('.nota-menu').textContent), /continua a lavorare/);
-    await clicca('.comandi-titolo .menu .voce', 'Finché non lo tolgo'); await attesa(50); assert.deepEqual(fatte('friday:comando').at(-1), ['non_disturbare', { acceso: true, fino: null }]);
+    await clicca('.comandi-titolo .menu .voce', 'Finché non lo tolgo'); await attesa(50); assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['non_disturbare', { acceso: true, fino: null }]);
   });
 
   const imp = (id, sezione, mod) => vai(id, mod);
@@ -160,6 +161,7 @@ H.avvia('requisiti-b', async () => {
     await wait(() => document.querySelectorAll('.riga.azione').length === 5); assert.equal((await righe())[0], '~/.claude-accountmanager');
     assert.equal(await run(() => document.querySelector('.riga.azione .errore')?.textContent), 'Non leggibile: permesso negato', 'la cartella non leggibile mostra il suo errore');
     await run(() => [...document.querySelectorAll('.riga.azione')].find((r) => r.textContent.includes('.claude-squadd')).querySelector('button').click());
+    await clicca('[role=dialog] button', 'Rimuovi'); // «Rimuovi» chiede conferma (101-22095)
     await wait(() => document.querySelectorAll('.riga.azione').length === 4); assert.deepEqual(imposta(), [{ accountTolti: ['~/.claude-squadd'] }]);
     await wait(() => /Cartella rimossa/.test(document.querySelector('.area-avvisi').innerText)); await clicca('.area-avvisi button', 'Annulla');
     await wait(() => document.querySelectorAll('.riga.azione').length === 5); assert.deepEqual(imposta().at(-1), { accountTolti: [] });
@@ -170,7 +172,7 @@ H.avvia('requisiti-b', async () => {
 
   await req('H16', async () => {
     await imp('101-17716');
-    assert.equal((await testo('.gruppo .riga .t-base')).length, 10);
+    assert.equal((await testo('.gruppo .riga .t-base')).length, 11); // con «Trova nella sessione» (⌘F)
     const tasti = () => run(() => Object.fromEntries([...document.querySelectorAll('.gruppo .riga')].map((r) => [r.querySelector('.t-base').textContent, r.querySelector('.tasto, .secondario')?.textContent])));
     assert.equal((await tasti())['Cerca sessioni'], '⌘K');
     const premi = (key, code, extra = {}) => run((key, code, extra) => window.dispatchEvent(new KeyboardEvent('keydown', { key, code, bubbles: true, cancelable: true, ...extra })), key, code, extra);

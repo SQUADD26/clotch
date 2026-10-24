@@ -85,8 +85,8 @@ H.avvia = (nome, corpo) => app.whenReady().then(async () => {
     if (c === 'sessioni:imposta-impostazioni') H.scena.impostazioni = { ...H.scena.impostazioni, ...a[0] }; // il main salva nel file delle preferenze
     return rispostaScena(H.scena, c, a);
   });
-  ipcMain.removeHandler('friday:comando'); // di serie risponde «fatto», senza toccare Friday
-  ipcMain.handle('friday:comando', (_e, ...a) => { H.chiamate.push(['friday:comando', ...a]); return 'friday:comando' in H.rispondi ? H.rispondi['friday:comando'](...a) : { esito: 'ok', testo: '' }; });
+  ipcMain.removeHandler('clotch-ai:comando'); // di serie risponde «fatto», senza toccare clotch AI
+  ipcMain.handle('clotch-ai:comando', (_e, ...a) => { H.chiamate.push(['clotch-ai:comando', ...a]); return 'clotch-ai:comando' in H.rispondi ? H.rispondi['clotch-ai:comando'](...a) : { esito: 'ok', testo: '' }; });
   const w = H.win = new BrowserWindow({ show: false, focusable: false, width: 1800, height: 1000, webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true } });
   w.on('show', () => mostrate++); w.on('focus', () => fuochi++);
   w.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));

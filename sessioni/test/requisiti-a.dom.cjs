@@ -43,6 +43,8 @@ H.avvia('requisiti-a', async () => {
     await clicca('.barra-laterale .riga .testo', 'beta-app'); await clicca('.riga-sessione .testo', 'Beta due'); await wait(() => /Finita/.test(document.querySelector('.intestazione .stato')?.textContent));
     d = await dati(); assert.equal(d.titolo, 'Beta due'); assert.ok(d.dati.includes('Codex') && d.dati.includes('beta-app'), d.dati);
     assert.equal(await run(() => !!document.querySelector('.pannello')), true);
+    // il bottone gira: obiettivo -> Info sessione (schede, bottone premuto) -> chiuso (#437)
+    await clicca('button', 'Pannello'); await wait(() => document.querySelector('button[aria-label="Pannello"]')?.getAttribute('aria-expanded') === 'true' && !!document.querySelector('.pannello'));
     await clicca('button', 'Pannello'); await wait(() => !document.querySelector('.pannello'));
     await clicca('button', 'Pannello'); await wait(() => !!document.querySelector('.pannello'));
   });
@@ -80,7 +82,7 @@ H.avvia('requisiti-a', async () => {
       const b = document.querySelector('.bottone-invia'); return { c: document.querySelector('.casella').className, a: b.getAttribute('aria-label'), bg: getComputedStyle(b).backgroundColor, acc, off: b.disabled }; });
     let s = await st(); assert.deepEqual([/in-corso/.test(s.c), s.a, s.bg, s.off], [true, 'Interrompi', s.acc, false]);
     await run(() => document.querySelector('.bottone-invia').click()); await attesa(60);
-    assert.deepEqual(fatte('friday:comando'), [['interrompi', { chat: 's1' }]]);
+    assert.deepEqual(fatte('clotch-ai:comando'), [['interrompi', { chat: 's1' }]]);
     await scrivi('textarea', 'altro'); s = await st(); assert.equal(s.a, 'Invia', 'con del testo il bottone torna Invia');
   });
 
@@ -88,7 +90,7 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { s.elenco.sessioni[1].sorgente = 'cursor'; }); await caricaChat('s2');
     const r = await run(() => { const t = document.querySelector('textarea'); return { d: t.disabled, ph: t.placeholder, c: document.querySelector('.casella').className, off: document.querySelector('.bottone-invia').disabled }; });
     assert.deepEqual([r.d, r.ph, /disabilitata/.test(r.c), r.off], [true, 'Rispondi da Cursor', true, true]);
-    await run(() => document.querySelector('.bottone-invia').click()); await attesa(40); assert.deepEqual(fatte('friday:comando'), []);
+    await run(() => document.querySelector('.bottone-invia').click()); await attesa(40); assert.deepEqual(fatte('clotch-ai:comando'), []);
   });
 
   await req('E15', async () => {
@@ -107,17 +109,17 @@ H.avvia('requisiti-a', async () => {
     await wait(() => document.querySelectorAll('.messaggio-in-coda').length === 2);
     assert.equal((await testo('.messaggio-in-coda .etichetta'))[0], '2 messaggi in coda');
     await clicca('.messaggio-in-coda button', 'Rimuovi'); await attesa(50);
-    assert.deepEqual(fatte('friday:comando').at(-1), ['coda_togli', { chat: 's1', voce: 'v1' }]);
+    assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['coda_togli', { chat: 's1', voce: 'v1' }]);
     await clicca('.messaggio-in-coda button', 'Interrompi e manda ora'); await attesa(80);
-    assert.deepEqual(fatte('friday:comando').slice(-2), [['manda', { chat: 's1', testo: 'prima in coda', modo: 'subito' }], ['coda_togli', { chat: 's1', voce: 'v1' }]]);
+    assert.deepEqual(fatte('clotch-ai:comando').slice(-2), [['manda', { chat: 's1', testo: 'prima in coda', modo: 'subito' }], ['coda_togli', { chat: 's1', voce: 'v1' }]]);
     await clicca('.messaggio-in-coda button', 'Modifica'); await wait(() => document.querySelector('textarea').value === 'prima in coda' && !!document.querySelector('.nota-casella'));
     await scrivi('textarea', 'nuovo testo'); H.azzera();
     await tasto('textarea', { key: 'Enter', code: 'Enter', metaKey: true }); await attesa(80);
-    assert.deepEqual(fatte('friday:comando'), [['coda_modifica', { chat: 's1', voce: 'v1', testo: 'nuovo testo' }]]);
+    assert.deepEqual(fatte('clotch-ai:comando'), [['coda_modifica', { chat: 's1', voce: 'v1', testo: 'nuovo testo' }]]);
     await scrivi('textarea', 'subito'); await tasto('textarea', { key: 'Enter', code: 'Enter' }); await attesa(80);
-    assert.deepEqual(fatte('friday:comando').at(-1), ['manda', { chat: 's1', testo: 'subito', modo: 'subito' }]);
+    assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['manda', { chat: 's1', testo: 'subito', modo: 'subito' }]);
     await scrivi('textarea', 'in coda'); await tasto('textarea', { key: 'Enter', code: 'Enter', metaKey: true }); await attesa(80);
-    assert.deepEqual(fatte('friday:comando').at(-1), ['manda', { chat: 's1', testo: 'in coda', modo: 'coda' }]);
+    assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['manda', { chat: 's1', testo: 'in coda', modo: 'coda' }]);
   });
 
   await req('D7', async () => {
@@ -128,7 +130,7 @@ H.avvia('requisiti-a', async () => {
     assert.deepEqual(await testo('.risposta .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Mostra nel file della sessione']);
     await clicca('.risposta .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
     await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
-    assert.deepEqual(await run(() => window.__copiato), [md, 'Titolo\ngrassetto e codice']);
+    assert.deepEqual(await run(() => window.__copiato), [md, 'Titolo\n\ngrassetto e codice']); // blocchi separati da riga vuota (#440)
     await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Mostra nel file della sessione'); await attesa(50);
     assert.deepEqual(fatte('sessioni:azione'), [['s1', 'mostra-nel-finder']]);
     await clicca('.risposta .azioni button', 'Altro'); await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.risposta .menu'));
@@ -204,12 +206,12 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { const c = s.registro.chat.s1; c.stato = 'serve_roberto'; c.richieste = [{ rid: 'r1', genere: 'permesso', strumento: 'Bash', ingresso: { command: 'rm -rf dist', description: 'Svuota la build.' }, domande: [] }]; s.elenco.sessioni[0].stato = 'aspetta'; });
     await caricaChat(); await wait(() => !!document.querySelector('.carta, [class*=carta]') && /Permesso richiesto/.test(document.body.innerText));
     assert.ok((await testo('.bottoni button')).join('|').includes('Consenti|Consenti sempre|Nega'), 'tre bottoni');
-    rispondi['friday:comando'] = () => ({ esito: 'errore', testo: 'no' });
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'errore', testo: 'no' });
     await clicca('.bottoni button', 'Consenti'); await wait(() => /Sessione non raggiunta/.test(document.body.innerText));
     assert.match(await run(() => document.body.innerText), /Permesso richiesto/);
-    delete rispondi['friday:comando']; H.azzera();
+    delete rispondi['clotch-ai:comando']; H.azzera();
     await clicca('.bottoni button', 'Nega'); await wait(() => /Negato da te/.test(document.body.innerText));
-    assert.deepEqual(fatte('friday:comando'), [['rispondi_permesso', { chat: 's1', rid: 'r1', scelta: 'nega' }]]);
+    assert.deepEqual(fatte('clotch-ai:comando'), [['rispondi_permesso', { chat: 's1', rid: 'r1', scelta: 'nega' }]]);
     assert.equal(await run(() => /Permesso richiesto/.test(document.body.innerText)), false);
   });
 
@@ -256,10 +258,10 @@ H.avvia('requisiti-a', async () => {
     const menu = () => run(() => { const g = [...document.querySelectorAll('.riga-sessione')].find((x) => x.textContent.includes('Gamma tre')), b = g.getBoundingClientRect();
       g.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: b.x + 30, clientY: b.y + 5 })); return [b.x + 30, b.y + 5]; });
     const p = await menu(); await wait(() => !!document.querySelector('.menu[role=menu]'));
-    assert.deepEqual(await testo('.menu .etichetta'), ['Fissa in alto', 'Archivia', 'Segna come non letta', 'Apri in una nuova finestra', 'Copia ID sessione', 'Copia cartella di lavoro', 'Copia link alla sessione', 'Mostra nel Finder']);
+    assert.deepEqual(await testo('.menu .etichetta'), ['Fissa in alto', 'Rinomina…', 'Archivia', 'Segna come non letta', 'Apri in una nuova finestra', 'Copia ID sessione', 'Copia cartella di lavoro', 'Copia link alla sessione', 'Mostra nel Finder']);
     assert.deepEqual(await run(() => { const s = document.querySelector('.menu').style; return [parseFloat(s.left), parseFloat(s.top)]; }), p, 'il menu si apre dove hai cliccato');
     await clicca('.menu .voce .etichetta', 'Copia ID sessione'); await wait(() => !document.querySelector('.menu')); assert.deepEqual(fatte('sessioni:azione'), [['s3', 'copia-id']]);
-    await menu(); await voce('Archivia'); await attesa(50); assert.deepEqual(fatte('friday:comando'), [['archivia', { chat: 's3' }]]);
+    await menu(); await voce('Archivia'); await attesa(50); assert.deepEqual(fatte('clotch-ai:comando'), [['archivia', { chat: 's3' }]]);
     await menu(); await voce('Segna come non letta'); await attesa(50); assert.deepEqual(fatte('sessioni:imposta-preferenze'), [['s3', { nonLetta: true }]]);
     await menu(); await esc(); await wait(() => !document.querySelector('.menu'));
     await menu(); await run(() => document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))); await wait(() => !document.querySelector('.menu'));
