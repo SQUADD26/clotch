@@ -1,7 +1,6 @@
 /* figma: 101-21010 — «menu sessione», «menu aggiungi» 101-25845, «Menu filtro» 101-16689, «menu profilo» 101-21498, «tendina lingua» 101-32999 */
 .menu {
   position: absolute; z-index: 10; width: var(--misura-menu); padding: var(--spazio-1);
-  max-width: calc(100vw - 2 * var(--spazio-2)); max-height: calc(100vh - 2 * var(--spazio-2)); overflow-y: auto;
   display: flex; flex-direction: column;
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);

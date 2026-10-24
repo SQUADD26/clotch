@@ -21,7 +21,7 @@
 .pezzo-chat .avviso-avvio .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 
 /* menu sopra il selettore, a 4 px dal bordo; ramo più largo (misura/menu-avvio-largo) */
-.pezzo-chat .menu-avvio { position: absolute; left: 0; bottom: calc(100% + var(--spazio-1)); z-index: 5; width: var(--misura-menu); max-width: calc(100vw - 2 * var(--spazio-2)); max-height: calc(100vh - 2 * var(--spazio-2)); overflow-y: auto; gap: var(--spazio-0-5); }
+.pezzo-chat .menu-avvio { position: absolute; left: 0; bottom: calc(100% + var(--spazio-1)); z-index: 5; width: var(--misura-menu); gap: var(--spazio-0-5); }
 .pezzo-chat .menu-avvio .gruppo-rami { display: flex; flex-direction: column; gap: var(--spazio-0-5); }
 .pezzo-chat .ricerca-avvio {
   display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone); padding: 0 var(--spazio-2);

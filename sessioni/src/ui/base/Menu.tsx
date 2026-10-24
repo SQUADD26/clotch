@@ -1,7 +1,6 @@
 // figma: 101-21010 — «menu sessione»: voci con icona, scorciatoia e separatori; testata del «menu profilo» 101-21498;
 // voce pericolo rossa con la sua icona (101-21348); voci con scelta fatta, spunta a sinistra (101-32999). Esc o clic fuori chiudono.
 import { useEffect, useRef, type CSSProperties } from "react";
-import { usaDentro } from "./dentro";
 import { Icona, type NomeIcona } from "./Icona";
 import "./menu.css";
 
@@ -25,7 +24,6 @@ interface Props {
 export function Menu({ voci, onChiudi, testata, style, inizio = 0 }: Props) {
   const conScelta = voci.some((v) => v !== "separatore" && "fai" in v && v.scelta !== undefined);
   const ref = useRef<HTMLDivElement>(null);
-  usaDentro(ref);
   useEffect(() => {
     (ref.current?.querySelector<HTMLButtonElement>("button.scelta") ?? ref.current?.querySelectorAll<HTMLButtonElement>("button")[inizio])?.focus();
     const tasto = (e: KeyboardEvent) => {

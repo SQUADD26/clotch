@@ -2,7 +2,6 @@
 // 148-52864 — «menu ramo» (Predefiniti, Altri rami, ricerca); i selettori «Selettore avvio» (Riposo, Passaggio, Aperto, Spento, Errore).
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { CartellaAvvio, ContestoCartella } from "../../tipi";
-import { usaDentro } from "../base/dentro";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { numero } from "../base/token";
 import { Interruttore } from "../impostazioni/controlli";
@@ -32,7 +31,6 @@ function Menu({ segnaposto, cerca, onCerca, larga = false, onChiudi, children }:
 }) {
   const ref = useRef<HTMLDivElement>(null), chiudi = useRef(onChiudi);
   chiudi.current = onChiudi;
-  usaDentro(ref);
   useEffect(() => {
     ref.current?.querySelector("input")?.focus();
     const tasto = (e: KeyboardEvent) => {
@@ -76,14 +74,12 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
   onScegli(a: Ambiente): void; onAggiungi(p?: Proposta): void; onTogli(m: Macchina): void; onChiudi(): void;
 }) {
   const [cerca, setCerca] = useState(""), [host, setHost] = useState(ssh);
-  const doppio = useRef<HTMLDivElement>(null);
-  usaDentro(doppio);
   const q = cerca.trim().toLowerCase(), trova = (t: string) => t.toLowerCase().includes(q);
   const scegli = (a: Ambiente) => { onScegli(a); onChiudi(); };
   const e = (a: Ambiente) => ambiente.tipo === a.tipo && ambiente.host === a.host;
   const voci: Ambiente[] = [{ tipo: "locale" }, { tipo: "cloud" }, { tipo: "remote_control" }, ...mac.macchine.filter((m) => !m.locale).map((m) => ({ tipo: "ssh" as const, host: m.nome }))];
   return (
-    <div ref={doppio} className="menu-doppio">
+    <div className="menu-doppio">
       <Menu segnaposto="Cerca ambienti…" cerca={cerca} onCerca={setCerca} onChiudi={onChiudi}>
         {q ? voci.filter((a) => trova(nomeAmbiente(a))).map((a) => <Riga key={nomeAmbiente(a)} etichetta={nomeAmbiente(a)} fine="spunta" scelta={e(a)} onClick={() => scegli(a)} />) : (
           <>

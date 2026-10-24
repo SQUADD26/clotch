@@ -10,9 +10,12 @@
   display: flex; align-items: center; pointer-events: auto;
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
-  animation: avviso-entra var(--tempo-normale) ease;
-  transition: opacity var(--tempo-normale) ease, transform var(--tempo-normale) ease;
 }
-.avviso-comparsa.esce { opacity: 0; transform: scale(0.8); }
 .avviso-comparsa .messaggio { flex: 1; min-width: 0; }
+<<<<<<< HEAD
+=======
 @keyframes avviso-entra { from { opacity: 0; transform: scale(0.8); } }
+/* passaggio dei bottoni dell'avviso (azione e X): il bottone sporge di spazio/1 per lato, l'avviso non cambia misura */
+.avviso-comparsa button { padding: var(--spazio-1); margin: calc(-1 * var(--spazio-1)); border-radius: var(--raggio-md); }
+.avviso-comparsa button:hover { background: var(--colore-fondo-riga-passaggio); }
+>>>>>>> f489a3e (fix(cornice): passaggio su testata delle schede Info e sui bottoni degli avvisi (#587))
