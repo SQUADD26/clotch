@@ -147,7 +147,7 @@ H.avvia('requisiti-a', async () => {
 
   await req('D8', async () => {
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000)]; }); await caricaChat();
-    await wait(() => document.querySelector('.pensiero .luccica')?.textContent === 'Ragionamento…');
+    await wait(() => document.querySelector('.pensiero .luccica')?.textContent === 'Ragionamento');
     assert.equal(await run(() => document.querySelector('.pensiero button')), null, 'in corso non si apre');
     nuova((s) => { s.messaggi.s1 = [U('domanda'), PE('ragiono sul problema', 1000), AS('ecco', 5000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
     await wait(() => /^Ragionamento/.test(document.querySelector('.pensiero button')?.textContent || ''));
