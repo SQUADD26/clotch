@@ -36,6 +36,14 @@ function useSessione() {
   return { elenco, sezione, s: elenco.dati?.sessioni.find((x) => x.id === sessione) ?? null };
 }
 
+/** Perché il filo è vuoto, secondo lo stato della sessione (la barra laterale dice già lo stesso con l'icona). */
+const corpoVuoto = (stato: string, adesso?: string) =>
+  adesso === "errore" ? "La sessione si è fermata con un errore prima di scrivere."
+  : adesso === "interrotta" ? "La sessione è stata interrotta prima di scrivere."
+  : stato === "lavora" ? "La sessione sta lavorando: i messaggi arrivano tra poco."
+  : stato === "finita" ? "La sessione è finita senza messaggi da mostrare."
+  : "La sessione è aperta ma non ha ancora messaggi.";
+
 export function Intestazione() {
   const { s } = useSessione();
   const p = usePreferenze().dati;
@@ -100,7 +108,7 @@ function ChatSessione() {
   if (!m.messaggi.length) {
     return (
       <>
-        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="La sessione è aperta ma non ha ancora messaggi." /></div>
+        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo={corpoVuoto(s.stato, s.situazione?.adesso)} />{inFondo}</div>
         {casella}
         <Trova iniziale={provaDi(sezione, "trova")} />
       </>
