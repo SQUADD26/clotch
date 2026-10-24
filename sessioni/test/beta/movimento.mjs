@@ -62,8 +62,8 @@ export function difettiInterruzione(c, dove) {
   for (const [k, serie] of gruppi) {
     const s = serie.slice().sort((x, y) => x[0] - y[0]), op = s.map((x) => x[1]), lo = Math.min(...op), hi = Math.max(...op);
     if (hi - lo < 0.05 || op.length <= 2) continue;
-    let salto;
-    if (gesto == null) salto = Math.max(0, ...op.slice(1).map((v, i) => Math.abs(v - op[i]))) / (hi - lo);
+    let salto, assoluto;
+    if (gesto == null) { assoluto = Math.max(0, ...op.slice(1).map((v, i) => Math.abs(v - op[i]))); salto = assoluto / (hi - lo); }
     else {
       // salto = cambio tra l'ultimo fotogramma prima del gesto e il primo dopo, oltre il passo più lungo del moto intorno
       // (un'entrata veloce e decisa fa passi grandi da sé, specie a pochi fotogrammi al secondo: quelli non sono salti)
@@ -72,10 +72,11 @@ export function difettiInterruzione(c, dove) {
       // il passo di riferimento guarda anche il fotogramma dopo: un moto che accelera (uscita ease-in) non è un salto
       const prima = op.slice(0, i), dopo = op[i + 1] != null ? Math.abs(op[i + 1] - op[i]) : 0;
       const passo = Math.max(dopo, ...prima.slice(1).map((v, j) => Math.abs(v - prima[j])));
-      const cambio = Math.abs(op[i] - op[i - 1]);
+      const cambio = assoluto = Math.abs(op[i] - op[i - 1]);
       salto = cambio > 1.5 * passo ? cambio / (hi - lo) : 0;
     }
-    if (salto > 0.25) d.push({ criterio: 'M10', dove: k, valore: `salto del ${Math.round(salto * 100)}% tra due fotogrammi` });
+    // un salto di meno di un decimo di opacità non si vede (il bottone che torna al riposo dopo il premuto: 0,89 -> 0,95 è «57%» di un'escursione di 0,11)
+    if (salto > 0.25 && assoluto > 0.1) d.push({ criterio: 'M10', dove: k, valore: `salto del ${Math.round(salto * 100)}% tra due fotogrammi` });
   }
   return d;
 }
