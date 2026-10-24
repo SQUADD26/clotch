@@ -148,7 +148,7 @@
    "box": {
     "x": 48,
     "y": 20,
-    "w": 38,
+    "w": 39,
     "h": 18
    },
    "variabili": {
@@ -157,7 +157,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge",
+   "testo": "Leggo",
    "font": "SF Pro Regular"
   },
   {
@@ -165,7 +165,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 90,
+    "x": 91,
     "y": 20,
     "w": 68,
     "h": 18
@@ -288,7 +288,7 @@
    "box": {
     "x": 48,
     "y": 62,
-    "w": 38,
+    "w": 39,
     "h": 18
    },
    "variabili": {
@@ -297,7 +297,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge",
+   "testo": "Leggo",
    "font": "SF Pro Regular"
   },
   {
@@ -305,7 +305,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 90,
+    "x": 91,
     "y": 62,
     "w": 68,
     "h": 18
@@ -324,7 +324,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 162,
+    "x": 163,
     "y": 63,
     "w": 16,
     "h": 16
@@ -340,7 +340,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 167.33203125,
+    "x": 168.33203125,
     "y": 66.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -459,7 +459,7 @@
    "box": {
     "x": 48,
     "y": 104,
-    "w": 38,
+    "w": 39,
     "h": 18
    },
    "variabili": {
@@ -468,7 +468,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge",
+   "testo": "Leggo",
    "font": "SF Pro Regular"
   },
   {
@@ -476,7 +476,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 90,
+    "x": 91,
     "y": 104,
     "w": 68,
     "h": 18
@@ -495,7 +495,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 162,
+    "x": 163,
     "y": 105,
     "w": 16,
     "h": 16
@@ -511,7 +511,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 167.33203125,
+    "x": 168.33203125,
     "y": 108.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -631,7 +631,7 @@
    "box": {
     "x": 50,
     "y": 148,
-    "w": 38,
+    "w": 39,
     "h": 18
    },
    "variabili": {
@@ -640,7 +640,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge",
+   "testo": "Leggo",
    "font": "SF Pro Regular"
   },
   {
@@ -648,7 +648,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 92,
+    "x": 93,
     "y": 148,
     "w": 68,
     "h": 18
@@ -667,7 +667,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 164,
+    "x": 165,
     "y": 149,
     "w": 16,
     "h": 16
@@ -683,7 +683,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 169.33203125,
+    "x": 170.33203125,
     "y": 152.33306884765625,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -810,7 +810,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Esegue un comando",
+   "testo": "Eseguo un comando",
    "font": "SF Pro Regular"
   },
   {
@@ -1047,7 +1047,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Esegue un comando",
+   "testo": "Eseguo un comando",
    "font": "SF Pro Regular"
   },
   {
@@ -1186,7 +1186,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Fotografa",
+   "testo": "Fotografo",
    "font": "SF Pro Regular"
   },
   {

@@ -3095,7 +3095,7 @@
    "box": {
     "x": 89,
     "y": 608,
-    "w": 176,
+    "w": 132,
     "h": 18
    },
    "variabili": {
@@ -3104,7 +3104,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Claude ha ragionato per 14 s",
+   "testo": "Ho ragionato per 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3112,7 +3112,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 271,
+    "x": 227,
     "y": 609,
     "w": 16,
     "h": 16
@@ -3128,7 +3128,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 276.33203125,
+    "x": 232.33203125,
     "y": 612.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3180,7 +3180,7 @@
    "box": {
     "x": 89,
     "y": 636,
-    "w": 179,
+    "w": 135,
     "h": 18
    },
    "variabili": {
@@ -3189,7 +3189,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Claude ha usato 12 strumenti",
+   "testo": "Ho usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3197,7 +3197,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 274,
+    "x": 230,
     "y": 636,
     "w": 35,
     "h": 18
@@ -3216,7 +3216,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 315,
+    "x": 271,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3232,7 +3232,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 315.66796875,
+    "x": 271.66796875,
     "y": 637.666015625,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -3247,7 +3247,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 337,
+    "x": 293,
     "y": 636,
     "w": 47,
     "h": 18
@@ -3266,7 +3266,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 390,
+    "x": 346,
     "y": 637,
     "w": 16,
     "h": 16
@@ -3282,7 +3282,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 395.33203125,
+    "x": 351.33203125,
     "y": 640.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3557,7 +3557,7 @@
    "box": {
     "x": 89,
     "y": 801,
-    "w": 138,
+    "w": 96,
     "h": 18
    },
    "variabili": {
@@ -3565,7 +3565,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Claude legge Filo.tsx…",
+   "testo": "Leggo Filo.tsx…",
    "font": "SF Pro Regular"
   },
   {
@@ -3573,7 +3573,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 233,
+    "x": 191,
     "y": 801,
     "w": 78,
     "h": 18
