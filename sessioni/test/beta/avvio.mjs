@@ -54,12 +54,12 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
     s = { ...s, messaggi: {}, info: {}, archiviate: [], elenco: s.elenco && { ...s.elenco, sessioni: [] } };
     if (s.navigazione) s.navigazione = { vista: s.navigazione.vista };
   }
-  // quote d'uso finte (#691): senza, il piede account non ha menu da cliccare. Il primo è l'account della sessione aperta, relativi ad adesso
+  // quote d'uso finte (#691): normale, finita (100 %), quasi finita (95 %); senza, il piede account non ha menu da cliccare. Il primo è l'account della sessione aperta, relativi ad adesso
   const h = 3_600_000, ora = Date.now();
   s.uso ??= [
     { account: 'accountmanager', email: 'accountmanager@example.com', usato: 31, ripartenza: '', cinque: 42, cinqueFine: ora + 2 * h, sette: 31, setteFine: ora + 70 * h },
     { account: 'secondo', email: 'secondo@example.com', usato: 100, ripartenza: '', cinque: 100, cinqueFine: ora + h, sette: 64, setteFine: ora + 40 * h },
-    { account: 'terzo', email: 'terzo@example.com', usato: 12, ripartenza: '', cinque: 8, cinqueFine: ora + 4 * h, sette: 12, setteFine: ora + 100 * h },
+    { account: 'terzo', email: 'terzo@example.com', usato: 95, ripartenza: '', cinque: 71, cinqueFine: ora + 4 * h, sette: 95, setteFine: ora + 100 * h }, // quasi finito: giallo
   ];
   if (lun) { const nav = s.navigazione; s = lungo(s); s.navigazione = nav; }
   const f = join(cartella, `scena-${area}-${dati}${lun ? '-lungo' : ''}.json`);

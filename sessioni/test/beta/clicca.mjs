@@ -109,6 +109,16 @@ async function giro(app, area, cfg, console_) {
         await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(60); await pagina.keyboard.press('Escape');
         const r = await c; if (r) difettiInterruzione(r, el.dove).forEach((d) => reg.difetti.push({ ...d, quando: el.dove }));
       }
+      if (!dopo.aperti) { // menu dentro il menu (#691): si riapre e si apre ogni voce che apre un altro menu, con foto e sonde
+        await pausa(300); await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(300);
+        const sotto = await pagina.evaluate(() => [...document.querySelectorAll(`:is(${window.__bt.SOPRA}) :is([aria-haspopup]:not([aria-haspopup="false"]),[aria-expanded])`)].map((e, k) => (e.setAttribute('data-bt2', k), window.__bt.sel(e))));
+        for (let k = 0; k < Math.min(sotto.length, 4); k++) {
+          if (!(await pagina.locator(`[data-bt2="${k}"]`).first().click({ timeout: 1000 }).then(() => true, () => false))) continue;
+          await pausa(350); const f = await foto(`el${i}-sotto${k}`); el.foto.push(f);
+          await difetti(`${el.dove} › ${sotto[k]}`, f);
+        }
+        for (let k = 0; k < 3 && (await pagina.evaluate(() => window.__bt.menuAperti())); k++) { await pagina.keyboard.press('Escape'); await pausa(250); }
+      }
     } else if (tipo !== 'campo') { await pagina.keyboard.press('Escape'); await pausa(250); } // la chiusura con Esc finisce la sua transizione prima della firma
     if (await pagina.evaluate((r) => window.__bt.firma(r), radice) !== firma0) { await pulito(); nomi = await segna(); }
   }
