@@ -19,7 +19,7 @@ import { ChipModello } from "./ChipModello";
 import { Coda, mandaOra } from "./Coda";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
-import { Suggerimenti, useVoci } from "./Suggerimenti";
+import { ID_MENU, idVoce, Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
 import { MAX_ALLEGATI, MAX_TOTALE_BYTE, limiteAllegato } from "../../allegati-limiti";
 import { casella, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
@@ -218,6 +218,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
         )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}
+            {...(cerca && { role: "combobox", "aria-expanded": true, "aria-controls": ID_MENU, "aria-autocomplete": "list", "aria-activedescendant": voci.length ? idVoce(Math.min(scelta, voci.length - 1)) : undefined })}
             onSelect={(e) => setCaret(e.currentTarget.selectionStart)} onFocus={() => setChiuso(false)} onBlur={() => setChiuso(true)}
             placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>

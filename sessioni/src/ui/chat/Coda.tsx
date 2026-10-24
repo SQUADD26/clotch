@@ -35,7 +35,7 @@ export function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, 
             {i === 0 && !lunga && <span className="etichetta">{conto}</span>}
             <span className="testo">{v.testo}</span>
             <div className="azioni">
-              <Suggerimento testo="Interrompi e invia" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
+              <Suggerimento testo="Interrompi e invia" scorciatoia={i === 0 ? "↵" : null} classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
                 <BottoneIcona icona="invia-ora" etichetta="Interrompi e invia" onClick={() => mandaOra(chat, v, preferenza, attuale, pref)} />
               </Suggerimento>
               <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
