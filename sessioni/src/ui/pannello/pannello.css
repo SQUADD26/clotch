@@ -8,6 +8,7 @@
 .pezzo-pannello .pannello-obiettivo .sezione.prove { gap: var(--spazio-2); }
 .pezzo-pannello .pannello-obiettivo .divisore { height: var(--misura-tratto); flex: none; background: var(--colore-bordo-leggero); }
 .pezzo-pannello .pannello-obiettivo .prova { display: flex; gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo :is(.sezione > div, .prova > span) { min-width: 0; overflow-wrap: anywhere; }
 .pezzo-pannello .pannello-obiettivo .errore { color: var(--colore-testo-errore); }
 .pezzo-pannello .pannello-obiettivo .riga-file { display: flex; gap: var(--spazio-2); }
 .pezzo-pannello .pannello-obiettivo .conteggio { flex: 1; }
