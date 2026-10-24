@@ -15,16 +15,19 @@ const elenco = [
 ];
 const vista: Vista = { filtri: [], raggruppa: "cartella", ordina: "attivita" };
 
-test("cartelle in ordine di ultima attività, titolo «Progetti»", () => {
+test("cartelle in ordine alfabetico, ferme anche se l'attività cambia, titolo «Progetti»", () => {
   const b = componi(elenco, vista, {}, ORA);
   assert.equal(b.titolo, "Progetti");
-  assert.deepEqual(b.gruppi.map((g) => [g.titolo, g.sessioni.map((x) => x.id)]), [["clotch", ["1", "3"]], ["squadd-v2", ["2"]], ["dentalspace", ["4"]]]);
+  assert.deepEqual(b.gruppi.map((g) => [g.titolo, g.sessioni.map((x) => x.id)]), [["clotch", ["1", "3"]], ["dentalspace", ["4"]], ["squadd-v2", ["2"]]]);
+  // la sessione più vecchia diventa la più recente: le cartelle non si muovono (#1144)
+  const dopo = elenco.map((x) => (x.id === "4" ? { ...x, ultimaAttivita: ORA } : x));
+  assert.deepEqual(componi(dopo, vista, {}, ORA).gruppi.map((g) => g.titolo), ["clotch", "dentalspace", "squadd-v2"]);
 });
 
 test("filtri attivi: «N sessioni» e solo le sessioni che passano", () => {
   const b = componi(elenco, { ...vista, filtri: [{ proprieta: "stato", valori: ["aspetta", "ferma"] }, { proprieta: "sorgente", valori: [] }] }, {}, ORA);
   assert.equal(b.titolo, "2 sessioni");
-  assert.deepEqual(b.gruppi.flatMap((g) => g.sessioni.map((x) => x.id)), ["2", "3"]);
+  assert.deepEqual(b.gruppi.flatMap((g) => g.sessioni.map((x) => x.id)), ["3", "2"]); // clotch prima di squadd-v2
 });
 
 test("fissate in cima e anche nella loro cartella (101:21065)", () => {
@@ -35,7 +38,7 @@ test("fissate in cima e anche nella loro cartella (101:21065)", () => {
 
 test("raggruppa per data e per sorgente, ordina per nome", () => {
   assert.deepEqual(componi(elenco, { ...vista, raggruppa: "data" }, {}, ORA).gruppi.map((g) => g.titolo), ["Oggi", "12 ott"]);
-  assert.deepEqual(componi(elenco, { ...vista, raggruppa: "sorgente", ordina: "nome" }, {}, ORA).gruppi.map((g) => g.titolo), ["Codex", "Claude Code", "Cursor"]); // i gruppi seguono la prima sessione in ordine di nome
+  assert.deepEqual(componi(elenco, { ...vista, raggruppa: "sorgente", ordina: "nome" }, {}, ORA).gruppi.map((g) => g.titolo), ["Claude Code", "Codex", "Cursor"]);
 });
 
 test("testi: pillola, giorni, opzioni, piede", () => {
