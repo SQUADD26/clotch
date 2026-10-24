@@ -160,7 +160,7 @@ app.whenReady().then(async () => {
     emit({ tipo: 'upsert', sessione: 'Gap', epoca: gr.result.cronologia.epoca, daSeq: 4, aSeq: 5, totale: 2,
       righe: [{ chiave: 'fixture:Gap:1', ordine: 1, revisione: 5, messaggio: user('Non applicare') }] });
     await wait(async () => await run('probe.stato') === 'errore', 'gap visibile');
-    assert.equal(await text(), 'Conservato'); assert.match(await run('probe.errore'), /Mancano aggiornamenti/);
+    assert.equal(await text(), 'Conservato'); assert.match(await run('probe.errore'), /Aggiornamenti persi/);
     sources.Gap = [user('Risincronizzata')]; let n = pending.length;
     await run('probe.riprova()'); await requests(n + 1); await settle(pending[n]); assert.equal(await text(), 'Risincronizzata');
     assert.equal(await run('probe.stato'), 'pronto'); console.log('ASYNC_V1_GAP_RECOVERY_OK');

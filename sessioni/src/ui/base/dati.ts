@@ -49,7 +49,7 @@ export const messaggioValido = (m: unknown): m is Messaggio => oggetto(m) && (m.
 
 /** Elenco con la forma controllata: `sessioni` non è un array = errore con «Riprova»; le sessioni storte si scartano. */
 export function elencoValido(e: unknown): Elenco {
-  if (!oggetto(e) || !Array.isArray(e.sessioni)) throw new Error("Elenco delle sessioni non valido.");
+  if (!oggetto(e) || !Array.isArray(e.sessioni)) throw new Error("Sessioni non leggibili. Riprova.");
   return { sessioni: e.sessioni.filter(sessioneValida), errori: Array.isArray(e.errori) ? e.errori.filter((x) => oggetto(x) && sono(x, "string", "percorso", "messaggio")) : [] };
 }
 

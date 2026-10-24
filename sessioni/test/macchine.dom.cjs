@@ -108,7 +108,7 @@ app.whenReady().then(async () => {
       await wait(() => document.querySelectorAll('.menu-ssh .riga-macchina').length === 3);
       await clicca('.menu-ssh .riga-macchina', 'rise');
       await wait(() => [...document.querySelectorAll('.selettore')].some((e) => e.textContent.trim() === 'rise'));
-      assert.deepEqual(await testi('.selettore'), ['rise', '/srv/clotch', 'dev', 'Worktree']);
+      assert.deepEqual(await testi('.selettore'), ['rise', '/srv/clotch', 'dev', 'Copia di lavoro']);
       await scrivi('Controlla i test');
       await invio();
       await attendi(() => comandi.some((c) => c.cmd === 'nuova_sessione'));
