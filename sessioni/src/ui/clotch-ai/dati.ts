@@ -49,12 +49,15 @@ export function useRegistro() {
   return { ...registro.usa(), riprova: () => { registro.metti({ stato: "carica" }); leggi(); } };
 }
 
-/** Per chi non è un componente: `cb` col registro ora (se c'è) e a ogni cambio; torna la funzione per staccarsi. */
+/** Per chi non è un componente: `cb` col registro ora (se c'è, subito dopo l'iscrizione, mai dentro) e a ogni cambio; torna la funzione per staccarsi. */
 export function seguiRegistro(cb: (r: Registro) => void): () => void {
   collega();
-  const d = registro.get().dati;
-  if (d) cb(d);
-  return registro.segui(() => { const r = registro.get().dati; if (r) cb(r); });
+  let vivo = true, dato = false;
+  const manda = () => { const r = registro.get().dati; if (vivo && r) { dato = true; cb(r); } };
+  // in microtask: il chiamante che usa `off` dentro `cb` l'ha già in mano; se un cambio è arrivato prima, non si richiama
+  queueMicrotask(() => { if (!dato) manda(); });
+  const fuori = registro.segui(manda);
+  return () => { vivo = false; fuori(); };
 }
 
 /** Stato che il registro non ha: l'app sta avviando clotch AI («Avvio…», «Riavvio…»). */
