@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792870626802,
+    "ultimaAttivita": 1792852143522,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -56,12 +56,12 @@
    {
     "tipo": "utente",
     "testo": "Perché la voce «Assistenza» non si vede nella barra?",
-    "t": 1792870699655
+    "t": 1792852216046
    },
    {
     "tipo": "pensiero",
     "testo": "Il filo mostra una riga per ogni strumento. Raggruppo gli strumenti del turno in una riga sola, chiusa. Apro il gruppo solo se Roberto lo chiede. L’errore resta visibile anche col gruppo chiuso.",
-    "t": 1792870700655
+    "t": 1792852217046
    },
    {
     "tipo": "strumento",
@@ -74,7 +74,7 @@
      "testo": "Found 4 files\na\nb\nc\nd",
      "errore": false
     },
-    "t": 1792870714655,
+    "t": 1792852231046,
     "id": "t0"
    },
    {
@@ -87,7 +87,7 @@
      "testo": "…",
      "errore": false
     },
-    "t": 1792870714855,
+    "t": 1792852231246,
     "id": "t1"
    },
    {
@@ -100,7 +100,7 @@
      "testo": "",
      "errore": false
     },
-    "t": 1792870715155,
+    "t": 1792852231546,
     "id": "t2"
    },
    {
@@ -113,7 +113,7 @@
      "testo": "Exit code 1",
      "errore": true
     },
-    "t": 1792870718155,
+    "t": 1792852234546,
     "id": "t3"
    },
    {
@@ -126,14 +126,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792870723155,
+    "t": 1792852239546,
     "id": "t4"
    },
    {
     "tipo": "assistente",
     "testo": "La voce «Assistenza» c’è, ma la barra la nasconde a chi non ha il ruolo «supporto». Il controllo sta in useRoleAccess.ts. Ti propongo di mostrarla a tutti gli admin.",
     "modello": "claude-opus-5-5",
-    "t": 1792870746155
+    "t": 1792852262546
    }
   ]
  },
