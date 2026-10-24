@@ -10,8 +10,8 @@ import { tastiDi } from "./tasti";
 
 const AZIONI: [string, string][] = [
   ["cerca", "Cerca sessioni"], ["clotchAi", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
-  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra barra laterale"], ["impostazioni", "Apri impostazioni"],
-  ["inviaInterrompi", "Invia e interrompi la sessione"], ["coda", "Metti in coda"], ["trova", "Trova nella sessione"],
+  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra o nascondi barra laterale"], ["impostazioni", "Apri impostazioni"],
+  ["inviaInterrompi", "Interrompi e invia"], ["coda", "Metti in coda"], ["trova", "Cerca nella sessione"],
 ];
 const nome = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
 

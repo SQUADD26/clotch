@@ -18,10 +18,11 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
   const t0 = performance.now(); let prima = t0;
   const tick = (t) => {
     passi.push(t - prima); prima = t;
-    for (const a of document.getAnimations()) if (!viste.has(a)) {
+    // anche le ombre (uscita dei sovrapposti: copia muta in uno shadow root, base/Sovrapposto.tsx)
+    for (const a of [...document.getAnimations(), ...[...document.body.children].flatMap((e) => e.shadowRoot?.getAnimations() ?? [])]) if (!viste.has(a)) {
       const tempi = a.effect.getTiming(), chiavi = a.effect.getKeyframes();
       viste.set(a, { nome: a.animationName ?? a.transitionProperty, pseudo: a.effect.pseudoElement ?? '', classe: String(a.effect.target?.className ?? ''),
-        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations });
+        durata: tempi.duration, curva: tempi.easing !== 'linear' ? tempi.easing : (chiavi[0]?.easing ?? 'linear'), giri: tempi.iterations, primo: a.effect.target ? Number(getComputedStyle(a.effect.target, a.effect.pseudoElement ?? null).opacity) : null });
     }
     if (t - t0 < ms) requestAnimationFrame(tick); else fine({ animazioni: [...viste.values()], passi: passi.slice(1) });
   };
@@ -98,6 +99,17 @@ app.whenReady().then(async () => {
     assert.equal(esce.durata, ms(tok['tempo-uscita'])); assert.equal(curva(esce.curva), curva(tok['curva-uscita']));
     await run(() => [...document.querySelectorAll('.avviso-comparsa button')].find((b) => b.textContent === 'Annulla')?.click());
 
+    // sovrapposto chiuso a metà apertura (M10): l'uscita parte dall'opacità raggiunta, non da 1
+    await run(`(${clic('button[aria-label="Altro"]')})()`);
+    await new Promise((r) => setTimeout(r, 50));
+    const aperto = await run(() => Number(getComputedStyle(document.querySelector('.sovrapposto')).opacity));
+    const uscita = await run(`window.registra(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), 300)`);
+    const m10 = uscita.animazioni.filter((a) => a.classe.includes('esce'));
+    console.log(`MOV MOV-022 sovrapposto interrotto aperto=${aperto.toFixed(2)} uscite=${m10.length} ${m10.map((a) => `parte=${a.primo.toFixed(2)} durata=${a.durata}ms`).join(' ')}`);
+    assert.ok(m10.length >= 1, 'MOV-022: il menu chiuso a metà ha la sua uscita');
+    assert.ok(aperto < 0.9 && m10.every((a) => Math.abs(a.primo - aperto) < 0.25), `MOV-022: aperto a ${aperto}, l'uscita parte da ${m10.map((a) => a.primo)}`);
+    assert.ok(m10.every((a) => a.durata === ms(tok['tempo-uscita'])), 'MOV-022: uscita in tempo-uscita');
+
     // pressione: un bottone icona premuto scende a scala-premuto in tempo-pressione
     const c = await run(() => { const r = document.querySelector('button[aria-label="Barra laterale"]').getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; });
     const transizione = await run(() => getComputedStyle(document.querySelector('button[aria-label="Barra laterale"]')).transitionDuration);
@@ -119,6 +131,13 @@ app.whenReady().then(async () => {
     if (await run(() => !!document.querySelector('.velo-barra'))) await run(`(${clic('.velo-barra')})()`), await wait(() => !document.querySelector('.velo-barra'));
     await misura('MOV-012', 'barra sopra apre', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E], ['::view-transition-new(velo)', ...E]]);
     await misura('MOV-013', 'barra sopra chiude', clic('.velo-barra'), [['::view-transition-old(barra)', ...U], ['::view-transition-old(velo)', ...U]]);
+
+    // due cambi di struttura nello stesso fotogramma: la prima transizione è saltata, niente errore non gestito (#750)
+    const rifiuti = await run(`new Promise((fine) => { const r = []; const f = (e) => r.push(String(e.reason)); addEventListener('unhandledrejection', f);
+      const b = document.querySelector('button[aria-label="Barra laterale"]'); b.click(); b.click();
+      setTimeout(() => { removeEventListener('unhandledrejection', f); fine(r); }, 400); })`);
+    assert.deepEqual(rifiuti, [], '#750: promesse di View Transition rifiutate senza gestore');
+    console.log('MOV-023 due transizioni nello stesso fotogramma: 0 errori');
 
     // riduci movimento: niente gruppi che si spostano, niente scale né infinite
     // controllo positivo: uno spinner gira (infinito, tempo-giro) finché il movimento non è ridotto

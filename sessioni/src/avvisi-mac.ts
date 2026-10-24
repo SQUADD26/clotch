@@ -15,7 +15,7 @@ export function collegaAvvisi(elenco: () => Sessione[], impostazioni: () => Impo
   const controllaQuote = () => quoteUso().then((quote) => {
     const imp = impostazioni(), nuove = sogliePassate(quote, soglie); // le soglie si registrano anche in silenzio: non si recuperano dopo
     if (imp.avvisoLimite === false || inSilenzio(imp.silenzio ?? PARTENZA.silenzio, ora()) || !Notification.isSupported()) return;
-    for (const n of nuove) new Notification({ title: n.account, body: `Quota usata: ${n.soglia}%`, silent: true }).show();
+    for (const n of nuove) new Notification({ title: n.account, body: `Limite di uso: ${n.soglia}%`, silent: true }).show();
   }, () => {});
   return (a: Aggiornamento) => {
     void controllaQuote();

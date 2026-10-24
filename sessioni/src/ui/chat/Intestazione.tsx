@@ -14,7 +14,7 @@ import { SORGENTE, nomeAccount, provaDi } from "./testi";
 import "./intestazione.css";
 
 const STATO: Record<StatoSegno, string> = {
-  lavora: "In corso", aspetta: "In attesa di te", ferma: "Ferma", finita: "Finita", errore: "Non risponde",
+  lavora: "In corso", aspetta: "In attesa di te", ferma: "In pausa", finita: "Finita", errore: "Non risponde",
 };
 
 export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRisponde: boolean; pref?: PreferenzeSessione }) {
@@ -28,9 +28,9 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
       <div className="testi">
         <div className="riga-titolo">
           <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-          <span className="titolo">{s.titolo || "Senza titolo"}</span>
+          <span className="titolo" title={s.titolo}>{s.titolo || "Senza titolo"}</span>
         </div>
-        <div className="dati">
+        <div className="dati" title={dati.filter(Boolean).join(" · ")}>
           <span className="stato"><SegnoStato stato={stato} />{STATO[stato]}</span>
           {dati.map((d, i) => d && (
             <span key={i} className="dato">

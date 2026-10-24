@@ -11,7 +11,4 @@
 }
 .pezzo-chat .trova input::placeholder { color: var(--colore-testo-secondario); }
 .pezzo-chat .trova .contatore { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
-/* icona nuda da 16: l'area del clic è più larga, il margine negativo non sposta niente */
-.pezzo-chat .trova .icona-trova { flex: none; display: flex; padding: var(--spazio-1); margin: calc(-1 * var(--spazio-1)); border-radius: var(--raggio-md); }
-.pezzo-chat .trova .icona-trova:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
-.pezzo-chat .trova .icona-trova.su .icona { transform: rotate(180deg); }
+.pezzo-chat .trova .bottone-icona.su .icona { transform: rotate(180deg); }

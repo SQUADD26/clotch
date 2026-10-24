@@ -15,6 +15,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 /* fine dell'avvio (101-30345): il corpo compare con dissolvenza quando arriva l'elenco */
 .cornice .corpo { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
 .cornice.in-avvio .corpo { opacity: 0; }
+.avvio { transition: opacity var(--tempo-uscita) var(--curva-uscita); }
 
 /* View Transition (base/movimento.ts): ogni gruppo con nome si sposta e ridimensiona, il resto dissolve */
 :root { --scivola-barra: -100%; --scivola-pannello: 100%; --sposta-entrata: var(--spazio-1); }

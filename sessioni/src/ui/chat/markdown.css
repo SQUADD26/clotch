@@ -7,15 +7,27 @@
 .pezzo-chat .markdown h1 { font-size: var(--testo-dimensione-titolo-1); line-height: var(--testo-riga-titolo-1); font-weight: 600; }
 .pezzo-chat .markdown h2 { padding-top: var(--spazio-3); font-size: var(--testo-dimensione-titolo-2); line-height: var(--testo-riga-titolo-2); font-weight: 600; }
 .pezzo-chat .markdown :is(h3,h4,h5,h6) { padding-top: var(--spazio-2); font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); font-weight: 500; }
+/* livelli sotto h3 (non nel disegno): scendono di corpo e di colore, così restano distinguibili */
+.pezzo-chat .markdown h4 { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 600; }
+.pezzo-chat .markdown h5 { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 600; color: var(--colore-testo-secondario); }
+.pezzo-chat .markdown h6 { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); font-weight: 600; color: var(--colore-testo-secondario); }
 .pezzo-chat .markdown a { color: var(--colore-testo-link); text-decoration: none; }
-.pezzo-chat .markdown a:hover { text-decoration: underline; }
+.pezzo-chat .markdown a:hover { text-decoration: underline; opacity: var(--opacita-passaggio); }
+.pezzo-chat .markdown a { transition: opacity var(--tempo-entrata) var(--curva-entrata); }
+.pezzo-chat .markdown a:focus-visible { border-radius: var(--raggio-xs); outline-width: var(--misura-tratto-forte); outline-offset: 0; }
+.pezzo-chat .markdown a:active { opacity: var(--opacita-premuto); }
+.pezzo-chat .markdown .link-inerte { color: var(--colore-testo-link); cursor: default; }
+.pezzo-chat .markdown .immagine { display: inline-flex; align-items: center; gap: var(--spazio-1-5); color: var(--colore-testo-secondario); vertical-align: bottom; }
 .pezzo-chat .markdown strong { font-weight: 600; }
 
 /* elenchi: segno di 20 px, 8 px di aria, voci a spazio/1-5 una dall'altra */
-.pezzo-chat .markdown :is(ul,ol) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spazio-1-5); counter-reset: voce; }
+.pezzo-chat .markdown :is(ul,ol) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spazio-1-5); counter-reset: voce calc(var(--inizio, 1) - 1); }
 .pezzo-chat .markdown li { position: relative; padding-left: calc(var(--spazio-5) + var(--spazio-2)); counter-increment: voce; }
-.pezzo-chat .markdown li > :is(p) { margin: 0; }
+/* figli di citazione e di voce: stesso ritmo dei paragrafi del filo (spazio/3); una lista annidata in una voce stretta resta a spazio/1-5 */
+.pezzo-chat .markdown :is(blockquote,li) > * { margin-block: 0; }
+.pezzo-chat .markdown :is(blockquote,li) > * + * { margin-top: var(--spazio-3); }
 .pezzo-chat .markdown li > :is(ul,ol) { margin-top: var(--spazio-1-5); }
+.pezzo-chat .markdown li:has(> p) > * + * { margin-top: var(--spazio-3); }
 .pezzo-chat .markdown ul > li::before {
   content: ""; position: absolute; left: var(--spazio-2); top: calc((var(--testo-riga-messaggio) - var(--spazio-1)) / 2);
   width: var(--spazio-1); height: var(--spazio-1); border-radius: var(--raggio-pieno); background: var(--colore-icona-secondaria);
@@ -27,11 +39,19 @@
 .pezzo-chat .markdown ol > li::before { content: counter(voce) "."; position: absolute; left: 0; width: var(--spazio-5); text-align: right; color: var(--colore-testo-secondario); }
 .pezzo-chat .markdown li.task-list-item { padding-left: 0; }
 .pezzo-chat .markdown li.task-list-item::before { content: none; }
+/* casella dell'attività: disegnata con i token, non quella del sistema */
+.pezzo-chat .markdown .task-list-item > input[type="checkbox"], .pezzo-chat .markdown .task-list-item > p > input[type="checkbox"] {
+  appearance: none; box-sizing: border-box; display: inline-grid; place-content: center; vertical-align: text-bottom; margin: 0 var(--spazio-2) 0 0;
+  width: var(--misura-icona); height: var(--misura-icona); border: var(--misura-tratto-forte) solid var(--colore-icona-terziaria); border-radius: var(--raggio-xs); background: none;
+}
+.pezzo-chat .markdown .task-list-item input[type="checkbox"]:checked { border-color: var(--colore-icona-accento); background: var(--colore-icona-accento); }
+.pezzo-chat .markdown .task-list-item input[type="checkbox"]:checked::after { content: ""; width: var(--spazio-1); height: var(--spazio-2); margin-top: calc(-1 * var(--misura-tratto)); border: solid var(--colore-testo-su-primario); border-width: 0 var(--misura-tratto-forte) var(--misura-tratto-forte) 0; transform: rotate(45deg); }
+.pezzo-chat .markdown .task-list-item:has(input:checked) { color: var(--colore-testo-secondario); }
 
 .pezzo-chat .markdown blockquote {
   margin: 0; padding-left: var(--spazio-3); border-left: var(--misura-tratto-forte) solid var(--colore-bordo-forte); color: var(--colore-testo-secondario);
 }
-.pezzo-chat .markdown blockquote > p { margin: 0; }
+.pezzo-chat .markdown blockquote blockquote { margin-left: var(--spazio-3); }
 .pezzo-chat .markdown hr { height: var(--misura-tratto); margin: var(--spazio-1) 0; border: 0; background: var(--colore-bordo-leggero); }
 
 /* codice in linea */
@@ -70,6 +90,7 @@
 .pezzo-chat .tabella-markdown :is(th,td):not(:first-child).larga { width: var(--misura-tabella-colonna-larga); }
 .pezzo-chat .tabella-markdown :is(th,td).numero { width: var(--misura-tabella-colonna-numero); min-width: var(--misura-tabella-colonna-numero); text-align: right; }
 .pezzo-chat .tabella-markdown tr:last-child > td { border-bottom: 0; }
+.pezzo-chat .tabella-markdown tbody tr:hover > td { background-image: linear-gradient(var(--colore-fondo-riga-passaggio), var(--colore-fondo-riga-passaggio)); }
 .pezzo-chat .tabella-markdown th {
   position: sticky; top: 0; z-index: var(--livello-sopra-2); color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500;
   background-color: var(--colore-fondo-superficie); background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione));

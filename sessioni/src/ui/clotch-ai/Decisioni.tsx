@@ -45,7 +45,7 @@ export function Decisioni() {
   const gruppi = r ? decisioniPerGiorno(r, Date.now()) : [];
   const conferma = typeof scelta === "string" ? gruppi.flatMap((g) => g.voci).find((d) => d.id === scelta) ?? null : scelta;
   if (r && !gruppi.length) {
-    return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="clotch AI non ha ancora deciso niente" corpo="Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare." /></div>;
+    return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="Nessuna decisione" corpo="Le scelte di clotch AI compaiono qui e si possono annullare." /></div>;
   }
   return (
     <div className="vista-clotch-ai">

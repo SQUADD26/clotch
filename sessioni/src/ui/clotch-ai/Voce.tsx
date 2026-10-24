@@ -7,7 +7,7 @@ import { statoVoce } from "./statoVoce";
 import "./voce.css";
 
 /** L'app sta dicendo un avviso a voce (Clotch assente): lo dice il main, che è chi lancia `say`. */
-function useVoceApp() {
+export function useVoceApp() {
   const [parla, setParla] = useState(false);
   useEffect(() => {
     clotchAi().voce().then(setParla, () => {});

@@ -15,7 +15,7 @@ import { AvvisoRosso } from "./Pezzi";
 import { PrimaApertura } from "./PrimaApertura";
 import { AvvisoMicrofono, useVoce as useStatoVoce } from "./Voce";
 import { statoClotchAi } from "./vista";
-import { dettaChiTocca, dettatura, useVoce } from "./dettatura";
+import { dettaChiTocca, dettatura, fermaPerUscita, useVoce } from "./dettatura";
 
 export function ChatClotchAi() {
   const { dati: r } = useRegistro();
@@ -31,17 +31,18 @@ export function ChatClotchAi() {
   useEffect(() => { const t = provaDi(sezione, "dettatura"); if (t !== null) dettatura.metti({ attiva: true, testo: t }); }, [sezione]);
   // ⌥Spazio apre e chiude il microfono; con Clotch acceso è il suo tasto globale e l'app non fa niente
   useEffect(() => {
-    if (clotch) return;
+    if (clotch || spenta) return;
     const premi = (e: KeyboardEvent) => { if (e.altKey && e.code === "Space" && !e.repeat) { e.preventDefault(); dettaChiTocca(false); } };
     addEventListener("keydown", premi);
     return () => removeEventListener("keydown", premi);
-  }, [clotch]);
+  }, [clotch, spenta]);
+  useEffect(() => fermaPerUscita, []); // niente microfono aperto fuori vista
   return (
     <>
       {/* chat vuota (101-36642) solo a registro letto: prima non si sa se è vuota */}
       {vuota && r ? <PrimaApertura /> : <FiloClotchAi>{permessi.length > 0 && <Permessi permessi={permessi} />}</FiloClotchAi>}
       {(avvio === "riavvio" || spenta) && <div className="vista-clotch-ai chat-clotch-ai">
-        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Riprendo le sessioni e gli avvisi da dove erano." />}
+        {avvio === "riavvio" && <AvvisoRosso titolo="Riavvio clotch AI" corpo="Sessioni e avvisi riprendono da dove erano." />}
         {!avvio && st?.stato === "spenta" && (
           <>
             <AvvisoRosso titolo={st.da ? `clotch AI si è chiusa alle ${orario(st.da)}` : "clotch AI si è chiusa"} corpo="L’app prova a riaprirla. Se non riparte, riavviala tu." />
