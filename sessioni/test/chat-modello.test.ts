@@ -115,3 +115,9 @@ test("riconciliazione non muta il modello precedente e conserva blocchi diversi 
   assert.deepEqual(prima, congelato);
   assert.equal(primoTurno(dopo).blocchi[1].chiave, primoTurno(prima).blocchi[0].chiave);
 });
+
+test("domanda: multiSelect, header e descrizione delle opzioni arrivano al filo", () => {
+  const q = { question: "Quali schermate?", header: "Schermate", multiSelect: true, options: [{ label: "Barra", description: "La barra laterale" }, { label: "Chat" }] };
+  const b = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, st("q1", "AskUserQuestion", { questions: [q] }, null)], true)[1]);
+  assert.deepEqual(b[0].tipo === "domanda" && b[0].domande, [{ domanda: "Quali schermate?", opzioni: ["Barra", "Chat"], descrizioni: ["La barra laterale", ""], header: "Schermate", multi: true }]);
+});

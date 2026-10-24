@@ -4,6 +4,7 @@ import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
+import type { DomandaTesto } from "./modello";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
 import { comanda } from "./clotch-ai";
@@ -96,21 +97,24 @@ function frecceOpzioni(e: KeyboardEvent<HTMLDivElement>, n: number, scegli: (j: 
   scegli(j); bottoni[j].focus();
 }
 
+/** Perché i bottoni sono spenti: la domanda non è di clotch AI (si risponde dal terminale) o manca ancora una scelta. */
+const NotaSolaLettura = () => <div className="nota-voce"><Icona nome="terminale" /><span>Rispondi dal terminale: clotch AI non vede questa richiesta</span></div>;
+
 /** `rid` null: la domanda è aperta nella trascrizione ma clotch AI non la conosce, e non si può rispondere da qui. */
-export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: { domanda: string; opzioni: string[] }[]; da: string | null }) {
+export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: DomandaTesto[]; da: string | null }) {
   // l'opzione consigliata parte scelta, come nel disegno
-  const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));
-  const [altro, setAltro] = useState("");
+  const [scelte, setScelte] = useState<number[][]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? [] : [i]; }));
+  const [altro, setAltro] = useState<string[]>(domande.map(() => ""));
   const [fatta, setFatta] = useState<{ testo: string; saltata: boolean } | null>(null);
   const { inCorso, fai } = useInCorso();
   const ris = useRiserva();
   if (fatta !== null) return fatta.saltata ? <Esito icona="persona" colore="secondaria" esito="Saltata" /> : <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={fatta.testo} />;
-  const risposte = domande.map((d, i) => {
-    const o = scelte[i];
-    const scelta = o == null ? "" : d.opzioni[o].replace(CONSIGLIATA, "");
-    return { domanda: d.domanda, scelta, testo: i === domande.length - 1 ? altro.trim() : "" };
-  });
-  const pronta = !!rid && !inCorso && risposte.every((r) => r.scelta || r.testo);
+  const scegli = (i: number, j: number) => setScelte(scelte.map((x, k) => k !== i ? x : domande[i].multi ? (x.includes(j) ? x.filter((y) => y !== j) : [...x, j].sort()) : [j]));
+  const risposte = domande.map((d, i) => ({
+    domanda: d.domanda, scelta: scelte[i].map((o) => d.opzioni[o].replace(CONSIGLIATA, "")).join(", "), testo: altro[i].trim(),
+  }));
+  const manca = risposte.findIndex((r) => !r.scelta && !r.testo);
+  const pronta = !!rid && !inCorso && manca < 0;
   const rispondi = () => pronta ? fai(async () => { if (await comanda("rispondi_domanda", { chat, rid, risposte })) setFatta({ testo: risposte.map((r) => r.testo || r.scelta).join(" · "), saltata: false }); }) : undefined;
   const salta = () => rid ? fai(async () => { if (await comanda("salta_domanda", { chat, rid })) setFatta({ testo: "", saltata: true }); }) : undefined;
   return (
@@ -118,25 +122,28 @@ export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string 
       <Carta icona="persona" titolo="Domanda per te" dettaglio={da}>
         {domande.map((d, i) => (
           <div key={i} className="domanda-blocco">
+            {d.header && <div className="intestazione-domanda">{ris.testo(d.header)}</div>}
             <div className="testo-domanda">{ris.testo(d.domanda)}</div>
-            <div className="opzioni" role="radiogroup" onKeyDown={(e) => frecceOpzioni(e, d.opzioni.length, (j) => setScelte(scelte.map((x, k) => (k === i ? j : x))))}>
+            <div className="opzioni" role={d.multi ? "group" : "radiogroup"} aria-label={d.domanda}
+              onKeyDown={(e) => frecceOpzioni(e, d.opzioni.length, (j) => { if (!d.multi) scegli(i, j); })}>
               {d.opzioni.map((o, j) => (
-                <button key={j} type="button" role="radio" aria-checked={scelte[i] === j} className={scelte[i] === j ? "opzione scelta" : "opzione"}
-                  onClick={() => setScelte(scelte.map((x, k) => (k === i ? j : x)))}>
+                <button key={j} type="button" role={d.multi ? "checkbox" : "radio"} aria-checked={scelte[i].includes(j)} className={scelte[i].includes(j) ? "opzione scelta" : "opzione"}
+                  onClick={() => scegli(i, j)}>
                   <span className="numero">{j + 1}</span>
-                  <span className="testo">{ris.testo(o.replace(CONSIGLIATA, ""))}</span>
+                  <span className="testo">{ris.testo(o.replace(CONSIGLIATA, ""))}{d.descrizioni?.[j] && <span className="descrizione">{ris.testo(d.descrizioni[j])}</span>}</span>
                   {CONSIGLIATA.test(o) && <span className="nota">Consigliata</span>}
                 </button>
               ))}
             </div>
+            <input className="altro" placeholder="Scrivi un’altra risposta" value={altro[i]} aria-label={`Un’altra risposta a: ${d.domanda}`}
+              onChange={(e) => setAltro(altro.map((x, k) => (k === i ? e.target.value : x)))} onKeyDown={(e) => { if (e.key === "Enter") void rispondi(); }} />
           </div>
         ))}
-        <input className="altro" placeholder="Scrivi un’altra risposta" value={altro} onChange={(e) => setAltro(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") void rispondi(); }} />
         <div className="bottoni">
           <Bottone onClick={rispondi} disabled={!pronta}>Rispondi</Bottone>
           <Bottone tipo="secondario" onClick={salta} disabled={!rid || inCorso}>Salta</Bottone>
         </div>
+        {!rid ? <NotaSolaLettura /> : manca >= 0 && <div className="nota-voce"><span>{domande.length > 1 ? `Manca la risposta alla domanda ${manca + 1}` : "Scegli o scrivi una risposta"}</span></div>}
       </Carta>
       <NotaVoce acceso="Rispondi anche a voce dal notch: ⌥Spazio" spento="Rispondi qui o a voce con ⌥Spazio" />
     </>
@@ -178,6 +185,7 @@ export function Piano({ chat, rid, testo }: { chat: string; rid: string | null; 
         <Bottone onClick={() => decidi("approva")} disabled={!rid || inCorso}>Approva</Bottone>
         <Bottone tipo="secondario" onClick={() => decidi("modifica")} disabled={!rid || inCorso}>Modifica</Bottone>
       </div>
+      {!rid && <NotaSolaLettura />}
     </Carta>
   );
 }
