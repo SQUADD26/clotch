@@ -18,7 +18,7 @@ function Posto({ f, id, forza, children }: { f: Foglio; id: string; forza?: "pas
   const b = f.nodi.find((n) => n.id === id)!.box;
   return <div className={forza && `forza-${forza}`} style={{ position: "absolute", left: b.x, top: b.y, width: b.w, height: b.h, overflow: "hidden", display: "flex", flexDirection: "column", padding: "0 var(--spazio-2)" }}>{children}</div>;
 }
-const Tela = ({ children }: { children: ReactNode }) => <div className="filo" style={{ position: "relative", height: "100%", overflow: "hidden" }}><div className="turno">{children}</div></div>;
+const Tela = ({ children }: { children: ReactNode }) => <div className="filo" style={{ position: "relative", height: "100%", overflow: "hidden", background: "var(--colore-fondo-superficie)" }}><div className="turno">{children}</div></div>;
 
 let n = 0;
 const st = (nome: string, ingresso: object, durata: number | null, stato: StatoStrumento = "chiusa", uscita = ""): BloccoStrumento =>
@@ -27,7 +27,7 @@ const GH = "gh api 'repos/SQUADD26/gestionale-interno/contents/src/hooks/useRole
 const CINQUE = [st("Grep", { pattern: "canAccess" }, 200, "chiusa", "Found 4 files"), st("Read", { file_path: "src/hooks/useRoleAccess.ts" }, 300),
   st("Bash", { command: GH }, 3000), st("Bash", { command: "npm run e2e" }, 5000, "errore", "Exit code 1"), st("screenshot", { name: "la pagina Dashboard" }, 23000)];
 const ALTRI = [st("Read", { file_path: "src/AppSidebar.tsx" }, 400), st("Read", { file_path: "src/useEffectiveAuth.ts" }, 300), st("Grep", { pattern: "Live chat" }, 600, "chiusa", "Found 12 files"),
-  st("Read", { file_path: "src/sb.tsx" }, 200), st("Bash", { command: "npm run typecheck", description: "Esegue npm run typecheck" }, 2000), st("Read", { file_path: "src/Ricerca.tsx" }, 400), st("Read", { file_path: "src/Filo.tsx" }, 300)];
+  st("Read", { file_path: "src/sb.tsx" }, 200), st("Bash", { command: "npm run typecheck" }, 2000), st("Read", { file_path: "src/Ricerca.tsx" }, 400), st("Read", { file_path: "src/Filo.tsx" }, 300)];
 const g = (blocchi: BloccoStrumento[], x: Partial<DatiGruppo> = {}) => ({ ...(raggruppa(blocchi)[0] as DatiGruppo), ...x });
 const DODICI = g([...CINQUE, ...ALTRI.slice(0, 7)], { durata: 48_000, errori: [] });
 const ERRORE = { ...DODICI, errori: [CINQUE[3]] };
