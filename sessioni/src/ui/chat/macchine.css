@@ -37,8 +37,8 @@
   color: var(--colore-testo-primario); user-select: text;
 }
 .pezzo-chat .dialogo .casella-macchina::placeholder { color: var(--colore-testo-secondario); }
-.pezzo-chat .dialogo .casella-macchina:focus-visible { outline: none; border-color: var(--colore-bordo-fuoco); }
-.pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-icona-errore); }
+.pezzo-chat .dialogo .casella-macchina:focus-visible { border-color: var(--colore-bordo-fuoco); }
+.pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-bordo-errore); }
 .pezzo-chat .dialogo .messaggio-campo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-errore); }
 
 /* preparazione */
