@@ -26,33 +26,27 @@ const errore = (messaggio: string) => avvisa({ tipo: "errore", messaggio });
 const segnala = (cmd: Parameters<ClotchAiApi["comando"]>[0]) =>
   clotchAi().comando(cmd).then((e) => { if (e.esito !== "ok") errore(e.testo || "clotch non raggiunto"); }, () => errore("clotch non raggiunto"));
 
-type Riconoscitore = { lang: string; continuous: boolean; interimResults: boolean; start(): void; stop(): void; abort(): void;
-  onresult: ((e: any) => void) | null; onerror: ((e: any) => void) | null; onend: (() => void) | null };
-let riconoscitore: Riconoscitore | null = null;
+let ascolto: (() => void) | null = null; // toglie l'ascolto degli eventi del main
 
 /** Microfono del bottone «Detta» e di ⌥Spazio. Con Clotch acceso lo apre e lo chiude Clotch (stessa pressione di ⌥Spazio). */
 export function dettaChiTocca(clotch: boolean) {
   if (clotch) return void segnala("clotch_dettatura");
-  if (riconoscitore) return fineDettatura();
-  const Costruttore = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-  if (!Costruttore) return errore("Dettatura non disponibile");
-  const r: Riconoscitore = new Costruttore();
-  r.lang = "it-IT"; r.continuous = true; r.interimResults = true;
-  r.onresult = (e) => dettatura.metti({ attiva: true, testo: Array.from(e.results as ArrayLike<ArrayLike<{ transcript: string }>>, (x) => x[0].transcript).join(" ").trim() });
-  // «not-allowed»: la finestra non ha il permesso del microfono (permessi.ts lo nega); «network»: Electron non ha il servizio di Google
-  r.onerror = (e) => { errore(e.error === "not-allowed" || e.error === "service-not-allowed" ? "Microfono non consentito" : "Dettatura interrotta"); chiudi(); };
-  r.onend = () => { if (riconoscitore === r) fineDettatura(); };
-  riconoscitore = r;
+  if (ascolto) return void fineDettatura();
+  // Il microfono lo apre il main con l'eseguibile nativo (dettatura-app.ts): la pagina non ha il permesso «media» e il webkitSpeechRecognition di Electron non ha il servizio di Google.
+  ascolto = clotchAi().onDettatura((e) => {
+    if ("testo" in e) return dettatura.metti({ attiva: true, testo: e.testo });
+    if (e.errore) { errore(e.errore); chiudi(); } else void fineDettatura();
+  });
   dettatura.metti({ attiva: true, testo: "" });
-  try { r.start(); } catch { errore("Dettatura non disponibile"); chiudi(); }
+  clotchAi().dettatura(true).catch(() => { errore("Dettatura non disponibile"); chiudi(); });
 }
 
-function chiudi() { riconoscitore?.abort(); riconoscitore = null; dettatura.metti({ attiva: false, testo: "" }); }
+function chiudi() { ascolto?.(); ascolto = null; dettatura.metti({ attiva: false, testo: "" }); }
 
 /** «Fine»: il testo capito va a clotch AI come `parla` (da: app). */
 export async function fineDettatura() {
   const testo = dettatura.get().testo.trim();
-  riconoscitore?.stop();
+  void clotchAi().dettatura(false).catch(() => {});
   chiudi();
   if (testo) await comanda("parla", { testo });
 }
