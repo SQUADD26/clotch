@@ -1,6 +1,8 @@
 // figma: 101-8036 — blocchi del filo: «Messaggio Roberto» 101:7210, «Risposta» 101:7216, «Blocco codice» 101:7213,
 // «Pensiero» 101:7238, «Chiamata strumento» 101:7278, «Modifica file» 101:13464, «File toccati» 101:7315, «Ricerca sul web» 101:13525 (finestra «Ricerca sul web»: 101-15577).
 import { useContext, useState, type ReactNode } from "react";
+import { avvisa } from "../base/Avvisi";
+import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { Miniature, VisoreContesto } from "./Allegati";
 import { nomeFile } from "./percorsi";
@@ -11,9 +13,35 @@ import "./filo.css";
 import "./uscita.css";
 import { conTransizione } from "../base/movimento";
 
+// un messaggio di più di RIGHE_BOLLA righe o CARATTERI_BOLLA caratteri si vede ridotto, con «Mostra tutto» sotto
+const RIGHE_BOLLA = 12, CARATTERI_BOLLA = 800;
+const INDIRIZZO = /(https?:\/\/[^\s<>"']*[^\s<>"'.,;:!?)\]])/;
+
+/** Gli indirizzi web scritti da Roberto si aprono come quelli della risposta. */
+const conLink = (t: string): ReactNode[] => t.split(INDIRIZZO).map((p, i) => i % 2 ? <a key={i} href={p} title={p} target="_blank" rel="noreferrer noopener">{p}</a> : p);
+
 export function MessaggioRoberto({ testo }: { testo: string }) {
-  const r = useRiserva();
-  return <div className="messaggio-roberto"><div className="bolla">{r.testo(testo)}</div></div>;
+  const r = useRiserva(), t = r.testo(testo);
+  const lungo = t.length > CARATTERI_BOLLA || t.split("\n").length > RIGHE_BOLLA;
+  const [tutto, setTutto] = useState(false);
+  const [copiato, setCopiato] = useState(false);
+  const copia = () => void navigator.clipboard.writeText(t).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); })
+    .catch(() => avvisa({ tipo: "errore", messaggio: "Copia non riuscita" }));
+  return (
+    <div className="messaggio-roberto">
+      <div className="contenuto-roberto">
+        <div className={lungo && !tutto ? "bolla ridotta" : "bolla"}>{conLink(t)}</div>
+        <div className="azioni-roberto">
+          {lungo && (
+            <button type="button" className={tutto ? "mostra-tutto aperto" : "mostra-tutto"} aria-expanded={tutto} onClick={() => conTransizione(() => setTutto(!tutto))}>
+              <span>{tutto ? "Mostra meno" : "Mostra tutto"}</span><Icona nome="giu" />
+            </button>
+          )}
+          <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta="Copia" onClick={copia} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Testata apribile: freccia a destra da chiusa, in giù da aperta (varianti Chiusa/Aperta del disegno). */

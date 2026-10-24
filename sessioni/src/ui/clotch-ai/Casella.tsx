@@ -146,7 +146,7 @@ export function Casella() {
   if (rotto || !s.dati) {
     return (
       <div className="vista-clotch-ai">
-        <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere ~/.claude/registro/AAAA-MM.jsonl. Riprovo tra 10 s." />
+        <AvvisoRosso titolo="Registro non leggibile" corpo="clotch AI non riesce a leggere il registro. Nuovo tentativo tra 10 s." />
         <div className="riga-f">
           <Bottone tipo="secondario" onClick={s.riprova}>Riprova ora</Bottone>
           {/* shortcut: il percorso è quello di serie; con FRIDAY_REGISTRO diverso (solo prove) apre comunque ~/.claude/registro */}
@@ -159,7 +159,7 @@ export function Casella() {
   if (!c.progetti.length && !c.proposti.length) {
     return (
       <div className="vista-clotch-ai">
-        <Vuoto icona="posta" titolo="Niente aspetta te" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
+        <Vuoto icona="posta" titolo="Nessuna richiesta" corpo="clotch AI ti avvisa qui, in chat o a voce, quando una sessione ha bisogno di te.">
           <Bottone tipo="secondario" onClick={() => n.apri("clotch-ai")}>Scrivi a clotch AI</Bottone>
         </Vuoto>
       </div>

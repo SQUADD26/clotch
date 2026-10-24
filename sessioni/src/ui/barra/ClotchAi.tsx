@@ -7,6 +7,7 @@ import { useNavigazione } from "../base/navigazione";
 import { casella, statoClotchAi, type StatoClotchAi } from "../clotch-ai/vista";
 import { RigaComando } from "./Righe";
 import { ViaDalMac } from "./ViaDalMac";
+import { orario } from "../base/formato";
 
 declare global {
   interface Window { clotchAi: import("../../tipi").ClotchAiApi }
@@ -23,15 +24,13 @@ export function useRegistro(): Registro | null {
   return useRegistroUnico().dati ?? null; // lo stesso negozio delle viste di clotch AI: un evento si legge una volta sola
 }
 
-const ora = (t: number) => new Date(t).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-
 export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"]> }) {
   return (
     <div className="banda">
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
-        <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${ora(nd.fino)}`}</span>
-        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Togli</button>
+        <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${orario(nd.fino)}`}</span>
+        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Rimuovi</button>
       </div>
       <span className="dettaglio t-xs secondario">{nd.tenuti} avvisi tenuti per dopo</span>
     </div>

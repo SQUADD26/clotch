@@ -20,13 +20,13 @@ export type Blocco = (
   | { tipo: "web"; id: string; query: string; fonti: Fonte[] }
   | { tipo: "attivita"; passi: Passo[] }
   | { tipo: "aiutanti"; aiutanti: Aiutante[] }
-  | { tipo: "domanda"; id: string; domande: { domanda: string; opzioni: string[] }[]; risposta: string | null; aperta: boolean }
+  | { tipo: "domanda"; id: string; domande: DomandaTesto[]; risposta: string | null; aperta: boolean }
   | { tipo: "piano"; id: string; testo: string; approvato: boolean; aperto: boolean }
   | { tipo: "bloccato"; id: string; testo: string }
   | { tipo: "file-toccati"; file: FileToccato[] }
   | { tipo: "risposta"; testo: string; inScrittura: boolean }
   | { tipo: "interrotta" }
-  | { tipo: "errore"; testo: string }) & { chiave?: string; origini?: string[] };
+  | { tipo: "errore"; testo: string; riprova?: { n: number; di: number } }) & { chiave?: string; origini?: string[] };
 
 export type Voce =
   /** `immagini`: incollate (101:28041); `percorsi`: file scritti in fondo al testo come `@percorso` (la casella li mette così). */
@@ -41,6 +41,7 @@ const INTERRUZIONE = /^\[Request interrupted by user/;
 const RIASSUNTO = /^This session is being continued from a previous conversation/;
 // esiti che dicono «bloccato da una regola o da un hook» (situazioni 11, 11b del catalogo)
 const BLOCCO = /^(<tool_use_error>)?(PreToolUse|Permission to use|.*denied by .*(rule|hook))/;
+const NASCOSTI = /hit your (session |usage |weekly )?limit|^No response requested/i;
 const RIFIUTO = /^The user doesn't want to proceed/;
 
 /** Stato di uno strumento: ancora senza esito = in corso finché la sessione lavora, poi chiuso. */
@@ -49,12 +50,19 @@ function stato(m: Strumento, vivo: boolean): StatoStrumento {
   return m.esito.errore ? "errore" : "chiusa";
 }
 
+/** `header`, `multi` e `descrizioni` (una per opzione, "" se manca) sono i campi di AskUserQuestion oltre al disegno. */
+export interface DomandaTesto { domanda: string; opzioni: string[]; header?: string; multi?: boolean; descrizioni?: string[] }
+
 /** Le opzioni del disegno sono testi; «(Recommended)» resta nel testo e il filo lo mostra come «Consigliata». */
+const opzioniDi = (d: unknown) => Array.isArray((d as { options?: unknown[] }).options) ? (d as { options: unknown[] }).options : [];
 const domandeDi = (ingresso: unknown) => {
   const q = (ingresso as { questions?: unknown[] })?.questions;
   return Array.isArray(q) ? q.map((d) => ({
     domanda: testoCampo(d, "question"),
-    opzioni: Array.isArray((d as { options?: unknown[] }).options) ? (d as { options: unknown[] }).options.map((o) => testoCampo(o, "label")) : [],
+    opzioni: opzioniDi(d).map((o) => testoCampo(o, "label")),
+    descrizioni: opzioniDi(d).map((o) => testoCampo(o, "description")),
+    header: testoCampo(d, "header"),
+    multi: (d as { multiSelect?: unknown }).multiSelect === true,
   })) : [];
 };
 
@@ -133,7 +141,10 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     switch (m.tipo) {
       case "pensiero": tu.blocchi.push({ tipo: "pensiero", testo: m.testo, durata: durata(i), inCorso: vivo && ultimo }); return;
       case "assistente": tu.blocchi.push({ tipo: "risposta", testo: m.testo, inScrittura: vivo && ultimo }); return;
-      case "errore": tu.blocchi.push({ tipo: "errore", testo: m.testo }); return;
+      case "errore":
+        // «hit your limit» lo dice già l'avviso «Limite di uso raggiunto»; «No response requested.» è il resto di un'interruzione; un errore vuoto non ha nulla da dire
+        if (!m.riprova && (!m.testo.trim() || NASCOSTI.test(m.testo))) return;
+        tu.blocchi.push({ tipo: "errore", testo: m.testo, ...(m.riprova ? { riprova: m.riprova } : {}) }); return;
       case "strumento": return strumento(tu, m, i);
     }
   }

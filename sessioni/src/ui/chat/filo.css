@@ -8,8 +8,17 @@
 .pezzo-chat .turno { display: flex; flex-direction: column; gap: var(--spazio-3); }
 
 .pezzo-chat .messaggio-roberto { display: flex; justify-content: flex-end; }
+.pezzo-chat .contenuto-roberto { display: flex; flex-direction: column; align-items: flex-end; gap: var(--spazio-2); min-width: 0; max-width: var(--misura-bolla-max); }
+.pezzo-chat .messaggio-roberto .bolla.ridotta { max-height: calc(12 * var(--testo-riga-messaggio) + 2 * var(--spazio-2-5)); overflow: hidden; }
+.pezzo-chat .messaggio-roberto .bolla a { color: inherit; text-decoration: underline; }
+.pezzo-chat .azioni-roberto { display: flex; align-items: center; gap: var(--spazio-0-5); }
+/* messaggio breve: «Copia» a sinistra della bolla, in fondo alla riga; messaggio lungo: sotto la bolla, accanto a «Mostra tutto» */
+.pezzo-chat .contenuto-roberto:not(:has(.mostra-tutto)) { flex-direction: row; align-items: flex-end; gap: var(--spazio-1); }
+.pezzo-chat .contenuto-roberto:not(:has(.mostra-tutto)) .azioni-roberto { order: -1; }
+/* la copia compare al passaggio e col fuoco da tastiera; il messaggio lungo tiene sempre «Mostra tutto» */
+.pezzo-chat .messaggio-roberto:not(:hover):not(:focus-within) .azioni-roberto .bottone-icona { opacity: 0; }
 .pezzo-chat .messaggio-roberto .bolla {
-  max-width: var(--misura-bolla-max); padding: var(--spazio-2-5) var(--spazio-4); border-radius: var(--raggio-2xl);
+  max-width: 100%; padding: var(--spazio-2-5) var(--spazio-4); border-radius: var(--raggio-2xl);
   background: var(--colore-fondo-bolla); color: var(--colore-testo-bolla);
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); white-space: pre-wrap; overflow-wrap: anywhere;
 }
@@ -43,8 +52,15 @@
   display: flex; align-items: center; gap: var(--spazio-2); width: 100%; min-width: 0; text-align: left;
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
+/* passaggio e premuto come la testata del pannello Info (info.css): il fondo sporge, il testo resta dov'è */
+.pezzo-chat .filo .testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .filo .testata:not(:disabled):active { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .filo :is(.strumento, .pensiero) > .testata {
+  box-sizing: content-box; width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
+  padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
+}
 .pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
-.pezzo-chat .testata .tipo { font-weight: 500; flex: none; }
+.pezzo-chat .testata .tipo { font-weight: 500; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .testata .dettaglio {
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -61,6 +77,7 @@
   border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
   white-space: pre-wrap; overflow-wrap: anywhere;
+  max-height: calc(var(--misura-riga) * 8); overflow-y: auto; /* comando o uscita lunghi scorrono dentro il blocco: testata e bottoni restano in vista */
 }
 .pezzo-chat .blocco-codice .comando { color: var(--colore-testo-primario); }
 .pezzo-chat .blocco-codice .uscita { color: var(--colore-testo-secondario); }
@@ -82,7 +99,7 @@
 .pezzo-chat .differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
 
 .pezzo-chat .file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
-.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); }
+.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: calc(var(--raggio-lg) - var(--misura-tratto)); } /* il fuoco segue la forma dentro il bordo */
 .pezzo-chat .file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .file-toccati .file {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);
@@ -109,7 +126,7 @@
 .pezzo-chat .risposta .con-menu { position: relative; display: inline-flex; }
 .pezzo-chat .risposta .aperto { background: var(--colore-fondo-riga-passaggio); }
 /* microfono e «…» compaiono al passaggio sulla risposta («risposta al passaggio», 101:23727) */
-.pezzo-chat .risposta:not(:hover) .azioni:not(.fisse):not(:focus-within) .al-passaggio { display: none; }
+.pezzo-chat .risposta:not(:hover) .azioni:not(.fisse):not(:focus-within) .al-passaggio { opacity: 0; } /* resta nel Tab: col fuoco la riga si mostra */
 .pezzo-chat .turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
 /* avvisi e modifiche aperte stanno a spazio/6 dai vicini del turno (101:15790, 101:14631) */
 .pezzo-chat .turno > .avviso-filo, .pezzo-chat .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }

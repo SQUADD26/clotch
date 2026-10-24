@@ -5,14 +5,9 @@ import { Icona } from "../base/Icona";
 import { Gruppo, Pagina, Tasto } from "./controlli";
 import { prova } from "./prova";
 import { imposta, useImpostazioni } from "./stato";
-import { tastiDi } from "./tasti";
+import { AZIONI, nomeAzione, normalizza, tastiDi } from "./tasti";
 
-const AZIONI: [string, string][] = [
-  ["cerca", "Cerca sessioni"], ["clotchAi", "Scrivi a clotch AI"], ["prossima", "Prossima sessione in attesa"], ["consenti", "Consenti"],
-  ["nega", "Nega"], ["ferma", "Ferma la sessione"], ["barra", "Mostra barra laterale"], ["impostazioni", "Apri impostazioni"],
-  ["inviaInterrompi", "Invia e interrompi la sessione"], ["coda", "Metti in coda"], ["trova", "Trova nella sessione"],
-];
-const nome = (azione: string) => AZIONI.find(([a]) => a === azione)?.[1] ?? azione;
+const nome = nomeAzione;
 
 interface Conflitto { azione: string; tasti: string; con: string }
 
@@ -49,7 +44,7 @@ export default function Scorciatoie() {
       <Gruppo>
         {AZIONI.map(([azione, etichetta]) => {
           const c = conflitto?.azione === azione ? conflitto : null;
-          const t = tasti[azione];
+          const t = normalizza(tasti[azione]);
           return (
             <div key={azione} className="riga">
               <div className="testi"><div className="t-base">{etichetta}</div></div>

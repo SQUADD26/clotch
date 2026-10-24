@@ -49,7 +49,10 @@
 /* modello (148:28674): nome, «Predefinito» e il numero della scorciatoia o la spunta; «Impegno» si apre a destra, in cima (148:28740); in fondo «Modalità veloce» (148:28806) */
 .pezzo-chat .menu-casella.flottante.destra .titolo-gruppo, .pezzo-chat .menu-casella.impegno .titolo-gruppo { padding: var(--spazio-1-5) var(--spazio-2) var(--spazio-1); }
 .pezzo-chat .menu-casella .voce .testa { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); }
-.pezzo-chat .menu-casella .voce .testa .etichetta { flex: none; }
+.pezzo-chat .menu-casella .voce .testa .etichetta { flex: 0 1 auto; } /* i nomi lunghi finiscono con i puntini; «Predefinito» non si stringe */
+.pezzo-chat .menu-casella .predefinito { flex: none; }
+/* «Altri modelli» scorre oltre le sei voci invece di uscire dalla finestra */
+.pezzo-chat .menu-casella [aria-label="Altri modelli"] { max-height: calc(6 * var(--spazio-8)); overflow-y: auto; }
 .pezzo-chat .menu-casella .predefinito {
   padding: var(--spazio-0-5) var(--spazio-2); border: var(--misura-tratto) solid var(--colore-bordo-forte); border-radius: var(--raggio-pieno);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);

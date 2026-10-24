@@ -9,13 +9,13 @@ const imp = (id, sezione, mod) => vai(id, mod);
 const imposta = () => fatte('sessioni:imposta-impostazioni').map((x) => x[0]);
 
 H.avvia('requisiti-c', async () => {
-  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Info su clotch» apre Info
+  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Informazioni su clotch» apre Info
     nuova(); rispondi['impostazioni:profilo'] = () => ({ nome: 'Anna Verdi', iniziali: 'AV' }); await caricaChat();
     await wait(() => document.querySelector('.piede .avatar')?.textContent === 'AV');
     assert.equal((await testo('.piede .testi span'))[0], 'Anna Verdi');
     await run(() => document.querySelector('.piede .avatar').click()); await wait(() => !!document.querySelector('[role=menu] .testata'));
     assert.equal((await testo('[role=menu] .testata .medio'))[0], 'Anna Verdi');
-    await clicca('[role=menu] .voce', 'Info su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
+    await clicca('[role=menu] .voce', 'Informazioni su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
   });
 
   await req('A27', async () => { // il menu dell'app macOS: «Informazioni su clotch» e le voci standard
@@ -34,7 +34,7 @@ H.avvia('requisiti-c', async () => {
     assert.equal(await run(() => document.querySelector('.risposta .azioni button[aria-label="Leggi con clotch AI"]').disabled), false);
     H.azzera(); await clicca('.risposta .azioni button', 'Leggi con clotch AI'); await attesa(50);
     assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
-    H.azzera(); await clicca('.risposta .azioni button', 'Altro'); await clicca('.pezzo-chat .menu .voce', 'Leggi con clotch AI'); await attesa(50);
+    H.azzera(); await clicca('.risposta .azioni button', 'Altre azioni'); await clicca('.pezzo-chat .menu .voce', 'Leggi con clotch AI'); await attesa(50);
     assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
   });
 
@@ -44,7 +44,7 @@ H.avvia('requisiti-c', async () => {
       s.elenco.sessioni[0].obiettivo = { testo: 'Obiettivo di prova', stato: 'aperto', valido: true, prove: [{ testo: 'Prova verde', fatta: true }, { testo: 'Prova rossa', fatta: false, fallita: true }, { testo: 'Prova da fare', fatta: false }] };
       s.info = { s1: { contesto: 1000, file: { quanti: 0, aggiunte: 0, tolte: 0 }, prs: [pr(1, 'unita', 'dev'), pr(2, null, null), pr(3, 'aperta', 'dev')] } };
     });
-    await caricaChat(); await clicca('button', 'Pannello'); await wait(() => document.querySelectorAll('.pannello-info .scheda').length > 0);
+    await caricaChat(); await clicca('button', 'Mostra pannello'); await wait(() => document.querySelectorAll('.pannello-info .scheda').length > 0);
     assert.equal(await run(() => document.querySelector('.pannello-obiettivo .prova:nth-child(3) span.errore')?.textContent), 'Prova rossa', 'la prova fallita ha il suo stato');
     assert.equal(await run(() => document.querySelectorAll('.pannello-obiettivo .prova span.errore').length), 1, 'solo quella fallita');
     await wait(() => document.querySelectorAll('.apri-pr').length === 3);
@@ -96,7 +96,7 @@ H.avvia('requisiti-c', async () => {
       assert.deepEqual(fatte('clotch-ai:avvia').length, attesi, nota);
     };
     await avvio({ clotchAi: null, impostazioni: { attiva: true } }, 1, 'impostazioni accese, nessun evento: parte una volta');
-    assert.match(await run(() => document.body.innerText), /Avvio…/);
+    assert.match(await run(() => document.body.innerText), /Avviando…/);
     await avvio({ clotchAi: null, impostazioni: { attiva: false } }, 0, 'impostazioni spente: non parte');
     await avvio({ clotchAi: { evento: 'stop', t: H.ora - 60000 }, impostazioni: { attiva: true } }, 0, 'spenta da Roberto: non parte');
     await avvio({ clotchAi: null, impostazioni: null }, 0, 'senza impostazioni: non parte');

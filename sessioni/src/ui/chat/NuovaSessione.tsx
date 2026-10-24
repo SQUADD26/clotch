@@ -57,6 +57,9 @@ function guardaErrore(comando: string) {
 type Menu = "ambiente" | "cartella" | "ramo" | "permessi" | "modello" | null;
 type Dialogo = { tipo: "aggiungi"; proposta?: Proposta | null; macchina?: Macchina | null } | { tipo: "togli"; nome: string } | null;
 
+// Ciò che si è scelto e scritto resta finché la sessione non parte: Indietro dopo un giro in un'altra vista lo ritrova (#698).
+const ricordo: { testo?: string; ambiente?: Ambiente; scelta?: CartellaAvvio | null; ramo?: string | null; worktree?: boolean } = {};
+
 export function NuovaSessione() {
   const { sezione } = useNavigazione();
   const apriSessione = useApriSessione();
@@ -64,13 +67,14 @@ export function NuovaSessione() {
   const dati = useChiamata(() => window.nuovaSessione.cartelle(), []).dati;
   const mac = useMacchine();
   const [menu, setMenu] = useState<Menu>(() => { const m = provaDi(sezione, "menu"); return m === "ssh" ? "ambiente" : m === "ambiente" || m === "cartella" || m === "ramo" ? m : null; });
-  const [ambiente, setAmbiente] = useState<Ambiente>(() => { const a = provaDi(sezione, "ambiente"); return a ? { tipo: "ssh", host: a } : LOCALE; });
+  const [ambiente, setAmbiente] = useState<Ambiente>(() => { const a = provaDi(sezione, "ambiente"); return a ? { tipo: "ssh", host: a } : ricordo.ambiente ?? LOCALE; });
   const [dialogo, setDialogo] = useState<Dialogo>(() => { const d = provaDi(sezione, "dialogo"), r = provaDi(sezione, "rimuovi"); return r ? { tipo: "togli", nome: r } : d ? { tipo: "aggiungi" } : null; });
-  const [scelta, setScelta] = useState<CartellaAvvio | null | undefined>(undefined); // undefined = ancora la prima dei recenti
-  const [ramoScelto, setRamo] = useState<string | null>(null);
-  const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") !== "spento");
+  const [scelta, setScelta] = useState<CartellaAvvio | null | undefined>(ricordo.scelta); // undefined = ancora la prima dei recenti
+  const [ramoScelto, setRamo] = useState<string | null>(ricordo.ramo ?? null);
+  const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") ? provaDi(sezione, "worktree") !== "spento" : ricordo.worktree ?? true);
   const [p, setP] = useState<PreferenzeSessione>({});
-  const [testo, setTesto] = useState(() => provaDi(sezione, "testo") ?? "");
+  const [testo, setTesto] = useState(() => provaDi(sezione, "testo") ?? ricordo.testo ?? "");
+  useEffect(() => { Object.assign(ricordo, { testo, ambiente, scelta, ramo: ramoScelto, worktree }); }, [testo, ambiente, scelta, ramoScelto, worktree]);
   const [attesa, setAttesa] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
 
@@ -97,7 +101,7 @@ export function NuovaSessione() {
 
   const imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>) => setP((x) => ({ ...x, ...parte }) as PreferenzeSessione);
   const modello = modelloDi({ modello: idModello(globale) ?? null }, p) ?? "";
-  const pronto = !!testo.trim() && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
+  const pronto = !!testo.trim() && !!dati && !attesa && (!cartella || !locale || !!contesto) && !bloccata;
   const manda = async () => {
     if (!pronto || !dati) return;
     setAttesa(true);
@@ -110,7 +114,7 @@ export function NuovaSessione() {
       return;
     }
     guardaErrore(e.id);
-    if (e.sessione) void apriSessione(e.sessione);
+    if (e.sessione) { for (const k of Object.keys(ricordo)) delete ricordo[k as keyof typeof ricordo]; void apriSessione(e.sessione); }
     else setTimeout(() => { setAttesa(false); setTesto(""); }, ATTESA_MS);
   };
   const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -135,7 +139,7 @@ export function NuovaSessione() {
           <div className={`casella ${!testo ? "vuota" : bloccata ? "disabilitata" : "scritta"}${menu === "permessi" || menu === "modello" ? " fuoco" : ""}`}>
             <div className="area-testo">
               <textarea ref={area} rows={1} value={testo} disabled={!!attesa} autoFocus={!sezione} onChange={(e) => setTesto(e.target.value)} onKeyDown={tasti}
-                placeholder="Scrivi il primo messaggio" aria-label="Scrivi il primo messaggio" />
+                placeholder="Descrivi il lavoro" aria-label="Descrivi il lavoro" />
             </div>
             <div className="azioni">
               <BottoneIcona icona="piu" etichetta="Allega" disabled />
@@ -163,7 +167,7 @@ export function NuovaSessione() {
               <Selettore icona="ramo" etichetta={ramo ?? "Nessun ramo"} aperto={menu === "ramo"} fisso={remoto} onClick={() => apri("ramo")}>
                 {menu === "ramo" && <MenuRamo rami={contesto.rami} ramo={ramo} inizio={provaDi(sezione, "cerca") ?? ""} onScegli={setRamo} onChiudi={chiudi} />}
               </Selettore>
-              <Selettore icona="strati" etichetta={worktree ? "Worktree" : "Senza worktree"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
+              <Selettore icona="strati" etichetta={worktree ? "Copia di lavoro" : "Senza copia di lavoro"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
             </>
           )}
         </div>

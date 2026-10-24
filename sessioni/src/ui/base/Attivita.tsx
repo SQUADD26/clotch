@@ -28,7 +28,7 @@ export function Attivita() {
   return (
     <>
       <div className="bottone-attivita">
-        <BottoneIcona icona="campana" etichetta="Attività" aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
+        <BottoneIcona icona="campana" etichetta="Mostra attività" aria-expanded={aperto} className={aperto ? "aperto" : ""} onClick={() => setAperto(!aperto)} />
         {n > 0 && <span className="contatore t-xs medio">{n}</span>}
       </div>
       {aperto && (

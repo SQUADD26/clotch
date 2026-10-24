@@ -6,8 +6,15 @@
 }
 .pezzo-pannello .pannello-obiettivo .sezione { display: flex; flex-direction: column; gap: var(--spazio-1); }
 .pezzo-pannello .pannello-obiettivo .sezione.prove { gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo .titolo-stato { display: flex; align-items: center; justify-content: space-between; gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo .stato-obiettivo { flex: none; }
+.pezzo-pannello .pannello-obiettivo .stato-obiettivo.successo { color: var(--colore-testo-successo); }
+.pezzo-pannello .pannello-obiettivo .stato-obiettivo.errore { color: var(--colore-testo-errore); }
+.pezzo-pannello .pannello-obiettivo .stato-obiettivo.avviso { color: var(--colore-sessione-arancione); }
+.pezzo-pannello .pannello-obiettivo .stato-obiettivo.secondario { color: var(--colore-testo-secondario); }
 .pezzo-pannello .pannello-obiettivo .divisore { height: var(--misura-tratto); flex: none; background: var(--colore-bordo-leggero); }
 .pezzo-pannello .pannello-obiettivo .prova { display: flex; gap: var(--spazio-2); }
+.pezzo-pannello .pannello-obiettivo :is(.sezione > div, .prova > span) { min-width: 0; overflow-wrap: anywhere; }
 .pezzo-pannello .pannello-obiettivo .errore { color: var(--colore-testo-errore); }
 .pezzo-pannello .pannello-obiettivo .riga-file { display: flex; gap: var(--spazio-2); }
 .pezzo-pannello .pannello-obiettivo .conteggio { flex: 1; }

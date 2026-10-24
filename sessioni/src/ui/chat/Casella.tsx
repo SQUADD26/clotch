@@ -10,14 +10,13 @@ import { BottoneIcona, Bottone } from "../base/Bottone";
 import { usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
-import { Suggerimento } from "../base/Suggerimento";
-import { numero } from "../base/token";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
 import { ALLEGATI_PROVA, AllegatiCasella, type AllegatoCasella } from "./Allegati";
 import { ChipContesto, ChipPermessi, impostaDi, NomeSopra } from "./Chip";
 import { ChipModello } from "./ChipModello";
+import { Coda, mandaOra } from "./Coda";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
@@ -26,7 +25,7 @@ import { MAX_ALLEGATI, MAX_TOTALE_BYTE, limiteAllegato } from "../../allegati-li
 import { casella, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
 import { etichettaModello, motivoNonInviato } from "./scelte";
 import { useBozza } from "./bozze";
-import { argsManda, idModello, provaDi, quanti } from "./testi";
+import { argsManda, idModello, provaDi } from "./testi";
 import "./casella.css";
 
 export interface VoceCoda { voce: string; testo: string }
@@ -35,34 +34,11 @@ export { nomeModello } from "./scelte";
 
 const Tasto = ({ t }: { t: string }) => <span className="tasto-chip">{t}</span>;
 
-function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, preferenza, pref }: {
-  voci: VoceCoda[]; modifica: string | null; onModifica(v: VoceCoda): void; chat: string; suggerimento: boolean; attuale: string | null; preferenza: string; pref?: PreferenzeSessione;
-}) {
-  const subito = async (v: VoceCoda) => { if (await comanda("manda", argsManda(chat, v.testo, "subito", preferenza, attuale, pref))) await comanda("coda_togli", { chat, voce: v.voce }); };
-  return (
-    <div className="coda">
-      {voci.map((v, i) => (
-        <div key={v.voce} className={modifica === v.voce ? "messaggio-in-coda in-modifica" : "messaggio-in-coda"}>
-          {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
-          <span className="testo">{v.testo}</span>
-          <div className="azioni">
-            <Suggerimento testo="Interrompi e manda ora" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
-              <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
-            </Suggerimento>
-            <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
-            <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /** `segnaposto`: «In attesa della sessione» (101:15993), «Riparte alle 18:00» (101:16211); di solito «Scrivi alla sessione». */
 /** `prova`: stato di una scena di prova: «scritta:<testo>» (101:43332), «modifica» della prima in coda (101:43708), «suggerimento» (101:43945),
  *  «menu-aggiungi» (101:25845), «rilascio» (101:27294), «menu:permessi» / «menu:modello» e «impegno» (101:26140, 148:28674, 148:28740), «tooltip» del contesto (101:26140), «errore:<perché>» (101:27528).
  *  `account`: la cartella dell'account della sessione, per le sue skill. */
-export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Scrivi alla sessione", prova = null, appenaMandato = false, account = "" }: {
+export function Casella({ chat, lavora, coda, modello, permessi = null, contesto = null, disabilitata, segnaposto = "Chiedi alla sessione", prova = null, appenaMandato = false, account = "" }: {
   chat: string; lavora: boolean; coda: VoceCoda[]; modello: string | null; permessi?: string | null; contesto?: number | null; disabilitata: boolean; segnaposto?: string; prova?: string | null; account?: string;
   /** Roberto ha appena interrotto e mandato (101:43535): i tasti restano sotto la casella. */
   appenaMandato?: boolean;
@@ -103,6 +79,11 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     if (menu === null && eraAperto.current && document.activeElement === document.body) area.current?.focus();
     eraAperto.current = menu !== null;
   }, [menu]);
+
+  // la voce in modifica è già partita: il testo resta nella casella come messaggio nuovo
+  useEffect(() => {
+    if (modifica && !coda.some((v) => v.voce === modifica.voce)) { bozza.esci(true); avvisa({ tipo: "info", messaggio: "Il messaggio è già partito" }); }
+  }, [coda, modifica]);
 
   useEffect(() => (lavora && !disabilitata ? registraAzione("ferma", () => void comanda("interrompi", { chat })) : undefined), [lavora, disabilitata, chat]);
 
@@ -184,16 +165,16 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     if (caricando || grandi.length) return;
     if (pronti.reduce((n, a) => n + (a.byte ?? 0), 0) > MAX_TOTALE_BYTE) { setErrore(`Gli allegati pesano più di ${peso(MAX_TOTALE_BYTE)} in tutto: togline qualcuno.`); return; }
     const richiesta = bozza.inizia(pronti.length > 0);
-    if (!richiesta) return;
+    if (!richiesta) { if (modo === "subito" && !modifica && coda[0]) void mandaOra(chat, coda[0], preferenza, modello, pref); return; } // ↵ a casella vuota: la prima della coda parte, come il suo bottone
     ultimo.current = modo; setErrore(null);
-    const t = richiesta.testo.trim(), modifica = richiesta.modifica;
+    const t = richiesta.testo.trim(), daModifica = richiesta.modifica;
     const con = pronti.length ? { allegati: pronti.map((a) => a.percorso) } : {}; // i percorsi vanno nel campo `allegati`, il testo può essere vuoto
     let ok = false;
     try {
-      ok = modifica
+      ok = daModifica
         ? modo === "coda"
-          ? await invia("coda_modifica", { chat, voce: modifica.voce, testo: t, ...con })
-          : (await invia("manda", { ...argsManda(chat, t, "subito", preferenza, modello, pref), ...con })) && (await invia("coda_togli", { chat, voce: modifica.voce }))
+          ? await invia("coda_modifica", { chat, voce: daModifica.voce, testo: t, ...con })
+          : (await invia("manda", { ...argsManda(chat, t, "subito", preferenza, modello, pref), ...con })) && (await invia("coda_togli", { chat, voce: daModifica.voce }))
         : await invia("manda", { ...argsManda(chat, t, lavora ? modo : "subito", preferenza, modello, pref), ...con });
     } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
@@ -230,7 +211,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       )}
       <div className={`casella ${stato}${modifica || menu === "permessi" || menuAggiungi ? " fuoco" : ""}${errore ? " errore" : ""}${trascina && !disabilitata ? " trascina" : ""}`}>
         {(allegati.length > 0 || (trascina && !disabilitata)) && (
-          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => setAllegati((x) => x.filter((y) => y !== a))} />
+          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => { setAllegati((x) => x.filter((y) => y !== a)); if (allegati.length === 1) area.current?.focus(); }} />
         )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}

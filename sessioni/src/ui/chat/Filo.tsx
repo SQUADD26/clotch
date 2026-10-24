@@ -35,19 +35,23 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
     case "file-toccati": return <FileToccati b={b} aperto={aperto} />;
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
-    case "errore": return <AvvisoFilo tipo="errore" titolo={b.testo} />;
+    case "errore":
+      if (b.riprova) return <AvvisoFilo tipo="attesa" titolo="Riprovo" corpo={`Tentativo ${b.riprova.n} di ${b.riprova.di}`} />;
+      return /^API Error/.test(b.testo) ? <AvvisoFilo tipo="errore" titolo="Richiesta non riuscita" corpo={b.testo} /> : <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":
-      if (!b.aperta) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta ?? ""} />;
+      if (!b.aperta) return b.risposta ? <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta} /> : <Esito icona="persona" colore="secondaria" esito="Senza risposta" />;
       return <Domanda chat={chat} rid={richiesta("domanda")?.rid ?? null} domande={b.domande} da={da} />;
     case "piano":
       if (b.approvato) return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={quanti(passiPiano(b.testo).passi.length, "passo", "passi")} />;
-      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : null;
+      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : <Esito icona="chiudi" colore="errore" esito="Piano rifiutato" />;
   }
 }
 
 /** Quante righe ha il filo: la misura di «3 nuovi messaggi». */
 const righeDel = (voci: Voce[]) => voci.reduce((n, v) => n + (v.tipo === "turno" ? v.blocchi.length : 1), 0);
+
+const distanze = new Map<string, number>(); // chat -> distanza dal fondo all'ultimo scorrimento
 
 export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCarica, inFondo, inCima, prova = null }: {
   voci: Voce[]; chat: string; vivo: boolean; finita: boolean; c: ChatClotchAi | null; da: string | null;
@@ -63,7 +67,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const galleria = useMemo(() => galleriaDi(voci, chat), [voci, chat]);
   const [aperta, setAperta] = useState<string | null>(() => { const n = provaDi(prova, "visore"); return n == null ? null : galleria[Number(n) || 0]?.chiave ?? null; });
   const indice = galleria.findIndex((g) => g.chiave === aperta); // per chiave: un'immagine nuova in testa non sposta quella aperta
-  const daFondo = useRef(0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo
+  const daFondo = useRef(distanze.get(chat) ?? 0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo; tornando alla chat si ritrova il punto di lettura (#698)
   const letto = useRef({ righe: righeDel(voci), prima: voci[0]?.chiave }); // com'era il filo all'ultimo disegno
   const [nuovi, setNuovi] = useState(0); // righe arrivate in fondo mentre si leggeva più su
   const inFondoDel = () => daFondo.current <= numero("spazio-6");
@@ -75,6 +79,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   // il modello degli aiutanti lo sa solo il registro («Sonnet 5.5», 101:14396)
   const modello = nomeModello([...(c?.aiutanti.values() ?? [])].find((x) => x.modello)?.modello ?? null);
 
+  useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight - f.clientHeight - daFondo.current; }, []);
   useLayoutEffect(() => {
     const f = filo.current, righe = righeDel(voci), prima = voci[0]?.chiave;
     if (!f) return;
@@ -96,6 +101,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
     const f = filo.current;
     if (!f) return;
     daFondo.current = f.scrollHeight - f.clientHeight - f.scrollTop;
+    distanze.set(chat, daFondo.current);
     if (inFondoDel()) setNuovi(0);
     if (f.scrollTop === 0 && prima !== false) altri(); // «Gli altri si caricano quando sali»
   };
@@ -138,7 +144,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
           </Fragment>
         );
       })}
-      {permessi.map((p) => <Permesso key={p.rid} chat={chat} r={p} da={da} />)}
+      {permessi.map((p, i) => <Permesso key={p.rid} chat={chat} r={p} da={da} prima={i === 0} />)}
       {inFondo}
     </div>
     {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}

@@ -29,7 +29,7 @@ function dettaglio(r: Registro, d: Decisione) {
 
 /** Esito dell'annullo: i testi li scrive clotch AI in comando_fatto (101-39767, 101-40016); `riprova` rifà il comando. */
 export function esitoAnnulla(e: { esito: string; testo: string }, riprova: () => void) {
-  if (e.esito === "ok") avvisa({ tipo: "info", messaggio: e.testo || "Decisione annullata. La sessione aspetta te." });
+  if (e.esito === "ok") avvisa({ tipo: "info", messaggio: e.testo || "Decisione revocata. La sessione aspetta te." });
   else avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde", azione: { etichetta: "Riprova", fai: riprova } });
 }
 
@@ -45,7 +45,7 @@ export function Decisioni() {
   const gruppi = r ? decisioniPerGiorno(r, Date.now()) : [];
   const conferma = typeof scelta === "string" ? gruppi.flatMap((g) => g.voci).find((d) => d.id === scelta) ?? null : scelta;
   if (r && !gruppi.length) {
-    return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="clotch AI non ha ancora deciso niente" corpo="Qui trovi ogni scelta che clotch AI fa da sola, e la puoi annullare." /></div>;
+    return <div className="vista-clotch-ai"><Vuoto icona="libro" titolo="Nessuna decisione" corpo="Le scelte di clotch AI compaiono qui e si possono revocare." /></div>;
   }
   return (
     <div className="vista-clotch-ai">
@@ -62,7 +62,7 @@ export function Decisioni() {
                   <span className="t-xs secondario">{dettaglio(r!, d)}</span>
                 </div>
                 {d.annullata ? <span className="t-sm secondario">Annullata</span>
-                  : d.annullabile ? <Bottone tipo="secondario" onClick={() => setConferma(d)}>Annulla</Bottone>
+                  : d.annullabile ? <Bottone tipo="secondario" onClick={() => setConferma(d)}>Revoca</Bottone>
                   : d.nonAnnullabile && <span className="t-sm secondario">{d.nonAnnullabile}</span>}
               </div>
             );
@@ -70,10 +70,10 @@ export function Decisioni() {
         </section>
       ))}
       {conferma && (
-        <Dialogo titolo="Annullare la decisione?" corpo={conferma.effettoAnnullo ?? conferma.perche} onChiudi={() => setConferma(null)}
+        <Dialogo titolo="Revocare la decisione?" corpo={conferma.effettoAnnullo ?? conferma.perche} onChiudi={() => setConferma(null)}
           bottoni={<>
-            <Bottone tipo="secondario" onClick={() => setConferma(null)}>Lascia così</Bottone>
-            <Bottone tipo="pericolo" onClick={() => { setConferma(null); annulla(conferma); }}>Annulla la decisione</Bottone>
+            <Bottone tipo="secondario" onClick={() => setConferma(null)}>Annulla</Bottone>
+            <Bottone tipo="pericolo" onClick={() => { setConferma(null); annulla(conferma); }}>Revoca decisione</Bottone>
           </>} />
       )}
     </div>

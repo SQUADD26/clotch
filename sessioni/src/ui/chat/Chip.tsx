@@ -29,6 +29,7 @@ export function ChipMenu({ aperto, onAperto, lato, etichetta, disabled, chip, ch
     const voci = () => [...menu.querySelectorAll<HTMLButtonElement>("button")];
     (voci().find((b) => b.classList.contains("scelta")) ?? voci()[0])?.focus();
     const tasto = (e: KeyboardEvent) => {
+      if (e.key === "Tab") { onAperto(false); e.preventDefault(); return; } // il menu si chiude e il fuoco torna al chip
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
       const b = voci(), i = b.indexOf(document.activeElement as HTMLButtonElement);
       b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();

@@ -53,7 +53,7 @@ export class Sessioni {
       const r = await new Promise<{ stato: StatoIniziale; claude: [string, any][]; altre: Parameters<typeof caricaCache>[0] }>((ok, no) => {
         const w = new Worker(path.join(__dirname, "avvio-worker.js"), { workerData: { home: this.home, env: { ...process.env }, imp, cache: fileCache } });
         w.on("message", (m) => (m?.anteprima ? suAnteprima?.(m.anteprima) : ok(m))); w.once("error", no);
-        w.once("exit", (c) => no(new Error(`worker d'avvio uscito (${c})`)));
+        w.once("exit", (c) => no(new Error(`worker d’avvio uscito (${c})`)));
       });
       for (const [k, v] of r.claude) cacheClaude.set(k, v);
       caricaCache(r.altre);

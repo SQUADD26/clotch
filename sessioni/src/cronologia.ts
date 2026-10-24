@@ -138,7 +138,7 @@ export class Cronologia {
         return err("cursore_invalido", "Cursore cronologia non valido");
       snapshot = this.snapshots.get(token);
       if (!snapshot) return err("snapshot_scaduta", "Cronologia scaduta. Ricarica la sessione.");
-      if (snapshot.dati.sessione !== s.id) return err("cursore_invalido", "Cursore di un'altra sessione");
+      if (snapshot.dati.sessione !== s.id) return err("cursore_invalido", "Cursore di un’altra sessione");
       this.snapshots.delete(token); this.snapshots.set(token, snapshot);
       prima = Number(n);
       if (prima <= 0 || prima > snapshot.righe.length) return err("cursore_invalido", "Posizione cronologia non valida");

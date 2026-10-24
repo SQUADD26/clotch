@@ -25,3 +25,10 @@
 .pezzo-barra .cella-icona:hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-barra .cella-icona.scelta { background: var(--colore-fondo-riga-scelta); }
 .pezzo-barra .scelta-icona .rimuovi { align-self: flex-start; }
+/* stati (#667): passaggio e premuto da token; altezza della griglia fissa, così «Nessuna icona» non accorcia il pannello (#659) */
+.pezzo-barra .campione:hover { opacity: var(--opacita-passaggio); }
+.pezzo-barra .campione:active { opacity: var(--opacita-premuto); }
+.pezzo-barra .cella-icona:active, .pezzo-barra .cella-icona.scelta:hover { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .cella-icona.scelta:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .griglia { min-height: calc(3 * var(--misura-cella-icona) + 2 * var(--spazio-0-5)); align-content: flex-start; }
+.pezzo-barra .griglia .vuoto { width: 100%; padding: var(--spazio-4) 0; text-align: center; }

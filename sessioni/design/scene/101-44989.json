@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792845022383,
+    "ultimaAttivita": 1792845484306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -60,7 +60,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792845442383,
+    "ultimaAttivita": 1792845904306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -102,7 +102,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792845622383,
+    "ultimaAttivita": 1792846084306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -144,7 +144,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792845622383,
+    "ultimaAttivita": 1792846084306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -186,7 +186,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792845622383,
+    "ultimaAttivita": 1792846084306,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -252,14 +252,14 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792845732383,
+    "battito": 1792846194306,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845732383,
+    "visto": 1792846194306,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -290,14 +290,14 @@
       "domande": []
      }
     ],
-    "battito": 1792845722383,
+    "battito": 1792846184306,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845742383,
+    "visto": 1792846204306,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -328,14 +328,14 @@
       "domande": []
      }
     ],
-    "battito": 1792845722383,
+    "battito": 1792846184306,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792845742383,
+    "visto": 1792846204306,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -358,7 +358,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792845722383,
+    "battito": 1792846184306,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
@@ -386,7 +386,7 @@
       "stato": "pending"
      }
     ],
-    "visto": 1792845742383,
+    "visto": 1792846204306,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -400,7 +400,7 @@
   "avvisi": [
    {
     "id": "a0",
-    "t": 1792845182383,
+    "t": 1792845644306,
     "testo": "Due sessioni aspettano te.",
     "livello": "info",
     "motivo": "risposta",
@@ -419,7 +419,7 @@
   "comandi": [
    {
     "id": "c0",
-    "t": 1792845162383,
+    "t": 1792845624306,
     "cmd": "parla",
     "da": "app",
     "args": {
