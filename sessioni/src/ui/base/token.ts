@@ -135,6 +135,7 @@ export type Token =
   | "colore-bordo-fuoco-verde"
   | "colore-bordo-fuoco-viola"
   | "colore-bordo-fuoco-argento"
+  | "colore-bordo-errore"
   | "colore-ombra-colore"
   | "colore-semaforo-rosso"
   | "colore-semaforo-giallo"
@@ -264,6 +265,7 @@ export type Token =
   | "tempo-spostamento"
   | "tempo-avviso"
   | "opacita-spento"
+  | "opacita-passaggio"
   | "curva-entrata-x1"
   | "curva-entrata-y1"
   | "curva-entrata-x2"
@@ -425,6 +427,7 @@ export const valori: Record<Token, string> = {
   "colore-bordo-fuoco-verde": "#40c977",
   "colore-bordo-fuoco-viola": "#ad7bf9",
   "colore-bordo-fuoco-argento": "#c4c8ce",
+  "colore-bordo-errore": "#ff6764",
   "colore-ombra-colore": "#00000030",
   "colore-semaforo-rosso": "#ff5f57",
   "colore-semaforo-giallo": "#febc2e",
@@ -554,6 +557,7 @@ export const valori: Record<Token, string> = {
   "tempo-spostamento": "200ms",
   "tempo-avviso": "4000ms",
   "opacita-spento": "0.4",
+  "opacita-passaggio": "0.88",
   "curva-entrata-x1": "0.215",
   "curva-entrata-y1": "0.61",
   "curva-entrata-x2": "0.355",
