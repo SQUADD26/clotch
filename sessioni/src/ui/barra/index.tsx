@@ -35,7 +35,19 @@ const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
 // Lo stato di elenco sopravvive allo smontaggio della Barra (impostazioni, barra laterale chiusa).
 const conservato = { vista: { filtri: [], raggruppa: "cartella", ordina: "attivita" } as Vista, chiuse: new Set<string>(), aperteAMano: new Set<string>() };
 
+/** ↑ ↓ spostano il fuoco tra le righe della barra (comandi, cartelle, sessioni): una sola per tutte. */
+function frecce(e: globalThis.KeyboardEvent) {
+  const attivo = document.activeElement as HTMLElement | null;
+  const barra = attivo?.closest<HTMLElement>(".pezzo-barra");
+  if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || !barra || !attivo!.matches(".riga, .riga *")) return;
+  const righe = [...barra.querySelectorAll<HTMLElement>("button.riga, .riga[tabindex]")];
+  const i = righe.findIndex((r) => r === attivo || r.contains(attivo));
+  const prossima = righe[i + (e.key === "ArrowDown" ? 1 : -1)];
+  if (prossima) { e.preventDefault(); prossima.focus(); }
+}
+
 export default function Barra() {
+  useEffect(() => { document.addEventListener("keydown", frecce); return () => document.removeEventListener("keydown", frecce); }, []);
   const n = useNavigazione();
   const apriSessione = useApriSessione();
   const { scorciatoie: { cerca: tastoCerca }, etichetteCartelle } = useImpostazioni();

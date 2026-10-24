@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "finita",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792844275435,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -44,7 +44,8 @@
      "inCoda": 0,
      "segni": []
     },
-    "file": ""
+    "file": "",
+    "contesto": 124000
    }
   ],
   "errori": []
@@ -54,12 +55,12 @@
    {
     "tipo": "utente",
     "testo": "This session is being continued from a previous conversation that ran out of context.",
-    "t": 1792792981531
+    "t": 1792844207435
    },
    {
     "tipo": "utente",
     "testo": "Porta il disegno Sessioni nel codice, pari pari.",
-    "t": 1792792982531
+    "t": 1792844208435
    },
    {
     "tipo": "strumento",
@@ -92,7 +93,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792792983531,
+    "t": 1792844209435,
     "id": "t0"
    },
    {
@@ -106,7 +107,7 @@
      "testo": "Ha letto 4 file",
      "errore": false
     },
-    "t": 1792792984531,
+    "t": 1792844210435,
     "id": "t1"
    },
    {
@@ -120,7 +121,7 @@
      "testo": "Nessun errore",
      "errore": false
     },
-    "t": 1792792996531,
+    "t": 1792844222435,
     "id": "t2"
    },
    {
@@ -134,7 +135,7 @@
      "testo": "14 stati pari al disegno",
      "errore": false
     },
-    "t": 1792793004531,
+    "t": 1792844230435,
     "id": "t3"
    },
    {
@@ -149,7 +150,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793045531,
+    "t": 1792844271435,
     "id": "t4"
    },
    {
@@ -164,7 +165,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793046531,
+    "t": 1792844272435,
     "id": "t5"
    },
    {
@@ -179,14 +180,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793047531,
+    "t": 1792844273435,
     "id": "t6"
    },
    {
     "tipo": "assistente",
     "testo": "Fatto. Le 14 schermate sono pari al disegno; la PR verso dev è aperta.",
     "modello": "claude-opus-5-5",
-    "t": 1792793048531
+    "t": 1792844274435
    }
   ]
  },
@@ -211,7 +212,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792793149531,
+    "battito": 1792844375435,
     "aiutanti": {
      "a1": {
       "tipo": "general-purpose",
@@ -226,14 +227,15 @@
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792793169531,
+    "visto": 1792844395435,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
     "quarantena": null,
     "errore": null,
     "rifiuto": null,
-    "persi": 0
+    "persi": 0,
+    "contestoMax": 200000
    }
   },
   "fermoTutto": false,

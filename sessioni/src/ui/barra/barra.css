@@ -21,7 +21,10 @@
 .pezzo-barra .sessioni-gruppo { display: flex; flex-direction: column; gap: var(--spazio-0-5); padding-left: var(--spazio-6); }
 .pezzo-barra .riga-sessione .azioni { display: none; gap: var(--spazio-0-5); }
 .pezzo-barra .riga-sessione:hover .azioni, .pezzo-barra .riga-sessione.passaggio .azioni { display: flex; }
-.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno { display: none; }
+.pezzo-barra .riga-sessione:hover .segno, .pezzo-barra .riga-sessione.passaggio .segno,
+.pezzo-barra .riga-sessione:hover .indicatore-pr, .pezzo-barra .riga-sessione.passaggio .indicatore-pr { display: none; } /* le azioni prendono il posto di PR e stato: il titolo non perde spazio (#552) */
+/* premuto: il div non ha il :active dei button (stile.css); come lui, fondo riga-scelta, ma non quando si preme un bottone dentro la riga */
+.pezzo-barra .riga-sessione:active:not(:has(button:active)) { background: var(--colore-fondo-riga-scelta); }
 /* madri, figlie e PR (101:34605): freccia dopo il titolo, indicatore PR a destra */
 .pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
