@@ -69,7 +69,8 @@
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) {
         if (/hidden|clip|auto|scroll/.test(getComputedStyle(p).overflow) && !dentro(r, p.getBoundingClientRect())) { una('TAGLIATO', e, `tagliato da ${sel(p)}`); break; }
       }
-      const coperti = [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
+      // chi non prende il mouse (tooltip, pointer-events: none) non si vede con elementFromPoint: non si misura
+      const coperti = getComputedStyle(e).pointerEvents === 'none' ? [] : [[.5, .5], [.1, .1], [.9, .1], [.1, .9], [.9, .9]].map(([x, y]) => [r.left + r.width * x, r.top + r.height * y])
         .filter(([x, y]) => x >= 0 && y >= 0 && x < innerWidth && y < innerHeight).filter(([x, y]) => { const t = document.elementFromPoint(x, y); return t && !e.contains(t); });
       if (coperti.length) una('COPERTO', e, `${coperti.length}/5 punti coperti da ${sel(document.elementFromPoint(...coperti[0]))}`);
     }
@@ -78,6 +79,9 @@
 
   // Anello del fuoco: c'è (outline o box-shadow) e segue la forma (stesso raggio del pezzo che si vede, se il fuoco è su un figlio o un genitore).
   function anello(e) {
+    // un campo non disegna l'anello: lo disegna il contenitore (#521), il primo antenato col fuoco dentro che ha outline
+    const nudo = (x) => { const z = getComputedStyle(x); return z.outlineStyle !== 'none' && parseFloat(z.outlineWidth) > 0; };
+    if (e.matches('input,textarea') && !nudo(e)) { for (let p = e.parentElement, n = 0; p && n < 4; p = p.parentElement, n++) if (nudo(p)) return null; }
     const s = getComputedStyle(e), r = e.getBoundingClientRect();
     const c = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0, o = s.boxShadow !== 'none';
     if (!c && !o) return { criterio: 'FOCUS', dove: sel(e), valore: 'nessun anello del fuoco' };

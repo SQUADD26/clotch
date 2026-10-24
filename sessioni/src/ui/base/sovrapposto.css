@@ -1,0 +1,37 @@
+/* figma: 101-20859 — livelli, posto e movimento comuni di menu, popover, tooltip, dialoghi e ricerca (base/Sovrapposto.tsx, #519) */
+.sovrapposto, .velo {
+  --curva-in: cubic-bezier(var(--curva-entrata-x1), var(--curva-entrata-y1), var(--curva-entrata-x2), var(--curva-entrata-y2));
+  --curva-out: cubic-bezier(var(--curva-uscita-x1), var(--curva-uscita-y1), var(--curva-uscita-x2), var(--curva-uscita-y2));
+}
+
+.sovrapposto { position: fixed; z-index: var(--livello-menu); max-width: calc(100vw - 2 * var(--misura-margine-finestra)); }
+.sovrapposto[role="tooltip"] { z-index: var(--livello-tooltip); }
+.velo { z-index: var(--livello-dialogo); }
+
+/* entrata dal lato del bottone, uscita più rapida; con «riduci movimento» solo dissolvenza */
+.sovrapposto, .velo > * { animation: sovrapposto-entra var(--tempo-entrata) var(--curva-in) both; }
+.velo { animation: sovrapposto-dissolvi var(--tempo-entrata) var(--curva-in) both; }
+.sovrapposto.esce, .velo.esce > * { animation: sovrapposto-entra var(--tempo-uscita) var(--curva-out) reverse both; pointer-events: none; }
+.velo.esce { animation: sovrapposto-dissolvi var(--tempo-uscita) var(--curva-out) reverse both; pointer-events: none; }
+.sovrapposto { --da-x: 0px; --da-y: calc(-1 * var(--spazio-1)); }
+.sovrapposto[data-lato="sopra"] { --da-y: var(--spazio-1); }
+.sovrapposto[data-lato="destra"] { --da-x: calc(-1 * var(--spazio-1)); --da-y: 0px; }
+.velo > * { --da-x: 0px; --da-y: var(--spazio-1); }
+@keyframes sovrapposto-entra { from { opacity: 0; transform: translate(var(--da-x), var(--da-y)); } }
+@keyframes sovrapposto-dissolvi { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .sovrapposto, .velo > *, .sovrapposto.esce, .velo.esce > * { animation-name: sovrapposto-dissolvi; }
+}
+/* la prova di parità fotografa lo stato fermo */
+.parita .sovrapposto, .parita .velo, .parita .velo > * { animation: none; }
+.parita .esce { display: none; }
+
+/* elenchi lunghi: mai oltre la finestra, scorrono dentro (il menu modello no: il suo «Impegno» esce di lato) */
+.sovrapposto:is(.menu, .menu-avvio, .menu-ssh, .menu-account) { max-height: calc(100vh - 2 * var(--misura-margine-finestra)); overflow-y: auto; }
+/* stati delle voci di ogni sovrapposto: tastiera come il passaggio, premuto più scuro, spento senza passaggio */
+.sovrapposto :is(.voce, .riga-altro, .risultato, .voce-azione):focus-visible { background: var(--colore-fondo-riga-passaggio); outline: none; }
+.sovrapposto :is(.voce, .riga-altro, .risultato, .voce-azione):active:not(:disabled) { background: var(--colore-fondo-riga-scelta); }
+.sovrapposto .voce:disabled { opacity: var(--opacita-spento); background: none; }
+/* finestra stretta o bassa: dialoghi e ricerca restano dentro, col margine */
+.velo > * { max-width: calc(100vw - 2 * var(--misura-margine-finestra)); }
+.velo > .dialogo { max-height: calc(100vh - 2 * var(--misura-margine-finestra)); overflow-y: auto; }

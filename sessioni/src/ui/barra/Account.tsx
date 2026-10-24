@@ -1,10 +1,11 @@
 // figma: 148-62026 — bottone account in fondo alla barra (#478): account in uso con le quote 5 ore e 7 giorni; primo menu 148:62191
 // (uso attuale + «Cambia account»), secondo menu 148:62379 (gli altri account), 90 % 148:62621, cambio non disponibile 148:62813.
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useState, type CSSProperties, type MouseEvent } from "react";
 import type { Registro } from "../../clotch-ai";
 import type { QuotaUso } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona } from "../base/Icona";
+import { Sovrapposto } from "../base/Sovrapposto";
 import { numero } from "../base/token";
 import { comanda } from "../chat/clotch-ai";
 import { accountScelto, conto, iniziali, livello, nome, trova, useCorrente, useOra, useQuote, type Livello } from "./account-dati";
@@ -53,20 +54,9 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
   const quote = useQuote(prova?.quote) ?? [];
   const cor = useCorrente(chat, registro, daDisco, prova?.previsto, nuova);
   const [menu, setMenu] = useState<0 | 1 | 2>(prova?.menu ?? 0);
-  const radice = useRef<HTMLDivElement>(null), piede = useRef<HTMLDivElement>(null);
-  const [punto, setPunto] = useState({ x: 0, y: 0 });
-  useLayoutEffect(() => {
-    const r = piede.current!.getBoundingClientRect();
-    setPunto({ x: r.left, y: innerHeight - r.top + numero("spazio-2") });
-  }, [menu]);
-  useEffect(() => {
-    if (!menu) return;
-    const tasto = (e: KeyboardEvent) => { if (e.key === "Escape") setMenu(0); };
-    const fuori = (e: globalThis.MouseEvent) => { if (!radice.current?.contains(e.target as Node)) setMenu(0); };
-    addEventListener("keydown", tasto);
-    addEventListener("mousedown", fuori);
-    return () => { removeEventListener("keydown", tasto); removeEventListener("mousedown", fuori); };
-  }, [menu]);
+  const [piede, setPiede] = useState<HTMLDivElement | null>(null);
+  // il secondo menu si appoggia al primo, alla sua destra, coi fondi allineati
+  const [primo, setPrimo] = useState<HTMLDivElement | null>(null);
 
   // senza sessione l'account è quello previsto (o il primo del feed se il motore non risponde)
   const q = trova(quote, cor.chiave) ?? (cor.motore === null ? quote[0] : undefined);
@@ -82,8 +72,8 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
   const avvisoLimite = q && avviso(q);
 
   return (
-    <div ref={radice} className="account-barra" style={{ "--x": `${punto.x}px`, "--y": `${punto.y}px` } as CSSProperties}>
-      <div ref={piede} className={`piede-account ${menu ? "aperto" : ""}`} onClick={() => (q || cor.motore === false) && setMenu(menu ? 0 : 1)}>
+    <div className="account-barra">
+      <div ref={setPiede} className={`piede-account ${menu ? "aperto" : ""}`} onClick={() => (q || cor.motore === false) && setMenu(menu ? 0 : 1)}>
         <div className="riga-account">
           <button type="button" className="apri" aria-haspopup="menu" aria-expanded={menu > 0}>
             <span className="avatar" style={colore(colori)}><span className="t-xs medio">{iniziali(titolo)}</span></span>
@@ -106,8 +96,8 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
         })}
       </div>
 
-      {menu > 0 && q && (
-        <div className="menu-account" role="menu">
+      {menu > 0 && q && piede && (
+        <Sovrapposto ancora={piede} lato="sopra" scarto={numero("spazio-2")} className="menu-account" role="menu" rif={setPrimo} onChiudi={() => setMenu(0)}>
           <div className="uso-attuale">
             <Blocco etichetta="5 ore" usato={q.cinque} fine={q.cinqueFine} ora={ora} />
             <Blocco etichetta="7 giorni" usato={q.sette} fine={q.setteFine} ora={ora} />
@@ -119,11 +109,11 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
             : <button type="button" role="menuitem" className={`voce ${menu === 2 ? "scelta" : ""}`} onClick={() => setMenu(menu === 2 ? 1 : 2)}>
                 <Icona nome="persona" /><span className="t-sm testo">Cambia account</span><Icona nome="destra" />
               </button>}
-        </div>
+        </Sovrapposto>
       )}
 
-      {menu === 2 && cambia && (
-        <div className="menu-account secondo" role="menu">
+      {menu === 2 && cambia && primo && (
+        <Sovrapposto ancora={primo} lato="destra" fine scarto={numero("spazio-2")} className="menu-account secondo" role="menu" onChiudi={() => setMenu(1)}>
           <div className="titolo-menu t-sm secondario">Cambia account</div>
           {quote.map((x, i) => x !== q && (
             <button key={x.account} type="button" role="menuitem" className={`riga-altro ${prova?.passaggio === x.account ? "passaggio" : ""}`} onClick={() => passa(x)}>
@@ -139,7 +129,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
           ))}
           <div className="linea" />
           <div className="nota t-xs secondario">{cor.motore ? "La sessione riprende sull’account scelto." : "La sessione parte con l’account scelto."}</div>
-        </div>
+        </Sovrapposto>
       )}
     </div>
   );

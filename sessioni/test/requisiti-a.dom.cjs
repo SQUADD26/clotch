@@ -126,14 +126,14 @@ H.avvia('requisiti-a', async () => {
     const md = '## Titolo\n**grassetto** e `codice`';
     nuova((s) => { s.messaggi.s1 = [U('domanda'), AS(md, 1000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat(); await copiaFinta();
     await wait(() => !!document.querySelector('.risposta .azioni'));
-    await clicca('.risposta .azioni button', 'Altro'); await wait(() => !!document.querySelector('.risposta .menu'));
-    assert.deepEqual(await testo('.risposta .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Leggi con clotch AI', 'Mostra nel file della sessione']);
-    await clicca('.risposta .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
-    await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
+    await clicca('.risposta .azioni button', 'Altro'); await wait(() => !!document.querySelector('.pezzo-chat .menu'));
+    assert.deepEqual(await testo('.pezzo-chat .menu .etichetta'), ['Copia testo', 'Copia come Markdown', 'Leggi con clotch AI', 'Mostra nel file della sessione']);
+    await clicca('.pezzo-chat .menu .voce', 'Copia come Markdown'); await wait(() => window.__copiato.length === 1);
+    await clicca('.risposta .azioni button', 'Altro'); await clicca('.pezzo-chat .menu .voce', 'Copia testo'); await wait(() => window.__copiato.length === 2);
     assert.deepEqual(await run(() => window.__copiato), [md, 'Titolo\n\ngrassetto e codice']); // blocchi separati da riga vuota (#440)
-    await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Mostra nel file della sessione'); await attesa(50);
+    await clicca('.risposta .azioni button', 'Altro'); await clicca('.pezzo-chat .menu .voce', 'Mostra nel file della sessione'); await attesa(50);
     assert.deepEqual(fatte('sessioni:azione'), [['s1', 'mostra-nel-finder']]);
-    await clicca('.risposta .azioni button', 'Altro'); await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.risposta .menu'));
+    await clicca('.risposta .azioni button', 'Altro'); await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.pezzo-chat .menu'));
   });
 
   await req('K2', async () => {

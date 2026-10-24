@@ -22,13 +22,14 @@ import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
 import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { APezzi } from "./APezzi";
-import { accanto, type Punto } from "./Sovrapposti";
+import { accanto } from "./Sovrapposti";
+import { Sovrapposto, type Ancora, type Punto } from "../base/Sovrapposto";
 import { conTransizione } from "../base/movimento";
 
 export type Aperto =
-  | { tipo: "opzioni"; i: number; a: Punto } | { tipo: "proprieta"; a: Punto } | { tipo: "raggruppa"; a: Punto }
-  | { tipo: "icona"; id: string; a: Punto } | { tipo: "riga"; id: string; a: Punto }
-  | { tipo: "cartella"; chiave: string; a: Punto } | { tipo: "profilo"; a: Punto };
+  | { tipo: "opzioni"; i: number; a: Ancora } | { tipo: "proprieta"; a: Ancora } | { tipo: "raggruppa"; a: Ancora }
+  | { tipo: "icona"; id: string; a: Ancora } | { tipo: "riga"; id: string; a: Ancora }
+  | { tipo: "cartella"; chiave: string; a: Ancora } | { tipo: "profilo"; a: Ancora };
 
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
 const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
@@ -85,6 +86,19 @@ export default function Barra() {
     addEventListener("keydown", tasto);
     return () => removeEventListener("keydown", tasto);
   }, [n.sessione]);
+  // frecce su e giù nella lista: il fuoco passa alla riga dopo e a quella prima (comandi, cartelle e sessioni)
+  useEffect(() => {
+    const frecce = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowDown" && e.key !== "ArrowUp") || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return; // ⌃↑ ⌃↓ sono delle sessioni (dialoghi/)
+      const t = e.target as HTMLElement;
+      if (!t.matches?.(".pezzo-barra .riga:not(.titolo-sezione)")) return;
+      const righe = [...document.querySelectorAll<HTMLElement>(".pezzo-barra .riga:not(.titolo-sezione)")].filter((x) => x.getClientRects().length);
+      const dopo = righe[righe.indexOf(t) + (e.key === "ArrowDown" ? 1 : -1)];
+      if (dopo) { e.preventDefault(); dopo.focus(); }
+    };
+    addEventListener("keydown", frecce);
+    return () => removeEventListener("keydown", frecce);
+  }, []);
   useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
   const chiudi = () => setAperto(null);
@@ -167,7 +181,7 @@ export default function Barra() {
 
       <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
         daDisco={sessione(p ? p.scelta ?? "" : n.sessione ?? "")?.account}
-        onAltro={(e) => { const r = e.currentTarget.closest(".piede-account")!.getBoundingClientRect(); setAperto({ tipo: "profilo", a: { x: r.left, y: r.top } }); }} />
+        onAltro={(e) => setAperto({ tipo: "profilo", a: e.currentTarget.closest(".piede-account")! })} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
@@ -187,7 +201,7 @@ export default function Barra() {
           a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />
       )}
       {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
-      {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
+      {suggerimento && !aperto && !ricerca && <Sovrapposto passivo ancora={suggerimento.a} className="suggerimento t-xs" role="tooltip">{suggerimento.testo}</Sovrapposto>}
       {ricerca && (
         <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}
           onApri={apriSessione} onAzione={(id, a) => void api().azione(id, a)} onChiudi={() => setRicerca(false)} />

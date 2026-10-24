@@ -8,7 +8,7 @@
 .pezzo-barra .pillola-filtro.aggiungi { background: none; border: var(--misura-tratto) solid var(--colore-bordo-normale); }
 
 /* «Menu filtro»: padding e gap spazio-2/1, raggio lg (il «menu» della base ha spazio-1 e raggio xl) */
-.pezzo-barra .menu.menu-filtro { padding: var(--spazio-2); gap: var(--spazio-1); border-radius: var(--raggio-lg); }
+.pezzo-barra .menu.menu-filtro { padding: var(--spazio-2); gap: var(--spazio-1); }
 .pezzo-barra .menu-filtro .testata { height: var(--testo-riga-sm); box-sizing: content-box; padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-1); display: flex; align-items: center; }
 .pezzo-barra .campo-menu {
   height: var(--misura-bottone); padding: var(--spazio-1) var(--spazio-2); gap: var(--spazio-2);

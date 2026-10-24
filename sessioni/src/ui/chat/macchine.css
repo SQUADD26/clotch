@@ -1,10 +1,8 @@
 /* figma: 149-67470 — menu SSH (149:67469) e «Riga macchina» (149:67373); 149-67536 — dialogo «Aggiungi macchina» con «Chip proposta» e «Campo macchina»;
    149-67632 — «Passo preparazione» (149:67422), comando da copiare, codice di GitHub (149:70649). Solo variabili del file Figma (token.css). */
 
-/* il pannello SSH sta a destra del menu ambiente, in alto alla stessa altezza; il menu decide dove sta il blocco, il pannello può scendere sotto di lui */
-.pezzo-chat .menu-doppio { position: absolute; left: 0; bottom: calc(100% + var(--spazio-1)); z-index: 5; }
-.pezzo-chat .menu-doppio .menu-avvio { position: static; }
-.pezzo-chat .menu-ssh { position: absolute; top: 0; left: calc(var(--misura-menu) + var(--spazio-1)); width: var(--misura-menu-avvio-largo); gap: var(--spazio-0-5); }
+/* il pannello SSH sta a destra del menu ambiente, in alto alla stessa altezza (base/Sovrapposto); può scendere sotto di lui */
+.pezzo-chat .menu-ssh { width: var(--misura-menu-avvio-largo); gap: var(--spazio-0-5); }
 .pezzo-chat .menu-ssh .vuoto-ssh { display: flex; flex-direction: column; gap: var(--spazio-1); padding: var(--spazio-2); }
 .pezzo-chat .menu-ssh .vuoto-ssh .titolo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .menu-ssh .vuoto-ssh .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
@@ -13,7 +11,7 @@
 .pezzo-chat .menu-ssh .riga-macchina { position: relative; cursor: default; }
 .pezzo-chat .menu-ssh .togli { display: none; flex: none; border-radius: var(--raggio-md); }
 .pezzo-chat .menu-ssh .riga-macchina:hover .togli, .pezzo-chat .menu-ssh .riga-macchina:focus-within .togli { display: flex; }
-.pezzo-chat .menu-ssh .riga-macchina .tooltip { display: none; top: 50%; left: calc(100% + var(--spazio-2)); translate: 0 -50%; }
+.pezzo-chat .menu-ssh .riga-macchina .tooltip { display: none; position: absolute; top: 50%; left: calc(100% + var(--spazio-2)); translate: 0 -50%; }
 .pezzo-chat .menu-ssh .riga-macchina:hover .tooltip, .pezzo-chat .menu-ssh .riga-macchina.mostra .tooltip { display: flex; }
 .pezzo-chat .selettore:disabled:hover { background: none; }
 
@@ -39,8 +37,8 @@
   color: var(--colore-testo-primario); user-select: text;
 }
 .pezzo-chat .dialogo .casella-macchina::placeholder { color: var(--colore-testo-secondario); }
-.pezzo-chat .dialogo .casella-macchina:focus-visible { outline: none; border-color: var(--colore-bordo-fuoco); }
-.pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-icona-errore); }
+.pezzo-chat .dialogo .casella-macchina:focus-visible { border-color: var(--colore-bordo-fuoco); }
+.pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-bordo-errore); }
 .pezzo-chat .dialogo .messaggio-campo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-errore); }
 
 /* preparazione */

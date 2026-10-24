@@ -2,20 +2,20 @@
 .corpo { position: relative; }
 
 /* barra laterale sopra la colonna: il velo copre tutta la finestra, barra titolo compresa */
-.velo-barra { position: absolute; inset: 0; z-index: 24; background: var(--colore-fondo-velo); -webkit-app-region: no-drag; }
+.velo-barra { position: absolute; inset: 0; z-index: var(--livello-barra-sovrapposta); background: var(--colore-fondo-velo); -webkit-app-region: no-drag; }
 .barra-laterale.sopra {
-  position: absolute; z-index: 25; top: var(--misura-barra-titolo); bottom: 0; left: 0; width: var(--misura-barra-laterale);
+  position: absolute; z-index: var(--livello-barra-sovrapposta); top: var(--misura-barra-titolo); bottom: 0; left: 0; width: var(--misura-barra-laterale);
   background: var(--colore-fondo-cornice);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 
 /* maniglia sul bordo destro della barra: fascia da misura-trascina, linea da misura-tratto-forte al passaggio */
-.maniglia-barra { position: absolute; z-index: 2; top: 0; bottom: 0; width: var(--misura-trascina); cursor: col-resize; display: flex; justify-content: center; -webkit-app-region: no-drag; }
+.maniglia-barra { position: absolute; z-index: var(--livello-sopra); top: 0; bottom: 0; width: var(--misura-trascina); cursor: col-resize; display: flex; justify-content: center; -webkit-app-region: no-drag; }
 .maniglia-barra .linea { width: var(--misura-tratto-forte); height: 100%; }
 .maniglia-barra:hover .linea, .maniglia-barra:focus-visible .linea, .maniglia-barra.attiva .linea, .maniglia-barra.prova .linea { background: var(--colore-bordo-forte); }
 .maniglia-barra:focus-visible { outline: none; }
 .suggerimento-maniglia {
-  display: none; position: absolute; top: 50%; left: calc(100% + var(--spazio-1)); transform: translateY(-50%); z-index: 3; pointer-events: none; white-space: nowrap;
+  display: none; position: absolute; top: 50%; left: calc(100% + var(--spazio-1)); transform: translateY(-50%); z-index: var(--livello-tooltip); pointer-events: none; white-space: nowrap;
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
   background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
@@ -26,7 +26,7 @@
 /* pannello obiettivo sopra la colonna, quando la finestra non ha posto per metterlo accanto (si apre dal bottone dell'intestazione) */
 .contenuto { position: relative; }
 .pannello.sopra {
-  position: absolute; z-index: 5; top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); max-height: calc(100% - var(--spazio-4)); border-radius: var(--raggio-xl);
+  position: absolute; z-index: var(--livello-barra-sovrapposta); top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); max-height: calc(100% - var(--spazio-4)); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pannello.sopra .pannello-obiettivo { width: 100%; }
