@@ -14,7 +14,7 @@ for (let i = 2; i < process.argv.length; i++) {
   const k = process.argv[i].replace(/^--/, ''), v = process.argv[i + 1];
   arg[k] = v && !v.startsWith('--') ? (i++, v) : true;
 }
-const aree = arg.area === 'tutto' ? Object.keys(AREE) : [arg.area];
+const aree = arg.area === 'tutto' ? Object.keys(AREE).filter((a) => !AREE[a].extra) : [arg.area];
 if (!arg.out || aree.some((a) => !AREE[a])) { console.error(`uso: node test/beta/clicca.mjs --area <${Object.keys(AREE).join('|')}|tutto> --out <cartella> [--matrice]`); process.exit(2); }
 const OUT = resolve(arg.out), MAX = +arg.max || 80, VIDEO = !!arg.video;
 

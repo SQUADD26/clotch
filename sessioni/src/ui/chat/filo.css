@@ -56,10 +56,11 @@
 .pezzo-chat .filo .testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-chat .filo .testata:not(:disabled):active { background: var(--colore-fondo-riga-scelta); }
 .pezzo-chat .filo :is(.strumento, .pensiero) > .testata {
-  box-sizing: content-box; width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
+  width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
 }
-.pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
+.pezzo-chat .pensiero .testata { gap: var(--spazio-1); align-self: flex-start; }
+.pezzo-chat .filo .pensiero > .testata { width: auto; } /* «Ragionato per…» è larga quanto il suo testo: il fondo del passaggio le sta attorno */
 .pezzo-chat .testata .tipo { font-weight: 500; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
 .pezzo-chat .testata .dettaglio {
