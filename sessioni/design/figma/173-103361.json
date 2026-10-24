@@ -1,0 +1,792 @@
+{
+ "file": "gayvkX0IaLjZghH2otVbJt",
+ "frame": {
+  "id": "173:103361",
+  "nome": "Varianti pannello – Scuro",
+  "w": 2528,
+  "h": 266
+ },
+ "variabili": {
+  "colore/fondo/riquadro": "#2c2c30",
+  "raggio/2xl": 20,
+  "spazio/6": 24,
+  "spazio/16": 64,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/base": 14,
+  "testo/riga/base": 20,
+  "spazio/4": 16,
+  "colore/testo/primario": "#ffffff",
+  "testo/dimensione/lg": 16,
+  "testo/riga/lg": 24,
+  "spazio/8": 32,
+  "spazio/2": 8,
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
+  "raggio/md": 10,
+  "misura/bottone": 28,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
+  "colore/fondo/riga-passaggio": "#ffffff0d",
+  "colore/fondo/riga-scelta": "#ffffff14",
+  "colore/bordo/fuoco": "#ee7c37",
+  "misura/tratto-forte": 2,
+  "colore/icona/primaria": "#ffffffe7"
+ },
+ "nodi": [
+  {
+   "id": "173:103361",
+   "nome": "Varianti pannello – Scuro",
+   "tipo": "FRAME",
+   "box": {
+    "x": 0,
+    "y": 0,
+    "w": 2528,
+    "h": 266
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riquadro",
+    "cornerRadius": "raggio/2xl",
+    "itemSpacing": "spazio/6",
+    "paddingLeft": "spazio/16",
+    "paddingRight": "spazio/16",
+    "paddingTop": "spazio/16",
+    "paddingBottom": "spazio/16"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103360",
+   "nome": "nota",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 64,
+    "w": 2400,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Un solo bottone: acceso col pannello aperto, spento col pannello chiuso. Il pann",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "173:103359",
+   "nome": "Bottone pannello",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 108,
+    "w": 2400,
+    "h": 94
+   },
+   "variabili": {
+    "itemSpacing": "spazio/4"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103357",
+   "nome": "titolo gruppo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 108,
+    "w": 132,
+    "h": 24
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/lg",
+    "lineHeight": "testo/riga/lg"
+   },
+   "senza": [],
+   "testo": "Bottone pannello",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103358",
+   "nome": "celle",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 2400,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/8"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103321",
+   "nome": "No Riposo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 64,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103320",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 64,
+    "y": 148,
+    "w": 64,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "No Riposo",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103317",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 64,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103317;173:76796",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 70,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103317;173:76796;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 71.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103326",
+   "nome": "No Passaggio",
+   "tipo": "FRAME",
+   "box": {
+    "x": 160,
+    "y": 148,
+    "w": 86,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103325",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 160,
+    "y": 148,
+    "w": 86,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "No Passaggio",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103322",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 160,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103322;173:76800",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 166,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103322;173:76800;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 167.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103331",
+   "nome": "No Premuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 278,
+    "y": 148,
+    "w": 75,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103330",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 278,
+    "y": 148,
+    "w": 75,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "No Premuto",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103327",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 278,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103327;173:76804",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 284,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103327;173:76804;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 285.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103336",
+   "nome": "No Fuoco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 385,
+    "y": 148,
+    "w": 60,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103335",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 385,
+    "y": 148,
+    "w": 60,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "No Fuoco",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103332",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 385,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "strokeWeight": "misura/tratto-forte",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103332;173:76808",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 391,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103332;173:76808;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 392.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103341",
+   "nome": "Sì Riposo",
+   "tipo": "FRAME",
+   "box": {
+    "x": 477,
+    "y": 148,
+    "w": 59,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103340",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 477,
+    "y": 148,
+    "w": 59,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sì Riposo",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103337",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 477,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103337;173:76812",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 483,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103337;173:76812;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 484.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103346",
+   "nome": "Sì Passaggio",
+   "tipo": "FRAME",
+   "box": {
+    "x": 568,
+    "y": 148,
+    "w": 80,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103345",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 568,
+    "y": 148,
+    "w": 80,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sì Passaggio",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103342",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 568,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103342;173:76816",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 574,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103342;173:76816;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 575.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103351",
+   "nome": "Sì Premuto",
+   "tipo": "FRAME",
+   "box": {
+    "x": 680,
+    "y": 148,
+    "w": 69,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103350",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 680,
+    "y": 148,
+    "w": 69,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sì Premuto",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103347",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 680,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103347;173:76820",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 686,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103347;173:76820;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 687.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103356",
+   "nome": "Sì Fuoco",
+   "tipo": "FRAME",
+   "box": {
+    "x": 781,
+    "y": 148,
+    "w": 54,
+    "h": 54
+   },
+   "variabili": {
+    "itemSpacing": "spazio/2"
+   },
+   "senza": []
+  },
+  {
+   "id": "173:103355",
+   "nome": "etichetta stato",
+   "tipo": "TEXT",
+   "box": {
+    "x": 781,
+    "y": 148,
+    "w": 54,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Sì Fuoco",
+   "font": "SF Pro Medium"
+  },
+  {
+   "id": "173:103352",
+   "nome": "Bottone pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 781,
+    "y": 174,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "strokes[0]": "colore/bordo/fuoco",
+    "cornerRadius": "raggio/md",
+    "strokeWeight": "misura/tratto-forte",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103352;173:76824",
+   "nome": "icona pannello",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 787,
+    "y": 180,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I173:103352;173:76824;101:7079",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 788.33203125,
+    "y": 181.33203125,
+    "w": 13.333984375,
+    "h": 13.333984375
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/primaria"
+   },
+   "senza": []
+  }
+ ]
+}
