@@ -18,6 +18,7 @@ FAMIGLIE['cerca-voce'] = 'CVO';
 FAMIGLIE['ux-mac'] = 'UXM';
 FAMIGLIE['cerca-impostazioni-3'] = 'CI3';
 FAMIGLIE['cerca-impostazioni-2'] = 'CI2';
+FAMIGLIE['cerca-decisioni-regole'] = 'CDR';
 FAMIGLIE['cerca-ricerca'] = 'CRS';
 FAMIGLIE['cerca-stati-turno'] = 'CST';
 // parole di gusto: «vedi» dice un sì/no che si osserva, mai un giudizio
