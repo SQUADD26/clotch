@@ -105,7 +105,8 @@ export default function Barra() {
   const filtri = vista.filtri;
   const aggiungiFiltro = (prop: Proprieta) => {
     const i = filtri.findIndex((f) => f.proprieta === prop);
-    if (i < 0) setVista({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
+    // subito, senza transizione: il filtro è vuoto (le righe non cambiano) e il suo menu delle opzioni lo legge ora
+    if (i < 0) setVistaSubito({ ...vista, filtri: [...filtri, { proprieta: prop, valori: [] }] });
     setAperto({ tipo: "opzioni", i: i < 0 ? filtri.length : i, a: aperto!.a });
   };
   const suTroncato = (testo: string | null, el?: HTMLElement) => {

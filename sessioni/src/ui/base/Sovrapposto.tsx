@@ -87,7 +87,7 @@ function useLuogo() {
   const [luogo, setLuogo] = useState<{ genitore: Element; pezzo: string; centrato: boolean } | null>(null);
   useLayoutEffect(() => {
     const g = segno.current?.parentElement;
-    if (g) setLuogo({ genitore: g, pezzo: g.closest(".pezzo")?.className ?? "", centrato: !!g.closest(".centrato") });
+    if (g) setLuogo({ genitore: g, pezzo: g.closest(".pezzo")?.className ?? "", centrato: !!g.closest(".centrato, .impostazioni") });
   }, []);
   return { segno: <span ref={segno} hidden />, luogo };
 }
@@ -164,7 +164,7 @@ function Galleggia({ ancora, pezzo, lato = "sotto", fine = false, centro = false
 }
 
 /** Velo a tutta finestra con il suo contenuto (dialoghi, ricerca): in fondo al body, Tab dentro, fuoco che torna.
- *  `centrato`: al centro esatto; vale anche se chi lo scrive sta in un contenitore `.centrato` (dialoghi nelle impostazioni). */
+ *  `centrato`: al centro esatto; vale anche se chi lo scrive sta in un contenitore `.centrato` o nelle impostazioni (119:57106, 119:57552). */
 export function Velo({ className = "", centrato = false, onChiudi, children }: { className?: string; centrato?: boolean; onChiudi(): void; children: ReactNode }) {
   const { segno, luogo } = useLuogo();
   return <>{segno}{luogo && <VeloAperto className={`${className}${centrato || luogo.centrato ? " centrato" : ""}`} pezzo={luogo.pezzo} onChiudi={onChiudi}>{children}</VeloAperto>}</>;

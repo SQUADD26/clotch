@@ -44,7 +44,7 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
   };
   const voce = (m: Scelta, numero?: number) => (
     <button key={m.id} type="button" role="menuitemradio" aria-checked={m.id === modello} className={m.id === modello ? "voce scelta" : "voce"}
-      onClick={() => scegliModello(m.id)} onMouseEnter={() => { setImpegno(true); setAnteprima(m.id); }} onFocus={() => setAnteprima(m.id)} onKeyDown={(e) => { setImpegno(true); if (e.key === "ArrowRight") setTimeout(() => document.querySelector<HTMLElement>(".sovrapposto.impegno button")?.focus()); }}>
+      onClick={() => scegliModello(m.id)} onMouseEnter={() => { setImpegno(true); setAnteprima(m.id); }} onFocus={() => setAnteprima(m.id)} onKeyDown={(e) => { if (e.key === "ArrowRight") { setImpegno(true); setTimeout(() => document.querySelector<HTMLElement>(".sovrapposto.impegno button")?.focus()); } }}>
       <span className="testa"><span className="etichetta">{m.etichetta}</span>{m.id === predefinito && <span className="predefinito">Predefinito</span>}</span>
       {m.id === modello ? <Icona nome="spunta" /> : numero ? <span className="numero">{numero}</span> : null}
     </button>
