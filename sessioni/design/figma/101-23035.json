@@ -4,7 +4,8 @@
   "id": "101:23035",
   "nome": "Finestra ricerca",
   "w": 640,
-  "h": 232
+  "h": 232,
+  "dentro": "101:23003"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",

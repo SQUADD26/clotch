@@ -4,7 +4,8 @@
   "id": "101:21065",
   "nome": "Barra laterale",
   "w": 266,
-  "h": 856
+  "h": 856,
+  "dentro": "101:21061"
  },
  "variabili": {
   "spazio/0-5": 2,
