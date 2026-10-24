@@ -111,6 +111,8 @@ export async function configura({ app, pagina }, { misura, tema, ridotto }) {
   const { w, h } = MISURE[misura];
   await app.evaluate(({ BrowserWindow }, [w, h]) => { const f = BrowserWindow.getAllWindows()[0]; f.setContentSize(w, h); }, [w, h]);
   await pagina.emulateMedia({ colorScheme: tema === 'chiaro' ? 'light' : 'dark', reducedMotion: ridotto ? 'reduce' : 'no-preference' });
+  // il tema dell'app è «Automatico»: segue il Mac emulato (#1093)
+  await pagina.evaluate(() => { document.documentElement.dataset.tema = 'automatico'; });
   await pagina.waitForFunction(([w, h]) => innerWidth === w && innerHeight === h, [w, h], { timeout: 5000 }).catch(() => {});
   await pagina.evaluate(() => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))));
 }

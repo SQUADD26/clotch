@@ -256,6 +256,8 @@ export interface ClotchAiApi {
 /** Impostazioni dell'app (#351) nel file delle preferenze (`SessioniApi.impostazioni`); i valori di partenza sono quelli del disegno. */
 export interface ImpostazioniApp {
   apriAllAvvio: boolean; barraDeiMenu: boolean; lingua: string; modello: string; apriSessione: string; cartellaRegistro: string;
+  /** «Automatico» (come il Mac), «Chiaro», «Scuro» (#1093); si parte da Scuro, l’aspetto di sempre. */
+  tema: string;
   colore: string; carattere: string; dimensione: string; densita: string; pannelloAperto: boolean; iconeSessioni: boolean;
   /** Larghezza della barra laterale in px, se trascinata (frame 101:29399); assente = quella del disegno. */
   barraLarghezza?: number;
