@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
     await tasto({ key: '/', code: 'Slash', metaKey: true });
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Scorciatoie da tastiera');
-    assert.equal(await run(() => document.querySelectorAll('.riga-tasto').length), 20);
+    assert.equal(await run(() => document.querySelectorAll('.riga-tasto').length), 21); // con «Nuova sessione ⌘N» (#468)
     await run(() => { const i = document.querySelector('[role=dialog] input'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(i, 'coda'); i.dispatchEvent(new Event('input', { bubbles: true })); });
     await wait(() => document.querySelectorAll('.riga-tasto').length === 1);
     assert.equal(await run(() => document.querySelector('.riga-tasto').textContent), 'Metti in coda⌘↵');

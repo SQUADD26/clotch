@@ -9,6 +9,8 @@ import type { Novita } from "../../tipi";
 export interface DatiDialoghi {
   rinomina: { titolo: string; valore: string; nota: string; salva(nome: string): void };
   novita: { versione: string; novita: Novita };
+  /** «Scegli le ore…» del silenzio (149-66688): `valore` «22:00–7:00»; `attivo` = [riga, segmento] col fuoco. */
+  ore: { valore: string; attivo?: [number, number]; salva(ore: string): void };
 }
 export type NomeDialogo = "aggiornamento" | "scorciatoie" | keyof DatiDialoghi;
 export interface Aperto { nome: NomeDialogo; dati?: unknown }

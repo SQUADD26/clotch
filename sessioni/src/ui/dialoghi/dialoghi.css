@@ -24,3 +24,20 @@
 .pezzo-dialoghi .novita li { display: flex; align-items: flex-start; gap: var(--spazio-2); }
 .pezzo-dialoghi .dialoghi-vista { display: contents; }
 .pezzo-dialoghi .dialoghi-vista.centrato .velo { padding-bottom: 0; }
+/* figma: 149-66688 — «dialogo silenzio»: «Dalle»/«Alle» con selettore a segmenti (149-66904 «del giorno dopo», 149-67120 errore e «Salva» spento) */
+.pezzo-dialoghi .riga-ora { display: flex; align-items: center; gap: var(--spazio-3); }
+.pezzo-dialoghi .nome-ora { width: var(--spazio-12); flex: none; }
+.pezzo-dialoghi .selettore-ora {
+  display: flex; align-items: center; gap: var(--spazio-1); padding: var(--spazio-1-5) var(--spazio-3); border-radius: var(--raggio-lg);
+  background: var(--colore-fondo-casella); border: var(--misura-tratto) solid var(--colore-bordo-normale);
+  font-size: var(--testo-dimensione-base);
+}
+.pezzo-dialoghi .selettore-ora.fuoco { border-color: var(--colore-bordo-fuoco); }
+.pezzo-dialoghi .segmento { padding: var(--spazio-0-5) var(--spazio-1); border-radius: var(--raggio-xs); outline: none; cursor: default; }
+.pezzo-dialoghi .segmento.scelto { background: var(--colore-fondo-riga-scelta); }
+.pezzo-dialoghi .frecce { display: flex; flex-direction: column; padding-left: var(--spazio-1); }
+.pezzo-dialoghi .freccia { width: var(--spazio-3); height: var(--spazio-3); display: flex; }
+.pezzo-dialoghi .freccia .icona { width: var(--spazio-3); height: var(--spazio-3); }
+.pezzo-dialoghi .freccia.su .icona { transform: rotate(180deg); }
+.pezzo-dialoghi .errore-ore { color: var(--colore-testo-errore); }
+.pezzo-dialoghi .bottone:disabled { opacity: var(--opacita-spento); }

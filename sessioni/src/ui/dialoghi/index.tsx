@@ -8,6 +8,7 @@ import { useNavigazione } from "../base/navigazione";
 import { provaDi } from "../chat/testi";
 import { DialogoAggiornamento } from "./Aggiornamento";
 import { DialogoNovita } from "./Novita";
+import { DialogoOre } from "./Ore";
 import { DialogoRinomina } from "./Rinomina";
 import { DialogoScorciatoie } from "./Scorciatoie";
 import { vicina } from "./vicina";
@@ -42,6 +43,7 @@ export function Dialoghi() {
       case "aggiornamento": return <DialogoAggiornamento />;
       case "scorciatoie": return <DialogoScorciatoie />;
       case "rinomina": return <DialogoRinomina {...(aperto.dati as DatiDialoghi["rinomina"])} />;
+      case "ore": return <DialogoOre {...(aperto.dati as DatiDialoghi["ore"])} />;
       case "novita": return <DialogoNovita {...(aperto.dati as DatiDialoghi["novita"])} />;
       default: return null;
     }
