@@ -1,0 +1,61 @@
+/* figma: 148-62026 — bottone account in fondo alla barra (148:62167) e i suoi due menu (148:62356 uso, 148:62567 cambio). Solo token. */
+.pezzo-barra .account-barra { display: contents; }
+.pezzo-barra .account-barra .errore { color: var(--colore-testo-errore); }
+
+.pezzo-barra .piede-account {
+  flex: none; padding: var(--spazio-2); gap: var(--spazio-2); display: flex; flex-direction: column;
+  border-radius: var(--raggio-md); text-align: left; cursor: default;
+}
+.pezzo-barra .piede-account:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .piede-account.aperto { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .riga-account { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-barra .riga-account .apri { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); text-align: left; }
+.pezzo-barra .account-barra .avatar {
+  width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-pieno); flex: none;
+  display: flex; align-items: center; justify-content: center; color: var(--colore-testo-su-primario);
+}
+.pezzo-barra .account-barra .avatar.piccolo { width: var(--misura-campione); height: var(--misura-campione); }
+.pezzo-barra .account-barra .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.pezzo-barra .riga-account .testi > * { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pezzo-barra .riga-account .cambia { display: flex; flex: none; }
+.pezzo-barra .riga-account .cambia svg { transform: rotate(180deg); }
+
+.pezzo-barra .uso-piede { display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-barra .uso-piede .testata { display: flex; justify-content: space-between; }
+.pezzo-barra .barra-account { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); }
+.pezzo-barra .barra-account .pieno { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
+.pezzo-barra .barra-account .pieno.l-giallo { background: var(--colore-semaforo-giallo); }
+.pezzo-barra .barra-account .pieno.l-pieno { background: var(--colore-testo-errore); }
+
+/* i due menu galleggiano sopra il bottone, appoggiati sopra di lui; il secondo sta a destra del primo (--x, --y: dal bottone) */
+.pezzo-barra .menu-account {
+  position: fixed; left: var(--x); bottom: var(--y); z-index: 10; width: var(--misura-menu-modello); padding: var(--spazio-1);
+  display: flex; flex-direction: column;
+  background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
+  box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
+}
+.pezzo-barra .menu-account.secondo { left: calc(var(--x) + var(--misura-menu-modello) + var(--spazio-2)); }
+.pezzo-barra .menu-account .linea { height: var(--misura-tratto); background: var(--colore-bordo-leggero); }
+.pezzo-barra .uso-attuale { padding: var(--spazio-2); display: flex; flex-direction: column; gap: var(--spazio-4); }
+.pezzo-barra .blocco-uso { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-barra .blocco-uso .testata { display: flex; justify-content: space-between; align-items: center; }
+.pezzo-barra .avviso-limite { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-barra .menu-account .voce {
+  padding: var(--spazio-2); gap: var(--spazio-2); display: flex; align-items: center; border-radius: var(--raggio-md); text-align: left; width: 100%;
+}
+.pezzo-barra .menu-account .voce:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .menu-account .voce.scelta { background: var(--colore-fondo-riga-scelta); }
+.pezzo-barra .menu-account .voce .testo { flex: 1; }
+.pezzo-barra .menu-account .motivo { padding: var(--spazio-2); gap: var(--spazio-2); display: flex; align-items: flex-start; }
+.pezzo-barra .menu-account .titolo-menu, .pezzo-barra .menu-account .nota { padding: var(--spazio-2); }
+
+.pezzo-barra .riga-altro {
+  padding: var(--spazio-2); gap: var(--spazio-2); display: flex; align-items: flex-start; border-radius: var(--raggio-md); text-align: left; width: 100%;
+}
+.pezzo-barra .riga-altro:hover, .pezzo-barra .riga-altro.passaggio { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-barra .riga-altro:not(:hover):not(.passaggio) .passa { visibility: hidden; }
+.pezzo-barra .riga-altro .testi { gap: var(--spazio-1); align-items: stretch; }
+.pezzo-barra .riga-altro .nome { display: flex; justify-content: space-between; align-items: center; gap: var(--spazio-2); }
+.pezzo-barra .riga-altro .nome .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pezzo-barra .riga-altro .barre { display: flex; gap: var(--spazio-2); }
+.pezzo-barra .riga-altro .mini { flex: 1; display: flex; flex-direction: column; gap: var(--spazio-0-5); }

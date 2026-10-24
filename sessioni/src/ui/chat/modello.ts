@@ -1,7 +1,9 @@
 // Dai messaggi della trascrizione alle voci del filo (frame 101:8036 e «Chat al lavoro»). Puro: niente DOM, niente IPC.
 // Un messaggio di Roberto apre un turno; nel turno i blocchi stanno nell'ordine in cui arrivano.
 // Un turno finito mostra le modifiche riunite in «File toccati» (101:8036, 101:15335); quello vivo le mostra una a una (101:14631).
-import type { Messaggio } from "../../tipi";
+import type { Messaggio, RifImmagine } from "../../tipi";
+import { ramoCreato } from "./eventi";
+import { senzaPercorsi, senzaSegnaposto } from "./percorsi";
 import { descrivi, differenze, fonti, testoCampo, type Descrizione, type Fonte, type RigaDiff, type StatoStrumento } from "./strumenti";
 
 type Strumento = Extract<Messaggio, { tipo: "strumento" }>;
@@ -10,9 +12,9 @@ export interface FileToccato { file: string; aggiunte: number; tolte: number }
 export interface Aiutante { id: string; nome: string; azione: string; durata: number | null; finito: boolean }
 export interface Passo { testo: string; stato: "fatto" | "in-corso" | "da-fare" }
 
-export type Blocco =
+export type Blocco = (
   | { tipo: "pensiero"; testo: string; durata: number | null; inCorso: boolean }
-  | ({ tipo: "strumento"; id: string; stato: StatoStrumento; durata: number | null; uscita: string } & Descrizione)
+  | ({ tipo: "strumento"; id: string; stato: StatoStrumento; durata: number | null; uscita: string; immagini?: RifImmagine[] } & Descrizione)
   | { tipo: "modifica"; id: string; file: string; aggiunte: number; tolte: number; righe: RigaDiff[]; durata: number | null }
   | { tipo: "web"; id: string; query: string; fonti: Fonte[] }
   | { tipo: "attivita"; passi: Passo[] }
@@ -23,12 +25,15 @@ export type Blocco =
   | { tipo: "file-toccati"; file: FileToccato[] }
   | { tipo: "risposta"; testo: string; inScrittura: boolean }
   | { tipo: "interrotta" }
-  | { tipo: "errore"; testo: string };
+  | { tipo: "errore"; testo: string }) & { chiave?: string; origini?: string[] };
 
 export type Voce =
-  | { tipo: "roberto"; chiave: string; testo: string }
+  /** `immagini`: incollate (101:28041); `percorsi`: file scritti in fondo al testo come `@percorso` (la casella li mette così). */
+  | { tipo: "roberto"; chiave: string; testo: string; immagini?: RifImmagine[]; percorsi?: string[]; t: number | null }
   | { tipo: "riassunto"; chiave: string }
-  | { tipo: "turno"; chiave: string; blocchi: Blocco[]; inizio: number | null; fine: number | null };
+  /** Cosa è successo nella sessione (101:28725): `testo` è già la riga da scrivere. */
+  | { tipo: "evento"; chiave: string; testo: string; t: number | null }
+  | { tipo: "turno"; chiave: string; blocchi: Blocco[]; origini?: string[]; inizio: number | null; fine: number | null };
 
 const MODIFICHE = new Set(["Edit", "MultiEdit", "Write", "NotebookEdit"]);
 const INTERRUZIONE = /^\[Request interrupted by user/;
@@ -71,7 +76,7 @@ export function contaRighe(righe: RigaDiff[]) {
  * `vivo`: la sessione lavora ancora (situazione «lavora», «aiutanti»…): l'ultimo turno è aperto, gli strumenti senza esito girano.
  * `cartella`: per mostrare i percorsi relativi.
  */
-export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[] {
+export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identita?: readonly { chiave: string }[], precedenti: readonly Voce[] = [], sessione = ""): Voce[] {
   const out: Voce[] = [];
   let turno: Extract<Voce, { tipo: "turno" }> | null = null;
   let inizio: number | null = null; // il turno dura dal messaggio di Roberto che lo apre
@@ -79,15 +84,35 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
   const durata = (i: number) => { const a = messaggi[i].t, b = tempoDopo(i); return a != null && b != null && b >= a ? b - a : null; };
 
   messaggi.forEach((m, i) => {
-    const chiave = `${i}-${m.t ?? ""}`;
+    const fisica = identita?.[i]?.chiave;
+    const chiave = fisica ? `fisico:${JSON.stringify([sessione, fisica])}` : `${i}-${m.t ?? ""}`;
+    const prima = new Set(turno?.blocchi);
+    elabora(m, i, chiave);
+    if (!fisica || !turno) return;
+    turno.origini = [...(turno.origini ?? []), chiave];
+    for (const b of turno.blocchi) {
+      const aggregato = m.tipo === "strumento" && ((m.nome === "TodoWrite" && b.tipo === "attivita") ||
+        (["Agent", "Task"].includes(m.nome) && b.tipo === "aiutanti"));
+      if (!prima.has(b) || aggregato) {
+        b.chiave ??= `${chiave}:${b.tipo}`;
+        b.origini = [...(b.origini ?? []), chiave];
+      }
+    }
+  });
+
+  function elabora(m: Messaggio, i: number, chiave: string) {
     if (m.tipo === "utente") {
       if (INTERRUZIONE.test(m.testo)) { (turno ?? apri(m.t, chiave)).blocchi.push({ tipo: "interrotta" }); return; }
       if (RIASSUNTO.test(m.testo)) { turno = null; out.push({ tipo: "riassunto", chiave }); return; }
       turno = null;
       inizio = m.t;
-      out.push({ tipo: "roberto", chiave, testo: m.testo });
+      const { testo, percorsi } = senzaPercorsi(m.immagini ? senzaSegnaposto(m.testo) : m.testo);
+      out.push({ tipo: "roberto", chiave, testo, ...(m.immagini ? { immagini: m.immagini } : {}), ...(percorsi.length ? { percorsi } : {}), t: m.t });
       return;
     }
+    // un ramo creato finisce il turno: la riga dell'evento sostituisce il comando e il filo riparte da lei
+    const ramo = m.tipo === "strumento" && m.esito && !m.esito.errore && m.nome === "Bash" ? ramoCreato(testoCampo(m.ingresso, "command")) : null;
+    if (ramo) { turno = null; out.push({ tipo: "evento", chiave, testo: `Ramo creato: ${ramo}`, t: m.t }); return; }
     const tu = turno ?? apri(m.t, chiave);
     if (m.t != null) tu.fine = m.t;
     const ultimo = i === messaggi.length - 1;
@@ -97,10 +122,10 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
       case "errore": tu.blocchi.push({ tipo: "errore", testo: m.testo }); return;
       case "strumento": return strumento(tu, m, i);
     }
-  });
+  }
 
   function apri(t: number | null, chiave: string) {
-    turno = { tipo: "turno", chiave, blocchi: [], inizio: inizio ?? t, fine: t };
+    turno = { tipo: "turno", chiave: identita ? `turno:${chiave}` : chiave, blocchi: [], inizio: inizio ?? t, fine: t };
     out.push(turno);
     return turno;
   }
@@ -115,7 +140,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
     }
     if (m.nome === "Agent" || m.nome === "Task") {
       const a: Aiutante = {
-        id: m.id, nome: testoCampo(m.ingresso, "description") || testoCampo(m.ingresso, "subagent_type"),
+        id: identita?.[i]?.chiave ? `aiutante:${JSON.stringify([sessione, identita[i].chiave])}` : m.id, nome: testoCampo(m.ingresso, "description") || testoCampo(m.ingresso, "subagent_type"),
         azione: esito.split("\n")[0], durata: durata(i), finito: !!m.esito && !/^Async agent launched/.test(esito),
       };
       const b = tu.blocchi.find((x) => x.tipo === "aiutanti");
@@ -143,7 +168,7 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
     // bloccato da una regola: la chiamata resta una riga normale, il perché va nell'avviso senza il nome dell'hook (101:15790)
     const bloccato = !!m.esito?.errore && BLOCCO.test(esito);
     const stRiga = bloccato ? "chiusa" : st;
-    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
+    tu.blocchi.push({ tipo: "strumento", id: m.id, stato: stRiga, durata: durata(i), uscita: esito, ...(m.esito?.immagini ? { immagini: m.esito.immagini } : {}), ...descrivi(m.nome, m.ingresso, stRiga, cartella) });
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 
@@ -159,9 +184,17 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = ""): Voce[
     }
     const resto = v.blocchi.filter((b) => b.tipo !== "modifica");
     const r = resto.map((b) => b.tipo).lastIndexOf("risposta");
-    resto.splice(r < 0 ? resto.length : r, 0, { tipo: "file-toccati", file: [...perFile.values()] });
+    const origini = mod.flatMap((b) => b.origini ?? []);
+    resto.splice(r < 0 ? resto.length : r, 0, { tipo: "file-toccati", file: [...perFile.values()],
+      ...(origini.length ? { chiave: `${origini[0]}:file-toccati`, origini } : {}) });
     v.blocchi = resto;
   });
+  if (identita) {
+    const turni = out.filter((v): v is Extract<Voce, { tipo: "turno" }> => v.tipo === "turno");
+    const vecchi = precedenti.filter((v): v is Extract<Voce, { tipo: "turno" }> => v.tipo === "turno");
+    riconcilia(turni, vecchi);
+    for (const t of turni) riconcilia(t.blocchi, vecchi.find((v) => v.chiave === t.chiave)?.blocchi ?? []);
+  }
   return out;
 }
 
@@ -176,4 +209,30 @@ export function riepilogo(v: Extract<Voce, { tipo: "turno" }>) {
     if (b.tipo === "aiutanti") aiutanti += b.aiutanti.length;
   }
   return { durata: v.inizio != null && v.fine != null ? v.fine - v.inizio : null, strumenti, file: file.size, aiutanti };
+}
+
+
+/** Un gruppo mantiene la propria identità se contiene nascite fisiche già montate.
+ * Matching uno-a-uno per sovrapposizione: merge/split non duplica chiavi o trasferisce stato fra gruppi. */
+function riconcilia(nuovi: { tipo: string; chiave?: string; origini?: string[] }[], vecchi: readonly { tipo: string; chiave?: string; origini?: string[] }[]) {
+  const indice = new Map<string, number[]>();
+  vecchi.forEach((g, i) => {
+    for (const o of g.origini ?? []) {
+      const k = `${g.tipo}:${o}`;
+      indice.set(k, [...(indice.get(k) ?? []), i]);
+    }
+  });
+  const candidati: { nuovo: number; vecchio: number; peso: number }[] = [];
+  nuovi.forEach((g, nuovo) => {
+    const pesi = new Map<number, number>();
+    for (const o of g.origini ?? []) for (const i of indice.get(`${g.tipo}:${o}`) ?? []) pesi.set(i, (pesi.get(i) ?? 0) + 1);
+    for (const [vecchio, peso] of pesi) candidati.push({ nuovo, vecchio, peso });
+  });
+  candidati.sort((a, b) => b.peso - a.peso || a.vecchio - b.vecchio || a.nuovo - b.nuovo);
+  const presi = new Set<number>(), usati = new Set<number>();
+  for (const c of candidati) {
+    if (presi.has(c.nuovo) || usati.has(c.vecchio)) continue;
+    nuovi[c.nuovo].chiave = vecchi[c.vecchio].chiave;
+    presi.add(c.nuovo); usati.add(c.vecchio);
+  }
 }

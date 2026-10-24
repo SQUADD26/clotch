@@ -1,4 +1,5 @@
 // Canali IPC delle preferenze, delle impostazioni dell'app e delle azioni su una sessione (#360, #368), nel processo main.
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFile } from "node:child_process";
 import { app, clipboard, shell, type IpcMain } from "electron";
@@ -23,12 +24,12 @@ export function collegaPreferenze(ipc: IpcMain, invia: (canale: string, dati: un
     if (!s) throw new Error("sessione non trovata");
     switch (azione) {
       case "nuova-finestra": apriFinestra(s.id); return;
-      case "copia-id": clipboard.writeText(s.id); return;
-      case "copia-cartella": clipboard.writeText(s.cartella); return;
+      case "copia-id": return clipboard.writeText(s.id);
+      case "copia-cartella": return clipboard.writeText(s.cartella);
       case "copia-link":
         if (!s.idApp) throw new Error("questa sessione non è dell'app Claude: nessun link");
-        clipboard.writeText(`claude://code/continue?session=${s.idApp}`); return;
-      case "mostra-nel-finder": shell.showItemInFolder(s.cartella); return;
+        return clipboard.writeText(`claude://code/continue?session=${s.idApp}`);
+      case "mostra-nel-finder": shell.showItemInFolder(s.file && fs.existsSync(s.file) ? s.file : s.cartella); return; // il file della sessione, se c'è
       case "apri-terminale":
         if (!s.cartella) throw new Error("questa sessione non ha una cartella");
         return new Promise<void>((ok, ko) => execFile("open", ["-a", "Terminal", s.cartella], (e) => (e ? ko(e) : ok())));

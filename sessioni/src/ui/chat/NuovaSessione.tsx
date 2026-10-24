@@ -1,0 +1,163 @@
+// figma: 148-51982 — «Nuova sessione»: intestazione 148:52165, casella del primo messaggio e selettori Ambiente, Cartella, Ramo, Worktree.
+// Menu ambiente 148:52243, cartella 148:52543, ramo 148:52864; worktree spento 148:53138; cartella senza git 148:53399; finestra stretta 148:53655.
+// Invio manda `nuova_sessione`; il motore risponde a sessione nata (fino a ~1 minuto) con il suo id e si apre quella.
+// Se modello o sforzo partono diversi, il motore scrive dopo un `errore` per lo stesso comando: si mostra nell'avviso.
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import type { CartellaAvvio, ContestoCartella, NuovaSessioneApi, PreferenzeSessione } from "../../tipi";
+import { BottoneIcona } from "../base/Bottone";
+import { avvisa } from "../base/Avvisi";
+import { useChiamata } from "../base/dati";
+import { Icona } from "../base/Icona";
+import { useNavigazione } from "../base/navigazione";
+import { useApriSessione } from "../barra/apri";
+import { accountScelto } from "../barra/account-dati";
+import { useImpostazioni } from "../impostazioni/stato";
+import { argsNuovaSessione, LOCALE, nomeAmbiente, notaAvvio, type Ambiente } from "./avvio";
+import { ChipPermessi } from "./Chip";
+import { ChipModello } from "./ChipModello";
+import { daPiano } from "../clotch-ai/registro";
+import { comandaEsito } from "./clotch-ai";
+import { Selettore, MenuAmbiente, MenuCartella, MenuRamo } from "./MenuAvvio";
+import { modelloDi, sforzoDi } from "./scelte";
+import { erroreComando, idModello, provaDi } from "./testi";
+import "./casella.css";
+import "./nuova-sessione.css";
+
+declare global {
+  interface Window { nuovaSessione: NuovaSessioneApi }
+}
+
+const ATTESA_MS = 60_000; // `ok` senza id di sessione: la casella si libera dopo un minuto
+const ERRORE_DOPO_MS = 120_000; // quanto si resta in ascolto dell'`errore` che il motore scrive dopo `ok`
+const SENZA_GIT: ContestoCartella = { git: false, rami: [], predefinito: null };
+
+export function IntestazioneNuovaSessione() {
+  return <div className="intestazione"><div className="testi"><span className="titolo">Nuova sessione</span></div></div>;
+}
+
+/** «modello letto …, chiesto …»: l'`errore` che il motore scrive dopo `ok` per lo stesso comando; arriva quando la vista è già chiusa, quindi l'avviso è dell'app. */
+function guardaErrore(comando: string) {
+  const t = setTimeout(() => off(), ERRORE_DOPO_MS);
+  const off = window.clotchAi.onRegistro((r) => {
+    const x = daPiano(r).esiti.get(comando);
+    if (x?.esito !== "errore") return;
+    off(); clearTimeout(t);
+    avvisa({ tipo: "errore", messaggio: x.testo || "La sessione è partita con modello o sforzo diversi da quelli chiesti" });
+  });
+}
+
+type Menu = "ambiente" | "cartella" | "ramo" | "permessi" | "modello" | null;
+
+export function NuovaSessione() {
+  const { sezione } = useNavigazione();
+  const apriSessione = useApriSessione();
+  const { modello: globale } = useImpostazioni();
+  const dati = useChiamata(() => window.nuovaSessione.cartelle(), []).dati;
+  const ssh = useChiamata(() => window.nuovaSessione.ssh(), []).dati ?? [];
+  const [menu, setMenu] = useState<Menu>(() => { const m = provaDi(sezione, "menu"); return m === "ambiente" || m === "cartella" || m === "ramo" ? m : null; });
+  const [ambiente, setAmbiente] = useState<Ambiente>(LOCALE);
+  const [scelta, setScelta] = useState<CartellaAvvio | null | undefined>(undefined); // undefined = ancora la prima dei recenti
+  const [ramoScelto, setRamo] = useState<string | null>(null);
+  const [worktree, setWorktree] = useState(() => provaDi(sezione, "worktree") !== "spento");
+  const [p, setP] = useState<PreferenzeSessione>({});
+  const [testo, setTesto] = useState("");
+  const [attesa, setAttesa] = useState(false);
+  const area = useRef<HTMLTextAreaElement>(null);
+
+  const recenti = dati?.recenti ?? [];
+  const cartella = scelta !== undefined ? scelta : recenti.find((c) => c.nome === provaDi(sezione, "cartella")) ?? recenti[0] ?? null;
+  const elencoMenu = cartella && !recenti.some((c) => c.percorso === cartella.percorso) ? [cartella, ...recenti] : recenti;
+  const locale = ambiente.tipo === "locale";
+  const [ctx, setCtx] = useState<{ percorso: string; c: ContestoCartella } | null>(null);
+  useEffect(() => {
+    if (!cartella || !locale) return;
+    let vivo = true;
+    window.nuovaSessione.contesto(cartella.percorso).then((c) => vivo && setCtx({ percorso: cartella.percorso, c }), () => vivo && setCtx({ percorso: cartella.percorso, c: SENZA_GIT }));
+    return () => { vivo = false; };
+  }, [cartella?.percorso, locale]);
+  const contesto = cartella && locale && ctx?.percorso === cartella.percorso ? ctx.c : null; // null = ancora in lettura
+  const ramo = ramoScelto ?? contesto?.predefinito ?? null;
+  const senzaGit = !!contesto && !contesto.git;
+  const conGit = !!contesto?.git;
+
+  useLayoutEffect(() => { const a = area.current; if (a) { a.style.height = "auto"; a.style.height = `${a.scrollHeight}px`; } }, [testo]);
+
+  const imposta = (parte: Partial<{ [K in keyof PreferenzeSessione]: PreferenzeSessione[K] | null }>) => setP((x) => ({ ...x, ...parte }) as PreferenzeSessione);
+  const modello = modelloDi({ modello: idModello(globale) ?? null }, p) ?? "";
+  const pronto = !!testo.trim() && !attesa && (!cartella || !locale || !!contesto);
+  const manda = async () => {
+    if (!pronto || !dati) return;
+    setAttesa(true);
+    const e = await comandaEsito("nuova_sessione", argsNuovaSessione({ ambiente, cartella: cartella?.percorso ?? dati.casa, prompt: testo.trim(), modello, sforzo: sforzoDi(p).id,
+      account: accountScelto.leggi(), git: conGit ? { ramo, worktree } : null }));
+    if (e?.esito !== "ok") {
+      setAttesa(false);
+      // il motore dice il perché (cartella che non c'è, ramo, lock occupato…); riprovare serve solo se non l'ha rifiutato
+      avvisa({ tipo: "errore", messaggio: (e && (e.esito === "rifiutato" || e.esito === "errore") && e.testo) || erroreComando(e), azione: e?.esito === "rifiutato" ? undefined : { etichetta: "Riprova", fai: () => void manda() } });
+      return;
+    }
+    guardaErrore(e.id);
+    if (e.sessione) void apriSessione(e.sessione);
+    else setTimeout(() => { setAttesa(false); setTesto(""); }, ATTESA_MS);
+  };
+  const tasti = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    void manda();
+  };
+  const apriCartella = async () => { const c = await window.nuovaSessione.scegliCartella().catch(() => null); if (c) { setScelta(c); setRamo(null); } };
+  const apri = (m: Menu) => setMenu(menu === m ? null : m);
+  const chiudi = () => setMenu(null);
+
+  return (
+    <div className="nuova-sessione">
+      <div className="nuova-corpo">
+        <div className="area-casella con-menu">
+          <div className={`casella ${testo ? "scritta" : "vuota"}${menu === "permessi" || menu === "modello" ? " fuoco" : ""}`}>
+            <div className="area-testo">
+              <textarea ref={area} rows={1} value={testo} disabled={!!attesa} autoFocus={!sezione} onChange={(e) => setTesto(e.target.value)} onKeyDown={tasti}
+                placeholder="Scrivi il primo messaggio" aria-label="Scrivi il primo messaggio" />
+            </div>
+            <div className="azioni">
+              <BottoneIcona icona="piu" etichetta="Allega" disabled />
+              <ChipPermessi s={{ modello, permessi: null, contesto: null }} p={p} imposta={imposta} aperto={menu === "permessi"} onAperto={(a) => setMenu(a ? "permessi" : null)} disabled={!!attesa} />
+              <span className="spinta" />
+              <ChipModello s={{ modello, permessi: null, contesto: null }} p={p} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={!!attesa} />
+              <BottoneIcona icona="microfono" etichetta="Detta" disabled />
+              <button type="button" className="bottone-invia" disabled={!pronto} aria-label={attesa ? "In attesa della sessione" : "Invia"} title={attesa ? "In attesa della sessione" : "Invia"} onClick={() => void manda()}>
+                {attesa ? <Icona nome="spinner" gira colore="su-accento" /> : <Icona nome="invia" colore={testo ? "su-accento" : "terziaria"} />}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="selettori-avvio">
+          <Selettore icona="computer" etichetta={nomeAmbiente(ambiente)} aperto={menu === "ambiente"} onClick={() => apri("ambiente")}>
+            {menu === "ambiente" && <MenuAmbiente ambiente={ambiente} ssh={ssh} onScegli={setAmbiente} onChiudi={chiudi} />}
+          </Selettore>
+          <Selettore icona="cartella" etichetta={cartella?.nome ?? "Nessuna cartella"} aperto={menu === "cartella"} stato={senzaGit ? "errore" : undefined} onClick={() => apri("cartella")}>
+            {menu === "cartella" && <MenuCartella recenti={elencoMenu} cartella={cartella} ctx={contesto} ramo={ramo} worktree={worktree} inizio={provaDi(sezione, "cerca-cartella") ?? ""}
+              onCartella={(c) => { setScelta(c); setRamo(null); }} onApri={() => void apriCartella()} onRamo={() => setMenu("ramo")} onWorktree={setWorktree} onChiudi={chiudi} />}
+          </Selettore>
+          {conGit && (
+            <>
+              <Selettore icona="ramo" etichetta={ramo ?? "Nessun ramo"} aperto={menu === "ramo"} onClick={() => apri("ramo")}>
+                {menu === "ramo" && <MenuRamo rami={contesto.rami} ramo={ramo} inizio={provaDi(sezione, "cerca") ?? ""} onScegli={setRamo} onChiudi={chiudi} />}
+              </Selettore>
+              <Selettore icona="strati" etichetta={worktree ? "Worktree" : "Senza worktree"} stato={worktree ? undefined : "spento"} onClick={() => setWorktree(!worktree)} />
+            </>
+          )}
+        </div>
+        {conGit && cartella && <span className="nota-avvio">{notaAvvio(worktree, ramo, cartella.nome)}</span>}
+        {senzaGit && cartella && (
+          <div className="avviso-avvio" role="alert">
+            <Icona nome="avviso" colore="errore" />
+            <div className="testi">
+              <span className="titolo">«{cartella.nome}» non è un repo git</span>
+              <span className="corpo">Ramo e worktree non sono disponibili. Scegli un’altra cartella o scrivi qui.</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

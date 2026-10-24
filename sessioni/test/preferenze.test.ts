@@ -49,3 +49,13 @@ test("impostazioni: imposta unisce, null toglie; file rotto non viene sovrascrit
   assert.throws(() => impostaImpostazioni(f, { tema: "chiaro" }));
   assert.equal(fs.readFileSync(f, "utf8"), "{rotto");
 });
+
+test("preferenze (#437): la scorciatoia salvata sotto `friday` si legge col nome nuovo e il file viene riscritto", () => {
+  const f = file();
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify({ sessioni: {}, app: { scorciatoie: { cerca: "⌘K", friday: "⌘⇧L" } } })); // chiave vecchia delle scorciatoie salvate
+  assert.deepEqual(leggiImpostazioni(f), { scorciatoie: { cerca: "⌘K", clotchAi: "⌘⇧L" } });
+  assert.deepEqual(JSON.parse(fs.readFileSync(f, "utf8")).app.scorciatoie, { cerca: "⌘K", clotchAi: "⌘⇧L" });
+  fs.writeFileSync(f, JSON.stringify({ sessioni: {}, app: { scorciatoie: { friday: "⌘1", clotchAi: "⌘2" } } })); // chiave vecchia delle scorciatoie salvate
+  assert.deepEqual(leggiImpostazioni(f), { scorciatoie: { clotchAi: "⌘2" } });
+});

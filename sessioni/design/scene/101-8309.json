@@ -19,7 +19,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792768244164,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "Leggere dal disco le sessioni di tutte le cartelle ~/.claude-*, di Codex e di Cursor, senza interfaccia.",
      "stato": "aperto",
@@ -55,7 +55,7 @@
    {
     "tipo": "utente",
     "testo": "Leggi le sessioni dal disco: tutte le cartelle ~/.claude-*, Codex e Cursor.",
-    "t": 1792768229164
+    "t": 1792793034531
    },
    {
     "tipo": "strumento",
@@ -68,14 +68,14 @@
      "testo": "",
      "errore": false
     },
-    "t": 1792768230164,
+    "t": 1792793035531,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Trovo 6 cartelle di account e 312 sessioni. Scrivo il lettore e i test.",
     "modello": "claude-opus-5-5",
-    "t": 1792768232164
+    "t": 1792793037531
    },
    {
     "tipo": "strumento",
@@ -87,7 +87,7 @@
      "testo": "PASS sessioni/lettore.test.ts (11 test)\nTests: 11 passed, 11 total",
      "errore": false
     },
-    "t": 1792768233164,
+    "t": 1792793038531,
     "id": "t1"
    },
    {
@@ -97,13 +97,13 @@
      "command": "npm test -- cartelle"
     },
     "esito": null,
-    "t": 1792768242164,
+    "t": 1792793047531,
     "id": "t2"
    },
    {
     "tipo": "pensiero",
     "testo": "…",
-    "t": 1792768243164
+    "t": 1792793048531
    }
   ]
  },
@@ -117,7 +117,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [],
   "regole": [],

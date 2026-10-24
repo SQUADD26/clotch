@@ -2,37 +2,60 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
+import { impostaIdentita, impostaNome } from "./branding";
+import { provaSilenziosa } from "./modalita-prova";
+import { verificaChiamante } from "./ipc-fiducia";
+
+// Bootstrap prima degli import con accesso a preferenze, log e dati dell'app.
+const iParita = process.argv.indexOf("--parita");
+const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
+if (iParita > 0) {
+  process.env.CLOTCH_TEST_SILENT = "1";
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("prohibited");
+} else if (provaSilenziosa()) {
+  app.commandLine.appendSwitch("mute-audio");
+  if (process.platform === "darwin") app.setActivationPolicy("accessory");
+}
+impostaNome();
+
 import { Sessioni } from "./api";
+import { collegaAllegati } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
-import { impostaIdentita, impostaNome } from "./branding";
 import { apriFinestra, parita } from "./finestra";
-import { collegaFriday } from "./friday-ipc";
+import { infoSessione } from "./info-sessione";
+import { collegaClotchAi } from "./clotch-ai-ipc";
 import { collegaImpostazioni } from "./impostazioni";
+import { collegaNuovaSessione } from "./nuova-sessione";
 import { collegaIndice } from "./indice-ipc";
 import { leggiImpostazioni } from "./preferenze";
+import { collegaCasella } from "./casella-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
 import { collegaScena, fileScena, leggiScena } from "./scena";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import type { Aggiornamento, PaginaMessaggi } from "./tipi";
 
 // la scala 1 dell'export Figma la dà --force-device-scale-factor=1 sulla riga di comando (npm run parita)
-const iParita = process.argv.indexOf("--parita");
-const idParita = iParita > 0 ? process.argv[iParita + 1] : null;
-const scena = idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null;
+const scena = (() => {
+  try { return idParita ? leggiScena(fileScena(path.join(__dirname, "..", ".."), idParita)) : null; }
+  catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
+})();
 
-impostaNome();
 const sessioni = new Sessioni();
 
 // impostazioni lette dal file a ogni uso (così seguono i cambi); file rotto = valori di partenza
 const filePreferenze = path.join(app.getPath("userData"), "preferenze.json");
 const impostazioniApp = (): Record<string, unknown> => { try { return leggiImpostazioni(filePreferenze); } catch { return {}; } };
-const registra = (m: string) => scriviRegistro(String(impostazioniApp().cartellaRegistro || CARTELLA_REGISTRO), m);
+const registra = (m: string) => scriviRegistro(provaSilenziosa() ? path.join(app.getPath("userData"), "logs")
+  : String(impostazioniApp().cartellaRegistro || CARTELLA_REGISTRO), m);
 process.on("uncaughtException", (e) => registra(`eccezione non gestita: ${testoErrore(e)}`));
 process.on("unhandledRejection", (e) => registra(`promessa rifiutata: ${testoErrore(e)}`));
 // un solo punto per tutti i canali IPC: ogni errore di un canale va nel registro e poi torna al renderer
 const handle = ipcMain.handle.bind(ipcMain);
 ipcMain.handle = (canale, fn) => handle(canale, async (...a) => {
-  try { return await fn(...a); } catch (e) { registra(`${canale}: ${testoErrore(e)}`); throw e; }
+  try { verificaChiamante(a[0]); return await fn(...a); } catch (e) { registra(`${canale}: ${testoErrore(e)}`); throw e; }
 });
 const lettiMale = new Set<string>();
 const elenco = () => {
@@ -42,34 +65,69 @@ const elenco = () => {
 };
 
 app.whenReady().then(() => {
+  if (iParita > 0 && !scena) {
+    console.error(`parità: scena non disponibile per ${idParita || "nessun frame"}; servizi dal vivo disattivati`);
+    app.exit(1);
+    return;
+  }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
-  ipcMain.handle("sessioni:elenco", elenco);
-  const indice = collegaIndice(ipcMain, sessioni);
-  ipcMain.handle("sessioni:messaggi", (_e, id: string, pagina: number) => ({ ...sessioni.messaggi(String(id), Number(pagina) | 0), totale: indice.totale(String(id)) }));
-  collegaFriday(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
+  // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
+  // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
+  let apri!: () => void;
+  const dopo = new Promise<void>((ok) => { apri = ok; });
+  const pronte = dopo.then(() => caricaSessioni());
+  ipcMain.handle("sessioni:elenco", async () => { await pronte; return elenco(); });
+  ipcMain.handle("sessioni:info", async (_e, id: string) => { await pronte; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
+  const indice = collegaIndice(ipcMain, sessioni, pronte);
+  ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
+    await pronte;
+    if (opzioni !== undefined && (
+      !opzioni || typeof opzioni !== "object" || Array.isArray(opzioni) || opzioni.v !== 1 ||
+      (opzioni.cursore !== undefined && (typeof opzioni.cursore !== "string" || opzioni.cursore.length > 4096))
+    )) throw new Error("Richiesta cronologia non valida. Riprova.");
+    if (opzioni && (!Number.isSafeInteger(pagina) || pagina < 0))
+      throw new Error("Pagina cronologia non valida. Riprova.");
+    const leggi: (id: string, pagina: number, opzioni?: OpzioniCronologia) => PaginaMessaggi | Promise<PaginaMessaggi>
+      = sessioni.messaggi.bind(sessioni);
+    const risposta = await leggi(String(id), opzioni ? pagina : Number(pagina) | 0, opzioni);
+    if (opzioni) {
+      if (!risposta.cronologia && !risposta.erroreCronologia)
+        throw new Error("Cronologia non disponibile. Riprova.");
+      return risposta;
+    }
+    return { ...risposta, totale: indice.totale(String(id)) };
+  });
+  collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
     if (c === "sessioni:impostazioni") barraMenu();
   };
   collegaPreferenze(ipcMain, invia, sessioni);
+  collegaCasella(ipcMain, sessioni);
+  collegaNuovaSessione(ipcMain, () => sessioni.elencoSessioni().sessioni);
   collegaImpostazioni(ipcMain, sessioni, indice, invia);
-  sessioni.osserva((a) => {
+  collegaAllegati(ipcMain, os.homedir(), (id) => sessioni.elencoSessioni().sessioni.find((x) => x.id === id)?.file ?? null);
+  let avvisa = (_a: Aggiornamento) => {}; // diventa quello vero dopo la prima finestra
+  const finestra = apriFinestra();
+  // la finestra la mostra il suo ready-to-show (registrato prima di questo): solo dopo si legge. Il timer evita l'attesa infinita se non arriva.
+  if (finestra) finestra.once("ready-to-show", () => setImmediate(apri)); else apri();
+  setTimeout(apri, 10_000).unref();
+  const caricaSessioni = async () => {
+    await sessioni.osservaInWorker((a) => {
+      barraMenu();
+      BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
+      const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
+      const el = sessioni.elencoSessioni().sessioni;
+      const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
+      if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
+      avvisa(a);
+    });
+    // dopo l'osservatore: da qui l'elenco è il suo
+    avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();
-    BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", a));
-    const ids = new Set([...a.sessioni, ...a.nuoviMessaggi.map((n) => n.id)]);
-    const el = sessioni.elencoSessioni().sessioni;
-    const sparite = [...ids].some((id) => !el.some((s) => s.id === id)); // fuori dall'elenco = fuori dall'indice
-    if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
-    avvisa(a);
-  });
-  // dopo osserva(): da qui l'elenco è quello dell'osservatore; il callback gira più tardi, quando `avvisa` esiste già
-  const avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
-
-  if (idParita) return parita(idParita);
-  barraMenu();
-  apriFinestra();
+  };
   app.on("activate", () => BrowserWindow.getAllWindows().length || apriFinestra());
 });
 

@@ -25,9 +25,9 @@ final class VoiceClearLinesTests: XCTestCase {
         XCTAssertFalse(VoiceTurn.vague("Mi serve il tuo sì per il merge.", subject: question.subject))
     }
 
-    func testFridayIsLeftToTheItalianVoice() {
+    func testFridayBecomesClotchAI() {
         let said = VoiceTurn.pronounced("Friday apre un worktree dopo l'handoff", VoiceTurn.builtInPronunciation)
-        XCTAssertEqual(said, "Friday apre un worktree dopo l'handoff")
+        XCTAssertEqual(said, "clotch AI apre un worktree dopo l'handoff")
     }
 
     func testVoiceKnowsItIsTheRightHand() {
@@ -48,10 +48,10 @@ final class VoiceClearLinesTests: XCTestCase {
     }
 
     /// #299: every spoken line goes through `speechRequest`, so the English names stay as written in all of them.
-    func testFridayGoesToElevenLabsAsWritten() throws {
-        let r = VoiceTurn.speechRequest(text: "Ho aperto Friday sul nodo giusto", config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation)
+    func testClotchAIGoesToElevenLabsAsWritten() throws {
+        let r = VoiceTurn.speechRequest(text: "Ho aperto clotch AI sul nodo giusto", config: .init([:]), key: "k", pronunciation: VoiceTurn.builtInPronunciation)
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
-        XCTAssertEqual(body["text"] as? String, "Ho aperto Friday sul nodo giusto")
+        XCTAssertEqual(body["text"] as? String, "Ho aperto clotch AI sul nodo giusto")
     }
 
     /// #312: real lines of `eventi.jsonl` (subjects and texts): «Overseer» never reaches ElevenLabs, whatever the place in the line.
@@ -63,7 +63,7 @@ final class VoiceClearLinesTests: XCTestCase {
             let body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(r.httpBody)) as? [String: Any])
             let text = try XCTUnwrap(body["text"] as? String)
             XCTAssertFalse(text.lowercased().contains("overseer"), text)
-            XCTAssertTrue(text.contains("Friday"), text)
+            XCTAssertTrue(text.contains("clotch AI"), text)
         }
     }
 }

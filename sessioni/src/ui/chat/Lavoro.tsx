@@ -1,4 +1,4 @@
-// figma: 101-14396 — lavoro e righe di stato nel filo: «Attività» 101:13368, «Aiutanti» 101:13419, «Interrotta» 101:13475,
+// figma: 101-14396 — lavoro e righe di stato nel filo: «Attività» 101:13368, «Aiutanti» 101:13419, «Interrotta» 101:13475 (finestra «Interrotta da te»: 101-15055),
 // «Riassunto» 101:13480, «Fine turno» 101:13494, «Bloccato da una regola» 101:13532, «Non risponde» 101:13541, «Avviso» 101:7316.
 import type { ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
@@ -40,7 +40,7 @@ export function Attivita({ passi }: { passi: Passo[] }) {
   );
 }
 
-/** `modello`: dal registro di Friday («aiutante» con modello), se c'è. */
+/** `modello`: dal registro di clotch AI («aiutante» con modello), se c'è. */
 export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello: string | null }) {
   const finiti = aiutanti.every((a) => a.finito);
   const ris = useRiserva();
@@ -72,9 +72,12 @@ export function RigaStato({ icona, colore, esito, dettaglio }: { icona: NomeIcon
 
 export const Interrotta = () => <RigaStato icona="stop" colore="terziaria" esito="Interrotta da te" />;
 
-export function Riassunto() {
-  return <div className="riassunto"><span className="linea" /><span className="testo">Conversazione riassunta per fare spazio</span><span className="linea" /></div>;
+/** «riga evento» (101:28708): linea, testo, linea. Il riassunto, il cambio di giorno e gli eventi della sessione sono tutti questa riga. */
+export function RigaEvento({ testo }: { testo: string }) {
+  return <div className="riga-evento"><span className="linea" /><span className="testo">{testo}</span><span className="linea" /></div>;
 }
+
+export const Riassunto = () => <RigaEvento testo="Conversazione riassunta per fare spazio" />;
 
 export function FineTurno({ ms, strumenti, file, aiutanti }: { ms: number | null; strumenti: number; file: number; aiutanti: number }) {
   const parti = [

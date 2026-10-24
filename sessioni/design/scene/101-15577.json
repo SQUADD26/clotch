@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792768244164,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Come si fa la barra laterale trasparente su Mac?",
-    "t": 1792768241164
+    "t": 1792793046531
    },
    {
     "tipo": "strumento",
@@ -66,14 +66,14 @@
      "testo": "Links: [{\"title\":\"BrowserWindow: vibrancy e visualEffectState\",\"url\":\"https://electronjs.org/docs\"},{\"title\":\"Barra laterale trasparente su macOS\",\"url\":\"https://github.com/x\"},{\"title\":\"NSVisualEffectView\",\"url\":\"https://developer.apple.com/x\"},{\"title\":\"Barra del titolo nascosta con i semafori\",\"url\":\"https://stackoverflow.com/x\"}]",
      "errore": false
     },
-    "t": 1792768242164,
+    "t": 1792793047531,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Con vibrancy «sidebar» sulla finestra e lo sfondo della barra trasparente. Lo provo adesso.",
     "modello": "claude-opus-5-5",
-    "t": 1792768243164
+    "t": 1792793048531
    }
   ]
  },
@@ -87,7 +87,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [],
   "regole": [],

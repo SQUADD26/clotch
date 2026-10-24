@@ -1,10 +1,11 @@
-// figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta), «Piede barra laterale».
-import type { MouseEvent, ReactNode } from "react";
-import type { PreferenzeSessione, Sessione } from "../../tipi";
+// figma: 101-7728 — righe della barra: «Riga comando», «Titolo sezione», «Riga progetto», «Riga sessione» (Riposo, Passaggio, Scelta).
+import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import type { PreferenzeSessione, Profilo, Sessione } from "../../tipi";
 import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { SegnoStato } from "../base/SegnoStato";
+import { IndicatorePr } from "./Pr";
 import "./barra.css";
 
 /** «Riga comando»: Cerca sessioni ⌘K, Filtra, Casella… (icona, etichetta, testo a destra). */
@@ -50,6 +51,12 @@ interface PropsSessione {
   fissata?: boolean;
   /** Solo per la prova di parità: la riga disegnata come al passaggio del mouse. */
   passaggio?: boolean;
+  /** Sessione avviata da un'altra (101:34605): indentata, col suo segno «figlia». */
+  figlia?: boolean;
+  /** Quante figlie ha; con almeno una, la freccia le chiude e le apre. */
+  figlie?: number;
+  figlieAperte?: boolean;
+  onFiglie?(): void;
   onApri(): void;
   onIcona(e: MouseEvent): void;
   onFissa(): void;
@@ -57,7 +64,7 @@ interface PropsSessione {
   onTroncato(titolo: string | null, el?: HTMLElement): void;
 }
 
-export function RigaSessione({ s, pref, scelta, fissata, passaggio, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
+export function RigaSessione({ s, pref, scelta, fissata, passaggio, figlia, figlie = 0, figlieAperte = true, onFiglie, onApri, onIcona, onFissa, onMenu, onTroncato }: PropsSessione) {
   const entra = (e: MouseEvent<HTMLElement>) => {
     const t = e.currentTarget.querySelector<HTMLElement>(".testo");
     onTroncato(t && t.scrollWidth > t.clientWidth ? s.titolo : null, t ?? undefined);
@@ -69,11 +76,19 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, onApri, onIc
       onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
       onKeyDown={(e) => { if (e.key === "Enter") onApri(); }}
     >
+      {figlia && <Icona nome="figlia" colore="terziaria" />}
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
       <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>{s.titolo}</span>
-      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.stato} />}</span>
+      {figlie > 0 && (
+        <button type="button" className="freccia-figlie" aria-expanded={figlieAperte} aria-label={figlieAperte ? "Nascondi le figlie" : "Mostra le figlie"}
+          onClick={(e) => { e.stopPropagation(); onFiglie?.(); }}>
+          <Icona nome={figlieAperte ? "giu" : "destra"} />
+        </button>
+      )}
+      {s.app?.prs.length ? <IndicatorePr pr={s.app.prs[s.app.prs.length - 1]} /> : null}
+      <span className="segno">{fissata ? <Icona nome="spillo" colore="terziaria" /> : <SegnoStato stato={s.situazione?.adesso === "errore" ? "errore" : s.stato} />}</span>
       <span className="azioni" onClick={(e) => e.stopPropagation()}>
         <BottoneIcona icona="spillo" etichetta="Fissa in alto" onClick={onFissa} />
         <BottoneIcona icona="altro" etichetta="Altre azioni" onClick={onMenu} />
@@ -82,15 +97,13 @@ export function RigaSessione({ s, pref, scelta, fissata, passaggio, onApri, onIc
   );
 }
 
-export function Piede({ dettaglio, onMenu, onImpostazioni }: { dettaglio: string; onMenu(e: MouseEvent): void; onImpostazioni(): void }) {
-  return (
-    <div className="piede">
-      <button type="button" className="avatar" onClick={onMenu}><span className="t-xs medio">RB</span></button>
-      <button type="button" className="testi" onClick={onMenu}>
-        <span>Roberto Bondici</span>
-        <span className="t-xs secondario">{dettaglio}</span>
-      </button>
-      <BottoneIcona icona="impostazioni" etichetta="Impostazioni" onClick={onImpostazioni} />
-    </div>
-  );
+let letto: Promise<Profilo> | undefined;
+/** Nome e iniziali dell'utente, dal main (account Claude o macOS); vuoti finché non arrivano. */
+export function useProfilo(): Profilo {
+  const [p, setP] = useState<Profilo>({ nome: "", iniziali: "" });
+  useEffect(() => {
+    letto ??= window.impostazioni.profilo();
+    letto.then(setP, () => { letto = undefined; });
+  }, []);
+  return p;
 }

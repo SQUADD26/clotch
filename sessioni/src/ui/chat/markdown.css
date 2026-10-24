@@ -1,0 +1,91 @@
+/* figma: 131-59690 — risposta formattata, scuro (chiaro 140-60134): titoli, paragrafi, elenchi, codice, citazione, linea, tabella.
+   figma: 140-60491 — tabella larga e lunga, scuro (chiaro 140-62309): colonna e intestazione fisse, barre di scorrimento.
+   I numeri sono variabili di Figma (token.css). */
+.pezzo-chat .markdown { display: flex; flex-direction: column; gap: var(--spazio-3); min-width: 0; }
+.pezzo-chat .markdown > * { margin: 0; }
+.pezzo-chat .markdown :is(h1,h2,h3,h4,h5,h6) { color: var(--colore-testo-primario); }
+.pezzo-chat .markdown h1 { font-size: var(--testo-dimensione-titolo-1); line-height: var(--testo-riga-titolo-1); font-weight: 600; }
+.pezzo-chat .markdown h2 { padding-top: var(--spazio-3); font-size: var(--testo-dimensione-titolo-2); line-height: var(--testo-riga-titolo-2); font-weight: 600; }
+.pezzo-chat .markdown :is(h3,h4,h5,h6) { padding-top: var(--spazio-2); font-size: var(--testo-dimensione-lg); line-height: var(--testo-riga-lg); font-weight: 500; }
+.pezzo-chat .markdown a { color: var(--colore-testo-link); text-decoration: none; }
+.pezzo-chat .markdown a:hover { text-decoration: underline; }
+.pezzo-chat .markdown strong { font-weight: 600; }
+
+/* elenchi: segno di 20 px, 8 px di aria, voci a spazio/1-5 una dall'altra */
+.pezzo-chat .markdown :is(ul,ol) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spazio-1-5); counter-reset: voce; }
+.pezzo-chat .markdown li { position: relative; padding-left: calc(var(--spazio-5) + var(--spazio-2)); counter-increment: voce; }
+.pezzo-chat .markdown li > :is(p) { margin: 0; }
+.pezzo-chat .markdown li > :is(ul,ol) { margin-top: var(--spazio-1-5); }
+.pezzo-chat .markdown ul > li::before {
+  content: ""; position: absolute; left: var(--spazio-2); top: calc((var(--testo-riga-messaggio) - var(--spazio-1)) / 2);
+  width: var(--spazio-1); height: var(--spazio-1); border-radius: var(--raggio-pieno); background: var(--colore-icona-secondaria);
+}
+.pezzo-chat .markdown ul ul > li::before {
+  box-sizing: border-box; left: calc(var(--spazio-2) - var(--misura-tratto)); top: calc((var(--testo-riga-messaggio) - var(--spazio-1-5)) / 2);
+  width: var(--spazio-1-5); height: var(--spazio-1-5); background: none; border: var(--misura-tratto) solid var(--colore-icona-secondaria);
+}
+.pezzo-chat .markdown ol > li::before { content: counter(voce) "."; position: absolute; left: 0; width: var(--spazio-5); text-align: right; color: var(--colore-testo-secondario); }
+.pezzo-chat .markdown li.task-list-item { padding-left: 0; }
+.pezzo-chat .markdown li.task-list-item::before { content: none; }
+
+.pezzo-chat .markdown blockquote {
+  margin: 0; padding-left: var(--spazio-3); border-left: var(--misura-tratto-forte) solid var(--colore-bordo-forte); color: var(--colore-testo-secondario);
+}
+.pezzo-chat .markdown blockquote > p { margin: 0; }
+.pezzo-chat .markdown hr { height: var(--misura-tratto); margin: var(--spazio-1) 0; border: 0; background: var(--colore-bordo-leggero); }
+
+/* codice in linea */
+.pezzo-chat .markdown :not(pre) > code {
+  display: inline-block; margin: -1px 0; padding: var(--spazio-0-5) var(--spazio-1-5); border-radius: var(--raggio-xs); background: var(--colore-fondo-casella);
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs);
+}
+/* codice a blocchi: «sh» e «copia» in testa, poi le righe */
+.pezzo-chat .markdown-codice { gap: var(--spazio-2); }
+.pezzo-chat .testata-codice { display: flex; align-items: center; justify-content: space-between; min-height: var(--misura-bottone); color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); }
+.pezzo-chat .markdown-codice pre { margin: 0; overflow-x: auto; white-space: pre; color: var(--colore-testo-primario); }
+.pezzo-chat .markdown-codice code { font-family: var(--testo-famiglia-codice); }
+.pezzo-chat .cod-parola { color: var(--colore-codice-parola); }
+.pezzo-chat .cod-testo { color: var(--colore-codice-testo); }
+.pezzo-chat .cod-funzione { color: var(--colore-codice-funzione); }
+.pezzo-chat .cod-numero { color: var(--colore-codice-numero); }
+.pezzo-chat .cod-commento { color: var(--colore-codice-commento); }
+
+/* tabella: scorre in tutti e due i versi, intestazione e prima colonna restano ferme */
+.pezzo-chat .tabella-markdown {
+  overflow: auto; max-height: var(--misura-tabella-altezza-max);
+  border: var(--misura-tratto) solid var(--colore-bordo-leggero); border-radius: var(--raggio-lg);
+}
+.pezzo-chat .tabella-markdown::-webkit-scrollbar { width: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); height: calc(var(--misura-barra-scorrimento) + 2 * var(--spazio-1)); }
+.pezzo-chat .tabella-markdown::-webkit-scrollbar-thumb {
+  border: var(--spazio-1) solid transparent; border-radius: var(--raggio-pieno); background: var(--colore-icona-terziaria); background-clip: padding-box;
+}
+.pezzo-chat .tabella-markdown::-webkit-scrollbar-corner { background: transparent; }
+.pezzo-chat .tabella-markdown table { width: 100%; min-width: max-content; border-collapse: separate; border-spacing: 0; }
+.pezzo-chat .tabella-markdown :is(th,td) {
+  min-width: var(--misura-tabella-colonna-testo); padding: var(--spazio-2-5) var(--spazio-4); text-align: start; white-space: nowrap;
+  font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); border-bottom: var(--misura-tratto) solid var(--colore-bordo-leggero);
+}
+.pezzo-chat .tabella-markdown :is(th,td):not(:first-child) { width: var(--misura-tabella-colonna-testo); }
+.pezzo-chat .tabella-markdown :is(th,td).larga { min-width: var(--misura-tabella-colonna-larga); }
+.pezzo-chat .tabella-markdown :is(th,td):not(:first-child).larga { width: var(--misura-tabella-colonna-larga); }
+.pezzo-chat .tabella-markdown :is(th,td).numero { width: var(--misura-tabella-colonna-numero); min-width: var(--misura-tabella-colonna-numero); text-align: right; }
+.pezzo-chat .tabella-markdown tr:last-child > td { border-bottom: 0; }
+.pezzo-chat .tabella-markdown th {
+  position: sticky; top: 0; z-index: 2; color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500;
+  background-color: var(--colore-fondo-superficie); background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione));
+}
+.pezzo-chat .tabella-markdown :is(th,td):first-child { position: sticky; left: 0; background-color: var(--colore-fondo-superficie); }
+.pezzo-chat .tabella-markdown th:first-child { z-index: 3; background-image: linear-gradient(var(--colore-fondo-tabella-intestazione), var(--colore-fondo-tabella-intestazione)); }
+.pezzo-chat .tabella-markdown td:first-child { z-index: 1; }
+.pezzo-chat .tabella-markdown.scorre :is(th,td):first-child { border-right: var(--misura-tratto) solid var(--colore-bordo-normale); }
+.pezzo-chat .tabella-markdown td strong { font-weight: 500; }
+.pezzo-chat .tabella-markdown td code { padding: 0; background: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-base); }
+.pezzo-chat .esito { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-chat .esito .punto { flex: none; width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-pieno); }
+.pezzo-chat .punto.successo { background: var(--colore-icona-successo); }
+.pezzo-chat .punto.accento { background: var(--colore-icona-accento); }
+.pezzo-chat .punto.secondaria { background: var(--colore-icona-secondaria); }
+.pezzo-chat .punto.accento-blu { background: var(--colore-icona-accento-blu); }
+/* nota sotto la tabella: un paragrafo tutto in corsivo che la segue è la sua didascalia (140:61158) */
+.pezzo-chat .tabella-markdown + p:has(> em:only-child) { margin-top: calc(-1 * var(--spazio-1)); color: var(--colore-testo-secondario); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.pezzo-chat .tabella-markdown + p > em:only-child { font-style: normal; }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
-import { daPiano } from "../friday/registro";
+import { daPiano } from "../clotch-ai/registro";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
@@ -15,12 +15,15 @@ const VOCI: [Chiave, string, string][] = [
   ["clotchObiettivi", "Obiettivi anche nel notch", "Accetta e rifiuta dal notch o da qui"],
 ];
 
+/** Dove si scarica Clotch: il main apre i collegamenti web nel browser (link-esterni.ts). */
+const SCARICA = "https://github.com/SQUADD26/clotch/releases/latest";
+
 function useVersioneClotch(): string | null {
   const [v, setV] = useState<string | null>(null);
   useEffect(() => {
     const prendi = (p: unknown) => setV(daPiano(p).clotch?.versione ?? null);
-    window.friday.registro().then(prendi, () => {});
-    return window.friday.onRegistro(prendi);
+    window.clotchAi.registro().then(prendi, () => {});
+    return window.clotchAi.onRegistro(prendi);
   }, []);
   return v;
 }
@@ -42,7 +45,7 @@ export default function Clotch() {
                 : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
             </div>
           </div>
-          {!acceso && <Bottone tipo="secondario" disabled>Scarica clotch</Bottone>}
+          {!acceso && <Bottone tipo="secondario" onClick={() => window.open(SCARICA)}>Scarica clotch</Bottone>}
         </div>
         {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
           <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>

@@ -703,7 +703,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -1902,7 +1902,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "friday-mac-v2",
+   "testo": "clotch-ai-mac-v2",
    "font": "SF Pro Regular"
   },
   {
@@ -4683,7 +4683,7 @@
    "box": {
     "x": 1412,
     "y": 72,
-    "w": 76,
+    "w": 74,
     "h": 28
    },
    "variabili": {
@@ -4734,7 +4734,7 @@
    "box": {
     "x": 1440,
     "y": 77,
-    "w": 40,
+    "w": 38,
     "h": 18
    },
    "variabili": {
@@ -4743,7 +4743,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Clotch",
+   "testo": "clotch",
    "font": "SF Pro Regular"
   },
   {

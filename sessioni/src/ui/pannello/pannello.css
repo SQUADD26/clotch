@@ -21,7 +21,8 @@
   border-radius: var(--raggio-pieno); background: var(--colore-fondo-bottone-secondario);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm);
 }
-.pezzo-pannello .pillola-clotch.schermo { background: var(--colore-fondo-riga-scelta); }
+/* al centro della finestra (101-49592): la barra del titolo è il suo riferimento */
+.pezzo-pannello .pillola-clotch.schermo { background: var(--colore-fondo-riga-scelta); position: absolute; left: 50%; transform: translateX(-50%); }
 
 /* foglio degli stati per la prova di parità (frame 113-51111) */
 .pezzo-pannello .foglio-stati { display: flex; gap: var(--spazio-8); align-items: flex-start; }

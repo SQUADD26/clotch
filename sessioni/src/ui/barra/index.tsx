@@ -1,4 +1,4 @@
-// figma: 101-7728 — barra laterale (#348): comandi, Friday, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
+// figma: 101-7728 — barra laterale (#348): comandi, clotch AI, filtri, elenco per cartelle, piede. Stati: vuoto 101:8772,
 // caricamento 101:8824, errore cartella 101:8931, 200 sessioni 101:9109, titolo lunghissimo 101:9359.
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import caricamento from "../../../design/figma/101-8824.json";
@@ -10,13 +10,15 @@ import { registraAzione } from "../base/scorciatoie";
 import { useNavigazione } from "../base/navigazione";
 import { numero } from "../base/token";
 import { useApriSessione } from "./apri";
-import { componi, dettaglioProfilo, opzioni, type Proprieta, type Vista } from "./elenco";
+import { conFiglie } from "./figlie";
+import { componi, dettaglioProfilo, numeroAccount, opzioni, type Proprieta, type Vista } from "./elenco";
 import { MenuOpzioni, MenuProprieta, MenuRaggruppa, Pillole } from "./Filtri";
-import { RigheFriday, useRegistro } from "./Friday";
+import { RigheClotchAi, useRegistro } from "./ClotchAi";
+import { AccountBarra } from "./Account";
 import { MenuCartella, MenuProfilo, MenuRiga } from "./Menu";
 import { prova } from "./prova";
 import { copiaUltimoBlocco, Ricerca } from "./Ricerca";
-import { Piede, RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
+import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe";
 import { SceltaIcona } from "./SceltaIcona";
 import { accanto, type Punto } from "./Sovrapposti";
 
@@ -28,10 +30,14 @@ export type Aperto =
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
 const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
 
+// Lo stato di elenco sopravvive allo smontaggio della Barra (impostazioni, barra laterale chiusa).
+const conservato = { vista: { filtri: [], raggruppa: "cartella", ordina: "attivita" } as Vista, chiuse: new Set<string>(), aperteAMano: new Set<string>() };
+
 export default function Barra() {
   const n = useNavigazione();
   const apriSessione = useApriSessione();
-  const tastoCerca = useImpostazioni().scorciatoie.cerca;
+  const { scorciatoie: { cerca: tastoCerca }, etichetteCartelle } = useImpostazioni();
+  const etichetta = (g: { chiave: string; titolo: string }) => etichetteCartelle[g.chiave] ?? g.titolo;
   const p = prova();
   const vivo = useElenco();
   const prefVive = usePreferenze();
@@ -42,17 +48,19 @@ export default function Barra() {
   const adesso = p?.ora ?? Date.now();
   const sessioni = elenco.dati?.sessioni ?? [];
 
-  const [vista, setVista] = useState<Vista>(p?.vista ?? { filtri: [], raggruppa: "cartella", ordina: "attivita" });
+  const [vista, setVista] = useState<Vista>(p?.vista ?? conservato.vista);
   const [aperto, setAperto] = useState<Aperto | null>(p?.aperto ?? null);
   const [ricerca, setRicerca] = useState(p?.ricerca !== undefined);
-  const [chiuse, setChiuse] = useState<Set<string>>(new Set());
+  const [chiuse, setChiuse] = useState<Set<string>>(conservato.chiuse);
   const [suggerimento, setSuggerimento] = useState<{ testo: string; a: Punto } | null>(p?.suggerimento ?? null);
   const barra = useMemo(() => componi(sessioni, vista, pref, adesso), [sessioni, vista, pref, adesso]);
   const pagina = p?.pagina ?? n.vista;
   const scelta = pagina === "sessione" ? (p?.scelta ?? n.sessione) : null;
-  // aperta: la cartella della sessione scelta e quelle aperte a mano; chiuse a mano restano chiuse
-  const [aperteAMano, setAperteAMano] = useState<Set<string>>(new Set(p?.aperte ?? []));
-  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
+  // aperta: la cartella della sessione scelta, quelle aperte a mano e (con un filtro attivo) quelle con i risultati; chiuse a mano restano chiuse
+  const filtrato = vista.filtri.some((f) => f.valori.length);
+  const [aperteAMano, setAperteAMano] = useState<Set<string>>(p ? new Set(p.aperte ?? []) : conservato.aperteAMano);
+  useEffect(() => { if (!p) Object.assign(conservato, { vista, chiuse, aperteAMano }); }, [p, vista, chiuse, aperteAMano]);
+  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
     setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
@@ -61,7 +69,7 @@ export default function Barra() {
 
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {
-      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.friday.comando("archivia", { chat: n.sessione }); }
+      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.clotchAi.comando("archivia", { chat: n.sessione }); }
       if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
     };
     addEventListener("keydown", tasto);
@@ -83,9 +91,12 @@ export default function Barra() {
   };
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
-  const righe = (lista: typeof sessioni, fissate = false) => lista.map((s) => (
+  const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
+  const alternaFiglie = (id: string) => setFiglieChiuse((c) => { const x = new Set(c); if (!x.delete(id)) x.add(id); return x; });
+  const righe = (lista: typeof sessioni, fissate = false) => (fissate ? lista.map((s) => ({ s, figlia: false, figlie: 0 })) : conFiglie(lista, figlieChiuse)).map(({ s, figlia, figlie }) => (
     <RigaSessione
       key={s.id} s={s} pref={pref[s.id]} scelta={!fissate && s.id === scelta} fissata={fissate} passaggio={!fissate && p?.passaggio === s.id}
+      figlia={figlia} figlie={figlie} figlieAperte={!figlieChiuse.has(s.id)} onFiglie={() => alternaFiglie(s.id)}
       onApri={() => apriSessione(s.id)}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
       onFissa={() => void api().impostaPreferenze(s.id, { fissa: pref[s.id]?.fissa ? null : true })}
@@ -96,10 +107,11 @@ export default function Barra() {
 
   return (
     <>
+      <RigaComando icona="piu" etichetta="Nuova sessione" lato="⌘N" scelta={pagina === "nuova-sessione"} onClick={() => n.apri("nuova-sessione")} />
       <RigaComando icona="cerca" etichetta="Cerca sessioni" lato={tastoCerca ?? undefined} onClick={() => setRicerca(true)} />
       <RigaComando icona="filtra" etichetta="Filtra" lato={filtri.length ? `${filtri.length} attivi` : undefined}
         onClick={(e) => setAperto({ tipo: "raggruppa", a: accanto(e.currentTarget, -numero("spazio-1")) })} />
-      <RigheFriday r={registro} adesso={adesso} pagina={pagina} />
+      <RigheClotchAi r={registro} adesso={adesso} pagina={pagina} />
       <Pillole filtri={filtri} onApri={(i, e) => setAperto({ tipo: "opzioni", i, a: accanto(e.currentTarget, numero("spazio-1")) })}
         onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })} />
 
@@ -130,7 +142,7 @@ export default function Barra() {
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
           {barra.gruppi.map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
-              <RigaCartella nome={g.titolo} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
+              <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => alterna(g.chiave)}
                 onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} />
               {aperta(g.chiave) && <div className="sessioni-gruppo">{righe(g.sessioni)}</div>}
             </div>
@@ -140,8 +152,9 @@ export default function Barra() {
         </div>
       )}
 
-      <Piede dettaglio={dettaglioProfilo(sessioni)} onImpostazioni={() => n.apri("impostazioni")}
-        onMenu={(e) => setAperto({ tipo: "profilo", a: { x: e.currentTarget.closest(".piede")!.getBoundingClientRect().left, y: e.currentTarget.closest(".piede")!.getBoundingClientRect().top } })} />
+      <AccountBarra conta={numeroAccount(sessioni)} nuova={n.vista === "nuova-sessione"} chat={p ? p.scelta ?? null : n.vista === "nuova-sessione" ? null : n.sessione} registro={registro} prova={p?.account}
+        daDisco={sessione(p ? p.scelta ?? "" : n.sessione ?? "")?.account}
+        onAltro={(e) => { const r = e.currentTarget.closest(".piede-account")!.getBoundingClientRect(); setAperto({ tipo: "profilo", a: { x: r.left, y: r.top } }); }} />
 
       {aperto?.tipo === "raggruppa" && (
         <MenuRaggruppa a={aperto.a} raggruppa={vista.raggruppa} ordina={vista.ordina} onChiudi={chiudi}
@@ -155,9 +168,12 @@ export default function Barra() {
           onRimuovi={() => { setVista({ ...vista, filtri: filtri.filter((_, i) => i !== aperto.i) }); chiudi(); }} />
       )}
       {aperto?.tipo === "icona" && <SceltaIcona a={aperto.a} pref={pref[aperto.id]} onChiudi={chiudi} onImposta={(x) => void api().impostaPreferenze(aperto.id, x)} />}
-      {aperto?.tipo === "riga" && sessione(aperto.id) && <MenuRiga s={sessione(aperto.id)!} pref={pref[aperto.id]} a={aperto.a} onChiudi={chiudi} />}
-      {aperto?.tipo === "cartella" && <MenuCartella sessioni={barra.gruppi.find((g) => g.chiave === aperto.chiave)?.sessioni ?? []} a={aperto.a} onChiudi={chiudi} />}
-      {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
+      {aperto?.tipo === "riga" && sessione(aperto.id) && <MenuRiga s={sessione(aperto.id)!} pref={pref[aperto.id]} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />}
+      {aperto?.tipo === "cartella" && barra.gruppi.find((g) => g.chiave === aperto.chiave) && (
+        <MenuCartella sessioni={barra.gruppi.find((g) => g.chiave === aperto.chiave)!.sessioni} chiave={aperto.chiave} etichetta={etichetta(barra.gruppi.find((g) => g.chiave === aperto.chiave)!)}
+          a={aperto.a} inizio={p?.voce} onChiudi={chiudi} />
+      )}
+      {aperto?.tipo === "profilo" && <MenuProfilo dettaglio={dettaglioProfilo(sessioni)} a={aperto.a} inizio={p?.voce} onChiudi={chiudi} onImpostazioni={() => n.apri("impostazioni")} />}
       {suggerimento && <div className="suggerimento t-xs" style={{ left: suggerimento.a.x, top: suggerimento.a.y }}>{suggerimento.testo}</div>}
       {ricerca && (
         <Ricerca sessioni={sessioni} pref={pref} aperta={scelta} ora={adesso} iniziale={p?.ricerca} cerca={p ? async () => p.cercati ?? [] : undefined}

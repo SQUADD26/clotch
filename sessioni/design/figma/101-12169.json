@@ -8,36 +8,37 @@
   "dentro": "101:12118"
  },
  "variabili": {
+  "colore/fondo/elevato": "#2d2d2d",
+  "raggio/lg": 12.5,
+  "spazio/3": 12,
+  "misura/scelta-icona": 304,
+  "colore/fondo/bottone-secondario": "#ffffff0d",
   "raggio/md": 10,
   "spazio/2": 8,
-  "raggio/pieno": 9999,
+  "misura/riga": 32,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
-  "spazio/0-5": 2,
-  "misura/riga": 32,
-  "colore/testo/primario": "#ffffff",
+  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
-  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
-  "spazio/3": 12,
-  "colore/fondo/riga-scelta": "#ffffff14",
-  "colore/sessione/arancione": "#ff8549",
+  "spazio/0-5": 2,
   "colore/sessione/grigio": "#c4c8ce",
-  "colore/fondo/bottone-secondario": "#ffffff0d",
-  "raggio/lg": 12.5,
-  "spazio/4": 16,
-  "misura/bottone-invio": 32,
-  "colore/fondo/elevato": "#2d2d2d",
-  "misura/scelta-icona": 304,
+  "raggio/pieno": 9999,
   "misura/campione": 20,
   "colore/sessione/rosso": "#ff6764",
+  "colore/sessione/arancione": "#ff8549",
+  "misura/tratto-forte": 2,
   "misura/campione-interno": 12,
   "colore/sessione/verde": "#40c977",
   "colore/sessione/blu": "#339cff",
   "colore/sessione/viola": "#ad7bf9",
-  "misura/cella-icona": 32
+  "colore/fondo/riga-scelta": "#ffffff14",
+  "misura/cella-icona": 32,
+  "spazio/4": 16,
+  "misura/bottone-invio": 32,
+  "colore/testo/primario": "#ffffff"
  },
  "nodi": [
   {
@@ -216,12 +217,11 @@
    "variabili": {
     "strokes[0]": "colore/sessione/arancione",
     "cornerRadius": "raggio/pieno",
+    "strokeWeight": "misura/tratto-forte",
     "width": "misura/campione",
     "height": "misura/campione"
    },
-   "senza": [
-    "strokeWeight 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12169;101:11256;101:16661",
@@ -325,11 +325,10 @@
     "h": 100
    },
    "variabili": {
-    "itemSpacing": "spazio/0-5"
+    "itemSpacing": "spazio/0-5",
+    "counterAxisSpacing": "spazio/0-5"
    },
-   "senza": [
-    "counterAxisSpacing 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:12169;101:11262",

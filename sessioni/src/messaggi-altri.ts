@@ -7,8 +7,9 @@ const t = (o: any): number | null => {
   const x = typeof o?.timestamp === "string" ? Date.parse(o.timestamp) : NaN;
   return Number.isNaN(x) ? null : x;
 };
+const stringa = (x: unknown) => (typeof x === "string" ? x : "");
 const unisci = (c: unknown, tipi: string[]) =>
-  Array.isArray(c) ? c.map((b: any) => (tipi.includes(b?.type) && typeof b.text === "string" ? b.text : "")).join("") : String(c ?? "");
+  Array.isArray(c) ? c.map((b: any) => (tipi.includes(b?.type) && typeof b.text === "string" ? b.text : "")).join("") : stringa(c);
 
 export class ConvertitoreCodex {
   private chiamate = new Map<string, Strumento>();
@@ -26,13 +27,13 @@ export class ConvertitoreCodex {
     } else if (p.type === "function_call" || p.type === "custom_tool_call") {
       let ingresso: unknown = p.arguments ?? p.input;
       if (typeof ingresso === "string") try { ingresso = JSON.parse(ingresso); } catch { /* resta testo */ }
-      const m: Strumento = { tipo: "strumento", id: String(p.call_id), nome: String(p.name), ingresso, esito: null, t: t(o) };
-      this.chiamate.set(m.id, m);
+      const m: Strumento = { tipo: "strumento", id: stringa(p.call_id), nome: stringa(p.name) || "strumento", ingresso, esito: null, t: t(o) };
+      if (m.id) this.chiamate.set(m.id, m); // senza id nessuna uscita può agganciarsi
       r.nuovi.push(m);
     } else if (p.type === "function_call_output" || p.type === "custom_tool_call_output") {
-      const m = this.chiamate.get(String(p.call_id));
+      const m = this.chiamate.get(stringa(p.call_id));
       if (m) {
-        m.esito = { testo: typeof p.output === "string" ? p.output : JSON.stringify(p.output), errore: false };
+        m.esito = { testo: typeof p.output === "string" ? p.output : JSON.stringify(p.output) ?? "", errore: false };
         r.aggiornati.push(m);
       }
     }
@@ -112,7 +113,7 @@ export class ConvertitoreCursor {
       const testo = unisci(c, ["text"]);
       if (testo.trim()) r.nuovi.push({ tipo: "assistente", testo, modello: null, t: null });
       for (const b of Array.isArray(c) ? c : []) {
-        if (b?.type === "tool_use") r.nuovi.push({ tipo: "strumento", id: String(b.id ?? ""), nome: String(b.name), ingresso: b.input, esito: null, t: null });
+        if (b?.type === "tool_use") r.nuovi.push({ tipo: "strumento", id: stringa(b.id), nome: stringa(b.name) || "strumento", ingresso: b.input, esito: null, t: null });
       }
     }
     return r;

@@ -15,9 +15,11 @@
 }
 
 .pezzo-chat .risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }
+/* risposta con titoli, elenchi, codice o tabelle: 12 px tra testo e azioni (131:59867 -> 131:59889); il solo paragrafo resta a 8 */
+.pezzo-chat .risposta:has(.markdown > :not(p)) { gap: var(--spazio-3); }
 .pezzo-chat .testo-risposta {
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); color: var(--colore-testo-primario);
-  white-space: pre-wrap; overflow-wrap: anywhere;
+  white-space: normal; overflow-wrap: anywhere;
 }
 .pezzo-chat .risposta .azioni { display: flex; gap: var(--spazio-0-5); }
 .pezzo-chat .cursore {

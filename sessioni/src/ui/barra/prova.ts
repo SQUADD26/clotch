@@ -1,9 +1,10 @@
 // figma: 101-7728 — dati della prova di parità (`npm run parita -- <frame>`): ogni frame della barra con i suoi testi e stati.
 // Fuori dalla prova `prova()` torna null e la barra legge i dati veri.
-import type { Registro } from "../../friday";
-import type { Elenco, PreferenzeSessione, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
+import type { Registro } from "../../clotch-ai";
+import type { Elenco, PreferenzeSessione, PrSessione, QuotaUso, RisultatoRicerca, Sessione, Sorgente, Stato } from "../../tipi";
 import type { Stato as StatoChiamata } from "../base/dati";
 import type { Vista } from "./elenco";
+import type { ProvaAccount } from "./Account";
 import type { Aperto } from "./index";
 
 const ORA = new Date(2026, 9, 22, 15, 0).getTime();
@@ -31,11 +32,14 @@ function clotch(icone: [string, string?][]) {
   return { lista, pref };
 }
 
-function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number } = {}): Registro {
-  const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]);
+function registro(f: { stato?: "attiva" | "spenta"; nd?: { fino: number | null; tenuti: number }; aspettano?: number; clotch?: boolean; afk?: number } = {}): Registro {
+  const chat = new Map<string, any>([["friday", { chat: "friday", visto: f.stato === "spenta" ? ORA - 3600 * 1000 : ORA }]]); // nome del protocollo del motore
   for (let i = 0; i < (f.aspettano ?? 0); i++)
     chat.set(`c${i}`, { chat: `c${i}`, progetto: "clotch", visto: ORA, richieste: [{ genere: "permesso" }], stato: "serve_roberto", passi: [], aiutanti: new Map() });
-  return { chat, friday: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null } as unknown as Registro;
+  // «Con e senza Clotch» (#437): Clotch acceso da un minuto; `afk` = quanti avvisi tiene dopo 20 min via dal Mac
+  const clotch = f.clotch ? { voce: "accesa", parla: false, ascolta: false, t: ORA - MIN } : null;
+  const afk = f.afk === undefined ? null : { da: ORA - 20 * MIN, avvisi: f.afk };
+  return { chat, clotchAi: { evento: "avvio", t: ORA }, nonDisturbare: f.nd ?? null, clotch, afk } as unknown as Registro;
 }
 
 interface Prova {
@@ -45,6 +49,8 @@ interface Prova {
   registro: Registro | null;
   vista?: Vista;
   aperto?: Aperto;
+  /** Voce del menu aperto che ha il fuoco, come l'evidenziata del disegno. */
+  voce?: number;
   aperte?: string[];
   scelta?: string;
   /** Vista aperta (useNavigazione().vista) del frame; di solito «sessione». */
@@ -53,6 +59,8 @@ interface Prova {
   ricerca?: string;
   cercati?: RisultatoRicerca[];
   suggerimento?: { testo: string; a: { x: number; y: number } };
+  /** Bottone account in fondo (#478): quote, account previsto e menu aperto. */
+  account?: ProvaAccount;
 }
 
 const pronto = (sessioni: Sessione[], errori: Elenco["errori"] = []) => ({ stato: "pronto" as const, dati: { sessioni, errori }, riprova() {} });
@@ -60,36 +68,73 @@ const ICONE: [string, string?][] = [["stella"], ["strati"], ["schermo"], ["micro
 
 function base(icone = ICONE, extra: Partial<Prova> = {}): Prova {
   const c = clotch(icone);
-  const sessioni = [...c.lista, ...riempi("squadd-v2", 23, 60), ...riempi("dentalspace", 9, 200), ...riempi("friday-mac-v2", 14, 400)];
+  const sessioni = [...c.lista, ...riempi("squadd-v2", 23, 60), ...riempi("dentalspace", 9, 200), ...riempi("clotch-ai-mac-v2", 14, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref: c.pref, registro: registro(), scelta: c.lista[0].id, ...extra };
 }
 
 const FRAME: Record<string, () => Prova> = {
   "101-8036": () => base(),
   "101-8309": () => base(),
+  "101-33775": () => base(),
+  "101-34190": () => base(),
   "101-9628": () => base(),
   "101-35109": () => base(),
   "101-8805": () => ({ ora: ORA, elenco: pronto([]), pref: {}, registro: registro() }),
   "101-8912": () => ({ ora: ORA, elenco: { stato: "carica", riprova() {} }, pref: {}, registro: registro() }),
-  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-friday", messaggio: "permesso negato" }]) }; },
+  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-clotch-ai", messaggio: "permesso negato" }]) }; },
   "101-12118": () => { const b = base([["stella", "arancione"], ...ICONE.slice(1)]); return { ...b, aperto: { tipo: "icona", id: b.scelta!, a: { x: 335, y: 169 } } }; },
   "101-21061": () => {
     const b = base();
     const ids = b.elenco.dati!.sessioni.map((x) => x.id);
     b.pref[ids[3]].fissa = true;
-    return { ...b, passaggio: ids[1], aperto: { tipo: "riga", id: ids[1], a: { x: 282, y: 408 } } };
+    return { ...b, passaggio: ids[1], aperto: { tipo: "riga", id: ids[1], a: { x: 282, y: 408 } }, voce: 2 }; // «Archivia» evidenziata
   },
-  "101-21257": () => { const b = base(); return { ...b, aperto: { tipo: "cartella", chiave: "squadd-v2", a: { x: 286, y: 460 } } }; },
-  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 672 } } }),
+  "101-21257": () => { const b = base(); return { ...b, aperto: { tipo: "cartella", chiave: "squadd-v2", a: { x: 286, y: 460 } }, voce: 1 }; }, // «Copia percorso» evidenziata
+  "101-21376": () => ({ ...base(), aperto: { tipo: "profilo", a: { x: 72, y: 672 } }, voce: 1 }), // «Scorciatoie da tastiera» evidenziata
   "101-24127": () => {
     const b = base();
     b.elenco.dati!.sessioni[0].titolo = "Clotch: sessioni in Electron con lettura dal disco e filtri";
     return { ...b, passaggio: b.scelta, suggerimento: { testo: b.elenco.dati!.sessioni[0].titolo, a: { x: 120, y: 326 } } };
   },
   "101-30238": () => ({ ...base(), aperto: { tipo: "raggruppa", a: { x: 326, y: 142 } } }),
-  "101-38897": () => ({ ...base(), pagina: "friday", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
-  "101-42000": () => ({ ...base(), pagina: "friday", registro: registro({ stato: "spenta", aspettano: 3 }) }),
+  "101-38897": () => ({ ...base(), pagina: "clotch-ai", registro: registro({ nd: { fino: new Date(2026, 9, 22, 18, 0).getTime(), tenuti: 3 }, aspettano: 3 }) }),
+  "101-42000": () => ({ ...base(), pagina: "clotch-ai", registro: registro({ stato: "spenta", aspettano: 3 }) }),
 };
+
+// sessioni figlie e PR (101:34605): madri e figlie con l'indicatore della loro PR
+const pr = (numero: number, stato: PrSessione["stato"]): PrSessione => ({ numero, stato, verso: "dev", url: `https://github.com/SQUADD26/clotch/pull/${numero}` });
+FRAME["101-34605"] = () => {
+  const f = (x: Sessione, idApp: string, padre: string | null, p?: PrSessione): Sessione => ({ ...x, idApp,
+    app: { padre, prs: p ? [p] : [], connettori: [], strumentiMcp: 0, cli: null, ospite: null, remoto: false } });
+  const lista = [
+    f(s("Sessioni: disegno e app Electron", "clotch", "lavora", 1), "local_1", null, pr(336, "aperta")),
+    f(s("Figma: schermate app Sessioni", "clotch", "lavora", 2), "local_2", "local_1", pr(335, "aperta")),
+    f(s("Sessioni: lettura dal disco", "clotch", "finita", 3), "local_3", "local_1", pr(334, "unita")),
+    f(s("Notch: avviso schermo", "clotch", "finita", 4), "local_4", null, pr(319, "unita")),
+    f(s("clotch AI: casella e sandbox", "squadd-v2", "lavora", 5), "local_5", null, pr(2412, "aperta")),
+    f(s("Figma: lavagna sistema clotch AI", "squadd-v2", "aspetta", 6), "local_6", "local_5"),
+    f(s("Backend: auth e RLS", "squadd-v2", "ferma", 7), "local_7", null, pr(2398, "chiusa")),
+  ];
+  const icone = ["stella", "tavolozza", "database", "schermo", "fulmine", "tavolozza", "database"];
+  const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: icone[i] }]));
+  return { ora: ORA, elenco: pronto([...lista, ...riempi("dentalspace", 9, 200), ...riempi("clotch-ai-mac-v2", 14, 400)]), pref, registro: registro(), scelta: lista[0].id, aperte: ["squadd-v2"] };
+};
+
+// sessione aperta da clotch AI (101:45507): la barra ha solo la cartella della sessione
+FRAME["101-45507"] = () => {
+  const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];
+  return { ora: ORA, elenco: pronto(lista), pref: { [lista[0].id]: { icona: "database" }, [lista[1].id]: { icona: "stella" } }, registro: registro({ aspettano: 3 }), scelta: lista[0].id };
+};
+// «Con e senza Clotch» (#437): la barra dei nove frame; 3 sessioni aspettano te, come la Casella del disegno
+const CON = (pagina: string, f: Parameters<typeof registro>[0] = {}) => () => ({ ...base(), pagina, aperte: ["clotch"], registro: registro({ aspettano: 3, ...f }) });
+for (const id of ["101-46268", "101-46701", "101-48368"]) FRAME[id] = CON("clotch-ai", { clotch: true });
+for (const id of ["101-46308", "101-46741"]) FRAME[id] = CON("clotch-ai");
+FRAME["101-49067"] = CON("casella", { clotch: true, afk: 4 });
+FRAME["101-49194"] = CON("casella");
+FRAME["101-30172"] = () => ({ ...base(), registro: registro({ aspettano: 3 }) }); // popover Attività
+FRAME["101-36010"] = CON("casella"); // caricamento della Casella: la barra è già pronta
+FRAME["101-49592"] = CON("sessione", { clotch: true });
+FRAME["101-49632"] = CON("sessione");
 
 function filtrata(aperto?: Aperto): Prova {
   const lista = [s("Backend: auth e RLS", "squadd-v2", "aspetta", 1), s("Squadd: promozione di dev", "squadd-v2", "aspetta", 2)];
@@ -114,8 +159,9 @@ const TANTE: [string, string, Stato][] = [
 ];
 FRAME["101-9340"] = () => {
   const lista = TANTE.map(([t, , st], i) => s(t, "clotch", st, i + 1));
+  for (const x of lista) if (/^(Hook|ESP32):/.test(x.titolo)) x.situazione = { adesso: "errore", strumento: null, inCoda: 0, segni: [] }; // 101:9109: segno rosso
   const pref = Object.fromEntries(lista.map((x, i) => [x.id, { icona: TANTE[i][1] }]));
-  const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("friday-mac-v2", 27, 400)];
+  const sessioni = [...lista, ...riempi("squadd-v2", 71, 60), ...riempi("dentalspace", 38, 200), ...riempi("clotch-ai-mac-v2", 27, 400)];
   return { ora: ORA, elenco: pronto(sessioni), pref, registro: registro({ aspettano: 3 }), scelta: lista[3].id };
 };
 
@@ -123,7 +169,7 @@ FRAME["101-9340"] = () => {
 function ricerca(testo: string): Prova {
   const b = base();
   const extra = [
-    s("Lettura dei log di Codex", "friday-mac-v2", "finita", 10 * 24 * 60, "codex", "codex"),
+    s("Lettura dei log di Codex", "clotch-ai-mac-v2", "finita", 10 * 24 * 60, "codex", "codex"),
     s("Backend: auth e RLS", "squadd-v2", "finita", 24 * 60), s("Overseer: voce in Clotch", "clotch", "finita", 3 * 24 * 60),
   ];
   const nel = (x: Sessione, frammento: string): RisultatoRicerca => ({ id: x.id, titolo: x.titolo, frammento, t: x.ultimaAttivita, nelTitolo: false });
@@ -140,6 +186,57 @@ function ricerca(testo: string): Prova {
 FRAME["101-10297"] = () => ricerca("lettura");
 FRAME["101-23003"] = () => ricerca("copia");
 FRAME["101-23248"] = () => ricerca("kubernetes");
+// allegati e immagini nel filo (#437): la barra di «Sessione aperta», come 101-8036
+for (const id of ["101-25845", "101-28041", "101-28232", "148-46383", "148-47483", "148-49251", "148-45727"]) FRAME[id] = () => base();
+// dialoghi, avvisi, casella e domande di clotch AI: la barra è quella della sessione aperta
+for (const id of ["101-22044", "101-24007", "101-28289", "101-48405"]) FRAME[id] = () => base();
+// domanda per te (101:47850 con Clotch, 101:47883 senza): «Sessioni: app Electron» aspetta ed è la sessione aperta
+const DOMANDA = (f: Parameters<typeof registro>[0]) => () => {
+  const b = base(), x = b.elenco.dati!.sessioni[1];
+  x.titolo = "Sessioni: app Electron"; x.stato = "aspetta";
+  return { ...b, scelta: x.id, registro: registro({ aspettano: 3, ...f }) };
+};
+FRAME["101-47850"] = DOMANDA({ clotch: true });
+FRAME["101-47883"] = DOMANDA({});
+
+// frame «Casella: …» (#437): la barra è quella di 101:8036
+for (const id of ["101-26745", "101-27018", "101-26140", "101-26427", "101-27528"]) FRAME[id] = FRAME["101-8036"];
+
+// risposte formattate (#466: 131-59690, 140-60134, 140-60491, 140-62309): sessione aperta, barra di 101:8036
+for (const id of ["131-59690", "140-60134", "140-60491", "140-62309"]) FRAME[id] = FRAME["101-8036"];
+
+// i dialoghi (#437) stanno sopra la sessione aperta, con la barra di «Sessione aperta»
+FRAME["101-22137"] = FRAME["101-8036"];
+FRAME["101-22186"] = FRAME["101-8036"];
+
+// i frame «Barra laterale» (266×856) dentro un frame a tutta finestra (`dentro` nel suo JSON): la stessa barra di quel frame
+const BARRE: Record<string, string> = {
+  "101-12122": "101-12118", "101-16822": "101-16818", "101-21065": "101-21061", "101-21261": "101-21257", "101-21380": "101-21376", "101-24131": "101-24127",
+  "101-29403": "101-29399", "101-30176": "101-30172", "101-30242": "101-30238", "101-35113": "101-35109", "101-38901": "101-38897", "101-41838": "101-41834",
+  "101-42004": "101-42000", "101-42249": "101-42245", "101-49071": "101-49067", "101-49198": "101-49194", "101-8055": "101-8309", "101-8772": "101-8805",
+  "101-8824": "101-8912", "101-8931": "101-9090", "101-9109": "101-9340", "101-9359": "101-9628", "101-9860": "101-10017",
+};
+for (const [barra, finestra] of Object.entries(BARRE)) FRAME[barra] = FRAME[finestra] ?? (() => base());
+
+// bottone account (#478: 148-62026 normale, 148-62191 primo menu, 148-62379 secondo menu, 148-62621 al 90 %, 148-62813 sessione fuori dal motore):
+// la sessione aperta è del motore (account `.claude-accountmanager`), tranne l'ultimo frame; l'ora è ferma, i conti alla rovescia sono quelli del disegno.
+const H = 3_600_000, M = 60_000, S = 1000;
+const quota = (account: string, cinque: number, cf: number, sette: number, sf: number): QuotaUso =>
+  ({ account, email: `${account}@example.com`, usato: sette, ripartenza: "", cinque, cinqueFine: ORA + cf, sette, setteFine: ORA + sf });
+const QUOTE = (a: [number, number, number, number] = [38, 2 * H + 14 * M + 8 * S, 61, 3 * 24 * H + 5 * H + 12 * M + 40 * S]): QuotaUso[] => [
+  quota("accountmanager", ...a), quota("squadd", 72, 3 * H, 40, 2 * 24 * H), quota("friday", 100, 47 * M + 30 * S, 88, 24 * H), quota("dentalspace", 12, 4 * H, 20, 5 * 24 * H),
+];
+const CON_ACCOUNT = (menu: 0 | 1 | 2, o: { motore?: boolean; novanta?: boolean; passaggio?: string } = {}) => (): Prova => {
+  const b = base(), id = b.scelta!;
+  if (o.motore !== false) (b.registro!.chat as Map<string, unknown>).set(id, { chat: id, account: ".claude-accountmanager", sorgente: "motore", visto: ORA, richieste: [], passi: [], aiutanti: new Map() });
+  const quote = QUOTE(o.novanta ? [90, 21 * M + 36 * S, 74, 2 * 24 * H + 8 * H + 40 * M + 12 * S] : undefined);
+  return { ...b, account: { ora: ORA, quote, previsto: null, menu, passaggio: o.passaggio } };
+};
+FRAME["148-62026"] = CON_ACCOUNT(0);
+FRAME["148-62191"] = CON_ACCOUNT(1);
+FRAME["148-62379"] = CON_ACCOUNT(2, { passaggio: "squadd" });
+FRAME["148-62621"] = CON_ACCOUNT(1, { novanta: true });
+FRAME["148-62813"] = CON_ACCOUNT(1, { motore: false });
 
 let una: Prova | null | undefined;
 /** Calcolata una volta: gli id delle sessioni restano gli stessi a ogni disegno. */

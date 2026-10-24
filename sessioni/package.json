@@ -13,19 +13,28 @@
     "elenco": "tsc && node dist/src/elenco-cli.js",
     "prove": "tsc && node dist/src/prove-collegamento.js",
     "start": "npm run build && electron .",
-    "parita": "node scripts/scene-chat.mjs && npm run build && electron --force-device-scale-factor=1 --force-color-profile=srgb . --parita"
+    "scene": "node scripts/scene-chat.mjs && node scripts/scene-allegati.mjs && node scripts/scene-filo.mjs && node scripts/scene-layout.mjs && node scripts/scene-info.mjs && node scripts/scene-clotch-ai.mjs && node scripts/scene-clotch-ai-voce.mjs && node scripts/scene-barra.mjs && node scripts/scene-dialoghi.mjs && node scripts/scene-casella.mjs && node scripts/scene-nuova.mjs && node scripts/scene-clotch.mjs && node scripts/scene-markdown.mjs",
+    "parita": "npm run build && npm run scene && node scripts/parita-tutti.mjs",
+    "pacchetto:mac": "node scripts/pacchetto.mjs"
   },
   "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@types/mdast": "^4.0.4",
     "@types/node": "^24.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "electron": "^38.0.0",
+    "electron": "45.0.0",
     "typescript": "^5.9.0",
     "vite": "^8.3.5"
   },
   "dependencies": {
+    "mdast-util-to-string": "^4.0.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5"
   }
 }

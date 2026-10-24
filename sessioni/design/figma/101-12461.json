@@ -158,11 +158,10 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12465",
@@ -429,11 +428,10 @@
     "h": 28
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12483",
@@ -577,11 +575,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12492",
@@ -1115,11 +1112,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12519",
@@ -1342,11 +1338,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12532",
@@ -1570,11 +1565,10 @@
     "h": 44
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12545",
@@ -1865,11 +1859,10 @@
     "h": 108
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12563",
@@ -2580,11 +2573,10 @@
     "h": 133
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12605",
@@ -3265,11 +3257,10 @@
     "h": 192
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12644",
@@ -5751,11 +5742,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12722",
@@ -5880,11 +5870,10 @@
     "h": 20
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12729",
@@ -6011,11 +6000,10 @@
     "h": 56
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12736",
@@ -6620,11 +6608,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12771",
@@ -6810,11 +6797,10 @@
     "h": 28
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12782",
@@ -6937,11 +6923,10 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12789",
@@ -8598,11 +8583,10 @@
     "h": 20
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12810",
@@ -8979,11 +8963,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12825",
@@ -9224,11 +9207,10 @@
     "h": 32
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12840",
@@ -9311,11 +9293,10 @@
     "h": 44
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12845",
@@ -9675,11 +9656,10 @@
     "h": 52
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12863",
@@ -9882,11 +9862,10 @@
     "h": 41
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12875",
@@ -9985,11 +9964,10 @@
     "h": 82
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12881",
@@ -10095,11 +10073,10 @@
     "h": 78
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12887",
@@ -10243,11 +10220,10 @@
     "h": 66
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12896",
@@ -10399,11 +10375,10 @@
     "h": 56
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12905",
@@ -10966,11 +10941,10 @@
     "h": 316
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12939",
@@ -11457,11 +11431,10 @@
     "h": 56
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12968",
@@ -11597,11 +11570,10 @@
     "h": 64
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12976",
@@ -11760,11 +11732,10 @@
     "h": 62
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12985",
@@ -11953,11 +11924,10 @@
     "h": 34
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:12996",
@@ -12126,11 +12096,10 @@
     "h": 300
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "101:13003",
@@ -12416,11 +12385,10 @@
     "h": 100
    },
    "variabili": {
-    "itemSpacing": "spazio/0-5"
+    "itemSpacing": "spazio/0-5",
+    "counterAxisSpacing": "spazio/0-5"
    },
-   "senza": [
-    "counterAxisSpacing 2"
-   ]
+   "senza": []
   },
   {
    "id": "I101:13003;101:11262",
@@ -14043,11 +14011,10 @@
     "h": 136
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "120:58420",
@@ -14888,11 +14855,10 @@
     "h": 142
    },
    "variabili": {
-    "itemSpacing": "spazio/6"
+    "itemSpacing": "spazio/6",
+    "counterAxisSpacing": "spazio/6"
    },
-   "senza": [
-    "counterAxisSpacing 24"
-   ]
+   "senza": []
   },
   {
    "id": "121:58776",

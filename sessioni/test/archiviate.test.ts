@@ -31,14 +31,14 @@ test("archiviate: senza cartella o senza data «dove» ha solo quello che c'è",
   assert.deepEqual(r.map((x) => x.dove).sort(), ["22 ott 2026, 18:40", "clotch"]);
 });
 
-test("archiviate: registro di Friday (fine archiviata, comando archivia riuscito) unito all'app senza doppioni, data = archiviazione", () => {
+test("archiviate: registro di clotch AI (fine archiviata, comando archivia riuscito) unito all'app senza doppioni, data = archiviazione", () => {
   const t = (g: number) => Date.UTC(2026, 9, g, 12, 0);
   const r = archiviate(
     [app({ cliId: "c1", titolo: "Dall'app", ultimaAttivita: t(1) }), app({ cliId: "c4", archiviata: false })],
     reg({
       chat: {
         c1: { titolo: "Dal registro", progetto: "/Users/x/altro", fine: "archiviata", fineT: t(25) },
-        c2: { titolo: "Solo registro", progetto: "friday", fine: "archiviata", fineT: t(24) },
+        c2: { titolo: "Solo registro", progetto: "clotch-ai", fine: "archiviata", fineT: t(24) },
         c3: { titolo: "Da comando", progetto: null, fine: null, fineT: null },
         c4: { titolo: "Ripristinata dall'app", progetto: "x", fine: "archiviata", fineT: t(26) },
         c5: { titolo: "Uscita normale", progetto: "x", fine: "uscita", fineT: t(27) },
@@ -50,7 +50,16 @@ test("archiviate: registro di Friday (fine archiviata, comando archivia riuscito
     }), "UTC");
   assert.deepEqual(r, [
     { id: "c1", titolo: "Dall'app", dove: "clotch · 25 ott 2026, 12:00" },
-    { id: "c2", titolo: "Solo registro", dove: "friday · 24 ott 2026, 12:00" },
+    { id: "c2", titolo: "Solo registro", dove: "clotch-ai · 24 ott 2026, 12:00" },
     { id: "c3", titolo: "Da comando", dove: "23 ott 2026, 12:00" },
   ]);
+});
+
+test("archiviate: un «ripristina» riuscito dopo «archivia» toglie la chat; un «archivia» dopo la rimette (#456)", () => {
+  const t = (g: number) => Date.UTC(2026, 9, g, 12, 0);
+  const cmd = (id: string, c: string, g: number, esito = "ok") => ({ id, cmd: c, t: t(g), args: { chat: "m1" }, esito });
+  const ids = (comandi: ReturnType<typeof cmd>[]) => archiviate([], reg({ chat: { m1: { titolo: "Motore" } }, comandi }), "UTC").map((x) => x.id);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2)]), []);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2), cmd("c", "archivia", 3)]), ["m1"]);
+  assert.deepEqual(ids([cmd("a", "archivia", 1), cmd("b", "ripristina", 2, "rifiutato")]), ["m1"]);
 });

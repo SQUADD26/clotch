@@ -1,12 +1,12 @@
 // figma: 101-13650 — richieste a Roberto: «Richiesta permesso» 101:13247, «Domanda» 101:13280 (101:13896), «Piano» 101:13314 (101:14132).
-// Ogni risposta è un comando nella casella di Friday (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
+// Ogni risposta è un comando nella casella di clotch AI (contratto v1): rispondi_permesso, rispondi_domanda, salta_domanda, piano.
 import { useEffect, useState, type ReactNode } from "react";
 import { Bottone } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
 import { useClotchAcceso } from "../pannello";
 import { BloccoCodice } from "./Blocchi";
-import { comanda } from "./friday";
+import { comanda } from "./clotch-ai";
 import { useRiserva } from "./riserva";
 import { testoCampo } from "./strumenti";
 import { quanti } from "./testi";
@@ -43,7 +43,8 @@ export interface Richiesta { rid: string; strumento: string | null; ingresso: un
 
 type Scelta = "consenti" | "consenti_sempre" | "nega";
 
-export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: string | null }) {
+/** `titolo`: nella chat di clotch AI la carta dice di quale sessione è (101-37492). */
+export function Permesso({ chat, r, da, titolo = "Permesso richiesto" }: { chat: string; r: Richiesta; da: string | null; titolo?: string }) {
   const [scelta, setScelta] = useState<Scelta | null>(null);
   const ris = useRiserva();
   const cmd = ris.testo(testoCampo(r.ingresso, "command")); // sempre intero: chi approva deve vedere gli argomenti, vale solo nascondiChiavi
@@ -61,7 +62,7 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
       : <Esito icona="spunta" colore="successo" esito="Consentito da te" dettaglio={cmd || r.strumento || ""} codice />;
   }
   return (
-    <Carta icona="mano" titolo="Permesso richiesto" dettaglio={da}>
+    <Carta icona="mano" titolo={titolo} dettaglio={da}>
       {cmd && <div className="domanda">Eseguire questo comando?</div>}
       {mostra && <BloccoCodice comando={mostra} />}
       {testoCampo(r.ingresso, "description") && <div className="motivo">{ris.testo(testoCampo(r.ingresso, "description"))}</div>}
@@ -76,7 +77,7 @@ export function Permesso({ chat, r, da }: { chat: string; r: Richiesta; da: stri
 
 const CONSIGLIATA = /\s*\((Recommended|Consigliata)\)\s*$/i;
 
-/** `rid` null: la domanda è aperta nella trascrizione ma Friday non la conosce, e non si può rispondere da qui. */
+/** `rid` null: la domanda è aperta nella trascrizione ma clotch AI non la conosce, e non si può rispondere da qui. */
 export function Domanda({ chat, rid, domande, da }: { chat: string; rid: string | null; domande: { domanda: string; opzioni: string[] }[]; da: string | null }) {
   // l'opzione consigliata parte scelta, come nel disegno
   const [scelte, setScelte] = useState<(number | null)[]>(domande.map((d) => { const i = d.opzioni.findIndex((o) => CONSIGLIATA.test(o)); return i < 0 ? null : i; }));

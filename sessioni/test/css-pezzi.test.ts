@@ -13,7 +13,7 @@ test("css dei pezzi: ogni regola sotto .pezzo-<pezzo>", () => {
     for (const f of fs.readdirSync(path.join(UI, pezzo)).filter((f) => f.endsWith(".css"))) {
       const css = fs.readFileSync(path.join(UI, pezzo, f), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/@keyframes[^{]*\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, "");
       for (const m of css.matchAll(/(?:^|})\s*([^{}@]+)\{/g))
-        for (const s of m[1].split(",").map((x) => x.trim()))
+        for (const s of m[1].split(/,(?![^(]*\))/).map((x) => x.trim())) // virgole dentro :is()/:where() non separano i selettori
           // `.parita` sta su <html>: le regole della sola prova di parità la mettono prima del prefisso
           if (!s.replace(/^\.parita /, "").startsWith(`.pezzo-${pezzo} `)) fuori.push(`${pezzo}/${f}: ${s}`);
     }

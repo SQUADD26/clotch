@@ -6,7 +6,7 @@
 .pezzo-impostazioni .andamento .pila { display: flex; flex-direction: column-reverse; width: 100%; }
 .pezzo-impostazioni .andamento .pila > div { flex-basis: 0; }
 
-/* schede: `.scheda` è già della scheda di progetto in friday.css, qui `.tab-uso` */
+/* schede: `.scheda` è già della scheda di progetto in clotch-ai.css, qui `.tab-uso` */
 .pezzo-impostazioni .tab-uso { display: flex; align-items: center; height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-md); }
 .pezzo-impostazioni .tab-uso.scelta { background: var(--colore-fondo-riga-scelta); }
 

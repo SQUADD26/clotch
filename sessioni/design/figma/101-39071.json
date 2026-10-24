@@ -8,16 +8,16 @@
   "dentro": "101:38897"
  },
  "variabili": {
+  "colore/fondo/attesa": "#ee7c3729",
   "raggio/md": 10,
-  "spazio/2": 8,
   "spazio/1": 4,
+  "spazio/2": 8,
   "misura/icona": 16,
+  "colore/icona/accento": "#ee7c37",
   "colore/testo/primario": "#ffffff",
-  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/fondo/attesa": "#ee7c3729",
-  "colore/icona/accento": "#ee7c37",
+  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16
  },

@@ -11,6 +11,7 @@
   flex: 1; min-width: 0; resize: none; border: 0; outline: none; background: none; padding: 0; margin: 0;
   font: inherit; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario);
   user-select: text;
+  max-height: var(--misura-casella-testo-max); overflow-y: auto; /* 101:25801: cresce fino a qui, poi scorre */
 }
 .pezzo-chat .casella textarea::placeholder { color: var(--colore-testo-secondario); }
 .pezzo-chat .casella .azioni { display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone-invio); }

@@ -8,17 +8,13 @@
   "dentro": "101:10017"
  },
  "variabili": {
-  "raggio/md": 10,
-  "spazio/6": 24,
+  "spazio/0-5": 2,
   "spazio/2": 8,
-  "raggio/pieno": 9999,
-  "spazio/1": 4,
-  "misura/bottone": 28,
+  "misura/barra-laterale": 266,
+  "raggio/md": 10,
+  "misura/riga": 32,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
-  "spazio/0-5": 2,
-  "misura/barra-laterale": 266,
-  "misura/riga": 32,
   "colore/testo/primario": "#ffffff",
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
@@ -29,9 +25,14 @@
   "colore/testo/successo": "#40c977",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
+  "spazio/1": 4,
   "colore/fondo/riga-scelta": "#ffffff14",
+  "raggio/pieno": 9999,
   "spazio/3": 12,
+  "misura/bottone": 28,
   "colore/bordo/normale": "#ffffff15",
+  "misura/tratto": 1,
+  "spazio/6": 24,
   "colore/sessione/grigio": "#c4c8ce",
   "colore/fondo/bottone-secondario": "#ffffff0d"
  },
@@ -56,7 +57,22 @@
    "senza": []
   },
   {
-   "id": "101:9861",
+   "id": "117:51820",
+   "nome": "comandi barra laterale",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 0,
+    "w": 250,
+    "h": 202
+   },
+   "variabili": {
+    "itemSpacing": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51476",
    "nome": "comando cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -75,7 +91,7 @@
    "senza": []
   },
   {
-   "id": "I101:9861;101:7172",
+   "id": "I117:51820;117:51476;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -91,7 +107,7 @@
    "senza": []
   },
   {
-   "id": "I101:9861;101:7172;101:6869",
+   "id": "I117:51820;117:51476;101:7172;101:6869",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -106,7 +122,7 @@
    "senza": []
   },
   {
-   "id": "I101:9861;101:7174",
+   "id": "I117:51820;117:51476;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -125,7 +141,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9861;101:7175",
+   "id": "I117:51820;117:51476;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -144,7 +160,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:9866",
+   "id": "I117:51820;117:51481",
    "nome": "comando filtra",
    "tipo": "INSTANCE",
    "box": {
@@ -163,7 +179,7 @@
    "senza": []
   },
   {
-   "id": "I101:9866;101:7172",
+   "id": "I117:51820;117:51481;101:7172",
    "nome": "icona cerca",
    "tipo": "INSTANCE",
    "box": {
@@ -179,7 +195,7 @@
    "senza": []
   },
   {
-   "id": "I101:9866;101:7172;101:6874",
+   "id": "I117:51820;117:51481;101:7172;101:6874",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -194,7 +210,7 @@
    "senza": []
   },
   {
-   "id": "I101:9866;101:7174",
+   "id": "I117:51820;117:51481;101:7174",
    "nome": "etichetta",
    "tipo": "TEXT",
    "box": {
@@ -213,7 +229,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9866;101:7175",
+   "id": "I117:51820;117:51481;101:7175",
    "nome": "scorciatoia",
    "tipo": "TEXT",
    "box": {
@@ -232,7 +248,7 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "101:13603",
+   "id": "I117:51820;117:51486",
    "nome": "riga Friday",
    "tipo": "INSTANCE",
    "box": {
@@ -251,7 +267,7 @@
    "senza": []
   },
   {
-   "id": "I101:13603;101:13544",
+   "id": "I117:51820;117:51486;101:13544",
    "nome": "icona scintille",
    "tipo": "INSTANCE",
    "box": {
@@ -267,7 +283,7 @@
    "senza": []
   },
   {
-   "id": "I101:13603;101:13544;101:11153",
+   "id": "I117:51820;117:51486;101:13544;101:11153",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
@@ -282,7 +298,7 @@
    "senza": []
   },
   {
-   "id": "I101:13603;101:13543",
+   "id": "I117:51820;117:51486;101:13543",
    "nome": "titolo",
    "tipo": "TEXT",
    "box": {
@@ -297,11 +313,11 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
-   "id": "I101:13603;101:13546",
+   "id": "I117:51820;117:51486;101:13546",
    "nome": "stato",
    "tipo": "TEXT",
    "box": {
@@ -320,12 +336,276 @@
    "font": "SF Pro Regular"
   },
   {
+   "id": "I117:51820;117:51495",
+   "nome": "voce Casella",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 102,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51495;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 110,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51495;101:7172;101:11094",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 16.66650390625,
+    "y": 111.999755859375,
+    "w": 14.667144775390625,
+    "h": 12
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51495;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 108,
+    "w": 193,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Casella",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51820;117:51495;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 241,
+    "y": 109,
+    "w": 9,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "3",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51820;117:51500",
+   "nome": "voce Decisioni",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 136,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51500;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 144,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51500;101:7172;101:11183",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 16.66650390625,
+    "y": 145.3330078125,
+    "w": 14.6669921875,
+    "h": 13.333658218383789
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51500;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 142,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Decisioni",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51820;117:51500;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 143,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51820;117:51505",
+   "nome": "voce Regole",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 8,
+    "y": 170,
+    "w": 250,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51505;101:7172",
+   "nome": "icona cerca",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 16,
+    "y": 178,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51505;101:7172;101:11137",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 17.99951171875,
+    "y": 178.666015625,
+    "w": 12,
+    "h": 14.668789863586426
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I117:51820;117:51505;101:7174",
+   "nome": "etichetta",
+   "tipo": "TEXT",
+   "box": {
+    "x": 40,
+    "y": 176,
+    "w": 202,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Regole",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I117:51820;117:51505;101:7175",
+   "nome": "scorciatoia",
+   "tipo": "TEXT",
+   "box": {
+    "x": 250,
+    "y": 177,
+    "w": 0,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "",
+   "font": "SF Pro Regular"
+  },
+  {
    "id": "101:16763",
    "nome": "pillole filtro",
    "tipo": "FRAME",
    "box": {
     "x": 8,
-    "y": 102,
+    "y": 204,
     "w": 250,
     "h": 68
    },
@@ -344,7 +624,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 110,
+    "y": 212,
     "w": 189,
     "h": 28
    },
@@ -364,7 +644,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 28,
-    "y": 115,
+    "y": 217,
     "w": 60,
     "h": 18
    },
@@ -383,7 +663,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 92,
-    "y": 115,
+    "y": 217,
     "w": 81,
     "h": 18
    },
@@ -402,7 +682,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 177,
-    "y": 116,
+    "y": 218,
     "w": 16,
     "h": 16
    },
@@ -418,7 +698,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 180.3330078125,
-    "y": 121.3330078125,
+    "y": 223.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -433,7 +713,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 142,
+    "y": 244,
     "w": 140,
     "h": 28
    },
@@ -453,7 +733,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 28,
-    "y": 147,
+    "y": 249,
     "w": 37,
     "h": 18
    },
@@ -472,7 +752,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 69,
-    "y": 147,
+    "y": 249,
     "w": 55,
     "h": 18
    },
@@ -491,7 +771,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 128,
-    "y": 148,
+    "y": 250,
     "w": 16,
     "h": 16
    },
@@ -507,7 +787,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 131.3330078125,
-    "y": 153.3330078125,
+    "y": 255.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
    },
@@ -522,7 +802,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 160,
-    "y": 142,
+    "y": 244,
     "w": 78,
     "h": 28
    },
@@ -532,11 +812,10 @@
     "itemSpacing": "spazio/1",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
+    "strokeWeight": "misura/tratto",
     "height": "misura/bottone"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16774;101:16684",
@@ -544,7 +823,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 173,
-    "y": 148,
+    "y": 250,
     "w": 16,
     "h": 16
    },
@@ -560,7 +839,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 175.66650390625,
-    "y": 150.666259765625,
+    "y": 252.666259765625,
     "w": 10.6669921875,
     "h": 10.6669921875
    },
@@ -575,7 +854,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 193,
-    "y": 147,
+    "y": 249,
     "w": 32,
     "h": 18
    },
@@ -594,9 +873,9 @@
    "tipo": "FRAME",
    "box": {
     "x": 8,
-    "y": 172,
+    "y": 274,
     "w": 250,
-    "h": 622
+    "h": 520
    },
    "variabili": {
     "itemSpacing": "spazio/0-5",
@@ -610,7 +889,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 184,
+    "y": 286,
     "w": 250,
     "h": 32
    },
@@ -627,7 +906,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 16,
-    "y": 191,
+    "y": 293,
     "w": 234,
     "h": 18
    },
@@ -646,7 +925,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 8,
-    "y": 218,
+    "y": 320,
     "w": 250,
     "h": 32
    },
@@ -665,7 +944,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 16,
-    "y": 226,
+    "y": 328,
     "w": 16,
     "h": 16
    },
@@ -681,7 +960,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 16.66650390625,
-    "y": 227.3330078125,
+    "y": 329.3330078125,
     "w": 14.668932914733887,
     "h": 12.667033195495605
    },
@@ -696,7 +975,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 40,
-    "y": 224,
+    "y": 326,
     "w": 194,
     "h": 20
    },
@@ -715,7 +994,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 242,
-    "y": 225,
+    "y": 327,
     "w": 8,
     "h": 18
    },
@@ -734,7 +1013,7 @@
    "tipo": "FRAME",
    "box": {
     "x": 8,
-    "y": 252,
+    "y": 354,
     "w": 250,
     "h": 66
    },
@@ -750,7 +1029,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 252,
+    "y": 354,
     "w": 226,
     "h": 32
    },
@@ -770,7 +1049,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 260,
+    "y": 362,
     "w": 16,
     "h": 16
    },
@@ -786,7 +1065,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 260,
+    "y": 362,
     "w": 16,
     "h": 16
    },
@@ -802,7 +1081,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 41.3330078125,
-    "y": 260.666259765625,
+    "y": 362.666259765625,
     "w": 13.333984375,
     "h": 14.6669921875
    },
@@ -817,7 +1096,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 258,
+    "y": 360,
     "w": 162,
     "h": 20
    },
@@ -836,7 +1115,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 260,
+    "y": 362,
     "w": 16,
     "h": 16
    },
@@ -849,7 +1128,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 260,
+    "y": 362,
     "w": 16,
     "h": 16
    },
@@ -865,7 +1144,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.59619140625,
-    "y": 260.666259765625,
+    "y": 362.666259765625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
    },
@@ -880,7 +1159,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 32,
-    "y": 286,
+    "y": 388,
     "w": 226,
     "h": 32
    },
@@ -899,7 +1178,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 294,
+    "y": 396,
     "w": 16,
     "h": 16
    },
@@ -915,7 +1194,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 40,
-    "y": 294,
+    "y": 396,
     "w": 16,
     "h": 16
    },
@@ -931,7 +1210,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 40.6650390625,
-    "y": 294.66650390625,
+    "y": 396.66650390625,
     "w": 14.668047904968262,
     "h": 14.048399925231934
    },
@@ -946,7 +1225,7 @@
    "tipo": "TEXT",
    "box": {
     "x": 64,
-    "y": 292,
+    "y": 394,
     "w": 162,
     "h": 20
    },
@@ -965,7 +1244,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 294,
+    "y": 396,
     "w": 16,
     "h": 16
    },
@@ -978,7 +1257,7 @@
    "tipo": "INSTANCE",
    "box": {
     "x": 234,
-    "y": 294,
+    "y": 396,
     "w": 16,
     "h": 16
    },
@@ -994,7 +1273,7 @@
    "tipo": "VECTOR",
    "box": {
     "x": 234.59619140625,
-    "y": 294.666259765625,
+    "y": 396.666259765625,
     "w": 14.737014770507812,
     "h": 14.666666030883789
    },

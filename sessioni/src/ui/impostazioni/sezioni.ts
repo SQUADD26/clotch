@@ -5,7 +5,7 @@ export const SEZIONI = [
   ["generale", "Generale", "impostazioni"],
   ["aspetto", "Aspetto", "tavolozza"],
   ["notifiche", "Notifiche", "campana"],
-  ["friday", "clotch AI", "scintille"],
+  ["clotch-ai", "clotch AI", "scintille"],
   ["scorciatoie", "Scorciatoie", "tastiera"],
   ["sorgenti", "Sorgenti", "computer"],
   ["account", "Account", "persona"],

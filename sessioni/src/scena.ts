@@ -3,18 +3,23 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { IpcMain } from "electron";
-import { leggiRegistro } from "./friday";
-import { piano } from "./friday-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, Messaggio, PaginaMessaggi, PreferenzeSessione, QuotaUso } from "./tipi";
-import { DIM_PAGINA } from "./messaggi";
+import { leggiRegistro } from "./clotch-ai";
+import { piano } from "./clotch-ai-ipc";
+import type { CartellaAvvio, ContestoCartella, Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, ModelloMotore, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
+import type { OpzioniCronologia } from "./cronologia-tipi";
+import { creaCronologiaScena } from "./scena-cronologia";
 
 export interface Scena {
   /** Vista di partenza, come `useNavigazione()`: vista, sessione scelta, sezione. */
   navigazione?: { vista: string; sessione?: string; sezione?: string };
   elenco?: Elenco;
+  /** «Avvio» (101:30345): l'elenco non arriva mai, la finestra resta sul logo. */
+  avvio?: boolean;
   /** Messaggi per id di sessione, in ordine di tempo. */
   messaggi?: Record<string, Messaggio[]>;
   preferenze?: Record<string, PreferenzeSessione>;
+  /** Contesto e file toccati per id di sessione (pannello «Info sessione»). */
+  info?: Record<string, InfoSessione>;
   impostazioni?: Record<string, unknown>;
   /** Impostazioni (#351): cartelle degli account come le dà il main, quote d'uso, archiviate, spazio, versione. */
   cartelle?: CartellaAccount[];
@@ -25,51 +30,97 @@ export interface Scena {
   /** Info (#351): le note della versione e se c'è «Controlla aggiornamenti». */
   novita?: Novita;
   aggiornamenti?: boolean;
-  /** Registro di Friday come lo dà `friday:registro`. */
+  /** Menu della casella (#437): comandi con «/» e file con «@» che il main darebbe a quella sessione. */
+  comandi?: VoceComando[];
+  file?: string[];
+  /** «Nuova sessione» (#468): cartelle recenti, rami per percorso e host SSH come li darebbe il main. */
+  nuova?: { recenti: CartellaAvvio[]; casa?: string; contesti: Record<string, ContestoCartella>; ssh?: string[] };
+  /** Catalogo dei modelli del motore come lo dà `sessioni:modelli` (assente = il file non c'è). */
+  modelli?: ModelloMotore[];
+  /** Registro di clotch AI come lo dà `clotch-ai:registro`. */
   registro?: unknown;
+  /** Allegati e immagini (#437): i file che `casella:descrivi` trova, le immagini (file PNG del repo, per «<uuid riga>:<n>» o per percorso) e le skill. */
+  allegati?: FileAllegato[];
+  immagini?: Record<string, string>;
+  skill?: string[];
+  /** «Casella: caricamento» (101:36010): il registro non arriva mai, la vista resta sulle sagome. */
+  registroLento?: boolean;
+  /** L'app sta dicendo un avviso a voce (frame 101-37055): `clotch-ai:voce`. */
+  voce?: boolean;
 }
 
 export const fileScena = (radice: string, id: string) => path.join(radice, "design", "scene", `${id}.json`);
 export const leggiScena = (file: string): Scena | null => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : null);
 
-/** «Clotch acceso» scade dopo 10 min (#350): nella scena `clotch.t` ≤ 0 vuol dire «tanti ms fa», da adesso. */
+/** «Clotch acceso» scade dopo 10 min (#350): nella scena `clotch.t`, `schermo.da` e `afk.da` ≤ 0 vogliono dire «tanti ms fa», da adesso. */
 function conOra(r: unknown): unknown {
-  const c = (r as { clotch?: { t: number } | null }).clotch;
-  return c && c.t <= 0 ? { ...(r as object), clotch: { ...c, t: Date.now() + c.t } } : r;
+  const o = { ...(r as Record<string, { t?: number; da?: number } | null | undefined>) }, ora = Date.now();
+  for (const [k, campo] of [["clotch", "t"], ["schermo", "da"], ["afk", "da"]] as const) {
+    const x = o[k], v = x?.[campo];
+    if (x && v !== undefined && v <= 0) o[k] = { ...x, [campo]: ora + v };
+  }
+  return o;
 }
+
+const cronologie = new WeakMap<Scena, ReturnType<typeof creaCronologiaScena>>();
 
 /** Risposta di un canale IPC dalla scena; i canali che scrivono non fanno niente. */
 export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknown {
   switch (canale) {
-    case "sessioni:elenco": return s.elenco ?? { sessioni: [], errori: [] };
+    case "sessioni:elenco": return s.avvio ? new Promise(() => {}) : s.elenco ?? { sessioni: [], errori: [] };
     case "sessioni:messaggi": {
-      const tutti = s.messaggi?.[String(args[0])] ?? [], p = Number(args[1]) | 0;
-      const fine = tutti.length - p * DIM_PAGINA;
-      return { messaggi: tutti.slice(Math.max(0, fine - DIM_PAGINA), Math.max(0, fine)), pagina: p, haAltre: fine - DIM_PAGINA > 0, errore: null, totale: tutti.length } satisfies PaginaMessaggi;
+      let cronologia = cronologie.get(s);
+      if (!cronologia) {
+        cronologia = creaCronologiaScena((id) => s.messaggi?.[id] ?? []);
+        cronologie.set(s, cronologia);
+      }
+      return cronologia.pagina(String(args[0]), args[1] as number, args[2] as OpzioniCronologia | undefined);
     }
     case "sessioni:preferenze": return s.preferenze ?? {};
+    case "sessioni:info": return s.info?.[String(args[0])]; // senza `info` la scena non mostra file né contesto
     case "sessioni:impostazioni": return s.impostazioni ?? {};
     case "sessioni:cerca": return [];
+    case "sessioni:comandi": return s.comandi ?? [];
+    case "sessioni:modelli": return s.modelli ?? null;
+    case "sessioni:file": return (s.file ?? []).filter((f) => f.toLowerCase().includes(String(args[1] ?? "").toLowerCase()));
     case "sessioni:spazio": return s.spazio ?? { indice: 0, messaggi: 0, immagini: 0, altro: 0 };
     case "impostazioni:radici": return (s.cartelle ?? []).map((c) => c.percorso);
     case "impostazioni:cartelle": return (s.cartelle ?? []).filter((c) => (args[0] as string[]).includes(c.percorso));
     case "impostazioni:versione": return s.versione ?? "";
+    case "impostazioni:profilo": return { nome: "Roberto Bondici", iniziali: "RB" }; // il nome dei frame del disegno
     case "impostazioni:uso": return s.uso ?? null;
     case "impostazioni:archiviate": return s.archiviate ?? [];
     case "impostazioni:novita": return s.novita ?? null;
     case "impostazioni:aggiornamenti": return args[0] === true ? undefined : s.aggiornamenti ?? false;
+    case "casella:descrivi": return (s.allegati ?? []).filter((a) => (args[0] as string[]).includes(a.percorso));
+    case "casella:immagine": {
+      const d = args[0] as { rif?: { riga: string; n: number }; percorso?: string };
+      const file = s.immagini?.[d.rif ? `${d.rif.riga}:${d.rif.n}` : String(d.percorso)];
+      return file ? `data:image/png;base64,${fs.readFileSync(path.join(__dirname, "..", "..", file)).toString("base64")}` : null;
+    }
+    case "nuova:cartelle": return { recenti: s.nuova?.recenti ?? [], casa: s.nuova?.casa ?? "/Users/roberto" };
+    case "nuova:contesto": return s.nuova?.contesti[String(args[0])] ?? { git: false, rami: [], predefinito: null };
+    case "nuova:ssh": return s.nuova?.ssh ?? [];
+    case "nuova:scegli-cartella": return null;
+    case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
+    case "casella:scegli": return [];
+    case "casella:copia": return (s.allegati ?? []).filter((a) => (args[0] as string[]).includes(a.percorso));
+    case "casella:incolla": return null;
+    case "casella:copia-immagine": case "casella:salva-immagine": return false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
-    case "friday:registro": return conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
+    case "clotch-ai:registro": return s.registroLento ? new Promise(() => {}) : conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
+    case "clotch-ai:voce": return s.voce === true;
     default: return undefined;
   }
 }
 
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
-  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:spazio", "sessioni:ricostruisci", "sessioni:svuota",
-  "friday:registro", "friday:comando", "friday:avvia", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
-  "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
+  "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:modelli", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
+  "clotch-ai:registro", "clotch-ai:comando", "clotch-ai:avvia", "clotch-ai:voce", "clotch-ai:dettatura", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
+  "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
-  "impostazioni:novita", "impostazioni:aggiornamenti"];
+  "impostazioni:novita", "impostazioni:aggiornamenti",
+  "nuova:cartelle", "nuova:contesto", "nuova:ssh", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

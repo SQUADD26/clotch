@@ -21,7 +21,18 @@ function leggiFile(file: string): FilePreferenze {
   if (!oggetto(p)) throw new Error(`preferenze non valide: ${file}`);
   if (!("sessioni" in p) && !("app" in p)) return { sessioni: p as Preferenze, app: {} }; // forma di #360: mappa piatta degli id
   if ((p.sessioni !== undefined && !oggetto(p.sessioni)) || (p.app !== undefined && !oggetto(p.app))) throw new Error(`preferenze non valide: ${file}`);
-  return { sessioni: (p.sessioni ?? {}) as Preferenze, app: (p.app ?? {}) as Impostazioni };
+  const letto = { sessioni: (p.sessioni ?? {}) as Preferenze, app: (p.app ?? {}) as Impostazioni };
+  if (portaChiaviVecchie(letto.app)) try { scriviFile(file, letto); } catch { /* sola lettura: la lettura è già col nome nuovo, riscrive la prossima volta */ }
+  return letto;
+}
+
+/** #437: la scorciatoia «Scrivi a clotch AI» si salvava sotto `friday`; la chiave vecchia fa da fallback, poi sparisce. */
+function portaChiaviVecchie(app: Impostazioni): boolean {
+  const s = app.scorciatoie;
+  if (!oggetto(s) || !("friday" in s)) return false; // chiave vecchia delle scorciatoie salvate
+  if (!("clotchAi" in s)) s.clotchAi = s.friday;
+  delete s.friday; // chiave vecchia delle scorciatoie salvate
+  return true;
 }
 
 /** Scrittura atomica (.tmp poi rename). */
