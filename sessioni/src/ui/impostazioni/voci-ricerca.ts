@@ -17,6 +17,7 @@ export const VOCI: Voce[] = [
   v("generale", "Modello per i tuoi messaggi", "Usato quando scrivi a una sessione da qui"),
   v("generale", "Apri una sessione", "Cosa succede quando ne scegli una dall’elenco"),
   v("generale", "Cartella del registro", "Dove clotch scrive gli errori"),
+  v("aspetto", "Tema", "Chiaro, scuro o come il Mac"),
   v("aspetto", "Colore principale", "Bottoni, segni di stato e messaggi tuoi"),
   v("aspetto", "Carattere", "Testo dell’app"),
   v("aspetto", "Dimensione del testo", "Vale per conversazione ed elenco"),

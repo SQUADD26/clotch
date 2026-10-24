@@ -27,6 +27,7 @@ const PROVE: Record<string, Prova> = {
   "101-32827": { aperta: "Lingua" },
   "119-55555": { aperta: "Modello per i tuoi messaggi" },
   "119-55726": { aperta: "Apri una sessione" },
+  "167-98670": { aperta: "Tema" },
   "119-55904": { aperta: "Colore principale" },
   "119-56054": { aperta: "Carattere" },
   "119-56211": { aperta: "Dimensione del testo" },

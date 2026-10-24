@@ -21,6 +21,7 @@
   max-width: 100%; padding: var(--spazio-2-5) var(--spazio-4); border-radius: var(--raggio-2xl);
   background: var(--colore-fondo-bolla); color: var(--colore-testo-bolla);
   font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-messaggio); white-space: pre-wrap; overflow-wrap: anywhere;
+  --colore-icona-accento: var(--colore-testo-bolla); /* l'accento sulla bolla accento non si legge (issue 1093: 2,14 in chiaro) */
 }
 
 .pezzo-chat .risposta { display: flex; flex-direction: column; gap: var(--spazio-2); }

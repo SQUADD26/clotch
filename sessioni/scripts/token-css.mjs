@@ -64,12 +64,15 @@ export function genera(tokens) {
   return { css, ts };
 }
 
-const { css, ts } = genera(JSON.parse(readFileSync(IN, 'utf8')));
-if (process.argv.includes('--check')) {
-  const vecchi = [CSS, TS].filter((f, i) => { try { return readFileSync(f, 'utf8') !== [css, ts][i]; } catch { return true; } });
-  if (vecchi.length) { console.error(`token non aggiornati: ${vecchi.join(', ')}. Lancia: node scripts/token-css.mjs`); process.exit(1); }
-  console.log('token: ok');
-} else {
-  writeFileSync(CSS, css); writeFileSync(TS, ts);
-  console.log(`token: ${CSS}, ${TS}`);
+// da riga di comando; importato (scripts/contrasto.mjs) dà solo voci() e MODI
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const { css, ts } = genera(JSON.parse(readFileSync(IN, 'utf8')));
+  if (process.argv.includes('--check')) {
+    const vecchi = [CSS, TS].filter((f, i) => { try { return readFileSync(f, 'utf8') !== [css, ts][i]; } catch { return true; } });
+    if (vecchi.length) { console.error(`token non aggiornati: ${vecchi.join(', ')}. Lancia: node scripts/token-css.mjs`); process.exit(1); }
+    console.log('token: ok');
+  } else {
+    writeFileSync(CSS, css); writeFileSync(TS, ts);
+    console.log(`token: ${CSS}, ${TS}`);
+  }
 }
