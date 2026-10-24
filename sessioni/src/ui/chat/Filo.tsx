@@ -5,10 +5,11 @@ import type { ChatClotchAi } from "../../clotch-ai";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
 import { numero } from "../base/token";
-import { nomeModello } from "./Casella";
 import { AllegatiMessaggio, VisoreContesto } from "./Allegati";
-import { Attivita, Aiutanti, AvvisoFilo, FineTurno, Interrotta, Riassunto, RigaEvento } from "./Lavoro";
-import { FileToccati, MessaggioRoberto, Modifica, Pensiero, RicercaWeb, Strumento } from "./Blocchi";
+import { Attivita, AvvisoFilo, FineTurno, Interrotta, Riassunto, RigaEvento } from "./Lavoro";
+import { FileToccati, MessaggioRoberto, Modifica } from "./Blocchi";
+import { Aiutanti, Gruppo, Ragionamento } from "./Compatto";
+import { raggruppa } from "./gruppi";
 import { Risposta } from "./Risposta";
 import { MenuSelezione } from "./Selezione";
 import { giorniDelFilo } from "./eventi";
@@ -22,16 +23,15 @@ import "./nuovi.css";
 type Richiesta = ChatClotchAi["richieste"][number];
 
 /** Un blocco del turno. `vivo`: l'ultimo turno di una sessione che lavora (le modifiche si vedono aperte, 101:14631). */
-function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
-  b: Blocco; chat: string; vivo: boolean; richiesta(g: string): Richiesta | null; da: string | null; prova: boolean; modello: string | null; aperto: boolean;
+function BloccoTurno({ b, chat, vivo, richiesta, da, prova, aperto }: {
+  b: Blocco; chat: string; vivo: boolean; richiesta(g: string): Richiesta | null; da: string | null; prova: boolean; aperto: boolean;
 }) {
   switch (b.tipo) {
-    case "pensiero": return <Pensiero b={b} aperto={aperto} />;
-    case "strumento": return <Strumento b={b} aperta={aperto} />;
+    case "pensiero": return <Ragionamento b={b} aperto={aperto} />;
+    case "strumento": case "web": return null; // stanno nei gruppi compatti (raggruppa)
     case "modifica": return <Modifica b={b} aperta={vivo} />;
-    case "web": return <RicercaWeb b={b} />;
     case "attivita": return <Attivita passi={b.passi} />;
-    case "aiutanti": return <Aiutanti aiutanti={b.aiutanti} modello={modello} />;
+    case "aiutanti": return <Aiutanti aiutanti={b.aiutanti} aperto={aperto} />;
     case "file-toccati": return <FileToccati b={b} aperto={aperto} />;
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
@@ -58,7 +58,8 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   /** Messaggi più vecchi non ancora caricati (null = non si sa, ma ci sono). */
   prima: number | null | false; altri(): void; altriCarica: boolean; inFondo?: ReactNode; inCima?: ReactNode;
   /** Stato di una scena di prova (`sezione` della navigazione): «menu-risposta» apre il menu dell'ultima risposta (101:23727),
-   *  «aperti:pensiero,strumento» parte coi blocchi di quei tipi aperti, come dopo un clic (101:8309, 8610, 9628);
+   *  «aperti:pensiero,strumento» parte coi blocchi di quei tipi aperti, come dopo un clic (101:8309, 8610, 9628; «aiutanti»: il primo rapporto);
+   *  «riga:2» apre quella riga del gruppo di strumenti aperto (163:87853); «fermo» disegna come con «riduci movimento» (163:90075);
    *  «nuovi:3» mostra «3 nuovi messaggi» (101:28652); «selezione:x,y» sceglie l'ultima risposta e apre il suo menu (101:28471). */
   prova?: string | null;
 }) {
@@ -71,13 +72,19 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const letto = useRef({ righe: righeDel(voci), prima: voci[0]?.chiave }); // com'era il filo all'ultimo disegno
   const [nuovi, setNuovi] = useState(0); // righe arrivate in fondo mentre si leggeva più su
   const inFondoDel = () => daFondo.current <= numero("spazio-6");
+  // La corsa liscia ha il bersaglio fissato alla partenza, ma le righe fuori vista (content-visibility) prendono la misura vera solo quando
+  // entrano: a fine corsa, se manca ancora un tratto, si completa (altrimenti la pillola resta e il filo si ferma a metà).
+  const vaiInFondo = () => {
+    const f = filo.current;
+    if (!f) return;
+    f.addEventListener("scrollend", () => { if (f.scrollHeight - f.clientHeight - f.scrollTop < f.clientHeight) f.scrollTo({ top: f.scrollHeight }); }, { once: true });
+    f.scrollTo({ top: f.scrollHeight, behavior: "smooth" });
+  };
   const richiesta = (g: string) => c?.richieste.find((r) => r.genere === g) ?? null;
   // permessi aperti: non stanno nella trascrizione, solo nel registro di clotch AI
   const permessi = c?.richieste.filter((r) => r.genere === "permesso") ?? [];
   const ultimo = voci.length - 1;
   const aperti = provaDi(prova, "aperti")?.split(",") ?? [];
-  // il modello degli aiutanti lo sa solo il registro («Sonnet 5.5», 101:14396)
-  const modello = nomeModello([...(c?.aiutanti.values() ?? [])].find((x) => x.modello)?.modello ?? null);
 
   useLayoutEffect(() => { const f = filo.current; if (f) f.scrollTop = f.scrollHeight - f.clientHeight - daFondo.current; }, []);
   useLayoutEffect(() => {
@@ -111,7 +118,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   return (
     <VisoreContesto.Provider value={{ sessione: chat, apri: (da) => setAperta(chiaveImmagine(da)) }}>
     <div className="filo-area">
-    <div className="filo" ref={filo} onScroll={scorri}>
+    <div className={provaDi(prova, "fermo") !== null ? "filo fermo" : "filo"} ref={filo} onScroll={scorri}>
       {inCima}
       {prima !== false && (
         <div className="precedenti">
@@ -131,13 +138,13 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
         if (v.tipo === "riassunto") return <Riassunto key={v.chiave} />;
         if (v.tipo === "evento") return <Fragment key={v.chiave}>{giorno}<RigaEvento testo={v.testo} /></Fragment>;
         const vivoQui = vivo && k === ultimo;
-        const r = riepilogo(v);
+        const r = riepilogo(v), blocchi = raggruppa(v.blocchi);
         return (
           <Fragment key={v.chiave}>{giorno}
           <div className="turno">
-            {v.blocchi.map((b, i) => (
-              <BloccoTurno key={b.chiave ?? `${v.chiave}:${i}`} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} modello={modello} aperto={aperti.includes(b.tipo)}
-                prova={provaDi(prova, "menu-risposta") !== null && k === ultimo && i === v.blocchi.length - 1} />
+            {blocchi.map((b, i) => b.tipo === "gruppo" ? <Gruppo key={b.chiave ?? `${v.chiave}:${i}`} g={b} aperto={aperti.includes("strumento")} riga={Number(provaDi(prova, "riga") ?? -1)} /> : (
+              <BloccoTurno key={b.chiave ?? `${v.chiave}:${i}`} b={b} chat={chat} vivo={vivoQui} richiesta={richiesta} da={da} aperto={aperti.includes(b.tipo)}
+                prova={provaDi(prova, "menu-risposta") !== null && k === ultimo && i === blocchi.length - 1} />
             ))}
             {k === ultimo && finita && <FineTurno ms={r.durata} strumenti={r.strumenti} file={r.file} aiutanti={r.aiutanti} />}
           </div>
@@ -149,7 +156,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
     </div>
     {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}
     {mostra > 0 && (
-      <button type="button" className="nuovi-messaggi" onClick={() => filo.current?.scrollTo({ top: filo.current.scrollHeight, behavior: "smooth" })}>
+      <button type="button" className="nuovi-messaggi" onClick={vaiInFondo}>
         <Icona nome="giu-freccia" colore="primaria" />
         <span>{quanti(mostra, "nuovo messaggio", "nuovi messaggi")}</span>
       </button>

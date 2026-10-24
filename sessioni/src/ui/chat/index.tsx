@@ -23,7 +23,9 @@ import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
 export { CasellaClotchAi, FiloClotchAi } from "./FiloClotchAi";
-export { scene } from "./varianti";
+import { scene as varianti } from "./varianti";
+import { scene as compatto } from "./varianti-compatto";
+export const scene = { ...varianti, ...compatto };
 
 /** L'ultimo messaggio di Roberto segue un turno interrotto: ha appena usato «interrompi e manda». */
 function dopoInterruzione(voci: Voce[]) {

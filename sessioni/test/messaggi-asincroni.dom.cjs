@@ -189,7 +189,7 @@ app.whenReady().then(async () => {
 
     const invalid = await fetch('NoProtocol', [user('Non accettare legacy')]);
     await settle(invalid, { messaggi: [user('Non accettare legacy')], pagina: 0, haAltre: false, totale: 1, errore: null });
-    assert.equal(await run('probe.stato'), 'errore'); assert.match(await run('probe.errore'), /Protocollo cronologia/);
+    assert.equal(await run('probe.stato'), 'errore'); assert.match(await run('probe.errore'), /Messaggi non leggibili/);
     assert.equal(await run('probe.messaggi.length'), 0); console.log('ASYNC_V1_MISSING_METADATA_REJECTED');
     console.log('ASYNC_CHAT_ISOLATION_OK');
 
@@ -203,10 +203,10 @@ app.whenReady().then(async () => {
       ...Array.from({ length: 49 }, (_, i) => ({ tipo: 'assistente', testo: 'Risposta stabile ' + i, modello: null, t: null }))];
     collegaScena(ipcMain, scene);
     await win.loadFile(path.join(root, 'renderer/index.html'), { query: { vista: 'sessione', sessione: chatId } });
-    await wait(async () => await run('!!document.querySelector(".pensiero .testata")'), 'pensiero del renderer completo');
+    await wait(async () => await run('!!document.querySelector(".pensiero button")'), 'pensiero del renderer completo');
     await run(`window.retainedThought = document.querySelector('.pensiero');
       window.retainedButton = retainedThought.querySelector('button'); retainedButton.click(); retainedButton.focus();`);
-    await wait(async () => await run('document.querySelector(".testo-pensiero")?.textContent === "Pensiero persistente"'), 'pensiero espanso');
+    await wait(async () => await run('document.querySelector(".pensiero .rientrato .testo")?.textContent === "Pensiero persistente"'), 'pensiero espanso');
     assert.equal(await run('document.activeElement === retainedButton'), true);
     await run(`[...document.querySelectorAll('.precedenti button')].find(b=>b.textContent==='Carica precedenti')?.click()`); // il focus può già averle caricate dallo scorrimento in cima (Filo.tsx:100)
     await wait(async () => await run('document.querySelector(".messaggio-roberto .bolla")?.textContent === "Inizio turno precedente"'), 'prepend vero della chat');
