@@ -15,6 +15,9 @@ export function applicaElenco(e: Elenco | undefined, c: Aggiornamento["elenco"],
     per.set(s.id, s);
     cambiato = true;
   }
+  // le cartelle non lette viaggiano con l'evento: senza, un avviso nuovo o risolto resterebbe com'era finché non si rilegge tutto
+  const errori = Array.isArray(c.errori) && JSON.stringify(c.errori) !== JSON.stringify(e.errori) ? c.errori : e.errori;
   // stesso ordine del main (leggiElenco): la più recente prima
-  return cambiato ? { ...e, sessioni: [...per.values()].sort((a, b) => b.ultimaAttivita - a.ultimaAttivita) } : e;
+  if (!cambiato) return errori === e.errori ? e : { ...e, errori };
+  return { ...e, errori, sessioni: [...per.values()].sort((a, b) => b.ultimaAttivita - a.ultimaAttivita) };
 }
