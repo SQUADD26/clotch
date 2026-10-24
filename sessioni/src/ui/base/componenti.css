@@ -31,8 +31,8 @@
 }
 .bottone-icona:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
 /* acceso (aperto o premuto a levetta): fondo «scelta», diverso dal passaggio; sopra un acceso passaggio e premuto velano come nei bottoni pieni */
-.bottone-icona[aria-expanded="true"], .bottone-icona[aria-pressed="true"] { background: var(--colore-fondo-riga-scelta); }
-.bottone-icona[aria-expanded="true"]:hover:not(:disabled), .bottone-icona[aria-pressed="true"]:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+.bottone-icona[aria-expanded="true"], .bottone-icona[aria-pressed="true"], .bottone-icona.aperto { background: var(--colore-fondo-riga-scelta); }
+.bottone-icona[aria-expanded="true"]:hover:not(:disabled), .bottone-icona[aria-pressed="true"]:hover:not(:disabled), .bottone-icona.aperto:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
 .bottone-icona:active:not(:disabled) { background: var(--colore-fondo-riga-scelta); opacity: var(--opacita-premuto); }
 
 /* Pillola (Filtro): Attivo=Sì | No */
@@ -68,3 +68,7 @@
 /* bottone nudo dentro una riga che ha già il suo fondo di passaggio (icona della sessione, «apri» dell'account): passaggio e premuto velano il bottone, come nei bottoni pieni */
 .riga-sessione > button:hover:not(:disabled), .riga-account .apri:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
 .riga-sessione > button:active:not(:disabled), .riga-account .apri:active:not(:disabled) { opacity: var(--opacita-premuto); }
+
+/* voce scelta (già col fondo «scelta»): passaggio e premuto la velano */
+.voce.scelta:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+.voce.scelta:active:not(:disabled) { opacity: var(--opacita-premuto); }
