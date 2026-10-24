@@ -25,6 +25,8 @@
 
 /* pannello obiettivo sopra la colonna, quando la finestra non ha posto per metterlo accanto (si apre dal bottone dell'intestazione) */
 .contenuto { position: relative; }
+/* clic fuori dal pannello sopra: copre la colonna, trasparente (nessun velo nel disegno) */
+.velo-pannello { position: absolute; inset: 0; z-index: var(--livello-barra-sovrapposta); }
 .pannello.sopra {
   position: absolute; z-index: var(--livello-barra-sovrapposta); top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); max-height: calc(100% - var(--spazio-4)); border-radius: var(--raggio-xl);
   background: var(--colore-fondo-cornice); /* opaco: tra una scheda e l'altra non si legge la chat sotto (#713) */

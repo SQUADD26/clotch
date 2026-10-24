@@ -33,7 +33,7 @@ function Corpo() {
   const sessioni = useElenco().dati?.sessioni;
   const titolo = (n.vista === "sessione" ? sessioni?.find((s) => s.id === n.sessione)?.titolo : NOME_VISTA[n.vista]) || "clotch";
   useEffect(() => { document.title = titolo; }, [titolo]);
-  const corpo = useRef<HTMLDivElement>(null), colonna = useRef<HTMLDivElement>(null), contenuto = useRef<HTMLDivElement>(null), sopra = useRef<HTMLElement>(null);
+  const corpo = useRef<HTMLDivElement>(null), colonna = useRef<HTMLDivElement>(null), contenuto = useRef<HTMLDivElement>(null), sopra = useRef<HTMLElement>(null), sopraPannello = useRef<HTMLElement>(null);
   const impostazioni = n.vista === "impostazioni";
   const finestra = useLarghezza(corpo), larghezzaColonna = useLarghezza(colonna, !impostazioni);
   const largo = useLarghezza(contenuto, !impostazioni) >= LARGHEZZA_PANNELLO;
@@ -46,7 +46,10 @@ function Corpo() {
   const barraSopra = n.sovrapposta && n.barraAperta;
   const chiudiBarra = useFuocoDentro(barraSopra, sopra, ".barra-titolo [aria-label='Barra laterale']", n.alternaBarra);
   useEscChiude(barraSopra, chiudiBarra);
-  useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
+  // il pannello sopra fa come la barra sopra (#903): clic fuori e Esc lo chiudono, il fuoco entra e torna al bottone, la colonna dietro è inerte
+  const pannelloSopra = !largo && n.pannelloAperto && !impostazioni && !VISTE_CLOTCH_AI.includes(n.vista) && n.vista !== "nuova-sessione";
+  const chiudiPannello = useFuocoDentro(pannelloSopra, sopraPannello, ".pezzo-chat [aria-label='Mostra pannello']", n.chiudiPannello);
+  useEscChiude(pannelloSopra, chiudiPannello);
   // sotto il velo della barra sopra niente fuoco né clic (#941)
   const attributi = { ref: corpo, inert: useCoperto() || barraSopra || undefined, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
   if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni" centro><Impostazioni /></Pezzo></div>;
@@ -61,11 +64,12 @@ function Corpo() {
           <div className="superficie">
             {clotchAi ? <Pezzo nome="clotch-ai"><IntestazioneClotchAi /></Pezzo> : <Pezzo nome="chat"><IntestazioneChat /></Pezzo>}
             <div className="contenuto" ref={contenuto}>
-              <div className="colonna" ref={colonna}>
+              <div className="colonna" ref={colonna} inert={pannelloSopra || undefined}>
                 {clotchAi ? <Pezzo nome="clotch-ai" centro><ClotchAi /></Pezzo> : <Pezzo nome="chat" centro><Chat /></Pezzo>}
                 <AreaAvvisi />
               </div>
-              {!clotchAi && n.vista !== "nuova-sessione" && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello" centro><Pannello /></Pezzo></aside>}
+              {pannelloSopra && <div className="velo-pannello" onClick={chiudiPannello} />}
+              {!clotchAi && n.vista !== "nuova-sessione" && n.pannelloAperto && <aside ref={sopraPannello} className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello" centro><Pannello /></Pezzo></aside>}
             </div>
           </div>
         </main>
