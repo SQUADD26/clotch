@@ -130,6 +130,19 @@ app.whenReady().then(async () => {
     await attendi(() => finto.comandi.filter((c) => c[0] === 'ripristina').length === 3);
   });
 
+  await check('LIVELLI: a finestra stretta il primo Esc chiude solo il menu, il secondo la barra (#759)', async () => {
+    win.setSize(480, 768);
+    await wait(() => !document.querySelector('.barra-laterale'));
+    await run(() => document.querySelector('button[aria-label="Barra laterale"]').click());
+    await wait(() => !!document.querySelector('.barra-laterale.sopra'));
+    await apri('Sessione b');
+    await tasto('Escape');
+    await wait(() => !document.querySelector('[role=menu]'));
+    assert.ok(await run(() => !!document.querySelector('.barra-laterale.sopra')), 'la barra è rimasta');
+    await tasto('Escape');
+    await wait(() => !document.querySelector('.barra-laterale'));
+  });
+
   console.log(`MENU_SESSIONE_RIEPILOGO ok=${risultati.filter(Boolean).length} fail=${risultati.filter((x) => !x).length}`);
   app.exit(risultati.every(Boolean) ? 0 : 1);
 }).catch((e) => { console.error(e); app.exit(1); });
