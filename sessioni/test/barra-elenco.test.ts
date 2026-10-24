@@ -47,6 +47,16 @@ test("testi: pillola, giorni, opzioni, piede", () => {
   assert.equal(dettaglioProfilo([]), "Nessuna sessione");
 });
 
+test("filtri: Errore, date vere in ordine, plurale (#636 #737 #736)", () => {
+  const errore = { ...elenco[2], id: "5", situazione: { adesso: "errore" as const, strumento: null, inCoda: 0, segni: [] } };
+  const b = componi([...elenco, errore], { ...vista, filtri: [{ proprieta: "stato", valori: ["errore"] }] }, {}, ORA);
+  assert.deepEqual(b.gruppi.flatMap((g) => g.sessioni.map((x) => x.id)), ["5"]);
+  assert.equal(b.titolo, "1 sessione");
+  const vecchia = { ...elenco[3], id: "6", ultimaAttivita: new Date(2025, 9, 12).getTime() };
+  assert.deepEqual(opzioni([...elenco, vecchia], "attivita", ORA).map((o) => o.voce), ["Oggi", "12 ott", "12 ott"]);
+  assert.equal(componi(elenco, { ...vista, filtri: [{ proprieta: "stato", valori: ["errore"] }] }, {}, ORA).totale, 0);
+});
+
 test("etichetta di una cartella e cartelle da nascondere (#460)", () => {
   assert.deepEqual(conEtichetta({}, "clotch", "Notch"), { clotch: "Notch" });
   assert.deepEqual(conEtichetta({ clotch: "Notch", altra: "X" }, "clotch", "  ".trim()), { altra: "X" }); // vuota = torna il nome della cartella

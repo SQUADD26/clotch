@@ -101,8 +101,9 @@ export default function Barra() {
   }, []);
   useEffect(() => registraAzione("cerca", () => setRicerca((x) => !x)), []);
 
-  const chiudi = () => setAperto(null);
   const filtri = vista.filtri;
+  // una pillola rimasta senza valori non filtra niente: alla chiusura del menu si toglie da sola
+  const chiudi = () => { setAperto(null); if (filtri.some((f) => !f.valori.length)) setVista({ ...vista, filtri: filtri.filter((f) => f.valori.length) }); };
   const aggiungiFiltro = (prop: Proprieta) => {
     const i = filtri.findIndex((f) => f.proprieta === prop);
     // subito, senza transizione: il filtro è vuoto (le righe non cambiano) e il suo menu delle opzioni lo legge ora
@@ -114,6 +115,7 @@ export default function Barra() {
     const r = el.getBoundingClientRect();
     setSuggerimento({ testo, a: { x: r.left - numero("spazio-2"), y: r.bottom + numero("spazio-3") } });
   };
+  const attivi = filtri.filter((f) => f.valori.length).length;
   const sessione = (id: string) => sessioni.find((s) => s.id === id);
 
   const [figlieChiuse, setFiglieChiuse] = useState<Set<string>>(new Set());
@@ -137,11 +139,12 @@ export default function Barra() {
     <>
       <RigaComando icona="piu" etichetta="Nuova sessione" lato="⌘N" scelta={pagina === "nuova-sessione"} onClick={() => n.apri("nuova-sessione")} />
       <RigaComando icona="cerca" etichetta="Cerca sessioni" lato={tastoCerca ?? undefined} onClick={() => setRicerca(true)} />
-      <RigaComando icona="filtra" etichetta="Filtra" lato={filtri.length ? `${filtri.length} attivi` : undefined}
+      <RigaComando icona="filtra" etichetta="Filtra" lato={attivi ? `${attivi} ${attivi === 1 ? "attivo" : "attivi"}` : undefined}
         onClick={(e) => setAperto({ tipo: "raggruppa", a: accanto(e.currentTarget, -numero("spazio-1")) })} />
       <RigheClotchAi r={registro} adesso={adesso} pagina={pagina} />
       <Pillole filtri={filtri} onApri={(i, e) => setAperto({ tipo: "opzioni", i, a: accanto(e.currentTarget, numero("spazio-1")) })}
-        onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })} />
+        onAggiungi={(e) => setAperto({ tipo: "proprieta", a: accanto(e.currentTarget, numero("spazio-1")) })}
+        onTogli={(i) => setVista({ ...vista, filtri: filtri.filter((_, k) => k !== i) })} />
 
       {elenco.stato === "carica" && !elenco.dati ? (
         <div className="elenco" aria-busy="true">
@@ -168,6 +171,12 @@ export default function Barra() {
           ))}
           {!!barra.fissate.length && <><TitoloSezione>Fissate</TitoloSezione>{righe(barra.fissate, true)}</>}
           {!!sessioni.length && <TitoloSezione>{barra.titolo}</TitoloSezione>}
+          {!!sessioni.length && !barra.totale && (
+            <div className="nessun-risultato">
+              <span className="t-sm secondario">Nessuna sessione</span>
+              <Bottone tipo="secondario" onClick={() => setVista({ ...vista, filtri: [] })}>Rimuovi filtri</Bottone>
+            </div>
+          )}
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
               <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
