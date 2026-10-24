@@ -81,7 +81,7 @@ app.whenReady().then(() => {
   const menuApp = collegaMenuApp(scenaProva ? () => ({}) : impostazioniApp, (parte) => scenaProva || invia("sessioni:impostazioni", impostaImpostazioni(filePreferenze, parte)));
   menuApp();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
-  if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
+  if (scenaProva) { collegaScena(ipcMain, scenaProva, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d))); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
   // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
   let apri!: () => void;

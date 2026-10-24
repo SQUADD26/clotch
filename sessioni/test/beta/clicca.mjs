@@ -8,6 +8,7 @@ import { join, resolve } from 'node:path';
 import { AREE, avvia, configura, preparaScena, schermo } from './avvio.mjs';
 import { difettiInterruzione, difettiMovimento, riassunto } from './movimento.mjs';
 import { tokenPagina } from './token.mjs';
+import { provaMenu } from './menu.mjs';
 
 const arg = {};
 for (let i = 2; i < process.argv.length; i++) {
@@ -123,6 +124,8 @@ async function giro(app, area, cfg, console_) {
     } else if (tipo !== 'campo') { await pagina.keyboard.press('Escape'); await pausa(250); } // la chiusura con Esc finisce la sua transizione prima della firma
     if (await pagina.evaluate((r) => window.__bt.firma(r), radice) !== firma0) { await pulito(); nomi = await segna(); }
   }
+  // menu della riga e della cartella, col clic destro e col «⋯», e ogni loro voce attivata (#1081)
+  await pulito(); await provaMenu({ pagina, radice, reg, foto, difetti, segna, pulito, firma0 });
   // Tab su tutta l'area: anello del fuoco presente e con la forma del pezzo
   await pulito(); await segna(); await pagina.evaluate(() => document.activeElement?.blur());
   for (let k = 0; k < Math.min(60, n + 5); k++) {
