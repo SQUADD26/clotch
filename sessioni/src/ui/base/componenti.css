@@ -1,7 +1,7 @@
 /* figma: 101-12461 — componenti comuni dal frame «Varianti»: icona, bottoni, pillola, campo, segno stato */
 .icona { width: var(--misura-icona); height: var(--misura-icona); flex: none; display: block; }
-/* rotazione dello spinner: «spin» lineare del vault (ui-ux-animazioni.md § Catalogo @keyframes), 1.2s tra le durate osservate */
-.gira { animation: gira 1.2s linear infinite; }
+/* rotazione dello spinner: «spin» lineare del vault (ui-ux-animazioni.md § Catalogo @keyframes) */
+.gira { animation: gira var(--tempo-giro) var(--curva-lineare) infinite; }
 @keyframes gira { to { transform: rotate(360deg); } }
 
 /* Bottone: Tipo=Primario | Secondario */

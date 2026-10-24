@@ -2,6 +2,7 @@
 // Si parte da ?vista=&sessione=&sezione= (nuova finestra, scene di prova di scena.ts).
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "./dati";
+import { conTransizione } from "./movimento";
 
 /** «nuova-sessione» (148:51982): la vista per aprire una sessione, montata dalla chat, senza pannello. */
 export type Vista = "sessione" | "nuova-sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
@@ -63,24 +64,24 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
       return { passi: [...passi.slice(0, i), passo], i };
     return { passi: [...passi.slice(0, i + 1), passo], i: i + 1 };
   }), []);
-  const apri = useCallback((...a: Parameters<typeof vai>) => { setBarraStretta(false); vai(...a); }, [vai]); // scelta una sessione la barra sopra si richiude
+  const apri = useCallback((...a: Parameters<typeof vai>) => conTransizione(() => { setBarraStretta(false); vai(...a); }), [vai]); // scelta una sessione la barra sopra si richiude
   const pannelloAperto = misura.largo ? pannelloLargo : pannelloStretto;
   const nav = useMemo<Navigazione>(() => ({
     ...storia.passi[storia.i],
     apri,
-    indietro: () => setStoria((s) => ({ ...s, i: Math.max(0, s.i - 1) })),
-    avanti: () => setStoria((s) => ({ ...s, i: Math.min(s.passi.length - 1, s.i + 1) })),
+    indietro: () => conTransizione(() => setStoria((s) => ({ ...s, i: Math.max(0, s.i - 1) }))),
+    avanti: () => conTransizione(() => setStoria((s) => ({ ...s, i: Math.min(s.passi.length - 1, s.i + 1) }))),
     puoIndietro: storia.i > 0,
     puoAvanti: storia.i < storia.passi.length - 1,
     barraAperta: misura.stretta ? barraStretta : barraLarga,
-    alternaBarra: () => (misura.stretta ? setBarraStretta : setBarraLarga)((x) => !x),
+    alternaBarra: () => conTransizione(() => (misura.stretta ? setBarraStretta : setBarraLarga)((x) => !x)),
     pannelloAperto, pannelloInfo,
-    alternaPannello: () => {
+    alternaPannello: () => conTransizione(() => {
       const imposta = misura.largo ? setPannelloLargo : setPannelloStretto;
       if (!pannelloAperto) imposta(true);
       else if (!pannelloInfo) setInfo(true);
       else { setInfo(false); imposta(false); }
-    },
+    }),
     sovrapposta: misura.stretta, adatta,
   }), [storia, apri, misura, adatta, barraLarga, barraStretta, pannelloAperto, pannelloInfo]);
   return <Contesto.Provider value={nav}>{children}</Contesto.Provider>;
