@@ -231,6 +231,8 @@ export interface CasellaApi {
   copiaImmagine(da: DaImmagine): Promise<boolean>;
   /** Finestra «Salva con nome»; false se annullata. */
   salvaImmagine(da: DaImmagine, nome: string): Promise<boolean>;
+  /** Mostra il file nel Finder. */
+  mostra(percorso: string): Promise<void>;
   /** Le skill dell'account della sessione, in ordine alfabetico. */
   skill(account: string): Promise<SkillNome[]>;
 }

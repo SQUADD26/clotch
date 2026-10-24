@@ -230,7 +230,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       )}
       <div className={`casella ${stato}${modifica || menu === "permessi" || menuAggiungi ? " fuoco" : ""}${errore ? " errore" : ""}${trascina && !disabilitata ? " trascina" : ""}`}>
         {(allegati.length > 0 || (trascina && !disabilitata)) && (
-          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => setAllegati((x) => x.filter((y) => y !== a))} />
+          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => { setAllegati((x) => x.filter((y) => y !== a)); if (allegati.length === 1) area.current?.focus(); }} />
         )}
         <div className="area-testo">
           <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}
