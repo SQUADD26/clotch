@@ -34,7 +34,7 @@ H.avvia('requisiti-c', async () => {
     assert.equal(await run(() => document.querySelector('.risposta .azioni button[aria-label="Leggi con clotch AI"]').disabled), false);
     H.azzera(); await clicca('.risposta .azioni button', 'Leggi con clotch AI'); await attesa(50);
     assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
-    H.azzera(); await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Leggi con clotch AI'); await attesa(50);
+    H.azzera(); await clicca('.risposta .azioni button', 'Altro'); await clicca('.pezzo-chat .menu .voce', 'Leggi con clotch AI'); await attesa(50);
     assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
   });
 
@@ -55,7 +55,7 @@ H.avvia('requisiti-c', async () => {
 
   await req('H3', async () => {
     await imp('101-17363');
-    const apri = async () => { await run(() => document.querySelector('.scelta [aria-label^="Silenzio"]').click()); await clicca('.scelta .menu .voce', 'Scegli le ore…'); await wait(() => !!document.querySelector('[role=dialog] input')); };
+    const apri = async () => { await run(() => document.querySelector('.scelta [aria-label^="Silenzio"]').click()); await clicca('.menu-scelta .voce', 'Scegli le ore…'); await wait(() => !!document.querySelector('[role=dialog] input')); };
     await apri(); assert.match(await run(() => document.querySelector('[role=dialog]').innerText), /Scegli le ore[\s\S]*22:00–8:00/);
     await scrivi('[role=dialog] input', 'domani'); await clicca('[role=dialog] button', 'Salva'); await wait(() => /Ore non valide/.test(document.querySelector('.area-avvisi')?.innerText || ''));
     assert.deepEqual(imposta(), [], 'ore non valide: niente salvato');

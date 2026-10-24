@@ -44,8 +44,9 @@ export function Menu({ voci, onChiudi, testata, ancora, lato, fine, scarto, clas
       b[e.key === "Home" ? 0 : e.key === "End" ? b.length - 1 : (i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
       e.preventDefault();
     };
-    el.addEventListener("keydown", tasto);
-    return () => el.removeEventListener("keydown", tasto);
+    const scatola = el.parentElement ?? el; // anche i tasti mandati al menu intero
+    scatola.addEventListener("keydown", tasto);
+    return () => scatola.removeEventListener("keydown", tasto);
   }, [el]);
   return (
     <Sovrapposto ancora={ancora} lato={lato} fine={fine} scarto={scarto} className={classe ? `menu ${classe}` : "menu"} role="menu" onChiudi={onChiudi}>
