@@ -14,6 +14,9 @@ ICON_CATALOG="Assets.xcassets"
 ICON_SOURCE="AppIcon.icon"
 ICON_INFO_PLIST=".build/AppIcon.partial.plist"
 
+SESSIONI_APP=".build/electron/pacchetto/clotch-darwin-arm64/clotch.app"  # sessioni/scripts/pacchetto.mjs output
+SESSIONI_ENTITLEMENTS="ClotchSessioni.entitlements"
+
 NOTARIZE=false
 
 usage() {
@@ -48,6 +51,22 @@ notarize() {
     out=$(xcrun notarytool submit "$1" --keychain-profile "clotch" --wait 2>&1) || true
     echo "$out" >&2
     grep -q "status: Accepted" <<<"$out"
+}
+
+# Signs the inner Electron app inside-out, one piece at a time, BEFORE the outer Clotch.app seals it. No `--deep`:
+# it would stamp one set of options on every helper in an order of its choosing, and Electron's helpers and framework
+# would no longer verify. Mach-O files first (dylibs, ShipIt, bin/dettatura), then frameworks and helper apps from the deepest up, then the app.
+sign_sessioni() {
+    local app="$1" f
+    while IFS= read -r f; do
+        if [[ "$(file -b "$f")" == *Mach-O* ]]; then
+            codesign --force --options runtime --entitlements "$SESSIONI_ENTITLEMENTS" --sign "$SIGN_ID" "$f"
+        fi
+    done < <(find "$app" -type f)
+    while IFS= read -r f; do
+        codesign --force --options runtime --entitlements "$SESSIONI_ENTITLEMENTS" --sign "$SIGN_ID" "$f"
+    done < <(find "$app" -mindepth 1 -type d \( -name "*.framework" -o -name "*.app" \) | awk -F/ '{print NF" "$0}' | sort -rn | cut -d' ' -f2-)
+    codesign --force --options runtime --entitlements "$SESSIONI_ENTITLEMENTS" --sign "$SIGN_ID" "$app"
 }
 
 build_mac() {
@@ -113,6 +132,13 @@ build_mac() {
         fi
     done
 
+    # One package (#465): the Electron app «clotch» (sessioni/) rides inside Clotch.app. Contents/Helpers/ is where codesign
+    # and Gatekeeper expect nested code (Resources/ is for data, and unsigned code there fails the seal). The notch never starts it by itself.
+    echo "Building the sessioni app (Electron)..."
+    [ -d sessioni/node_modules ] || (cd sessioni && npm ci)
+    (cd sessioni && npm run pacchetto:mac)
+    ditto "$SESSIONI_APP" "$APP_BUNDLE/Contents/Helpers/clotch.app"
+
     ENTITLEMENTS="Clotch.entitlements"
 
     # Use SIGN_ID env var, or auto-detect: prefer "Developer ID Application" for distribution,
@@ -148,6 +174,7 @@ build_mac() {
     codesign --force --options runtime --sign "$SIGN_ID" "$SPARKLE_FW"
 
     codesign --force --options runtime --sign "$SIGN_ID" "$APP_BUNDLE/Contents/Helpers/clotch-bridge"
+    sign_sessioni "$APP_BUNDLE/Contents/Helpers/clotch.app"
     codesign --force --options runtime --sign "$SIGN_ID" --entitlements "$ENTITLEMENTS" "$APP_BUNDLE"
 
     if [ "$NOTARIZE" = true ] && [[ "$SIGN_NAME" == *"Developer ID"* ]]; then
