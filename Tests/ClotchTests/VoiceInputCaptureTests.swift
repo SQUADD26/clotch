@@ -64,7 +64,7 @@ final class VoiceInputCaptureTests: XCTestCase {
     /// #304: no microphone is opened while Roberto does not dictate (AirPods would switch to call mode): not at launch,
     /// not after an utterance, not after an audio change. Only the press makes one.
     func testNoMicrophoneOutsideDictation() async throws {
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         var made = 0
         c.makeCapture = { made += 1; return VoiceCapture(microphone: $0) }
         c.prewarm()
@@ -88,7 +88,7 @@ final class VoiceInputCaptureTests: XCTestCase {
     func testTriplePressListensOnce() async throws {
         var made: [RecordedVoice] = []
         let buffers = try Self.recorded("Ciao")
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.makeCapture = { _ in let v = RecordedVoice(buffers); made.append(v); return v }
         c.press(); c.press(); c.press()
         try await waitFor { c.phase == .listening }
@@ -112,7 +112,7 @@ final class VoiceInputCaptureTests: XCTestCase {
 
     /// Roberto's 22/10: «press in listening», then the local engine's end never came back and the bar stayed on «Trascrivo» for 100 s.
     func testLocalEngineThatNeverFinishesEndsWithAnError() async throws {
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.makeCapture = { _ in RecordedVoice([]) }
         c.finishLocal = { try? await Task.sleep(nanoseconds: 600_000_000_000); return "" }
         c.localWait = 1
@@ -138,7 +138,7 @@ final class VoiceInputCaptureTests: XCTestCase {
 
     /// An error folds by itself after 8 s (the microphone's too: same line; not tried here, its watcher would open the real microphone).
     func testErrorFoldsByItself() async throws {
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.show(failure: .network)
         XCTAssertEqual(c.phase, .failure(.network))
         try await waitFor(seconds: 9) { c.phase == .idle }
@@ -155,7 +155,7 @@ final class VoiceInputCaptureTests: XCTestCase {
 
     private func controller(_ buffers: [AVAudioPCMBuffer]) -> (VoiceInputController, RecordedVoice) {
         let voice = RecordedVoice(buffers)
-        let c = VoiceInputController(files: VoiceFiles(home: home))
+        let c = VoiceInputController.trusting(files: VoiceFiles(home: home))
         c.makeCapture = { _ in voice }
         return (c, voice)
     }

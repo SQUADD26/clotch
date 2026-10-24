@@ -11,7 +11,9 @@
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
-.avviso-comparsa .messaggio { flex: 1; min-width: 0; }
+.avviso-comparsa .messaggio { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+/* al massimo tre righe, il testo intero sta nel suggerimento (#1067) */
+.avviso-comparsa .messaggio { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 /* passaggio dei bottoni dell'avviso (azione e X, 158:82181): il bottone sporge del suo padding, l'avviso non cambia misura */
 .avviso-comparsa button { padding: var(--spazio-0-5); margin: calc(-1 * var(--spazio-0-5)); border-radius: var(--raggio-xs); }
 .avviso-comparsa button.medio { padding: var(--spazio-0-5) var(--spazio-1-5); margin: calc(-1 * var(--spazio-0-5)) calc(-1 * var(--spazio-1-5)); } /* azione, 158:82181 */

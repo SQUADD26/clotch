@@ -22,6 +22,10 @@ extension VoiceInputController {
             ("6b-errore-crediti", fail(.credits)),
             ("6c-errore-rete", fail(.network)),
             ("6d-errore-locale", fail(.local)),
+            ("8-non-e-la-voce", fail(.notYou)),
+            ("8b-voce-incerta", fail(.unsure)),
+            ("8c-manca-impronta", fail(.noVoiceprint)),
+            ("8d-mac-bloccato", fail(.locked)),
         ]
     }
 }

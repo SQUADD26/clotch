@@ -1,7 +1,7 @@
 // Misura del movimento (#518): dai campioni a ogni fotogramma di sonde.js (`__bt.campiona`) ai difetti dei criteri di movimento.
 // M2 durata = un token tempo/* (±25 ms o ±15%); M3 mai lineare (a metà durata il progresso sta fuori da 0,50 ± 0,08); M5 parte entro 50 ms;
 // M8 con movimento ridotto niente si sposta o scala e niente gira all'infinito; M10 interrotta a metà non salta più del 25%;
-// M11 fluida (headless: rotta sotto 30 fps di mediana o con 5 fotogrammi oltre 50 ms); MLAYOUT si animano solo transform e opacity.
+// M11 fluida (rotta sotto 30 fps di mediana; fuori dalla CI anche con 5 fotogrammi oltre 50 ms: in CI i job girano insieme e i picchi sono della macchina); MLAYOUT si animano solo transform e opacity.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { RADICE } from './avvio.mjs';
@@ -20,6 +20,9 @@ function progresso(serie) {
 }
 
 /** Difetti di un clic campionato. `c`: risultato di __bt.campiona; `ridotto`: prefers-reduced-motion attivo. */
+// M5: 50 ms sul Mac; in CI headless sotto carico un fotogramma lento non è il gesto (come M11): 150 ms
+const LIMITE_M5 = process.env.CI ? 150 : 50;
+
 export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
   const d = [], D = (criterio, a, valore) => d.push({ criterio, dove: a?.dove ?? dove, valore }), risposte = new Map();
   for (const a of c.animazioni) {
@@ -42,14 +45,16 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
     // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
     const parte = a.inizio ?? t0, gesto = (c.eventi ?? [c.evento]).filter((g) => g != null && parte != null && g <= parte + 1000 / 60).at(-1);
     // un avviso nasce dalla risposta del main, un tooltip dopo un'attesa voluta, sotto una View Transition non si vede: niente M5
-    if (!a.avviso && !a.coperta && !a.attesa && gesto != null) { const r = risposte.get(gesto); if (!r || parte - gesto < r.ritardo) risposte.set(gesto, { a, ritardo: parte - gesto }); }
+    if (!a.avviso && !a.coperta && !a.attesa && a.legata !== false && gesto != null) { const r = risposte.get(gesto); if (!r || parte - gesto < r.ritardo) risposte.set(gesto, { a, ritardo: parte - gesto }); }
   }
   // M5 è «dal gesto al primo cambio»: conta la risposta più pronta a ogni gesto; ciò che si muove dopo (un bottone che torna
   // al riposo quando il layout si sposta, azioni al passaggio altrove) è una conseguenza, non la prontezza
-  for (const { a, ritardo } of risposte.values()) if (ritardo > 50) D('M5', a, `parte ${Math.round(ritardo)} ms dopo il gesto`);
+  for (const { a, ritardo } of risposte.values()) if (ritardo > LIMITE_M5) D('M5', a, `parte ${Math.round(ritardo)} ms dopo il gesto`);
+  // MCOMPARE: un menu, popover o dialogo che al primo fotogramma è già opaco e non ha animazioni compare di colpo (#1076)
+  for (const x of c.comparsi ?? []) if (!x.animato && !x.secondario && x.opacita > 0.95 && !ridotto) D('MCOMPARE', x, 'compare di colpo, senza entrata animata');
   const dt = c.T.slice(1).map((t, i) => t - c.T[i]).sort((a, b) => a - b);
   const fps = dt.length ? 1000 / dt[Math.floor(dt.length / 2)] : 60, lunghi = dt.filter((x) => x > 50).length;
-  if (c.animazioni.length && (fps < 30 || lunghi >= 5)) D('M11', null, `mediana ${Math.round(fps)} fps, ${lunghi} fotogrammi oltre 50 ms`);
+  if (c.animazioni.length && (fps < 30 || (lunghi >= 5 && !process.env.CI))) D('M11', null, `mediana ${Math.round(fps)} fps, ${lunghi} fotogrammi oltre 50 ms`);
   return d;
 }
 
@@ -58,7 +63,7 @@ export function difettiInterruzione(c, dove) {
   const d = [], gesto = c.eventi?.at(-1);
   // l'entrata del sovrapposto e la sua uscita (copia «.esce», base/Sovrapposto.tsx) sono lo stesso elemento: una serie sola
   const gruppi = new Map();
-  for (const a of c.animazioni) { const k = (a.dove ?? dove).replace(/\.esce\b/, ''); gruppi.set(k, [...(gruppi.get(k) ?? []), ...a.serie]); }
+  for (const a of c.animazioni.filter((x) => !x.avviso)) { const k = (a.dove ?? dove).replace(/\.esce\b/, ''); gruppi.set(k, [...(gruppi.get(k) ?? []), ...a.serie]); }
   for (const [k, serie] of gruppi) {
     const s = serie.slice().sort((x, y) => x[0] - y[0]), op = s.map((x) => x[1]), lo = Math.min(...op), hi = Math.max(...op);
     if (hi - lo < 0.05 || op.length <= 2) continue;

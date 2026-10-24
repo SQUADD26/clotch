@@ -15,7 +15,9 @@
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .popover-attivita .testata { display: flex; align-items: center; justify-content: space-between; color: var(--colore-testo-primario); }
-.popover-attivita .testata button { display: flex; }
+/* la X ha area da 24 px e gli stati del bottone icona, ma la testata resta alta come nel disegno (101-30232): il margine negativo ridà la differenza (#1071) */
+.popover-attivita .chiudi-popover { width: var(--misura-bottone-piccolo); height: var(--misura-bottone-piccolo); margin: calc(-1 * var(--spazio-1)); border-radius: var(--raggio-xs); } /* «Bottone chiudi» 167:98366 */
+.popover-attivita .riga-stato { display: flex; align-items: center; gap: var(--spazio-2); }
 /* «Con sessioni» 163:83903: righe «Riga attesa» 163:83900; sei righe, la settima scorre */
 .popover-attivita.con-sessioni { width: var(--misura-menu-modello); }
 .popover-attivita .elenco {

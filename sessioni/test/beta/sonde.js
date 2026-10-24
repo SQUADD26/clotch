@@ -2,6 +2,8 @@
 // campionatore delle animazioni a ogni fotogramma. Ogni difetto: { criterio, dove, valore }. Criteri in sessioni/test/beta/LEGGIMI.md.
 (() => {
   const SOPRA = '[role=menu],[role=listbox],[role=dialog],[role=tooltip],.menu,.tooltip,.popover-attivita,.dialogo,[popover]:popover-open,dialog[open],.avviso-comparsa';
+  // tooltip e avvisi: nascono dal passaggio o dalla risposta del main, non si chiudono con Esc e non misurano la prontezza del gesto
+  const SECONDARI = '.avviso-comparsa,[role=status],[role=tooltip],.tooltip,.suggerimento';
   const CLIC = 'button,a,[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[role=tab],[role=option],input,textarea,[tabindex]:not([tabindex="-1"])';
   const LAYOUT = /^(width|height|top|left|right|bottom|inset|margin|padding|max-|min-|flex-basis|grid-template)/;
   const num = (s) => (String(s).match(/-?[\d.]+/g) || []).map(Number);
@@ -12,6 +14,8 @@
     const t = testo(e);
     return e.tagName.toLowerCase() + c + (t ? ` «${t}»` : '');
   };
+  // aspetto calcolato di un pezzo e dei suoi figli: seconda prova degli stati, accanto ai pixel della foto
+  const aspetto = (x) => [x, ...x.querySelectorAll('*')].map((y) => { const z = getComputedStyle(y); return z.color + z.backgroundColor + z.opacity + z.borderTopColor + z.boxShadow + z.transform + z.fill + z.stroke; }).join();
   const vis = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0; };
   const proprio = (e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
   const dentro = (a, b, m = 1) => a.left >= b.left - m && a.top >= b.top - m && a.right <= b.right + m && a.bottom <= b.bottom + m;
@@ -55,7 +59,6 @@
       let scorre = false;
       for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (/auto|scroll|hidden|clip/.test(getComputedStyle(p).overflow)) { scorre = true; break; }
       if (e.disabled || e.getAttribute('aria-disabled') === 'true') {
-        const aspetto = (x) => [x, ...x.querySelectorAll('*')].map((y) => { const z = getComputedStyle(y); return z.color + z.backgroundColor + z.opacity + z.borderTopColor + z.fill + z.stroke; }).join();
         const gemello = [...document.querySelectorAll(`${radice} :is(${CLIC})`)].find((o) => o !== e && o.className === e.className && !o.disabled && o.getAttribute('aria-disabled') !== 'true' && vis(o));
         if (gemello && aspetto(gemello) === aspetto(e)) una('STATO', e, `disabilitato uguale all'attivo ${sel(gemello)}`);
       }
@@ -100,9 +103,11 @@
   // Campiona ogni fotogramma per `ms`: tempi dei fotogrammi e, per ogni animazione che parte, proprietà, durata e curva dichiarate, opacità e trasformazione misurate.
   function campiona(ms) {
     // ogni gesto conta: un'animazione parte dal premuto (pointerdown), un'altra dal clic (pointerup), un'altra dal tasto
-    let ev = null; const eventi = [], l = () => { const t = performance.now(); ev ??= t; eventi.push(t); }, GESTI = ['pointerdown', 'pointerup', 'keydown'];
+    let ev = null; const eventi = [], bersagli = [], l = (x) => { const t = performance.now(); ev ??= t; eventi.push(t); if (x.target instanceof Element) bersagli.push(x.target); }, GESTI = ['pointerdown', 'pointerup', 'keydown', 'bt-gesto']; // bt-gesto: stato forzato dal cliccatore (CSS.forcePseudoState), che arriva dopo il pointerdown
     GESTI.forEach((g) => addEventListener(g, l, { capture: true }));
     const prima = new Set(document.getAnimations()), anim = new Map(), T = [];
+    // sovrapposti che compaiono durante il campione: al primo fotogramma, opaci e senza nessuna animazione = comparsi di colpo
+    const giaSopra = new Set(sopra()), comparsi = new Map();
     return new Promise((ok) => {
       const t0 = performance.now(), passo = (t) => {
         T.push(t);
@@ -112,7 +117,9 @@
           if (!anim.has(a)) {
             const k = a.effect.getKeyframes(), tim = a.effect.getComputedTiming();
             anim.set(a, { dove: sel(a.effect.target) + (a.effect.pseudoElement ?? ''), nome: a.transitionProperty ?? a.animationName ?? '?', proprieta: [...new Set(k.flatMap((f) => Object.keys(f).filter((x) => !['offset', 'computedOffset', 'easing', 'composite'].includes(x))))],
-              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest('.avviso-comparsa,[role=status]') || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
+              // legata al gesto: sul pezzo toccato (o dentro/attorno) o in un sovrapposto; il resto è una conseguenza, non la prontezza (#1076)
+              legata: bersagli.some((g) => g.contains(a.effect.target) || a.effect.target.contains(g)) || !!a.effect.target.closest?.(SOPRA),
+              durata: dichiarata(a) ?? tim.duration, avviso: !!a.effect.target.closest(SECONDARI) || /\(avviso-\d+\)/.test(a.effect.pseudoElement ?? ''),
               // nasce sotto una View Transition (base/movimento.ts): il DOM vero è coperto dalle foto, la sua partenza non si vede
               coperta: !a.effect.pseudoElement && document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition')),
               // il tooltip compare dopo un'attesa voluta (base/Suggerimento.tsx), non subito al gesto
@@ -124,16 +131,21 @@
           if (e.inizio == null && a.startTime != null) e.inizio = a.startTime;
           e.serie.push([t, +s.opacity, m[4] ?? 0, m[5] ?? 0, Math.hypot(m[0], m[1])]);
         }
+        for (const e of sopra()) if (!giaSopra.has(e) && !comparsi.has(e)) {
+          let su = false; for (let q = e.parentElement; q && !su; q = q.parentElement) su = q.getAnimations().length > 0; // entra con il contenitore
+          const mosso = su || e.getAnimations({ subtree: true }).length || document.getAnimations().some((x) => x.effect?.pseudoElement?.startsWith('::view-transition'));
+          comparsi.set(e, { dove: sel(e), opacita: +getComputedStyle(e).opacity, animato: !!mosso, secondario: e.matches(SECONDARI) });
+        }
         if (t - t0 < ms) return requestAnimationFrame(passo);
         GESTI.forEach((g) => removeEventListener(g, l, { capture: true }));
-        ok({ evento: ev, eventi, T, animazioni: [...anim.values()] });
+        ok({ evento: ev, eventi, T, animazioni: [...anim.values()], comparsi: [...comparsi.values()] });
       };
       requestAnimationFrame(passo);
     });
   }
 
   window.__bt = {
-    SOPRA, LAYOUT: LAYOUT.source, sel, statiche, anello, campiona,
+    SOPRA, LAYOUT: LAYOUT.source, sel, aspetto, statiche, anello, campiona,
     cliccabili(radice) {
       const visti = new Set();
       return [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).filter((e) => !e.closest(SOPRA)).filter((e) => {
@@ -142,7 +154,8 @@
     },
     sopra,
     // menu, popover e dialoghi aperti da un gesto: tooltip e avvisi a comparsa non si chiudono con Esc né prendono il fuoco
-    menuAperti: () => sopra().filter((e) => !e.matches('.avviso-comparsa,[role=tooltip],.tooltip,[role=status]')).length,
+    menuAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).length,
+    nomiAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).map(sel).join(', '),
     firma: (radice) => [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).length + '|' + sopra().length + '|' + location.search,
   };
 })();

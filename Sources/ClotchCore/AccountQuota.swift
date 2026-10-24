@@ -38,11 +38,18 @@ public struct AccountQuota: Identifiable, Equatable, Sendable {
 
 public enum AccountQuotas {
     /// The dashboard's JSON, merged and in Macchine's "next to use" order; nil when unreadable.
-    public static func parse(_ data: Data, now: Date) -> [AccountQuota]? {
+    /// `registered`: emails of the accounts set up on this Mac (`RegisteredAccounts`); one the dashboard
+    /// does not list yet shows with no reading, so a new account is there before its first turn (#1109).
+    public static func parse(_ data: Data, now: Date, registered: [String] = []) -> [AccountQuota]? {
         guard let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
               let rows = root["rows"] as? [[String: Any]] else { return nil }
         let real = (root["real"] as? [[String: Any]] ?? []).compactMap(row)
-        return order(merge(real: real, rows: rows.compactMap(row), now: now), now: now)
+        var list = merge(real: real, rows: rows.compactMap(row), now: now)
+        let known = Set(list.map(\.email))
+        list += registered.filter { !known.contains($0) }.map {
+            AccountQuota(email: $0, at: nil, fiveHour: QuotaWindow(used: nil, reset: nil), sevenDay: QuotaWindow(used: nil, reset: nil))
+        }
+        return order(list, now: now)
     }
 
     static func row(_ d: [String: Any]) -> AccountQuota? {
@@ -84,6 +91,15 @@ public enum AccountQuotas {
             let (ka, kb) = (key(a), key(b))
             return ka != kb ? ka < kb : a.email < b.email
         }
+    }
+}
+
+public enum RegisteredAccounts {
+    /// `~/.config/claude-accounts/accounts.json` (the engine's registry, written by `setup`): each account's email, sorted by name.
+    public static func emails(from data: Data) -> [String] {
+        guard let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let accounts = root["accounts"] as? [String: [String: Any]] else { return [] }
+        return accounts.keys.sorted().compactMap { (accounts[$0]?["email"] as? String).flatMap { $0.isEmpty ? nil : $0 } }
     }
 }
 

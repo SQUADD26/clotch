@@ -104,6 +104,7 @@ struct VoiceSettingsPage: View {
             if let note { Text(note).font(.settings(T.notchTesto11)).foregroundStyle(T.testoSecondario).frame(maxWidth: .infinity, alignment: .trailing) }
         }
         .onAppear(perform: load)
+        .onReceive(NotificationCenter.default.publisher(for: .voiceIdChanged)) { _ in load() }
         .onDisappear { if !configBroken { saveConfig() } }
         .task {
             // The open ones, newest first; the chosen one stays listed even when archived.

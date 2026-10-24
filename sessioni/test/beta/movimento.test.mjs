@@ -62,3 +62,7 @@ test('M10: un\'uscita che accelera dopo il gesto non è un salto', () => {
 test('interruzione: un salto sotto un decimo di opacità non si vede (#998)', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 1, 0, 0, 1], [16, 0.95, 0, 0, 1], [32, 0.89, 0, 0, 1], [48, 0.95, 0, 0, 1]] })] })), []));
 
 test('interruzione con salto', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 0, 0, 0, 1], [16, 0.2, 0, 0, 1], [32, 1, 0, 0, 1]] })] })), ['M10']));
+test('sovrapposto che compare di colpo (#1076)', () => {
+  const c = { T: [0, 16, 32], animazioni: [], comparsi: [{ dove: 'div.menu', opacita: 1, animato: false, secondario: false }, { dove: 'div.tooltip', opacita: 1, animato: false, secondario: true }, { dove: 'div.dialogo', opacita: 0, animato: true, secondario: false }] };
+  assert.deepEqual(difettiMovimento(c).map((d) => d.criterio + ' ' + d.dove), ['MCOMPARE div.menu']);
+});

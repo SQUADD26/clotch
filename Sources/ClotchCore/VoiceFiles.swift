@@ -42,6 +42,8 @@ public struct VoiceFiles {
         jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
         overseerURL = home.appendingPathComponent(".claude/overseer/attuale.json")
+        fridaySettingsURL = URL(fileURLWithPath: ProcessInfo.processInfo.environment["FRIDAY_DIR"] ?? home.appendingPathComponent(".claude/friday").path)
+            .appendingPathComponent("impostazioni.json")
     }
 
     /// Orders for the Friday (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
@@ -50,6 +52,8 @@ public struct VoiceFiles {
     /// The engine's outcome of each order, `<same file name>` inside (#262, see `VoiceRoute.delivery`).
     public var outcomesURL: URL { inboxURL.appendingPathComponent(".esiti") }
     public let overseerURL: URL
+    /// Friday's settings (claude-config `friday_impostazioni.py`, `friday comando imposta`): written only by the engine.
+    public let fridaySettingsURL: URL
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }
 
@@ -89,6 +93,14 @@ public struct VoiceFiles {
     /// config.json as an object; missing = empty. Throws when it is there but not a JSON object, so a save never
     /// overwrites a file Roberto must fix by hand (same rule as `voce velocita`).
     public func readConfig() throws -> [String: Any] {
+        var config = try savedConfig()
+        // #1119: «usa questo microfono» goes through Friday; its choice (a name or a uid, "" = the system's) wins over config.json.
+        if let data = try? Data(contentsOf: fridaySettingsURL),
+           let mic = ((try? JSONSerialization.jsonObject(with: data)) as? [String: Any])?["microfono"] as? String { config["ingresso_microfono"] = mic }
+        return config
+    }
+
+    private func savedConfig() throws -> [String: Any] {
         guard let data = try? Data(contentsOf: configURL) else { return [:] }
         guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CocoaError(.fileReadCorruptFile)
@@ -98,7 +110,7 @@ public struct VoiceFiles {
 
     /// Writes only these keys; every other field of config.json stays as it was.
     public func updateConfig(_ changes: [String: Any]) throws {
-        let merged = try readConfig().merging(changes) { _, new in new }
+        let merged = try savedConfig().merging(changes) { _, new in new }
         try write(JSONSerialization.data(withJSONObject: merged, options: [.prettyPrinted, .sortedKeys]), to: configURL)
     }
 

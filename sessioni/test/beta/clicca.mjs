@@ -8,6 +8,7 @@ import { join, resolve } from 'node:path';
 import { AREE, avvia, configura, preparaScena, schermo } from './avvio.mjs';
 import { difettiInterruzione, difettiMovimento, riassunto } from './movimento.mjs';
 import { tokenPagina } from './token.mjs';
+import { provaMenu } from './menu.mjs';
 
 const arg = {};
 for (let i = 2; i < process.argv.length; i++) {
@@ -68,25 +69,26 @@ async function giro(app, area, cfg, console_) {
     // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
     const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true', null, { timeout: 2000 }).catch(() => false);
     await loc.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {}); // il riquadro si misura dopo lo scorrimento: sotto il bordo la foto era vuota e HOVER/PREMUTO risultavano uguali al riposo
-    const box = await loc.boundingBox(), cont = await loc.locator('xpath=ancestor::*[contains(concat(" ",@class," ")," casella ")][1]').boundingBox().catch(() => null), clip = box && ((b) => ({ x: Math.max(0, b.x - 4), y: Math.max(0, b.y - 4), width: b.width + 8, height: b.height + 8 }))(cont ?? box); // un campo dentro la casella: il bordo che cambia al passaggio è del contenitore
+    const box = await loc.boundingBox(), cont = await loc.evaluate((e) => { const r = e.parentElement?.closest('.casella')?.getBoundingClientRect(); return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : null; }, null, { timeout: 2000 }).catch(() => null), /* senza casella il locator aspettava 30 s per elemento */ clip = box && ((b) => ({ x: Math.max(0, b.x - 4), y: Math.max(0, b.y - 4), width: b.width + 8, height: b.height + 8 }))(cont ?? box); // un campo dentro la casella: il bordo che cambia al passaggio è del contenitore
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
     const manca = (criterio, valore) => reg.difetti.push({ criterio, dove: el.dove, valore, quando: el.dove, foto: el.foto.at(-1) });
     await pagina.mouse.move(0, 0, { steps: 2 }); await pausa(200);
-    const riposo = await pezzo();
+    const asp = () => loc.evaluate((e) => window.__bt.aspetto(e)).catch(() => null);
+    const riposo = await pezzo(), aRiposo = await asp();
     const ok = await loc.hover({ timeout: 2000 }).then(() => true, (e) => (el.errore = e.message.split('\n')[0], false));
     // un solo spostamento non sempre accende :hover (visto sulle righe della barra, #522): si entra con qualche passo, come una mano vera
     if (ok && box) await pagina.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 1, { steps: 4 });
     if (ok) await forza(i, ['hover']);
     await pausa(250);
-    const sopra = await pezzo(); el.foto.push(await foto(`el${i}-hover`));
-    if (ok && !disab && uguali(riposo, sopra)) manca('HOVER', 'nessun cambio visivo col mouse sopra');
+    const sopra = await pezzo(), aSopra = await asp(); el.foto.push(await foto(`el${i}-hover`));
+    if (ok && !disab && tipo !== 'campo' && uguali(riposo, sopra) && aRiposo === aSopra) manca('HOVER', 'nessun cambio visivo col mouse sopra');
     const campione = VIDEO ? pagina.evaluate(() => window.__bt.campiona(700)).catch(() => null) : null;
     if (ok) {
-      await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pausa(80);
-      const premuto = await pezzo(); el.foto.push(await foto(`el${i}-premuto`));
+      await pagina.mouse.down(); await forza(i, ['hover', 'active']); await pagina.evaluate(() => dispatchEvent(new Event('bt-gesto'))).catch(() => {}); await pausa(80);
+      const premuto = await pezzo(), aPremuto = await asp(); el.foto.push(await foto(`el${i}-premuto`));
       await pagina.mouse.up(); await forza(i, []);
-      if (!disab && tipo !== 'campo' && uguali(sopra, premuto)) manca('PREMUTO', 'nessuno stato premuto');
+      if (!disab && tipo !== 'campo' && !cfg.ridotto && uguali(sopra, premuto) && aSopra === aPremuto) manca('PREMUTO', 'nessuno stato premuto');
     }
     if (campione) { const c = await campione; if (c) { reg.movimenti.push({ dove: el.dove, animazioni: riassunto(c) }); difettiMovimento(c, { ridotto: cfg.ridotto, dove: el.dove }).forEach((d) => reg.difetti.push({ ...d, quando: el.dove })); } }
     else await pausa(350);
@@ -97,21 +99,34 @@ async function giro(app, area, cfg, console_) {
     // tastiera: in un campo si scrive e si svuota; un sovrapposto aperto si percorre con le frecce, Esc lo chiude e il fuoco torna a chi l'ha aperto
     if (tipo === 'campo') { await loc.fill('Collaudo beta').catch(() => {}); el.foto.push(await foto(`el${i}-scritto`)); await loc.fill('').catch(() => {}); }
     else if (tipo === 'tab') { await pagina.keyboard.press('ArrowRight'); el.foto.push(await foto(`el${i}-freccia`)); }
-    const aperti = await pagina.evaluate(() => window.__bt.menuAperti());
+    const aperti = await pagina.evaluate(() => window.__bt.menuAperti()), nomiAperti = aperti ? await pagina.evaluate(() => window.__bt.nomiAperti()) : '';
     if (aperti && tipo !== 'campo') {
       await pagina.keyboard.press('ArrowDown'); el.foto.push(await foto(`el${i}-freccia`));
       await pagina.keyboard.press('Escape'); await pausa(450);
       const dopo = await pagina.evaluate(() => ({ aperti: window.__bt.menuAperti(), fuoco: document.activeElement?.getAttribute('data-bt') }));
       if (dopo.aperti) reg.difetti.push({ criterio: 'ESC', dove: el.dove, valore: 'Esc non chiude il sovrapposto', quando: el.dove, foto: el.foto.at(-1) });
-      else if (dopo.fuoco !== String(i)) reg.difetti.push({ criterio: 'FUOCO-RITORNO', dove: el.dove, valore: 'dopo Esc il fuoco non torna al pulsante che ha aperto', quando: el.dove, foto: el.foto.at(-1) });
+      else if (dopo.fuoco !== String(i)) reg.difetti.push({ criterio: 'FUOCO-RITORNO', dove: el.dove, valore: `dopo Esc il fuoco non torna al pulsante che ha aperto ${nomiAperti}`, quando: el.dove, foto: el.foto.at(-1) });
       if (VIDEO && !dopo.aperti) { // M10: si riapre e si interrompe a metà con Esc
         const c = pagina.evaluate(() => window.__bt.campiona(500)).catch(() => null);
         await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(60); await pagina.keyboard.press('Escape');
         const r = await c; if (r) difettiInterruzione(r, el.dove).forEach((d) => reg.difetti.push({ ...d, quando: el.dove }));
       }
+      if (!dopo.aperti) { // menu dentro il menu (#691): si riapre e si apre ogni voce che apre un altro menu, con foto e sonde
+        await pausa(300); await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(300);
+        const sotto = await pagina.evaluate(() => [...document.querySelectorAll(`:is(${window.__bt.SOPRA}) :is([aria-haspopup]:not([aria-haspopup="false"]),[aria-expanded])`)].map((e, k) => (e.setAttribute('data-bt2', k), window.__bt.sel(e))));
+        for (let k = 0; k < Math.min(sotto.length, 4); k++) {
+          if (!(await pagina.locator(`[data-bt2="${k}"]`).first().click({ timeout: 1000 }).then(() => true, () => false))) continue;
+          await pausa(350); const f = await foto(`el${i}-sotto${k}`); el.foto.push(f);
+          await difetti(`${el.dove} › ${sotto[k]}`, f);
+        }
+        for (let k = 0; k < 3 && (await pagina.evaluate(() => window.__bt.menuAperti())); k++) { await pagina.keyboard.press('Escape'); await pausa(250); }
+      }
     } else if (tipo !== 'campo') { await pagina.keyboard.press('Escape'); await pausa(250); } // la chiusura con Esc finisce la sua transizione prima della firma
     if (await pagina.evaluate((r) => window.__bt.firma(r), radice) !== firma0) { await pulito(); nomi = await segna(); }
   }
+  // menu della riga e della cartella, col clic destro e col «⋯», e ogni loro voce attivata (#1081)
+  // nella matrice solo scuro con dati (min, grande, con e senza testo lungo): il tema chiaro e il movimento ridotto hanno gli stessi menu, e ogni voce costa ~2 s
+  if (!arg.matrice || (cfg.tema === 'scuro' && cfg.dati === 'con' && !cfg.ridotto)) { await pulito(); await provaMenu({ pagina, radice, reg, foto, difetti, segna, pulito, firma0 }); }
   // Tab su tutta l'area: anello del fuoco presente e con la forma del pezzo
   await pulito(); await segna(); await pagina.evaluate(() => document.activeElement?.blur());
   for (let k = 0; k < Math.min(60, n + 5); k++) {

@@ -145,7 +145,7 @@ final class PilotVoicePathsTests: XCTestCase {
         else if FileManager.default.fileExists(atPath: real.path) { try FileManager.default.createSymbolicLink(at: keyURL, withDestinationURL: real) }
         let files = VoiceFiles(home: home)
         let voice = RecordedVoice(try text.map { try VoiceInputCaptureTests.recorded($0) } ?? [])
-        let c = VoiceInputController(files: files)
+        let c = VoiceInputController.trusting(files: files)
         c.makeCapture = { _ in voice }
         let d = Diary()
         d.bag = [c.$phase.removeDuplicates().sink { d.add("fase \(Self.describe($0))") },

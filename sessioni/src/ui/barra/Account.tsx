@@ -122,7 +122,7 @@ export function AccountBarra({ conta, chat, registro, daDisco, nuova, prova, onA
           <div className="linea" />
           {cor.motore === false
             ? <div className="motivo"><Icona nome="info" /><span className="t-sm secondario">Sessione avviata fuori da clotch: l’account non si cambia.</span></div>
-            : <button type="button" role="menuitem" className={`voce ${menu === 2 ? "scelta" : ""}`} onClick={() => setMenu(menu === 2 ? 1 : 2)}>
+            : <button type="button" role="menuitem" aria-haspopup="menu" aria-expanded={menu === 2} className={`voce ${menu === 2 ? "scelta" : ""}`} onClick={() => setMenu(menu === 2 ? 1 : 2)}>
                 <Icona nome="persona" /><span className="t-sm testo">Cambia account</span><Icona nome="destra" />
               </button>}
         </Sovrapposto>

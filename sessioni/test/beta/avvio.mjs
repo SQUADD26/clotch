@@ -50,6 +50,17 @@ function lungo(x, chiave) {
   return x;
 }
 
+// Barra ricca (#1081): 21 righe in 5 cartelle, con e senza cartella e idApp, una fissata, una non letta, tutti gli stati;
+// così i menu della riga e della cartella hanno ogni voce accesa e «Archivia tutte» ha più righe.
+const PROGETTI = ['clotch', 'squadd-v2', 'dentalspace', 'claude-config', 'rise'], STATI = ['lavora', 'aspetta', 'ferma', 'finita'];
+function ricca(s) {
+  const base = s.elenco.sessioni[0], ora = Date.now();
+  const altre = Array.from({ length: 20 }, (_, k) => ({ ...base, id: `b${k + 1}`, titolo: `Sessione di prova ${k + 1} di ${PROGETTI[k % 5]}`, progetto: PROGETTI[k % 5],
+    cartella: k % 3 ? `/Users/roberto/progetti/${PROGETTI[k % 5]}` : '', idApp: k % 2 ? `local_prova${k}` : null, stato: STATI[k % 4], ultimaAttivita: ora - (k + 1) * 7 * 60_000, obiettivo: null, situazione: null }));
+  return { ...s, elenco: { ...s.elenco, sessioni: [{ ...base, cartella: base.cartella || '/Users/roberto/progetti/clotch', idApp: base.idApp ?? 'local_prova0' }, ...altre] },
+    preferenze: { ...s.preferenze, b1: { ...s.preferenze?.b1, fissa: true }, b2: { ...s.preferenze?.b2, nonLetta: true } } };
+}
+
 /** Scrive la scena del giro: `dati` con|senza, `lungo` sì/no. Senza dati = elenco e messaggi vuoti, nessuna sessione aperta. */
 export function preparaScena(area, { dati, lungo: lun }, cartella) {
   let s = JSON.parse(readFileSync(join(RADICE, 'design/scene', `${AREE[area].scena}.json`), 'utf8'));
@@ -57,13 +68,14 @@ export function preparaScena(area, { dati, lungo: lun }, cartella) {
     s = { ...s, messaggi: {}, info: {}, archiviate: [], elenco: s.elenco && { ...s.elenco, sessioni: [] } };
     if (s.navigazione) s.navigazione = { vista: s.navigazione.vista };
   }
-  // quote d'uso finte (#691): senza, il piede account non ha menu da cliccare. Il primo è l'account della sessione aperta, relativi ad adesso
+  // quote d'uso finte (#691): normale, finita (100 %), quasi finita (95 %); senza, il piede account non ha menu da cliccare. Il primo è l'account della sessione aperta, relativi ad adesso
   const h = 3_600_000, ora = Date.now();
   s.uso ??= [
     { account: 'accountmanager', email: 'accountmanager@example.com', usato: 31, ripartenza: '', cinque: 42, cinqueFine: ora + 2 * h, sette: 31, setteFine: ora + 70 * h },
     { account: 'secondo', email: 'secondo@example.com', usato: 100, ripartenza: '', cinque: 100, cinqueFine: ora + h, sette: 64, setteFine: ora + 40 * h },
-    { account: 'terzo', email: 'terzo@example.com', usato: 12, ripartenza: '', cinque: 8, cinqueFine: ora + 4 * h, sette: 12, setteFine: ora + 100 * h },
+    { account: 'terzo', email: 'terzo@example.com', usato: 95, ripartenza: '', cinque: 71, cinqueFine: ora + 4 * h, sette: 95, setteFine: ora + 100 * h }, // quasi finito: giallo
   ];
+  if (area === 'barra' && dati !== 'senza' && s.elenco?.sessioni?.length) s = ricca(s);
   if (lun) { const nav = s.navigazione; s = lungo(s); s.navigazione = nav; }
   const f = join(cartella, `scena-${area}-${dati}${lun ? '-lungo' : ''}.json`);
   writeFileSync(f, JSON.stringify(s));

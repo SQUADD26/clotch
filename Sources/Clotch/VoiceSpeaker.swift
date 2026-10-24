@@ -29,6 +29,32 @@ final class VoiceSpeaker {
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.interrompi-voce"), object: nil, queue: .main) { _ in
             MainActor.assumeIsolated { VoiceInputController.shared.hush() }
         }
+        // clotch#1130: Friday's «usa questa voce»; only Clotch writes `voice_id`. The last request wins.
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.squadd.clotch.imposta-voce"), object: nil, queue: .main) { note in
+            let asked = note.userInfo?["voce"] as? String ?? ""
+            MainActor.assumeIsolated { self.setVoiceTask?.cancel(); self.setVoiceTask = Task { await self.setVoice(asked) } }
+        }
+    }
+
+    private var setVoiceTask: Task<Void, Never>?
+
+    private func setVoice(_ asked: String) async {
+        let key = files.key
+        let outcome = await VoiceSet.apply(asked, files: files) {
+            guard let key, let (data, _) = try? await URLSession.shared.data(for: { var r = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/voices")!); r.setValue(key, forHTTPHeaderField: "xi-api-key"); return r }()),
+                  let list = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["voices"] as? [[String: Any]] else { return [] }
+            return list.compactMap { v in (v["name"] as? String).flatMap { n in (v["voice_id"] as? String).map { (n, $0) } } }
+        }
+        if Task.isCancelled { return }
+        switch outcome {
+        case .set(let id): Self.log.notice("set-voice: voice_id now \(id, privacy: .public)")
+            NotificationCenter.default.post(name: .voiceIdChanged, object: nil)
+        case .rejected(let why):
+            Self.log.error("set-voice: rejected: \(why, privacy: .public)")
+            let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+            p.arguments = ["-e", "on run argv\ndisplay notification (item 1 of argv) with title \"Clotch\"\nend run", why]
+            try? p.run()
+        }
     }
 
     /// At quit: the hook and the mod see no live Clotch and stand aside. The hook entries stay, doing nothing.
@@ -260,3 +286,5 @@ final class VoiceSpeaker {
         return h.readDataToEndOfFile()
     }
 }
+
+extension Notification.Name { static let voiceIdChanged = Notification.Name("clotch.voiceIdChanged") }
