@@ -20,6 +20,9 @@ export const AREE = {
   chat: { scena: '101-8036', radice: '.pezzo-chat' },
   nuova: { scena: '148-51982', radice: '.nuova-sessione' },
   friday: { scena: '101-16432', radice: '.pezzo-clotch-ai' },
+  // le due viste di clotch AI che `friday` (parte dalla chat) non apre mai (#1043)
+  decisioni: { scena: '101-39266', radice: '.pezzo-clotch-ai' },
+  regole: { scena: '101-40473', radice: '.pezzo-clotch-ai' },
   impostazioni: { scena: '101-17193', radice: '.pezzo-impostazioni' },
   cornice: { scena: '101-8036', radice: '.barra-titolo' },
   // stati di «Nuova sessione» e delle macchine SSH (#524): una scena per stato, `extra` = fuori da `tutto` per non moltiplicare i giri della CI

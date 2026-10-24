@@ -89,6 +89,16 @@ test("vista: decisioni per giorno, annullate e non annullabili; regole per dove 
   assert.deepEqual(regolePerDove(r).map((x) => [x.dove, x.regole.map((y) => y.testo)]), [["claude-config", ["Più nuova", "Parla chiaro"]], ["/r/clotch", ["Figma prima"]]]);
 });
 
+test("vista: decisioni solo vecchie o senza ora hanno un titolo di gruppo vero (#1054)", () => {
+  const r = registro([
+    [3 * 24 * 60, MOTORE, "decisione", { cosa: "Vecchia", perche: "", inverso: null, chat: "", genere: "altro" }],
+    [10, MOTORE, "decisione", { cosa: "Senza ora", perche: "", inverso: null, chat: "", genere: "altro" }],
+  ]);
+  r.decisioni.find((d) => d.cosa === "Senza ora")!.t = null;
+  const titoli = decisioniPerGiorno(r, ORA).map((g) => g.titolo);
+  assert.ok(titoli.includes("Senza data") && !titoli.includes("") && !titoli.includes("Oggi"), titoli.join("|"));
+});
+
 test("vista: il registro passa il ponte del preload senza Map e torna uguale", () => {
   const r = registro([
     [5, "m1", "inizio", { titolo: "T", madre: "", progetto: "clotch" }],
