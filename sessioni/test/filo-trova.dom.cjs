@@ -116,10 +116,12 @@ app.whenReady().then(async () => {
     await ready('.menu');
     assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce .etichetta')].map((e) => e.textContent)), ['Copia', 'Seleziona tutto', 'Chiedi a clotch AI']);
     // la prima voce è evidenziata all'apertura (101:28635), anche dopo un clic vero del mouse: fondo di passaggio come quando si apre da tastiera
+    await pausa(300); // il fondo delle voci passa in 75 ms (movimento.css, #586): si legge a transizione finita
     const colori = await run(() => { const [prima, seconda] = document.querySelectorAll('.menu .voce'); return { attiva: document.activeElement === prima,      prima: getComputedStyle(prima).backgroundColor, seconda: getComputedStyle(seconda).backgroundColor }; });
     assert.equal(colori.attiva, true, 'il fuoco è sulla prima voce');
     assert.notEqual(colori.prima, colori.seconda, 'la prima voce ha il fondo di passaggio, la seconda no');
-    await run(() => document.querySelectorAll('.menu .voce')[1].dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))); // il passaggio sposta l'evidenza
+    await run(() => document.querySelectorAll('.menu .voce')[1].dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))); // il movimento del mouse sposta l'evidenza (#818)
+    await pausa(300);
     assert.deepEqual(await run(() => [...document.querySelectorAll('.menu .voce')].map((v) => getComputedStyle(v).backgroundColor !== 'rgba(0, 0, 0, 0)')), [false, true, false]);
     await win.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: false });
     win.webContents.debugger.detach();
@@ -147,8 +149,10 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => document.querySelector('.nuovi-messaggi').textContent), '1 nuovo messaggio');
     assert.equal(await run(() => document.querySelector('.filo').scrollTop), 0);
     await run(() => document.querySelector('.nuovi-messaggi').click());
-    await pausa(1200);
-    assert.equal(await run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); }), true);
+    // la corsa liscia dura più di un secondo: si aspetta la fine (al massimo 5 s) invece di un tempo fisso
+    const infondo = () => run(() => { const f = document.querySelector('.filo'); return f.scrollHeight - f.clientHeight - f.scrollTop < 30 && !document.querySelector('.nuovi-messaggi'); });
+    for (let k = 0; k < 50 && !(await infondo()); k++) await pausa(100);
+    assert.equal(await infondo(), true);
     console.log('FILO_NUOVI_MESSAGGI_OK');
 
     // «Chiedi a clotch AI»: la citazione arriva nella casella di clotch AI e la vista si apre, senza inviare

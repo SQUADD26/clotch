@@ -72,6 +72,14 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const letto = useRef({ righe: righeDel(voci), prima: voci[0]?.chiave }); // com'era il filo all'ultimo disegno
   const [nuovi, setNuovi] = useState(0); // righe arrivate in fondo mentre si leggeva più su
   const inFondoDel = () => daFondo.current <= numero("spazio-6");
+  // La corsa liscia ha il bersaglio fissato alla partenza, ma le righe fuori vista (content-visibility) prendono la misura vera solo quando
+  // entrano: a fine corsa, se manca ancora un tratto, si completa (altrimenti la pillola resta e il filo si ferma a metà).
+  const vaiInFondo = () => {
+    const f = filo.current;
+    if (!f) return;
+    f.addEventListener("scrollend", () => { if (f.scrollHeight - f.clientHeight - f.scrollTop < f.clientHeight) f.scrollTo({ top: f.scrollHeight }); }, { once: true });
+    f.scrollTo({ top: f.scrollHeight, behavior: "smooth" });
+  };
   const richiesta = (g: string) => c?.richieste.find((r) => r.genere === g) ?? null;
   // permessi aperti: non stanno nella trascrizione, solo nel registro di clotch AI
   const permessi = c?.richieste.filter((r) => r.genere === "permesso") ?? [];
@@ -148,7 +156,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
     </div>
     {indice >= 0 && <Visore galleria={galleria} indice={indice} onIndice={(i) => setAperta(galleria[i].chiave)} onChiudi={() => setAperta(null)} />}
     {mostra > 0 && (
-      <button type="button" className="nuovi-messaggi" onClick={() => filo.current?.scrollTo({ top: filo.current.scrollHeight, behavior: "smooth" })}>
+      <button type="button" className="nuovi-messaggi" onClick={vaiInFondo}>
         <Icona nome="giu-freccia" colore="primaria" />
         <span>{quanti(mostra, "nuovo messaggio", "nuovi messaggi")}</span>
       </button>

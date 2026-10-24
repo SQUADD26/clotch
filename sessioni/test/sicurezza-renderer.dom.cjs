@@ -87,7 +87,9 @@ app.whenReady().then(async () => {
     // tutto aperto: gruppi, righe e ragionamento del filo compatto (#876) si aprono a strati
     for (let i = 0; i < 3; i++) { await run(() => document.querySelectorAll('.filo button[aria-expanded="false"]').forEach((b) => b.click())); await attesa(300); }
     const r = await run(() => { const f = document.querySelector('.filo');
-      return { vivi: f.querySelectorAll('img,iframe,object,embed,a,script,style,form,video,audio,[onerror],[onload],[onclick],[href]').length,
+      // gli indirizzi web scritti da Roberto diventano link (#787): solo https/http, scritti per intero, in una scheda a parte e senza opener; ogni altro elemento è ostile
+      const sicuro = (e) => e.tagName === 'A' && /^https?:\/\//.test(e.getAttribute('href')) && e.getAttribute('href') === e.textContent && e.target === '_blank' && /noopener/.test(e.rel) && e.attributes.length <= 4;
+      return { vivi: [...f.querySelectorAll('img,iframe,object,embed,a,script,style,form,video,audio,[onerror],[onload],[onclick],[href]')].filter((e) => !sicuro(e)).length,
         testo: f.innerText, pwn: !!window.__pwn, corpo: getComputedStyle(document.body).display }; });
     assert.equal(r.vivi, 0, 'nessun elemento nato dal testo');
     assert.equal(r.pwn, false); assert.notEqual(r.corpo, 'none');
