@@ -171,6 +171,7 @@ export type Token =
   | "raggio-2xl"
   | "raggio-casella"
   | "raggio-pieno"
+  | "raggio-sovrapposto"
   | "testo-dimensione-xs"
   | "testo-dimensione-sm"
   | "testo-dimensione-base"
@@ -250,13 +251,39 @@ export type Token =
   | "misura-menu-avvio-largo"
   | "misura-campo-porta"
   | "misura-riga-menu-larga"
+  | "misura-margine-finestra"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
   | "tempo-breve"
   | "tempo-normale"
   | "tempo-lento"
-  | "opacita-spento";
+  | "tempo-entrata"
+  | "tempo-uscita"
+  | "tempo-pressione"
+  | "tempo-spostamento"
+  | "tempo-avviso"
+  | "opacita-spento"
+  | "curva-entrata-x1"
+  | "curva-entrata-y1"
+  | "curva-entrata-x2"
+  | "curva-entrata-y2"
+  | "curva-uscita-x1"
+  | "curva-uscita-y1"
+  | "curva-uscita-x2"
+  | "curva-uscita-y2"
+  | "curva-spostamento-x1"
+  | "curva-spostamento-y1"
+  | "curva-spostamento-x2"
+  | "curva-spostamento-y2"
+  | "scala-premuto"
+  | "livello-base"
+  | "livello-barra-sovrapposta"
+  | "livello-velo"
+  | "livello-dialogo"
+  | "livello-menu"
+  | "livello-avviso"
+  | "livello-tooltip";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -434,6 +461,7 @@ export const valori: Record<Token, string> = {
   "raggio-2xl": "20px",
   "raggio-casella": "22px",
   "raggio-pieno": "9999px",
+  "raggio-sovrapposto": "15px",
   "testo-dimensione-xs": "12px",
   "testo-dimensione-sm": "13px",
   "testo-dimensione-base": "14px",
@@ -513,13 +541,39 @@ export const valori: Record<Token, string> = {
   "misura-menu-avvio-largo": "320px",
   "misura-campo-porta": "96",
   "misura-riga-menu-larga": "312",
+  "misura-margine-finestra": "8px",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
   "tempo-breve": "150ms",
   "tempo-normale": "200ms",
   "tempo-lento": "400ms",
+  "tempo-entrata": "150ms",
+  "tempo-uscita": "100ms",
+  "tempo-pressione": "75ms",
+  "tempo-spostamento": "200ms",
+  "tempo-avviso": "4000ms",
   "opacita-spento": "0.4",
+  "curva-entrata-x1": "0.215",
+  "curva-entrata-y1": "0.61",
+  "curva-entrata-x2": "0.355",
+  "curva-entrata-y2": "1",
+  "curva-uscita-x1": "0.55",
+  "curva-uscita-y1": "0.055",
+  "curva-uscita-x2": "0.675",
+  "curva-uscita-y2": "0.19",
+  "curva-spostamento-x1": "0.645",
+  "curva-spostamento-y1": "0.045",
+  "curva-spostamento-x2": "0.355",
+  "curva-spostamento-y2": "1",
+  "scala-premuto": "0.98",
+  "livello-base": "0",
+  "livello-barra-sovrapposta": "20",
+  "livello-velo": "30",
+  "livello-dialogo": "40",
+  "livello-menu": "50",
+  "livello-avviso": "60",
+  "livello-tooltip": "70",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);
