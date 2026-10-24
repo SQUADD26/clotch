@@ -2,7 +2,7 @@
 // Le scelte per chat stanno nelle preferenze della sessione (`modello` è l'id CLI che #457 manda al motore).
 import type { EsitoComando } from "../../comandi";
 import type { ModelloMotore, PreferenzeSessione, Sessione } from "../../tipi";
-import { MODELLI } from "./testi";
+import { èModello, MODELLI } from "./testi";
 
 /** «claude-opus-5-5» -> «Opus 5.5», come «chip modello» e l'intestazione. */
 export const nomeModello = (m: string | null) => {
@@ -41,17 +41,17 @@ export const permessiDi = (s: Pick<Sessione, "permessi">, p?: PreferenzeSessione
 
 /** Id CLI del modello in uso: la scelta fatta qui, altrimenti quello della sessione (può avere un suffisso di data). */
 export const modelloDi = (s: Pick<Sessione, "modello">, p?: PreferenzeSessione) =>
-  p?.modello ?? MODELLI_MENU.find((m) => s.modello?.startsWith(m.id))?.id ?? s.modello;
+  p?.modello ?? MODELLI_MENU.find((m) => èModello(s.modello, m.id))?.id ?? s.modello;
 
 /** Etichetta dell'id CLI (`claude-opus-5-5` → «Opus 5.5»); undefined se non è un modello noto. */
-export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => id?.startsWith(m.id))?.etichetta;
+export const etichettaModello = (id: string | null | undefined) => MODELLI_MENU.find((m) => èModello(id, m.id))?.etichetta;
 
 /** Impegno in uso: la scelta fatta qui, altrimenti il predefinito del modello (`base`, di solito «medio»). */
 export const sforzoDi = (p?: PreferenzeSessione, base = SFORZO_BASE) =>
   SFORZI.find((x) => x.id === p?.sforzo) ?? SFORZI.find((x) => x.id === base) ?? SFORZI.find((x) => x.id === SFORZO_BASE)!;
 
 /** La voce del catalogo del motore per un id CLI (può avere un suffisso di data). */
-export const voceCatalogo = (cat: ModelloMotore[] | null, id: string | null | undefined) => (id ? cat?.find((m) => id.startsWith(m.modello)) : undefined);
+export const voceCatalogo = (cat: ModelloMotore[] | null, id: string | null | undefined) => (id ? cat?.find((m) => èModello(id, m.modello)) : undefined);
 /** Modelli del menu: i quattro principali e, dal catalogo, gli altri («Altri modelli»). Senza catalogo la lista fissa di sopra. */
 export function modelliMenu(cat: ModelloMotore[] | null): { principali: Scelta[]; altri: Scelta[] } {
   if (!cat) return { principali: MODELLI_MENU, altri: [] };

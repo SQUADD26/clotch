@@ -40,25 +40,25 @@ function fileTrovati(uscita: string) {
 
 export interface Frase { verbo: string; oggetto: string }
 
-/** Verbo in grigio e oggetto in chiaro, come «Riga strumento» (163:84207): «Legge» «Ricerca.tsx». */
+/** Verbo in grigio e oggetto in chiaro, come «Riga strumento» (163:84207): «Leggo» «Ricerca.tsx». In prima persona singolare: è la sessione che parla (#876). */
 export function frase(nome: string, ingresso: unknown, uscita = ""): Frase {
   const file = base(campo(ingresso, "file_path") || campo(ingresso, "path") || campo(ingresso, "notebook_path"));
   const f = (verbo: string, oggetto = "") => ({ verbo, oggetto });
   switch (nome) {
-    case "Bash": return f(campo(ingresso, "description") || "Esegue un comando");
-    case "Read": return f("Legge", file);
+    case "Bash": { const d = campo(ingresso, "description"); return d ? f("Eseguo un comando:", d) : f("Eseguo un comando"); } // la descrizione la scrive il modello: si cita, non si coniuga
+    case "Read": return f("Leggo", file);
     case "Grep": case "Glob": {
       const cosa = `"${campo(ingresso, "pattern")}"`, n = uscita ? fileTrovati(uscita) : 0;
-      if (nome === "Glob") return f("Trova", n ? `${n} file ${cosa}` : `file ${cosa}`);
-      return f("Cerca", n ? `${cosa} in ${n} file` : campo(ingresso, "path") ? `${cosa} in ${file}` : cosa);
+      if (nome === "Glob") return f("Trovo", n ? `${n} file ${cosa}` : `file ${cosa}`);
+      return f("Cerco", n ? `${cosa} in ${n} file` : campo(ingresso, "path") ? `${cosa} in ${file}` : cosa);
     }
-    case "Write": return f("Scrive", file);
-    case "Edit": case "MultiEdit": case "NotebookEdit": return f("Modifica", file);
-    case "WebSearch": return f("Cerca sul web", `"${campo(ingresso, "query")}"`);
-    case "WebFetch": { const u = campo(ingresso, "url"); try { return f("Apre", new URL(u).hostname.replace(/^www\./, "")); } catch { return f("Apre una pagina web"); } }
+    case "Write": return f("Scrivo", file);
+    case "Edit": case "MultiEdit": case "NotebookEdit": return f("Modifico", file);
+    case "WebSearch": return f("Cerco sul web", `"${campo(ingresso, "query")}"`);
+    case "WebFetch": { const u = campo(ingresso, "url"); try { return f("Apro", new URL(u).hostname.replace(/^www\./, "")); } catch { return f("Apro una pagina web"); } }
     default:
-      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return f("Fotografa", campo(ingresso, "name") || "lo schermo");
-      return f("Usa", nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " "));
+      if (/screenshot/i.test(nome) || campo(ingresso, "action") === "screenshot") return f("Fotografo", campo(ingresso, "name") || "lo schermo");
+      return f("Uso", nome.replace(/^mcp__[^_]+__/, "").replace(/_/g, " "));
   }
 }
 

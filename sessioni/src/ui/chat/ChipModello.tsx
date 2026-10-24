@@ -1,9 +1,10 @@
 // figma: 148-28674 — «Selettore modello · Menu aperto» (148-28740 con «Impegno» a destra, 148-28806 «Modalità veloce»); chip modello 101:24829.
-import { useEffect, useRef, useState, type KeyboardEvent as TastoReact } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as TastoReact } from "react";
 import type { ModelloMotore } from "../../tipi";
 import { api } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { Sovrapposto } from "../base/Sovrapposto";
+import { èModello } from "./testi";
 import { numero as misura } from "../base/token";
 import { Interruttore } from "../impostazioni/controlli";
 import { ChipMenu, type Dati, type Imposta } from "./Chip";
@@ -27,6 +28,14 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
   const partenza = useRef<HTMLElement | null>(null);
   const [impegno, setImpegno] = useState(impegnoAperto), [anteprima, setAnteprima] = useState<string | null>(null), [altriAperti, setAltriAperti] = useState(false);
   const mostrato = anteprima ?? modello, sforzi = sforziDi(cat, mostrato);
+  // senza posto accanto al menu (finestra stretta) «Impegno» non si appoggia sopra: sta nel menu, sotto i modelli
+  const [stretto, setStretto] = useState(false);
+  useLayoutEffect(() => {
+    const m = aperto ? document.querySelector('button.chip[aria-label="Modello e impegno"]')?.getBoundingClientRect() : null; // il menu sta a destra del chip: stessa riga destra
+    if (!m) return;
+    const serve = misura("misura-menu-impegno") + misura("spazio-1") + misura("misura-margine-finestra");
+    setStretto(innerWidth - m.right < serve && m.right - misura("misura-menu-modello") < serve);
+  }, [aperto]);
   const apri = (a: boolean) => { setImpegno(false); setAnteprima(null); setAltriAperti(false); onAperto(a); };
   const scegliModello = (id: string) => { setImpegno(true); setAnteprima(id); imposta({ modello: id }); };
   useEffect(() => {
@@ -42,17 +51,33 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
     if (e.key === "Tab") apri(false);
     else if (e.key === "ArrowLeft") modello()?.focus();
     else if (e.key === "ArrowDown" || e.key === "ArrowUp") b[(i + (e.key === "ArrowDown" ? 1 : b.length - 1)) % b.length]?.focus();
+    else if (e.key === "Home" || e.key === "End") b[e.key === "Home" ? 0 : b.length - 1]?.focus();
     else return;
     e.preventDefault();
     e.stopPropagation();
   };
-  const uso = (id: string) => !!modello?.startsWith(id); // l'id in uso può avere il suffisso di data
+  const uso = (id: string) => èModello(modello, id); // l'id in uso può avere il suffisso di data
   const voce = (m: Scelta, numero?: number) => (
     <button key={m.id} type="button" role="menuitemradio" aria-checked={uso(m.id)} className={uso(m.id) ? "voce scelta" : "voce"}
       onClick={() => scegliModello(m.id)} onMouseEnter={() => { setImpegno(true); setAnteprima(m.id); }} onFocus={() => setAnteprima(m.id)} onKeyDown={(e) => { if (e.key === "ArrowRight") { setImpegno(true); setTimeout(() => document.querySelector<HTMLElement>(".sovrapposto.impegno button")?.focus()); } }}>
-      <span className="testa"><span className="etichetta">{m.etichetta}</span>{!!predefinito?.startsWith(m.id) && <span className="predefinito">Predefinito</span>}</span>
+      <span className="testa"><span className="etichetta">{m.etichetta}</span>{èModello(predefinito, m.id) && <span className="predefinito">Predefinito</span>}</span>
       {uso(m.id) ? <Icona nome="spunta" /> : numero ? <span className="numero">{numero}</span> : null}
     </button>
+  );
+  const elencoImpegno = (
+          <div onKeyDown={stretto ? undefined : (e) => frecce(e, () => partenza.current ?? document.querySelector<HTMLElement>(".menu-casella.flottante.destra button.scelta, .menu-casella.flottante.destra button"))}>
+          <div className="titolo-gruppo">Impegno</div>
+          {sforzi.map((x) => {
+            const scelto = x.id === sforzoDi(p, base(mostrato)).id; // l'impegno scelto vale per ogni modello
+            return (
+              <button key={x.id} type="button" role="menuitemradio" aria-checked={scelto} className="voce"
+                onClick={() => { apri(false); imposta({ ...(mostrato !== modello ? { modello: mostrato } : {}), sforzo: x.id === base(mostrato) ? null : x.id }, base(mostrato)); }}>
+                <span className="testa"><span className="etichetta">{x.etichetta}</span></span>
+                {scelto && <Icona nome="spunta" />}
+              </button>
+            );
+          })}
+          </div>
   );
   return (
     <ChipMenu aperto={aperto} onAperto={apri} lato="destra" etichetta="Modello e impegno" disabled={disabled}
@@ -77,24 +102,12 @@ export function ChipModello({ s, p, imposta, aperto, onAperto, disabled, predefi
           </div>
         </>
       )}
-      {impegno && sforzi.length > 0 && (
+      {(stretto ? sforzi.length > 0 : impegno && sforzi.length > 0) && (stretto ? <><div className="linea-menu" />{elencoImpegno}</> : (
         // a destra del menu, in cima; a sinistra se a destra non c'è posto (base/Sovrapposto); ← torna al modello
         <Sovrapposto lato="destra" scarto={misura("spazio-1")} className="menu-casella impegno" role="group" label="Impegno" onChiudi={() => setImpegno(false)}>
-          <div onKeyDown={(e) => frecce(e, () => partenza.current ?? document.querySelector<HTMLElement>(".menu-casella.flottante.destra button.scelta, .menu-casella.flottante.destra button"))}>
-          <div className="titolo-gruppo">Impegno</div>
-          {sforzi.map((x) => {
-            const scelto = x.id === sforzoDi(p, base(mostrato)).id; // l'impegno scelto vale per ogni modello
-            return (
-              <button key={x.id} type="button" role="menuitemradio" aria-checked={scelto} className="voce"
-                onClick={() => { apri(false); imposta({ ...(mostrato !== modello ? { modello: mostrato } : {}), sforzo: x.id === base(mostrato) ? null : x.id }, base(mostrato)); }}>
-                <span className="testa"><span className="etichetta">{x.etichetta}</span></span>
-                {scelto && <Icona nome="spunta" />}
-              </button>
-            );
-          })}
-          </div>
+          {elencoImpegno}
         </Sovrapposto>
-      )}
+      ))}
     </ChipMenu>
   );
 }

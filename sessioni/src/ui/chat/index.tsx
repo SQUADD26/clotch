@@ -18,6 +18,7 @@ import { TestaSessione } from "./Intestazione";
 import { IntestazioneNuovaSessione, NuovaSessione } from "./NuovaSessione";
 import { Trova } from "./Trova";
 import { Limite, NonRisponde } from "./Lavoro";
+import { useTrascrizioneRemota } from "./remota";
 import { voci as daMessaggi, type Voce } from "./modello";
 import { daQuanto, nomeAccount, ora as orario, provaDi } from "./testi";
 
@@ -79,12 +80,16 @@ function ChatSessione() {
     precedenti.current.sessione === s?.id ? precedenti.current.voci : [], s?.id), [m.messaggi, vivo, s?.cartella, m.identita, s?.id]);
   useLayoutEffect(() => { precedenti.current = { sessione: s?.id ?? null, voci }; }, [s?.id, voci]);
 
+  const remota = useTrascrizioneRemota(s, vivo, m.riprova);
+  useEffect(() => { // con già dei messaggi (la copia dell'app Claude) il rifiuto del motore non copre il filo: avviso con «Riprova»
+    if (remota.rifiuto && m.messaggi.length) avvisa({ tipo: "errore", messaggio: remota.rifiuto, azione: { etichetta: "Riprova", fai: remota.riprova } });
+  }, [remota.rifiuto]);
   useEffect(() => {
     const messaggio = m.altriErrore ?? (m.messaggi.length ? m.errore : null);
     if (messaggio) avvisa({ tipo: "errore", messaggio, azione: { etichetta: "Riprova", fai: m.altriErrore ? m.riprovaAltri : m.riprova } });
   }, [m.errore, m.altriErrore]);
 
-  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length)) return <Sagome />;
+  if (elenco.stato === "carica" || (s && m.stato === "carica" && !m.messaggi.length) || remota.attesa) return <Sagome />;
   if (elenco.stato === "errore" && !s) return <StatoErrore titolo="Sessioni non lette" corpo={`clotch non riesce a leggere l’elenco delle sessioni: ${motivoErrore(elenco.errore)}.`} riprova={elenco.riprova} />;
   if (!s) {
     if (elenco.dati?.errori[0]) return <CartellaNonLeggibile errori={elenco.dati.errori} riprova={elenco.riprova} />;
@@ -95,6 +100,7 @@ function ChatSessione() {
     );
     return elenco.dati ? <NessunaSessione aggiungi={() => void aggiungi(impostazioni.accountTolti, impostazioni.accountAggiunti)} impostazioni={() => apri("impostazioni")} /> : null;
   }
+  if (remota.rifiuto && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${remota.rifiuto}.`} riprova={remota.riprova} />;
   if (m.stato === "errore" && !m.messaggi.length) return <StatoErrore titolo="Messaggi non letti" corpo={`clotch non riesce a leggere i messaggi: ${motivoErrore(m.errore ?? "", s.app?.ospite)}.`} riprova={m.riprova} />;
 
   const muta = !!c && nonRisponde(c, adesso);

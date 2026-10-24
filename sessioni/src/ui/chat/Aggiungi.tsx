@@ -33,7 +33,7 @@ export function Aggiungi({ account, disabilitata, aperto, onApri, onChiudi, alle
   ];
   return (
     <span className="aggiungi">
-      <NomeSopra testo="Aggiungi">
+      <NomeSopra testo="Aggiungi" nascosto={aperto}>
         <BottoneIcona icona="piu" etichetta="Aggiungi" title={undefined} disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
           onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
       </NomeSopra>

@@ -3198,7 +3198,7 @@
    "box": {
     "x": 373,
     "y": 503,
-    "w": 115,
+    "w": 176,
     "h": 18
    },
    "variabili": {
@@ -3207,7 +3207,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ragionato per 14 s",
+   "testo": "Claude ha ragionato per 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3215,7 +3215,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 494,
+    "x": 555,
     "y": 504,
     "w": 16,
     "h": 16
@@ -3231,7 +3231,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 499.33203125,
+    "x": 560.33203125,
     "y": 507.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -3283,7 +3283,7 @@
    "box": {
     "x": 373,
     "y": 531,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -3292,7 +3292,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3300,7 +3300,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 513,
+    "x": 558,
     "y": 531,
     "w": 35,
     "h": 18
@@ -3319,7 +3319,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 554,
+    "x": 599,
     "y": 532,
     "w": 16,
     "h": 16
@@ -3335,7 +3335,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 557.33203125,
+    "x": 602.33203125,
     "y": 537.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -5196,7 +5196,7 @@
    "box": {
     "x": 373,
     "y": 801,
-    "w": 96,
+    "w": 138,
     "h": 18
    },
    "variabili": {
@@ -5204,7 +5204,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge Filo.tsx…",
+   "testo": "Claude legge Filo.tsx…",
    "font": "SF Pro Regular"
   },
   {
@@ -5212,7 +5212,7 @@
    "nome": "conteggio",
    "tipo": "TEXT",
    "box": {
-    "x": 475,
+    "x": 517,
     "y": 801,
     "w": 78,
     "h": 18

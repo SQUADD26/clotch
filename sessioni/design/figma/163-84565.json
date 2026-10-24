@@ -106,7 +106,7 @@
    "box": {
     "x": 24,
     "y": 20,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -115,7 +115,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -123,7 +123,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 164,
+    "x": 209,
     "y": 20,
     "w": 35,
     "h": 18
@@ -142,7 +142,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 205,
+    "x": 250,
     "y": 21,
     "w": 16,
     "h": 16
@@ -158,7 +158,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 210.33203125,
+    "x": 255.33203125,
     "y": 24.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -211,7 +211,7 @@
    "box": {
     "x": 24,
     "y": 62,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -220,7 +220,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -228,7 +228,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 164,
+    "x": 209,
     "y": 62,
     "w": 35,
     "h": 18
@@ -247,7 +247,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 205,
+    "x": 250,
     "y": 63,
     "w": 16,
     "h": 16
@@ -263,7 +263,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 208.33203125,
+    "x": 253.33203125,
     "y": 68.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -1155,7 +1155,7 @@
    "box": {
     "x": 24,
     "y": 310,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -1164,7 +1164,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -1172,7 +1172,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 164,
+    "x": 209,
     "y": 310,
     "w": 35,
     "h": 18
@@ -1191,7 +1191,7 @@
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 205,
+    "x": 250,
     "y": 311,
     "w": 16,
     "h": 16
@@ -1207,7 +1207,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 205.66796875,
+    "x": 250.66796875,
     "y": 311.6663818359375,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -1222,7 +1222,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 227,
+    "x": 272,
     "y": 310,
     "w": 47,
     "h": 18
@@ -1241,7 +1241,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 280,
+    "x": 325,
     "y": 311,
     "w": 16,
     "h": 16
@@ -1257,7 +1257,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 285.33203125,
+    "x": 330.33203125,
     "y": 314.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -1310,7 +1310,7 @@
    "box": {
     "x": 24,
     "y": 352,
-    "w": 134,
+    "w": 179,
     "h": 18
    },
    "variabili": {
@@ -1319,7 +1319,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Ha usato 12 strumenti",
+   "testo": "Claude ha usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -1327,7 +1327,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 164,
+    "x": 209,
     "y": 352,
     "w": 35,
     "h": 18
@@ -1346,7 +1346,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 205,
+    "x": 250,
     "y": 353,
     "w": 16,
     "h": 16
@@ -1362,7 +1362,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 208.33203125,
+    "x": 253.33203125,
     "y": 358.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619

@@ -70,6 +70,10 @@
 /* Scorciatoie: tasti in ascolto e tasti già usati (101-33015) */
 .pezzo-impostazioni .tasto-chip.in-ascolto { box-shadow: inset 0 0 0 var(--misura-tratto-forte) var(--colore-bordo-fuoco); }
 .pezzo-impostazioni .conflitto { display: flex; align-items: center; gap: var(--spazio-2); }
+/* finestra stretta: il conflitto va su una riga sua, sotto l'etichetta, invece di coprirla (#950) */
+.pezzo-impostazioni .impostazioni.stretta .riga:has(> .conflitto) { flex-wrap: wrap; }
+.pezzo-impostazioni .impostazioni.stretta .riga > .conflitto { order: 1; flex-basis: 100%; flex-wrap: wrap; }
+.pezzo-impostazioni .impostazioni.stretta .riga > .conflitto > span { flex-basis: 100%; }
 
 /* Uso: schede, righe con la barra, nota sulla fonte dei dati (101-48825) */
 .pezzo-impostazioni .schede { display: flex; gap: var(--spazio-1); }
@@ -98,10 +102,16 @@
 
 /* stati di passaggio e disabilitato dei controlli (riga-passaggio = passaggio, riga-scelta = premuto) */
 .pezzo-impostazioni .interruttore:hover:not(:disabled) { box-shadow: inset 0 0 0 var(--spazio-16) var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .interruttore:active:not(:disabled) { box-shadow: inset 0 0 0 var(--spazio-16) var(--colore-fondo-riga-scelta); }
 .pezzo-impostazioni .interruttore:disabled { opacity: var(--opacita-spento); }
 .pezzo-impostazioni .scelta .valore:hover:not(:disabled) .secondario, .pezzo-impostazioni .valore-scelta:hover .secondario { color: var(--colore-testo-primario); }
-.pezzo-impostazioni button:hover > .tasto-chip:not(.errore) { background: var(--colore-fondo-riga-scelta); }
+/* il tasto «Cambia …»: stesso velo dei bottoni secondari (componenti.css), un gradino più forte perché il chip è piccolo (#951) */
+.pezzo-impostazioni button:hover > .tasto-chip:not(.errore) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni button:active > .tasto-chip:not(.errore) { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta), inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
 .pezzo-impostazioni .tab-uso:hover:not(.scelta) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .tab-uso:active:not(.scelta) { background: var(--colore-fondo-riga-scelta); }
+.pezzo-impostazioni .tab-uso.scelta:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-impostazioni .tab-uso.scelta:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }
 .pezzo-impostazioni .indietro:hover { color: var(--colore-testo-primario); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"] { border-radius: var(--raggio-xs); }
 .pezzo-impostazioni .riga > button[aria-label^="Assegna"]:hover { background: var(--colore-fondo-riga-passaggio); }
