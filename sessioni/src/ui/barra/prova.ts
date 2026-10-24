@@ -81,7 +81,7 @@ const FRAME: Record<string, () => Prova> = {
   "101-35109": () => base(),
   "101-8805": () => ({ ora: ORA, elenco: pronto([]), pref: {}, registro: registro() }),
   "101-8912": () => ({ ora: ORA, elenco: { stato: "carica", riprova() {} }, pref: {}, registro: registro() }),
-  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-clotch-ai", messaggio: "permesso negato" }]) }; },
+  "101-9090": () => { const b = base(); return { ...b, elenco: pronto(b.elenco.dati!.sessioni, [{ percorso: "~/.claude-friday/projects", messaggio: "permesso negato" }]) }; },
   "101-12118": () => { const b = base([["stella", "arancione"], ...ICONE.slice(1)]); return { ...b, aperto: { tipo: "icona", id: b.scelta!, a: { x: 335, y: 169 } } }; },
   "101-21061": () => {
     const b = base();
