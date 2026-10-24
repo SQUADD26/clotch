@@ -36,6 +36,11 @@
   "misura/riga": 32,
   "testo/dimensione/base": 14,
   "testo/riga/base": 20,
+  "colore/fondo/bottone-secondario": "#ffffff0d",
+  "raggio/xs": 5,
+  "colore/testo/secondario": "#ffffffb5",
+  "testo/dimensione/sm": 13,
+  "testo/riga/sm": 18,
   "colore/fondo/riga-scelta": "#ffffff14",
   "colore/fondo/superficie": "#181818",
   "colore/bordo/leggero": "#ffffff0b",
@@ -46,12 +51,8 @@
   "testo/dimensione/xl": 28,
   "testo/riga/xl": 36,
   "misura/intestazione": 56,
-  "colore/testo/secondario": "#ffffffb5",
   "colore/bordo/normale": "#ffffff15",
   "raggio/xl": 15,
-  "testo/dimensione/sm": 13,
-  "testo/riga/sm": 18,
-  "colore/fondo/bottone-secondario": "#ffffff0d",
   "misura/bottone-invio": 32
  },
  "nodi": [
@@ -512,7 +513,7 @@
    "box": {
     "x": 104,
     "y": 156,
-    "w": 184,
+    "w": 139,
     "h": 20
    },
    "variabili": {
@@ -522,6 +523,45 @@
    },
    "senza": [],
    "testo": "Cerca",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I101:32366;154:71334",
+   "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 251,
+    "y": 155,
+    "w": 37,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:32366;154:71334;101:17088",
+   "nome": "tasti",
+   "tipo": "TEXT",
+   "box": {
+    "x": 259,
+    "y": 157,
+    "w": 21,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "⌘K",
    "font": "SF Pro Regular"
   },
   {
@@ -1551,7 +1591,7 @@
    "box": {
     "x": 416,
     "y": 232.5,
-    "w": 548,
+    "w": 530,
     "h": 24
    },
    "variabili": {
@@ -1564,19 +1604,39 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:32505;101:7543",
+   "id": "I101:32505;154:71338",
    "nome": "tasto",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 958,
+    "y": 233.5,
+    "w": 38,
+    "h": 22
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/bottone-secondario",
+    "cornerRadius": "raggio/xs",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "paddingTop": "spazio/0-5",
+    "paddingBottom": "spazio/0-5"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:32505;154:71338;101:17088",
+   "nome": "tasti",
    "tipo": "TEXT",
    "box": {
-    "x": 976,
-    "y": 236.5,
-    "w": 20,
-    "h": 16
+    "x": 966,
+    "y": 235.5,
+    "w": 22,
+    "h": 18
    },
    "variabili": {
     "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
    },
    "senza": [],
    "testo": "esc",
