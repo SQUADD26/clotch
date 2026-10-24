@@ -71,9 +71,9 @@ export function MenuProfilo({ dettaglio, a, inizio, onImpostazioni, onChiudi }: 
     { icona: "impostazioni", etichetta: "Impostazioni", scorciatoia: "⌘,", fai: onImpostazioni },
     { icona: "tastiera", etichetta: "Scorciatoie da tastiera", scorciatoia: "⌘/", fai: () => apriDialogo("scorciatoie") },
     { icona: "scintille", etichetta: "Novità", fai: () => void apriNovita() },
-    { icona: "aggiorna", etichetta: "Verifica aggiornamenti…", fai: () => void verificaAggiornamenti() },
+    { icona: "aggiorna", etichetta: "Controlla aggiornamenti", fai: () => void verificaAggiornamenti() },
     "separatore",
-    { icona: "info", etichetta: "Info su clotch", fai: () => n.apri("impostazioni", undefined, "info") },
+    { icona: "info", etichetta: "Informazioni su clotch", fai: () => n.apri("impostazioni", undefined, "info") },
   ];
   return <Menu testata={{ titolo: nome, dettaglio }} voci={voci} inizio={inizio} onChiudi={onChiudi} ancora={a} lato="sopra" scarto={numero("spazio-1")} />;
 }

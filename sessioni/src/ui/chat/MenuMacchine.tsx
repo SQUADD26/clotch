@@ -32,8 +32,8 @@ export function PannelloSsh({ mac, ambiente, mostraBase = null, onScegli, onAggi
             <span className="etichetta">{m.nome}</span>
             {daFinire ? <span className="valore da-completare">Da completare</span> : <span className="valore">{m.utente}@{m.nome}</span>}
             {ambiente.tipo === "ssh" && ambiente.host === m.nome && <Icona nome="spunta" colore="primaria" />}
-            {!base && <button type="button" className="togli" aria-label={`Togli ${m.nome}`} onClick={(e) => { e.stopPropagation(); onTogli(m); }}><Icona nome="cestino" /></button>}
-            {base && <span className="tooltip" role="tooltip">È la macchina di base: non si toglie.</span>}
+            {!base && <button type="button" className="togli" aria-label={`Rimuovi ${m.nome}`} onClick={(e) => { e.stopPropagation(); onTogli(m); }}><Icona nome="cestino" /></button>}
+            {base && <span className="tooltip" role="tooltip">È la macchina di base: non si rimuove.</span>}
           </div>
         );
       })}

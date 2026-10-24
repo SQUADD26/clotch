@@ -166,7 +166,7 @@ app.whenReady().then(async () => {
 
   await check('INFO: «Novità della versione» apre lo stesso dialogo, al centro della finestra', async () => {
     await carica({ vista: 'impostazioni', sezione: 'info' });
-    await wait(() => document.body.innerText.includes('Note di rilascio'));
+    await wait(() => document.body.innerText.includes('Novità'));
     await run(() => [...document.querySelectorAll('.valore-scelta')].find((b) => b.textContent.includes('Novità della versione')).click());
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Novità della versione 0.1.0');

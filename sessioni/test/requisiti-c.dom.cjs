@@ -9,13 +9,13 @@ const imp = (id, sezione, mod) => vai(id, mod);
 const imposta = () => fatte('sessioni:imposta-impostazioni').map((x) => x[0]);
 
 H.avvia('requisiti-c', async () => {
-  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Info su clotch» apre Info
+  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Informazioni su clotch» apre Info
     nuova(); rispondi['impostazioni:profilo'] = () => ({ nome: 'Anna Verdi', iniziali: 'AV' }); await caricaChat();
     await wait(() => document.querySelector('.piede .avatar')?.textContent === 'AV');
     assert.equal((await testo('.piede .testi span'))[0], 'Anna Verdi');
     await run(() => document.querySelector('.piede .avatar').click()); await wait(() => !!document.querySelector('[role=menu] .testata'));
     assert.equal((await testo('[role=menu] .testata .medio'))[0], 'Anna Verdi');
-    await clicca('[role=menu] .voce', 'Info su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
+    await clicca('[role=menu] .voce', 'Informazioni su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
   });
 
   await req('A27', async () => { // il menu dell'app macOS: «Informazioni su clotch» e le voci standard

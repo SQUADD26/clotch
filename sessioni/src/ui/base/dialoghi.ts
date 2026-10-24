@@ -35,7 +35,7 @@ export async function apriNovita() {
   } catch (e) { avvisa({ tipo: "errore", messaggio: messaggioErrore(e) }); }
 }
 
-/** «Verifica aggiornamenti…»: se sul disco c'è una versione nuova apre «Aggiornare clotch ora?», se no lo dice. */
+/** «Controlla aggiornamenti»: se sul disco c'è una versione nuova apre «Aggiornare clotch ora?», se no lo dice. */
 export async function verificaAggiornamenti() {
   try {
     if (await window.impostazioni.aggiornamenti(true)) return apriDialogo("aggiornamento");
