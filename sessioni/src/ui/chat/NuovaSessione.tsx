@@ -126,7 +126,7 @@ export function NuovaSessione() {
   const togli = async (nome: string) => {
     setDialogo(null);
     const e = await comandaEsito("macchina_togli", { nome });
-    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
+    if (e?.esito === "ok") { if (ambiente.host === nome) setAmbiente(LOCALE); avvisa({ tipo: "successo", messaggio: `${nome} rimossa` }); } else avvisa({ tipo: "errore", messaggio: motivoGuasto(e) });
     mac.ricarica();
   };
   const apri = (m: Menu) => setMenu(menu === m ? null : m);
