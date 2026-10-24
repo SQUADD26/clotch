@@ -4,7 +4,8 @@
   "id": "101:21348",
   "nome": "menu cartella",
   "w": 260,
-  "h": 177
+  "h": 177,
+  "dentro": "101:21257"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
