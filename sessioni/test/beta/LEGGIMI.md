@@ -10,7 +10,7 @@ node test/beta/giudica.mjs /tmp/beta-barra
 
 - Aree: `barra`, `chat`, `nuova`, `friday`, `impostazioni`, `cornice`, `tutto` (scena e radice in `avvio.mjs`, `AREE`).
 - Opzioni: `--tema chiaro|scuro`, `--misura min|grande` (min = «Finestra 480», grande = 1440×900), `--dati con|senza`, `--lungo` (titoli e nomi da 120 caratteri, messaggi da 600), `--ridotto` (prefers-reduced-motion), `--matrice` (tema × misura × dati × lungo, più un giro ridotto), `--video` (registra e misura ogni animazione), `--max N` (elementi per giro, 80).
-- L'app parte con `--scena <file>` (src/main.ts): CLOTCH_TEST_SILENT=1, HOME temporanea copiata da `test/fixtures/home`, un Electron alla volta (`/tmp/clotch-electron.lock`, come `scripts/prove-dom.mjs`). Senza DISPLAY avvia un Xvfb suo. Nella sandbox prende le librerie GTK da `/work/r.bondici/gtk/root`.
+- L'app parte con `--scena <file>` (src/main.ts): CLOTCH_TEST_SILENT=1, HOME temporanea copiata da `test/fixtures/home`, al massimo N Electron insieme sulla macchina (`scripts/posti.mjs`, `CLOTCH_BETA_POSTI`, se no metà dei core; posti di pid morti liberati da soli). Senza DISPLAY avvia un Xvfb suo. Nella sandbox prende le librerie GTK da `/work/r.bondici/gtk/root`.
 - Uscita: `<out>/<area>/<config>/registro.json`, `foto/`, `<out>/<area>/video/`, `<out>/sommario.json`, e la riga «N elementi cliccati, M foto».
 
 ## Criteri delle sonde (campo `criterio` dei difetti)
