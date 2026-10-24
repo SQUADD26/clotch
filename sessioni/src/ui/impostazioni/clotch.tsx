@@ -30,14 +30,14 @@ export default function Clotch() {
         <div className="riga stato-clotch">
           <Icona nome="schermo" colore={acceso ? "successo" : "terziaria"} />
           <div className="testi">
-            <div className="t-base medio">{acceso ? "clotch è collegato" : "clotch non è installato"}</div>
+            <div className="t-base medio">{acceso ? "clotch è collegato" : "clotch non è collegato"}</div>
             <div className="t-sm secondario">
               {acceso
                 ? `${versione ? `Versione ${versione}. V` : "V"}oce, dettatura e avvisi passano dal notch`
-                : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
+                : "clotch è l’app del notch: ti parla, ti ascolta e ti avvisa. Senza, tutto il resto funziona lo stesso"}
             </div>
           </div>
-          {!acceso && <Bottone tipo="secondario" onClick={() => window.open(SCARICA)}>Scarica clotch</Bottone>}
+          {!acceso && <Bottone tipo="secondario" onClick={() => window.open(SCARICA)}>Ottieni clotch</Bottone>}
         </div>
         {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
           <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>
