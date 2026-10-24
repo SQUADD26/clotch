@@ -42,4 +42,10 @@
 .pezzo-pannello .campione.usato { background: var(--colore-sessione-blu); }
 .pezzo-pannello .campione.libero { background: var(--colore-bordo-normale); }
 
+/* file toccati: elenco che scorre dentro la scheda; caricamento ed errore delle schede */
+.pezzo-pannello .elenco-file { display: flex; flex-direction: column; gap: var(--spazio-2); max-height: calc(var(--misura-riga) * 6); overflow-y: auto; }
+.pezzo-pannello .errore-info .errore { color: var(--colore-testo-errore); }
+.pezzo-pannello .errore-info .bottone { align-self: flex-start; }
+.pezzo-pannello .riga-sagoma { height: var(--misura-icona); border-radius: var(--raggio-xs); background: var(--colore-fondo-sagoma); }
+.pezzo-pannello .riga-sagoma.corta { width: 60%; }
 .pezzo-pannello .apri-pr { align-self: flex-start; text-decoration: none; }
