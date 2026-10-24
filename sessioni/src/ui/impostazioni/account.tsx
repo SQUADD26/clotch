@@ -48,7 +48,7 @@ export default function Account() {
   useEffect(() => { if (prova?.dopoRimuovi) avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => {} } }); }, []);
   return (
     <Pagina titolo="Account">
-      <div className="t-base secondario">Le cartelle ~/.claude-* da cui leggere le sessioni di Claude Code.</div>
+      <div className="t-base secondario">Le cartelle degli account da cui leggere le sessioni di Claude Code.</div>
       {cartelle && cartelle.length > 0 && (
         <Gruppo>
           {cartelle.map((c) => (
@@ -65,7 +65,7 @@ export default function Account() {
       )}
       <Bottone onClick={() => aggiungi(v.accountTolti, v.accountAggiunti)}>Aggiungi cartella</Bottone>
       {daRimuovere && (
-        <Dialogo titolo="Rimuovere la cartella?" corpo={`Smetto di leggere le sessioni di ${daRimuovere}. I file restano dove sono.`} onChiudi={() => setDaRimuovere(null)}
+        <Dialogo titolo="Rimuovere la cartella?" corpo={`Le sessioni di ${daRimuovere} non vengono più lette. I file restano dove sono.`} onChiudi={() => setDaRimuovere(null)}
           bottoni={<>
             <Bottone tipo="secondario" onClick={() => setDaRimuovere(null)}>Annulla</Bottone>
             <Bottone tipo="pericolo" onClick={() => { rimuovi(daRimuovere, v.accountTolti); setDaRimuovere(null); }}>Rimuovi</Bottone>

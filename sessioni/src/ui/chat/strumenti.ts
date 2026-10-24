@@ -27,7 +27,7 @@ export function descrivi(nome: string, ingresso: unknown, stato: StatoStrumento,
   switch (nome) {
     case "Bash": {
       const cmd = campo(ingresso, "command");
-      const etichetta = stato === "errore" ? "Comando non riuscito" : stato === "in-corso" ? "Eseguendo" : "Comando";
+      const etichetta = stato === "errore" ? "Comando non riuscito" : stato === "in-corso" ? "Eseguendo…" : "Comando";
       return { etichetta, icona: "terminale", dettaglio: cmd, comando: `$ ${cmd}` };
     }
     case "Read": return { etichetta: "Letto", icona: "file", dettaglio: file, comando: null };

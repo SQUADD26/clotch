@@ -152,7 +152,7 @@ app.whenReady().then(async () => {
     await run(() => [...document.querySelectorAll('.riga.azione button')].find((b) => b.textContent === 'Rimuovi').click());
     await wait(() => !!document.querySelector('[role=dialog]'));
     assert.equal(await dialogo(), 'Rimuovere la cartella?');
-    assert.ok((await run(() => document.querySelector('[role=dialog]').textContent)).includes('Smetto di leggere le sessioni di ~/.claude-uno. I file restano dove sono.'));
+    assert.ok((await run(() => document.querySelector('[role=dialog]').textContent)).includes('Le sessioni di ~/.claude-uno non vengono più lette. I file restano dove sono.'));
     await clicca('[role=dialog] button', 'Annulla');
     await wait(() => !document.querySelector('[role=dialog]'));
     assert.equal(finto.chiamateImp.length, prima);
@@ -173,10 +173,10 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => getComputedStyle(document.querySelector('.velo')).paddingBottom), '0px');
   });
 
-  await check('MINIATURE: «Carico…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
+  await check('MINIATURE: «Caricando…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
     await carica({ vista: 'sessione', sessione: 'a', sezione: 'scritta:Guarda questi|allegati' });
     await wait(() => document.querySelectorAll('.allegato').length === 4);
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS · 4 KB', 'Non letta', 'Carico…', 'Troppo grande']);
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS · 4 KB', 'Non letta', 'Caricando…', 'Troppo grande']);
     assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), true);
     await run(() => document.querySelector('button[aria-label="Rimuovi registro.log"]').click());
     await wait(() => document.querySelectorAll('.allegato').length === 3);

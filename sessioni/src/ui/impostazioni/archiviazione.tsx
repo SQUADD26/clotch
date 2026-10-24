@@ -52,7 +52,7 @@ export default function Archiviazione() {
         {spazio.stato === "carica" && (
           <div className="riga calcolo">
             <Icona nome="spinner" gira />
-            <span className="t-sm secondario">Calcolo lo spazio delle immagini…</span>
+            <span className="t-sm secondario">Calcolando lo spazio delle immagini…</span>
           </div>
         )}
       </Gruppo>

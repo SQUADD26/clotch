@@ -28,9 +28,9 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
       <div className="testi">
         <div className="riga-titolo">
           <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-          <span className="titolo">{s.titolo || "Senza titolo"}</span>
+          <span className="titolo" title={s.titolo}>{s.titolo || "Senza titolo"}</span>
         </div>
-        <div className="dati">
+        <div className="dati" title={dati.filter(Boolean).join(" · ")}>
           <span className="stato"><SegnoStato stato={stato} />{STATO[stato]}</span>
           {dati.map((d, i) => d && (
             <span key={i} className="dato">

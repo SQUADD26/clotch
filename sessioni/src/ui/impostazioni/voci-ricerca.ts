@@ -37,7 +37,7 @@ export const VOCI: Voce[] = [
     "Mostra o nascondi barra laterale", "Apri impostazioni", "Interrompi e invia", "Metti in coda", "Cerca nella sessione"].map((e) => v("scorciatoie", e)),
   v("sorgenti", "Claude Code", "Sessioni da terminale, da tutte le cartelle degli account"),
   v("sorgenti", "Claude", "Sessioni dell’app Claude per Mac"),
-  v("sorgenti", "Codex", "Sessioni di Codex in ~/.codex"),
+  v("sorgenti", "Codex", "Sessioni di Codex su questo computer"),
   v("sorgenti", "Cursor", "Chat di Cursor. Si leggono, ma non ricevono messaggi"),
   v("archiviazione", "Indice delle sessioni", "Ricostruiscilo se l’elenco non torna"),
   v("archiviazione", "Cache dei messaggi", "Si riempie da sola quando apri una sessione"),

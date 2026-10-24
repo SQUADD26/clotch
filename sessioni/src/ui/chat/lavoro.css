@@ -6,10 +6,13 @@
 }
 .pezzo-chat .testata-lavoro, .pezzo-chat .voce-lavoro, .pezzo-chat .riga-stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
 .pezzo-chat .testata-lavoro .titolo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
-.pezzo-chat .testata-lavoro .dettaglio, .pezzo-chat .voce-lavoro .durata { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.pezzo-chat .testata-lavoro .dettaglio { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-chat .testata-lavoro .conto, .pezzo-chat .voce-lavoro .durata { flex: none; }
+.pezzo-chat .testata-lavoro .dettaglio, .pezzo-chat .testata-lavoro .conto, .pezzo-chat .voce-lavoro .durata { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
+.pezzo-chat .voci-lavoro { display: flex; flex-direction: column; gap: var(--spazio-2); max-height: 40vh; overflow-y: auto; }
 .pezzo-chat .voce-lavoro .testo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pezzo-chat .voce-lavoro.attiva .testo { font-weight: 500; color: var(--colore-testo-primario); }
-.pezzo-chat .voce-lavoro .nome { flex: none; font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .voce-lavoro .nome { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: var(--colore-testo-primario); }
 
 .pezzo-chat .riga-stato { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .riga-stato .esito { flex: none; font-weight: 500; }
