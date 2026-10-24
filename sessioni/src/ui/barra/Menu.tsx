@@ -26,7 +26,7 @@ export function vociMenuSessione(s: Sessione, pref?: PreferenzeSessione): VoceMe
     }) },
     { icona: "archivia", etichetta: "Archivia", scorciatoia: "⇧⌘A", fai: () => void archivia(s.id) },
     "separatore",
-    { icona: "posta", etichetta: "Segna come non letta", fai: () => void api().impostaPreferenze(s.id, { nonLetta: true }) },
+    { icona: "posta", etichetta: pref?.nonLetta ? "Segna come letta" : "Segna come non letta", fai: () => void api().impostaPreferenze(s.id, { nonLetta: pref?.nonLetta ? null : true }) },
     { icona: "finestra", etichetta: "Apri in una nuova finestra", fai: azione(s.id, "nuova-finestra") },
     "separatore",
     { icona: "copia", etichetta: "Copia ID sessione", fai: azione(s.id, "copia-id") },

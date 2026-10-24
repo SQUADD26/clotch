@@ -48,7 +48,7 @@ export function giorno(t: number, ora: number) {
 export function valore(s: Sessione, p: Proprieta, ora: number): string {
   switch (p) {
     case "sorgente": return nomeSorgente(s.sorgente);
-    case "stato": return s.stato;
+    case "stato": return s.situazione?.adesso === "errore" ? "errore" : s.stato; // come il segno della riga (#636)
     case "attivita": return giorno(s.ultimaAttivita, ora);
     default: return s[p] ?? "";
   }

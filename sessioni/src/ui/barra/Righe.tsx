@@ -91,7 +91,8 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>
         <IconaRiga titolo={s.titolo} pref={pref} />
       </button>
-      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""}`}>
+      {pref?.nonLetta && <span className="pallino-non-letta" role="img" aria-label="Non letta" />}
+      <span className={`testo ${s.stato === "lavora" ? "lavoro" : ""} ${pref?.nonLetta ? "medio" : ""}`}>
         {s.titolo}
         {s.stato === "lavora" && <span className="luccica-area" aria-hidden="true"><span className="luccica-finestra"><span className="luccica-copia" data-titolo={s.titolo} /></span></span>}
       </span>

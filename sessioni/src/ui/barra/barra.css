@@ -5,6 +5,10 @@
 }
 .pezzo-barra .riga:hover, .pezzo-barra .riga.passaggio { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-barra .riga.scelta, .pezzo-barra .riga-sessione:active { background: var(--colore-fondo-riga-scelta); } /* la riga sessione è un div: il :active dei bottoni non la copre */
+/* la riga scelta ha in più una barra a sinistra: senza, scelta e passaggio erano quasi uguali (#641) */
+.pezzo-barra .riga.scelta { box-shadow: inset var(--spazio-0-5) 0 0 var(--colore-fondo-accento); }
+.pezzo-barra .pallino-non-letta { flex: none; width: var(--spazio-2); height: var(--spazio-2); border-radius: 50%; background: var(--colore-fondo-accento); }
+.pezzo-barra .vuoto-filtri { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spazio-2); padding: var(--spazio-2); }
 .pezzo-barra .riga .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pezzo-barra .riga .lato { flex: none; white-space: nowrap; }
 .pezzo-barra .riga.titolo-sezione, .pezzo-barra .riga.titolo-sezione:hover { background: none; }
