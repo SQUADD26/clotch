@@ -136,7 +136,9 @@ function notificationCalls(silent) {
     } },
     './modalita-prova': { provaSilenziosa: () => silent },
     './ipc-fiducia': fiducia,
-    './avvisi': { daAvvisare: () => ({ titolo: 'Test', corpo: 'Test', silenzioso: false, suono: 'default' }) },
+    './avvisi': { daAvvisare: () => ({ titolo: 'Test', corpo: 'Test', silenzioso: false, suono: 'default' }), inSilenzio: () => false },
+    './partenza': { PARTENZA: { silenzio: 'Mai' } },
+    './quote-uso': { quoteUso: () => Promise.reject(new Error('rete non usata nella prova')), sogliePassate: () => [] }, // avvisi 80%/90% (#456): niente rete
   };
   vm.runInNewContext(notificationsCode, { exports: output, require: name => {
     assert.ok(Object.hasOwn(modules, name), `confine notifiche inatteso ${name}`);

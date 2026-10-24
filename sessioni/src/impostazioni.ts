@@ -12,7 +12,7 @@ import { leggiRegistro, type Registro } from "./clotch-ai";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { creaAggiornamenti } from "./aggiornamento";
 import { provaSilenziosa } from "./modalita-prova";
-import { quoteUso } from "./quote-uso";
+import { quoteConGiorni } from "./quote-uso";
 import { accorcia, espandi, trovaRadici } from "./radici";
 import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
 
@@ -88,7 +88,8 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     sessioni.impostazioni({});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  ipc.handle("impostazioni:uso", () => quoteUso());
+  // shortcut: gli account sono quelli trovati nella home (non conta accountAggiunti/accountTolti); le trascrizioni si leggono qui, nel main
+  ipc.handle("impostazioni:uso", () => quoteConGiorni(trovaRadici(home)));
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
