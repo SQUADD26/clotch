@@ -235,4 +235,20 @@ H.avvia('requisiti-b', async () => {
     await clicca('button[role=switch]', 'Aggiornamenti automatici'); await attesa(60); assert.deepEqual(imposta(), [{ aggiornamentiAutomatici: false }]);
   });
 
+  await req('B7', async () => { // anche H8: Ripristina vivo, rifiuto del motore vecchio leggibile
+    await vai('101-32359'); await wait(() => document.body.textContent.includes('Backup Hetzner'));
+    const ripr = () => run(() => [...document.querySelectorAll('button')].filter((b) => b.textContent === 'Ripristina').map((b) => b.disabled));
+    assert.deepEqual(await ripr(), [false, false, false], 'Ripristina è acceso');
+    await scrivi('input[placeholder="Cerca sessioni archiviate"]', 'Backup'); await attesa(60);
+    assert.equal((await ripr()).length, 1, 'la ricerca filtra');
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'rifiutato', testo: "comando sconosciuto: 'ripristina'" });
+    await clicca('button', 'Ripristina'); await wait(() => /Ripristino non disponibile/.test(document.querySelector('.area-avvisi')?.textContent ?? ''));
+    assert.match(await run(() => document.querySelector('.area-avvisi').textContent), /aggiorna clotch AI/);
+    assert.equal((await ripr()).length, 1, 'la riga resta');
+    rispondi['clotch-ai:comando'] = () => ({ esito: 'ok', testo: '' });
+    await clicca('button', 'Ripristina'); await attesa(80);
+    assert.deepEqual(fatte('clotch-ai:comando').at(-1), ['ripristina', { chat: 'a3' }]); assert.equal((await ripr()).length, 0, 'ripristinata: esce dall\'elenco');
+    delete rispondi['clotch-ai:comando'];
+  });
+
 });

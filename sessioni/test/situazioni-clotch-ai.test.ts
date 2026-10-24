@@ -91,10 +91,10 @@ test("contratto col motore: stessa soglia «Non risponde» in src e in src/ui, u
 
 test("contratto col motore: i comandi dell'app sono quelli del motore, salvo due scarti dichiarati", () => {
   const app = new Set<string>(COMANDI);
-  // «ripristina»: il motore lo rifiuta (claude-config#2513); resta nell'elenco solo perché il bottone di archiviate.tsx è spento.
+  // «ripristina»: il motore installato può non averlo ancora (claude-config#2575, in dev): il bottone di archiviate.tsx è acceso e mostra il rifiuto.
   const soloApp = COMANDI.filter((c) => !MOTORE_COMANDI.includes(c));
   assert.deepEqual(soloApp, ["ripristina"]);
-  assert.match(fs.readFileSync(path.join(__dirname, "..", "..", "src", "ui", "impostazioni", "archiviate.tsx"), "utf8"), /const MOTORE_RIPRISTINA = false;/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, "..", "..", "src", "ui", "impostazioni", "archiviate.tsx"), "utf8"), /MOTORE_RIPRISTINA/);
   // «rinomina»: nessuna schermata la usa (manca il disegno), quindi l'app non la manda.
   assert.deepEqual(MOTORE_COMANDI.filter((c) => !app.has(c)), ["rinomina"]);
 });
