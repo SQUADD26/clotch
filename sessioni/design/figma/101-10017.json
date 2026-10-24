@@ -46,6 +46,7 @@
   "misura/tratto": 1,
   "colore/sessione/grigio": "#c4c8ce",
   "colore/sessione/blu": "#339cff",
+  "colore/testo/su-avatar": "#141414",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
   "colore/fondo/superficie": "#181818",
@@ -1911,7 +1912,7 @@
     "h": 16
    },
    "variabili": {
-    "fills[0]": "colore/testo/su-primario",
+    "fills[0]": "colore/testo/su-avatar",
     "fontSize": "testo/dimensione/xs",
     "lineHeight": "testo/riga/xs"
    },
@@ -1958,7 +1959,7 @@
    "box": {
     "x": 116,
     "y": 864,
-    "w": 112,
+    "w": 114,
     "h": 16
    },
    "variabili": {
@@ -1967,7 +1968,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Roberto · 6 account",
+   "testo": "Roberto 6 account",
    "font": "SF Pro Regular"
   },
   {
@@ -2408,7 +2409,7 @@
     "h": 16
    },
    "variabili": {
-    "itemSpacing": "spazio/2"
+    "itemSpacing": "spazio/3"
    },
    "senza": []
   },
@@ -2491,30 +2492,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9925;101:7420",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 424,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9925;101:7421",
    "nome": "progetto",
    "tipo": "TEXT",
    "box": {
-    "x": 436,
+    "x": 428,
     "y": 140,
     "w": 62,
     "h": 16
@@ -2529,30 +2511,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9925;101:7422",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 506,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9925;101:7416",
    "nome": "ramo",
    "tipo": "FRAME",
    "box": {
-    "x": 518,
+    "x": 502,
     "y": 140,
     "w": 180,
     "h": 16
@@ -2567,7 +2530,7 @@
    "nome": "icona ramo",
    "tipo": "INSTANCE",
    "box": {
-    "x": 518,
+    "x": 502,
     "y": 140,
     "w": 16,
     "h": 16
@@ -2583,7 +2546,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 519.3330078125,
+    "x": 503.3330078125,
     "y": 141.3330078125,
     "w": 13.333984375,
     "h": 13.333984375
@@ -2598,7 +2561,7 @@
    "nome": "ramo",
    "tipo": "TEXT",
    "box": {
-    "x": 538,
+    "x": 522,
     "y": 140,
     "w": 160,
     "h": 16
@@ -2613,30 +2576,11 @@
    "font": "Menlo Regular"
   },
   {
-   "id": "I101:9925;101:7423",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 706,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9925;101:7424",
    "nome": "modello",
    "tipo": "TEXT",
    "box": {
-    "x": 718,
+    "x": 694,
     "y": 140,
     "w": 51,
     "h": 16
@@ -2651,32 +2595,13 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I101:9925;101:7425",
-   "nome": "separatore",
-   "tipo": "TEXT",
-   "box": {
-    "x": 777,
-    "y": 140,
-    "w": 4,
-    "h": 16
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/secondario",
-    "fontSize": "testo/dimensione/xs",
-    "lineHeight": "testo/riga/xs"
-   },
-   "senza": [],
-   "testo": "·",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I101:9925;101:7426",
    "nome": "sorgente",
    "tipo": "TEXT",
    "box": {
-    "x": 789,
+    "x": 757,
     "y": 140,
-    "w": 126,
+    "w": 127,
     "h": 16
    },
    "variabili": {
@@ -2685,7 +2610,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Claude Code · squadd",
+   "testo": "Claude Code squadd",
    "font": "SF Pro Regular"
   },
   {

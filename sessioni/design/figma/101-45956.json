@@ -1645,7 +1645,7 @@
    "box": {
     "x": 417,
     "y": 252,
-    "w": 345,
+    "w": 347,
     "h": 18
    },
    "variabili": {
@@ -1654,7 +1654,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Versione 2.4 · voce, dettatura e avvisi passano dal notch",
+   "testo": "Versione 2.4 voce, dettatura e avvisi passano dal notch",
    "font": "SF Pro Regular"
   },
   {

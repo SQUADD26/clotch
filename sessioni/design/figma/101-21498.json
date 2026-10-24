@@ -92,7 +92,7 @@
    "box": {
     "x": 12,
     "y": 26,
-    "w": 125,
+    "w": 126,
     "h": 16
    },
    "variabili": {
@@ -101,7 +101,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "6 account · 4 sorgenti",
+   "testo": "6 account 4 sorgenti",
    "font": "SF Pro Regular"
   },
   {

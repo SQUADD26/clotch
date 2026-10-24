@@ -137,7 +137,7 @@
    "box": {
     "x": 48,
     "y": 20,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -146,7 +146,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -154,7 +154,7 @@
    "nome": "testo con riflesso",
    "tipo": "TEXT",
    "box": {
-    "x": 111,
+    "x": 104,
     "y": 20,
     "w": 79,
     "h": 18
@@ -275,7 +275,7 @@
    "box": {
     "x": 48,
     "y": 62,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -284,7 +284,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -292,7 +292,7 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 111,
+    "x": 104,
     "y": 62,
     "w": 79,
     "h": 18
@@ -414,7 +414,7 @@
    "box": {
     "x": 48,
     "y": 104,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -423,7 +423,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -431,7 +431,7 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 111,
+    "x": 104,
     "y": 104,
     "w": 79,
     "h": 18
@@ -450,9 +450,9 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 194,
+    "x": 187,
     "y": 104,
-    "w": 92,
+    "w": 85,
     "h": 18
    },
    "variabili": {
@@ -461,7 +461,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· nessun errore",
+   "testo": "nessun errore",
    "font": "SF Pro Regular"
   },
   {
@@ -469,7 +469,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 290,
+    "x": 276,
     "y": 105,
     "w": 16,
     "h": 16
@@ -485,7 +485,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 295.33203125,
+    "x": 281.33203125,
     "y": 108.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -603,7 +603,7 @@
    "box": {
     "x": 48,
     "y": 146,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -612,7 +612,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -620,7 +620,7 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 111,
+    "x": 104,
     "y": 146,
     "w": 79,
     "h": 18
@@ -639,9 +639,9 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 194,
+    "x": 187,
     "y": 146,
-    "w": 92,
+    "w": 85,
     "h": 18
    },
    "variabili": {
@@ -650,7 +650,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· nessun errore",
+   "testo": "nessun errore",
    "font": "SF Pro Regular"
   },
   {
@@ -658,7 +658,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 290,
+    "x": 276,
     "y": 147,
     "w": 16,
     "h": 16
@@ -674,7 +674,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 293.33203125,
+    "x": 279.33203125,
     "y": 152.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -844,7 +844,7 @@
    "box": {
     "x": 48,
     "y": 218,
-    "w": 59,
+    "w": 52,
     "h": 18
    },
    "variabili": {
@@ -853,7 +853,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Aiutante ·",
+   "testo": "Aiutante",
    "font": "SF Pro Regular"
   },
   {
@@ -861,7 +861,7 @@
    "nome": "cosa fa",
    "tipo": "TEXT",
    "box": {
-    "x": 111,
+    "x": 104,
     "y": 218,
     "w": 35,
     "h": 18
@@ -880,9 +880,9 @@
    "nome": "esito",
    "tipo": "TEXT",
    "box": {
-    "x": 150,
+    "x": 143,
     "y": 218,
-    "w": 55,
+    "w": 47,
     "h": 18
    },
    "variabili": {
@@ -891,7 +891,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· 1 errore",
+   "testo": "1 errore",
    "font": "SF Pro Regular"
   },
   {
@@ -899,7 +899,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 209,
+    "x": 194,
     "y": 219,
     "w": 16,
     "h": 16
@@ -915,7 +915,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 214.33203125,
+    "x": 199.33203125,
     "y": 222.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461

@@ -18,13 +18,13 @@
   "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/testo/terziario": "#ffffff8c",
   "misura/icona": 16,
   "colore/icona/terziaria": "#ffffff82",
-  "colore/bordo/normale": "#ffffff15",
-  "colore/testo/primario": "#ffffff",
+  "colore/testo/terziario": "#ffffff8c",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
+  "colore/bordo/normale": "#ffffff15",
+  "colore/testo/primario": "#ffffff",
   "spazio/6": 24,
   "colore/fondo/codice": "#141414",
   "raggio/md": 10,
@@ -100,6 +100,21 @@
    "senza": []
   },
   {
+   "id": "I163:84384;167:92861",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 20,
+    "w": 712,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:84384;163:84105",
    "nome": "titolo",
    "tipo": "TEXT",
@@ -119,30 +134,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:84384;163:84106",
-   "nome": "durata",
-   "tipo": "TEXT",
-   "box": {
-    "x": 106,
-    "y": 20,
-    "w": 35,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "· 48 s",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:84384;163:84107",
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 147,
+    "x": 106,
     "y": 21,
     "w": 16,
     "h": 16
@@ -158,7 +154,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 152.33203125,
+    "x": 111.33203125,
     "y": 24.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -167,6 +163,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:84384;163:84106",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 742,
+    "y": 21,
+    "w": 26,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "48 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84389",
@@ -205,6 +220,21 @@
    "senza": []
   },
   {
+   "id": "I163:84390;167:92865",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 62,
+    "w": 712,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:84390;163:84125",
    "nome": "titolo",
    "tipo": "TEXT",
@@ -224,30 +254,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:84390;163:84126",
-   "nome": "durata",
-   "tipo": "TEXT",
-   "box": {
-    "x": 106,
-    "y": 62,
-    "w": 35,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "· 48 s",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:84390;163:84127",
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 147,
+    "x": 106,
     "y": 63,
     "w": 16,
     "h": 16
@@ -263,7 +274,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 150.33203125,
+    "x": 109.33203125,
     "y": 68.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -272,6 +283,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:84390;163:84126",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 742,
+    "y": 63,
+    "w": 26,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "48 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84442",
@@ -412,7 +442,7 @@
    "box": {
     "x": 115,
     "y": 90,
-    "w": 121,
+    "w": 128,
     "h": 18
    },
    "variabili": {
@@ -421,7 +451,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"canAccess\" · 4 file",
+   "testo": "\"canAccess\" in 4 file",
    "font": "SF Pro Regular"
   },
   {
@@ -924,7 +954,7 @@
    "box": {
     "x": 128,
     "y": 226,
-    "w": 54,
+    "w": 47,
     "h": 18
    },
    "variabili": {
@@ -933,7 +963,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· uscita 1",
+   "testo": "uscita 1",
    "font": "SF Pro Regular"
   },
   {
@@ -1149,6 +1179,21 @@
    "senza": []
   },
   {
+   "id": "I163:84445;167:92866",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 310,
+    "w": 712,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:84445;163:84130",
    "nome": "titolo",
    "tipo": "TEXT",
@@ -1168,30 +1213,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:84445;163:84131",
-   "nome": "durata",
-   "tipo": "TEXT",
-   "box": {
-    "x": 106,
-    "y": 310,
-    "w": 35,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "· 48 s",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:84445;163:84132",
    "nome": "segno errore",
    "tipo": "INSTANCE",
    "box": {
-    "x": 147,
+    "x": 106,
     "y": 311,
     "w": 16,
     "h": 16
@@ -1207,7 +1233,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 147.66796875,
+    "x": 106.66796875,
     "y": 311.6663818359375,
     "w": 14.6669921875,
     "h": 14.6669921875
@@ -1222,7 +1248,7 @@
    "nome": "errori",
    "tipo": "TEXT",
    "box": {
-    "x": 169,
+    "x": 128,
     "y": 310,
     "w": 47,
     "h": 18
@@ -1241,7 +1267,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 222,
+    "x": 181,
     "y": 311,
     "w": 16,
     "h": 16
@@ -1257,7 +1283,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 227.33203125,
+    "x": 186.33203125,
     "y": 314.3330078125,
     "w": 5.333883762359619,
     "h": 9.333883285522461
@@ -1266,6 +1292,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:84445;163:84131",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 742,
+    "y": 311,
+    "w": 26,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "48 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84453",
@@ -1304,6 +1349,21 @@
    "senza": []
   },
   {
+   "id": "I163:84454;167:92865",
+   "nome": "azione",
+   "tipo": "FRAME",
+   "box": {
+    "x": 24,
+    "y": 352,
+    "w": 712,
+    "h": 18
+   },
+   "variabili": {
+    "itemSpacing": "spazio/1-5"
+   },
+   "senza": []
+  },
+  {
    "id": "I163:84454;163:84125",
    "nome": "titolo",
    "tipo": "TEXT",
@@ -1323,30 +1383,11 @@
    "font": "SF Pro Regular"
   },
   {
-   "id": "I163:84454;163:84126",
-   "nome": "durata",
-   "tipo": "TEXT",
-   "box": {
-    "x": 106,
-    "y": 352,
-    "w": 35,
-    "h": 18
-   },
-   "variabili": {
-    "fills[0]": "colore/testo/terziario",
-    "fontSize": "testo/dimensione/sm",
-    "lineHeight": "testo/riga/sm"
-   },
-   "senza": [],
-   "testo": "· 48 s",
-   "font": "SF Pro Regular"
-  },
-  {
    "id": "I163:84454;163:84127",
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 147,
+    "x": 106,
     "y": 353,
     "w": 16,
     "h": 16
@@ -1362,7 +1403,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 150.33203125,
+    "x": 109.33203125,
     "y": 358.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -1371,6 +1412,25 @@
     "fills[0]": "colore/icona/terziaria"
    },
    "senza": []
+  },
+  {
+   "id": "I163:84454;163:84126",
+   "nome": "durata",
+   "tipo": "TEXT",
+   "box": {
+    "x": 742,
+    "y": 353,
+    "w": 26,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/terziario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "48 s",
+   "font": "SF Pro Regular"
   },
   {
    "id": "163:84562",
@@ -1513,7 +1573,7 @@
    "box": {
     "x": 115,
     "y": 380,
-    "w": 121,
+    "w": 128,
     "h": 18
    },
    "variabili": {
@@ -1522,7 +1582,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"canAccess\" · 4 file",
+   "testo": "\"canAccess\" in 4 file",
    "font": "SF Pro Regular"
   },
   {
@@ -2025,7 +2085,7 @@
    "box": {
     "x": 128,
     "y": 516,
-    "w": 54,
+    "w": 47,
     "h": 18
    },
    "variabili": {
@@ -2034,7 +2094,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "· uscita 1",
+   "testo": "uscita 1",
    "font": "SF Pro Regular"
   },
   {
@@ -2596,7 +2656,7 @@
    "box": {
     "x": 115,
     "y": 642,
-    "w": 116,
+    "w": 123,
     "h": 18
    },
    "variabili": {
@@ -2605,7 +2665,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "\"Live chat\" · 12 file",
+   "testo": "\"Live chat\" in 12 file",
    "font": "SF Pro Regular"
   },
   {
