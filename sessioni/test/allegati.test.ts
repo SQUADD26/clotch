@@ -4,11 +4,11 @@ import * as assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { descrivi, leggiImmagine, leggiSkill } from "../src/allegati";
+import { descrivi, leggiImmagine, leggiSkill, salvaIncollata, copiaAllegati } from "../src/allegati";
 import { Convertitore } from "../src/messaggi-claude";
 import type { Messaggio } from "../src/tipi";
 import { voci } from "../src/ui/chat/modello";
-import { conPercorsi, galleria, LIMITE_ALLEGATO_BYTE, peso, senzaPercorsi, statoAllegato } from "../src/ui/chat/percorsi";
+import { galleria, peso, senzaPercorsi, statoAllegato } from "../src/ui/chat/percorsi";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==", "base64");
 const B64 = PNG.toString("base64");
@@ -18,12 +18,10 @@ test("peso: a mille come il Finder, con la virgola italiana", () => {
   assert.deepEqual([312_000, 4_000, 999, 1_200_000, null].map(peso), ["312 KB", "4 KB", "999 B", "1,2 MB", ""]);
 });
 
-test("percorsi in fondo al messaggio: scritti una riga ciascuno e riletti uguali", () => {
+test("percorsi in fondo al messaggio (scritti dal motore): una riga ciascuno, riletti come allegati", () => {
   const p = ["/Users/r/Desktop/schermata.png", "/Users/r/Mio file.ts"];
-  const t = conPercorsi("Guarda qui", p);
-  assert.equal(t, 'Guarda qui\n@/Users/r/Desktop/schermata.png\n@"/Users/r/Mio file.ts"');
+  const t = 'Guarda qui\n@/Users/r/Desktop/schermata.png\n@"/Users/r/Mio file.ts"';
   assert.deepEqual(senzaPercorsi(t), { testo: "Guarda qui", percorsi: p });
-  assert.equal(conPercorsi("Ciao", []), "Ciao");
   // un @ nel mezzo del testo non è un allegato; la prima riga resta sempre testo
   assert.deepEqual(senzaPercorsi("scrivi a @/tmp/x oggi"), { testo: "scrivi a @/tmp/x oggi", percorsi: [] });
   assert.deepEqual(senzaPercorsi("@/tmp/solo"), { testo: "@/tmp/solo", percorsi: [] });
@@ -70,6 +68,30 @@ test("immagine su disco: solo file immagine e percorsi assoluti; descrivi dice t
     [["a.png", "immagine", PNG.length], ["b.ts", "file", 1], ["cartella", "cartella", null]]);
 });
 
+test("immagine incollata: salvata in ~/.claude/casella/allegati/<id>/immagine.<ext> e descritta col suo percorso (#469)", () => {
+  const home = tmp();
+  const f = salvaIncollata(home, "image/png", new Uint8Array(PNG))!;
+  assert.match(f.percorso, new RegExp(`^${home}/\\.claude/casella/allegati/[0-9a-f-]{36}/immagine\\.png$`));
+  assert.deepEqual([f.tipo, f.byte, fs.readFileSync(f.percorso).equals(PNG)], ["immagine", PNG.length, true]);
+  // non è un'immagine, è vuota o non sono byte: niente file
+  assert.deepEqual([salvaIncollata(home, "text/plain", new Uint8Array(PNG)), salvaIncollata(home, "image/png", new Uint8Array()), salvaIncollata(home, "image/png", "x")], [null, null, null]);
+  assert.equal(fs.readdirSync(path.join(home, ".claude", "casella", "allegati")).length, 1);
+});
+
+test("file scelti: copiati in ~/.claude/casella/allegati/<id>/<nome> col nome di prima; cartelle e file mancanti no; oltre il limite non si copiano (#469)", () => {
+  const home = tmp(), src = tmp();
+  fs.writeFileSync(path.join(src, "lettore.ts"), "export {}");
+  fs.writeFileSync(path.join(src, "grande.ts"), Buffer.alloc(200_001));
+  fs.mkdirSync(path.join(src, "cartella"));
+  const r = copiaAllegati(home, [path.join(src, "lettore.ts"), path.join(src, "grande.ts"), path.join(src, "cartella"), path.join(src, "manca.ts")]);
+  assert.deepEqual(r.map((a) => a.nome), ["lettore.ts", "grande.ts"]);
+  assert.match(r[0].percorso, new RegExp(`^${home}/\\.claude/casella/allegati/[0-9a-f-]{36}/lettore\\.ts$`));
+  assert.equal(fs.readFileSync(r[0].percorso, "utf8"), "export {}");
+  assert.equal(r[1].percorso, path.join(src, "grande.ts")); // 200 001 byte di testo: troppo grande, resta dov'è
+  assert.equal(statoAllegato(r[1]), "grande");
+  assert.equal(fs.readdirSync(path.join(home, ".claude", "casella", "allegati")).length, 1);
+});
+
 test("skill: quelle dell'account, altrimenti di ~/.claude; niente cartelle nascoste né senza SKILL.md", () => {
   const home = tmp();
   for (const [d, n] of [[".claude", "ponytail"], [".claude", "app-copy"], [".claude", ".trash"], [".claude-x", "solo-x"]])
@@ -91,9 +113,12 @@ test("filo: segnaposto e percorsi escono dal testo; il visore parte dall'immagin
   assert.deepEqual(galleria(v, "s1").map((g) => g.nome), ["pagina.png", "uno.png", "Immagine 1"]);
 });
 
-test("stato di un allegato nella casella: carico, troppo grande, pronto (#460)", () => {
-  assert.equal(statoAllegato({ byte: null, carico: true }), "carico");
-  assert.equal(statoAllegato({ byte: LIMITE_ALLEGATO_BYTE + 1 }), "grande");
-  assert.equal(statoAllegato({ byte: LIMITE_ALLEGATO_BYTE }), null); // il limite stesso passa
-  assert.equal(statoAllegato({ byte: null }), null); // una cartella non ha peso
+test("stato di un allegato nella casella: carico, troppo grande col limite del suo tipo, pronto (#460, #469)", () => {
+  assert.equal(statoAllegato({ nome: "a.ts", byte: null, carico: true }), "carico");
+  // immagine 5 MB, PDF 20 MB, testo 200 KB: il limite stesso passa, un byte in più no
+  for (const [nome, limite] of [["a.png", 5_000_000], ["a.pdf", 20_000_000], ["a.ts", 200_000]] as const) {
+    assert.equal(statoAllegato({ nome, byte: limite }), null, nome);
+    assert.equal(statoAllegato({ nome, byte: limite + 1 }), "grande", nome);
+  }
+  assert.equal(statoAllegato({ nome: "prova.mov", byte: 480_000_000 }), "grande");
 });

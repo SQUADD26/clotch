@@ -25,8 +25,7 @@ function scena(id, sezione, extra = {}) {
   dati.navigazione.sezione = sezione;
   Object.assign(dati.elenco.sessioni.find((s) => s.id === "s1"),{ permessi: "default", contesto: 124000 }); // 62% di 200 000
   dati.registro.chat.s1 = { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 }; // la finestra la dà il motore (contesto_max, #475)
-  writeFileSync(new URL(`${id.includes("-") ? id : `101-${id}`}.json`, cartella), JSON.stringify({ ...dati, ...extra, preferenze: { ...dati.preferenze, ...extra.preferenze } }, null, 1) + "
-");
+  writeFileSync(new URL(`${id.includes("-") ? id : `101-${id}`}.json`, cartella), JSON.stringify({ ...dati, ...extra, preferenze: { ...dati.preferenze, ...extra.preferenze } }, null, 1) + "\n");
 }
 
 scena("26745", "scritta:/co", { comandi: COMANDI });

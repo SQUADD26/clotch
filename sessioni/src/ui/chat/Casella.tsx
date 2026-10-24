@@ -1,8 +1,9 @@
+// figma: 148-46383 — miniature degli allegati sopra il testo (Allegati.tsx), avviso «File troppo grande» 148:49251, rilascio 148:45727.
 // figma: 101-43332 — «Casella di scrittura» 101:7407 (Vuota, Scritta, Fuoco, In corso, Disabilitata), «Messaggio in coda» 101:13488,
 // coda (101:14849), modifica della voce (101:43708), «invia ora» (101:43945), Invio diretto (101:43535).
 // Scelte e menu (#437): comandi «/» 101:26745, file «@» 101:27018, permessi e contesto 101:26140, modello e sforzo 101:26427, non inviato 101:27528.
 // Mentre la sessione lavora: ↵ interrompe e manda subito (`manda` modo subito), ⌘↵ mette in coda (`manda` modo coda).
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import type { PreferenzeSessione } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { BottoneIcona, Bottone } from "../base/Bottone";
@@ -12,13 +13,14 @@ import { registraAzione } from "../base/scorciatoie";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
-import { ALLEGATI_PROVA, ChipAllegato, type AllegatoCasella } from "./Allegati";
+import { ALLEGATI_PROVA, AllegatiCasella, type AllegatoCasella } from "./Allegati";
 import { ChipContesto, ChipModello, ChipPermessi, impostaDi } from "./Chip";
 import { useAvvisiSopra } from "./avvisiSopra";
 import { comanda, comandaEsito } from "./clotch-ai";
 import { Suggerimenti, useVoci } from "./Suggerimenti";
 import { cercaDi, conScelta } from "./cerca-casella";
-import { casella, conPercorsi, eImmagine, nomeFile, statoAllegato } from "./percorsi";
+import { MAX_ALLEGATI, MAX_TOTALE_BYTE, limiteAllegato } from "../../allegati-limiti";
+import { casella, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
 import { etichettaModello, motivoNonInviato } from "./scelte";
 import { useBozza } from "./bozze";
 import { argsManda, idModello, provaDi, quanti } from "./testi";
@@ -72,12 +74,16 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const pref = usePreferenze().dati[chat], imposta = useMemo(() => impostaDi(chat), [chat]);
   const preferenza = etichettaModello(pref?.modello) ?? globale; // la scelta di questa chat vince su quella dell'app
   const dati = { s: { modello, permessi, contesto }, p: pref };
-  const [allegati, setAllegati] = useState<AllegatoCasella[]>(() => (provaDi(prova, "allegati") !== null ? ALLEGATI_PROVA : []));
+  const [allegati, setAllegati] = useState<AllegatoCasella[]>(() => ALLEGATI_PROVA[provaDi(prova, "allegati") ?? "-"] ?? []);
   const [menuAggiungi, setMenuAggiungi] = useState(() => provaDi(prova, "menu-aggiungi") !== null);
   const [trascina, setTrascina] = useState(() => provaDi(prova, "rilascio") !== null);
-  const unisci = (nuovi: AllegatoCasella[]) => setAllegati((x) => [...x, ...nuovi.filter((n, i) => !x.some((y) => y.percorso === n.percorso) && nuovi.findIndex((m) => m.percorso === n.percorso) === i)]);
+  const unisci = (nuovi: AllegatoCasella[]) => {
+    if (allegati.length + nuovi.length > MAX_ALLEGATI) avvisa({ tipo: "errore", messaggio: `Al massimo ${MAX_ALLEGATI} file` });
+    setAllegati((x) => [...x, ...nuovi.filter((n, i) => !x.some((y) => y.percorso === n.percorso) && nuovi.findIndex((m) => m.percorso === n.percorso) === i)].slice(0, MAX_ALLEGATI));
+  };
   const caricando = allegati.some((a) => a.carico); // il messaggio parte quando tutti i file sono letti
-  const allega = async () => unisci(await casella().scegli().catch(() => []));
+  const pronti = allegati.filter((a) => !statoAllegato(a)), grandi = allegati.filter((a) => statoAllegato(a) === "grande"); // un file oltre il limite ferma il messaggio finché non lo togli
+  const allega = async () => void aggiungi.current((await casella().scegli().catch(() => [])).map((f) => f.percorso)); // anche i file scelti passano dalla copia
   /** «/goal », «/plan », «/<skill> »: il comando va in testa al messaggio, al posto di un altro già scritto. */
   const comando = (c: string) => { bozza.scrivi(c + testo.replace(/^\/\S*\s*/, "")); area.current?.focus(); };
   const [menu, setMenu] = useState<"permessi" | "modello" | null>(() => { const m = provaDi(prova, "menu"); return m === "permessi" || m === "modello" ? m : null; });
@@ -110,10 +116,32 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const aggiungi = useRef((_: string[]) => {});
   aggiungi.current = async (percorsi) => {
     unisci(percorsi.map((percorso) => ({ percorso, nome: nomeFile(percorso), tipo: eImmagine(percorso) ? "immagine" : "file", byte: null, carico: true })));
-    const trovati = percorsi.length ? await casella().descrivi(percorsi).catch(() => []) : [];
+    const trovati = percorsi.length ? await casella().copia(percorsi).catch(() => []) : [];
     if (trovati.length < percorsi.length) avvisa({ tipo: "errore", messaggio: "File non letto" });
-    // il chip «Carico…» diventa il file letto; se non si è letto sparisce
-    setAllegati((x) => x.flatMap((a) => (a.carico && percorsi.includes(a.percorso) ? trovati.filter((t) => t.percorso === a.percorso) : [a])));
+    // il segnaposto «Carico…» diventa il file copiato in «allegati» (stesso nome); se non si è copiato sparisce
+    setAllegati((x) => {
+      const usati = new Set<number>();
+      return x.flatMap((a) => {
+        if (!(a.carico && percorsi.includes(a.percorso))) return [a];
+        const i = trovati.findIndex((t, j) => t.nome === a.nome && !usati.has(j));
+        if (i < 0) return [];
+        usati.add(i);
+        return [trovati[i]];
+      });
+    });
+  };
+  // Cmd+V con file o immagini: un file copiato dal Finder ha il suo percorso; un'immagine copiata no, e il Mac la salva e dà il percorso del salvataggio
+  const incolla = (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    const file = [...e.clipboardData.files];
+    if (!file.length) return;
+    e.preventDefault();
+    const percorsi = file.map((f) => casella().percorso(f)).filter(Boolean);
+    if (percorsi.length) void aggiungi.current(percorsi);
+    const incollate = file.filter((f) => !casella().percorso(f) && f.type.startsWith("image/"));
+    void Promise.all(incollate.map(async (f) => casella().incolla(f.type, new Uint8Array(await f.arrayBuffer())).catch(() => null))).then((fatte) => {
+      unisci(fatte.filter((x) => x !== null));
+      if (fatte.includes(null)) avvisa({ tipo: "errore", messaggio: "Immagine non incollata" });
+    });
   };
   useEffect(() => {
     if (disabilitata) return;
@@ -151,18 +179,20 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     return false;
   };
   const manda = async (modo: "subito" | "coda") => {
-    if (caricando) return;
-    const richiesta = bozza.inizia();
+    if (caricando || grandi.length) return;
+    if (pronti.reduce((n, a) => n + (a.byte ?? 0), 0) > MAX_TOTALE_BYTE) { setErrore(`Gli allegati pesano più di ${peso(MAX_TOTALE_BYTE)} in tutto: togline qualcuno.`); return; }
+    const richiesta = bozza.inizia(pronti.length > 0);
     if (!richiesta) return;
     ultimo.current = modo; setErrore(null);
-    const t = conPercorsi(richiesta.testo.trim(), allegati.filter((a) => !statoAllegato(a)).map((a) => a.percorso)), modifica = richiesta.modifica;
+    const t = richiesta.testo.trim(), modifica = richiesta.modifica;
+    const con = pronti.length ? { allegati: pronti.map((a) => a.percorso) } : {}; // i percorsi vanno nel campo `allegati`, il testo può essere vuoto
     let ok = false;
     try {
       ok = modifica
         ? modo === "coda"
-          ? await invia("coda_modifica", { chat, voce: modifica.voce, testo: t })
-          : (await invia("manda", argsManda(chat, t, "subito", preferenza, modello, pref))) && (await invia("coda_togli", { chat, voce: modifica.voce }))
-        : await invia("manda", argsManda(chat, t, lavora ? modo : "subito", preferenza, modello, pref));
+          ? await invia("coda_modifica", { chat, voce: modifica.voce, testo: t, ...con })
+          : (await invia("manda", { ...argsManda(chat, t, "subito", preferenza, modello, pref), ...con })) && (await invia("coda_togli", { chat, voce: modifica.voce }))
+        : await invia("manda", { ...argsManda(chat, t, lavora ? modo : "subito", preferenza, modello, pref), ...con });
     } finally { richiesta.finisci(ok); if (ok) setAllegati([]); }
   };
 
@@ -185,9 +215,9 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
     void manda(azione === "coda" ? "coda" : "subito");
   };
 
-  const ferma = lavora && !testo.trim();
+  const ferma = lavora && !testo.trim() && !allegati.length;
   const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
-  const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo ? "scritta" : "vuota";
+  const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo || allegati.length ? "scritta" : "vuota";
   return (
     <div className="area-casella con-menu" ref={areaCasella}>
       {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
@@ -195,14 +225,12 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
       {modifica && (
         <div className="nota-casella"><Icona nome="matita" /><span>Modifichi il messaggio in coda. ⌘↵ lo rimette in coda.</span></div>
       )}
-      <div className={`casella ${stato}${modifica || menu === "permessi" || menuAggiungi ? " fuoco" : ""}${errore ? " errore" : ""}`}>
-        {allegati.length > 0 && (
-          <div className="allegati-casella">
-            {allegati.map((a) => <ChipAllegato key={a.percorso} a={a} onRimuovi={() => setAllegati((x) => x.filter((y) => y !== a))} />)}
-          </div>
+      <div className={`casella ${stato}${modifica || menu === "permessi" || menuAggiungi ? " fuoco" : ""}${errore ? " errore" : ""}${trascina && !disabilitata ? " trascina" : ""}`}>
+        {(allegati.length > 0 || (trascina && !disabilitata)) && (
+          <AllegatiCasella allegati={allegati} rilascio={trascina && !disabilitata} onRimuovi={(a) => setAllegati((x) => x.filter((y) => y !== a))} />
         )}
         <div className="area-testo">
-          <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti}
+          <textarea ref={area} rows={1} value={testo} disabled={disabilitata} onChange={(e) => scrivi(e.target.value, e.target.selectionStart)} onKeyDown={tasti} onPaste={incolla}
             onSelect={(e) => setCaret(e.currentTarget.selectionStart)} onFocus={() => setChiuso(false)} onBlur={() => setChiuso(true)}
             placeholder={disabilitata ? "Rispondi da Cursor" : segnaposto} aria-label={segnaposto} />
         </div>
@@ -213,14 +241,24 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} predefinito={idModello(globale)} impegnoAperto={provaDi(prova, "impegno") !== null} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
           <BottoneIcona icona="microfono" etichetta="Detta" disabled />
-          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && (caricando || !testo.trim()))}
+          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
             aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
             <Icona nome={ferma ? "stop" : "invia"} colore={stato === "vuota" || stato === "disabilitata" ? "terziaria" : "su-accento"} />
           </button>
         </div>
-        {trascina && !disabilitata && <div className="zona-rilascio"><Icona nome="graffetta" colore="accento" /><span>Rilascia per allegare</span></div>}
       </div>
+      {grandi.length > 0 && (
+        <div className="avviso-allegato" role="alert">
+          <Icona nome="avviso" colore="errore" />
+          <span className="testi">
+            <span className="titolo">{grandi.length === 1 ? "File troppo grande" : `${grandi.length} file troppo grandi`}</span>
+            <span className="corpo">{grandi.length === 1 ? `${grandi[0].nome} non parte: pesa ${peso(grandi[0].byte)} e il limite è ${peso(limiteAllegato(grandi[0].nome))}. Rimuovilo o allega un file più piccolo.`
+              : `Non partono: superano il limite. Rimuovili o allega file più piccoli.`}</span>
+          </span>
+          <Bottone tipo="secondario" onClick={() => setAllegati((x) => x.filter((a) => statoAllegato(a) !== "grande"))}>Rimuovi file</Bottone>
+        </div>
+      )}
       {errore && (
         <div className="errore-invio" role="alert">
           <Icona nome="avviso" colore="errore" /><span className="testo">{errore}</span>

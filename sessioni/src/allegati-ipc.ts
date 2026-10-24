@@ -1,7 +1,7 @@
 // Canali `casella:*` (#437): file e cartelle da allegare, immagini del filo, copia e «Salva con nome», skill. La logica sta in allegati.ts.
 import { BrowserWindow, clipboard, ClipboardItem, dialog, nativeImage, type IpcMain } from "electron";
 import * as fs from "node:fs";
-import { comeIndirizzo, descrivi, leggiImmagine, leggiSkill } from "./allegati";
+import { comeIndirizzo, descrivi, leggiImmagine, leggiSkill, salvaIncollata, copiaAllegati } from "./allegati";
 import { provaSilenziosa } from "./modalita-prova";
 import type { DaImmagine } from "./tipi";
 
@@ -11,11 +11,13 @@ export function collegaAllegati(ipc: IpcMain, home: string, fileSessione: (id: s
   const silenzio = provaSilenziosa();
   ipc.handle("casella:scegli", async (e) => {
     if (silenzio) return [];
-    const opzioni: Electron.OpenDialogOptions = { properties: ["openFile", "openDirectory", "multiSelections"], defaultPath: home };
+    const opzioni: Electron.OpenDialogOptions = { properties: ["openFile", "multiSelections"], defaultPath: home };
     const r = await (finestra(e) ? dialog.showOpenDialog(finestra(e)!, opzioni) : dialog.showOpenDialog(opzioni));
     return r.canceled ? [] : descrivi(r.filePaths);
   });
   ipc.handle("casella:descrivi", (_e, percorsi: unknown) => descrivi(percorsi));
+  ipc.handle("casella:copia", (_e, percorsi: unknown) => copiaAllegati(home, percorsi));
+  ipc.handle("casella:incolla", (_e, mime: unknown, byte: unknown) => salvaIncollata(home, mime, byte));
   ipc.handle("casella:immagine", async (_e, da: DaImmagine) => {
     const i = await leggiImmagine(da, fileSessione);
     return i ? comeIndirizzo(i) : null;

@@ -1,7 +1,9 @@
 // Allegati, immagini e skill della casella (#437), senza Electron: i canali stanno in allegati-ipc.ts.
+import { randomUUID } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as readline from "node:readline";
+import { limiteAllegato } from "./allegati-limiti";
 import { immaginiDiRiga } from "./messaggi-claude";
 import type { DaImmagine, FileAllegato, RifImmagine, SkillNome } from "./tipi";
 
@@ -66,4 +68,33 @@ export function leggiSkill(home: string, account: string): SkillNome[] {
   const dir = [proprio, path.join(home, ".claude", "skills")].find((d) => { try { return !!d && fs.statSync(d).isDirectory(); } catch { return false; } });
   if (!dir) return [];
   return fs.readdirSync(dir).filter((n) => !n.startsWith(".") && fs.existsSync(path.join(dir, n, "SKILL.md"))).sort().map((nome) => ({ nome }));
+}
+
+const ESTENSIONE_MIME = Object.fromEntries(Object.entries(MIME).map(([e, m]) => [m, e]));
+const MAX_INCOLLATA = 100 * 1024 * 1024;
+
+/** Il motore accetta solo file regolari dentro `~/.claude/casella/allegati/` (sottocartelle ok): l'app copia lì ogni file scelto o incollato prima di `manda`. */
+const salva = (home: string, nome: string, scrivi: (dest: string) => void) => {
+  const dir = path.join(home, ".claude", "casella", "allegati", randomUUID());
+  fs.mkdirSync(dir, { recursive: true });
+  const dest = path.join(dir, nome);
+  scrivi(dest);
+  return dest;
+};
+
+/** Un'immagine incollata non ha un percorso: si salva in `allegati/<id>/immagine.<ext>` e si descrive. null se non è un'immagine, è vuota o troppo grande. */
+export function salvaIncollata(home: string, mime: unknown, byte: unknown): FileAllegato | null {
+  const ext = typeof mime === "string" ? ESTENSIONE_MIME[mime] : undefined;
+  if (!ext || !(byte instanceof Uint8Array) || !byte.length || byte.length > MAX_INCOLLATA) return null;
+  return descrivi([salva(home, `immagine.${ext}`, (d) => fs.writeFileSync(d, byte))])[0] ?? null;
+}
+
+/** Copia i file scelti o trascinati in `allegati/<id>/<nome>` e li descrive col nome di prima. Una cartella non si allega (il motore vuole file regolari);
+ *  un file oltre il limite del suo tipo non si copia: resta col suo percorso e la casella dice «troppo grande». Un file che non si copia sparisce dal risultato. */
+export function copiaAllegati(home: string, percorsi: unknown): FileAllegato[] {
+  return descrivi(percorsi).flatMap((a): FileAllegato[] => {
+    if (a.tipo === "cartella") return [];
+    if (a.byte !== null && a.byte > limiteAllegato(a.nome)) return [a];
+    try { return [{ ...a, percorso: salva(home, a.nome, (d) => fs.copyFileSync(a.percorso, d)) }]; } catch { return []; }
+  });
 }
