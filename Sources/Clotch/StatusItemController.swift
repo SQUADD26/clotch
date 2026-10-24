@@ -24,7 +24,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     private func syncVisibility() {
-        if SettingsManager.shared.hideWhenNoSession {
+        // con l'app clotch nel pacchetto il menu è la porta per aprirla (#465): resta visibile anche col notch sempre mostrato
+        if SettingsManager.shared.hideWhenNoSession || AppSessioni.url() != nil {
             showStatusItem()
         } else {
             hideStatusItem()
