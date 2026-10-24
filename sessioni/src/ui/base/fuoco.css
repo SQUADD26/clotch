@@ -2,7 +2,8 @@
    Esclusi apposta: il campo grande del dialogo (101:10247, il dialogo è il campo), «Cerca» delle impostazioni (101:119-57161, si tinge) e le caselle che cambiano già bordo. */
 input:focus-visible, textarea:focus-visible { outline: none; }
 .campo.piccolo:has(> input:focus-visible), .campo-menu:has(> input:focus-visible), .cerca-icone:has(> input:focus-visible),
-.ricerca-avvio:has(> input:focus-visible), .trova:has(> input:focus-visible), .carta-richiesta .altro:focus-visible {
+.ricerca-avvio:has(> input:focus-visible), .trova:has(> input:focus-visible), .carta-richiesta .altro:focus-visible,
+.casella:focus-within, .casella-macchina:focus-visible {
   outline: var(--misura-tratto) solid var(--colore-bordo-fuoco); outline-offset: calc(-1 * var(--misura-tratto));
 }
 
@@ -26,3 +27,7 @@ input:read-only, textarea:read-only { cursor: default; }
 /* anello di focus sempre dentro il bordo dell'elemento: dentro una lista che scorre o un contenitore con overflow non si taglia mai */
 :focus-visible { outline-offset: calc(-1 * var(--misura-tratto)); }
 .testata:focus-visible { border-radius: var(--raggio-md); } /* testata di un blocco che si apre: il bottone è a spigolo vivo, l'anello no */
+
+/* hover dei campi e delle testate dei blocchi: i campi prendono il bordo forte (come l'allegato), la testata la tinta di riga */
+.casella:hover:not(:focus-within):not(.errore), .casella-macchina:hover:not(:focus-visible):not(.errore) { border-color: var(--colore-bordo-forte); }
+.testata:hover { background: var(--colore-fondo-riga-passaggio); }
