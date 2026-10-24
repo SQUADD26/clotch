@@ -64,7 +64,7 @@
 .pezzo-chat .interruttore .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
 
 /* messaggio non inviato: la casella tiene il testo con il bordo d'errore, sotto il perché e «Riprova» */
-.pezzo-chat .casella.errore, .pezzo-chat .casella.errore:focus-within { border-color: var(--colore-testo-errore); }
+.pezzo-chat .casella.errore, .pezzo-chat .casella.errore:focus-within { border-color: var(--colore-bordo-errore); }
 .pezzo-chat .errore-invio {
   display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-1); min-height: var(--misura-bottone-invio);
   margin-inline: calc(-1 * (var(--spazio-4) + var(--spazio-0-5)));

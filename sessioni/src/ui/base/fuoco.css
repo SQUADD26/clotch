@@ -19,10 +19,9 @@ button:disabled, input:disabled, textarea:disabled { opacity: var(--opacita-spen
 input:read-only, textarea:read-only { cursor: default; }
 :is(input, textarea)[aria-invalid="true"] { color: var(--colore-testo-errore); }
 
-/* hover di Bottone e Pillola (riposo/hover/premuto/focus/disabilitato). Il disegno non ha ancora la variabile del primario: `opacity` provvisoria, vedi #521 */
-.bottone.secondario:hover:not(:disabled), .pillola:not(.attiva):hover { background: var(--colore-fondo-riga-scelta); }
-.bottone.pericolo:hover:not(:disabled) { box-shadow: inset 0 0 0 999px var(--colore-fondo-riga-passaggio); }
-.bottone.primario:hover:not(:disabled), .pillola.attiva:hover { opacity: 0.9; }
+/* Bottone e Pillola pieni: passaggio 153:71039 e premuto 154:71340 sono opacità su tutto il bottone */
+.bottone:hover:not(:disabled), .pillola:hover:not(:disabled) { opacity: var(--opacita-passaggio); }
+.bottone:active:not(:disabled), .pillola:active:not(:disabled) { opacity: var(--opacita-premuto); }
 
 /* anello di focus sempre dentro il bordo dell'elemento: dentro una lista che scorre o un contenitore con overflow non si taglia mai */
 :focus-visible { outline-offset: calc(-1 * var(--misura-tratto)); }
