@@ -43,8 +43,8 @@ const registro = (c) => ({ chat: c ? { s1: c } : {}, fermoTutto: false, avvisi: 
   regole: [], nonDisturbare: null, impostazioni: null, esiti: {}, errori: [] });
 
 function scena(id, s, msg, { c = null, sezione, info } = {}) {
-  const dati = { navigazione: { vista: "sessione", sessione: "s1", ...(sezione ? { sezione } : {}) }, elenco: { sessioni: [sessione(s)], errori: [] },
-    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c), ...(info ? { info: { s1: info } } : {}) };
+  const dati = { navigazione: { vista: "sessione", sessione: "s1", ...(sezione ? { sezione } : {}) }, elenco: { sessioni: [sessione({ contesto: 124000, ...s })], errori: [] }, // 62% di 200 000: il chip «Contesto usato» è in ogni frame
+    messaggi: { s1: msg }, preferenze: { s1: { icona: s.icona ?? "strati" } }, registro: registro(c ? { ...c, contestoMax: 200_000 } : { chat: "s1", coda: [], richieste: [], aiutanti: {}, passi: [], contestoMax: 200_000 }), ...(info ? { info: { s1: info } } : {}) };
   writeFileSync(new URL(`../design/scene/101-${id}.json`, import.meta.url), JSON.stringify(dati, null, 1) + "\n");
 }
 
