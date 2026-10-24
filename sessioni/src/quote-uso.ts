@@ -2,10 +2,11 @@
 // sezione Uso. Cache di 60 s; un errore di rete lancia, e la sezione non mostra numeri.
 // shortcut: solo il feed (tutti gli account); l'API OAuth di un solo account (ClaudeQuotaClient) non serve e il token non si tocca.
 import * as fs from "node:fs/promises";
+import * as os from "node:os";
 import * as path from "node:path";
 import type { Radice } from "./radici";
 import type { QuotaUso } from "./tipi";
-import { quoteDalFeed } from "./uso-testi";
+import { nomeMac, quoteDalFeed } from "./uso-testi";
 
 const FEED = "https://claude.squaddbackend.com/dashboard/data";
 const CACHE_MS = 60_000;
@@ -17,7 +18,7 @@ let giorniCache: { quando: number; dati: Awaited<ReturnType<typeof usoAlGiorno>>
 export async function quoteUso(ora = Date.now(), leggi: () => Promise<unknown> = leggiFeed): Promise<QuotaUso[]> {
   if (cache && ora - cache.quando < CACHE_MS) return cache.dati;
   inVolo ??= leggi().then((json) => {
-    const dati = quoteDalFeed(json, Date.now());
+    const dati = quoteDalFeed(json, Date.now(), nomeMac(os.hostname()));
     if (!dati) throw new Error("risposta del feed non valida");
     cache = { quando: Date.now(), dati };
     return dati;
@@ -116,8 +117,10 @@ export async function quoteConGiorni(radici: Radice[], ora = Date.now(), contaGi
   const [quote, uso] = await Promise.all([quoteUso(ora), giorniCache?.dati ?? contaGiorni(radici, ora)]);
   giorniCache ??= { quando: ora, dati: uso };
   const vuota = [...uso.values()][0]?.map((g) => ({ ...g, v: 0 }));
-  if (![...uso.values()].some((g) => g.some((x) => x.v))) return quote;
-  return quote.map((q) => ({ ...q, giorni: uso.get(q.account) ?? vuota }));
+  // le cartelle dell'account per email: la sessione porta il nome della cartella, non l'email (#993)
+  const conCartelle = quote.map((q) => ({ ...q, cartelle: radici.filter((r) => r.email?.toLowerCase() === q.email?.toLowerCase()).map((r) => r.account) }));
+  if (![...uso.values()].some((g) => g.some((x) => x.v))) return conCartelle;
+  return conCartelle.map((q) => ({ ...q, giorni: uso.get(q.account) ?? vuota }));
 }
 
 /** Quando l'uso supera l'80% e il 90%: `viste` = ultima soglia già raggiunta per account (si aggiorna qui). Lo stesso account avvisa una volta per soglia e finestra: se l'uso scende sotto, la soglia si azzera. La prima lettura di un account è solo il punto di partenza; da 100% in su c'è l'avviso del limite. */

@@ -283,6 +283,8 @@ export interface QuotaUso {
   /** Per finestra (#478): percentuale usata (null senza dato) e quando riparte, in ms; `usato` resta quello del 7 giorni (100 se le 5 ore sono finite). */
   /** Email dell'account: è quella che chiedono `nuova_sessione` e `riprendi_altrove`. */
   email?: string;
+  /** Cartelle dell'account sul Mac (`.claude-x`) con quell'email: la sessione porta il nome della cartella (#993). */
+  cartelle?: string[];
   cinque?: number | null; cinqueFine?: number | null; sette?: number | null; setteFine?: number | null; giorni?: { giorno: string; v: number }[] }
 /** `id` = id della sessione (CLI), serve a «Ripristina». */
 export interface Archiviata { id: string; titolo: string; dove: string }
