@@ -94,8 +94,11 @@ function SchedaProgetto({ p, fatte }: { p: Progetto; fatte: string[] }) {
 
 function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["proposti"][number]; clotch: boolean }) {
   // fatto: la scheda sparisce col registro nuovo; non riuscito: il perché di clotch AI (testo del disegno se non ne dà)
+  const [invio, setInvio] = useState(false); // niente doppio invio mentre clotch AI risponde
   const decidi = async (esito: "accetta" | "rifiuta") => {
-    const e = await clotchAi().comando("obiettivo", { chat: o.chat, esito });
+    setInvio(true);
+    const e = await clotchAi().comando("obiettivo", { chat: o.chat, esito }).catch(() => ({ esito: "errore", testo: "" }));
+    setInvio(false);
     if (e.esito !== "ok") avvisa({ tipo: "errore", messaggio: e.testo || "clotch AI non risponde" });
   };
   return (
@@ -106,8 +109,8 @@ function ObiettivoProposto({ o, clotch }: { o: ReturnType<typeof casella>["propo
       </div>
       <span className="t-sm secondario">{o.testo}</span>
       <div className="riga-f">
-        <Bottone onClick={() => decidi("accetta")}>Accetta</Bottone>
-        <Bottone tipo="secondario" onClick={() => decidi("rifiuta")}>Rifiuta</Bottone>
+        <Bottone disabled={invio} onClick={() => decidi("accetta")}>Accetta</Bottone>
+        <Bottone tipo="secondario" disabled={invio} onClick={() => decidi("rifiuta")}>Rifiuta</Bottone>
         {clotch && (
           <span className="riga-f nota-clotch"><Icona nome="schermo" /><span className="t-xs secondario">Puoi decidere anche dal notch</span></span>
         )}

@@ -27,6 +27,7 @@
 .contenuto { position: relative; }
 .pannello.sopra {
   position: absolute; z-index: var(--livello-barra-sovrapposta); top: 0; right: var(--spazio-4); max-width: calc(100% - 2 * var(--spazio-4)); max-height: calc(100% - var(--spazio-4)); border-radius: var(--raggio-xl);
+  background: var(--colore-fondo-cornice); /* opaco: tra una scheda e l'altra non si legge la chat sotto (#713) */
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pannello.sopra .pannello-obiettivo { width: 100%; }

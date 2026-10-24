@@ -7,6 +7,7 @@
   "h": 2051
  },
  "variabili": {
+  "colore/fondo/superficie": "#181818",
   "spazio/12": 48,
   "colore/fondo/elevato": "#2d2d2d",
   "colore/bordo/fuoco": "#ee7c37",
@@ -67,7 +68,8 @@
   "colore/fondo/cornice": "#232323",
   "misura/pannello": 320,
   "colore/bordo/leggero": "#ffffff0b",
-  "colore/bordo/errore": "#ff7673"
+  "colore/bordo/errore": "#ff7673",
+  "colore/sessione/arancione": "#ff8549"
  },
  "nodi": [
   {
@@ -81,6 +83,7 @@
     "h": 2051
    },
    "variabili": {
+    "fills[0]": "colore/fondo/superficie",
     "itemSpacing": "spazio/12",
     "counterAxisSpacing": "spazio/12"
    },
@@ -13185,6 +13188,377 @@
     "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
+  },
+  {
+   "id": "163:84074",
+   "nome": "Riga attesa",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2262,
+    "y": 2019,
+    "w": 304,
+    "h": 32
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84074;163:83880",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2270,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84074;163:83880;101:11209",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2270,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84074;163:83880;101:11209;101:11030",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2270.6650390625,
+    "y": 2027.666015625,
+    "w": 14.668047904968262,
+    "h": 14.048399925231934
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/arancione"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84074;163:83883",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2294,
+    "y": 2025,
+    "w": 147,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Backend: auth e RLS",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84074;163:83884",
+   "nome": "tipo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2449,
+    "y": 2026,
+    "w": 61,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Permesso",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84074;163:83885",
+   "nome": "tempo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2518,
+    "y": 2026,
+    "w": 40,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "12 min",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84081",
+   "nome": "Riga attesa",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2614,
+    "y": 2019,
+    "w": 304,
+    "h": 32
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-passaggio",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84081;163:83887",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2622,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84081;163:83887;101:11209",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2622,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84081;163:83887;101:11209;101:11030",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2622.6650390625,
+    "y": 2027.666015625,
+    "w": 14.668047904968262,
+    "h": 14.048399925231934
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/arancione"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84081;163:83890",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2646,
+    "y": 2025,
+    "w": 147,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Backend: auth e RLS",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84081;163:83891",
+   "nome": "tipo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2801,
+    "y": 2026,
+    "w": 61,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Permesso",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84081;163:83892",
+   "nome": "tempo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2870,
+    "y": 2026,
+    "w": 40,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "12 min",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "163:84088",
+   "nome": "Riga attesa",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2966,
+    "y": 2019,
+    "w": 304,
+    "h": 32
+   },
+   "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
+    "cornerRadius": "raggio/md",
+    "itemSpacing": "spazio/2",
+    "paddingLeft": "spazio/2",
+    "paddingRight": "spazio/2",
+    "height": "misura/riga"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84088;163:83894",
+   "nome": "icona sessione",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2974,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84088;163:83894;101:11209",
+   "nome": "glifo",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 2974,
+    "y": 2027,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84088;163:83894;101:11209;101:11030",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 2974.6650390625,
+    "y": 2027.666015625,
+    "w": 14.668047904968262,
+    "h": 14.048399925231934
+   },
+   "variabili": {
+    "fills[0]": "colore/sessione/arancione"
+   },
+   "senza": []
+  },
+  {
+   "id": "I163:84088;163:83897",
+   "nome": "titolo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 2998,
+    "y": 2025,
+    "w": 147,
+    "h": 20
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base",
+    "lineHeight": "testo/riga/base"
+   },
+   "senza": [],
+   "testo": "Backend: auth e RLS",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84088;163:83898",
+   "nome": "tipo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 3153,
+    "y": 2026,
+    "w": 61,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "Permesso",
+   "font": "SF Pro Regular"
+  },
+  {
+   "id": "I163:84088;163:83899",
+   "nome": "tempo",
+   "tipo": "TEXT",
+   "box": {
+    "x": 3222,
+    "y": 2026,
+    "w": 40,
+    "h": 18
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/sm",
+    "lineHeight": "testo/riga/sm"
+   },
+   "senza": [],
+   "testo": "12 min",
+   "font": "SF Pro Regular"
   }
  ]
 }

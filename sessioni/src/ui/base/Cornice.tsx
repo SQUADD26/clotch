@@ -1,6 +1,6 @@
 // figma: 101-8036 — «Sessione aperta · 1440» (e 101-8610 a 1024): barra del titolo e tre colonne con i punti di montaggio.
 // Finestre strette e barra ridimensionabile: 101-29280, 101-29399, 101-29552, 101-29770, 101-29971 (base/layout.tsx).
-import { useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import Barra from "../barra";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
 import { Dialoghi } from "../dialoghi";
@@ -13,7 +13,8 @@ import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { Pezzo } from "./Pezzo";
 import { LARGHEZZA_BARRA_FISSA, ManigliaBarra, useEscChiude, useLarghezza, useLarghezzaBarra } from "./layout";
-import { ConNavigazione, useNavigazione, VISTE_CLOTCH_AI } from "./navigazione";
+import { useElenco } from "./dati";
+import { ConNavigazione, useNavigazione, VISTE_CLOTCH_AI, type Vista } from "./navigazione";
 import { useScorciatoie } from "./scorciatoie";
 import { numero } from "./token";
 import "./cornice.css";
@@ -22,9 +23,15 @@ import "./aspetto.css";
 // Il pannello sta accanto alla colonna solo se c'è posto per entrambi (a 1440 sì, a 1024 no, come nei due frame).
 const LARGHEZZA_PANNELLO = numero("misura-colonna") + numero("misura-pannello") + 3 * numero("spazio-4");
 
+// HIG Windows: il titolo dice cosa mostra la finestra (menu Finestra, Dock, Mission Control), anche se la barra lo nasconde (#864)
+const NOME_VISTA: Partial<Record<Vista, string>> = { "nuova-sessione": "Nuova sessione", "clotch-ai": "clotch AI", casella: "Casella", decisioni: "Decisioni", regole: "Regole", impostazioni: "Impostazioni" };
+
 function Corpo() {
   const n = useNavigazione();
   useScorciatoie();
+  const sessioni = useElenco().dati?.sessioni;
+  const titolo = (n.vista === "sessione" ? sessioni?.find((s) => s.id === n.sessione)?.titolo : NOME_VISTA[n.vista]) || "clotch";
+  useEffect(() => { document.title = titolo; }, [titolo]);
   const corpo = useRef<HTMLDivElement>(null), colonna = useRef<HTMLDivElement>(null), contenuto = useRef<HTMLDivElement>(null);
   const impostazioni = n.vista === "impostazioni";
   const finestra = useLarghezza(corpo), larghezzaColonna = useLarghezza(colonna, !impostazioni);

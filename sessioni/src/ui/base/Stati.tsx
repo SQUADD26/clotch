@@ -6,10 +6,11 @@ import { Bottone } from "./Bottone";
 import "./stati.css";
 
 /** Vuoto ed errore: titolo, testo e bottoni al centro della superficie. Testi dal frame Figma della situazione. */
-export function MessaggioAlCentro({ titolo, corpo, children }: { titolo: string; corpo: string; children?: ReactNode }) {
+/** `allarme`: un errore, VoiceOver lo dice appena compare (#866). */
+export function MessaggioAlCentro({ titolo, corpo, allarme, children }: { titolo: string; corpo: string; allarme?: boolean; children?: ReactNode }) {
   return (
-    <div className="messaggio-al-centro">
-      <div className="t-xl">{titolo}</div>
+    <div className="messaggio-al-centro" role={allarme ? "alert" : undefined}>
+      <div className="t-xl" role="heading" aria-level={2}>{titolo}</div>
       <div className="t-base secondario">{corpo}</div>
       {children && <div className="bottoni">{children}</div>}
     </div>
@@ -19,7 +20,7 @@ export function MessaggioAlCentro({ titolo, corpo, children }: { titolo: string;
 /** Errore con «Riprova» (testo di 101-9090): per una chiamata fallita di dati.ts. */
 export function StatoErrore({ titolo, corpo, riprova, children }: { titolo: string; corpo: string; riprova(): void; children?: ReactNode }) {
   return (
-    <MessaggioAlCentro titolo={titolo} corpo={corpo}>
+    <MessaggioAlCentro titolo={titolo} corpo={corpo} allarme>
       {children}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>
@@ -51,7 +52,7 @@ export function CartellaNonLeggibile({ errori, riprova }: { errori: ErroreLettur
   const lista = errori.slice(0, MAX_CARTELLE).map((e) => `${e.percorso}: ${motivoErrore(e.messaggio)}`).join("\n");
   const altre = errori.length > MAX_CARTELLE ? `\ne altre ${errori.length - MAX_CARTELLE}` : "";
   return (
-    <MessaggioAlCentro titolo={uno ? "Cartella non leggibile" : "Cartelle non leggibili"}
+    <MessaggioAlCentro allarme titolo={uno ? "Cartella non leggibile" : "Cartelle non leggibili"}
       corpo={`${uno ? `clotch non può leggere ${lista}.` : `clotch non può leggere ${errori.length} cartelle:\n${lista}${altre}`}${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
       {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
@@ -75,7 +76,7 @@ const righe = nodi.filter((n) => /sagoma$/.test(n.nome) && n.nome !== "sagoma").
 export function Sagome() {
   const stileFilo: CSSProperties = { gap: v(filo.variabili.itemSpacing), paddingTop: v(filo.variabili.paddingTop), paddingBottom: v(filo.variabili.paddingBottom) };
   return (
-    <div className="sagome" style={stileFilo} aria-busy="true">
+    <div className="sagome" style={stileFilo} role="progressbar" aria-label="Caricamento" aria-busy="true">
       {righe.map((r, i) => (
         <div key={i} className={r.bolla ? "riga bolla" : "riga"} style={{ gap: v(r.gap) }}>
           {r.sagome.map((s, j) => (

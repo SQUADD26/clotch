@@ -67,7 +67,7 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
   const galleria = useMemo(() => galleriaDi(voci, chat), [voci, chat]);
   const [aperta, setAperta] = useState<string | null>(() => { const n = provaDi(prova, "visore"); return n == null ? null : galleria[Number(n) || 0]?.chiave ?? null; });
   const indice = galleria.findIndex((g) => g.chiave === aperta); // per chiave: un'immagine nuova in testa non sposta quella aperta
-  const daFondo = useRef(distanze.get(chat) ?? 0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo; tornando alla chat si ritrova il punto di lettura (#698)
+  const daFondo = useRef(distanze.get(chat) ?? 0); // distanza dal fondo prima di un cambio: 0 = resta attaccato in fondo; tornando alla chat si ritrova il punto di lettura (issue 698)
   const letto = useRef({ righe: righeDel(voci), prima: voci[0]?.chiave }); // com'era il filo all'ultimo disegno
   const [nuovi, setNuovi] = useState(0); // righe arrivate in fondo mentre si leggeva più su
   const inFondoDel = () => daFondo.current <= numero("spazio-6");
