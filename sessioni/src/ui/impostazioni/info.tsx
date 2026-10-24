@@ -38,7 +38,7 @@ export default function Info() {
   const apriRegistro = () => window.impostazioni.apri(v.cartellaRegistro).catch(errore);
   const voci: VoceMenu[] = [
     { etichetta: "Controlla aggiornamenti", fai: () => void verificaAggiornamenti() },
-    ...(novita ? [{ etichetta: `Novità della versione ${versione}`, fai: () => void apriNovita() }] : []),
+    ...(novita ? [{ etichetta: `Novità`, fai: () => void apriNovita() }] : []),
     { etichetta: "Copia versione", fai: () => { navigator.clipboard.writeText(versione).catch(errore); } },
   ];
   return (
@@ -57,9 +57,9 @@ export default function Info() {
           </button>
         </Riga>
         {novita && (
-          <Riga etichetta="Note di rilascio" azione>
+          <Riga etichetta="Novità" azione>
             <button type="button" className="valore-scelta" onClick={() => void apriNovita()}>
-              <span className="t-sm secondario">Novità della versione {versione}</span>
+              <span className="t-sm secondario">Versione {versione}</span>
               <Icona nome="destra" />
             </button>
           </Riga>

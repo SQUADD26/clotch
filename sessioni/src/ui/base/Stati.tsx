@@ -43,7 +43,7 @@ export function CartellaNonLeggibile({ errore, riprova }: { errore: ErroreLettur
   const permesso = errore.messaggio === "permesso negato";
   return (
     <MessaggioAlCentro titolo="Cartella non leggibile"
-      corpo={`clotch non può leggere ${errore.percorso}: ${errore.messaggio}.${permesso ? "\nDai a clotch l'accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
+      corpo={`clotch non può leggere ${errore.percorso}: ${errore.messaggio}.${permesso ? "\nDai a clotch l’accesso completo al disco in Impostazioni di Sistema › Privacy e sicurezza, poi riprova." : ""}`}>
       {permesso && <Bottone onClick={() => void window.impostazioni.apri(IMPOSTAZIONI_DI_SISTEMA).catch(() => {})}>Apri Impostazioni di Sistema</Bottone>}
       <Bottone tipo="secondario" onClick={riprova}>Riprova</Bottone>
     </MessaggioAlCentro>

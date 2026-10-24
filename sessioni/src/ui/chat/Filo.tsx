@@ -38,11 +38,11 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, modello, aperto }: {
     case "errore": return <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":
-      if (!b.aperta) return <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta ?? ""} />;
+      if (!b.aperta) return b.risposta ? <Esito icona="persona" colore="secondaria" esito="Hai risposto" dettaglio={b.risposta} /> : <Esito icona="persona" colore="secondaria" esito="Senza risposta" />;
       return <Domanda chat={chat} rid={richiesta("domanda")?.rid ?? null} domande={b.domande} da={da} />;
     case "piano":
       if (b.approvato) return <Esito icona="spunta" colore="successo" esito="Piano approvato" dettaglio={quanti(passiPiano(b.testo).passi.length, "passo", "passi")} />;
-      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : null;
+      return b.aperto ? <Piano chat={chat} rid={richiesta("piano")?.rid ?? null} testo={b.testo} /> : <Esito icona="chiudi" colore="errore" esito="Piano rifiutato" />;
   }
 }
 

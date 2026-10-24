@@ -95,7 +95,7 @@ export function SessioniCitate({ citate }: { citate: Citata[] }) {
       {aspettano.length > 0 && <div className="sessioni-citate">{aspettano.map((x) => <SchedaSessione key={x.s.id} x={x} />)}</div>}
       {altre.length > 0 && (
         <div className="testo-con-riferimenti">
-          {tutteLavorano && <span className="testo">{altre.length === 1 ? "Un’altra lavora:" : `Altre ${altre.length} lavorano:`}</span>}
+          {tutteLavorano && <span className="testo">{altre.length === 1 ? "Un’altra in corso:" : `Altre ${altre.length} in corso:`}</span>}
           {altre.map((x) => <Riferimento key={x.s.id} x={x} />)}
         </div>
       )}

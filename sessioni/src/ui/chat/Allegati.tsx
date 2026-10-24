@@ -11,19 +11,22 @@ export const VisoreContesto = createContext<{ sessione: string; apri(da: DaImmag
 
 const MAX_CACHE = 24;
 const cache = new Map<string, Promise<string | null>>();
+const leggi = (da: DaImmagine) => casella().immagine(da).catch(() => null);
+// un file del disco si rilegge a ogni apertura (può essere riscritto); una riga della trascrizione non cambia. Una lettura fallita non resta in cache.
 const carica = (da: DaImmagine) => {
+  if ("percorso" in da) return leggi(da);
   const k = chiaveImmagine(da);
   let p = cache.get(k);
   if (!p) {
-    p = casella().immagine(da).catch(() => null);
+    p = leggi(da).then((u) => { if (u === null) cache.delete(k); return u; });
     cache.set(k, p);
     if (cache.size > MAX_CACHE) cache.delete(cache.keys().next().value!);
   }
   return p;
 };
 
-/** L'immagine come indirizzo `data:`; undefined mentre si legge, null se non si legge. */
-export function useImmagine(da: DaImmagine | null) {
+/** L'immagine come indirizzo `data:`; undefined mentre si legge, null se non si legge. `giro` sale a ogni «Riprova». */
+export function useImmagine(da: DaImmagine | null, giro = 0) {
   const [url, setUrl] = useState<string | null | undefined>(undefined);
   const k = da && chiaveImmagine(da);
   useEffect(() => {
@@ -33,11 +36,11 @@ export function useImmagine(da: DaImmagine | null) {
     void carica(da).then((u) => vivo && setUrl(u));
     return () => { vivo = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [k]);
+  }, [k, giro]);
   return url;
 }
 
-type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string };
+type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string; mancante?: boolean };
 
 /** Il chip di un allegato nel filo (101:28041); nella casella ci sono le miniature, `Allegato`. */
 export function ChipAllegato({ a, onApri }: { a: Chip; onApri?(): void }) {
@@ -49,7 +52,7 @@ export function ChipAllegato({ a, onApri }: { a: Chip; onApri?(): void }) {
     </>
   );
   return (
-    <span className="chip-allegato">
+    <span className={`chip-allegato${a.mancante ? " mancante" : ""}`}>
       {onApri ? <button type="button" className="apri" onClick={onApri} aria-label={`Apri ${a.nome}`}>{corpo}</button> : <span className="apri">{corpo}</span>}
     </span>
   );
@@ -59,7 +62,7 @@ export function ChipAllegato({ a, onApri }: { a: Chip; onApri?(): void }) {
 export type AllegatoCasella = FileAllegato & { carico?: boolean };
 
 const sigla = (nome: string) => /\.([^.]+)$/.exec(nome)?.[1].toUpperCase();
-const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Carico…" : statoAllegato(a) === "grande" ? "Troppo grande"
+const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Caricando…" : statoAllegato(a) === "grande" ? "Troppo grande"
   : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(" · "));
 
 /** La miniatura di un allegato, sopra il testo della casella (148:43692 «Allegato nella casella»): immagine quadrata o riquadro col nome. */
@@ -91,13 +94,18 @@ export function Allegato({ a, onRimuovi }: { a: AllegatoCasella; onRimuovi(): vo
 export function AllegatiCasella({ allegati, rilascio, onRimuovi }: { allegati: AllegatoCasella[]; rilascio: boolean; onRimuovi(a: AllegatoCasella): void }) {
   const riga = useRef<HTMLDivElement>(null);
   const prima = useRef(allegati.length);
+  const tolto = useRef<number | null>(null); // posto dell'allegato tolto: il fuoco passa al successivo (o al precedente)
   useEffect(() => { // l'ultimo arrivato si vede
     if (allegati.length > prima.current) riga.current?.scrollTo({ left: riga.current.scrollWidth });
     prima.current = allegati.length;
+    if (tolto.current === null) return;
+    const x = riga.current?.querySelectorAll<HTMLElement>(".rimuovi-allegato");
+    x?.[Math.min(tolto.current, x.length - 1)]?.focus();
+    tolto.current = null;
   }, [allegati.length]);
   return (
     <div className="allegati-casella" ref={riga}>
-      {allegati.map((a) => <Allegato key={a.percorso} a={a} onRimuovi={() => onRimuovi(a)} />)}
+      {allegati.map((a) => <Allegato key={a.percorso} a={a} onRimuovi={() => { tolto.current = allegati.indexOf(a); onRimuovi(a); }} />)}
       {rilascio && <div className="zona-rilascio"><Icona nome="graffetta" colore="accento" /><span>Rilascia per allegare</span></div>}
     </div>
   );
@@ -116,7 +124,7 @@ function useDescrizioni(percorsi: string[]) {
   }, [k]);
   return (p: string): Chip & { percorso: string } => {
     const f = trovati?.find((x) => x.percorso === p);
-    return f ?? { percorso: p, nome: nomeFile(p), tipo: eImmagine(p) ? "immagine" : "file", byte: null, dettaglio: trovati ? "Non trovato" : "" };
+    return f ?? { percorso: p, nome: nomeFile(p), tipo: eImmagine(p) ? "immagine" : "file", byte: null, dettaglio: trovati ? "Non trovato" : "", mancante: !!trovati };
   };
 }
 
@@ -131,7 +139,7 @@ export function AllegatiMessaggio({ immagini, percorsi }: { immagini: RifImmagin
       ))}
       {percorsi.map((p) => {
         const a = descrivi(p);
-        return <ChipAllegato key={p} a={a} onApri={a.tipo === "immagine" ? () => apri({ percorso: p }) : undefined} />;
+        return <ChipAllegato key={p} a={a} onApri={a.mancante ? undefined : a.tipo === "immagine" ? () => apri({ percorso: p }) : () => void casella().mostra(p)} />;
       })}
     </div>
   );
@@ -148,11 +156,14 @@ export function Miniature({ immagini, nome }: { immagini: RifImmagine[]; nome: s
 }
 
 function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(): void }) {
-  const url = useImmagine(da);
+  const [giro, setGiro] = useState(0);
+  const url = useImmagine(da, giro);
   const [rotta, setRotta] = useState(false);
+  const riprova = () => { setRotta(false); setGiro((g) => g + 1); };
+  const mancante = url === null || rotta;
   return (
-    <button type="button" className="miniatura" onClick={onApri} aria-label={`Apri ${nome}`}>
-      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : url === null || rotta ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta</span> : null}
+    <button type="button" className={`miniatura${url === undefined ? " carico" : ""}`} onClick={mancante ? riprova : onApri} aria-label={mancante ? `Riprova a leggere ${nome}` : `Apri ${nome}`}>
+      {url && !rotta ? <img src={url} alt={nome} onError={() => setRotta(true)} /> : mancante ? <span className="non-letta"><Icona nome="immagine" colore="terziaria" />Immagine non letta · Riprova</span> : null}
     </button>
   );
 }

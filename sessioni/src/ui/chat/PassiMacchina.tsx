@@ -66,7 +66,7 @@ export function BloccoCodice({ riga }: { riga: RigaPasso }) {
     <div className="codice-github">
       <div className="codice-grande" aria-label="Codice di GitHub">{riga.codice}</div>
       <Bottone tipo="primario" onClick={apri}>Copia il codice e apri GitHub</Bottone>
-      <span className="nota-codice">Incolla il codice nella pagina che si apre. Aspetto fino a 10 minuti.</span>
+      <span className="nota-codice">Incolla il codice nella pagina che si apre. Attesa massima: 10 minuti.</span>
     </div>
   );
 }

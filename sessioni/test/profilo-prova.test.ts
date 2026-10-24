@@ -92,7 +92,7 @@ test("parità: profilo prima import/ready; errori IPC/processo non leggono o scr
     let letturePreferenze = 0;
     try {
       const modules: Record<string, unknown> = {
-        electron: { app: f.app, ipcMain: { handle: (id: string, fn: (...a: any[]) => any) => handlers.set(id, fn) }, BrowserWindow: {} },
+        electron: { app: f.app, ipcMain: { handle: (id: string, fn: (...a: any[]) => any) => handlers.set(id, fn) }, BrowserWindow: {}, nativeTheme: {} },
         "node:os": os, "node:path": path,
         "./branding": { ...f.branding, impostaIdentita() {} }, "./modalita-prova": f.modo,
         "./ipc-fiducia": { verificaChiamante: (evento: unknown) => assert.equal(evento, eventoIpc) },

@@ -31,7 +31,7 @@ export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
         <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${ora(nd.fino)}`}</span>
-        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Togli</button>
+        <button type="button" className="t-sm medio" onClick={() => window.clotchAi.comando("non_disturbare", { acceso: false })}>Rimuovi</button>
       </div>
       <span className="dettaglio t-xs secondario">{nd.tenuti} avvisi tenuti per dopo</span>
     </div>

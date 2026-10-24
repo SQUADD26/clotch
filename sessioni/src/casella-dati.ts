@@ -10,7 +10,7 @@ export const COMANDI_BASE: VoceComando[] = ([
   ["context", "Mostra quanto contesto è usato"], ["cost", "Mostra il consumo della sessione"], ["model", "Cambia il modello della sessione"],
   ["init", "Crea il file CLAUDE.md del progetto"], ["memory", "Modifica i file di memoria"], ["resume", "Riprende una conversazione"],
   ["review", "Rivede una pull request"], ["status", "Mostra lo stato della sessione"], ["config", "Apre le impostazioni di Claude Code"],
-  ["agents", "Gestisce gli aiutanti"], ["mcp", "Gestisce i connettori"], ["permissions", "Cambia i permessi"], ["help", "Mostra l'aiuto"],
+  ["agents", "Gestisce gli aiutanti"], ["mcp", "Gestisce i connettori"], ["permissions", "Cambia i permessi"], ["help", "Mostra l’aiuto"],
 ] as const).map(([n, descrizione]) => ({ nome: `/${n}`, descrizione, gruppo: "Comandi" }));
 
 /** `description` dall'intestazione `---` di un file di comando o di skill; senza, la prima riga di testo. */

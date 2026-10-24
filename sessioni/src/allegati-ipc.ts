@@ -1,5 +1,5 @@
 // Canali `casella:*` (#437): file e cartelle da allegare, immagini del filo, copia e «Salva con nome», skill. La logica sta in allegati.ts.
-import { BrowserWindow, clipboard, ClipboardItem, dialog, nativeImage, type IpcMain } from "electron";
+import { BrowserWindow, clipboard, ClipboardItem, dialog, nativeImage, shell, type IpcMain } from "electron";
 import * as fs from "node:fs";
 import { comeIndirizzo, descrivi, leggiImmagine, leggiSkill, salvaIncollata, copiaAllegati } from "./allegati";
 import { provaSilenziosa } from "./modalita-prova";
@@ -40,5 +40,6 @@ export function collegaAllegati(ipc: IpcMain, home: string, fileSessione: (id: s
     fs.writeFileSync(r.filePath, Buffer.from(i.base64, "base64"));
     return true;
   });
+  ipc.handle("casella:mostra", (_e, percorso: unknown) => { if (!silenzio && typeof percorso === "string" && fs.existsSync(percorso)) shell.showItemInFolder(percorso); });
   ipc.handle("casella:skill", (_e, account: string) => leggiSkill(home, account));
 }
