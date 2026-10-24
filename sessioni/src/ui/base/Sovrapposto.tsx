@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { posiziona, type Allinea, type Lato, type Punto } from "./posiziona";
-import { numero } from "./token";
+import { numero, valori } from "./token";
 import "./sovrapposto.css";
 
 export type { Allinea, Lato, Punto };
@@ -109,6 +109,9 @@ function useUscita(ref: RefObject<HTMLElement | null>) {
     const el = ref.current, pezzo = el?.parentElement?.className ?? "";
     return () => {
       if (!el || document.documentElement.classList.contains("parita")) return;
+      // l'uscita parte da dove l'entrata è arrivata (chiuso a metà apertura: nessun salto, criterio M10)
+      const parti = (x: HTMLElement) => [x, ...(x.classList.contains("velo") ? [...x.children] as HTMLElement[] : [])]; // il velo e il suo dialogo
+      const da = parti(el).map((x) => { const o = getComputedStyle(x); return { opacity: o.opacity, transform: o.transform === "none" ? "translate(0px, 0px)" : o.transform, verso: `translate(${o.getPropertyValue("--da-x") || "0px"}, ${o.getPropertyValue("--da-y") || "0px"})` }; });
       const ospite = document.createElement("div"), ombra = ospite.attachShadow({ mode: "open" }), w = document.createElement("div");
       ombra.adoptedStyleSheets = [foglio()];
       const c = el.cloneNode(true) as HTMLElement;
@@ -119,9 +122,15 @@ function useUscita(ref: RefObject<HTMLElement | null>) {
       ombra.appendChild(w);
       ospite.setAttribute("aria-hidden", "true");
       document.body.appendChild(ospite);
-      const via = () => ospite.remove();
-      c.addEventListener("animationend", via);
-      setTimeout(via, numero("tempo-uscita")); // senza animazione (riduci movimento) non arriva animationend
+      const fermo = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const uscite = parti(c).map((x, i) => {
+        x.style.animation = "none";
+        // il velo dissolve e il suo dialogo scivola dentro di lui; un menu o un tooltip dissolve e scivola insieme
+        const figlio = x !== c, { verso, ...inizio } = da[i];
+        const fine = { opacity: figlio ? inizio.opacity : "0", transform: fermo || (!figlio && x.classList.contains("velo")) ? inizio.transform : verso };
+        return x.animate([inizio, fine], { duration: numero("tempo-uscita"), easing: valori["curva-uscita"], fill: "forwards" }).finished;
+      });
+      Promise.all(uscite).then(() => ospite.remove(), () => ospite.remove());
     };
   }, []);
 }
