@@ -1,6 +1,6 @@
-/* Sistema di movimento di tutta l'app (#520): durate e curve solo da token (tempo/*, curva/*, scala/*, spostamento/*).
+/* Sistema di movimento di tutta l'app (issue 520): durate e curve solo da token (tempo/*, curva/*, scala/*, spostamento/*).
    Regole: entrata tempo-entrata con curva-entrata; uscita più breve, tempo-uscita con curva-uscita; si muovono solo transform e opacità;
-   le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (#519), con gli stessi token. */
+   le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (issue 519), con gli stessi token. */
 
 /* hover e pressione: colore e fondo seguono il passaggio, i premibili piccoli si riducono a scala-premuto */
 button, [role="button"], .pillola, .pillola-filtro, .riga {
