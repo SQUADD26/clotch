@@ -1,9 +1,20 @@
 /* Impostazioni «Aspetto» (aspetto.ts): ridefiniscono solo variabili di Figma;
    Media, Normale, Arancione e Sistema sono i valori di token.css. */
-:root[data-dimensione="piccola"] { --testo-dimensione-base: var(--testo-dimensione-sm); --testo-riga-base: var(--testo-riga-sm); --testo-riga-messaggio: var(--testo-riga-sm); }
-:root[data-dimensione="grande"] { --testo-dimensione-base: var(--testo-dimensione-lg); --testo-riga-base: var(--testo-riga-lg); --testo-riga-messaggio: var(--testo-riga-lg); }
-:root[data-densita="compatta"] { --misura-riga: var(--misura-riga-compatta); }
-:root[data-densita="ariosa"] { --misura-riga: var(--spazio-10); }
+/* Dimensione del testo: tutta la scala scende o sale di un gradino, così titolo e descrizione restano diversi (#1091).
+   La radice tiene i valori del disegno; il body li ridistribuisce (sul body una variabile non può leggere se stessa). */
+:root { --scala-xs: var(--testo-dimensione-xs); --scala-sm: var(--testo-dimensione-sm); --scala-base: var(--testo-dimensione-base); --scala-lg: var(--testo-dimensione-lg); --scala-titolo-2: var(--testo-dimensione-titolo-2);
+  --scala-riga-xs: var(--testo-riga-xs); --scala-riga-sm: var(--testo-riga-sm); --scala-riga-base: var(--testo-riga-base); --scala-riga-lg: var(--testo-riga-lg); --scala-riga-titolo-2: var(--testo-riga-titolo-2); }
+:root[data-dimensione="piccola"] body {
+  --testo-dimensione-sm: var(--scala-xs); --testo-dimensione-base: var(--scala-sm); --testo-dimensione-lg: var(--scala-base);
+  --testo-riga-sm: var(--scala-riga-xs); --testo-riga-base: var(--scala-riga-sm); --testo-riga-messaggio: var(--scala-riga-sm); --testo-riga-lg: var(--scala-riga-base);
+}
+:root[data-dimensione="grande"] body {
+  --testo-dimensione-xs: var(--scala-sm); --testo-dimensione-sm: var(--scala-base); --testo-dimensione-base: var(--scala-lg); --testo-dimensione-lg: var(--scala-titolo-2);
+  --testo-riga-xs: var(--scala-riga-sm); --testo-riga-sm: var(--scala-riga-base); --testo-riga-base: var(--scala-riga-lg); --testo-riga-messaggio: var(--scala-riga-lg); --testo-riga-lg: var(--scala-riga-titolo-2);
+}
+/* Densità dell'elenco: solo le righe della barra laterale, come dice la sua descrizione (#1092); menu e dialoghi restano */
+:root[data-densita="compatta"] .barra-laterale { --misura-riga: var(--misura-riga-compatta); }
+:root[data-densita="ariosa"] .barra-laterale { --misura-riga: var(--spazio-10); }
 :root[data-colore="blu"] { --colore-fondo-accento: var(--colore-fondo-accento-blu); --colore-fondo-bolla: var(--colore-fondo-bolla-blu); --colore-testo-bolla: var(--colore-testo-bolla-blu);
   --colore-icona-accento: var(--colore-icona-accento-blu); --colore-bordo-fuoco: var(--colore-bordo-fuoco-blu); --colore-fondo-attesa: var(--colore-fondo-attesa-blu); }
 :root[data-colore="verde"] { --colore-fondo-accento: var(--colore-fondo-accento-verde); --colore-fondo-bolla: var(--colore-fondo-bolla-verde); --colore-testo-bolla: var(--colore-testo-bolla-verde);

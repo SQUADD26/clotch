@@ -70,11 +70,12 @@ export function Scelta({ valore, etichetta, voci, dettagli, onScegli, disabled }
 }) {
   const [aperta, setAperta] = useState(false);
   const chiudi = () => setAperta(false);
+  const testo = valore || "Non disponibile"; // senza valore (clotch AI spenta, elenco non letto) mai una freccia sola (#1094)
   return (
     <div className="scelta">
-      <button type="button" className="valore" aria-label={`${etichetta}: ${valore}`} aria-haspopup={voci ? "menu" : undefined}
+      <button type="button" className="valore" aria-label={`${etichetta}: ${testo}`} aria-haspopup={voci ? "menu" : undefined}
         aria-expanded={voci ? aperta : undefined} disabled={disabled || !voci} onClick={() => setAperta((x) => !x)}>
-        <span className="t-sm secondario">{valore}</span>
+        <span className="t-sm secondario">{testo}</span>
         <Icona nome="giu" />
       </button>
       {aperta && voci && (
