@@ -63,6 +63,8 @@ jobs:
       - run: npm ci --no-audit --no-fund && node node_modules/electron/install.js
       - run: npm run build && npm run scene
       - name: Clicca tutto (${{ matrix.area }}, matrice completa)
+        env:
+          DEBUG: pw:browser
         run: node test/beta/clicca.mjs --area ${{ matrix.area }} --matrice --video --out beta-giro
       - name: Giudica
         env:

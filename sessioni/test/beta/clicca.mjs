@@ -52,12 +52,29 @@ async function giro(app, area, cfg, console_) {
     if (!(await loc.isVisible())) continue;
     el.foto.push(await foto(`el${i}-prima`));
     const tipo = await loc.evaluate((e) => e.matches('input,textarea,[contenteditable]') ? 'campo' : e.getAttribute('role') ?? e.tagName.toLowerCase());
+    // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
+    const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true');
+    const box = await loc.boundingBox(), clip = box && { x: Math.max(0, box.x - 4), y: Math.max(0, box.y - 4), width: box.width + 8, height: box.height + 8 };
+    const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
+    const uguali = (a, b) => a && b && a.equals(b);
+    const manca = (criterio, valore) => reg.difetti.push({ criterio, dove: el.dove, valore, quando: el.dove, foto: el.foto.at(-1) });
+    await pagina.mouse.move(0, 0); await pausa(200);
+    const riposo = await pezzo();
+    const ok = await loc.hover({ timeout: 2000 }).then(() => true, (e) => (el.errore = e.message.split('\n')[0], false));
+    await pausa(250);
+    const sopra = await pezzo(); el.foto.push(await foto(`el${i}-hover`));
+    if (ok && !disab && uguali(riposo, sopra)) manca('HOVER', 'nessun cambio visivo col mouse sopra');
     const campione = VIDEO ? pagina.evaluate(() => window.__bt.campiona(700)).catch(() => null) : null;
-    const ok = await loc.click({ timeout: 2000 }).then(() => true, (e) => (el.errore = e.message.split('\n')[0], false));
+    if (ok) {
+      await pagina.mouse.down(); await pausa(80);
+      const premuto = await pezzo(); el.foto.push(await foto(`el${i}-premuto`));
+      await pagina.mouse.up();
+      if (!disab && tipo !== 'campo' && uguali(sopra, premuto)) manca('PREMUTO', 'nessuno stato premuto');
+    }
     if (campione) { const c = await campione; if (c) { reg.movimenti.push({ dove: el.dove, animazioni: riassunto(c) }); difettiMovimento(c, { ridotto: cfg.ridotto, dove: el.dove }).forEach((d) => reg.difetti.push({ ...d, quando: el.dove })); } }
     else await pausa(350);
     el.foto.push(await foto(`el${i}-dopo`));
-    await difetti(el.dove, el.foto[1]);
+    await difetti(el.dove, el.foto.at(-1));
     reg.elementi.push(el);
     if (!ok) continue;
     // tastiera: in un campo si scrive e si svuota; un sovrapposto aperto si percorre con le frecce, Esc lo chiude e il fuoco torna a chi l'ha aperto
@@ -82,8 +99,10 @@ async function giro(app, area, cfg, console_) {
   await pulito(); await segna(); await pagina.evaluate(() => document.activeElement?.blur());
   for (let k = 0; k < Math.min(60, n + 5); k++) {
     await pagina.keyboard.press('Tab');
-    const d = await pagina.evaluate((r) => { const e = document.activeElement; return e && e !== document.body && e.closest(r) ? window.__bt.anello(e) : null; }, radice);
-    if (d) reg.difetti.push({ ...d, quando: 'Tab' });
+    const d = await pagina.evaluate((r) => { const e = document.activeElement; return e && e !== document.body && e.closest(r) ? { d: window.__bt.anello(e) } : null; }, radice);
+    if (!d) continue;
+    const f = await foto(`tab${k}`); // fuoco da tastiera, fotografato
+    if (d.d) reg.difetti.push({ ...d.d, quando: 'Tab', foto: f });
   }
   reg.console.push(...console_.splice(0));
   reg.console.forEach((c) => reg.difetti.push({ criterio: 'CONSOLE', dove: 'console', valore: c.slice(0, 200), quando: 'giro' }));
