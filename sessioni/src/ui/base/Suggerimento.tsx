@@ -19,7 +19,7 @@ export function Suggerimento({ testo, scorciatoia, forzato = false, lato, alline
   const chiudi = () => { clearTimeout(timer.current); setVisibile(false); };
   useEffect(() => () => clearTimeout(timer.current), []);
   return (
-    <span ref={setEl} className="con-tooltip" onMouseEnter={apri} onMouseLeave={chiudi} onMouseDown={chiudi}
+    <span ref={setEl} className="con-tooltip" onMouseEnter={apri} onMouseLeave={chiudi} onMouseDown={chiudi} onKeyDown={(e) => { if (e.key === "Escape") chiudi(); }}
       onFocus={(e) => { if (e.target.matches(":focus-visible")) setVisibile(true); }} onBlur={chiudi}>
       {children}
       {(visibile || forzato) && !nascosto && el && (
