@@ -15,8 +15,8 @@
 .pezzo-chat .riga-stato .esito { flex: none; font-weight: 500; }
 .pezzo-chat .riga-stato .dettaglio { flex: 1; min-width: 0; }
 
-.pezzo-chat .riassunto { display: flex; align-items: center; gap: var(--spazio-3); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
-.pezzo-chat .riassunto .linea { flex: 1; height: var(--misura-tratto); background: var(--colore-bordo-normale); }
+.pezzo-chat .riga-evento { display: flex; align-items: center; gap: var(--spazio-3); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .riga-evento .linea { flex: 1; height: var(--misura-tratto); background: var(--colore-bordo-normale); }
 
 .pezzo-chat .avviso-filo { display: flex; align-items: flex-start; gap: var(--spazio-3); padding: var(--spazio-3); border-radius: var(--raggio-lg); }
 .pezzo-chat .avviso-filo.attesa { background: var(--colore-fondo-attesa); }

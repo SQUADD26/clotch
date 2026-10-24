@@ -1,16 +1,21 @@
-// L'unico modulo dell'app che manda comandi a Friday (#352): scrive il file nella casella
+// L'unico modulo dell'app che manda comandi a clotch AI (#352): scrive il file nella casella
 // e aspetta la riga `comando_fatto` nel registro (contratto v1, sezione 3). Chat e impostazioni usano questo.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { msgErrore, parseRiga, righeNuove } from "./jsonl";
-import { cartellaRegistro, Comando, mandaComando } from "./friday";
+import { cartellaRegistro, Comando, mandaComando } from "./clotch-ai";
+import type { EsitoPasso, Macchina, Proposta } from "./macchine-tipi";
+
+/** `account_previsto` (contratto 3, #2599): con quale account partirebbe una sessione nuova; uso in %, reset ISO. */
+export interface AccountPrevisto { email: string; config_dir: string | null; uso_5h: number | null; uso_7g: number | null; reset_5h: string | null; reset_7g: string | null; scelto: boolean; motivo: string }
 
 export type EsitoComando =
-  /** Friday ha risposto con `comando_fatto`. */
-  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[] }
+  /** clotch AI ha risposto con `comando_fatto`. */
+  | { id: string; esito: "ok" | "rifiutato" | "errore"; testo: string; pr?: number; nonFermate?: string[]; /** nuova_sessione: la sessione nata e la macchina dove gira. */ sessione?: string; macchina?: string; account?: AccountPrevisto;
+      /** `macchine`: il registro e le connessioni di Claude Desktop da aggiungere. `macchina_aggiungi`: la voce (`voce`) e i passi fatti. */ macchine?: Macchina[]; proposte?: Proposta[]; voce?: Macchina; passi?: EsitoPasso[] }
   /** La casella non si può scrivere: il comando non è partito. */
   | { id: null; esito: "non_scritto"; testo: string }
-  /** Nessuna risposta in tempo. `preso: false` = Friday non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
+  /** Nessuna risposta in tempo. `preso: false` = clotch AI non l'ha preso (spenta): il file è stato ritirato e non partirà più. */
   | { id: string; esito: "scaduto"; testo: string; preso: boolean };
 
 export interface OpzioniComando { env?: NodeJS.ProcessEnv; scadenzaMs?: number; ogniMs?: number }
@@ -39,10 +44,21 @@ function ritira(home: string, id: string): boolean {
     if (!f) return false;
     fs.unlinkSync(path.join(dir, f));
     return true;
-  } catch { return false; } // Friday l'ha preso proprio ora
+  } catch { return false; } // clotch AI l'ha preso proprio ora
 }
 
-export async function inviaComando(home: string, cmd: Comando, args: Record<string, unknown> = {}, o: OpzioniComando = {}): Promise<EsitoComando> {
+const inVolo = new Map<string, Promise<EsitoComando>>();
+
+/** Doppio invio o doppio clic: lo stesso comando con gli stessi argomenti ancora in attesa è lo stesso comando, un file solo nella casella. */
+export function inviaComando(home: string, cmd: Comando, args: Record<string, unknown> = {}, o: OpzioniComando = {}): Promise<EsitoComando> {
+  let chiave: string;
+  try { chiave = `${home}\0${cmd}\0${JSON.stringify(args)}`; } catch { return invia(home, cmd, args, o); } // argomenti non serializzabili: l'errore lo dà la scrittura
+  let p = inVolo.get(chiave);
+  if (!p) inVolo.set(chiave, p = invia(home, cmd, args, o).finally(() => inVolo.delete(chiave)));
+  return p;
+}
+
+async function invia(home: string, cmd: Comando, args: Record<string, unknown>, o: OpzioniComando): Promise<EsitoComando> {
   const { env = {}, scadenzaMs = 30_000, ogniMs = 250 } = o;
   const nuove = righeDaOra(cartellaRegistro(home, env)); // prima di scrivere: la risposta non può sfuggire
   let id: string;
@@ -53,8 +69,15 @@ export async function inviaComando(home: string, cmd: Comando, args: Record<stri
       if (r.v !== 1 || r.tipo !== "comando_fatto" || r.dati?.comando !== id) continue;
       const e = r.dati.esito;
       const fatto: EsitoComando = { id, esito: e === "ok" || e === "rifiutato" ? e : "errore", testo: String(r.dati.testo ?? "") };
-      if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da Friday
+      if (Number.isInteger(r.dati.pr)) fatto.pr = r.dati.pr; // regola: la PR aperta da clotch AI
+      if (typeof r.dati.sessione === "string") fatto.sessione = r.dati.sessione; // nuova_sessione
+      if (typeof r.dati.macchina === "string") fatto.macchina = r.dati.macchina;
+      else if (r.dati.macchina && typeof r.dati.macchina === "object") fatto.voce = r.dati.macchina; // macchina_aggiungi
+      if (Array.isArray(r.dati.macchine)) fatto.macchine = r.dati.macchine;
+      if (Array.isArray(r.dati.proposte)) fatto.proposte = r.dati.proposte;
+      if (Array.isArray(r.dati.passi)) fatto.passi = r.dati.passi;
       if (Array.isArray(r.dati.non_fermate)) fatto.nonFermate = r.dati.non_fermate.map(String); // ferma_tutto
+      if (r.dati.account && typeof r.dati.account === "object") fatto.account = r.dati.account; // account_previsto
       return fatto;
     }
     if (Date.now() >= limite) return { id, esito: "scaduto", testo: "", preso: !ritira(home, id) };

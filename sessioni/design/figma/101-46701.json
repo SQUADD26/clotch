@@ -59,6 +59,7 @@
   "colore/bordo/fuoco": "#ee7c37",
   "raggio/casella": 22,
   "misura/colonna": 760,
+  "misura/onda-barra": 3,
   "misura/bottone-invio": 32,
   "colore/testo/errore": "#ff6764",
   "colore/fondo/errore": "#fa423e29"
@@ -702,7 +703,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -1900,7 +1901,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "friday-mac-v2",
+   "testo": "clotch-ai-mac-v2",
    "font": "SF Pro Regular"
   },
   {
@@ -2223,7 +2224,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2820,9 +2821,9 @@
    "nome": "nota clotch",
    "tipo": "FRAME",
    "box": {
-    "x": 773.5,
+    "x": 774.5,
     "y": 849,
-    "w": 279,
+    "w": 277,
     "h": 16
    },
    "variabili": {
@@ -2837,7 +2838,7 @@
    "nome": "icona microfono",
    "tipo": "INSTANCE",
    "box": {
-    "x": 781.5,
+    "x": 782.5,
     "y": 849,
     "w": 16,
     "h": 16
@@ -2853,7 +2854,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 784.16650390625,
+    "x": 785.16650390625,
     "y": 849.6640625,
     "w": 10.6669921875,
     "h": 14.667318344116211
@@ -2868,9 +2869,9 @@
    "nome": "testo",
    "tipo": "TEXT",
    "box": {
-    "x": 805.5,
+    "x": 806.5,
     "y": 849,
-    "w": 239,
+    "w": 237,
     "h": 16
    },
    "variabili": {
@@ -2879,7 +2880,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Ti ascolta il microfono di Clotch · ⌥Spazio",
+   "testo": "Ti ascolta il microfono di clotch · ⌥Spazio",
    "font": "SF Pro Regular"
   },
   {
@@ -2983,7 +2984,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2999,7 +3001,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3015,7 +3018,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3031,7 +3035,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3047,7 +3052,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3063,7 +3069,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3079,7 +3086,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3095,7 +3103,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3169,7 +3178,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Chiedi a Friday",
+   "testo": "Chiedi a clotch AI",
    "font": "SF Pro Regular"
   },
   {
@@ -4129,7 +4138,7 @@
    "box": {
     "x": 1212,
     "y": 72,
-    "w": 76,
+    "w": 74,
     "h": 28
    },
    "variabili": {
@@ -4180,7 +4189,7 @@
    "box": {
     "x": 1240,
     "y": 77,
-    "w": 40,
+    "w": 38,
     "h": 18
    },
    "variabili": {
@@ -4189,7 +4198,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Clotch",
+   "testo": "clotch",
    "font": "SF Pro Regular"
   }
  ]

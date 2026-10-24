@@ -1,6 +1,6 @@
 // Mette insieme le sorgenti in un solo elenco di sessioni.
 import * as path from "node:path";
-import { leggiRadice, nomeProgetto } from "./claude-code";
+import { chiaveCartella, leggiRadice, nomeProgetto, progettiDi } from "./claude-code";
 import { leggiApp, SessioneApp } from "./desktop";
 import { leggiCodex, leggiCursor } from "./altre-sorgenti";
 import { conPartenza, filtraElenco } from "./filtro-elenco";
@@ -22,24 +22,32 @@ export function statoDi(s: Sessione, reg: StatoRegistro | undefined, app: Sessio
 export const inAttesa = (e: Elenco) => e.sessioni.filter((s) => s.stato === "aspetta").length;
 
 /** `impostazioni` (le salvate, sezione `app` del file delle preferenze): senza, tutto; con, solo quello che permettono (#404). */
-export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown> }): Elenco {
+export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: number; impostazioni?: Record<string, unknown>; sporchi?: string[]; soloDopo?: number }): Elenco {
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
   const imp = opz.impostazioni && conPartenza(opz.impostazioni);
-  const app = leggiApp(opz.home, errori);
+  const app = leggiApp(opz.home, errori, opz.sporchi);
   const perCli = new Map(app.map((a) => [a.cliId, a]));
   const obiettivi = leggiObiettivi(path.join(opz.home, ".claude"), errori);
   const stati = leggiStati(path.join(opz.home, ".claude"), errori);
   const statoPerLocale = new Map([...stati.values()].filter((r) => r.localId).map((r) => [r.localId!, r]));
 
   const tutte: Sessione[] = [];
-  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) tutte.push(...leggiRadice(r, errori));
+  // stessa cartella vera sotto più account: la legge il primo (come prima, a pari attività vinceva il primo)
+  const progetti = new Set<string>();
+  for (const r of radiciScelte(opz.home, imp?.accountAggiunti, imp?.accountTolti)) {
+    const p = chiaveCartella(progettiDi(r.path));
+    if (progetti.has(p)) continue;
+    progetti.add(p);
+    tutte.push(...leggiRadice(r, errori, opz.sporchi, opz.soloDopo));
+  }
   const viste = new Set(tutte.map((s) => s.id));
   for (const s of tutte) {
     const a = perCli.get(s.id);
     if (!a) continue;
     s.sorgente = "claude-desktop";
     s.idApp = a.idApp;
+    s.app = a.app;
     s.titolo = a.titolo || s.titolo;
     s.cartella = a.cartella ?? s.cartella;
     s.progetto = nomeProgetto(s.cartella);
@@ -54,7 +62,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
     tutte.push({
       id: a.cliId, sorgente: "claude-desktop", account: a.profilo, email: null, idApp: a.idApp, titolo: a.titolo,
       progetto: nomeProgetto(cartella), cartella, ramo: a.ramo, modello: a.modello, stato: "ferma", perche: null,
-      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file,
+      ultimaAttivita: a.ultimaAttivita ?? 0, obiettivo: null, situazione: null, file: a.file, app: a.app,
     });
   }
   if (!imp || imp.sorgenteCodex) tutte.push(...leggiCodex(opz.home, opz.env ?? process.env, errori));

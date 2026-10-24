@@ -1,9 +1,9 @@
-// «Clotch acceso?» per tutta l'interfaccia (#350, coppie CL1–CL10): un solo posto, letto dal registro di Friday (`window.friday`).
-import type { Registro } from "../../friday";
-import type { FridayApi } from "../../tipi";
-import { daPiano } from "../friday/registro";
+// «Clotch acceso?» per tutta l'interfaccia (#350, coppie CL1–CL10): un solo posto, letto dal registro di clotch AI (`window.clotchAi`).
+import type { Registro } from "../../clotch-ai";
+import type { ClotchAiApi } from "../../tipi";
+import { seguiRegistro } from "../clotch-ai/dati";
 
-/** Uguale a CLOTCH_SPENTO_MS di friday.ts, che usa node:fs e non entra nel renderer. */
+/** Uguale a CLOTCH_SPENTO_MS di clotch-ai.ts, che usa node:fs e non entra nel renderer. */
 const SPENTO_MS = 600_000;
 
 /** Ultimo evento `clotch` con voce accesa e più giovane di 10 min (contratto v1). */
@@ -23,16 +23,14 @@ function aggiorna(r: Pick<Registro, "clotch">) {
 }
 
 function avvia() {
-  const f = (globalThis as { friday?: FridayApi }).friday;
+  const f = (globalThis as { clotchAi?: ClotchAiApi }).clotchAi;
   if (avviato || !f) return;
   avviato = true;
-  const da = (p: unknown) => aggiorna(daPiano(p));
-  f.registro().then(da, () => {}); // registro non leggibile: resta «assente», come senza Clotch
-  f.onRegistro(da);
+  seguiRegistro((r) => aggiorna({ clotch: r.clotch ?? null })); // registro non leggibile: resta «assente», come senza Clotch
   setInterval(() => aggiorna(ultimo), 60_000); // i 10 min scadono anche senza eventi nuovi
 }
 
-/** Vero se Clotch è acceso secondo il registro di Friday. */
+/** Vero se Clotch è acceso secondo il registro di clotch AI. */
 export function clotchAcceso(): boolean {
   avvia();
   return stato;

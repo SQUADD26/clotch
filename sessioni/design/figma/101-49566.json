@@ -4,20 +4,20 @@
   "id": "101:49566",
   "nome": "via dal mac",
   "w": 250,
-  "h": 54,
+  "h": 70,
   "dentro": "101:49194"
  },
  "variabili": {
+  "colore/fondo/riga-passaggio": "#ffffff0d",
   "raggio/md": 10,
-  "spazio/2": 8,
   "spazio/1": 4,
+  "spazio/2": 8,
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
   "colore/testo/primario": "#ffffff",
-  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/fondo/riga-passaggio": "#ffffff0d",
+  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16
  },
@@ -30,7 +30,7 @@
     "x": 0,
     "y": 0,
     "w": 250,
-    "h": 54
+    "h": 70
    },
    "variabili": {
     "fills[0]": "colore/fondo/riga-passaggio",
@@ -115,8 +115,8 @@
    "box": {
     "x": 8,
     "y": 30,
-    "w": 408,
-    "h": 16
+    "w": 234,
+    "h": 32
    },
    "variabili": {
     "fills[0]": "colore/testo/secondario",
@@ -124,7 +124,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Con Clotch gli avvisi aspettano il tuo ritorno. Intanto usa Non disturbare.",
+   "testo": "Con clotch gli avvisi aspettano il tuo ritorno. Intanto usa Non disturbare.",
    "font": "SF Pro Regular"
   }
  ]

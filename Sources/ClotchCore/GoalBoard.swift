@@ -301,5 +301,5 @@ public enum GoalBoard {
 
 extension String {
     /// The engine still writes «Overseer» in titles and labels (claude-config renames later): Roberto reads Friday.
-    var asFriday: String { replacingOccurrences(of: "Overseer", with: "Friday") }
+    var asFriday: String { replacingOccurrences(of: "Overseer", with: "clotch AI") }
 }

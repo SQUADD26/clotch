@@ -1,0 +1,79 @@
+/* figma: 149-67470 — menu SSH (149:67469) e «Riga macchina» (149:67373); 149-67536 — dialogo «Aggiungi macchina» con «Chip proposta» e «Campo macchina»;
+   149-67632 — «Passo preparazione» (149:67422), comando da copiare, codice di GitHub (149:70649). Solo variabili del file Figma (token.css). */
+
+/* il pannello SSH sta a destra del menu ambiente, in alto alla stessa altezza; il menu decide dove sta il blocco, il pannello può scendere sotto di lui */
+.pezzo-chat .menu-doppio { position: absolute; left: 0; bottom: calc(100% + var(--spazio-1)); z-index: 5; }
+.pezzo-chat .menu-doppio .menu-avvio { position: static; }
+.pezzo-chat .menu-ssh { position: absolute; top: 0; left: calc(var(--misura-menu) + var(--spazio-1)); width: var(--misura-menu-avvio-largo); gap: var(--spazio-0-5); }
+.pezzo-chat .menu-ssh .vuoto-ssh { display: flex; flex-direction: column; gap: var(--spazio-1); padding: var(--spazio-2); }
+.pezzo-chat .menu-ssh .vuoto-ssh .titolo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .menu-ssh .vuoto-ssh .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .menu-ssh .valore { flex: none; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .menu-ssh .valore.da-completare { color: var(--colore-testo-lavoro); }
+.pezzo-chat .menu-ssh .riga-macchina { position: relative; cursor: default; }
+.pezzo-chat .menu-ssh .togli { display: none; flex: none; border-radius: var(--raggio-md); }
+.pezzo-chat .menu-ssh .riga-macchina:hover .togli, .pezzo-chat .menu-ssh .riga-macchina:focus-within .togli { display: flex; }
+.pezzo-chat .menu-ssh .riga-macchina .tooltip { display: none; top: 50%; left: calc(100% + var(--spazio-2)); translate: 0 -50%; }
+.pezzo-chat .menu-ssh .riga-macchina:hover .tooltip, .pezzo-chat .menu-ssh .riga-macchina.mostra .tooltip { display: flex; }
+.pezzo-chat .selettore:disabled:hover { background: none; }
+
+/* dialogo: proposte da Claude Desktop e campi */
+.pezzo-chat .dialogo .proposte-macchina { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-chat .dialogo .titolo-proposte { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .chip-proposte { display: flex; flex-wrap: wrap; gap: var(--spazio-2); }
+.pezzo-chat .dialogo .chip-proposta {
+  display: inline-flex; align-items: center; gap: var(--spazio-1-5); height: var(--misura-bottone); padding: 0 var(--spazio-3); border-radius: var(--raggio-pieno);
+  background: var(--colore-fondo-bottone-secondario); font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .dialogo .chip-proposta.scelta { background: var(--colore-fondo-riga-scelta); border: var(--misura-tratto) solid var(--colore-bordo-forte); }
+.pezzo-chat .dialogo .campi-macchina { display: flex; flex-direction: column; gap: var(--spazio-3); }
+.pezzo-chat .dialogo .riga-campi { display: flex; gap: var(--spazio-3); }
+.pezzo-chat .dialogo .riga-campi.allinea-fondo { align-items: flex-end; }
+.pezzo-chat .dialogo .campo-largo { flex: 1; min-width: 0; display: flex; }
+.pezzo-chat .dialogo .campo-macchina { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-chat .dialogo .campo-macchina[style] { flex: none; }
+.pezzo-chat .dialogo .etichetta-campo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .casella-macchina {
+  width: 100%; height: var(--misura-bottone-invio); padding: 0 var(--spazio-3); border-radius: var(--raggio-lg); background: var(--colore-fondo-casella);
+  border: var(--misura-tratto) solid var(--colore-bordo-normale); font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base);
+  color: var(--colore-testo-primario); user-select: text;
+}
+.pezzo-chat .dialogo .casella-macchina::placeholder { color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .casella-macchina:focus-visible { outline: none; border-color: var(--colore-bordo-fuoco); }
+.pezzo-chat .dialogo .casella-macchina.errore { border-color: var(--colore-icona-errore); }
+.pezzo-chat .dialogo .messaggio-campo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-errore); }
+
+/* preparazione */
+.pezzo-chat .dialogo .passi-macchina { display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-chat .dialogo .passo { display: flex; align-items: center; gap: var(--spazio-3); height: var(--misura-riga); }
+.pezzo-chat .dialogo .nome-passo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); color: var(--colore-testo-primario); }
+.pezzo-chat .dialogo .dettaglio-passo { flex: none; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .passo.attesa .nome-passo { color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .passo.no .nome-passo, .pezzo-chat .dialogo .passo.no .dettaglio-passo { color: var(--colore-testo-errore); }
+.pezzo-chat .dialogo .passo.mano .nome-passo { color: var(--colore-testo-primario); }
+.pezzo-chat .dialogo .passo.mano .dettaglio-passo { color: var(--colore-testo-lavoro); }
+.parita .pezzo-chat .dialogo .gira { animation: none; }
+.pezzo-chat .dialogo .nota-passi { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .avviso-avvio { display: flex; align-items: flex-start; gap: var(--spazio-3); padding: var(--spazio-3); border-radius: var(--raggio-lg); background: var(--colore-fondo-errore); }
+.pezzo-chat .dialogo .avviso-avvio .testi { display: flex; flex-direction: column; gap: var(--spazio-1); min-width: 0; }
+.pezzo-chat .dialogo .avviso-avvio .titolo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .dialogo .avviso-avvio .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+
+.pezzo-chat .dialogo .comando-passo { display: flex; flex-direction: column; gap: var(--spazio-2); }
+.pezzo-chat .dialogo .titolo-comando { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .dialogo .testo-comando { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .dialogo .riga-comando { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-chat .dialogo .codice-macchina {
+  flex: 1; min-width: 0; padding: var(--spazio-3); border-radius: var(--raggio-lg); background: var(--colore-fondo-codice); user-select: text; overflow-wrap: anywhere;
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .dialogo .codice-github { display: flex; flex-direction: column; align-items: center; gap: var(--spazio-3); }
+.pezzo-chat .dialogo .codice-grande {
+  width: 100%; padding: var(--spazio-5) var(--spazio-4); border-radius: var(--raggio-lg); background: var(--colore-fondo-codice); text-align: center; user-select: text;
+  font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xl); line-height: var(--testo-riga-xl); color: var(--colore-testo-primario);
+}
+.pezzo-chat .dialogo .nota-codice { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); text-align: center; }
+
+/* Nuova sessione su una macchina da completare (149:69953) */
+.pezzo-chat .riga-avviso-macchina { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-chat .riga-avviso-macchina .motivo { flex: 1; min-width: 0; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }

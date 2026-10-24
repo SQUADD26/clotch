@@ -1,0 +1,25 @@
+/* figma: 101-46268 — «Casella voce» (Parla 56 alta, Ascolto 58: col tratto di fuoco) e «nota clotch» sopra la casella */
+.pezzo-chat .casella-voce {
+  display: flex; align-items: center; gap: var(--spazio-3); width: 100%;
+  padding: var(--spazio-3) var(--spazio-3) var(--spazio-3) var(--spazio-4);
+  background: var(--colore-fondo-casella); border-radius: var(--raggio-casella);
+}
+.pezzo-chat .casella-voce.ascolta { border: var(--misura-tratto) solid var(--colore-bordo-fuoco); }
+.pezzo-chat .casella-voce .testo {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.pezzo-chat .casella-voce.ascolta .testo { color: var(--colore-testo-primario); }
+.pezzo-chat .casella-voce .onda { display: flex; align-items: center; gap: var(--spazio-0-5); flex: none; }
+.pezzo-chat .casella-voce .barra { width: var(--misura-onda-barra); border-radius: var(--raggio-pieno); background: var(--colore-icona-accento); }
+
+.pezzo-chat .nota-voce-casella {
+  display: flex; align-items: center; justify-content: center; gap: var(--spazio-2); padding: 0 var(--spazio-2);
+  font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
+}
+
+/* «nota clotch» in cima al filo (101:49974): a sinistra, nella larghezza della colonna */
+.pezzo-chat .nota-schermo {
+  display: flex; align-items: center; gap: var(--spazio-2); padding: 0 var(--spazio-2); flex: none;
+  font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario);
+}

@@ -1,18 +1,44 @@
 // Canali delle impostazioni (#351) che non sono valori salvati: i valori stanno nel file delle preferenze (#368,
 // `sessioni:impostazioni`). Qui: cartelle degli account, scelta e apertura di cartelle, versione, avvio col Mac.
-// Le impostazioni di Friday non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
+// Le impostazioni di clotch AI non stanno qui: passano dalla casella (`imposta`, `spegni`, contratto v1).
+import { execFileSync } from "node:child_process";
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { app, dialog, shell, type IpcMain } from "electron";
+import type { IpcMain } from "electron";
 import type { Sessioni } from "./api";
 import type { Indice } from "./indice";
 import { nomeProgetto } from "./claude-code";
 import { leggiApp, type SessioneApp } from "./desktop";
-import { leggiRegistro, type Registro } from "./friday";
+import { leggiRegistro, type Registro } from "./clotch-ai";
 import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
-import { quoteUso } from "./quote-uso";
+import { creaAggiornamenti } from "./aggiornamento";
+import { provaSilenziosa } from "./modalita-prova";
+import { quoteConGiorni } from "./quote-uso";
+import { lavoro } from "./lavori";
 import { accorcia, espandi, trovaRadici } from "./radici";
-import type { Archiviata, CartellaAccount, Elenco } from "./tipi";
+import type { Archiviata, CartellaAccount, Elenco, Profilo } from "./tipi";
+
+/** Nome di macOS dell'utente (`id -F`), o il nome di accesso. */
+const nomeMac = () => {
+  try { return execFileSync("id", ["-F"], { encoding: "utf8", timeout: 2000 }).trim() || os.userInfo().username; } catch { return os.userInfo().username; }
+};
+
+/** Chi usa l'app (A16/G19): il nome dell'account Claude (`fullName`, se no `displayName`, in `.claude.json`); senza, quello di macOS.
+ *  shortcut: il primo account con un nome (il predefinito per primo), non quello attivo adesso; quando serve, scegliere quello della sessione più recente. */
+export function profiloUtente(home: string, mac: () => string = nomeMac): Profilo {
+  const files = trovaRadici(home).flatMap((r) => [path.join(r.path, ".claude.json"), ...(r.account === ".claude" ? [path.join(home, ".claude.json")] : [])]);
+  let nome = "";
+  for (const f of files) {
+    try {
+      const o = JSON.parse(fs.readFileSync(f, "utf8"))?.oauthAccount;
+      nome = [o?.fullName, o?.displayName].find((x): x is string => typeof x === "string" && !!x.trim())?.trim() ?? "";
+    } catch { /* manca o non si legge: prossimo account */ }
+    if (nome) break;
+  }
+  nome ||= mac().trim();
+  return { nome, iniziali: nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join("") };
+}
 
 /** Una riga per cartella: sessioni lette di quell'account, o il perché non si legge (testi del frame 101:10369). */
 export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAccount[] {
@@ -26,7 +52,7 @@ export function cartelleAccount(percorsi: string[], elenco: Elenco): CartellaAcc
 }
 
 /** Archiviate di tutte le sorgenti, la più recente prima: «<progetto> · <data e ora>» come nel frame 101:32359 («clotch · 22 ott 2026, 18:40»).
- *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di Friday (`fine` motivo `archiviata`, comando `archivia` riuscito).
+ *  Fonti, unite per id di sessione: app Claude (`isArchived`), registro di clotch AI (`fine` motivo `archiviata`, ultimo comando riuscito fra `archivia` e `ripristina`).
  *  La data è il momento dell'archiviazione se il registro lo dà, se no l'ultima attività. Se l'app dice che la sessione non è archiviata, vince l'app. */
 export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "comandi" | "esiti">, fuso?: string): Archiviata[] {
   const per = new Map<string, { titolo: string; progetto: string | null; quando: number | null }>();
@@ -35,9 +61,16 @@ export function archiviate(app: SessioneApp[], reg: Pick<Registro, "chat" | "com
     per.set(id, { titolo: c?.titolo ?? id, progetto: c?.progetto ? nomeProgetto(c.progetto) : null, quando });
   };
   for (const [id, c] of reg.chat) if (c.fine === "archiviata") registro(id, c.fineT);
+  const ultimo = new Map<string, { cmd: string; t: number | null }>(); // vince l'ultimo archivia/ripristina riuscito
   for (const c of reg.comandi) {
     const id = c.args?.chat;
-    if (c.cmd === "archivia" && typeof id === "string" && reg.esiti.get(c.id)?.esito === "ok" && !per.has(id)) registro(id, c.t);
+    if ((c.cmd === "archivia" || c.cmd === "ripristina") && typeof id === "string" && reg.esiti.get(c.id)?.esito === "ok"
+      && (c.t ?? 0) >= (ultimo.get(id)?.t ?? -Infinity)) ultimo.set(id, { cmd: c.cmd, t: c.t });
+  }
+  for (const [id, u] of ultimo) {
+    const fine = reg.chat.get(id);
+    if (u.cmd === "archivia") { if (!per.has(id)) registro(id, u.t); }
+    else if (!(fine?.fine === "archiviata" && (fine.fineT ?? 0) > (u.t ?? 0))) per.delete(id);
   }
   for (const a of app) {
     if (!a.archiviata) { per.delete(a.cliId); continue; }
@@ -58,15 +91,21 @@ export function eliminaDati(indice: Pick<Indice, "svuota">, filePreferenze: stri
 
 /** Canali di `window.impostazioni` (preload.ts). Le risposte della prova di parità le dà la scena (scena.ts). */
 export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: Indice, invia: (canale: string, dati: unknown) => void, home = os.homedir()) {
+  // letto qui e non in testa: i test Node importano il file senza il binario Electron scaricato
+  const { app, BrowserWindow, dialog, shell } = require("electron") as typeof import("electron");
   ipc.handle("impostazioni:radici", () => trovaRadici(home).map((r) => accorcia(r.path, home)));
   ipc.handle("impostazioni:cartelle", (_e, percorsi: string[]) => cartelleAccount(percorsi.map(String), sessioni.elencoSessioni()));
-  ipc.handle("impostazioni:scegli-cartella", async () => {
-    const r = await dialog.showOpenDialog({ properties: ["openDirectory"], defaultPath: home });
+  ipc.handle("impostazioni:scegli-cartella", async (e) => {
+    const opzioni: Electron.OpenDialogOptions = { properties: ["openDirectory"], defaultPath: home };
+    const padre = BrowserWindow.fromWebContents(e.sender); // il dialogo compare sullo schermo della finestra
+    const r = await (padre ? dialog.showOpenDialog(padre, opzioni) : dialog.showOpenDialog(opzioni));
     return r.canceled || !r.filePaths[0] ? null : accorcia(r.filePaths[0], home);
   });
   // shell.openPath torna "" se riesce, se no il perché
   ipc.handle("impostazioni:apri", async (_e, p: string) => { const err = await shell.openPath(espandi(String(p), home)); if (err) throw new Error(err); });
   ipc.handle("impostazioni:versione", () => app.getVersion());
+  ipc.handle("impostazioni:profilo", () => profiloUtente(home));
+  const aggiornamenti = creaAggiornamenti({ dir: app.getAppPath(), silenzioso: provaSilenziosa(), riapri: () => { app.relaunch(); app.exit(0); } });
   ipc.handle("impostazioni:avvio", (_e, acceso: boolean) => app.setLoginItemSettings({ openAtLogin: acceso === true }));
   ipc.handle("impostazioni:elimina-dati", () => {
     eliminaDati(indice, path.join(app.getPath("userData"), "preferenze.json"));
@@ -74,9 +113,10 @@ export function collegaImpostazioni(ipc: IpcMain, sessioni: Sessioni, indice: In
     sessioni.impostazioni({});
     void indice.metti(sessioni.elencoSessioni().sessioni, true); // «Sessioni le rilegge da capo»
   });
-  ipc.handle("impostazioni:uso", () => quoteUso());
+  // shortcut: gli account sono quelli trovati nella home (non conta accountAggiunti/accountTolti); le trascrizioni si leggono qui, nel main
+  ipc.handle("impostazioni:uso", () => quoteConGiorni(trovaRadici(home), Date.now(), (radici, ora) => lavoro({ tipo: "uso", radici, ora })));
   ipc.handle("impostazioni:archiviate", () => archiviate(leggiApp(home, []), leggiRegistro(home, process.env)));
   // shortcut: nessun CHANGELOG né aggiornatore nel repo, quindi niente note e niente «Controlla aggiornamenti»; quando ci sono, qui la fonte
   ipc.handle("impostazioni:novita", () => null);
-  ipc.handle("impostazioni:aggiornamenti", () => false);
+  ipc.handle("impostazioni:aggiornamenti", (_e, fai) => aggiornamenti(fai));
 }

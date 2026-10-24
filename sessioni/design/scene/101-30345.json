@@ -1,0 +1,21 @@
+{
+ "navigazione": {
+  "vista": "sessione",
+  "sessione": "s1"
+ },
+ "avvio": true,
+ "registro": {
+  "chat": {},
+  "fermoTutto": false,
+  "avvisi": [],
+  "clotch": null,
+  "clotchAi": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

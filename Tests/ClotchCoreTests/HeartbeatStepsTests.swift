@@ -22,7 +22,7 @@ final class HeartbeatStepsTests: XCTestCase {
         let first = HeartbeatSteps.stuck(old: [:], new: steps)
         XCTAssertEqual(first.map(\.subject), ["avvisi_voce"], "afk ok and osservatore at 1 say nothing")
         XCTAssertEqual(first.first?.kind, .stepStuck)
-        XCTAssertEqual(first.first?.text, "Friday: «avvisi voce» non riesce da 3 giri")
+        XCTAssertEqual(first.first?.text, "clotch AI: «avvisi voce» non riesce da 3 giri")
         var worse = steps
         worse["avvisi_voce"] = .init(ok: 0, failed: 4, error: "x")
         XCTAssertEqual(HeartbeatSteps.stuck(old: steps, new: worse), [], "still stuck: no second notice")

@@ -13,6 +13,7 @@
   "raggio/lg": 12.5,
   "spazio/3": 12,
   "spazio/4": 16,
+  "misura/tratto": 1,
   "spazio/2": 8,
   "misura/icona": 16,
   "colore/icona/accento": "#ee7c37",
@@ -51,20 +52,20 @@
   "misura/bottone": 28,
   "misura/menu": 260,
   "colore/fondo/riga-passaggio": "#ffffff0d",
-  "misura/tratto": 1,
+  "misura/tratto-forte": 2,
   "colore/sessione/grigio": "#c4c8ce",
   "colore/icona/viola": "#ad7bf9",
   "raggio/casella": 22,
   "misura/colonna": 760,
   "spazio/0-5": 2,
+  "misura/onda-barra": 3,
   "raggio/xl": 15,
   "misura/toast": 360,
   "misura/riferimento": 24,
   "misura/dialogo": 420,
   "colore/fondo/cornice": "#232323",
   "misura/pannello": 320,
-  "colore/bordo/leggero": "#ffffff0b",
-  "misura/tratto-forte": 2
+  "colore/bordo/leggero": "#ffffff0b"
  },
  "nodi": [
   {
@@ -3860,7 +3861,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "    <RigaFriday />",
+   "testo": "    <Rigaclotch AI />",
    "font": "Menlo Regular"
   },
   {
@@ -4153,7 +4154,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -4242,7 +4243,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -4326,9 +4327,9 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
-    "height": "misura/icona",
-    "strokeWeight": "misura/tratto"
+    "height": "misura/icona"
    },
    "senza": []
   },
@@ -4437,8 +4438,8 @@
     "itemSpacing": "spazio/1",
     "paddingLeft": "spazio/3",
     "paddingRight": "spazio/3",
-    "height": "misura/bottone",
-    "strokeWeight": "misura/tratto"
+    "strokeWeight": "misura/tratto",
+    "height": "misura/bottone"
    },
    "senza": []
   },
@@ -4708,9 +4709,9 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
-    "height": "misura/icona",
-    "strokeWeight": "misura/tratto"
+    "height": "misura/icona"
    },
    "senza": []
   },
@@ -4919,9 +4920,9 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
-    "height": "misura/icona",
-    "strokeWeight": "misura/tratto"
+    "height": "misura/icona"
    },
    "senza": []
   },
@@ -5009,9 +5010,9 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
-    "height": "misura/icona",
-    "strokeWeight": "misura/tratto"
+    "height": "misura/icona"
    },
    "senza": []
   },
@@ -5099,9 +5100,9 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
-    "height": "misura/icona",
-    "strokeWeight": "misura/tratto"
+    "height": "misura/icona"
    },
    "senza": []
   },
@@ -5819,8 +5820,8 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/2",
     "paddingRight": "spazio/2",
-    "height": "misura/riga",
-    "strokeWeight": "misura/tratto-forte"
+    "strokeWeight": "misura/tratto-forte",
+    "height": "misura/riga"
    },
    "senza": []
   },
@@ -5990,8 +5991,8 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
-    "height": "misura/bottone-invio",
-    "strokeWeight": "misura/tratto-forte"
+    "strokeWeight": "misura/tratto-forte",
+    "height": "misura/bottone-invio"
    },
    "senza": []
   },
@@ -7731,8 +7732,8 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/colonna",
-    "strokeWeight": "misura/tratto"
+    "strokeWeight": "misura/tratto",
+    "width": "misura/colonna"
    },
    "senza": []
   },
@@ -7813,7 +7814,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7829,7 +7831,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7845,7 +7848,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7861,7 +7865,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7877,7 +7882,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7893,7 +7899,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7909,7 +7916,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -7925,7 +7933,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8037,7 +8046,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Friday sta parlando",
+   "testo": "clotch AI sta parlando",
    "font": "SF Pro Regular"
   },
   {
@@ -8067,7 +8076,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8083,7 +8093,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8099,7 +8110,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8115,7 +8127,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8131,7 +8144,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8147,7 +8161,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8163,7 +8178,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8179,7 +8195,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -8866,8 +8883,8 @@
     "paddingRight": "spazio/3",
     "paddingTop": "spazio/3",
     "paddingBottom": "spazio/3",
-    "width": "misura/dialogo",
-    "strokeWeight": "misura/tratto"
+    "strokeWeight": "misura/tratto",
+    "width": "misura/dialogo"
    },
    "senza": []
   },
@@ -10047,7 +10064,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Nessun obiettivo. Friday lo propone quando capisce il lavoro della sessione.",
+   "testo": "Nessun obiettivo. clotch AI lo propone quando capisce il lavoro della sessione.",
    "font": "SF Pro Regular"
   },
   {
@@ -11585,7 +11602,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Nessun obiettivo. Friday lo propone quando capisce il lavoro della sessione.",
+   "testo": "Nessun obiettivo. clotch AI lo propone quando capisce il lavoro della sessione.",
    "font": "SF Pro Regular"
   },
   {

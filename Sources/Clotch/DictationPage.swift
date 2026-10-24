@@ -37,7 +37,7 @@ struct DictationPage: View {
 
     var body: some View {
         SettingsCardPage(symbol: "mic.fill", tint: T.impostazioniIconaArancio, title: "Dettatura",
-                     summary: "Premi la scorciatoia e parla: il notch ascolta, trascrive in diretta e manda il testo a Friday.", width: width ?? ClotchSettingsWindow.width) {
+                     summary: "Premi la scorciatoia e parla: il notch ascolta, trascrive in diretta e manda il testo a clotch AI.", width: width ?? ClotchSettingsWindow.width) {
             SettingsGroup {
                 CardRow(title: "Dettatura accesa", note: "Spenta, la scorciatoia non fa nulla.") {
                     CardSwitch(label: "Dettatura accesa", isOn: Binding(get: { config.enabled }, set: { config.enabled = $0; save() }))
@@ -87,11 +87,11 @@ struct DictationPage: View {
                              options: VoiceInput.languages.map { ($0.code, $0.name) })
                 }
             }
-            SettingsGroup(title: "Friday") {
-                CardRow(title: "Modello Friday",
+            SettingsGroup(title: "clotch AI") {
+                CardRow(title: "Modello clotch AI",
                         note: configBroken ? "Impostazioni illeggibili. Correggi a mano il file config.json della voce."
                         : "Risponde sullo stato del lavoro, scrive alle sessioni, sblocca le chat ferme e apre lavoro nuovo.\nPiù forte: capisce meglio, ma risponde più lento e costa di più.") {
-                    CardMenu(label: "Modello Friday", selection: Binding(get: { config.overseerModel }, set: { config.overseerModel = $0; save() }),
+                    CardMenu(label: "Modello clotch AI", selection: Binding(get: { config.overseerModel }, set: { config.overseerModel = $0; save() }),
                              options: [("claude-haiku-5-5", "Haiku 5.5"), ("claude-sonnet-5-5", "Sonnet 5.5"), ("claude-opus-5-5", "Opus 5.5")])
                         .disabled(configBroken)
                 }

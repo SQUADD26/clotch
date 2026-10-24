@@ -1,0 +1,37 @@
+/* figma: 101-33775 — schede del pannello «Info sessione»: Ambiente, Contesto, Connettori, Modifiche (componente 101:33614) */
+.pezzo-pannello .pannello-info {
+  flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: var(--spazio-3);
+}
+.pezzo-pannello .scheda {
+  width: var(--misura-pannello); padding: var(--spazio-4); gap: var(--spazio-3); flex: none;
+  display: flex; flex-direction: column;
+  background: var(--colore-fondo-cornice); border-radius: var(--raggio-xl);
+}
+.pezzo-pannello .scheda .testata { display: flex; align-items: center; gap: var(--spazio-1); width: 100%; text-align: left; }
+.pezzo-pannello .scheda .spazio { flex: 1; }
+.pezzo-pannello .riga-info { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-pannello .riga-info .testo { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* controllo remoto: stesso interruttore delle impostazioni, in sola lettura */
+.pezzo-pannello .interruttore {
+  width: var(--misura-interruttore-largo); height: var(--misura-interruttore-alto); flex: none;
+  padding: var(--spazio-0-5); border-radius: var(--raggio-pieno); background: var(--colore-fondo-riga-scelta); display: flex;
+}
+.pezzo-pannello .interruttore.acceso { background: var(--colore-fondo-accento); justify-content: flex-end; }
+.pezzo-pannello .manopola { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-pieno); background: var(--colore-fondo-manopola); }
+
+/* contesto: usato, barra e legenda */
+.pezzo-pannello .uso { display: flex; align-items: center; justify-content: space-between; }
+.pezzo-pannello .barra-contesto {
+  height: var(--misura-barra-uso); display: flex; overflow: hidden; border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma);
+}
+.pezzo-pannello .barra-contesto .parte { height: 100%; background: var(--colore-sessione-blu); }
+.pezzo-pannello .voci-contesto { display: flex; flex-direction: column; gap: var(--spazio-1); }
+.pezzo-pannello .voce { display: flex; align-items: center; gap: var(--spazio-2); }
+.pezzo-pannello .voce .nome { flex: 1; }
+.pezzo-pannello .campione { width: var(--misura-legenda); height: var(--misura-legenda); flex: none; border-radius: var(--raggio-xs); }
+.pezzo-pannello .campione.usato { background: var(--colore-sessione-blu); }
+.pezzo-pannello .campione.libero { background: var(--colore-bordo-normale); }
+
+.pezzo-pannello .apri-pr { align-self: flex-start; text-decoration: none; }

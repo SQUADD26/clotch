@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "aspetta",
     "perche": null,
-    "ultimaAttivita": 1792768064164,
+    "ultimaAttivita": 1792792869531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Fai la prova di parità di tutte le schermate.",
-    "t": 1792768200164
+    "t": 1792793005531
    },
    {
     "tipo": "strumento",
@@ -66,14 +66,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768201164,
+    "t": 1792793006531,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Le 14 immagini sono pronte. Prima di salvarle ho un dubbio.",
     "modello": "claude-opus-5-5",
-    "t": 1792768242164
+    "t": 1792793047531
    },
    {
     "tipo": "strumento",
@@ -97,7 +97,7 @@
      ]
     },
     "esito": null,
-    "t": 1792768243164,
+    "t": 1792793048531,
     "id": "t1"
    }
   ]
@@ -148,14 +148,14 @@
       "domande": []
      }
     ],
-    "battito": 1792768344164,
+    "battito": 1792793149531,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792768364164,
+    "visto": 1792793169531,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -168,7 +168,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [],
   "regole": [],

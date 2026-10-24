@@ -1,0 +1,4 @@
+/* figma: 101-49067 — la banda «via dal mac» va a capo; senza Clotch ha il fondo delle righe al passaggio (101:49566) */
+.pezzo-barra .banda.via .dettaglio { white-space: normal; }
+.pezzo-barra .banda.via.senza { background: var(--colore-fondo-riga-passaggio); }
+

@@ -19,7 +19,7 @@ final class VoiceInputController: ObservableObject {
     /// Seconds an order can still be taken back, before it leaves.
     static let cancelSeconds = 2.0
 
-    @Published private(set) var phase: Phase = .idle
+    @Published private(set) var phase: Phase = .idle { didSet { if !Self.hears(phase) { clearLiveText() } } }
     /// The microphone's last levels (0…1), newest last: the bars of the pill.
     @Published private(set) var levels = [Double](repeating: 0, count: 8)
     @Published private(set) var sure = ""
@@ -202,7 +202,29 @@ final class VoiceInputController: ObservableObject {
         levels = Array(levels.dropFirst()) + [level]
     }
 
-    func publishText() { (sure, maybe) = (dictation.sure, dictation.maybe) }
+    func publishText() {
+        (sure, maybe) = (dictation.sure, dictation.maybe)
+        publishLiveText()
+    }
+
+    private static func hears(_ phase: Phase) -> Bool { phase == .ready || phase == .listening || phase == .finishing }
+
+    /// claude-config#2572: the partial transcript, for the engine's `clotch` event (`testo`). Gone as soon as he stops talking.
+    private var liveTextURL: URL { files.voiceDir.appendingPathComponent("ascolto.json") }
+
+    private func publishLiveText() {
+        guard Self.hears(phase), !text.isEmpty else { return }
+        let o: [String: Any] = ["v": 1, "t": Date().timeIntervalSince1970, "testo": text]
+        try? files.write(JSONSerialization.data(withJSONObject: o), to: liveTextURL)
+    }
+
+    private func clearLiveText() { try? FileManager.default.removeItem(at: liveTextURL) }
+
+    /// claude-config#2572 «zitto»: the one way to stop the voice (the existing `hush()`) and the listening.
+    func hush() {
+        VoiceSpeaker.shared.hush()
+        cancel()
+    }
 
     // MARK: - Finishing
 
@@ -278,10 +300,10 @@ final class VoiceInputController: ObservableObject {
 
     private static func sentence(_ outcome: OverseerDelivery.Outcome) -> String {
         switch outcome {
-        case .sent: return "Inviato a Friday"
-        case .queued: return "In coda per Friday"
+        case .sent: return "Inviato a clotch AI"
+        case .queued: return "In coda per clotch AI"
         case .copied: return "Testo copiato. Incolla con ⌘V"
-        case .notDelivered: return "Non risulta consegnato a Friday. Testo copiato. Incolla con ⌘V"
+        case .notDelivered: return "Non risulta consegnato a clotch AI. Testo copiato. Incolla con ⌘V"
         }
     }
 

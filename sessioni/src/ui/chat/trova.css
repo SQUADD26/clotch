@@ -1,0 +1,17 @@
+/* figma: 101-23475 — «barra trova» 101:23594: lente, testo cercato, «1 di 2», su, giù, chiudi */
+/* width e max-width: la regola della colonna (.colonna .pezzo > *) ha specificità maggiore e li fissa a una colonna */
+.pezzo-chat .trova {
+  position: absolute; top: var(--spazio-2); right: var(--spazio-1); z-index: 2;
+  width: var(--misura-barra-trova) !important; max-width: none !important; height: var(--misura-bottone-invio);
+  display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1) var(--spazio-2) var(--spazio-1) var(--spazio-3);
+  border-radius: var(--raggio-lg); background: var(--colore-fondo-elevato);
+}
+.pezzo-chat .trova input {
+  flex: 1; min-width: 0; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-bordo-fuoco);
+}
+.pezzo-chat .trova input::placeholder { color: var(--colore-testo-secondario); }
+.pezzo-chat .trova .contatore { flex: none; font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+/* icona nuda da 16: l'area del clic è più larga, il margine negativo non sposta niente */
+.pezzo-chat .trova .icona-trova { flex: none; display: flex; padding: var(--spazio-1); margin: calc(-1 * var(--spazio-1)); border-radius: var(--raggio-md); }
+.pezzo-chat .trova .icona-trova:hover:not(:disabled) { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .trova .icona-trova.su .icona { transform: rotate(180deg); }

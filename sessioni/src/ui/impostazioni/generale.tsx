@@ -2,10 +2,11 @@
 import { avvisa } from "../base/Avvisi";
 import { Bottone } from "../base/Bottone";
 import { messaggioErrore } from "../base/dati";
+import { MODELLI } from "../chat/testi";
 import { CampoTesto, Gruppo, Interruttore, Pagina, Riga, Scelta } from "./controlli";
 import { imposta, IN_NUOVA_FINESTRA, useImpostazioni } from "./stato";
 
-const MODELLI = { "Opus 5.5": "Il più capace", "Sonnet 5.5": "Veloce", "Haiku 5.5": "Il più rapido", "Fable 5.1": "Casi difficili" }; // 119:55555
+const DETTAGLI_MODELLI = Object.fromEntries(Object.entries(MODELLI).map(([k, m]) => [k, m.dettaglio])); // 119:55555
 const APERTURE = ["Nella stessa finestra", IN_NUOVA_FINESTRA]; // 119:55726
 const LINGUE = ["Rilevamento automatico", "Italiano", "English"]; // voci della «tendina lingua» 101:32999
 
@@ -31,7 +32,7 @@ export default function Generale() {
           <Scelta etichetta="Lingua" valore={v.lingua} voci={LINGUE} onScegli={(x) => imposta("lingua", x)} />
         </Riga>
         <Riga etichetta="Modello per i tuoi messaggi" descrizione="Usato quando scrivi a una sessione da qui">
-          <Scelta etichetta="Modello per i tuoi messaggi" valore={v.modello} voci={Object.keys(MODELLI)} dettagli={MODELLI} onScegli={(x) => imposta("modello", x)} />
+          <Scelta etichetta="Modello per i tuoi messaggi" valore={v.modello} voci={Object.keys(MODELLI)} dettagli={DETTAGLI_MODELLI} onScegli={(x) => imposta("modello", x)} />
         </Riga>
         <Riga etichetta="Apri una sessione" descrizione="Cosa succede quando ne scegli una dall’elenco">
           <Scelta etichetta="Apri una sessione" valore={v.apriSessione} voci={APERTURE} onScegli={(x) => imposta("apriSessione", x)} />

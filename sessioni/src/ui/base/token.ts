@@ -15,35 +15,52 @@ export type Token =
   | "primitivo-grigio-232323"
   | "primitivo-grigio-363636"
   | "primitivo-grigio-2d2d2d"
+  | "primitivo-grigio-0d0d0d"
+  | "primitivo-grigio-f4f4f4"
+  | "primitivo-grigio-f7f7f8"
+  | "primitivo-grigio-e9e9eb"
   | "primitivo-arancio-ee7c37"
   | "primitivo-arancio-ee7c37-a16"
   | "primitivo-arancio-d25e28"
   | "primitivo-arancio-87401d"
   | "primitivo-arancio-fdf5f1"
   | "primitivo-arancio-ff8549"
+  | "primitivo-arancio-b9461b"
   | "primitivo-verde-40c977"
   | "primitivo-verde-40c977-a16"
   | "primitivo-verde-37915b"
   | "primitivo-verde-265f3d"
   | "primitivo-verde-f3fbf6"
+  | "primitivo-verde-1a7f45"
   | "primitivo-rosso-ff6764"
   | "primitivo-rosso-fa423e-a16"
+  | "primitivo-rosso-c8312d"
   | "primitivo-semaforo-rosso"
   | "primitivo-semaforo-giallo"
   | "primitivo-semaforo-verde"
   | "primitivo-pagina-riquadro"
   | "primitivo-nero-a19"
   | "primitivo-nero-a50"
+  | "primitivo-nero-a052"
+  | "primitivo-nero-a078"
+  | "primitivo-nero-a104"
+  | "primitivo-nero-a20"
+  | "primitivo-nero-a51"
+  | "primitivo-nero-a58"
+  | "primitivo-nero-a71"
+  | "primitivo-nero-a904"
   | "primitivo-blu-145694"
   | "primitivo-blu-339cff"
   | "primitivo-blu-339cff-a16"
   | "primitivo-blu-1982e5"
   | "primitivo-blu-f0f7fe"
+  | "primitivo-blu-0a66d6"
   | "primitivo-viola-ad7bf9"
   | "primitivo-viola-ad7bf9-a16"
   | "primitivo-viola-9965e8"
   | "primitivo-viola-6925d0"
   | "primitivo-viola-f6f1fd"
+  | "primitivo-viola-6f2fd6"
   | "primitivo-argento-c4c8ce"
   | "primitivo-argento-c4c8ce-a16"
   | "primitivo-argento-7a818d"
@@ -51,6 +68,7 @@ export type Token =
   | "primitivo-argento-f6f7f8"
   | "primitivo-giallo-f2c14e"
   | "primitivo-giallo-fff1c2"
+  | "primitivo-giallo-8a6100"
   | "colore-fondo-cornice"
   | "colore-fondo-superficie"
   | "colore-fondo-codice"
@@ -81,6 +99,7 @@ export type Token =
   | "colore-fondo-accento-argento"
   | "colore-fondo-bolla-argento"
   | "colore-fondo-attesa-argento"
+  | "colore-fondo-tabella-intestazione"
   | "colore-testo-primario"
   | "colore-testo-secondario"
   | "colore-testo-su-primario"
@@ -126,6 +145,11 @@ export type Token =
   | "colore-sessione-verde"
   | "colore-sessione-blu"
   | "colore-sessione-viola"
+  | "colore-codice-parola"
+  | "colore-codice-testo"
+  | "colore-codice-funzione"
+  | "colore-codice-numero"
+  | "colore-codice-commento"
   | "spazio-1"
   | "spazio-2"
   | "spazio-3"
@@ -152,12 +176,16 @@ export type Token =
   | "testo-dimensione-base"
   | "testo-dimensione-lg"
   | "testo-dimensione-xl"
+  | "testo-dimensione-titolo-1"
+  | "testo-dimensione-titolo-2"
   | "testo-riga-xs"
   | "testo-riga-sm"
   | "testo-riga-base"
   | "testo-riga-messaggio"
   | "testo-riga-lg"
   | "testo-riga-xl"
+  | "testo-riga-titolo-1"
+  | "testo-riga-titolo-2"
   | "testo-famiglia-ui"
   | "testo-famiglia-codice"
   | "testo-famiglia-arrotondato"
@@ -205,12 +233,30 @@ export type Token =
   | "misura-legenda"
   | "misura-riferimento"
   | "misura-riga-compatta"
+  | "misura-tabella-colonna-numero"
+  | "misura-tabella-colonna-testo"
+  | "misura-tabella-colonna-larga"
+  | "misura-tabella-altezza-max"
+  | "misura-tabella-riga"
+  | "misura-menu-modello"
+  | "misura-onda-barra"
+  | "misura-menu-permessi"
+  | "misura-casella-testo-max"
+  | "misura-menu-impegno"
+  | "misura-allegato-lato"
+  | "misura-allegato-x"
+  | "misura-finestra-stretta"
+  | "misura-allegato-avviso-largo"
+  | "misura-menu-avvio-largo"
+  | "misura-campo-porta"
+  | "misura-riga-menu-larga"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
   | "tempo-breve"
   | "tempo-normale"
-  | "tempo-lento";
+  | "tempo-lento"
+  | "opacita-spento";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -232,35 +278,52 @@ export const valori: Record<Token, string> = {
   "primitivo-grigio-232323": "#232323",
   "primitivo-grigio-363636": "#363636",
   "primitivo-grigio-2d2d2d": "#2d2d2d",
+  "primitivo-grigio-0d0d0d": "#0d0d0d",
+  "primitivo-grigio-f4f4f4": "#f4f4f4",
+  "primitivo-grigio-f7f7f8": "#f7f7f8",
+  "primitivo-grigio-e9e9eb": "#e9e9eb",
   "primitivo-arancio-ee7c37": "#ee7c37",
   "primitivo-arancio-ee7c37-a16": "#ee7c3729",
   "primitivo-arancio-d25e28": "#d25e28",
   "primitivo-arancio-87401d": "#87401d",
   "primitivo-arancio-fdf5f1": "#fdf5f1",
   "primitivo-arancio-ff8549": "#ff8549",
+  "primitivo-arancio-b9461b": "#b9461b",
   "primitivo-verde-40c977": "#40c977",
   "primitivo-verde-40c977-a16": "#40c97729",
   "primitivo-verde-37915b": "#37915b",
   "primitivo-verde-265f3d": "#265f3d",
   "primitivo-verde-f3fbf6": "#f3fbf6",
+  "primitivo-verde-1a7f45": "#1a7f45",
   "primitivo-rosso-ff6764": "#ff6764",
   "primitivo-rosso-fa423e-a16": "#fa423e29",
+  "primitivo-rosso-c8312d": "#c8312d",
   "primitivo-semaforo-rosso": "#ff5f57",
   "primitivo-semaforo-giallo": "#febc2e",
   "primitivo-semaforo-verde": "#28c840",
   "primitivo-pagina-riquadro": "#2c2c30",
   "primitivo-nero-a19": "#00000030",
   "primitivo-nero-a50": "#00000080",
+  "primitivo-nero-a052": "#0000000d",
+  "primitivo-nero-a078": "#00000014",
+  "primitivo-nero-a104": "#0000001b",
+  "primitivo-nero-a20": "#00000033",
+  "primitivo-nero-a51": "#00000082",
+  "primitivo-nero-a58": "#00000094",
+  "primitivo-nero-a71": "#000000b5",
+  "primitivo-nero-a904": "#000000e7",
   "primitivo-blu-145694": "#145694",
   "primitivo-blu-339cff": "#339cff",
   "primitivo-blu-339cff-a16": "#339cff29",
   "primitivo-blu-1982e5": "#1982e5",
   "primitivo-blu-f0f7fe": "#f0f7fe",
+  "primitivo-blu-0a66d6": "#0a66d6",
   "primitivo-viola-ad7bf9": "#ad7bf9",
   "primitivo-viola-ad7bf9-a16": "#ad7bf929",
   "primitivo-viola-9965e8": "#9965e8",
   "primitivo-viola-6925d0": "#6925d0",
   "primitivo-viola-f6f1fd": "#f6f1fd",
+  "primitivo-viola-6f2fd6": "#6f2fd6",
   "primitivo-argento-c4c8ce": "#c4c8ce",
   "primitivo-argento-c4c8ce-a16": "#c4c8ce29",
   "primitivo-argento-7a818d": "#7a818d",
@@ -268,6 +331,7 @@ export const valori: Record<Token, string> = {
   "primitivo-argento-f6f7f8": "#f6f7f8",
   "primitivo-giallo-f2c14e": "#f2c14e",
   "primitivo-giallo-fff1c2": "#fff1c2",
+  "primitivo-giallo-8a6100": "#8a6100",
   "colore-fondo-cornice": "#232323",
   "colore-fondo-superficie": "#181818",
   "colore-fondo-codice": "#141414",
@@ -298,6 +362,7 @@ export const valori: Record<Token, string> = {
   "colore-fondo-accento-argento": "#7a818d",
   "colore-fondo-bolla-argento": "#50555c",
   "colore-fondo-attesa-argento": "#c4c8ce29",
+  "colore-fondo-tabella-intestazione": "#ffffff14",
   "colore-testo-primario": "#ffffff",
   "colore-testo-secondario": "#ffffffb5",
   "colore-testo-su-primario": "#2d2d2d",
@@ -343,6 +408,11 @@ export const valori: Record<Token, string> = {
   "colore-sessione-verde": "#40c977",
   "colore-sessione-blu": "#339cff",
   "colore-sessione-viola": "#ad7bf9",
+  "colore-codice-parola": "#ad7bf9",
+  "colore-codice-testo": "#40c977",
+  "colore-codice-funzione": "#339cff",
+  "colore-codice-numero": "#ff8549",
+  "colore-codice-commento": "#ffffff7f",
   "spazio-1": "4px",
   "spazio-2": "8px",
   "spazio-3": "12px",
@@ -369,12 +439,16 @@ export const valori: Record<Token, string> = {
   "testo-dimensione-base": "14px",
   "testo-dimensione-lg": "16px",
   "testo-dimensione-xl": "28px",
+  "testo-dimensione-titolo-1": "24px",
+  "testo-dimensione-titolo-2": "20px",
   "testo-riga-xs": "16px",
   "testo-riga-sm": "18px",
   "testo-riga-base": "20px",
   "testo-riga-messaggio": "21px",
   "testo-riga-lg": "24px",
   "testo-riga-xl": "36px",
+  "testo-riga-titolo-1": "32px",
+  "testo-riga-titolo-2": "28px",
   "testo-famiglia-ui": "SF Pro",
   "testo-famiglia-codice": "Menlo",
   "testo-famiglia-arrotondato": "SF Pro Rounded",
@@ -422,12 +496,30 @@ export const valori: Record<Token, string> = {
   "misura-legenda": "8px",
   "misura-riferimento": "24px",
   "misura-riga-compatta": "28px",
+  "misura-tabella-colonna-numero": "104px",
+  "misura-tabella-colonna-testo": "200px",
+  "misura-tabella-colonna-larga": "232px",
+  "misura-tabella-altezza-max": "392px",
+  "misura-tabella-riga": "40px",
+  "misura-menu-modello": "320px",
+  "misura-onda-barra": "3px",
+  "misura-menu-permessi": "336px",
+  "misura-casella-testo-max": "240px",
+  "misura-menu-impegno": "200px",
+  "misura-allegato-lato": "120px",
+  "misura-allegato-x": "20px",
+  "misura-finestra-stretta": "480px",
+  "misura-allegato-avviso-largo": "734px",
+  "misura-menu-avvio-largo": "320px",
+  "misura-campo-porta": "96",
+  "misura-riga-menu-larga": "312",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
   "tempo-breve": "150ms",
   "tempo-normale": "200ms",
   "tempo-lento": "400ms",
+  "opacita-spento": "0.4",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);

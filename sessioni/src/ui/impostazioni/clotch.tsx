@@ -1,9 +1,9 @@
 // figma: 101-45956 — Impostazioni · Clotch con Clotch collegato; senza Clotch: 101-45993.
 // La versione arriva dall'evento clotch del registro (#339); finché Clotch non la scrive (#344) la descrizione la salta.
-import { useEffect, useState } from "react";
+
+import { useRegistro } from "../clotch-ai/dati";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
-import { daPiano } from "../friday/registro";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Gruppo, Interruttore, Pagina, Riga } from "./controlli";
 import { imposta, useImpostazioni, type Chiave } from "./stato";
@@ -15,15 +15,10 @@ const VOCI: [Chiave, string, string][] = [
   ["clotchObiettivi", "Obiettivi anche nel notch", "Accetta e rifiuta dal notch o da qui"],
 ];
 
-function useVersioneClotch(): string | null {
-  const [v, setV] = useState<string | null>(null);
-  useEffect(() => {
-    const prendi = (p: unknown) => setV(daPiano(p).clotch?.versione ?? null);
-    window.friday.registro().then(prendi, () => {});
-    return window.friday.onRegistro(prendi);
-  }, []);
-  return v;
-}
+/** Dove si scarica Clotch: il main apre i collegamenti web nel browser (link-esterni.ts). */
+const SCARICA = "https://github.com/SQUADD26/clotch/releases/latest";
+
+const useVersioneClotch = (): string | null => useRegistro().dati?.clotch?.versione ?? null;
 
 export default function Clotch() {
   const acceso = useClotchAcceso();
@@ -42,7 +37,7 @@ export default function Clotch() {
                 : "clotch fa tutto da sola: voce, dettatura e avvisi stanno qui"}
             </div>
           </div>
-          {!acceso && <Bottone tipo="secondario" disabled>Scarica clotch</Bottone>}
+          {!acceso && <Bottone tipo="secondario" onClick={() => window.open(SCARICA)}>Scarica clotch</Bottone>}
         </div>
         {acceso && VOCI.map(([chiave, etichetta, descrizione]) => (
           <Riga key={chiave} etichetta={etichetta} descrizione={descrizione}>

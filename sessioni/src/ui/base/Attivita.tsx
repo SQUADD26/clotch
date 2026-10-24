@@ -1,8 +1,8 @@
 // figma: 101-30172 — «Bottone attività» 121:58595 (Senza numero, Con numero, Aperto) e «Popover attività» 121:58601
 import { useEffect, useState } from "react";
-import type { Registro } from "../../friday";
-import { useRegistro } from "../friday/dati";
-import { casella } from "../friday/vista";
+import type { Registro } from "../../clotch-ai";
+import { useRegistro } from "../clotch-ai/dati";
+import { casella } from "../clotch-ai/vista";
 import { BottoneIcona } from "./Bottone";
 import { Icona } from "./Icona";
 import "./attivita.css";

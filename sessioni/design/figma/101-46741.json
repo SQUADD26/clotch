@@ -59,6 +59,7 @@
   "colore/bordo/fuoco": "#ee7c37",
   "raggio/casella": 22,
   "misura/colonna": 760,
+  "misura/onda-barra": 3,
   "misura/bottone-invio": 32,
   "colore/testo/errore": "#ff6764",
   "colore/fondo/errore": "#fa423e29"
@@ -702,7 +703,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -1900,7 +1901,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "friday-mac-v2",
+   "testo": "clotch-ai-mac-v2",
    "font": "SF Pro Regular"
   },
   {
@@ -2223,7 +2224,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Medium"
   },
   {
@@ -2983,7 +2984,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -2999,7 +3001,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3015,7 +3018,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3031,7 +3035,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3047,7 +3052,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3063,7 +3069,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3079,7 +3086,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3095,7 +3103,8 @@
    },
    "variabili": {
     "fills[0]": "colore/icona/accento",
-    "cornerRadius": "raggio/pieno"
+    "cornerRadius": "raggio/pieno",
+    "width": "misura/onda-barra"
    },
    "senza": []
   },
@@ -3169,7 +3178,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Chiedi a Friday",
+   "testo": "Chiedi a clotch AI",
    "font": "SF Pro Regular"
   },
   {

@@ -1,0 +1,74 @@
+/* figma: 148-46383 — miniature nella casella 148:43692, riquadro di rilascio 148:43696, avviso 148:43700; 101-28041 «chip allegato», «allegati messaggio», «miniatura» */
+.pezzo-chat .allegati-messaggio { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--spazio-2); }
+.pezzo-chat .chip-allegato {
+  display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; max-width: 100%; padding: var(--spazio-1) var(--spazio-2);
+  background: var(--colore-fondo-bottone-secondario); border-radius: var(--raggio-lg);
+}
+.pezzo-chat .chip-allegato .apri { display: inline-flex; align-items: center; gap: var(--spazio-2); min-width: 0; text-align: left; }
+.pezzo-chat .chip-allegato .testi { display: flex; flex-direction: column; min-width: 0; }
+.pezzo-chat .chip-allegato .nome {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .chip-allegato .dettaglio { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+
+/* le miniature stanno più staccate: 24 sopra e sotto, come nel disegno */
+.pezzo-chat .miniature { display: flex; flex-wrap: wrap; gap: var(--spazio-2); margin: var(--spazio-4) 0 var(--spazio-3); }
+.pezzo-chat .miniatura {
+  width: var(--misura-miniatura-larga); height: var(--misura-miniatura-alta); display: block; overflow: hidden;
+  background: var(--colore-fondo-bottone-secondario); border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-xl);
+}
+.pezzo-chat .miniatura img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pezzo-chat .miniatura .non-letta {
+  height: 100%; display: flex; align-items: center; justify-content: center; gap: var(--spazio-2);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+
+/* miniature sopra il testo (148:43692): una riga che scorre di lato, la casella non cresce */
+.pezzo-chat .casella .allegati-casella { display: flex; gap: var(--spazio-2); padding-left: var(--spazio-1); overflow-x: auto; scrollbar-width: none; }
+.pezzo-chat .casella .allegati-casella::-webkit-scrollbar { display: none; }
+.pezzo-chat .allegato, .pezzo-chat .zona-rilascio {
+  --lato: var(--misura-allegato-lato);
+  position: relative; box-sizing: border-box; flex: none; width: var(--lato); height: var(--lato); border-radius: var(--raggio-lg);
+}
+.pezzo-chat .allegato {
+  display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; gap: var(--spazio-2); padding: var(--spazio-3); overflow: hidden;
+  background: var(--colore-fondo-bottone-secondario); border: var(--misura-tratto) solid var(--colore-bordo-normale);
+}
+.pezzo-chat .allegato.immagine { padding: 0; background: var(--colore-fondo-codice); }
+.pezzo-chat .allegato:hover, .pezzo-chat .allegato:focus-within { border-color: var(--colore-bordo-forte); }
+.pezzo-chat .allegato img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pezzo-chat .allegato .testa-allegato { display: flex; flex-direction: column; gap: var(--spazio-1-5); min-width: 0; align-items: flex-start; }
+.pezzo-chat .allegato .nome {
+  max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; text-align: left;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .allegato .dettaglio { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .allegato .sagoma { width: var(--misura-icona); height: var(--misura-icona); border-radius: var(--raggio-sm); background: var(--colore-fondo-sagoma); }
+.pezzo-chat .allegato.carico.immagine { background: var(--colore-fondo-sagoma); }
+.pezzo-chat .allegato.errore { border-color: var(--colore-icona-errore); }
+.pezzo-chat .allegato.errore.immagine { background: var(--colore-fondo-bottone-secondario); align-items: center; justify-content: center; gap: var(--spazio-1); padding: var(--spazio-3); }
+/* la X: al passaggio e con la tastiera; durante il caricamento e sugli errori resta sempre visibile */
+.pezzo-chat .rimuovi-allegato {
+  position: absolute; top: calc(var(--spazio-1-5) - var(--misura-tratto)); right: calc(var(--spazio-1-5) - var(--misura-tratto)); opacity: 0;
+  width: var(--misura-allegato-x); height: var(--misura-allegato-x); display: inline-flex; align-items: center; justify-content: center;
+  background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-forte); border-radius: var(--raggio-pieno);
+}
+.pezzo-chat .allegato:hover .rimuovi-allegato, .pezzo-chat .rimuovi-allegato:focus-visible, .pezzo-chat .allegato.carico .rimuovi-allegato, .pezzo-chat .allegato.errore .rimuovi-allegato { opacity: 1; }
+/* il riquadro «Rilascia per allegare» in fondo alla riga (148:43696): la casella si colora (148:45727) */
+.pezzo-chat .zona-rilascio {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spazio-2); padding: var(--spazio-3); text-align: center;
+  background: var(--colore-fondo-attesa); border: var(--misura-tratto-forte) dashed var(--colore-bordo-fuoco);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); pointer-events: none;
+}
+.pezzo-chat .casella.trascina {
+  background: linear-gradient(var(--colore-fondo-attesa), var(--colore-fondo-attesa)), var(--colore-fondo-casella);
+  border: var(--misura-tratto-forte) dashed var(--colore-bordo-fuoco);
+}
+/* l'avviso sotto la casella (148:43700): un file oltre il limite non parte */
+.pezzo-chat .avviso-allegato { display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-2) var(--spazio-3); }
+.pezzo-chat .avviso-allegato .testi { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-chat .avviso-allegato .titolo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
+.pezzo-chat .avviso-allegato .corpo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
+.pezzo-chat .aggiungi { position: relative; display: inline-flex; }
+.pezzo-chat .aggiungi .menu { left: 0; bottom: calc(100% + var(--spazio-2)); max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }

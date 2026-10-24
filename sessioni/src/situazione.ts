@@ -28,8 +28,9 @@ function fine(adesso: Adesso, attesa: Map<string, string>, inCoda: number, segni
 }
 
 export function situazioneClaude(righe: any[]): Situazione {
-  let adesso: Adesso = "sconosciuta", inCoda = 0;
+  let adesso: Adesso = "sconosciuta", inCoda = 0, prima: Adesso | null = null; // prima: come stava la sessione prima di un /comando
   const attesa = new Map<string, string>(), segni = new Set<Segno>();
+  const comandoLocale = () => { if (prima) adesso = prima; prima = null; }; // /clear, /model…: il comando ha già risposto da sé, il modello non lavora
   for (const o of righe) {
     if (!o || typeof o !== "object") continue;
     if (o.type === "queue-operation") {
@@ -40,6 +41,7 @@ export function situazioneClaude(righe: any[]): Situazione {
     if (o.type === "system") {
       if (o.subtype === "compact_boundary") segni.add("compattazione");
       else if (o.subtype === "api_error") adesso = "riprova";
+      else if (o.subtype === "local_command") comandoLocale();
       else if (o.subtype === "stop_hook_summary" && adesso !== "interrotta") adesso = "turno_finito";
       continue;
     }
@@ -78,7 +80,8 @@ export function situazioneClaude(righe: any[]): Situazione {
     if (dec?.source === "user_temporary" || dec?.source === "user_permanent") segni.add("permesso_dato");
     if (o.toolUseResult?.structuredPatch) segni.add("modifica");
     if (k === "interrupted" || testo.startsWith("[Request interrupted by user")) { segni.add("interrotta"); adesso = "interrotta"; attesa.clear(); }
-    else if (risultati.length || (testo.trim() && !o.isMeta)) adesso = "lavora";
+    else if (testo.startsWith("<local-command-stdout>")) comandoLocale();
+    else if (risultati.length || (testo.trim() && !o.isMeta)) { if (testo.startsWith("<command-name>")) prima = adesso; adesso = "lavora"; }
   }
   return fine(adesso, attesa, inCoda, segni);
 }

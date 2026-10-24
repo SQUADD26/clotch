@@ -4,20 +4,20 @@
   "id": "101:49347",
   "nome": "via dal mac",
   "w": 250,
-  "h": 54,
+  "h": 70,
   "dentro": "101:49067"
  },
  "variabili": {
+  "colore/fondo/attesa": "#ee7c3729",
   "raggio/md": 10,
-  "spazio/2": 8,
   "spazio/1": 4,
+  "spazio/2": 8,
   "misura/icona": 16,
+  "colore/icona/accento": "#ee7c37",
   "colore/testo/primario": "#ffffff",
-  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/fondo/attesa": "#ee7c3729",
-  "colore/icona/accento": "#ee7c37",
+  "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16
  },
@@ -30,7 +30,7 @@
     "x": 0,
     "y": 0,
     "w": 250,
-    "h": 54
+    "h": 70
    },
    "variabili": {
     "fills[0]": "colore/fondo/attesa",
@@ -115,8 +115,8 @@
    "box": {
     "x": 8,
     "y": 30,
-    "w": 241,
-    "h": 16
+    "w": 234,
+    "h": 32
    },
    "variabili": {
     "fills[0]": "colore/testo/secondario",
@@ -124,7 +124,7 @@
     "lineHeight": "testo/riga/xs"
    },
    "senza": [],
-   "testo": "Clotch tiene 4 avvisi e te li legge al ritorno.",
+   "testo": "clotch tiene 4 avvisi e te li legge al ritorno.",
    "font": "SF Pro Regular"
   }
  ]

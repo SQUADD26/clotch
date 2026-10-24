@@ -24,6 +24,9 @@
   "misura/icona": 16,
   "colore/icona/secondaria": "#ffffffb5",
   "misura/bottone": 28,
+  "colore/testo/su-primario": "#2d2d2d",
+  "testo/dimensione/xs": 12,
+  "testo/riga/xs": 16,
   "spazio/0-5": 2,
   "misura/impostazioni-nav": 240,
   "spazio/3": 12,
@@ -44,8 +47,6 @@
   "testo/riga/xl": 36,
   "misura/intestazione": 56,
   "colore/testo/secondario": "#ffffffb5",
-  "testo/dimensione/xs": 12,
-  "testo/riga/xs": 16,
   "colore/bordo/normale": "#ffffff15",
   "raggio/xl": 15,
   "testo/dimensione/sm": 13,
@@ -317,6 +318,73 @@
     "fills[0]": "colore/icona/secondaria"
    },
    "senza": []
+  },
+  {
+   "id": "I101:32361;121:58602;121:58575",
+   "nome": "bottone",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 276,
+    "y": 72,
+    "w": 28,
+    "h": 28
+   },
+   "variabili": {
+    "cornerRadius": "raggio/md",
+    "width": "misura/bottone",
+    "height": "misura/bottone"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:32361;121:58602;121:58575;101:7139",
+   "nome": "icona campana",
+   "tipo": "INSTANCE",
+   "box": {
+    "x": 282,
+    "y": 78,
+    "w": 16,
+    "h": 16
+   },
+   "variabili": {
+    "width": "misura/icona",
+    "height": "misura/icona"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:32361;121:58602;121:58575;101:7139;101:18268",
+   "nome": "forma",
+   "tipo": "VECTOR",
+   "box": {
+    "x": 283.333984375,
+    "y": 78.66650390625,
+    "w": 13.332757949829102,
+    "h": 14.670573234558105
+   },
+   "variabili": {
+    "fills[0]": "colore/icona/secondaria"
+   },
+   "senza": []
+  },
+  {
+   "id": "I101:32361;121:58602;121:58580",
+   "nome": "numero",
+   "tipo": "TEXT",
+   "box": {
+    "x": 296,
+    "y": 68,
+    "w": 8,
+    "h": 16
+   },
+   "variabili": {
+    "fills[0]": "colore/testo/su-primario",
+    "fontSize": "testo/dimensione/xs",
+    "lineHeight": "testo/riga/xs"
+   },
+   "senza": [],
+   "testo": "2",
+   "font": "SF Pro Medium"
   },
   {
    "id": "101:32362",
@@ -729,7 +797,7 @@
     "lineHeight": "testo/riga/base"
    },
    "senza": [],
-   "testo": "Friday",
+   "testo": "clotch AI",
    "font": "SF Pro Regular"
   },
   {

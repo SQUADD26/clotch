@@ -1,0 +1,6 @@
+/* figma: 101-28652 — «mostra tutto» 101:28704: sotto il blocco dell'uscita, a una riga del filo (24) dal blocco */
+.pezzo-chat .mostra-tutto {
+  align-self: flex-start; margin-top: var(--spazio-4); display: flex; align-items: center; gap: var(--spazio-1); padding: 0 var(--spazio-1);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
+}
+.pezzo-chat .mostra-tutto.aperto .icona { transform: rotate(180deg); }

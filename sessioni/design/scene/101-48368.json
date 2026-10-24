@@ -1,0 +1,115 @@
+{
+ "navigazione": {
+  "vista": "clotch-ai",
+  "sezione": "avviso-notch"
+ },
+ "elenco": {
+  "sessioni": [],
+  "errori": []
+ },
+ "messaggi": {},
+ "preferenze": {},
+ "registro": {
+  "chat": {
+   "friday": {
+    "chat": "friday",
+    "titolo": null,
+    "madre": null,
+    "progetto": null,
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "lavora",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "richieste": [],
+    "battito": 1792793169933,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792793169933,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0
+   },
+   "c-backend": {
+    "chat": "c-backend",
+    "titolo": "Backend: auth e RLS",
+    "madre": null,
+    "progetto": "squadd-v2",
+    "account": ".claude-accountmanager",
+    "sorgente": "claude-code",
+    "daHandoff": null,
+    "stato": "serve_roberto",
+    "dettaglio": null,
+    "aspetto": null,
+    "domanda": null,
+    "limite": null,
+    "battito": 1792793149933,
+    "aiutanti": {},
+    "compattazioni": 0,
+    "interrotta": null,
+    "coda": [],
+    "obiettivo": null,
+    "passi": [],
+    "visto": 1792793049933,
+    "fine": null,
+    "chatNuova": null,
+    "fermata": false,
+    "quarantena": null,
+    "errore": null,
+    "rifiuto": null,
+    "persi": 0,
+    "richieste": [
+     {
+      "rid": "p1",
+      "genere": "permesso",
+      "strumento": "Bash",
+      "t": 1792793049933,
+      "domande": [],
+      "ingresso": {
+       "command": "supabase db push --db-url $DEV",
+       "description": "Porta su dev la migrazione 0042 delle policy."
+      }
+     }
+    ]
+   }
+  },
+  "fermoTutto": false,
+  "avvisi": [
+   {
+    "id": "a0",
+    "t": 1792792449933,
+    "testo": "«Backend: auth e RLS» aspetta un tuo permesso da 12 minuti.",
+    "livello": "normale",
+    "motivo": "chiesto",
+    "dettoDa": "clotch",
+    "sessioni": []
+   }
+  ],
+  "clotch": {
+   "voce": "accesa",
+   "parla": false,
+   "ascolta": false,
+   "versione": "2.4",
+   "t": -60000
+  },
+  "clotchAi": null,
+  "comandi": [],
+  "decisioni": [],
+  "regole": [],
+  "nonDisturbare": null,
+  "impostazioni": null,
+  "esiti": {},
+  "errori": []
+ }
+}

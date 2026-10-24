@@ -32,6 +32,6 @@ public enum HeartbeatSteps {
     }
 
     static func line(_ step: String, failed: Int) -> String {
-        "Friday: «\(step.replacingOccurrences(of: "_", with: " "))» non riesce da \(failed) giri"
+        "clotch AI: «\(step.replacingOccurrences(of: "_", with: " "))» non riesce da \(failed) giri"
     }
 }

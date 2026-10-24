@@ -8,33 +8,33 @@
   "dentro": "101:10017"
  },
  "variabili": {
-  "raggio/md": 10,
-  "spazio/2": 8,
+  "colore/fondo/elevato": "#2d2d2d",
+  "raggio/lg": 12.5,
   "spazio/1": 4,
-  "misura/bottone": 28,
-  "misura/icona": 16,
-  "colore/icona/secondaria": "#ffffffb5",
-  "misura/riga": 32,
-  "colore/testo/primario": "#ffffff",
+  "spazio/2": 8,
+  "misura/menu": 260,
   "colore/testo/secondario": "#ffffffb5",
   "testo/dimensione/sm": 13,
   "testo/riga/sm": 18,
-  "colore/icona/accento": "#ee7c37",
-  "colore/bordo/normale": "#ffffff15",
-  "raggio/lg": 12.5,
+  "misura/icona": 16,
+  "colore/icona/secondaria": "#ffffffb5",
   "colore/fondo/casella": "#363636",
+  "raggio/md": 10,
+  "misura/bottone": 28,
   "colore/icona/terziaria": "#ffffff82",
-  "colore/icona/successo": "#40c977",
-  "colore/testo/errore": "#ff6764",
-  "colore/fondo/elevato": "#2d2d2d",
-  "misura/menu": 260,
+  "misura/riga": 32,
   "colore/bordo/forte": "#ffffff28",
   "raggio/xs": 5,
+  "misura/tratto": 1,
+  "colore/icona/accento": "#ee7c37",
+  "colore/testo/primario": "#ffffff",
   "colore/fondo/riga-passaggio": "#ffffff0d",
   "colore/fondo/accento": "#d25e28",
   "colore/icona/su-accento": "#ffffff",
+  "colore/icona/successo": "#40c977",
   "colore/icona/errore": "#ff6764",
-  "misura/tratto": 1
+  "colore/bordo/normale": "#ffffff15",
+  "colore/testo/errore": "#ff6764"
  },
  "nodi": [
   {
@@ -253,12 +253,11 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
     "height": "misura/icona"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16701",
@@ -465,12 +464,11 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
     "height": "misura/icona"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16713",
@@ -556,12 +554,11 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
     "height": "misura/icona"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16718",
@@ -647,12 +644,11 @@
    "variabili": {
     "strokes[0]": "colore/bordo/forte",
     "cornerRadius": "raggio/xs",
+    "strokeWeight": "misura/tratto",
     "width": "misura/icona",
     "height": "misura/icona"
    },
-   "senza": [
-    "strokeWeight 1"
-   ]
+   "senza": []
   },
   {
    "id": "I101:16778;101:16723",

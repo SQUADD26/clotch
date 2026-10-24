@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792768244164,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "L’app Sessioni in Electron, pari al disegno, con tutti gli stati.",
      "stato": "aperto",
@@ -54,7 +54,7 @@
    {
     "tipo": "utente",
     "testo": "Aggiungi lo stato con 200 sessioni.",
-    "t": 1792768241164
+    "t": 1792793046531
    },
    {
     "tipo": "strumento",
@@ -66,7 +66,7 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792768242164,
+    "t": 1792793047531,
     "id": "t0"
    },
    {
@@ -76,7 +76,7 @@
      "command": "npm test -- elenco"
     },
     "esito": null,
-    "t": 1792768243164,
+    "t": 1792793048531,
     "id": "t1"
    }
   ]
@@ -102,7 +102,7 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792768344164,
+    "battito": 1792793149531,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
@@ -114,7 +114,7 @@
     ],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792768364164,
+    "visto": 1792793169531,
     "fine": null,
     "chatNuova": null,
     "fermata": false,
@@ -127,7 +127,7 @@
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,
-  "friday": null,
+  "clotchAi": null,
   "comandi": [],
   "decisioni": [],
   "regole": [],
