@@ -605,6 +605,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "Settings...",
+        "open_clotch_app": "Open clotch",
+        "show_clotch_app": "Show clotch",
         "check_for_updates": "Check for Updates...",
         "export_diagnostics": "Export Diagnostics…",
         "export_diagnostics_desc": "Creates a zip with logs, settings and session state, to attach to a report.",
@@ -1235,6 +1237,8 @@ final class L10n: ObservableObject {
         "about_desc2": "Legge solo file di questo Mac",
         "settings_title": "Impostazioni di Clotch",
         "settings_ellipsis": "Impostazioni...",
+        "open_clotch_app": "Apri clotch",
+        "show_clotch_app": "Mostra clotch",
         "check_for_updates": "Cerca aggiornamenti...",
         "export_diagnostics": "Esporta diagnostica…",
         "export_diagnostics_desc": "Crea uno zip con log, impostazioni e stato delle sessioni, da allegare a una segnalazione.",
@@ -1843,6 +1847,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "Einstellungen...",
+        "open_clotch_app": "clotch öffnen",
+        "show_clotch_app": "clotch zeigen",
         "check_for_updates": "Nach Updates suchen...",
         "export_diagnostics": "Diagnose exportieren...",
         "export_diagnostics_desc": "Erstellt für Fehlerberichte eine ZIP-Datei mit Logs, Einstellungen, Sitzungsstatus und aktuellen Hook-Ereignissen (Ereignisnamen, Quellen, erste 80 Zeichen von Prompts)",
@@ -2502,6 +2508,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "设置...",
+        "open_clotch_app": "打开 clotch",
+        "show_clotch_app": "显示 clotch",
         "check_for_updates": "检查更新...",
         "export_diagnostics": "导出诊断信息...",
         "export_diagnostics_desc": "创建包含日志、设置、会话状态以及最近 hook 事件（事件名、来源、提示词前 80 字符）的 zip 文件，用于反馈 Bug",
@@ -3161,6 +3169,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "設定...",
+        "open_clotch_app": "打開 clotch",
+        "show_clotch_app": "顯示 clotch",
         "check_for_updates": "檢查更新...",
         "export_diagnostics": "匯出診斷資訊...",
         "export_diagnostics_desc": "建立包含日誌、設定、會話狀態以及最近 hook 事件（事件名稱、來源、提示詞前 80 字元）的 zip 檔案，用於回報 Bug",
@@ -3820,6 +3830,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "設定...",
+        "open_clotch_app": "clotch を開く",
+        "show_clotch_app": "clotch を表示",
         "check_for_updates": "アップデートを確認...",
         "export_diagnostics": "診断情報をエクスポート...",
         "export_diagnostics_desc": "バグ報告用にログ、設定、セッション状態、直近のフックイベント（イベント名、ソース、プロンプト先頭 80 文字）を含む zip を作成します",
@@ -4479,6 +4491,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "설정...",
+        "open_clotch_app": "clotch 열기",
+        "show_clotch_app": "clotch 보기",
         "check_for_updates": "업데이트 확인...",
         "export_diagnostics": "진단 정보 내보내기...",
         "export_diagnostics_desc": "버그 보고를 위해 로그, 설정, 세션 상태 및 최근 후크 이벤트(이벤트 이름, 소스, 프롬프트 앞 80자)가 포함된 zip 파일을 만듭니다",
@@ -5138,6 +5152,8 @@ final class L10n: ObservableObject {
 
         // Menu
         "settings_ellipsis": "Ayarlar...",
+        "open_clotch_app": "clotch'u aç",
+        "show_clotch_app": "clotch'u göster",
         "check_for_updates": "Güncellemeleri Kontrol Et...",
         "export_diagnostics": "Tanılamaları Dışa Aktar...",
         "export_diagnostics_desc": "Hata raporları için günlükleri, ayarları, oturum durumunu ve son hook olaylarını (olay adları, kaynaklar, varsa istemin ilk 80 karakteri) içeren bir zip oluşturur",
