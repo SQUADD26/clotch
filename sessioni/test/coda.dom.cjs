@@ -1,4 +1,4 @@
-// Coda dei messaggi (#652, #655): oltre 4 voci scorre e il conto resta; ↵ a casella vuota manda la prima voce e la toglie.
+// Coda dei messaggi (#652, #655, #856): oltre 4 voci scorre e il conto resta; ↵ a casella vuota manda la prima voce e la toglie.
 // Lancio: npm run build && CLOTCH_TEST_SILENT=1 npx electron test/coda.dom.cjs
 const { app, BrowserWindow, ipcMain } = require('electron');
 const assert = require('node:assert/strict');
@@ -30,6 +30,15 @@ app.whenReady().then(async () => {
     console.log('COMANDI', JSON.stringify(comandi.map((c) => [c.cmd, c.args.voce ?? c.args.testo])));
     assert.deepEqual(comandi.map((c) => c.cmd), ['manda', 'coda_togli']);
     assert.equal(comandi[1].args.voce, 'v1');
+    // Rimuovi lo dice e si annulla (#856)
+    await run(() => document.querySelector('.coda .messaggio-in-coda [aria-label="Rimuovi"]').click());
+    await new Promise((ok) => setTimeout(ok, 300));
+    const avviso = await run(() => [...document.querySelectorAll('[data-avviso]')].map((a) => a.textContent).join('|'));
+    console.log('AVVISO', avviso);
+    assert.match(avviso, /Messaggio rimosso.*Annulla/);
+    await run(() => [...document.querySelectorAll('[data-avviso] button')].find((b) => b.textContent === 'Annulla').click());
+    await new Promise((ok) => setTimeout(ok, 300));
+    assert.deepEqual(comandi.slice(2).map((c) => [c.cmd, c.args.modo ?? c.args.voce]), [['coda_togli', 'v1'], ['manda', 'coda']]);
     console.log('CODA OK');
   } catch (e) { console.error(e); process.exitCode = 1; } finally { app.quit(); }
 });
