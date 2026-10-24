@@ -2,6 +2,7 @@
 // Finestre strette e barra ridimensionabile: 101-29280, 101-29399, 101-29552, 101-29770, 101-29971 (base/layout.tsx).
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import Barra from "../barra";
+import { RicercaGlobale } from "../barra/RicercaGlobale";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
 import { Dialoghi } from "../dialoghi";
 import ClotchAi, { Intestazione as IntestazioneClotchAi } from "../clotch-ai";
@@ -69,6 +70,7 @@ function Corpo() {
           </div>
         </main>
       </div>
+      <Pezzo nome="barra"><RicercaGlobale /></Pezzo>
       {/* barra sopra la colonna (101:29552): velo su tutta la finestra, barra del titolo compresa */}
       {barraSopra && (
         <>
