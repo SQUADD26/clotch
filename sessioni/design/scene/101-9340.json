@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "ferma",
     "perche": null,
-    "ultimaAttivita": 1792793049531,
+    "ultimaAttivita": 1792839146842,
     "obiettivo": {
      "testo": "Una foto dello schermo ogni 5 minuti quando Roberto è via, salvata nella cartella AFK.",
      "stato": "aperto",
@@ -55,12 +55,12 @@
    {
     "tipo": "utente",
     "testo": "Fai una foto dello schermo ogni 5 minuti quando sono via.",
-    "t": 1792793030531
+    "t": 1792839127842
    },
    {
     "tipo": "pensiero",
     "testo": "Roberto vuole l’aspetto di ChatGPT. Prima leggo i token e le schermate del vault, poi creo le variabili e i componenti.",
-    "t": 1792793031531
+    "t": 1792839128842
    },
    {
     "tipo": "strumento",
@@ -74,14 +74,14 @@
      "testo": "ok",
      "errore": false
     },
-    "t": 1792793045531,
+    "t": 1792839142842,
     "id": "t0"
    },
    {
     "tipo": "assistente",
     "testo": "Ho scritto il salvataggio delle foto. Ora provo il timer.",
     "modello": "claude-opus-5-5",
-    "t": 1792793048531
+    "t": 1792839145842
    }
   ]
  },
@@ -106,17 +106,17 @@
     "domanda": null,
     "limite": {
      "account": ".claude-accountmanager",
-     "ripartenza": 1792854000000
+     "ripartenza": 1792864800000
     },
     "richieste": [],
-    "battito": 1792793149531,
+    "battito": 1792839246842,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792793169531,
+    "visto": 1792839266842,
     "fine": null,
     "chatNuova": null,
     "fermata": false,

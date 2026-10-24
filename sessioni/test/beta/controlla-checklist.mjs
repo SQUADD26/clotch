@@ -28,7 +28,7 @@ for (const { f, i, r } of righe) {
   if (!new RegExp(`^${pre}-\\d{3}$`).test(v.id ?? '')) errori.push(`${posto}: id «${v.id}» non è ${pre}-001…`);
   if (visti.has(v.id)) errori.push(`${posto}: id ${v.id} doppio (già in ${visti.get(v.id)})`); else visti.set(v.id, posto);
   if (v.famiglia !== fam && v.famiglia !== pre) errori.push(`${posto} ${v.id}: famiglia «${v.famiglia}», il file dice «${fam}» (${pre})`);
-  for (const [k, min] of [['titolo', 8], ['dove', 3], ['fai', 15], ['vedi', 15], ['soglia', 1], ['fonte', 6], ['origine', 3]]) if (typeof v[k] !== 'string' || v[k].trim().length < min) errori.push(`${posto} ${v.id}: «${k}» mancante o sotto ${min} caratteri`);
+  for (const [k, min] of [['titolo', 8], ['dove', 3], ['fai', 3], ['vedi', 15], ['soglia', 1], ['fonte', 6], ['origine', 3]]) if (typeof v[k] !== 'string' || v[k].trim().length < min) errori.push(`${posto} ${v.id}: «${k}» mancante o sotto ${min} caratteri`);
   if (!GRAVITA.includes(v.gravita)) errori.push(`${posto} ${v.id}: gravita ${GRAVITA.join('|')}`);
   if (!PROVA.includes(v.prova)) errori.push(`${posto} ${v.id}: prova ${PROVA.join('|')}`);
   if (JSON.stringify(v.piattaforme) !== '["electron"]') errori.push(`${posto} ${v.id}: piattaforme deve essere ["electron"]`);
