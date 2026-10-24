@@ -6,18 +6,18 @@ import { chiudiDialogo, type DatiDialoghi } from "../base/dialoghi";
 
 const LIMITE = 120;
 
-/** Salva il nome scritto (senza spazi ai bordi; vuoto non si salva) e chiude. */
-export function DialogoRinomina({ titolo, valore, nota, salva }: DatiDialoghi["rinomina"]) {
+/** Salva il nome scritto (senza spazi ai bordi) e chiude; col campo vuoto Salva toglie il nome scelto e la nota dice cosa torna. */
+export function DialogoRinomina({ titolo, valore, nota, vuoto: tornaA = "Torna al nome originale.", salva }: DatiDialoghi["rinomina"]) {
   const [testo, setTesto] = useState(valore);
-  const vuoto = !testo.trim();
+  const vuoto = !testo.trim(), cambiato = testo.trim() !== valore.trim();
   const lungo = testo.trim().length > LIMITE;
-  const fai = () => { if (!vuoto && !lungo) { salva(testo.trim()); chiudiDialogo(); } };
+  const fai = () => { if (!lungo) { salva(testo.trim()); chiudiDialogo(); } };
   return (
     <Dialogo titolo={titolo} onChiudi={chiudiDialogo}
-      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={vuoto || lungo} onClick={fai}>Salva</Bottone></>}>
-      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus title={testo.length > 40 ? testo : undefined} aria-invalid={vuoto || lungo || undefined} onFocus={(e) => e.currentTarget.select()}
+      bottoni={<><Bottone tipo="secondario" onClick={chiudiDialogo}>Annulla</Bottone><Bottone disabled={lungo} onClick={fai}>Salva</Bottone></>}>
+      <input className="campo-nome" value={testo} aria-label={titolo} autoFocus title={testo.length > 40 ? testo : undefined} aria-invalid={lungo || undefined} onFocus={(e) => e.currentTarget.select()}
         onChange={(e) => setTesto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) fai(); }} />
-      <div className={vuoto || lungo ? "t-sm errore-ore" : "t-sm secondario"} role={vuoto || lungo ? "alert" : undefined}>{vuoto ? "Scrivi un nome." : lungo ? `Il nome ha ${testo.trim().length} caratteri: al massimo ${LIMITE}.` : nota}</div>
+      <div className={lungo ? "t-sm errore-ore" : "t-sm secondario"} role={lungo ? "alert" : undefined}>{lungo ? `Il nome ha ${testo.trim().length} caratteri: al massimo ${LIMITE}.` : vuoto && cambiato ? tornaA : nota}</div>
     </Dialogo>
   );
 }

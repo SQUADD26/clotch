@@ -22,7 +22,7 @@ export function vociMenuSessione(s: Sessione, pref?: PreferenzeSessione): VoceMe
   return [
     { icona: "spillo", etichetta: pref?.fissa ? "Togli da in alto" : "Fissa in alto", fai: () => void api().impostaPreferenze(s.id, { fissa: pref?.fissa ? null : true }) },
     { icona: "matita", etichetta: "Rinomina…", fai: () => apriDialogo("rinomina", {
-      titolo: "Rinomina sessione", valore: s.titolo, nota: "Il nome cambia solo in clotch.",
+      titolo: "Rinomina sessione", valore: s.titolo, nota: "Il nome cambia solo in clotch.", vuoto: "Torna al titolo della sessione.",
       salva: (nome) => void api().impostaPreferenze(s.id, { nome: nome || null }), // vuoto = torna il titolo della sessione
     }) },
     { icona: "archivia", etichetta: "Archivia", scorciatoia: "⇧⌘A", fai: () => void archivia([s.id]) },
@@ -56,7 +56,7 @@ export function MenuCartella({ sessioni, chiave, etichetta, a, inizio, onChiudi 
     { icona: "finder", etichetta: "Mostra nel Finder", ...senzaPercorso, fai: azione(prima, "mostra-nel-finder") },
     { icona: "copia", etichetta: "Copia percorso", ...senzaPercorso, fai: azione(prima, "copia-cartella", "Percorso copiato") },
     { icona: "matita", etichetta: "Rinomina etichetta…", fai: () => apriDialogo("rinomina", {
-      titolo: "Rinomina etichetta", valore: etichetta, nota: "L’etichetta cambia solo in clotch.",
+      titolo: "Rinomina etichetta", valore: etichetta, nota: "L’etichetta cambia solo in clotch.", vuoto: "Torna al nome della cartella.",
       salva: (nome) => imposta("etichetteCartelle", conEtichetta(etichetteCartelle, chiave, nome)),
     }) },
     { icona: "archivia", etichetta: "Archivia tutte le sessioni", fai: () => void archivia(sessioni.map((s) => s.id)) },
