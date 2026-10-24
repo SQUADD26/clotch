@@ -81,6 +81,11 @@ export const tocca = (f: string, x: string) => f === x || x.startsWith(f + path.
 
 /** Qualcosa in `sporchi` tocca `x` o sta dentro `x`. */
 export const toccata = (sporchi: string[], x: string) => sporchi.some((f) => tocca(f, x) || f.startsWith(x + path.sep));
+/** Toglie l'ultima lettura (e le cache dei suoi file) delle cartelle `projects` che non sono più lette: account tolto o spento. Al ritorno si rilegge da capo. */
+export function dimenticaProgetti(lette: Set<string>) {
+  for (const k of [...ultimi.keys()]) if (!lette.has(k)) { sfoltisci(k, new Set()); ultimi.delete(k); }
+}
+
 const copie = (u: Map<string, Cartella>) => [...u.values()].flatMap((c) => c.sessioni.map((s) => ({ ...s })));
 
 /** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dall'ultima lettura. */
