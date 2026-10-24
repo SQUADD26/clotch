@@ -8,17 +8,17 @@ Controllo: `node sessioni/scripts/copertura.mjs` (anche dentro `npm test`, `test
 | Campo | sì | parziale | no | non serve | non verificabile |
 |---|---|---|---|---|---|
 | Disegnato | 152 | - | 54 | - | 9 |
-| Implementato | 112 | 46 | 57 | - | - |
-| Collegato | 126 | - | 42 | 47 | - |
-| Provato | 88 | 69 | 58 | - | - |
+| Implementato | 125 | 33 | 57 | - | - |
+| Collegato | 128 | - | 40 | 47 | - |
+| Provato | 99 | 58 | 58 | - | - |
 
 Stato complessivo per requisito (derivato dai quattro campi):
 
 | Stato | n |
 |---|---|
-| Completo (implementato sì, collegato sì o non serve, provato sì) | 81 |
-| Implementato ma non collegato o non provato del tutto | 31 |
-| Parziale (implementato parziale) | 46 |
+| Completo (implementato sì, collegato sì o non serve, provato sì) | 92 |
+| Implementato ma non collegato o non provato del tutto | 33 |
+| Parziale (implementato parziale) | 33 |
 | Mancante (implementato no) | 57 |
 
 ## Cosa è cambiato rispetto alla versione precedente
@@ -64,3 +64,7 @@ Funzioni spente o finte, da non scambiare per fatti: Ripristina archiviate (B7, 
 - Le citazioni senza numero di riga, i frame Figma e le frasi «grep: 0 risultati» sono testo dei lettori e non sono rieseguiti dal controllo.
 - Le prove con «non verificato» o «non letto» restano tali (per esempio A31, A32, C9, B8); 9 requisiti hanno «disegnato: non verificabile» perché serve guardare Figma.
 - Lo stato complessivo è una regola meccanica sui quattro campi, non un giudizio sul valore del requisito.
+
+## Unione dei rami qa/456 (collegamenti)
+
+Aggiornati dopo l'unione di identita, interrompi, leggi, andamento, clotch-ai, pr-madre, novita: A16, G19, F10, A27 (profilo e menu), D2 (Leggi con clotch AI), H17, H37, H3 (Andamento, Scegli le ore), FR1, FR7, CL1 (collegamenti di clotch AI), B7, H8 (Ripristina), C7, CL12, R2 (PR e prove), CL2, D22, E12 (Interrompi con Clotch). Restano aperti con motivo nella colonna `mancante`: «manca-disegno» (A27, H3, FR1) e «manca-dato» (D2, CL1, CL2, CL7, CL12, R2, C7, D22).

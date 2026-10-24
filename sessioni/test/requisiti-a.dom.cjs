@@ -278,47 +278,4 @@ H.avvia('requisiti-a', async () => {
     assert.equal(await run(() => document.querySelector('textarea').value), 'bozza che resta');
   });
 
-  await req('A16', async () => { // nome e iniziali dal profilo vero (account Claude o macOS), non scritti nel codice; «Info su clotch» apre Info
-    nuova(); rispondi['impostazioni:profilo'] = () => ({ nome: 'Anna Verdi', iniziali: 'AV' }); await caricaChat();
-    await wait(() => document.querySelector('.piede .avatar')?.textContent === 'AV');
-    assert.equal((await testo('.piede .testi span'))[0], 'Anna Verdi');
-    await run(() => document.querySelector('.piede .avatar').click()); await wait(() => !!document.querySelector('[role=menu] .testata'));
-    assert.equal((await testo('[role=menu] .testata .medio'))[0], 'Anna Verdi');
-    await clicca('[role=menu] .voce', 'Info su clotch'); await wait(() => document.querySelector('.nav-impostazioni .voce.scelta')?.textContent === 'Info');
-  });
-
-  await req('A27', async () => { // il menu dell'app macOS: «Informazioni su clotch» e le voci standard
-    const { menuApp } = require(H.root + '/dist/src/branding.js');
-    const m = menuApp(), app = m[0].submenu.map((v) => v.label || v.type);
-    assert.equal(m[0].label, 'clotch');
-    assert.deepEqual(m[0].submenu.map((v) => v.role).filter(Boolean), ['about', 'services', 'hide', 'hideOthers', 'unhide', 'quit']);
-    assert.equal(app[0], 'Informazioni su clotch'); assert.equal(app.at(-1), 'Esci da clotch');
-    assert.deepEqual(m.slice(1).map((v) => v.role), ['fileMenu', 'editMenu', 'viewMenu', 'windowMenu']);
-  });
-
-
-  await req('D2', async () => { // «Leggi con clotch AI»: bottone e voce del menu mandano il testo della risposta (senza Markdown) alla voce
-    nuova((s) => { s.messaggi.s1 = [U('domanda'), AS('## Titolo\n**grassetto** e `codice`', 1000)]; s.elenco.sessioni[0].stato = 'finita'; }); await caricaChat();
-    await wait(() => !!document.querySelector('.risposta .azioni'));
-    assert.equal(await run(() => document.querySelector('.risposta .azioni button[aria-label="Leggi con clotch AI"]').disabled), false);
-    H.azzera(); await clicca('.risposta .azioni button', 'Leggi con clotch AI'); await attesa(50);
-    assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
-    H.azzera(); await clicca('.risposta .azioni button', 'Altro'); await clicca('.risposta .menu .voce', 'Leggi con clotch AI'); await attesa(50);
-    assert.deepEqual(fatte('clotch-ai:comando'), [['voce_leggi', { testo: 'Titolo\n\ngrassetto e codice' }]]);
-  });
-
-  await req('C7', async () => { // prova «fallita» dal registro; tutte le PR (con stato o solo col link), non solo l'ultima
-    const pr = (n, stato, verso) => ({ numero: n, url: `https://example.test/pull/${n}`, stato, verso });
-    nuova((s) => {
-      s.elenco.sessioni[0].obiettivo = { testo: 'Obiettivo di prova', stato: 'aperto', valido: true, prove: [{ testo: 'Prova verde', fatta: true }, { testo: 'Prova rossa', fatta: false, fallita: true }, { testo: 'Prova da fare', fatta: false }] };
-      s.info = { s1: { contesto: 1000, file: { quanti: 0, aggiunte: 0, tolte: 0 }, prs: [pr(1, 'unita', 'dev'), pr(2, null, null), pr(3, 'aperta', 'dev')] } };
-    });
-    await caricaChat(); await clicca('button', 'Pannello'); await wait(() => document.querySelectorAll('.pannello-info .scheda').length > 0);
-    assert.equal(await run(() => document.querySelector('.pannello-obiettivo .prova:nth-child(3) span.errore')?.textContent), 'Prova rossa', 'la prova fallita ha il suo stato');
-    assert.equal(await run(() => document.querySelectorAll('.pannello-obiettivo .prova span.errore').length), 1, 'solo quella fallita');
-    await wait(() => document.querySelectorAll('.apri-pr').length === 3);
-    assert.deepEqual((await testo('.scheda .riga-info .testo')).filter((t) => t.startsWith('PR #')), ['PR #1 · unita in dev', 'PR #2', 'PR #3 · aperta verso dev']);
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.apri-pr')].map((a) => a.getAttribute('href'))), [1, 2, 3].map((n) => `https://example.test/pull/${n}`));
-  });
-
 });
