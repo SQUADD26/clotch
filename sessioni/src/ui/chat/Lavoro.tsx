@@ -12,15 +12,16 @@ const SEGNO_PASSO: Record<Passo["stato"], [NomeIcona, "successo" | "accento" | "
   fatto: ["spunta", "successo"], "in-corso": ["in-corso", "accento"], "da-fare": ["orologio", "terziaria"],
 };
 
-function Riquadro({ icona, titolo, dettaglio, children }: { icona: NomeIcona; titolo: string; dettaglio?: string | null; children: ReactNode }) {
+function Riquadro({ icona, titolo, dettaglio, conto, children }: { icona: NomeIcona; titolo: string; dettaglio?: string | null; conto?: string; children: ReactNode }) {
   return (
     <div className="riquadro-lavoro">
       <div className="testata-lavoro">
         <Icona nome={icona} />
         <span className="titolo">{titolo}</span>
-        {dettaglio && <span className="dettaglio">{dettaglio}</span>}
+        {dettaglio && <span className="dettaglio" title={dettaglio}>{dettaglio}</span>}
+        {conto && <span className="conto">{conto}</span>}
       </div>
-      {children}
+      <div className="voci-lavoro">{children}</div>
     </div>
   );
 }
@@ -29,7 +30,7 @@ export function Attivita({ passi }: { passi: Passo[] }) {
   const fatti = passi.filter((p) => p.stato === "fatto").length;
   const ris = useRiserva();
   return (
-    <Riquadro icona="spunta" titolo="Attività" dettaglio={`${fatti} su ${passi.length}`}>
+    <Riquadro icona="spunta" titolo="Attività" conto={`${fatti} su ${passi.length}`}>
       {passi.map((p, i) => (
         <div key={i} className={p.stato === "in-corso" ? "voce-lavoro attiva" : "voce-lavoro"}>
           <Icona nome={SEGNO_PASSO[p.stato][0]} colore={SEGNO_PASSO[p.stato][1]} />
@@ -47,11 +48,11 @@ export function Aiutanti({ aiutanti, modello }: { aiutanti: Aiutante[]; modello:
   const n = aiutanti.length;
   const titolo = finiti ? `${quanti(n, "aiutante", "aiutanti")} ${n === 1 ? "finito" : "finiti"}` : `${quanti(n, "aiutante", "aiutanti")} al lavoro`;
   return (
-    <Riquadro icona="strati" titolo={titolo} dettaglio={modello}>
+    <Riquadro icona="strati" titolo={titolo} dettaglio={modello} conto={finiti ? undefined : `${aiutanti.filter((a) => a.finito).length} su ${n}`}>
       {aiutanti.map((a) => (
         <div key={a.id} className="voce-lavoro">
           <Icona nome={a.finito ? "spunta" : "in-corso"} colore={a.finito ? "successo" : "accento"} />
-          <span className="nome">{ris.testo(a.nome)}</span>
+          <span className="nome" title={a.nome}>{ris.testo(a.nome)}</span>
           <span className="testo">{ris.testo(a.azione)}</span>
           {a.durata != null && <span className="durata">{durata(a.durata)}</span>}
         </div>

@@ -102,6 +102,7 @@ function ChatSessione() {
       <>
         <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="La sessione è aperta ma non ha ancora messaggi." /></div>
         {casella}
+        <Trova iniziale={provaDi(sezione, "trova")} />
       </>
     );
   }

@@ -1,6 +1,6 @@
 // figma: 101-44748 — «clotch AI cita le sessioni»: «scheda sessione» per chi aspetta te, «riferimento sessione» per chi lavora,
 // scheda al passaggio sul riferimento (101:44989). Le sessioni citate vengono dal campo `sessioni` della risposta (claude-config#2512).
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { ChatClotchAi } from "../../clotch-ai";
 import type { Sessione } from "../../tipi";
 import { Bottone } from "../base/Bottone";
@@ -8,6 +8,7 @@ import { usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { IconaSessione } from "../base/IconaSessione";
 import { useNavigazione } from "../base/navigazione";
+import { numero } from "../base/token";
 import { SegnoStato } from "../base/SegnoStato";
 import { comanda, useOra } from "./clotch-ai";
 import { useRiserva } from "./riserva";
@@ -61,14 +62,25 @@ function Riferimento({ x }: { x: Citata }) {
   const n = useNavigazione();
   const pref = usePreferenze().dati[x.s.id];
   const [sopra, setSopra] = useState(provaDi(n.sezione, "scheda") === x.s.id); // scena di prova 101:44989
+  const scheda = useRef<HTMLDivElement>(null);
+  // la scheda resta nella finestra: si sposta a sinistra di quanto sporge
+  useLayoutEffect(() => {
+    const el = scheda.current;
+    if (!el) return;
+    el.style.left = "0px";
+    el.style.left = `${Math.min(0, innerWidth - numero("misura-margine-finestra") - el.getBoundingClientRect().right)}px`;
+  }, [sopra]);
   return (
-    <span className="con-scheda" onMouseEnter={() => setSopra(true)} onMouseLeave={() => setSopra(false)}>
+    <span className="con-scheda" onMouseEnter={() => setSopra(true)} onMouseLeave={() => setSopra(false)} onFocus={() => setSopra(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setSopra(false); }}
+      onKeyDown={(e) => { if (sopra && e.key === "Escape") { e.stopPropagation(); setSopra(false); } }}>
       <button type="button" className="riferimento-sessione" onClick={() => n.apri("sessione", x.s.id)}>
         <IconaSessione icona={pref?.icona} colore={pref?.colore} />
         <span className="titolo">{x.s.titolo}</span>
         <SegnoStato stato={x.s.stato} />
       </button>
-      {sopra && <SchedaSessione x={x} sospesa />}
+      {/* il ponte (padding) fa parte di .con-scheda: attraversando lo spazio la scheda non sparisce */}
+      {sopra && <div ref={scheda} className="ponte-scheda"><SchedaSessione x={x} sospesa /></div>}
     </span>
   );
 }
