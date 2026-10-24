@@ -39,8 +39,16 @@ const MS_GIORNO = 86_400_000;
  * `projects/**\/*.jsonl` toccate in quel periodo, ogni messaggio una volta. Il feed non dà l'uso al giorno.
  * Chiave = parte prima della @ dell'email dell'account (come `QuotaUso.account`). Un file illeggibile si salta.
  * shortcut: sono token (input + output + scrittura cache), non la % di quota; senza email nel `.claude.json` l'account non si abbina.
+ * Un conteggio alla volta: `letti` è di tutti, e due sovrapposti (barra e impostazioni) leggerebbero gli stessi byte avanzando il punto di ripresa due volte.
  */
-export async function usoAlGiorno(radici: Radice[], ora = Date.now()): Promise<Map<string, { giorno: string; v: number }[]>> {
+export function usoAlGiorno(radici: Radice[], ora = Date.now()): ReturnType<typeof conta> {
+  const p = fila.then(() => conta(radici, ora));
+  fila = p.catch(() => {});
+  return p;
+}
+let fila: Promise<unknown> = Promise.resolve();
+
+async function conta(radici: Radice[], ora: number): Promise<Map<string, { giorno: string; v: number }[]>> {
   const oggi = Math.floor(ora / MS_GIORNO), primo = oggi - GIORNI + 1, da = primo * MS_GIORNO;
   const out = new Map<string, number[]>(), perCartella = new Map<string, Voce[][]>(), visti = new Set<string>();
   for (const r of radici) {
