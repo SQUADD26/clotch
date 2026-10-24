@@ -80,7 +80,7 @@ export const chiaveCartella = (p: string) => { try { return fs.realpathSync(p); 
 export const tocca = (f: string, x: string) => f === x || x.startsWith(f + path.sep);
 
 /** Qualcosa in `sporchi` tocca `x` o sta dentro `x`. */
-const toccata = (sporchi: string[], x: string) => sporchi.some((f) => tocca(f, x) || f.startsWith(x + path.sep));
+export const toccata = (sporchi: string[], x: string) => sporchi.some((f) => tocca(f, x) || f.startsWith(x + path.sep));
 const copie = (u: Map<string, Cartella>) => [...u.values()].flatMap((c) => c.sessioni.map((s) => ({ ...s })));
 
 /** `sporchi`: i percorsi cambiati dall'ultimo giro (fs.watch). Senza, si rilegge tutto; con, cartelle e file non toccati vengono dall'ultima lettura. */

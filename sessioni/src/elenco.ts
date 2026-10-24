@@ -26,7 +26,7 @@ export function leggiElenco(opz: { home: string; env?: NodeJS.ProcessEnv; ora?: 
   const errori: ErroreLettura[] = [];
   const ora = opz.ora ?? Date.now();
   const imp = opz.impostazioni && conPartenza(opz.impostazioni);
-  const app = leggiApp(opz.home, errori);
+  const app = leggiApp(opz.home, errori, opz.sporchi);
   const perCli = new Map(app.map((a) => [a.cliId, a]));
   const obiettivi = leggiObiettivi(path.join(opz.home, ".claude"), errori);
   const stati = leggiStati(path.join(opz.home, ".claude"), errori);
