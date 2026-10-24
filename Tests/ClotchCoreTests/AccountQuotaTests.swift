@@ -14,6 +14,21 @@ final class AccountQuotaTests: XCTestCase {
         XCTAssertNil(QuotaWindow(used: nil, reset: future).leftNow(now))
     }
 
+    /// clotch#1109: an account registered on this Mac shows from the start, «no data yet», last.
+    func testRegisteredAccountWithoutReadingShows() throws {
+        let json = """
+        {"rows": [], "real": [{"email": "a@x.it", "five_used": 5, "five_resets": \(Int(now.timeIntervalSince1970) + 600),
+          "seven_used": 6, "seven_resets": \(Int(now.timeIntervalSince1970) + 7200), "ts": \(Int(now.timeIntervalSince1970) - 30)}]}
+        """
+        let registry = #"{"accounts": {"a": {"email": "a@x.it"}, "dentalspace": {"email": "info@dentalspace.ai"}, "senzaemail": {}}}"#
+        let emails = RegisteredAccounts.emails(from: Data(registry.utf8))
+        XCTAssertEqual(emails, ["a@x.it", "info@dentalspace.ai"])
+        let list = try XCTUnwrap(AccountQuotas.parse(Data(json.utf8), now: now, registered: emails))
+        XCTAssertEqual(list.map(\.email), ["a@x.it", "info@dentalspace.ai"], "no reading: shown, after the fresh ones")
+        XCTAssertNil(list[1].at, "no reading ever: «Nessun dato ancora»")
+        XCTAssertEqual(RegisteredAccounts.emails(from: Data("rotto".utf8)), [])
+    }
+
     func testMergeOrderAndLabel() throws {
         let json = """
         {"rows": [
