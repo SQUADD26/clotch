@@ -1,7 +1,15 @@
 /* Uso, scheda Andamento: grafico a barre impilate (119-57613). Tutte le misure da token. */
 .pezzo-impostazioni .andamento { display: flex; flex-direction: column; gap: var(--spazio-4); padding: var(--spazio-4); --altezza-pila: calc(var(--spazio-2) * 25); }
 .pezzo-impostazioni .andamento .testata { display: flex; justify-content: space-between; align-items: center; }
-.pezzo-impostazioni .andamento .grafico { display: flex; align-items: flex-end; gap: var(--spazio-2); align-self: flex-start; }
+/* 30 giorni a 480 non ci stanno: il grafico scorre dentro la scatola invece di allargare la pagina (#953) */
+.pezzo-impostazioni .andamento .grafico { display: flex; align-items: flex-end; gap: var(--spazio-2); align-self: flex-start; max-width: 100%; overflow-x: auto; }
+.pezzo-impostazioni .andamento .giorno { flex: none; }
+/* il pannello delle schede non cambia l'impaginazione: i suoi figli restano figli della pagina */
+.pezzo-impostazioni .pannello-uso { display: contents; }
+.pezzo-impostazioni .pannello-uso > * { align-self: stretch; } /* come gli altri figli della pagina (.contenuto-impostazioni > *) */
+/* nome lungo dell'account: una riga con i puntini, la percentuale non va a capo */
+.pezzo-impostazioni .riga.uso .nome-uso { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-impostazioni .riga.uso .valore-uso { flex: none; white-space: nowrap; }
 .pezzo-impostazioni .andamento .giorno { display: flex; flex-direction: column; align-items: center; gap: var(--spazio-1); width: var(--spazio-6); }
 .pezzo-impostazioni .andamento .pila { display: flex; flex-direction: column-reverse; width: 100%; }
 .pezzo-impostazioni .andamento .pila > div { flex-basis: 0; }

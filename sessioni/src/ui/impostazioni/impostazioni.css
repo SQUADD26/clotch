@@ -79,7 +79,7 @@
 .pezzo-impostazioni .schede { display: flex; gap: var(--spazio-1); }
 .pezzo-impostazioni .contenuto-impostazioni > .schede { align-self: flex-start; }
 .pezzo-impostazioni .riga.uso { flex-direction: column; align-items: stretch; gap: var(--spazio-2); }
-.pezzo-impostazioni .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; }
+.pezzo-impostazioni .riga.uso .testata { display: flex; justify-content: space-between; align-items: center; gap: var(--spazio-2); }
 .pezzo-impostazioni .barra-uso { height: var(--misura-barra-uso); border-radius: var(--raggio-pieno); background: var(--colore-fondo-sagoma); overflow: hidden; }
 .pezzo-impostazioni .barra-uso .pieno { height: 100%; border-radius: var(--raggio-pieno); background: var(--colore-testo-primario); }
 .pezzo-impostazioni .barra-uso .pieno.errore { background: var(--colore-testo-errore); }
@@ -88,9 +88,10 @@
 .pezzo-impostazioni .spazio-usato { display: flex; flex-direction: column; gap: var(--spazio-3); }
 .pezzo-impostazioni .barra-segmentata { height: var(--misura-riga); display: flex; gap: var(--spazio-0-5); }
 .pezzo-impostazioni .barra-segmentata > * { border-radius: var(--raggio-xs); }
-.pezzo-impostazioni .legenda { display: flex; gap: var(--spazio-4); }
-.pezzo-impostazioni .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); }
-.pezzo-impostazioni .campione { width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
+.pezzo-impostazioni .legenda { display: flex; flex-wrap: wrap; gap: var(--spazio-1) var(--spazio-4); }
+.pezzo-impostazioni .voce-legenda { display: flex; align-items: center; gap: var(--spazio-1); min-width: 0; max-width: 100%; }
+.pezzo-impostazioni .voce-legenda > .t-sm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pezzo-impostazioni .campione { flex: none; width: var(--misura-legenda); height: var(--misura-legenda); border-radius: var(--raggio-xs); }
 .pezzo-impostazioni .riga.calcolo { gap: var(--spazio-2); }
 
 /* Dati, Info, Clotch (101:17893, 101:33235, 101:18054, 101:45956) */
