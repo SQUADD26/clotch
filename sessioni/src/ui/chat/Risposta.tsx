@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
 import { Menu } from "../base/Menu";
+import { Sovrapposto } from "../base/Sovrapposto";
 import { comanda } from "./clotch-ai";
 import { Markdown, senzaMarkdown } from "./Markdown";
 import { useRiserva } from "./riserva";
@@ -25,14 +26,14 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
         <div className={menu ? "azioni fisse" : "azioni"}>
           <span className="con-suggerimento">
             <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta="Copia" onClick={() => copia(senzaMarkdown(testo))} />
-            {copiato && <span className="suggerimento">Copiato</span>}
+            {copiato && <Sovrapposto passivo centro className="suggerimento" role="tooltip">Copiato</Sovrapposto>}
           </span>
           {/* shortcut: legge la voce dell'app (`say`), non quella di Clotch: il motore non ha un comando che legga un testo (proposta: `leggi {testo}`) */}
           <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" onClick={leggi} />
           <span className="con-menu al-passaggio">
             <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
             {menu && (
-              <Menu onChiudi={() => setMenu(false)} style={{ bottom: "100%", left: 0 }} voci={[
+              <Menu onChiudi={() => setMenu(false)} lato="sopra" scarto={0} voci={[
                 { icona: "copia", etichetta: "Copia testo", fai: () => copia(senzaMarkdown(testo)) },
                 { icona: "file", etichetta: "Copia come Markdown", fai: () => copia(testo) },
                 { icona: "microfono", etichetta: "Leggi con clotch AI", fai: leggi },

@@ -1,14 +1,14 @@
 // Esegue in serie tutte le prove con finestra (test/*.dom.cjs) e la prova del main in VM (test/parita-invisibile.cjs).
-// Silenzioso: CLOTCH_TEST_SILENT=1, dati utente in una cartella temporanea, un solo Electron alla volta (lock condiviso).
+// Silenzioso: CLOTCH_TEST_SILENT=1, dati utente in una cartella temporanea, al massimo N Electron insieme sulla macchina (scripts/posti.mjs).
 // Uso: node scripts/prove-dom.mjs [pezzo-del-nome ...]   Uscita: 0 tutto verde, 2 solo difetti noti aperti, 1 prove rotte.
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { prendiPosto } from './posti.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const LOCK = '/tmp/clotch-electron.lock';
 const filtri = process.argv.slice(2);
 const mancano = ['dist/src/preload.js', 'renderer/index.html', 'node_modules/.bin/electron'].filter((f) => !fs.existsSync(path.join(root, f)));
 if (mancano.length) { console.error(`Manca ${mancano.join(', ')}: prima npm ci e npm run build.`); process.exit(1); }
@@ -18,10 +18,7 @@ const prove = fs.readdirSync(dir).filter((f) => f.endsWith('.dom.cjs')).sort()
   .map((f) => ({ f, electron: true })).concat(fs.existsSync(path.join(dir, 'parita-invisibile.cjs')) ? [{ f: 'parita-invisibile.cjs', electron: false }] : [])
   .filter((p) => !filtri.length || filtri.some((x) => p.f.includes(x)));
 
-const prendiLock = () => { for (;;) { try { fs.mkdirSync(LOCK); return; } catch { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000); } } };
-const rilasciaLock = () => { try { fs.rmdirSync(LOCK); } catch { /* già rilasciato */ } };
-let inLock = false;
-for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { if (inLock) rilasciaLock(); process.exit(130); });
+for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => process.exit(130)); // l'uscita libera il posto
 
 const dati = fs.mkdtempSync(path.join(os.tmpdir(), 'clotch-prove-dom-'));
 const righe = [];
@@ -31,9 +28,9 @@ for (const p of prove) {
   const t0 = Date.now();
   let r;
   if (p.electron) {
-    prendiLock(); inLock = true;
+    const libera = prendiPosto();
     try { r = spawnSync(path.join(root, 'node_modules/.bin/electron'), [`--user-data-dir=${path.join(dati, p.f)}`, file], { cwd: root, env, encoding: 'utf8', timeout: 240000, maxBuffer: 64 << 20 }); }
-    finally { rilasciaLock(); inLock = false; }
+    finally { libera(); }
   } else r = spawnSync(process.execPath, [file], { cwd: root, env, encoding: 'utf8', timeout: 240000, maxBuffer: 64 << 20 });
   const out = `${r.stdout ?? ''}\n${r.stderr ?? ''}`;
   const sf = out.match(/shows?=(\d+)\s+focus=(\d+)/);

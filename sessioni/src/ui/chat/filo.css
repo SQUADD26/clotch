@@ -31,7 +31,7 @@
 /* suggerimento sotto un bottone (frame 101:23727, «tooltip») */
 .pezzo-chat .con-suggerimento { position: relative; display: inline-flex; }
 .pezzo-chat .suggerimento {
-  position: absolute; top: calc(100% + var(--spazio-1-5)); left: 50%; transform: translateX(-50%); z-index: 2;
+  display: flex; align-items: center; gap: var(--spazio-2); pointer-events: none;
   padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md); white-space: nowrap;
   background: var(--colore-fondo-elevato); border: var(--misura-tratto) solid var(--colore-bordo-leggero);
   font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-primario);
@@ -109,7 +109,7 @@
 .pezzo-chat .risposta .con-menu { position: relative; display: inline-flex; }
 .pezzo-chat .risposta .aperto { background: var(--colore-fondo-riga-passaggio); }
 /* microfono e «…» compaiono al passaggio sulla risposta («risposta al passaggio», 101:23727) */
-.pezzo-chat .risposta:not(:hover) .azioni:not(.fisse) .al-passaggio { display: none; }
+.pezzo-chat .risposta:not(:hover) .azioni:not(.fisse):not(:focus-within) .al-passaggio { display: none; }
 .pezzo-chat .turno:empty { display: none; } /* un turno di soli rifiuti non occupa posto */
 /* avvisi e modifiche aperte stanno a spazio/6 dai vicini del turno (101:15790, 101:14631) */
 .pezzo-chat .turno > .avviso-filo, .pezzo-chat .turno > .modifica:has(.differenze) { margin: var(--spazio-3) 0; }

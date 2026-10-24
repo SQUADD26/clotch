@@ -3,7 +3,7 @@
 import { useState, type MouseEvent } from "react";
 import { Icona } from "../base/Icona";
 import { PROPRIETA, pillola, type Filtro, type Opzione, type Ordina, type Proprieta, type Raggruppa } from "./elenco";
-import { Sovrapposto, type Punto } from "./Sovrapposti";
+import { Sovrapposto, type Ancora } from "../base/Sovrapposto";
 import "./filtri.css";
 
 export function Pillole({ filtri, onApri, onAggiungi }: { filtri: Filtro[]; onApri(i: number, e: MouseEvent): void; onAggiungi(e: MouseEvent): void }) {
@@ -40,10 +40,10 @@ function CercaNelMenu({ segnaposto, valore, onCambia }: { segnaposto: string; va
 const cerca = (testo: string, q: string) => testo.toLowerCase().includes(q.trim().toLowerCase());
 
 /** «Menu filtro» Tipo=Proprietà: scegli su cosa filtrare. */
-export function MenuProprieta({ a, onScegli, onChiudi }: { a: Punto; onScegli(p: Proprieta): void; onChiudi(): void }) {
+export function MenuProprieta({ a, onScegli, onChiudi }: { a: Ancora; onScegli(p: Proprieta): void; onChiudi(): void }) {
   const [q, setQ] = useState("");
   return (
-    <Sovrapposto a={a} className="menu menu-filtro" onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-filtro" onChiudi={onChiudi}>
       <CercaNelMenu segnaposto="Cerca proprietà" valore={q} onCambia={setQ} />
       {PROPRIETA.filter((p) => cerca(p.etichetta, q)).map((p) => (
         <button key={p.chiave} type="button" className="voce" onClick={() => onScegli(p.chiave)}>
@@ -57,14 +57,14 @@ export function MenuProprieta({ a, onScegli, onChiudi }: { a: Punto; onScegli(p:
 
 /** «Menu filtro» Tipo=Opzioni: caselle da spuntare e «Rimuovi filtro». */
 export function MenuOpzioni({ a, filtro, opzioni, onCambia, onRimuovi, onChiudi }: {
-  a: Punto; filtro: Filtro; opzioni: Opzione[];
+  a: Ancora; filtro: Filtro; opzioni: Opzione[];
   onCambia(valori: string[]): void; onRimuovi(): void; onChiudi(): void;
 }) {
   const [q, setQ] = useState("");
   const etichetta = PROPRIETA.find((p) => p.chiave === filtro.proprieta)!.etichetta;
   const alterna = (v: string) => onCambia(filtro.valori.includes(v) ? filtro.valori.filter((x) => x !== v) : [...filtro.valori, v]);
   return (
-    <Sovrapposto a={a} className="menu menu-filtro" onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-filtro" onChiudi={onChiudi}>
       <div className="testata t-sm secondario">
         <span className="medio">{etichetta}</span>
         <span>è</span>
@@ -105,11 +105,11 @@ function Scelta({ etichetta, scelta, onClick }: { etichetta: string; scelta: boo
 
 /** Menu di «Filtra»: raggruppa, ordina, aggiungi filtro (101:30304). */
 export function MenuRaggruppa({ a, raggruppa, ordina, onRaggruppa, onOrdina, onAggiungi, onChiudi }: {
-  a: Punto; raggruppa: Raggruppa; ordina: Ordina;
+  a: Ancora; raggruppa: Raggruppa; ordina: Ordina;
   onRaggruppa(r: Raggruppa): void; onOrdina(o: Ordina): void; onAggiungi(e: MouseEvent): void; onChiudi(): void;
 }) {
   return (
-    <Sovrapposto a={a} className="menu menu-raggruppa" onChiudi={onChiudi}>
+    <Sovrapposto ancora={a} className="menu menu-raggruppa" onChiudi={onChiudi}>
       <div className="titolo-gruppo t-xs medio secondario">Raggruppa per</div>
       {RAGGRUPPA.map((r) => <Scelta key={r.chiave} etichetta={r.etichetta} scelta={raggruppa === r.chiave} onClick={() => onRaggruppa(r.chiave)} />)}
       <div className="separatore"><div className="linea" /></div>

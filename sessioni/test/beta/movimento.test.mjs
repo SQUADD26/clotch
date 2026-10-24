@@ -21,6 +21,11 @@ test('M5: il rilascio arriva dopo l\'inizio del fotogramma che lo disegna', () =
   const a = [anim({ serie: serie(200, (p) => 1 - (1 - p) ** 3).map((s) => [s[0] + 88, ...s.slice(1)]) })];
   assert.deepEqual(criteri(difettiMovimento({ evento: 100, eventi: [100, 195], T: a[0].serie.map((s) => s[0]), animazioni: a })), []);
 });
+test('M5 dall\'inizio vero dell\'animazione, non dal primo campione arrivato tardi', () => {
+  const a = [anim({ inizio: 105, serie: serie(200, (p) => 1 - (1 - p) ** 3).map((s) => [s[0] + 90, ...s.slice(1)]) })];
+  assert.deepEqual(criteri(difettiMovimento({ evento: 100, eventi: [100], T: a[0].serie.map((s) => s[0]), animazioni: a })), []);
+  assert.deepEqual(criteri(difettiMovimento({ evento: 100, eventi: [100], T: a[0].serie.map((s) => s[0]), animazioni: [{ ...a[0], inizio: undefined }] })), ['M5']);
+});
 test('gruppo di una View Transition: la misura della foto non è layout', () => assert.deepEqual(criteri(difettiMovimento(giro([anim({ dove: 'html::view-transition-group(superficie)', proprieta: ['width', 'height', 'transform'], serie: serie(200, (p) => 1 - (1 - p) ** 3) })]))), []));
 test('movimento ridotto: si sposta', () =>
   assert.deepEqual(criteri(difettiMovimento(giro([anim({ proprieta: ['transform'], serie: serie(200, () => 1, (p) => 8 * p) })]), { ridotto: true })), ['M8']));

@@ -8,10 +8,12 @@ import { Dialogo } from "../base/Dialogo";
 import { Icona, type NomeIcona } from "../base/Icona";
 import "../base/menu.css"; // stile di «menu» della base: qui il menu ha titolo e nota, che Menu non ha
 import { useAvvisoNotch } from "./avvisoNotch";
+import { useEscChiude } from "../base/layout";
 import { useNavigazione } from "../base/navigazione";
 import { avviaClotchAi, clotchAi, negozio, useRegistro } from "./dati";
 import { plurale } from "./Intestazione";
 import { sessioniAlLavoro, statoClotchAi } from "./vista";
+import { Sovrapposto } from "../base/Sovrapposto";
 
 // Ore fisse del disegno: «Fino alle 18:00»; «Fino a domani mattina» = domani alle 8:00 (decisione della master, #352).
 const ORA_SERA = 18, ORA_MATTINA = 8;
@@ -56,7 +58,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
     ["nascondi", "Finché non lo tolgo", { fino: null }],
   ];
   return (
-    <div className="menu" role="menu">
+    <Sovrapposto fine className="menu" role="menu" onChiudi={onChiudi}>
       <div className="titolo-menu t-xs medio secondario">Non disturbare</div>
       {voci.map(([icona, etichetta, args]) => (
         <button key={etichetta} type="button" role="menuitem" className="voce" onClick={() => metti(args)}>
@@ -68,7 +70,7 @@ function MenuNonDisturbare({ clotch, onChiudi }: { clotch: boolean; onChiudi(): 
       <div className="nota-menu t-sm secondario">
         {clotch ? "Vale anche per clotch: niente voce né microfono." : "clotch AI continua a lavorare e tiene gli avvisi per dopo."}
       </div>
-    </div>
+    </Sovrapposto>
   );
 }
 
@@ -79,6 +81,7 @@ export function ComandiTitolo() {
   const stato = fermo.usa();
   const menu = menuQuiete.usa();
   const chiudi = useCallback(() => menuQuiete.metti(false), []);
+  useEscChiude(menu, chiudi);
   const quiete = !!r && statoClotchAi(r, Date.now()).stato === "pausa";
   const quante = r ? sessioniAlLavoro(r) : 0;
   // «L’app prova a riaprirla» (101-42000): una volta per chiusura, mai dopo `spegni` (evento friday «stop») // nome del protocollo del motore

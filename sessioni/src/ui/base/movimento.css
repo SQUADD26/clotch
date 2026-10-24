@@ -1,6 +1,6 @@
-/* Sistema di movimento di tutta l'app (#520): durate e curve solo da token (tempo/*, curva/*, scala/*, spostamento/*).
+/* Sistema di movimento di tutta l'app (issue 520): durate e curve solo da token (tempo/*, curva/*, scala/*, spostamento/*).
    Regole: entrata tempo-entrata con curva-entrata; uscita più breve, tempo-uscita con curva-uscita; si muovono solo transform e opacità;
-   le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (#519), con gli stessi token. */
+   le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (issue 519), con gli stessi token. */
 
 /* hover e pressione: colore e fondo seguono il passaggio, i premibili piccoli si riducono a scala-premuto */
 button, [role="button"], .pillola, .pillola-filtro, .riga {
@@ -17,7 +17,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 .cornice.in-avvio .corpo { opacity: 0; }
 
 /* View Transition (base/movimento.ts): ogni gruppo con nome si sposta e ridimensiona, il resto dissolve */
-:root { --scivola-barra: -100%; --scivola-pannello: 100%; }
+:root { --scivola-barra: -100%; --scivola-pannello: 100%; --sposta-entrata: var(--spazio-1); }
 :root::view-transition { pointer-events: none; } /* i clic passano: la transizione si interrompe con il clic dopo */
 ::view-transition-old(*), ::view-transition-new(*) { animation-duration: var(--tempo-entrata); animation-timing-function: var(--curva-entrata); }
 /* un gruppo che cambia posto o misura (superficie, pannello, avvisi della pila) si sposta con tempo-spostamento */
@@ -33,7 +33,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 
 @keyframes scivola-barra { from { opacity: 0; transform: translateX(var(--scivola-barra)); } }
 @keyframes scivola-pannello { from { opacity: 0; transform: translateX(var(--scivola-pannello)); } }
-@keyframes compare { from { opacity: 0; transform: translateY(var(--spazio-1)) scale(var(--scala-entrata)); } }
+@keyframes compare { from { opacity: 0; transform: translateY(var(--sposta-entrata)) scale(var(--scala-entrata)); } }
 @keyframes dissolve { from { opacity: 0; } }
 ::view-transition-new(barra):only-child { animation-name: scivola-barra; }
 ::view-transition-old(barra):only-child { animation-name: scivola-barra; animation-direction: reverse; }
@@ -46,7 +46,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
 
 /* riduci movimento del Mac: niente spostamenti né scale, solo dissolvenza breve; nessuna animazione infinita */
 @media (prefers-reduced-motion: reduce) {
-  :root { --scivola-barra: 0%; --scivola-pannello: 0%; --scala-entrata: 1; --scala-premuto: 1; }
+  :root { --scivola-barra: 0%; --scivola-pannello: 0%; --sposta-entrata: 0px; --scala-entrata: 1; --scala-premuto: 1; }
   ::view-transition-group(*) { animation: none; }
   .gira, .luccica-finestra, .luccica-copia, .pezzo-chat .cursore { animation: none !important; }
 }

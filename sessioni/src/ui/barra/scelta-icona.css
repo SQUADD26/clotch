@@ -1,7 +1,7 @@
 /* figma: 101-12169 — «Scelta icona» */
 .pezzo-barra .scelta-icona {
-  z-index: 10; width: var(--misura-scelta-icona); padding: var(--spazio-3); gap: var(--spazio-3);
-  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-lg);
+  width: var(--misura-scelta-icona); padding: var(--spazio-3); gap: var(--spazio-3);
+  display: flex; flex-direction: column; background: var(--colore-fondo-elevato); border-radius: var(--raggio-sovrapposto);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
 .pezzo-barra .cerca-icone {

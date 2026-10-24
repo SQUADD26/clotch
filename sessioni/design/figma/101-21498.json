@@ -4,7 +4,8 @@
   "id": "101:21498",
   "nome": "menu profilo",
   "w": 260,
-  "h": 228
+  "h": 228,
+  "dentro": "101:21376"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
