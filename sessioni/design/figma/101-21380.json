@@ -4,8 +4,7 @@
   "id": "101:21380",
   "nome": "Barra laterale",
   "w": 266,
-  "h": 856,
-  "dentro": "101:21376"
+  "h": 856
  },
  "variabili": {
   "spazio/0-5": 2,
@@ -1853,6 +1852,7 @@
     "h": 28
    },
    "variabili": {
+    "fills[0]": "colore/fondo/riga-scelta",
     "cornerRadius": "raggio/md",
     "width": "misura/bottone",
     "height": "misura/bottone"
@@ -1860,7 +1860,7 @@
    "senza": []
   },
   {
-   "id": "I101:21395;155:76731;101:7139",
+   "id": "I101:21395;155:76731;153:71026",
    "nome": "icona altro",
    "tipo": "INSTANCE",
    "box": {
@@ -1876,7 +1876,7 @@
    "senza": []
   },
   {
-   "id": "I101:21395;155:76731;101:7139;101:7048",
+   "id": "I101:21395;155:76731;153:71026;101:7048",
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {

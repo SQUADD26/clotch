@@ -4,8 +4,7 @@
   "id": "101:39071",
   "nome": "non disturbare attivo",
   "w": 250,
-  "h": 72,
-  "dentro": "101:38897"
+  "h": 72
  },
  "variabili": {
   "colore/fondo/attesa": "#ee7c3729",

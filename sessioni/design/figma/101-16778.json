@@ -4,8 +4,7 @@
   "id": "101:16778",
   "nome": "menu filtro",
   "w": 260,
-  "h": 295,
-  "dentro": "101:10017"
+  "h": 295
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
@@ -29,12 +28,12 @@
   "colore/icona/accento": "#ee7c37",
   "colore/testo/primario": "#ffffff",
   "colore/fondo/riga-passaggio": "#ffffff0d",
-  "colore/fondo/accento": "#d25e28",
+  "colore/fondo/accento": "#c15625",
   "colore/icona/su-accento": "#ffffff",
   "colore/icona/successo": "#40c977",
   "colore/icona/errore": "#ff6764",
   "colore/bordo/normale": "#ffffff15",
-  "colore/testo/errore": "#ff6764"
+  "colore/testo/errore": "#ff7673"
  },
  "nodi": [
   {
