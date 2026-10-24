@@ -4,7 +4,7 @@
   "id": "101:12461",
   "nome": "Varianti",
   "w": 3428,
-  "h": 5522
+  "h": 5518
  },
  "variabili": {
   "colore/fondo/superficie": "#181818",
@@ -43,7 +43,7 @@
   "testo/dimensione/xs": 12,
   "testo/riga/xs": 16,
   "colore/fondo/codice": "#141414",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "misura/tratto": 1,
   "spazio/2-5": 10,
   "colore/testo/successo": "#40c977",
@@ -53,7 +53,7 @@
   "raggio/casella": 22,
   "raggio/pieno": 9999,
   "misura/bottone-invio": 32,
-  "colore/fondo/accento": "#d25e28",
+  "colore/fondo/accento": "#c15625",
   "colore/icona/su-accento": "#ffffff",
   "colore/fondo/bottone-primario": "#ffffff",
   "spazio/4": 16,
@@ -79,7 +79,7 @@
   "colore/semaforo/verde": "#28c840",
   "colore/fondo/sagoma": "#ffffff14",
   "misura/barra-uso": 6,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "colore/testo/bolla": "#fdf5f1",
   "testo/riga/messaggio": 21,
