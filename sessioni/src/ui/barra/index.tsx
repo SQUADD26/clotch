@@ -64,7 +64,9 @@ export default function Barra() {
   const filtrato = vista.filtri.some((f) => f.valori.length);
   const [aperteAMano, setAperteAMano] = useState<Set<string>>(p ? new Set(p.aperte ?? []) : conservato.aperteAMano);
   useEffect(() => { if (!p) Object.assign(conservato, { vista, chiuse, aperteAMano }); }, [p, vista, chiuse, aperteAMano]);
-  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || barra.gruppi.find((g) => g.chiave === chiave)?.sessioni.some((s) => s.id === scelta));
+  // la cartella della sessione scelta, calcolata una volta per render (prima: ogni cartella riscorreva tutte le cartelle, #474)
+  const conScelta = useMemo(() => barra.gruppi.find((g) => g.sessioni.some((s) => s.id === scelta))?.chiave, [barra, scelta]);
+  const aperta = (chiave: string) => !chiuse.has(chiave) && (aperteAMano.has(chiave) || filtrato || chiave === conScelta);
   const alterna = (chiave: string) => {
     const ora = aperta(chiave);
     setChiuse((c) => { const x = new Set(c); if (ora) x.add(chiave); else x.delete(chiave); return x; });
