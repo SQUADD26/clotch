@@ -43,6 +43,13 @@
   display: flex; align-items: center; gap: var(--spazio-2); width: 100%; min-width: 0; text-align: left;
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
+/* passaggio e premuto come la testata del pannello Info (info.css): il fondo sporge, il testo resta dov'è */
+.pezzo-chat .filo .testata:not(:disabled):hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .filo .testata:not(:disabled):active { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .filo :is(.strumento, .pensiero) > .testata {
+  box-sizing: content-box; width: calc(100% + 2 * var(--spazio-2)); margin: calc(-1 * var(--spazio-1)) calc(-1 * var(--spazio-2));
+  padding: var(--spazio-1) var(--spazio-2); border-radius: var(--raggio-md);
+}
 .pezzo-chat .pensiero .testata { gap: var(--spazio-1); width: auto; align-self: flex-start; }
 .pezzo-chat .testata .tipo { font-weight: 500; flex: none; }
 .pezzo-chat .testata .tipo.errore { color: var(--colore-testo-errore); }
@@ -61,6 +68,7 @@
   border-radius: var(--raggio-lg); background: var(--colore-fondo-codice);
   font-family: var(--testo-famiglia-codice); font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-sm);
   white-space: pre-wrap; overflow-wrap: anywhere;
+  max-height: calc(var(--misura-riga) * 8); overflow-y: auto; /* comando o uscita lunghi scorrono dentro il blocco: testata e bottoni restano in vista */
 }
 .pezzo-chat .blocco-codice .comando { color: var(--colore-testo-primario); }
 .pezzo-chat .blocco-codice .uscita { color: var(--colore-testo-secondario); }

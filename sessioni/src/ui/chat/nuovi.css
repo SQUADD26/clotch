@@ -7,3 +7,6 @@
   border-radius: var(--raggio-pieno); background: var(--colore-fondo-elevato);
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
 }
+/* passaggio e premuto: velatura sopra il fondo pieno (come i bottoni, componenti.css) */
+.pezzo-chat .nuovi-messaggi:hover { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .nuovi-messaggi:active { box-shadow: inset 0 0 0 100vmax var(--colore-fondo-riga-scelta); }

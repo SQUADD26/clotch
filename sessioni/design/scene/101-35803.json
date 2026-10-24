@@ -18,14 +18,15 @@
     "domanda": null,
     "limite": null,
     "richieste": [],
-    "battito": 1792793139710,
+    "contestoMax": null,
+    "battito": 1792845701401,
     "aiutanti": {},
     "compattazioni": 0,
     "interrotta": null,
     "coda": [],
     "obiettivo": null,
     "passi": [],
-    "visto": 1792840320000,
+    "visto": 1792851120000,
     "fine": null,
     "fineT": null,
     "chatNuova": null,
@@ -44,7 +45,7 @@
   "decisioni": [
    {
     "id": "r-000000000003",
-    "t": 1792768800000,
+    "t": 1792779600000,
     "cosa": "Archiviate 4 sessioni finite",
     "perche": "",
     "chat": "m-squadd",
@@ -55,8 +56,8 @@
     "annullata": false
    },
    {
-    "id": "r-000000000005",
-    "t": 1792830600000,
+    "id": "r-000000000004",
+    "t": 1792841400000,
     "cosa": "Promosso dev a main",
     "perche": "",
     "chat": "m-clotch",
@@ -67,8 +68,8 @@
     "annullata": false
    },
    {
-    "id": "r-000000000006",
-    "t": 1792832700000,
+    "id": "r-000000000005",
+    "t": 1792843500000,
     "cosa": "Risposto alla domanda: «Nel repo, in sessioni/design/app»",
     "perche": "",
     "chat": "c-figma",
@@ -80,7 +81,7 @@
    },
    {
     "id": "r-000000000007",
-    "t": 1792838400000,
+    "t": 1792849200000,
     "cosa": "Fermata la sessione «Notch: avviso schermo»",
     "perche": "",
     "chat": "c-fatta-0",
@@ -92,7 +93,7 @@
    },
    {
     "id": "r-000000000008",
-    "t": 1792840320000,
+    "t": 1792851120000,
     "cosa": "Consentita la migrazione 0042 su dev",
     "perche": "",
     "chat": "c-backend",
@@ -108,24 +109,25 @@
     "testo": "Main si cambia solo con la promozione da dev.",
     "perche": "",
     "dove": "claude-config",
-    "t": 1792306800000
+    "t": 1792317600000
    },
    {
     "testo": "Ogni interfaccia passa prima da Figma.",
     "perche": "",
     "dove": "/Users/privato/Documents/Repos/clotch",
-    "t": 1792566000000
+    "t": 1792576800000
    },
    {
     "testo": "Parla poco e chiaro: una cosa alla volta, parole semplici.",
     "perche": "",
     "dove": "claude-config",
-    "t": 1792738800000
+    "t": 1792749600000
    }
   ],
   "nonDisturbare": null,
   "impostazioni": null,
   "esiti": {},
-  "errori": []
+  "errori": [],
+  "passiMacchina": []
  }
 }
