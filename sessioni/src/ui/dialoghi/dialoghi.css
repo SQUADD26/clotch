@@ -40,5 +40,4 @@
 .pezzo-dialoghi .freccia .icona { width: var(--spazio-3); height: var(--spazio-3); }
 .pezzo-dialoghi .freccia.su .icona { transform: rotate(180deg); }
 .pezzo-dialoghi .errore-ore { color: var(--colore-testo-errore); }
-/* shortcut: l'opacità di «Salva» spento (0.4 in 149-67120) non ha ancora una variabile in Figma; da legare quando c'è */
-.pezzo-dialoghi .bottone:disabled { opacity: 0.4; }
+.pezzo-dialoghi .bottone:disabled { opacity: var(--opacita-spento); }

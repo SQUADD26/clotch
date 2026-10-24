@@ -2401,11 +2401,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/secondario"
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "Dalle",
    "font": "SF Pro Regular"
   },
@@ -2463,11 +2462,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "13",
    "font": "SF Pro Regular"
   },
@@ -2482,11 +2480,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": ":",
    "font": "SF Pro Regular"
   },
@@ -2520,11 +2517,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "00",
    "font": "SF Pro Regular"
   },
@@ -2625,11 +2621,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/secondario"
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "Alle",
    "font": "SF Pro Regular"
   },
@@ -2686,11 +2681,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "15",
    "font": "SF Pro Regular"
   },
@@ -2705,11 +2699,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": ":",
    "font": "SF Pro Regular"
   },
@@ -2743,11 +2736,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "00",
    "font": "SF Pro Regular"
   },

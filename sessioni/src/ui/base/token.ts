@@ -248,12 +248,15 @@ export type Token =
   | "misura-finestra-stretta"
   | "misura-allegato-avviso-largo"
   | "misura-menu-avvio-largo"
+  | "misura-campo-porta"
+  | "misura-riga-menu-larga"
   | "ombra-raggio"
   | "ombra-y"
   | "ombra-espansione"
   | "tempo-breve"
   | "tempo-normale"
-  | "tempo-lento";
+  | "tempo-lento"
+  | "opacita-spento";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -508,12 +511,15 @@ export const valori: Record<Token, string> = {
   "misura-finestra-stretta": "480px",
   "misura-allegato-avviso-largo": "734px",
   "misura-menu-avvio-largo": "320px",
+  "misura-campo-porta": "96",
+  "misura-riga-menu-larga": "312",
   "ombra-raggio": "32px",
   "ombra-y": "16px",
   "ombra-espansione": "-8px",
   "tempo-breve": "150ms",
   "tempo-normale": "200ms",
   "tempo-lento": "400ms",
+  "opacita-spento": "0.4",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);

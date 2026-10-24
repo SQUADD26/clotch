@@ -23,7 +23,8 @@ export function voci(tokens) {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
         const p = [...via, k];
-        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: f.$value });
+        // le variabili d'opacità (gruppo «opacita», ambito OPACITY) in Figma sono percentuali: nel CSS 40 -> 0.4
+        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: p[0] === 'opacita' && typeof f.$value === 'number' ? f.$value / 100 : f.$value });
         giu(f, p);
       }
     };

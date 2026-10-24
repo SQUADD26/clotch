@@ -64,7 +64,8 @@
   "colore/testo/errore": "#ff6764",
   "colore/fondo/bottone-secondario": "#ffffff0d",
   "misura/bottone-invio": 32,
-  "colore/fondo/bottone-primario": "#ffffff"
+  "colore/fondo/bottone-primario": "#ffffff",
+  "opacita/spento": 40
  },
  "nodi": [
   {
@@ -2402,11 +2403,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/secondario"
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "Dalle",
    "font": "SF Pro Regular"
   },
@@ -2463,11 +2463,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "22",
    "font": "SF Pro Regular"
   },
@@ -2482,11 +2481,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": ":",
    "font": "SF Pro Regular"
   },
@@ -2520,11 +2518,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "00",
    "font": "SF Pro Regular"
   },
@@ -2625,11 +2622,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/secondario"
+    "fills[0]": "colore/testo/secondario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "Alle",
    "font": "SF Pro Regular"
   },
@@ -2686,11 +2682,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "22",
    "font": "SF Pro Regular"
   },
@@ -2705,11 +2700,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": ":",
    "font": "SF Pro Regular"
   },
@@ -2744,11 +2738,10 @@
     "h": 17
    },
    "variabili": {
-    "fills[0]": "colore/testo/primario"
+    "fills[0]": "colore/testo/primario",
+    "fontSize": "testo/dimensione/base"
    },
-   "senza": [
-    "fontSize 14"
-   ],
+   "senza": [],
    "testo": "00",
    "font": "SF Pro Regular"
   },
@@ -2912,11 +2905,10 @@
     "itemSpacing": "spazio/2",
     "paddingLeft": "spazio/4",
     "paddingRight": "spazio/4",
+    "opacity": "opacita/spento",
     "height": "misura/bottone-invio"
    },
-   "senza": [
-    "opacity 0.4000000059604645"
-   ]
+   "senza": []
   },
   {
    "id": "I149:67304;101:7463",
