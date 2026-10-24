@@ -37,7 +37,7 @@ function Corpo() {
   useLayoutEffect(() => adatta(stretta, largo), [adatta, stretta, largo]);
   useEscChiude(n.sovrapposta && n.barraAperta, n.alternaBarra);
   useEscChiude(!largo && n.pannelloAperto, n.chiudiPannello);
-  const attributi = { ref: corpo, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
+  const attributi = { ref: corpo, inert: useAvvio() || undefined, "data-compatta": compatta || undefined, style: { "--larghezza-barra": `${barra.w}px` } as CSSProperties };
   if (impostazioni) return <div className="corpo" {...attributi}><Pezzo nome="impostazioni"><Impostazioni /></Pezzo></div>;
   const clotchAi = VISTE_CLOTCH_AI.includes(n.vista);
   const fissa = n.barraAperta && !n.sovrapposta;
@@ -76,9 +76,9 @@ export function Cornice() {
   return (
     <ConNavigazione>
       <div className={`cornice ${avvio ? "in-avvio" : ""}`}>
-        <BarraTitolo />
+        <BarraTitolo inerte={avvio} />
         <Corpo />
-        {avvio && <Avvio />}
+        <Avvio fine={!avvio} />
         <Pezzo nome="dialoghi"><Dialoghi /></Pezzo>
       </div>
     </ConNavigazione>
