@@ -1,0 +1,36 @@
+/* figma: 148-51982 — «Nuova sessione»; «Selettore avvio» e «Riga menu avvio» (148:56514); menu 148:52243, 148:52543, 148:52864; errore 148:53399 */
+/* la colonna centra il blocco su tutta l'altezza, anche sotto il suo margine di fondo */
+.pezzo-chat .nuova-sessione { width: 100%; max-width: var(--misura-colonna); flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; margin-bottom: calc(var(--spazio-4) * -1); }
+.pezzo-chat .nuova-corpo { display: flex; flex-direction: column; gap: var(--spazio-3); }
+
+.pezzo-chat .selettori-avvio { display: flex; flex-wrap: wrap; gap: var(--spazio-2); }
+.pezzo-chat .selettore-avvio { position: relative; display: inline-flex; }
+.pezzo-chat .selettore {
+  display: inline-flex; align-items: center; gap: var(--spazio-1-5); height: var(--misura-bottone); padding: 0 var(--spazio-2); border-radius: var(--raggio-md);
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); white-space: nowrap;
+}
+.pezzo-chat .selettore:hover { background: var(--colore-fondo-riga-passaggio); }
+.pezzo-chat .selettore.aperto { background: var(--colore-fondo-riga-scelta); }
+.pezzo-chat .selettore.spento { color: var(--colore-testo-secondario); }
+.pezzo-chat .selettore.errore { color: var(--colore-testo-errore); }
+.pezzo-chat .nota-avvio { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+
+.pezzo-chat .avviso-avvio { display: flex; align-items: flex-start; gap: var(--spazio-3); padding: var(--spazio-3); border-radius: var(--raggio-lg); background: var(--colore-fondo-errore); }
+.pezzo-chat .avviso-avvio .testi { display: flex; flex-direction: column; gap: var(--spazio-1); min-width: 0; }
+.pezzo-chat .avviso-avvio .titolo { font-size: var(--testo-dimensione-base); line-height: var(--testo-riga-base); font-weight: 500; color: var(--colore-testo-primario); }
+.pezzo-chat .avviso-avvio .corpo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+
+/* menu sopra il selettore, a 4 px dal bordo; ramo più largo (misura/menu-avvio-largo) */
+.pezzo-chat .menu-avvio { position: absolute; left: 0; bottom: calc(100% + var(--spazio-1)); z-index: 5; width: var(--misura-menu); gap: var(--spazio-0-5); }
+.pezzo-chat .menu-avvio .gruppo-rami { display: flex; flex-direction: column; gap: var(--spazio-0-5); }
+.pezzo-chat .ricerca-avvio {
+  display: flex; align-items: center; gap: var(--spazio-2); height: var(--misura-bottone); padding: 0 var(--spazio-2);
+  border-radius: var(--raggio-md); background: var(--colore-fondo-casella);
+}
+.pezzo-chat .ricerca-avvio input {
+  flex: 1; min-width: 0; border: 0; outline: none; background: none; padding: 0; font: inherit;
+  font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario);
+}
+.pezzo-chat .ricerca-avvio input::placeholder { color: var(--colore-testo-secondario); }
+.pezzo-chat .menu-avvio .valore { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+.pezzo-chat .menu-avvio .vuoto { padding: var(--spazio-3) var(--spazio-2); text-align: center; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }

@@ -12,7 +12,7 @@ export const STATI_CLOTCH_AI = ["lavora", "aspetta", "finito", "serve_roberto", 
 export const COMANDI = [
   "ferma_tutto", "riprendi_tutto", "ferma_chat", "riprendi_chat", "non_disturbare", "annulla", "regola", "parla", "quarantena",
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi",
-  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta", "zitto", "sessione_imposta",
+  "riprendi_altrove", "archivia", "ripristina", "obiettivo", "spegni", "imposta", "zitto", "sessione_imposta", "nuova_sessione",
 ] as const;
 /** Contratto: «Non risponde = stato lavora e nessun battito da 20 minuti», come friday_triage.FERMO_S (la copia della UI è in ui/chat/clotch-ai.ts). Clotch: ultimo evento più vecchio di 10 min = spento. */
 export const NON_RISPONDE_MS = 1_200_000;

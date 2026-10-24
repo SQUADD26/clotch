@@ -82,6 +82,7 @@ const MOTORE_COMANDI = [ // global/hooks/friday_comandi.py:25-36, chiavi di FORM
   "rispondi_permesso", "rispondi_domanda", "salta_domanda", "piano", "manda", "coda_modifica", "coda_togli", "interrompi", "riprendi_altrove",
   "archivia", "spegni", "imposta", "rinomina", "zitto", // zitto: claude-config#2572
   "sessione_imposta", // modello, sforzo, rapida di una chat ferma: claude-config#2568/#2571 (annunciato dal coordinatore, non ancora nel motore a 089cf3b)
+  "nuova_sessione", // claude-config#2577
 ];
 
 test("contratto col motore: stessa soglia «Non risponde» in src e in src/ui, uguale a friday_triage.FERMO_S", () => {

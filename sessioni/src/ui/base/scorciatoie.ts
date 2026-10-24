@@ -28,6 +28,7 @@ export function useScorciatoie() {
     const premi = (e: KeyboardEvent) => {
       // già gestito (la pagina Scorciatoie che registra, la casella); nei campi di testo solo le combinazioni con ⌘
       if (e.defaultPrevented || e.repeat || (inCampo(e.target) && !e.metaKey)) return;
+      if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey && e.key.toLowerCase() === "n") { e.preventDefault(); n.apri("nuova-sessione"); return; } // «Nuova sessione» ⌘N, fisso
       const a = azioneDi(tastiDi(e), scorciatoie);
       const navigazione: Record<string, () => void> = { clotchAi: () => n.apri("clotch-ai"), barra: n.alternaBarra, impostazioni: () => n.apri("impostazioni"),
         prossima: () => { const id = prossimaInAttesa(sessioni ?? [], n.sessione); if (id) apriSessione(id); } };

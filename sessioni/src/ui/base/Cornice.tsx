@@ -54,7 +54,7 @@ function Corpo() {
                 {clotchAi ? <Pezzo nome="clotch-ai"><ClotchAi /></Pezzo> : <Pezzo nome="chat"><Chat /></Pezzo>}
                 <AreaAvvisi />
               </div>
-              {!clotchAi && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
+              {!clotchAi && n.vista !== "nuova-sessione" && n.pannelloAperto && <aside className={largo ? "pannello" : "pannello sopra"}><Pezzo nome="pannello"><Pannello /></Pezzo></aside>}
             </div>
           </div>
         </main>

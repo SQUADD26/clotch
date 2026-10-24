@@ -3,7 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "./dati";
 
-export type Vista = "sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
+/** «nuova-sessione» (148:51982): la vista per aprire una sessione, montata dalla chat, senza pannello. */
+export type Vista = "sessione" | "nuova-sessione" | "clotch-ai" | "casella" | "decisioni" | "regole" | "impostazioni";
 /** Le viste di clotch AI: montano clotch-ai/, senza pannello. */
 export const VISTE_CLOTCH_AI: readonly Vista[] = ["clotch-ai", "casella", "decisioni", "regole"];
 /** `sezione`: sottopagina libera della vista (es. «generale» nelle impostazioni). */

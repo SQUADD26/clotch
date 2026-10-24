@@ -5,7 +5,7 @@ import * as path from "node:path";
 import type { IpcMain } from "electron";
 import { leggiRegistro } from "./clotch-ai";
 import { piano } from "./clotch-ai-ipc";
-import type { Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
+import type { CartellaAvvio, ContestoCartella, Archiviata, Novita, CartellaAccount, Elenco, FileAllegato, InfoSessione, Messaggio, PreferenzeSessione, QuotaUso, VoceComando } from "./tipi";
 import type { OpzioniCronologia } from "./cronologia-tipi";
 import { creaCronologiaScena } from "./scena-cronologia";
 
@@ -33,6 +33,8 @@ export interface Scena {
   /** Menu della casella (#437): comandi con «/» e file con «@» che il main darebbe a quella sessione. */
   comandi?: VoceComando[];
   file?: string[];
+  /** «Nuova sessione» (#468): cartelle recenti, rami per percorso e host SSH come li darebbe il main. */
+  nuova?: { recenti: CartellaAvvio[]; casa?: string; contesti: Record<string, ContestoCartella>; ssh?: string[] };
   /** Registro di clotch AI come lo dà `clotch-ai:registro`. */
   registro?: unknown;
   /** Allegati e immagini (#437): i file che `casella:descrivi` trova, le immagini (file PNG del repo, per «<uuid riga>:<n>» o per percorso) e le skill. */
@@ -92,6 +94,10 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
       const file = s.immagini?.[d.rif ? `${d.rif.riga}:${d.rif.n}` : String(d.percorso)];
       return file ? `data:image/png;base64,${fs.readFileSync(path.join(__dirname, "..", "..", file)).toString("base64")}` : null;
     }
+    case "nuova:cartelle": return { recenti: s.nuova?.recenti ?? [], casa: s.nuova?.casa ?? "/Users/roberto" };
+    case "nuova:contesto": return s.nuova?.contesti[String(args[0])] ?? { git: false, rami: [], predefinito: null };
+    case "nuova:ssh": return s.nuova?.ssh ?? [];
+    case "nuova:scegli-cartella": return null;
     case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
     case "casella:scegli": return [];
     case "casella:copia": return (s.allegati ?? []).filter((a) => (args[0] as string[]).includes(a.percorso));
@@ -110,7 +116,7 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
-  "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
+  "nuova:cartelle", "nuova:contesto", "nuova:ssh", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

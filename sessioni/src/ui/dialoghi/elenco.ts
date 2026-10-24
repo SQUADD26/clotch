@@ -11,7 +11,7 @@ export const GRUPPI: Gruppo[] = [
   ] },
   { titolo: "Generale", colonna: 0, righe: [
     { etichetta: "Apri impostazioni", azione: "impostazioni" }, { etichetta: "Mostra scorciatoie", fisso: "⌘/" },
-    { etichetta: "Scrivi a clotch AI", azione: "clotchAi" },
+    { etichetta: "Scrivi a clotch AI", azione: "clotchAi" }, { etichetta: "Nuova sessione", fisso: "⌘N" },
   ] },
   { titolo: "Sessione", colonna: 1, righe: [
     { etichetta: "Consenti", azione: "consenti" }, { etichetta: "Nega", azione: "nega" }, { etichetta: "Ferma la sessione", azione: "ferma" },
