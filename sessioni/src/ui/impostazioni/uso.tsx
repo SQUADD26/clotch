@@ -85,8 +85,9 @@ export default function Uso() {
     <Pagina titolo="Uso">
       <div className="schede" role="tablist" onKeyDown={(e) => {
         const i = SCHEDE.findIndex(([id]) => id === scheda), d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-        if (!d) return;
-        e.preventDefault(); setScheda(SCHEDE[(i + d + SCHEDE.length) % SCHEDE.length][0]);
+        const vai = e.key === "Home" ? 0 : e.key === "End" ? SCHEDE.length - 1 : d ? (i + d + SCHEDE.length) % SCHEDE.length : -1;
+        if (vai < 0) return;
+        e.preventDefault(); setScheda(SCHEDE[vai][0]);
         queueMicrotask(() => document.querySelector<HTMLElement>('[role=tab][aria-selected=true]')?.focus());
       }}>
         {SCHEDE.map(([id, nome]) => (

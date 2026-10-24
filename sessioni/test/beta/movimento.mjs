@@ -34,9 +34,9 @@ export function difettiMovimento(c, { ridotto = false, dove = '' } = {}) {
     if (!TEMPI.some((t) => Math.abs(a.durata - t) <= Math.max(25, t * 0.15))) D('M2', a, `${Math.round(a.durata)} ms, token ${TEMPI.join('/')} ms (${a.nome})`);
     const p = a.serie.length >= 6 ? progresso(a.serie) : null, t0 = a.serie[0]?.[0];
     if (p) {
-      // lineare = sulla retta a metà e a un quarto (una curva ease-in-out simmetrica passa da 0,5 a metà, ma non da 0,25 a un quarto)
-      const a_ = (f) => { const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata * f); return i >= 0 ? p[i] : null; }, meta = a_(0.5), quarto = a_(0.25);
-      if (a.durata > 100 && meta != null && Math.abs(meta - 0.5) < 0.08 && (quarto == null || Math.abs(quarto - 0.25) < 0.08)) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
+      // lineare = il progresso segue il tempo a un quarto, a metà e a tre quarti; una curva simmetrica (ease-in-out) vale 0,50 solo a metà
+      const a_ = [0.25, 0.5, 0.75].map((f) => { const i = a.serie.findIndex((s) => s[0] >= t0 + a.durata * f); return i >= 0 ? p[i] : null; }), meta = a_[1];
+      if (a.durata > 100 && meta != null && a_.every((v, k) => v != null && Math.abs(v - [0.25, 0.5, 0.75][k]) < 0.08)) D('M3', a, `a metà ${meta.toFixed(2)}: curva lineare (${a.curva})`);
     } else if (a.durata > 100 && a.curva === 'linear') D('M3', a, `curva dichiarata lineare (${a.nome})`);
     // M5 dal gesto che l'ha fatta partire: l'ultimo prima del suo primo fotogramma (premuto, clic o tasto). Il tempo di un fotogramma
     // è il suo inizio, di solito prima dell'evento che quel fotogramma disegna: si guarda fino a un fotogramma dopo.
