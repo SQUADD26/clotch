@@ -6,11 +6,15 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = fileURLToPath(new URL('./checklist/', import.meta.url));
+<<<<<<< HEAD
 const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-richieste': 'CRI', 'cerca-testi': 'CTX', 'cerca-temi': 'CTE', 'cerca-modello-coda': 'CMC', 'cerca-markdown': 'CMD', 'cerca-casella': 'CCA', 'cerca-allegati': 'CAL', 'cerca-pannello': 'CPA', 'cerca-avvio-stati': 'CAS', 'cerca-filtri': 'CFI', 'cerca-ferma-tutto': 'CFT', 'cerca-menu-sessione': 'CMS', 'cerca-nuova-sessione': 'CNS', 'cerca-righe-barra': 'BRI', 'cerca-titolo-avvisi': 'CTA' };
 FAMIGLIE['cerca-intestazione'] = 'CIN';
 FAMIGLIE['cerca-dialoghi'] = 'CDI';
 FAMIGLIE['cerca-account'] = 'CAC';
 FAMIGLIE['cerca-larghezze'] = 'CLA';
+=======
+const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-animazioni': 'CAN' };
+>>>>>>> 6fbad1b1 (test(beta): voci CAN della cercatrice animazioni (#520))
 const GRAVITA = ['bloccante', 'alta', 'media', 'bassa'], PROVA = ['auto', 'occhio', 'fotogrammi'];
 FAMIGLIE['cerca-tastiera'] = 'CTS';
 FAMIGLIE['cerca-icona-viadalmac'] = 'CIV';
