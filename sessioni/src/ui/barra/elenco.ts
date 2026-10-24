@@ -2,6 +2,7 @@
 // Testi dei frame 101:7728, 101:9860 (filtri), 101:16778 (stati), 101:17031 (proprietà), 101:30304 (raggruppa e ordina).
 import type { PreferenzeSessione, Sessione, Sorgente, Stato } from "../../tipi";
 import type { NomeIcona } from "../base/icone";
+import { giornoRelativo } from "../base/formato";
 
 type StatoSegno = Stato | "errore";
 
@@ -36,13 +37,7 @@ const SORGENTI: Record<Sorgente, string> = { "claude-code": "Claude Code", "clau
 export const nomeSorgente = (s: Sorgente) => SORGENTI[s];
 
 /** «Oggi», «Ieri», «12 ott»: le date della ricerca 101:10247. */
-export function giorno(t: number, ora: number) {
-  const d = new Date(t), oggi = new Date(ora);
-  const ieri = new Date(ora); ieri.setDate(ieri.getDate() - 1);
-  if (d.toDateString() === oggi.toDateString()) return "Oggi";
-  if (d.toDateString() === ieri.toDateString()) return "Ieri";
-  return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" }).replace(".", "");
-}
+export const giorno = giornoRelativo;
 
 /** Valore di una proprietà per filtri e menu delle opzioni. */
 export function valore(s: Sessione, p: Proprieta, ora: number): string {
