@@ -106,8 +106,8 @@ export function MenuAmbiente({ ambiente, mac, ssh = false, mostraBase, onScegli,
             <Titolo>Locale</Titolo>
             <Riga icona="computer" etichetta="Questo computer" fine="spunta" scelta={e({ tipo: "locale" })} onClick={() => scegli({ tipo: "locale" })} />
             <Separatore />
-            <Riga etichetta="Cloud" fine="freccia" onClick={() => scegli({ tipo: "cloud" })} />
-            <Riga etichetta="Remote Control" fine="freccia" onClick={() => scegli({ tipo: "remote_control" })} />
+            <Riga etichetta="Cloud" onClick={() => scegli({ tipo: "cloud" })} />
+            <Riga etichetta="Remote Control" onClick={() => scegli({ tipo: "remote_control" })} />
             <Riga etichetta="SSH" fine="freccia" attiva={host} sotto={host} onClick={() => setHost(!host)} onTasto={(e) => { if (e.key === "ArrowRight") { e.preventDefault(); setHost(true); setAlFuoco(true); } }} />
             <Separatore />
             {/* shortcut: gli ambienti nuovi sono le macchine SSH («Aggiungi macchina…»); il disegno non dice altro, la voce resta spenta */}
