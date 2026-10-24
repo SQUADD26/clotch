@@ -26,7 +26,7 @@ final class ScribeLiveTests: XCTestCase {
         let c = VoiceInputController(files: VoiceFiles(home: home))
         c.makeCapture = { _ in voice }
         var asked: String?
-        c.ask = { q, _ in asked = q; return .success("ok") }
+        c.deliver = { q in asked = q; return .passed }
 
         c.press()
         try await until(10) { c.phase == .listening }

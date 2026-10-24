@@ -9,7 +9,7 @@ public struct VoiceFiles {
     public static let defaultMaxChars = 60000  // voce.ts DEFAULTS.maxDayChars
     public static let speedRange = 0.7...2.0
 
-    public let keyURL, configURL, offURL, promptURL, ownPromptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, helperPromptURL,dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, seenURL, voiceDir: URL
+    public let keyURL, configURL, offURL, promptURL, ownPromptURL, pronunciationURL, basePronunciationURL, judgeQuestionURL, dayURL, lastURL, statusURL, activeURL, queueURL, eventsURL, alertsURL, judgeLogURL, jevKeyURL, seenURL, voiceDir: URL
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         let voce = home.appendingPathComponent(".config/voce")
@@ -29,7 +29,6 @@ public struct VoiceFiles {
         basePronunciationURL = engineFile("voce-pronuncia.json")
         pronunciationURL = voce.appendingPathComponent("pronuncia.json")
         judgeQuestionURL = home.appendingPathComponent(".claude/hooks/voce_giudice_domanda.txt")  // the same question as `voce_giudice.py`
-        helperPromptURL = home.appendingPathComponent(VoiceRoute.helperPromptPath)  // claude-config#2116: the voice helper's instructions
         dayURL = voce.appendingPathComponent("giorno.json")
         lastURL = voce.appendingPathComponent("ultima.json")
         statusURL = voce.appendingPathComponent("stato.json")
@@ -41,15 +40,7 @@ public struct VoiceFiles {
         judgeLogURL = voce.appendingPathComponent("giudice-log.jsonl")
         jevKeyURL = home.appendingPathComponent(".config/jev/api-key")  // the same key as claude-config's command judge
         voiceDir = voce
-        overseerURL = home.appendingPathComponent(".claude/overseer/attuale.json")
     }
-
-    /// Orders for the Friday (#110): one file each, see `VoiceRoute`. `.ascolta` is the mod's sign that it reads them.
-    public var inboxURL: URL { voiceDir.appendingPathComponent(VoiceRoute.inboxFolder) }
-    public var inboxListenerURL: URL { inboxURL.appendingPathComponent(".ascolta") }
-    /// The engine's outcome of each order, `<same file name>` inside (#262, see `VoiceRoute.delivery`).
-    public var outcomesURL: URL { inboxURL.appendingPathComponent(".esiti") }
-    public let overseerURL: URL
 
     public var hasKey: Bool { ((try? Data(contentsOf: keyURL))?.isEmpty == false) }
 

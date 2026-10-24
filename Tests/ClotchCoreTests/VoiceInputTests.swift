@@ -128,107 +128,10 @@ final class VoiceInputTests: XCTestCase {
         XCTAssertEqual(d.text, "a che punto siamo tutto il testo")
     }
 
-    // MARK: routing
-
-    func testQuestionsGoToTheReadOnlyModel() {
-        for t in ["A che punto siamo con il notch?", "a che punto siamo", "Cosa sta facendo la master di Friday?", "Quante richieste sono aperte",
-                  "Perché non usa la chiave?", "dimmi lo stato delle PR", "Come mai la sessione è ferma"] {
-            XCTAssertEqual(VoiceRoute.classify(t), .question, t)
-        }
-    }
-
-    func testOrdersGoToTheOverseer() {
-        for t in ["Apri una sessione per sistemare il login", "Fai partire la promozione di Clotch", "Voglio che la voce parli più piano",
-                  "Controlla le PR aperte e uniscile", "Serve una sessione sul calendario", "boh, il notch", String(repeating: "parola ", count: 80)] {
-            XCTAssertEqual(VoiceRoute.classify(t), .order, t)
-        }
-    }
-
-    func testConfirmationsAreNotes() {
-        XCTAssertEqual(VoiceRoute.classify("Ok grazie"), .note)
-        XCTAssertEqual(VoiceRoute.classify("va bene, perfetto"), .note)
-        XCTAssertEqual(VoiceRoute.classify("ok, ma perché?"), .question)
-    }
-
-    func testOrderPhrasedAsQuestionStaysAQuestion() {
-        // The registry's rule: «?» plus an interrogative opening wins over the action verb.
-        XCTAssertEqual(VoiceRoute.classify("Perché non usa la chiave?"), .question)
-        XCTAssertEqual(VoiceRoute.classify("Apri una sessione, cosa serve?"), .order, "an action verb without an interrogative opening is an order")
-    }
-
-    // MARK: inbox and read-only ask
-
-    func testInboxFileCarriesTheOrder() throws {
-        let at = Date(timeIntervalSince1970: 1_800_000_000.5)
-        XCTAssertEqual(VoiceRoute.inboxName(id: "ab12", at: at), "1800000000500-ab12.json")
-        let o = try XCTUnwrap(JSONSerialization.jsonObject(with: VoiceRoute.inboxPayload(id: "ab12", text: "Apri una sessione", at: at)) as? [String: Any])
-        XCTAssertEqual(o["v"] as? Int, 1)
-        XCTAssertEqual(o["id"] as? String, "ab12")
-        XCTAssertEqual(o["testo"] as? String, "Apri una sessione")
-        XCTAssertEqual(o["da"] as? String, "clotch-voce")
-        XCTAssertEqual(o["t"] as? Int, 1_800_000_000_500)
-    }
-
-    func testAskCanOnlyRead() {
-        let a = VoiceRoute.askArguments()
-        let tools = a[a.firstIndex(of: "--tools")! + 1].split(separator: ",").map(String.init)
-        XCTAssertEqual(Set(tools), ["Read", "Glob", "Grep", "Bash"])
-        let allowed = a[a.firstIndex(of: "--allowed-tools")! + 1].split(separator: ",").map(String.init)
-        XCTAssertEqual(allowed.filter { $0.hasPrefix("Bash") }.count, 4)
-        XCTAssertTrue(allowed.filter { $0.hasPrefix("Bash") }.allSatisfy { $0.hasPrefix("Bash(gh issue ") || $0.hasPrefix("Bash(gh pr ") })
-        for write in ["Write", "Edit", "NotebookEdit"] { XCTAssertFalse(a.joined().contains(write), write) }
-        XCTAssertTrue(a.contains("--no-session-persistence"))
-        XCTAssertEqual(a.last, VoiceRoute.askPrompt)
-        XCTAssertEqual(VoiceRoute.askInput("che ore sono"), "<sessioni>\n\n</sessioni>\n<domanda>\nche ore sono\n</domanda>\n")
-    }
-
-    func testHelperRunsOnlyItsOwnCommand() {
-        let a = VoiceRoute.helperArguments(prompt: "istruzioni")
-        let allowed = a[a.firstIndex(of: "--allowed-tools")! + 1].split(separator: ",").map(String.init)
-        XCTAssertEqual(allowed, ["Read", "Glob", "Grep", "Bash(python3 hooks/helper_voce.py:*)"])
-        for write in ["Write", "Edit", "NotebookEdit", "gh "] { XCTAssertFalse(a.joined().contains(write), write) }
-        XCTAssertEqual(a[a.firstIndex(of: "--model")! + 1], VoiceRoute.askModel)
-        XCTAssertEqual(a[a.firstIndex(of: "--max-budget-usd")! + 1], "0.10")
-        XCTAssertTrue(a.contains("--no-session-persistence"))
-        XCTAssertEqual(a.suffix(2), ["--system-prompt", "istruzioni"])
-        XCTAssertEqual(VoiceRoute.helperPromptPath, ".claude/hooks/helper_voce_prompt.md")
-    }
-
     func testOverseerModelIsChosenInTheSettings() {
         XCTAssertEqual(VoiceInput.Config([:]).overseerModel, "claude-haiku-5-5")
         XCTAssertEqual(VoiceInput.Config(["overseer_modello": "claude-opus-5-5"]).overseerModel, "claude-opus-5-5")
         XCTAssertEqual(VoiceInput.Config(["overseer_modello": "gpt-9"]).overseerModel, "claude-haiku-5-5", "a model Clotch does not know: Haiku")
-        let a = VoiceRoute.helperArguments(prompt: "p", model: "claude-opus-5-5")
-        XCTAssertEqual(a[a.firstIndex(of: "--model")! + 1], "claude-opus-5-5")
-        XCTAssertEqual(a[a.firstIndex(of: "--max-budget-usd")! + 1], "0.60")
-        XCTAssertEqual(VoiceRoute.budget("claude-sonnet-5-5"), "0.30")
-        XCTAssertEqual(VoiceRoute.helperSeconds("claude-haiku-5-5"), 90)
-        XCTAssertEqual(VoiceRoute.helperSeconds("claude-sonnet-5-5"), 150)
-    }
-
-    func testAskGetsTheSessionsClotchSees() {
-        let now = Date()
-        let line = VoiceRoute.sessionLine(title: "Clotch: voce", status: .running, lastActivity: now.addingTimeInterval(-180), now: now)
-        XCTAssertEqual(line, "- Clotch: voce: lavora, ultima attività 3 min fa")
-        XCTAssertTrue(VoiceRoute.askInput("quante sessioni?", sessions: [line]).hasPrefix("<sessioni>\n\(line)\n</sessioni>\n"))
-        XCTAssertFalse(VoiceRoute.askPrompt.contains("local_*.json"))
-    }
-
-    func testListenerFreshnessAndOverseerId() {
-        let now = Date()
-        XCTAssertFalse(VoiceRoute.listenerIsFresh(modified: nil, now: now))
-        XCTAssertTrue(VoiceRoute.listenerIsFresh(modified: now.addingTimeInterval(-30), now: now))
-        XCTAssertFalse(VoiceRoute.listenerIsFresh(modified: now.addingTimeInterval(-120), now: now))
-        XCTAssertEqual(VoiceRoute.overseerLocalId(Data(#"{"cli":"c","local_id":"local_ab","storia":[]}"#.utf8)), "local_ab")
-        XCTAssertNil(VoiceRoute.overseerLocalId(Data(#"{"cli":"c","local_id":""}"#.utf8)))
-        XCTAssertNil(VoiceRoute.overseerLocalId(Data("garbage".utf8)))
-    }
-
-    func testInboxFilesLiveUnderTheVoiceFolder() {
-        let f = VoiceFiles(home: URL(fileURLWithPath: "/h"))
-        XCTAssertEqual(f.inboxURL.path, "/h/.config/voce/ingresso")
-        XCTAssertEqual(f.inboxListenerURL.path, "/h/.config/voce/ingresso/.ascolta")
-        XCTAssertEqual(f.overseerURL.path, "/h/.claude/overseer/attuale.json")
     }
 
     /// #242: the sentences the local engine heard in the live tests of 22/10, and words that must stay.

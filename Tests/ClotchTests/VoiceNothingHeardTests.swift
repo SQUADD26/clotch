@@ -16,7 +16,7 @@ final class VoiceNothingHeardTests: XCTestCase {
 
     private func controller() -> VoiceInputController {
         let c = VoiceInputController(files: VoiceFiles(home: home))
-        c.ask = { _, _ in .success("Risposta finta") }
+        c.deliver = { _ in .answered("Risposta finta") }
         return c
     }
 

@@ -4,7 +4,7 @@ import XCTest
 @testable import Clotch
 import ClotchCore
 
-/// Black team's pilot (voice in): the real `VoiceInputController` walks paths P1 (question), P2 (order), P3 (error) with a recorded
+/// Black team's pilot (voice in): the real `VoiceInputController` walks path P3 (error) with a recorded
 /// voice (`say -o`, no sound), and writes a diary with the seconds of each step to `$PILOTA_DIR/voce-diario.txt`. It records, it does
 /// not judge: it fails only when it cannot drive the app. Nothing opens on screen, nothing is played, only temporary homes are written.
 /// Skipped without PILOTA_DIR.
@@ -22,73 +22,15 @@ final class PilotVoicePathsTests: XCTestCase {
 
     override func tearDown() async throws {
         homes.forEach { try? FileManager.default.removeItem(at: $0) }
-        OverseerDelivery.onFallback = nil
     }
 
     func testPilotVoicePaths() async throws {
         try? FileManager.default.removeItem(at: diaryURL)
-        try await p1()
-        try await p2(listening: true)
-        try await p2(listening: false)
         try await p3("P3a: solo silenzio, 3 s (motore locale)", engine: "locale", key: .real, speech: nil)
         try await p3("P3b: chiave ElevenLabs rifiutata (motore scribe, chiave finta)", engine: "scribe", key: .fake, speech: "Ciao, questa è una prova")
     }
 
     // MARK: - Paths
-
-    private func p1() async throws {
-        let question = "Quali sessioni stanno lavorando adesso?"
-        let (c, d, files) = try await rig("locale", .real, say: question)
-        let now = Date()
-        VoiceAsk.sessions = { [VoiceRoute.sessionLine(title: "Clotch, voce", status: .processing, lastActivity: now),
-                               VoiceRoute.sessionLine(title: "Friday", status: .idle, lastActivity: now.addingTimeInterval(-600)),
-                               VoiceRoute.sessionLine(title: "Squadd CRM", status: .waitingQuestion, lastActivity: now.addingTimeInterval(-120))] }
-        defer { VoiceAsk.sessions = { [] } }
-        var spoken = false
-        c.speak = { [self] text in
-            d.add("parlatore CHIAMATO con testo: «\(text)»")
-            d.add(await fetchSpeech(text, files))
-            spoken = true
-        }
-        guard try await utter(c, d, say: question) else { return try save(d, "P1: domanda «\(question)»") }
-        let idle = await until(150) { c.phase == .idle }
-        d.add(idle ? "BARRA idle: \(d.since()) s dopo il secondo press" : "BARRA NON idle dopo 150 s, fase \(c.phase)")
-        let late = await until(40) { spoken }
-        if !spoken { d.add(late ? "" : "parlatore MAI chiamato (o ancora in corso) 40 s dopo la barra") }
-        try save(d, "P1: domanda «\(question)» (sessioni finte date a VoiceAsk: 3 righe; `claude -p` FINTO, #270)")
-    }
-
-    private func p2(listening: Bool) async throws {
-        let order = "Chiudi le sessioni vecchie di stasera"
-        let (c, d, files) = try await rig("locale", .real, say: order)
-        var mod: Task<Void, Never>?
-        if listening {
-            try? FileManager.default.createDirectory(at: files.inboxURL, withIntermediateDirectories: true)
-            FileManager.default.createFile(atPath: files.inboxListenerURL.path, contents: Data())
-            mod = Task { @MainActor in  // Clean View's mod: reads the order, deletes it after 1 s
-                var seen = Set<String>()
-                while !Task.isCancelled {
-                    let names = (try? FileManager.default.contentsOfDirectory(atPath: files.inboxURL.path)) ?? []
-                    for n in names where !n.hasPrefix(".") && seen.insert(n).inserted {
-                        let body = (try? String(contentsOf: files.inboxURL.appendingPathComponent(n), encoding: .utf8)) ?? "?"
-                        d.add("INBOX file \(n), contenuto: \(body.trimmingCharacters(in: .whitespacesAndNewlines))")
-                        try? await Task.sleep(nanoseconds: 1_000_000_000)
-                        try? FileManager.default.removeItem(at: files.inboxURL.appendingPathComponent(n))
-                        d.add("mod: file cancellato (= ricevuto)")
-                    }
-                    try? await Task.sleep(nanoseconds: 100_000_000)
-                }
-            }
-        }
-        OverseerDelivery.onFallback = { d.add("RIPIEGO (finto, non eseguito): appunti ← «\($0)»") }
-        defer { mod?.cancel() }
-        guard try await utter(c, d, say: order) else { return try save(d, "P2: ordine") }
-        let idle = await until(60) { c.phase == .idle }
-        d.add(idle ? "BARRA idle: \(d.since()) s dopo il secondo press" : "BARRA NON idle dopo 60 s, fase \(c.phase)")
-        let left = ((try? FileManager.default.contentsOfDirectory(atPath: files.inboxURL.path)) ?? []).filter { !$0.hasPrefix(".") }
-        d.add("file rimasti nell'inbox alla fine: \(left.count)")
-        try save(d, "P2\(listening ? "" : "-senza-ascolta"): ordine «\(order)»" + (listening ? " (.ascolta fresco, il mod cancella dopo 1 s)" : " (nessun .ascolta)"))
-    }
 
     private func p3(_ title: String, engine: String, key: Key, speech: String?) async throws {
         let (c, d, _) = try await rig(engine, key, say: speech)
@@ -151,7 +93,7 @@ final class PilotVoicePathsTests: XCTestCase {
         d.bag = [c.$phase.removeDuplicates().sink { d.add("fase \(Self.describe($0))") },
                           c.$sure.combineLatest(c.$maybe).removeDuplicates { $0 == $1 }.dropFirst().sink { d.add("testo barra: sicuro=«\($0.0)» forse=«\($0.1)»") },
                           c.$hint.compactMap { $0 }.sink { d.add("avviso barra: \($0)") }]
-        c.ask = { q, h in d.add("ASK FINTO (nessun claude lanciato, #270): «\(q)», helper \(h != nil)"); return .success("Risposta finta del pilota.") }
+        c.deliver = { q in d.add("PARLA FINTO (nessun comando scritto, #270): «\(q)»"); return .answered("Risposta finta del pilota.") }
         d.voice = voice
         d.speechEnd = VoiceInputCaptureTests.speechEnd(try text.map { try VoiceInputCaptureTests.recorded($0) } ?? [])
         if engine == "locale" {

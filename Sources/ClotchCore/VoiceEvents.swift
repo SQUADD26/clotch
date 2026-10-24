@@ -40,6 +40,7 @@ public struct VoiceEvent: Equatable, Sendable {
     public var text = ""
     public var proof = ""     // for the eye: never said out loud
     public var level = "normale"  // alto | normale
+    public var speakAfter: Date?  // `parla_dopo` (epoch s, claude-config#2777): never begin before it, so two phrases come out one after the other
     public var judged = false  // `giudizio` already written by claude-config (or by Clotch's judge): not judged again
 
     public init(kind: Kind, at: Date, session: String = "", subject: String = "", text: String = "", proof: String = "", level: String? = nil) {
@@ -89,6 +90,7 @@ public enum VoiceEvents {
         e.localId = s["local_id"] as? String ?? ""
         e.role = s["ruolo"] as? String ?? ""
         e.judged = o["giudizio"] != nil
+        e.speakAfter = (o["parla_dopo"] as? Double).map { Date(timeIntervalSince1970: $0) }
         return e
     }
 
