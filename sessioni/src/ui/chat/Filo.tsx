@@ -36,7 +36,7 @@ function BloccoTurno({ b, chat, vivo, richiesta, da, prova, aperto }: {
     case "risposta": return <Risposta testo={b.testo} inScrittura={b.inScrittura} sessione={chat} prova={prova} />;
     case "interrotta": return <Interrotta />;
     case "errore":
-      if (b.riprova) return <AvvisoFilo tipo="attesa" titolo="Riprovo" corpo={`Tentativo ${b.riprova.n} di ${b.riprova.di}`} />;
+      if (b.riprova) return <AvvisoFilo tipo="attesa" icona="orologio" titolo="Riprovo" corpo={`Tentativo ${Math.min(b.riprova.n, b.riprova.di)} di ${b.riprova.di}${b.riprova.n >= b.riprova.di ? ", l’ultimo" : ""}`} />;
       return /^API Error/.test(b.testo) ? <AvvisoFilo tipo="errore" titolo="Richiesta non riuscita" corpo={b.testo} /> : <AvvisoFilo tipo="errore" titolo={b.testo} />;
     case "bloccato": return <AvvisoFilo tipo="attesa" titolo="Bloccato da una regola" corpo={b.testo} />;
     case "domanda":

@@ -138,3 +138,11 @@ test("rifiuti dell'utente: piano rifiutato col suo perché, comando negato e int
   assert.equal(b[1].tipo === "strumento" && b[1].stato, "chiusa");
   assert.equal(b[1].tipo === "strumento" && b[1].uscita, "Interrotto da te");
 });
+
+test("«Riprovo» resta solo finché non c'è la ripresa", () => {
+  const rip = { tipo: "errore" as const, testo: "", t: 1, riprova: { n: 1, di: 10 } };
+  const aperto = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, rip], true)[1]);
+  assert.deepEqual(aperto.map((x) => x.tipo), ["errore"]);
+  const ripreso = turno(voci([{ tipo: "utente", testo: "x", t: 0 }, rip, { tipo: "assistente", testo: "Rieccomi.", modello: null, t: 2 }], false)[1]);
+  assert.deepEqual(ripreso.map((x) => x.tipo), ["risposta"]);
+});

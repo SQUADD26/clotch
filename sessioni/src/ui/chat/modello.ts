@@ -201,6 +201,12 @@ export function voci(messaggi: Messaggio[], vivo: boolean, cartella = "", identi
     if (bloccato) tu.blocchi.push({ tipo: "bloccato", id: m.id, testo: esito.replace(/<\/?tool_use_error>/g, "").replace(/^PreToolUse:\S*\s*(hook error:\s*)?(\[[^\]]*\]:\s*)?/, "") });
   }
 
+  // «Riprovo» dice che sta riprovando: se dopo è arrivato altro, la ripresa c'è stata e l'avviso va tolto
+  out.forEach((v, k) => {
+    if (v.tipo !== "turno") return;
+    v.blocchi = v.blocchi.filter((b, j) => b.tipo !== "errore" || !b.riprova || (k === out.length - 1 && j === v.blocchi.length - 1));
+  });
+
   // turni finiti: le modifiche diventano un solo «File toccati» prima dell'ultima risposta
   out.forEach((v, k) => {
     if (v.tipo !== "turno" || (vivo && k === out.length - 1)) return;
