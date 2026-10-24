@@ -121,6 +121,8 @@ function ChatSessione() {
         prima={m.haAltre ? (m.totale != null ? m.totale - m.messaggi.length : null) : false}
         altri={() => void m.altri()} altriCarica={m.altriCarica} inFondo={inFondo} prova={sezione}
         inCima={!clotch && s.stato === "lavora" ? <NotaSchermo /> : undefined} />
+      {/* VoiceOver dice quando il turno parte e finisce; key: cambiando sessione non si annuncia lo stato dell'altra */}
+      <span key={s.id} className="solo-lettore" role="status">{muta ? "Non risponde" : c?.richieste.length ? "Richiesta per te" : vivo ? "Al lavoro" : "Turno finito"}</span>
       {casella}
       <Trova iniziale={provaDi(sezione, "trova")} />
     </>
