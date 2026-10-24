@@ -2,7 +2,7 @@ import AppKit
 import CoreGraphics
 import ClotchCore
 
-/// Voce fidata (#1120): «Ho sentito» the moment he stops, the voice checked against his print, the touch for what cannot be taken back.
+/// Voce fidata (#1120): «Ho sentito» the moment he stops, the voice checked against his print.
 extension VoiceInputController {
     /// The Mac is on the lock screen or the screen saver asks for a password.
     static var macLocked: Bool {
@@ -31,21 +31,6 @@ extension VoiceInputController {
         }
         return heard
     }
-
-    /// The order waits for a tap on the notch (the phone's tap, claude-config#2775, arrives the same way): true = confirmed.
-    func waitForTouch(run me: Int) async -> Bool {
-        awaitingTouch = true
-        defer { awaitingTouch = false }
-        for _ in 0..<(Int(Self.touchSeconds) * 10) {
-            if touched { touched = false; return true }
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            guard me == run, phase == .sending else { return false }
-        }
-        return false
-    }
-
-    /// The tap on «Conferma».
-    func confirmTouch() { if awaitingTouch { touched = true } }
 
     private func play(_ name: String) { (soundPlayer ?? { NSSound(named: $0)?.play() })(name) }
 }

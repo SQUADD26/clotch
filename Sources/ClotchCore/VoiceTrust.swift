@@ -40,19 +40,18 @@ public enum VoiceTrust {
     /// An order is taken only with all three: dictation started from the notch's key (never by a program), Mac unlocked, voice «yes».
     public static func accepted(fromKey: Bool, unlocked: Bool, verdict: Verdict) -> Bool { fromKey && unlocked && verdict == .yes }
 
-    /// Irreversible, money, production, messages to others: these wait for a touch. Anything else goes on its way.
-    /// In doubt it asks: a touch costs a second, a wrong send does not come back.
+    /// Irreversible, money, production, messages to others: the engine asks Roberto to confirm by voice (his print) or in Friday's chat. No tap (his words, 24/10).
     private static let risky = try! NSRegularExpression(pattern:
         #"\b(elimin\w*|cancell\w*|rimuov\w*|butta\w*|distrugg\w*|formatt\w*|svuota\w*|paga\w*|pagament\w*|bonific\w*|rimbors\w*|compra\w*|acquist\w*|fattur\w*|produzione|deploy\w*|pubblic\w*|promuov\w*|promozione|merge\w*|push\w*|force|manda\w*|invia\w*|scrivi a|rispondi a|mail|email|messaggio a|whatsapp|sms)\b"#)
-    public static func needsTouch(_ text: String) -> Bool {
+    public static func isRisky(_ text: String) -> Bool {
         let t = text.lowercased()
         return risky.firstMatch(in: t, range: NSRange(t.startIndex..., in: t)) != nil
     }
 
     /// What goes to the engine with the sentence (field `voce` of `parla`, claude-config#2771): the verdict and the distance, nothing of the print.
-    public static func payload(verdict: Verdict, distance: Float, fromKey: Bool, unlocked: Bool, touch: Bool) -> [String: Any] {
+    public static func payload(verdict: Verdict, distance: Float, fromKey: Bool, unlocked: Bool, risky: Bool) -> [String: Any] {
         ["esito": verdict.rawValue, "distanza": distance.isFinite ? (Double(distance) * 1000).rounded() / 1000 : -1,
-         "tasto": fromKey, "sbloccato": unlocked, "tocco": touch]
+         "tasto": fromKey, "sbloccato": unlocked, "rischiosa": risky]
     }
 
     // MARK: - The print on disk

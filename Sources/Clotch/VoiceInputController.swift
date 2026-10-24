@@ -104,9 +104,6 @@ final class VoiceInputController: ObservableObject {
     var heardAfter = 0.0
     /// The dictation started from the notch's key (or its button); never set by anything else.
     var fromKey = false
-    @Published var awaitingTouch = false
-    var touched = false
-    static let touchSeconds = 30.0
 
     init(files: VoiceFiles = VoiceFiles()) { self.files = files }
 
@@ -291,12 +288,9 @@ final class VoiceInputController: ObservableObject {
         }
         sendingSince = Date()
         phase = .sending
-        let touch = VoiceTrust.needsTouch(said)  // money, production, messages to others, what cannot be undone: a tap first
-        if touch {
-            guard await waitForTouch(run: me) else { if me == run { show("Non confermato. Non ho fatto niente.") }; return }
-        } else {
-            try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
-        }
+        // Money, production, messages to others, deletions: Roberto's recognised voice is the yes; the engine asks him aloud or in Friday's chat (`rischiosa`).
+        let risky = VoiceTrust.isRisky(said)
+        try? await Task.sleep(nanoseconds: UInt64(Self.cancelSeconds * 1e9))
         guard me == run, phase == .sending else { return }  // «Annulla» or Esc moved the run on
         disarmEscape()
         if let helper {
@@ -314,7 +308,7 @@ final class VoiceInputController: ObservableObject {
             // shortcut: a helper that acted and then timed out sends the order twice; the inbox keeps an order from being lost
             Self.log.notice("order: helper failed, inbox as before")
         }
-        let outcome = await OverseerDelivery.send(said, files: files, voice: VoiceTrust.payload(verdict: heard.verdict, distance: heard.distance, fromKey: fromKey, unlocked: unlocked(), touch: touch))
+        let outcome = await OverseerDelivery.send(said, files: files, voice: VoiceTrust.payload(verdict: heard.verdict, distance: heard.distance, fromKey: fromKey, unlocked: unlocked(), risky: risky))
         guard me == run else { return }
         Self.log.notice("order: \(String(describing: outcome), privacy: .public)")
         show(Self.sentence(outcome))
@@ -379,7 +373,6 @@ final class VoiceInputController: ObservableObject {
         hint = nil
         (listened, peak) = (0, 0)
         samples.clear()
-        touched = false
         levels = [Double](repeating: 0, count: levels.count)
     }
 
