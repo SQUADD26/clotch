@@ -23,8 +23,9 @@ export function voci(tokens) {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
         const p = [...via, k];
+        // Figma salva i numeri in float32 (0.215 -> 0.2150000035762787): 4 decimali bastano.
         // le variabili d'opacità (gruppo «opacita», ambito OPACITY) in Figma sono percentuali: nel CSS 40 -> 0.4
-        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: p[0] === 'opacita' && typeof f.$value === 'number' ? f.$value / 100 : f.$value });
+        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: typeof f.$value !== 'number' ? f.$value : +(p[0] === 'opacita' ? f.$value / 100 : f.$value).toFixed(4) });
         giu(f, p);
       }
     };
