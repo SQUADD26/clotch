@@ -9,6 +9,9 @@ const giro = (a, evento = 95) => ({ evento, T: a[0].serie.map((s) => s[0]), anim
 const criteri = (d) => d.map((x) => x.criterio).sort();
 
 test('token e curva viva: nessun difetto', () => assert.deepEqual(difettiMovimento(giro([anim({ serie: serie(200, (p) => 1 - (1 - p) ** 3) })])), []));
+test('una curva simmetrica non è lineare (#998)', () =>
+  assert.deepEqual(criteri(difettiMovimento(giro([anim({ durata: 300, curva: 'cubic-bezier(0.645, 0.045, 0.355, 1)', serie: serie(300, (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2)) })], 0))), ['M2', 'M5']));
+
 test('durata fuori token, lineare, parte tardi', () =>
   assert.deepEqual(criteri(difettiMovimento(giro([anim({ durata: 300, curva: 'linear', serie: serie(300, (p) => p) })], 0))), ['M2', 'M3', 'M5']));
 test('proprietà di layout', () => assert.deepEqual(criteri(difettiMovimento(giro([anim({ proprieta: ['height'], serie: serie(200, (p) => 1 - (1 - p) ** 3) })]))), ['MLAYOUT']));
