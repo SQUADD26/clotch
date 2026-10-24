@@ -23,6 +23,7 @@ import { RigaCartella, RigaComando, RigaSessione, TitoloSezione } from "./Righe"
 import { SceltaIcona } from "./SceltaIcona";
 import { APezzi } from "./APezzi";
 import { accanto } from "./Sovrapposti";
+import { archivia } from "./esiti";
 import { Sovrapposto, type Ancora, type Punto } from "../base/Sovrapposto";
 import { conTransizione } from "../base/movimento";
 
@@ -32,7 +33,8 @@ export type Aperto =
   | { tipo: "cartella"; chiave: string; a: Ancora } | { tipo: "profilo"; a: Ancora };
 
 const sagome = (caricamento.nodi as { nome: string; box: { w: number } }[]).filter((n) => n.nome === "sagoma").map((n) => n.box.w);
-const punto = (e: MouseEvent): Punto => ({ x: e.clientX, y: e.clientY });
+/** Clic destro: sul puntatore. Clic sul «⋯» o tasto dei menu (senza puntatore, `detail` 0): sotto il bottone o la riga (#718). */
+const dove = (e: MouseEvent): Ancora => e.type === "contextmenu" && (e.detail > 0 || e.clientX || e.clientY) ? { x: e.clientX, y: e.clientY } : e.currentTarget as Element;
 
 // Lo stato di elenco sopravvive allo smontaggio della Barra (impostazioni, barra laterale chiusa).
 const conservato = { vista: { filtri: [], raggruppa: "cartella", ordina: "attivita" } as Vista, chiuse: new Set<string>(), aperteAMano: new Set<string>() };
@@ -80,7 +82,7 @@ export default function Barra() {
 
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {
-      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void window.clotchAi.comando("archivia", { chat: n.sessione }); }
+      if (e.metaKey && e.shiftKey && e.key.toLowerCase() === "a" && n.sessione) { e.preventDefault(); void archivia([n.sessione]); }
       if (e.metaKey && e.shiftKey && e.code === "Semicolon" && n.sessione) { e.preventDefault(); void copiaUltimoBlocco(n.sessione); }
     };
     addEventListener("keydown", tasto);
@@ -130,7 +132,7 @@ export default function Barra() {
       onApri={() => { vivi.current.apriSessione(s.id); if (vivi.current.pref[s.id]?.nonLetta) void api().impostaPreferenze(s.id, { nonLetta: null }); }}
       onIcona={(e) => setAperto({ tipo: "icona", id: s.id, a: accanto(e.currentTarget, numero("spazio-1")) })}
       onFissa={() => void api().impostaPreferenze(s.id, { fissa: vivi.current.pref[s.id]?.fissa ? null : true })}
-      onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "riga", id: s.id, a: punto(e) }); }}
+      onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "riga", id: s.id, a: dove(e) }); }}
       onTroncato={suTroncato}
     />
   ));
@@ -180,7 +182,7 @@ export default function Barra() {
           <APezzi n={barra.gruppi.length} subito={!!p} figli={(q) => barra.gruppi.slice(0, q).map((g) => vista.raggruppa === "cartella" ? (
             <div key={g.chiave} className="gruppo">
               <RigaCartella nome={etichetta(g)} conteggio={g.sessioni.length} aperta={!!aperta(g.chiave)} onClick={() => vivi.current.alterna(g.chiave)}
-                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: punto(e) }); }} onTroncato={suTroncato} />
+                onMenu={(e) => { e.preventDefault(); setAperto({ tipo: "cartella", chiave: g.chiave, a: dove(e) }); }} onTroncato={suTroncato} />
               {aperta(g.chiave) && <div className="sessioni-gruppo"><APezzi n={g.sessioni.length} subito={!!p} figli={(k) => righe(g.sessioni).slice(0, k)} /></div>}
             </div>
           ) : (
