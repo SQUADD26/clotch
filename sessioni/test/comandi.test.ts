@@ -23,7 +23,7 @@ function clotchAiFinta(h: string, esito: string | null, aPezzi = false) {
     fs.mkdirSync(path.dirname(mese(h)), { recursive: true });
     fs.appendFileSync(mese(h), riga("comando", c));
     if (!esito) return;
-    const r = riga("comando_fatto", { comando: c.id, esito, testo: "fatto così", pr: 2402, non_fermate: ["chat-1"] });
+    const r = riga("comando_fatto", { comando: c.id, esito, testo: "fatto così", pr: 2402, non_fermate: ["chat-1"], sessione: "abcd1234", macchina: "mac" });
     if (!aPezzi) return fs.appendFileSync(mese(h), r);
     fs.appendFileSync(mese(h), r.slice(0, 20)); // riga a metà: non va letta finché non è chiusa
     setTimeout(() => fs.appendFileSync(mese(h), r.slice(20)), 60);
@@ -36,7 +36,7 @@ test("comandi: scrive .tmp poi rename nella forma del contratto e legge il suo c
   fs.writeFileSync(mese(h), riga("comando_fatto", { comando: "c-vecchio", esito: "ok", testo: "" })); // righe di prima: ignorate
   clotchAiFinta(h, "ok", true);
   const e = await inviaComando(h, "non_disturbare", { acceso: true, minuti: 60 }, { ogniMs: 20, scadenzaMs: 3000 });
-  assert.deepEqual(e, { id: e.id, esito: "ok", testo: "fatto così", pr: 2402, nonFermate: ["chat-1"] });
+  assert.deepEqual(e, { id: e.id, esito: "ok", testo: "fatto così", pr: 2402, nonFermate: ["chat-1"], sessione: "abcd1234", macchina: "mac" });
   const [nome] = fs.readdirSync(path.join(casella(h), "fatti"));
   assert.match(nome, new RegExp(`^\\d+-${e.id}\\.json$`));
   const c = JSON.parse(fs.readFileSync(path.join(casella(h), "fatti", nome), "utf8"));
