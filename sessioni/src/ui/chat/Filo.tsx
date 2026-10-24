@@ -1,6 +1,6 @@
 // figma: 101-8036 — «Filo» della sessione aperta: messaggi di Roberto, turni coi loro blocchi, «Carica precedenti» (101:9628),
 // fine turno (101:15335), richieste vive di clotch AI (101:13650, 13896, 14132) e avvisi in fondo (101:15790, 15993, 16211).
-import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { ChatClotchAi } from "../../clotch-ai";
 import { Bottone } from "../base/Bottone";
 import { Icona } from "../base/Icona";
@@ -84,6 +84,14 @@ export function Filo({ voci, chat, vivo, finita, c, da, prima, altri, altriCaric
     else if (arrivate > 0) setNuovi((n) => n + arrivate);
     letto.current = { righe, prima };
   });
+  // la casella cresce (un allegato, più righe di testo) e il filo si stringe: chi era in fondo resta in fondo (148:46383)
+  useEffect(() => {
+    const f = filo.current;
+    if (!f) return;
+    const o = new ResizeObserver(() => { if (inFondoDel()) f.scrollTop = f.scrollHeight - f.clientHeight - daFondo.current; });
+    o.observe(f);
+    return () => o.disconnect();
+  }, []);
   const scorri = () => {
     const f = filo.current;
     if (!f) return;

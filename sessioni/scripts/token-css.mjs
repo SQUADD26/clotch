@@ -23,7 +23,7 @@ export function voci(tokens) {
       for (const [k, f] of Object.entries(nodo)) {
         if (k.startsWith('$') || !f || typeof f !== 'object') continue;
         const p = [...via, k];
-        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: f.$value });
+        if ('$value' in f) out.set(p.join('-').replace(/\./g, '_'), { tipo: f.$type, valore: f.$type === 'number' && p[0] === 'misura' && p[1].startsWith('allegato-') ? `${f.$value}px` : f.$value }); // le misure `allegato-*` in Figma non hanno l'ambito «larghezza e altezza»: escono come numero, in CSS sono px (da sistemare nel file Figma, poi la riga si toglie)
         giu(f, p);
       }
     };

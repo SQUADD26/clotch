@@ -209,6 +209,10 @@ export interface CasellaApi {
   descrivi(percorsi: string[]): Promise<FileAllegato[]>;
   /** Il percorso di un file trascinato nella finestra; "" se non sta sul disco. */
   percorso(file: File): string;
+  /** Copia i file in «~/.claude/casella/allegati» (il motore accetta solo lì) e li descrive col nome di prima; un file oltre il limite resta dov'è. */
+  copia(percorsi: string[]): Promise<FileAllegato[]>;
+  /** Un'immagine incollata: il Mac la salva in «~/.claude/casella/allegati» e la descrive; null se non si salva. */
+  incolla(mime: string, byte: Uint8Array): Promise<FileAllegato | null>;
   /** L'immagine come indirizzo `data:`; null se non si legge. Con `sessione` e `rif`: dalla trascrizione; con `percorso`: dal disco. */
   immagine(da: DaImmagine): Promise<string | null>;
   copiaImmagine(da: DaImmagine): Promise<boolean>;

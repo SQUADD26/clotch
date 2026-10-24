@@ -28,8 +28,9 @@ function nuova(testo: string, modifica: VoceCoda | null) {
       aggiorna();
     },
     esci: () => { attiva = null; aggiorna(); },
-    inizia: () => {
-      if (invio || !stato.testo.trim()) return null;
+    // `conAllegati`: un messaggio con solo file o immagini, senza testo, parte lo stesso
+    inizia: (conAllegati = false) => {
+      if (invio || (!stato.testo.trim() && !conAllegati)) return null;
       const chiave = attiva, bozza = voci.get(chiave);
       const richiesta = { ...stato };
       invio = true;

@@ -184,9 +184,9 @@ FRAME["101-10297"] = () => ricerca("lettura");
 FRAME["101-23003"] = () => ricerca("copia");
 FRAME["101-23248"] = () => ricerca("kubernetes");
 // allegati e immagini nel filo (#437): la barra di «Sessione aperta», come 101-8036
-for (const id of ["101-25845", "101-27294", "101-28041", "101-28232"]) FRAME[id] = () => base();
+for (const id of ["101-25845", "101-28041", "101-28232", "148-46383", "148-47483", "148-49251", "148-45727"]) FRAME[id] = () => base();
 // dialoghi, avvisi, casella e domande di clotch AI: la barra è quella della sessione aperta
-for (const id of ["101-22044", "101-24007", "101-25542", "101-28289", "101-48405"]) FRAME[id] = () => base();
+for (const id of ["101-22044", "101-24007", "101-28289", "101-48405"]) FRAME[id] = () => base();
 // domanda per te (101:47850 con Clotch, 101:47883 senza): «Sessioni: app Electron» aspetta ed è la sessione aperta
 const DOMANDA = (f: Parameters<typeof registro>[0]) => () => {
   const b = base(), x = b.elenco.dati!.sessioni[1];

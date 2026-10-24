@@ -94,6 +94,8 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
     }
     case "casella:skill": return (s.skill ?? []).map((nome) => ({ nome }));
     case "casella:scegli": return [];
+    case "casella:copia": return (s.allegati ?? []).filter((a) => (args[0] as string[]).includes(a.percorso));
+    case "casella:incolla": return null;
     case "casella:copia-immagine": case "casella:salva-immagine": return false;
     // registro vuoto più i campi della scena: una scena scrive solo quello che il frame mostra
     case "clotch-ai:registro": return s.registroLento ? new Promise(() => {}) : conOra({ ...piano(leggiRegistro(path.join(path.sep, "nessuna-home"))), ...(s.registro as object) });
@@ -108,7 +110,7 @@ export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:prefere
   "impostazioni:apri", "impostazioni:versione", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
-  "casella:scegli", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
+  "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:skill"];
 
 export function collegaScena(ipc: IpcMain, s: Scena) {
   for (const c of CANALI) ipc.handle(c, (_e, ...args) => rispostaScena(s, c, args));

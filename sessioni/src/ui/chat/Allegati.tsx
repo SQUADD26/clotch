@@ -1,5 +1,6 @@
-// figma: 101-28041 — «chip allegato», «allegati messaggio» e «miniatura» nel filo; 101-25542 i chip nella casella (con la X per toglierli)
-import { createContext, useContext, useEffect, useState } from "react";
+// figma: 148-46383 — «Allegato nella casella» 148:43692, «Rimuovi allegato» 148:43627, «Spazio per rilascio» 148:43696 (una immagine 148:46383, tanti 148:47483, troppo grande 148:49251, trascinamento 148:45727)
+// figma: 101-28041 — «chip allegato», «allegati messaggio» e «miniatura» nel filo
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { DaImmagine, FileAllegato, RifImmagine } from "../../tipi";
 import { Icona } from "../base/Icona";
 import { casella, chiaveImmagine, eImmagine, nomeFile, peso, statoAllegato } from "./percorsi";
@@ -36,25 +37,68 @@ export function useImmagine(da: DaImmagine | null) {
   return url;
 }
 
-/** Un file della casella: `carico` finché non se ne conosce il peso (101:25542 «Carico…»). */
-export type AllegatoCasella = FileAllegato & { carico?: boolean };
-type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string; carico?: boolean };
+type Chip = Pick<FileAllegato, "nome" | "tipo" | "byte"> & { dettaglio?: string };
 
-export function ChipAllegato({ a, onApri, onRimuovi }: { a: Chip; onApri?(): void; onRimuovi?(): void }) {
-  const stato = statoAllegato(a);
+/** Il chip di un allegato nel filo (101:28041); nella casella ci sono le miniature, `Allegato`. */
+export function ChipAllegato({ a, onApri }: { a: Chip; onApri?(): void }) {
   const corpo = (
     <>
-      {stato === "carico" ? <Icona nome="spinner" gira /> : stato === "grande" ? <Icona nome="avviso" colore="errore" />
-        : <Icona nome={a.tipo === "cartella" ? "cartella" : a.tipo === "immagine" ? "immagine" : "file"} />}
+      <Icona nome={a.tipo === "cartella" ? "cartella" : a.tipo === "immagine" ? "immagine" : "file"} />
       <span className="testi"><span className="nome">{a.nome}</span>
-        <span className="dettaglio">{stato === "carico" ? "Carico…" : stato === "grande" ? "Troppo grande" : a.dettaglio ?? (a.tipo === "cartella" ? "Cartella" : peso(a.byte))}</span></span>
+        <span className="dettaglio">{a.dettaglio ?? (a.tipo === "cartella" ? "Cartella" : peso(a.byte))}</span></span>
     </>
   );
   return (
     <span className="chip-allegato">
       {onApri ? <button type="button" className="apri" onClick={onApri} aria-label={`Apri ${a.nome}`}>{corpo}</button> : <span className="apri">{corpo}</span>}
-      {onRimuovi && <button type="button" className="rimuovi" onClick={onRimuovi} aria-label={`Rimuovi ${a.nome}`}><Icona nome="chiudi" colore="terziaria" /></button>}
     </span>
+  );
+}
+
+/** Un file della casella: `carico` finché non se ne conosce il peso. */
+export type AllegatoCasella = FileAllegato & { carico?: boolean };
+
+const sigla = (nome: string) => /\.([^.]+)$/.exec(nome)?.[1].toUpperCase();
+const dettaglioFile = (a: AllegatoCasella) => (a.carico ? "Carico…" : statoAllegato(a) === "grande" ? "Troppo grande"
+  : a.tipo === "cartella" ? "Cartella" : [sigla(a.nome), peso(a.byte)].filter(Boolean).join(" · "));
+
+/** La miniatura di un allegato, sopra il testo della casella (148:43692 «Allegato nella casella»): immagine quadrata o riquadro col nome. */
+export function Allegato({ a, onRimuovi }: { a: AllegatoCasella; onRimuovi(): void }) {
+  const grande = statoAllegato(a) === "grande";
+  const foto = a.tipo === "immagine" && !grande;
+  const url = useImmagine(foto && !a.carico ? { percorso: a.percorso } : null);
+  const stato = grande || (foto && url === null) ? "errore" : a.carico || (foto && url === undefined) ? "carico" : "";
+  return (
+    <div className={`allegato ${foto ? "immagine" : "file"} ${stato}`} title={a.nome}>
+      {foto ? (stato === "errore"
+        ? <><Icona nome="avviso" colore="errore" /><span className="dettaglio">Non letta</span></>
+        : url ? <img src={url} alt={a.nome} /> : null) : (
+        <>
+          <div className="testa-allegato">
+            {stato === "carico" ? <span className="sagoma" /> : <Icona nome={grande ? "avviso" : a.tipo === "cartella" ? "cartella" : "file"} colore={grande ? "errore" : "secondaria"} />}
+            <span className="nome">{a.nome}</span>
+          </div>
+          <span className="dettaglio">{dettaglioFile(a)}</span>
+        </>
+      )}
+      <button type="button" className="rimuovi-allegato" onClick={onRimuovi} aria-label={`Rimuovi ${a.nome}`}><Icona nome="chiudi" /></button>
+    </div>
+  );
+}
+
+/** La riga unica sopra il testo: scorre di lato, la casella non cresce. `rilascio`: file trascinati sulla finestra (148:45727). */
+export function AllegatiCasella({ allegati, rilascio, onRimuovi }: { allegati: AllegatoCasella[]; rilascio: boolean; onRimuovi(a: AllegatoCasella): void }) {
+  const riga = useRef<HTMLDivElement>(null);
+  const prima = useRef(allegati.length);
+  useEffect(() => { // l'ultimo arrivato si vede
+    if (allegati.length > prima.current) riga.current?.scrollTo({ left: riga.current.scrollWidth });
+    prima.current = allegati.length;
+  }, [allegati.length]);
+  return (
+    <div className="allegati-casella" ref={riga}>
+      {allegati.map((a) => <Allegato key={a.percorso} a={a} onRimuovi={() => onRimuovi(a)} />)}
+      {rilascio && <div className="zona-rilascio"><Icona nome="graffetta" colore="accento" /><span>Rilascia per allegare</span></div>}
+    </div>
   );
 }
 
@@ -111,10 +155,16 @@ function Miniatura({ da, nome, onApri }: { da: DaImmagine; nome: string; onApri(
   );
 }
 
-/** Stato di una scena di prova (101:25542): un file, un'immagine, uno che si sta leggendo e uno oltre il limite. */
-export const ALLEGATI_PROVA: AllegatoCasella[] = [
-  { percorso: "/Users/privato/Desktop/lettore.ts", nome: "lettore.ts", tipo: "file", byte: 4_000 },
-  { percorso: "/Users/privato/Desktop/schermata-notch.png", nome: "schermata-notch.png", tipo: "immagine", byte: 312_000 },
-  { percorso: "/Users/privato/Desktop/registro.log", nome: "registro.log", tipo: "file", byte: null, carico: true },
-  { percorso: "/Users/privato/Desktop/prova.mov", nome: "prova.mov", tipo: "file", byte: 480_000_000 },
-];
+const D = "/Users/privato/Desktop";
+const f = (nome: string, tipo: FileAllegato["tipo"], byte: number | null, carico?: boolean): AllegatoCasella => ({ percorso: `${D}/${nome}`, nome, tipo, byte, ...(carico ? { carico } : {}) });
+const notch = f("schermata-notch.png", "immagine", 312_000), lettore = f("lettore.ts", "file", 4_000);
+/** Stati delle scene di prova, per la chiave di `allegati:<chiave>`: una immagine 148:46383, tanti 148:47483, troppo grande 148:49251, trascinamento 148:45727;
+ *  senza chiave: un file, un'immagine, uno che si sta leggendo e uno oltre il limite. */
+export const ALLEGATI_PROVA: Record<string, AllegatoCasella[]> = {
+  "": [lettore, notch, f("registro.log", "file", null, true), f("prova.mov", "file", 480_000_000)],
+  "una-immagine": [notch],
+  tanti: [notch, lettore, f("moduli.png", "immagine", 90_000), f("piano-lavori.pdf", "file", 2_400_000), f("clienti.csv", "file", 81_000),
+    f("cantiere.png", "immagine", 150_000), f("registro.log", "file", 3_000)],
+  "troppo-grande": [notch, lettore, f("prova.mov", "file", 480_000_000)],
+  trascinamento: [notch, lettore],
+};

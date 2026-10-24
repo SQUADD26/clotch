@@ -173,13 +173,16 @@ app.whenReady().then(async () => {
     assert.equal(await run(() => getComputedStyle(document.querySelector('.velo')).paddingBottom), '0px');
   });
 
-  await check('CHIP: «Carico…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
+  await check('MINIATURE: «Carico…» e «Troppo grande» nella casella; con un file in lettura il messaggio non parte', async () => {
     await carica({ vista: 'sessione', sessione: 'a', sezione: 'scritta:Guarda questi|allegati' });
-    await wait(() => document.querySelectorAll('.chip-allegato').length === 4);
-    assert.deepEqual(await run(() => [...document.querySelectorAll('.chip-allegato .dettaglio')].map((e) => e.textContent)), ['4 KB', '312 KB', 'Carico…', 'Troppo grande']);
+    await wait(() => document.querySelectorAll('.allegato').length === 4);
+    assert.deepEqual(await run(() => [...document.querySelectorAll('.allegato .dettaglio')].map((e) => e.textContent)), ['TS · 4 KB', 'Non letta', 'Carico…', 'Troppo grande']);
     assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), true);
     await run(() => document.querySelector('button[aria-label="Rimuovi registro.log"]').click());
-    await wait(() => document.querySelectorAll('.chip-allegato').length === 3);
+    await wait(() => document.querySelectorAll('.allegato').length === 3);
+    assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), true, 'prova.mov è oltre il limite');
+    await run(() => document.querySelector('button[aria-label="Rimuovi prova.mov"]').click());
+    await wait(() => document.querySelectorAll('.allegato').length === 2);
     assert.equal(await run(() => document.querySelector('.bottone-invia').disabled), false);
   });
 
