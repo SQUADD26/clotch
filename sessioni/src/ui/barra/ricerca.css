@@ -8,6 +8,8 @@
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-2xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
 }
+/* il campo resta alto come nel disegno anche quando la lista scorre (#935) */
+.pezzo-barra .finestra-ricerca > .campo { flex: none; }
 .pezzo-barra .finestra-ricerca .risultati { padding: var(--spazio-2); gap: var(--spazio-0-5); display: flex; flex-direction: column; overflow-y: auto; }
 .pezzo-barra .finestra-ricerca .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
 .pezzo-barra .voce-azione {
