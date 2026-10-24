@@ -52,11 +52,13 @@ function lungo(x, chiave) {
 
 // Barra ricca (#1081): 21 righe in 5 cartelle, con e senza cartella e idApp, una fissata, una non letta, tutti gli stati;
 // così i menu della riga e della cartella hanno ogni voce accesa e «Archivia tutte» ha più righe.
-const PROGETTI = ['clotch', 'squadd-v2', 'dentalspace', 'claude-config', 'rise'], STATI = ['lavora', 'aspetta', 'ferma', 'finita'];
+// CLOTCH_BETA_VOLUME=1: 30 cartelle e 90 sessioni, come i dati veri di Roberto (#1144)
+const VOLUME = !!process.env.CLOTCH_BETA_VOLUME;
+const PROGETTI = VOLUME ? ['clotch', 'squadd-v2', 'dentalspace', 'claude-config', 'rise', ...Array.from({ length: 25 }, (_, k) => `progetto-${k + 1}`)] : ['clotch', 'squadd-v2', 'dentalspace', 'claude-config', 'rise'], STATI = ['lavora', 'aspetta', 'ferma', 'finita'];
 function ricca(s) {
   const base = s.elenco.sessioni[0], ora = Date.now();
-  const altre = Array.from({ length: 20 }, (_, k) => ({ ...base, id: `b${k + 1}`, titolo: `Sessione di prova ${k + 1} di ${PROGETTI[k % 5]}`, progetto: PROGETTI[k % 5],
-    cartella: k % 3 ? `/Users/roberto/progetti/${PROGETTI[k % 5]}` : '', idApp: k % 2 ? `local_prova${k}` : null, stato: STATI[k % 4], ultimaAttivita: ora - (k + 1) * 7 * 60_000, obiettivo: null, situazione: null }));
+  const altre = Array.from({ length: VOLUME ? 90 : 20 }, (_, k) => ({ ...base, id: `b${k + 1}`, titolo: `Sessione di prova ${k + 1} di ${PROGETTI[k % PROGETTI.length]}`, progetto: PROGETTI[k % PROGETTI.length],
+    cartella: k % 3 ? `/Users/roberto/progetti/${PROGETTI[k % PROGETTI.length]}` : '', idApp: k % 2 ? `local_prova${k}` : null, stato: STATI[k % 4], ultimaAttivita: ora - (k + 1) * 7 * 60_000, obiettivo: null, situazione: null }));
   return { ...s, elenco: { ...s.elenco, sessioni: [{ ...base, cartella: base.cartella || '/Users/roberto/progetti/clotch', idApp: base.idApp ?? 'local_prova0' }, ...altre] },
     preferenze: { ...s.preferenze, b1: { ...s.preferenze?.b1, fissa: true }, b2: { ...s.preferenze?.b2, nonLetta: true } } };
 }

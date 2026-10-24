@@ -1,5 +1,6 @@
 // figma: 101-38901 — righe di clotch AI nella barra: «Riga clotch AI» (Attiva 101:7728,
 // In pausa 101:38901, Spenta 101:42004), voci Casella, Decisioni, Regole (101:42004), sotto la banda «Non disturbare» (101:39071). Dati: registro di clotch AI (src/ui/clotch-ai).
+import { useState } from "react";
 import type { Registro } from "../../clotch-ai";
 import { useRegistro as useRegistroUnico } from "../clotch-ai/dati";
 import { comanda } from "../chat/clotch-ai";
@@ -26,12 +27,15 @@ export function useRegistro(): Registro | null {
 }
 
 export function NonDisturbare({ nd }: { nd: NonNullable<Registro["nonDisturbare"]> }) {
+  const [tolto, setTolto] = useState(false);
+  if (tolto) return null; // il clic risponde subito (#1144): il motore scrive il registro dopo; se rifiuta, la banda torna e l'avviso dice perché
+  const togli = () => { setTolto(true); void comanda("non_disturbare", { acceso: false }).then((ok) => { if (!ok) setTolto(false); }); };
   return (
     <div className="banda" role="status">
       <div className="riga-banda">
         <Icona nome="luna" colore="accento" />
         <span className="titolo t-sm medio">{nd.fino === null ? "Non disturbare" : `Non disturbare fino alle ${orario(nd.fino)}`}</span>
-        <button type="button" className="t-sm medio" onClick={() => void comanda("non_disturbare", { acceso: false })}>Togli</button>
+        <button type="button" className="t-sm medio" onClick={togli}>Togli</button>
       </div>
       <span className="dettaglio t-xs secondario">{nd.tenuti} avvisi tenuti per dopo</span>
     </div>
