@@ -12,7 +12,8 @@ const tokens = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.ur
 const ACCENTI = ['', '-blu', '-verde', '-viola', '-argento']; // Colore principale (aspetto.css)
 
 const rgba = (h) => { const x = h.replace('#', ''); return [0, 2, 4, 6].map((i) => (i < x.length ? parseInt(x.slice(i, i + 2), 16) : 255)).map((v, i) => (i === 3 ? v / 255 : v)); };
-const sopra = (c, sotto) => c.slice(0, 3).map((v, i) => v * c[3] + sotto[i] * (1 - c[3])).concat(1);
+// lo schermo compone in 8 bit: il fondo composto si arrotonda come lo disegna il motore
+const sopra = (c, sotto) => c.slice(0, 3).map((v, i) => Math.round(v * c[3] + sotto[i] * (1 - c[3]))).concat(1);
 const lum = (c) => { const [r, g, b] = c.slice(0, 3).map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 export const rapporto = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 
