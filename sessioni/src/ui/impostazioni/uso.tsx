@@ -43,7 +43,7 @@ function Panoramica({ quote }: { quote: QuotaUso[] }) {
 
 function Andamento({ quote }: { quote: QuotaUso[] }) {
   const giorni = quote[0]?.giorni ?? [];
-  if (!giorni.length) return <Gruppo><VuotoLista titolo="Nessun dato per l’andamento" corpo="L’uso al giorno non è ancora disponibile." /></Gruppo>;
+  if (!giorni.length) return <Gruppo><VuotoLista titolo="Nessun uso registrato" corpo="L’andamento compare quando un account lavora in una sessione." /></Gruppo>;
   const totale = giorni.map((_, i) => quote.reduce((s, q) => s + (q.giorni?.[i]?.v ?? 0), 0));
   const massimo = Math.max(...totale, 1);
   return (

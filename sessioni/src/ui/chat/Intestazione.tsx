@@ -28,14 +28,14 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
       <div className="testi">
         <div className="riga-titolo">
           <IconaSessione icona={pref?.icona} colore={pref?.colore} />
-          <span className="titolo">{s.titolo}</span>
+          <span className="titolo">{s.titolo || "Senza titolo"}</span>
         </div>
         <div className="dati">
           <span className="stato"><SegnoStato stato={stato} />{STATO[stato]}</span>
           {dati.map((d, i) => d && (
             <span key={i} className="dato">
               <span className="separatore">·</span>
-              {i === 1 ? <span className="ramo"><Icona nome="ramo" /><span className="codice">{d}</span></span> : d}
+              {i === 1 ? <span className="ramo"><Icona nome="ramo" /><span className="codice">{d}</span></span> : <span className="testo-dato">{d}</span>}
             </span>
           ))}
         </div>
@@ -45,7 +45,7 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
         {/* «menu sessione» sotto il «…» (101:20859): le stesse voci della riga nella barra */}
         <div className="con-menu">
           <BottoneIcona icona="altro" etichetta="Altro" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((x) => !x)} />
-          {menu && <Menu voci={vociMenuSessione(s, pref)} onChiudi={() => setMenu(false)} style={{ right: 0, top: "calc(100% + var(--spazio-1-5))" }} />}
+          {menu && <Menu voci={vociMenuSessione(s, pref)} onChiudi={() => setMenu(false)} fine />}
         </div>
       </div>
     </div>

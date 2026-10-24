@@ -4,6 +4,7 @@ import { Fragment, useState, type ReactNode } from "react";
 import type { InfoSessione, PrInfo, Sessione } from "../../tipi";
 import { ICONA_PR } from "../barra/Pr";
 import { Icona, type NomeIcona } from "../base/Icona";
+import { conTransizione } from "../base/movimento";
 import { nomeAccount } from "../chat/testi";
 import { percento, testoPr, token } from "./info";
 import "./info.css";
@@ -11,7 +12,7 @@ import "./info.css";
 function Scheda({ titolo, aperta, onAlterna, dettaglio, children }: { titolo: string; aperta: boolean; onAlterna(): void; dettaglio?: string; children?: ReactNode }) {
   return (
     <section className="scheda">
-      <button type="button" className="testata" aria-expanded={aperta} onClick={onAlterna}>
+      <button type="button" className="testata" aria-expanded={aperta} onClick={() => conTransizione(onAlterna)}>
         <span className="t-base medio">{titolo}</span>
         <Icona nome={aperta ? "giu" : "destra"} />
         <span className="spazio" />

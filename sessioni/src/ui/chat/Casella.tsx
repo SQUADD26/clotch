@@ -10,6 +10,8 @@ import { BottoneIcona, Bottone } from "../base/Bottone";
 import { usePreferenze } from "../base/dati";
 import { Icona } from "../base/Icona";
 import { registraAzione } from "../base/scorciatoie";
+import { Suggerimento } from "../base/Suggerimento";
+import { numero } from "../base/token";
 import { useImpostazioni } from "../impostazioni/stato";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { Aggiungi } from "./Aggiungi";
@@ -44,10 +46,9 @@ function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, prefere
           {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
           <span className="testo">{v.testo}</span>
           <div className="azioni">
-            <span className={suggerimento && i === 0 ? "con-suggerimento sopra visibile" : "con-suggerimento sopra"}>
+            <Suggerimento testo="Interrompi e manda ora" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
               <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
-              <span className="suggerimento">Interrompi e manda ora <Tasto t="↵" /></span>
-            </span>
+            </Suggerimento>
             <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
             <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
           </div>
@@ -219,6 +220,7 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
   const ferma = lavora && !testo.trim() && !allegati.length;
   const altre = coda.filter((v) => v.voce !== modifica?.voce); // quella in modifica sta nella casella
   const stato = disabilitata ? "disabilitata" : ferma ? "in-corso" : testo || allegati.length ? "scritta" : "vuota";
+  const spento = stato === "vuota" || stato === "disabilitata" || invio; // il messaggio aspetta il motore: il bottone sembra spento, come quando non si può inviare
   return (
     <div className="area-casella con-menu" ref={areaCasella}>
       {cerca && <Suggerimenti tipo={cerca.tipo} voci={voci} scelta={Math.min(scelta, voci.length - 1)} onScelta={setScelta} onScegli={scegli} />}
@@ -242,10 +244,10 @@ export function Casella({ chat, lavora, coda, modello, permessi = null, contesto
           <ChipContesto s={dati.s} visibile={provaDi(prova, "tooltip") !== null} />
           <ChipModello {...dati} predefinito={idModello(globale)} impegnoAperto={provaDi(prova, "impegno") !== null} imposta={imposta} aperto={menu === "modello"} onAperto={(a) => setMenu(a ? "modello" : null)} disabled={disabilitata} />
           <BottoneIcona icona="microfono" etichetta="Detta" disabled />
-          <button type="button" className="bottone-invia" disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
+          <button type="button" className={invio ? "bottone-invia spento" : "bottone-invia"} aria-busy={invio} disabled={disabilitata || invio || (!ferma && (caricando || grandi.length > 0 || (!testo.trim() && !pronti.length)))}
             aria-label={ferma ? "Interrompi" : "Invia"} title={ferma ? "Interrompi" : "Invia"}
             onClick={() => (ferma ? comanda("interrompi", { chat }) : manda("subito"))}>
-            <Icona nome={ferma ? "stop" : "invia"} colore={stato === "vuota" || stato === "disabilitata" ? "terziaria" : "su-accento"} />
+            <Icona nome={ferma ? "stop" : "invia"} colore={spento ? "terziaria" : "su-accento"} />
           </button>
         </div>
       </div>

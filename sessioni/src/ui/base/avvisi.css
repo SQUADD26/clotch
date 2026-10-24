@@ -1,6 +1,6 @@
 /* figma: 101-24007 — pila di avvisi a comparsa al centro della colonna, sopra la casella (101-10457 per l'avviso) */
 .area-avvisi {
-  position: absolute; z-index: 20; left: 50%; transform: translateX(-50%);
+  position: absolute; z-index: var(--livello-avviso); left: 50%; transform: translateX(-50%);
   /* la chat alza la pila sopra la casella impostando --avvisi-basso sulla colonna */
   bottom: var(--avvisi-basso, var(--spazio-4));
   display: flex; flex-direction: column; gap: var(--spazio-2); pointer-events: none;
@@ -10,9 +10,9 @@
   display: flex; align-items: center; pointer-events: auto;
   background: var(--colore-fondo-elevato); border-radius: var(--raggio-xl);
   box-shadow: 0 var(--ombra-y) var(--ombra-raggio) var(--ombra-espansione) var(--colore-ombra-colore);
-  animation: avviso-entra var(--tempo-normale) ease;
-  transition: opacity var(--tempo-normale) ease, transform var(--tempo-normale) ease;
 }
-.avviso-comparsa.esce { opacity: 0; transform: scale(0.8); }
 .avviso-comparsa .messaggio { flex: 1; min-width: 0; }
-@keyframes avviso-entra { from { opacity: 0; transform: scale(0.8); } }
+/* passaggio dei bottoni dell'avviso (azione e X, 158:82181): il bottone sporge del suo padding, l'avviso non cambia misura */
+.avviso-comparsa button { padding: var(--spazio-0-5); margin: calc(-1 * var(--spazio-0-5)); border-radius: var(--raggio-xs); }
+.avviso-comparsa button.medio { padding: var(--spazio-0-5) var(--spazio-1-5); margin: calc(-1 * var(--spazio-0-5)) calc(-1 * var(--spazio-1-5)); } /* azione, 158:82181 */
+.avviso-comparsa button:hover { background: var(--colore-fondo-riga-passaggio); }

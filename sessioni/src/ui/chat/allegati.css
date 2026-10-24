@@ -71,4 +71,4 @@
 .pezzo-chat .avviso-allegato .titolo { font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-primario); }
 .pezzo-chat .avviso-allegato .corpo { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); color: var(--colore-testo-secondario); }
 .pezzo-chat .aggiungi { position: relative; display: inline-flex; }
-.pezzo-chat .aggiungi .menu { left: 0; bottom: calc(100% + var(--spazio-2)); max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }
+.pezzo-chat .menu-aggiungi { max-height: calc(var(--misura-riga) * 10); overflow-y: auto; }

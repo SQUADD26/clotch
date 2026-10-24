@@ -42,7 +42,6 @@
 .pezzo-clotch-ai .comandi-titolo .bottone-icona.aperto { background: var(--colore-fondo-riga-passaggio); }
 /* 101-38626: il menu ha il bordo destro sulla luna, 6 px sotto */
 .pezzo-clotch-ai .comandi-titolo .ancora-menu { position: relative; display: flex; }
-.pezzo-clotch-ai .comandi-titolo .menu { top: calc(var(--misura-bottone) + var(--spazio-1-5)); right: 0; }
 .pezzo-clotch-ai .menu .titolo-menu { padding: var(--spazio-1) var(--spazio-2); }
 .pezzo-clotch-ai .menu .nota-menu { min-height: var(--misura-riga); padding: 0 var(--spazio-2); display: flex; align-items: center; }
 

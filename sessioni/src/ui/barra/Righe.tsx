@@ -78,7 +78,7 @@ export const RigaSessione = memo(function RigaSessione({ s, pref, scelta, fissat
       role="button" tabIndex={0} aria-current={scelta || undefined}
       className={`riga riga-sessione ${scelta ? "scelta" : ""} ${passaggio ? "passaggio" : ""}`}
       onClick={onApri} onContextMenu={onMenu} onMouseEnter={entra} onMouseLeave={() => onTroncato(null)}
-      onKeyDown={(e) => { if (e.key === "Enter") onApri(); }}
+      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onApri(); } }}
     >
       {figlia && <Icona nome="figlia" colore="terziaria" />}
       <button type="button" aria-label="Icona della sessione" onClick={(e) => { e.stopPropagation(); onIcona(e); }}>

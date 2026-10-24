@@ -293,7 +293,10 @@ export type Token =
   | "livello-tooltip"
   | "livello-sopra"
   | "livello-sopra-2"
-  | "livello-sopra-3";
+  | "livello-sopra-3"
+  | "curva-entrata"
+  | "curva-uscita"
+  | "curva-spostamento";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -594,6 +597,9 @@ export const valori: Record<Token, string> = {
   "livello-sopra": "1",
   "livello-sopra-2": "2",
   "livello-sopra-3": "3",
+  "curva-entrata": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+  "curva-uscita": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
+  "curva-spostamento": "cubic-bezier(0.645, 0.045, 0.355, 1)",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);

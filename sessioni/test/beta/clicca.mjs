@@ -51,9 +51,11 @@ async function giro(app, area, cfg, console_) {
     const el = { n: i, dove: nomi[i], foto: [] };
     if (!(await loc.isVisible())) continue;
     el.foto.push(await foto(`el${i}-prima`));
-    const tipo = await loc.evaluate((e) => e.matches('input,textarea,[contenteditable]') ? 'campo' : e.getAttribute('role') ?? e.tagName.toLowerCase());
+    // l'elemento può sparire subito dopo il conteggio: le View Transition (#520) cambiano il DOM un fotogramma dopo il clic di prima
+    const tipo = await loc.evaluate((e) => e.matches('input,textarea,[contenteditable]') ? 'campo' : e.getAttribute('role') ?? e.tagName.toLowerCase(), null, { timeout: 2000 }).catch(() => null);
+    if (!tipo) continue;
     // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
-    const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true');
+    const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true', null, { timeout: 2000 }).catch(() => false);
     const box = await loc.boundingBox(), clip = box && { x: Math.max(0, box.x - 4), y: Math.max(0, box.y - 4), width: box.width + 8, height: box.height + 8 };
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
@@ -80,11 +82,11 @@ async function giro(app, area, cfg, console_) {
     // tastiera: in un campo si scrive e si svuota; un sovrapposto aperto si percorre con le frecce, Esc lo chiude e il fuoco torna a chi l'ha aperto
     if (tipo === 'campo') { await loc.fill('Collaudo beta').catch(() => {}); el.foto.push(await foto(`el${i}-scritto`)); await loc.fill('').catch(() => {}); }
     else if (tipo === 'tab') { await pagina.keyboard.press('ArrowRight'); el.foto.push(await foto(`el${i}-freccia`)); }
-    const aperti = await pagina.evaluate(() => window.__bt.sopra().length);
+    const aperti = await pagina.evaluate(() => window.__bt.menuAperti());
     if (aperti && tipo !== 'campo') {
       await pagina.keyboard.press('ArrowDown'); el.foto.push(await foto(`el${i}-freccia`));
       await pagina.keyboard.press('Escape'); await pausa(450);
-      const dopo = await pagina.evaluate(() => ({ aperti: window.__bt.sopra().filter((e) => !e.matches('.avviso-comparsa,[role=tooltip],.tooltip')).length, fuoco: document.activeElement?.getAttribute('data-bt') }));
+      const dopo = await pagina.evaluate(() => ({ aperti: window.__bt.menuAperti(), fuoco: document.activeElement?.getAttribute('data-bt') }));
       if (dopo.aperti) reg.difetti.push({ criterio: 'ESC', dove: el.dove, valore: 'Esc non chiude il sovrapposto', quando: el.dove, foto: el.foto.at(-1) });
       else if (dopo.fuoco !== String(i)) reg.difetti.push({ criterio: 'FUOCO-RITORNO', dove: el.dove, valore: 'dopo Esc il fuoco non torna al pulsante che ha aperto', quando: el.dove, foto: el.foto.at(-1) });
       if (VIDEO && !dopo.aperti) { // M10: si riapre e si interrompe a metà con Esc
@@ -92,7 +94,7 @@ async function giro(app, area, cfg, console_) {
         await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(60); await pagina.keyboard.press('Escape');
         const r = await c; if (r) difettiInterruzione(r, el.dove).forEach((d) => reg.difetti.push({ ...d, quando: el.dove }));
       }
-    } else if (tipo !== 'campo') await pagina.keyboard.press('Escape');
+    } else if (tipo !== 'campo') { await pagina.keyboard.press('Escape'); await pausa(250); } // la chiusura con Esc finisce la sua transizione prima della firma
     if (await pagina.evaluate((r) => window.__bt.firma(r), radice) !== firma0) { await pulito(); nomi = await segna(); }
   }
   // Tab su tutta l'area: anello del fuoco presente e con la forma del pezzo

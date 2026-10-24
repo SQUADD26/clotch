@@ -18,7 +18,7 @@
     "modello": "claude-opus-5-5",
     "stato": "lavora",
     "perche": null,
-    "ultimaAttivita": 1792844419130,
+    "ultimaAttivita": 1792793049531,
     "obiettivo": {
      "testo": "La pagina «Sessioni» in Figma con l’app intera in scuro, con tutti gli stati e pronta per il codice.",
      "stato": "aperto",
@@ -57,13 +57,13 @@
    {
     "tipo": "utente",
     "testo": "Mostrami il riepilogo con elenco, tabella e codice.",
-    "t": 1792844413130
+    "t": 1792793043531
    },
    {
     "tipo": "assistente",
     "testo": "# Verifica delle sessioni\n\nHo controllato i tre percorsi della pagina Sessioni, in chiaro e in scuro. I dettagli sono nella [prova eseguita](https://example.com/prova); qui sotto trovi il riepilogo.\n\n## Cosa è stato verificato\n\n- Ogni bozza resta nella sua chat.\n- Le risposte tardive non cambiano conversazione.\n- Il testo selezionato resta visibile dopo ogni aggiornamento.\n  - Anche con la barra laterale chiusa.\n  - Anche con la finestra stretta a 480 punti.\n\n### Per ripetere la prova\n\n1. Apri la sessione dalla barra laterale.\n2. Scrivi nella casella e premi Invio.\n3. Controlla che la risposta resti nel filo.\n\nPer i controlli da terminale usa `npm test` dal ramo `design/332-sessioni-figma`.\n\n```sh\nnpm test\nswift test --filter Sessioni\nprintf \"ok\"\n```\n\n> Prova eseguita su dati fittizi: i numeri veri arrivano con la prossima sessione.\n\n---\n\n## Risultati per percorso\n\n| Percorso | Schermate | Tempo (s) | Esito |\n| --- | ---: | ---: | --- |\n| Chat | 14 | 1,8 | Verificata |\n| Impostazioni | 22 | 2,4 | Verificate |\n| clotch AI | 9 | 0,9 | Verificata |\n| Notch | 6 | 1,1 | Da rivedere |\n| **Totale** | **51** | **6,2** | **1 da rivedere** |\n\n*Tempi misurati sulla stessa macchina, media di tre esecuzioni.*",
     "modello": "claude-opus-5-5",
-    "t": 1792844418130
+    "t": 1792793048531
    }
   ]
  },

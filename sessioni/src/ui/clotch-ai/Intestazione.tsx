@@ -1,6 +1,5 @@
 // figma: 101-35494 — «intestazione» delle viste clotch AI: icona e titolo, riga di stato (testi dai frame 101-35494, 35803,
 // 36010, 36225, 37696, 38897, 39266, 40267, 40473, 41628, 41834, 42000, 42245).
-import { BottoneIcona } from "../base/Bottone";
 import { Icona, type NomeIcona } from "../base/Icona";
 import { useNavigazione } from "../base/navigazione";
 import { useAvvio, useRegistro } from "./dati";
@@ -69,11 +68,6 @@ export function Intestazione() {
           {t.segno && <Icona nome={t.segno[0]} colore={t.segno[1]} gira={t.segno[0] === "spinner"} />}
           <span className="t-xs secondario">{t.stato}</span>
         </div>
-      </div>
-      <div className="azioni-f">
-        <BottoneIcona icona="pannello" etichetta="Pannello" onClick={n.alternaPannello} />
-        {/* shortcut: il disegno non ha il menu «…» delle viste clotch AI; il bottone c'è per parità, senza menu finché Figma non lo disegna */}
-        <BottoneIcona icona="altro" etichetta="Altro" />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@
   font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario);
 }
 .pezzo-chat .scheda-sessione.sospesa {
-  position: absolute; bottom: calc(100% + var(--spazio-1-5)); left: 0; z-index: 4; border-color: transparent; background: var(--colore-fondo-elevato);
+  position: absolute; bottom: calc(100% + var(--spazio-1-5)); left: 0; z-index: var(--livello-menu); border-color: transparent; background: var(--colore-fondo-elevato);
 }
 .pezzo-chat .scheda-sessione .testata, .pezzo-chat .scheda-sessione .stato { display: flex; align-items: center; gap: var(--spazio-2); min-width: 0; }
 .pezzo-chat .scheda-sessione .stato { gap: var(--spazio-1); color: var(--colore-testo-primario); }

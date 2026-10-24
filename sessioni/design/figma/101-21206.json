@@ -4,7 +4,8 @@
   "id": "101:21206",
   "nome": "menu contestuale",
   "w": 260,
-  "h": 314
+  "h": 314,
+  "dentro": "101:21061"
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",
