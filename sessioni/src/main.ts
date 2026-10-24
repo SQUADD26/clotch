@@ -43,6 +43,10 @@ const scena = (() => {
   catch { return null; } // scena rotta: stesso errore esplicito sotto, mai un dialogo Electron
 })();
 
+// beta tester (#518): `--scena <file>` apre la finestra vera, cliccabile, coi dati della scena; solo in prova silenziosa
+const iProva = process.argv.indexOf("--scena");
+const scenaProva = iProva > 0 && provaSilenziosa() ? leggiScena(process.argv[iProva + 1]) : null;
+
 const sessioni = new Sessioni();
 
 // impostazioni lette dal file a ogni uso (così seguono i cambi); file rotto = valori di partenza
@@ -72,6 +76,7 @@ app.whenReady().then(() => {
   }
   impostaIdentita();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
+  if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
   // ma rispondono quando `pronte` (la finestra è mostrata e il worker ha letto) è risolta.
   let apri!: () => void;
