@@ -30,7 +30,7 @@ export default function Notifiche() {
             <Interruttore etichetta={etichetta} acceso={v[k] === true} onCambia={(x) => imposta(k, x)} />
           </Riga>
         ))}
-        <Riga etichetta="Suono" descrizione="Per le sessioni in attesa di te"><Scelta etichetta="Suono" valore={v.suono} voci={SUONI} onScegli={(x) => imposta("suono", x)} /></Riga>
+        <Riga etichetta="Suono" descrizione="Per le sessioni in attesa di te"><Scelta etichetta="Suono" valore={v.suono} voci={SUONI} onScegli={(x) => { imposta("suono", x); void window.impostazioni.provaSuono(x); }} /></Riga>
         <Riga etichetta="Silenzio" descrizione="Niente notifiche in queste ore"><Scelta etichetta="Silenzio" valore={v.silenzio} voci={SILENZI.includes(v.silenzio) ? SILENZI : [...SILENZI.slice(0, -1), v.silenzio, ORE]}
           onScegli={(x) => (x === ORE ? scegliOre(v.silenzio) : imposta("silenzio", x))} /></Riga>
       </Gruppo>

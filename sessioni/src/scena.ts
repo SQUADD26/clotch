@@ -133,7 +133,7 @@ export function rispostaScena(s: Scena, canale: string, args: unknown[]): unknow
 export const CANALI = ["sessioni:elenco", "sessioni:messaggi", "sessioni:preferenze", "sessioni:imposta-preferenze", "sessioni:azione",
   "sessioni:impostazioni", "sessioni:imposta-impostazioni", "sessioni:cerca", "sessioni:comandi", "sessioni:modelli", "sessioni:file", "sessioni:spazio", "sessioni:info", "sessioni:ricostruisci", "sessioni:svuota",
   "clotch-ai:registro", "clotch-ai:comando", "clotch-ai:avvia", "clotch-ai:voce", "clotch-ai:dettatura", "impostazioni:radici", "impostazioni:cartelle", "impostazioni:scegli-cartella",
-  "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:uso", "impostazioni:archiviate",
+  "impostazioni:apri", "impostazioni:versione", "impostazioni:profilo", "impostazioni:avvio", "impostazioni:prova-suono", "impostazioni:uso", "impostazioni:archiviate",
   "impostazioni:elimina-dati",
   "impostazioni:novita", "impostazioni:aggiornamenti",
   "nuova:cartelle", "nuova:contesto", "nuova:scegli-chiave", "nuova:scegli-cartella", "casella:scegli", "casella:incolla", "casella:copia", "casella:descrivi", "casella:immagine", "casella:copia-immagine", "casella:salva-immagine", "casella:mostra", "casella:skill"];

@@ -57,11 +57,11 @@ test("silenzio: «Mai», intervallo normale e a cavallo di mezzanotte", () => {
   assert.equal(daAvvisare(sess("lavora"), sess("aspetta"), {}, a(23)), null, "senza impostazioni vale la partenza 22:00–8:00");
 });
 
-test("suono: Vetro e Pop di sistema, Campanello quello predefinito, Nessun suono muto; solo per «in attesa»", () => {
+test("suono: Vetro, Campanello (Ping) e Pop di sistema, Nessun suono muto; solo per «in attesa»", () => {
   const a = (suono: string) => daAvvisare(sess("lavora"), sess("aspetta"), { ...tutti, suono }, GIORNO)!;
   assert.deepEqual([a("Vetro").suono, a("Vetro").silenzioso], ["Glass", false]);
   assert.deepEqual([a("Pop").suono, a("Pop").silenzioso], ["Pop", false]);
-  assert.deepEqual([a("Campanello").suono, a("Campanello").silenzioso], [undefined, false]);
+  assert.deepEqual([a("Campanello").suono, a("Campanello").silenzioso], ["Ping", false]);
   assert.equal(a("Nessun suono").silenzioso, true);
   assert.equal(daAvvisare(sess("lavora"), sess("finita"), { ...tutti, suono: "Vetro" }, GIORNO)!.silenzioso, true);
 });

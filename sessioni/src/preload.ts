@@ -55,6 +55,7 @@ const impostazioni: ImpostazioniApi = {
   versione: () => ipcRenderer.invoke("impostazioni:versione"),
   profilo: () => ipcRenderer.invoke("impostazioni:profilo"),
   avvio: (acceso) => ipcRenderer.invoke("impostazioni:avvio", acceso),
+  provaSuono: (scelto) => ipcRenderer.invoke("impostazioni:prova-suono", scelto),
   uso: () => ipcRenderer.invoke("impostazioni:uso"),
   archiviate: () => ipcRenderer.invoke("impostazioni:archiviate"),
   eliminaDati: () => ipcRenderer.invoke("impostazioni:elimina-dati"),
