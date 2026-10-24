@@ -2,3 +2,5 @@
 .pezzo-impostazioni .menu-scelta .voce > .secondario { font-size: var(--testo-dimensione-xs); line-height: var(--testo-riga-xs); }
 /* la voce scelta è evidenziata nei frame (il focus da tastiera non si vede dopo un clic) */
 .pezzo-impostazioni .menu-scelta .voce.scelta { background: var(--colore-fondo-riga-passaggio); }
+/* tendina larga quanto la voce più lunga (microfono, account): la stringa si legge intera (#1144) */
+.pezzo-impostazioni .menu.menu-scelta { width: max-content; min-width: var(--misura-menu); max-width: calc(100vw - var(--spazio-8)); }

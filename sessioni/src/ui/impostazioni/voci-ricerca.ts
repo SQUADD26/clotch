@@ -12,7 +12,7 @@ const v = (sezione: Sezione, etichetta: string, descrizione?: string): Voce => (
 export const VOCI: Voce[] = [
   ...SEZIONI.map(([id, nome]) => v(id, nome)),
   v("generale", "Apri all’avvio del Mac", "clotch parte quando accendi il Mac"),
-  v("generale", "Mostra nella barra dei menu", "Un’icona con il numero di sessioni in attesa di te"),
+  v("generale", "Mostra nella barra dei menu", "In alto sul Mac, accanto all’orologio: l’icona di clotch e quante sessioni aspettano te"),
   v("generale", "Lingua", "Testi dell’app"),
   v("generale", "Modello per i tuoi messaggi", "Usato quando scrivi a una sessione da qui"),
   v("generale", "Apri una sessione", "Cosa succede quando ne scegli una dall’elenco"),

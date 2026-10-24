@@ -19,7 +19,7 @@
 .menu .spunta { display: flex; }
 .menu .spunta.nascosta { visibility: hidden; }
 .menu .titolo-gruppo { padding: var(--spazio-1) var(--spazio-2); }
-.menu .voci-menu { display: flex; flex-direction: column; }
+.menu .voci-menu { display: flex; flex-direction: column; gap: var(--spazio-0-5); } /* voci staccate: mai due fondi evidenziati che si toccano (#1144) */
 /* voce spenta: testo e icona terziari, nessun passaggio, nessun fuoco (saltata dalle frecce) */
 .menu .voce:disabled { cursor: default; }
 .menu .voce:disabled .etichetta { color: var(--colore-testo-terziario); }

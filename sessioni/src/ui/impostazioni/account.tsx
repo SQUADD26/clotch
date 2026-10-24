@@ -23,6 +23,8 @@ function useCartelle() {
   return radici.stato === "errore" ? { stato: "errore" as const, errore: radici.errore, dati: undefined, riprova: radici.riprova } : cartelle;
 }
 
+const nomeAccount = (p: string) => p.split("/").pop()!.replace(/^\.claude-?/, "") || "Account principale";
+
 function rimuovi(percorso: string) {
   imposta("accountTolti", [...leggi("accountTolti"), percorso]);
   avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => imposta("accountTolti", leggi("accountTolti").filter((x) => x !== percorso)) } });
@@ -47,7 +49,7 @@ export default function Account() {
   useEffect(() => { if (prova?.dopoRimuovi) avvisa({ tipo: "info", messaggio: "Cartella rimossa", azione: { etichetta: "Annulla", fai: () => {} } }); }, []);
   return (
     <Pagina titolo="Account">
-      <div className="t-base secondario">Le cartelle degli account da cui leggere le sessioni di Claude Code.</div>
+      <div className="t-base secondario">Ogni account Claude che usi ha una cartella sul Mac. clotch legge da lì le tue sessioni.</div>
       {lette.stato === "errore" && !lette.dati ? <Gruppo><ErroreLista titolo="Cartelle non lette" errore={lette.errore} riprova={lette.riprova} /></Gruppo>
         : !cartelle ? <Gruppo><Carica testo="Caricando le cartelle degli account…" /></Gruppo>
         : !cartelle.length ? <Gruppo><VuotoLista titolo="Nessuna cartella" corpo="Aggiungi la cartella di un account Claude Code per leggerne le sessioni." /></Gruppo>
@@ -57,7 +59,8 @@ export default function Account() {
             <div key={c.percorso} className="riga azione">
               <Icona nome="cartella" />
               <div className="testi">
-                <div className="t-sm">{c.percorso}</div>
+                <div className="t-sm">{nomeAccount(c.percorso)}</div>
+                <div className="t-xs secondario">{c.percorso}</div>
                 <div className={`t-sm ${c.errore ? "errore" : "secondario"}`}>{c.dettaglio}</div>
               </div>
               <Bottone tipo="secondario" aria-label={`Rimuovi ${c.percorso}`} onClick={() => setDaRimuovere(c.percorso)}>Rimuovi</Bottone>
