@@ -1,6 +1,7 @@
 // figma: 101-46268 — la voce di clotch AI. «Voce che parla» (Clotch 101-46268, senza 101-46308) e «Dettatura» (101-46701, 101-46741).
 // Chi parla o ascolta: Clotch se è acceso (lo dice il registro, `clotch.parla` e `clotch.ascolta`), altrimenti l'app (`voceApp`
 // dal main per le frasi lette con `say`, `dettatura` qui per il microfono del Mac).
+import { useEffect } from "react";
 import type { ClotchAiApi } from "../../tipi";
 import { avvisa } from "../base/Avvisi";
 import { useClotchAcceso } from "../pannello/Pillole";
@@ -17,6 +18,9 @@ export function useVoce(): Voce {
   const clotch = useClotchAcceso();
   const d = dettatura.usa();
   const chi = clotch ? "clotch" : "app";
+  // Con Clotch acceso la casella mostra il parziale che il motore scrive nel registro, nella stessa vista della dettatura dell'app.
+  const parziale = clotch ? (r?.clotch?.ascolta ? r.clotch.testo ?? "" : "") : null;
+  useEffect(() => { if (parziale !== null) dettatura.metti({ ...dettatura.get(), testo: parziale }); }, [parziale]);
   if (d.attiva || (clotch && r?.clotch?.ascolta)) return { chi, cosa: "ascolta" };
   if (clotch ? r?.clotch?.parla : r?.voceApp) return { chi, cosa: "parla" };
   return null;
@@ -53,5 +57,5 @@ export async function fineDettatura() {
 
 /** «Fine» con Clotch: stessa pressione di ⌥Spazio, il testo lo manda Clotch. */
 export const fineDettaturaClotch = () => segnala("clotch_dettatura");
-/** «Interrompi»: l'app ferma il suo `say`; per Clotch il segnale non ha ancora un ascoltatore (comandi-app.ts). */
-export const interrompiVoce = (chi: "clotch" | "app") => segnala(chi === "clotch" ? "clotch_interrompi_voce" : "voce_ferma");
+/** «Interrompi»: l'app ferma il suo `say`; per Clotch `zitto` va al motore (rifiuto «Clotch non è aperta.» nell'avviso). */
+export const interrompiVoce = (chi: "clotch" | "app") => segnala(chi === "clotch" ? "zitto" : "voce_ferma");

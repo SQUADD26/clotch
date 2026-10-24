@@ -4,17 +4,15 @@ import { fermaVoce } from "./voce-app";
 import { provaSilenziosa } from "./modalita-prova";
 import type { EsitoComando } from "./comandi";
 
-export const COMANDI_APP = ["voce_ferma", "clotch_dettatura", "clotch_interrompi_voce"] as const;
+export const COMANDI_APP = ["voce_ferma", "clotch_dettatura"] as const;
 export type ComandoApp = (typeof COMANDI_APP)[number];
 export const eComandoApp = (c: string): c is ComandoApp => (COMANDI_APP as readonly string[]).includes(c);
 
-// shortcut: `clotch_interrompi_voce` esiste solo da questa parte; Clotch non lo ascolta ancora (serve un osservatore in AppDelegate.swift che chiami VoiceSpeaker.shared.hush()).
-const SEGNALE = { clotch_dettatura: "dettatura", clotch_interrompi_voce: "interrompi-voce" } as const;
 
 export async function eseguiComandoApp(cmd: ComandoApp): Promise<EsitoComando> {
   if (cmd === "voce_ferma") { fermaVoce(); return { id: "app", esito: "ok", testo: "" }; }
   if (provaSilenziosa() || process.platform !== "darwin") return { id: null, esito: "non_scritto", testo: "Il segnale a Clotch parte solo dal Mac." };
   const { systemPreferences } = await import("electron");
-  systemPreferences.postNotification(`com.squadd.clotch.${SEGNALE[cmd]}`, {}, true);
+  systemPreferences.postNotification(`com.squadd.clotch.dettatura`, {}, true);
   return { id: "app", esito: "ok", testo: "" };
 }
