@@ -5,15 +5,16 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { runInNewContext } from "node:vm";
 
-function azione(scrivi: (testo: string) => Promise<void>, idApp: string | null = "local_fixture") {
+function azione(scrivi: (testo: string) => Promise<void>, idApp: string | null = "local_fixture", mostra: (p: string) => void = () => { throw new Error("Effetto del Mac vietato durante la prova"); }, file = "") {
   type Handler = (_e: unknown, id: string, azione: string) => unknown;
   const handlers = new Map<string, Handler>();
   const exports: { collegaPreferenze?: (...args: unknown[]) => void } = {};
   const vietato = () => { throw new Error("Effetto del Mac vietato durante la prova"); };
   const moduli: Record<string, unknown> = {
     "node:path": path,
+    "node:fs": fs,
     "node:child_process": { execFile: vietato },
-    electron: { app: { getPath: () => "/fixture-no-write" }, clipboard: { writeText: scrivi }, shell: { showItemInFolder: vietato } },
+    electron: { app: { getPath: () => "/fixture-no-write" }, clipboard: { writeText: scrivi }, shell: { showItemInFolder: mostra } },
     "./finestra": { apriFinestra: vietato },
     "./preferenze": { leggiImpostazioni: () => ({}), leggiPreferenze: vietato, impostaImpostazioni: vietato, impostaPreferenze: vietato },
   };
@@ -26,7 +27,7 @@ function azione(scrivi: (testo: string) => Promise<void>, idApp: string | null =
   }, { filename: "preferenze-ipc.js" });
   assert.ok(exports.collegaPreferenze);
   exports.collegaPreferenze({ handle: (nome: string, fn: Handler) => handlers.set(nome, fn) }, vietato, {
-    impostazioni: () => {}, elencoSessioni: () => ({ sessioni: [{ id: "chat-fixture", cartella: "/fixture/progetto", idApp }] }),
+    impostazioni: () => {}, elencoSessioni: () => ({ sessioni: [{ id: "chat-fixture", cartella: "/fixture/progetto", idApp, file }] }),
   });
   return handlers.get("sessioni:azione")!;
 }
@@ -64,4 +65,12 @@ test("link non disponibile: errore prima della clipboard, chat estranea rifiutat
   assert.throws(() => handler(null, "chat-fixture", "copia-link"), /nessun link/);
   assert.throws(() => handler(null, "altra-chat", "copia-id"), /non trovata/);
   assert.equal(copie, 0);
+});
+
+test("mostra-nel-finder: evidenzia il file della sessione se c'è, altrimenti la cartella", () => {
+  const aperti: string[] = [];
+  azione(async () => {}, "local_fixture", (p) => aperti.push(p), __filename)(null, "chat-fixture", "mostra-nel-finder");
+  azione(async () => {}, "local_fixture", (p) => aperti.push(p), "/fixture/non-esiste.jsonl")(null, "chat-fixture", "mostra-nel-finder");
+  azione(async () => {}, "local_fixture", (p) => aperti.push(p))(null, "chat-fixture", "mostra-nel-finder");
+  assert.deepEqual(aperti, [__filename, "/fixture/progetto", "/fixture/progetto"]);
 });

@@ -17,3 +17,11 @@ test("voce_ferma senza frasi in corso è ok; in prova silenziosa il segnale a Cl
   assert.equal((await eseguiComandoApp("voce_ferma")).esito, "ok");
   for (const c of ["clotch_dettatura", "clotch_interrompi_voce"] as const) assert.equal((await eseguiComandoApp(c)).esito, "non_scritto");
 });
+
+test("voce_leggi: legge il testo dato (in prova senza voce), non scrive il vuoto, non è un comando di clotch AI", async () => {
+  process.env.CLOTCH_TEST_SILENT = "1";
+  assert.equal(eComandoApp("voce_leggi"), true);
+  assert.equal((await eseguiComandoApp("voce_leggi", { testo: "ciao" })).esito, "ok");
+  for (const testo of ["", "   ", "- ", undefined, 3]) assert.equal((await eseguiComandoApp("voce_leggi", { testo })).esito, "non_scritto");
+  assert.equal((await eseguiComandoApp("voce_leggi")).esito, "non_scritto");
+});
