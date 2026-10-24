@@ -1,5 +1,5 @@
 // La finestra dell'app e la prova di parità (`npm run parita -- <node-id>`): stessa pagina, stessa misura del frame Figma.
-import { app, BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen, type Rectangle } from "electron";
 import * as assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -9,6 +9,7 @@ import { proteggiLinkEsterni } from "./link-esterni";
 import { provaSilenziosa } from "./modalita-prova";
 import { autorizzaIpc } from "./ipc-fiducia";
 import { impostaPermessi } from "./permessi";
+import { menuContestuale } from "./menu-contesto";
 
 const radice = path.join(__dirname, "..", "..");
 const pagina = path.join(radice, "renderer", "index.html");
@@ -22,6 +23,17 @@ function frame(id: string) {
   return { w: f.frame.w as number, h: f.frame.h as number, finestra: finestra as { w: number; h: number } };
 }
 
+const fileFinestra = () => path.join(app.getPath("userData"), "finestra.json");
+/** Posizione e misura dell'ultima chiusura (#887), se la barra del titolo cade ancora su uno schermo collegato. */
+function posizioneSalvata(): Rectangle | null {
+  try {
+    const b = JSON.parse(fs.readFileSync(fileFinestra(), "utf8")) as Rectangle;
+    const visibile = screen.getAllDisplays().some(({ workArea: a }) =>
+      b.y >= a.y && b.y < a.y + a.height && Math.min(b.x + b.width, a.x + a.width) - Math.max(b.x, a.x) >= numero("misura-barra-titolo"));
+    return [b.x, b.y, b.width, b.height].every(Number.isFinite) && visibile ? b : null;
+  } catch { return null; } // prima volta o file rotto: si parte dal centro
+}
+
 /** `sessione`: la finestra si apre già su quella sessione («Apri in una nuova finestra»). */
 /** `query`: vista di partenza di una scena di prova (`--scena`, beta tester #518). */
 export function apriFinestra(sessione?: string, opzioni: { show?: boolean; query?: Record<string, string | undefined> } = {}): BrowserWindow | null {
@@ -33,13 +45,15 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean; query
   const area = mostra ? (screen.getAllDisplays().find((d) => d.internal) ?? screen.getPrimaryDisplay()).workArea : null;
   const larghezza = area ? Math.min(grande.w, area.width) : grande.w;
   const altezza = area ? Math.min(grande.h, area.height) : grande.h;
+  const principale = mostra && !sessione, salvata = principale ? posizioneSalvata() : null; // «Apri in una nuova finestra» non sposta quella di sempre
   const w = new BrowserWindow({
     show: false, // si mostra a ready-to-show, col fondo già dipinto
     title: NOME_APP, icon: iconaApp(),
     width: larghezza, height: altezza,
     minWidth: area ? Math.min(piccola.w, larghezza) : piccola.w,
     minHeight: area ? Math.min(piccola.h, altezza) : piccola.h,
-    ...(area ? { x: area.x + Math.floor((area.width - larghezza) / 2), y: area.y + Math.floor((area.height - altezza) / 2) } : {}),
+    ...(salvata ? { x: salvata.x, y: salvata.y, width: salvata.width, height: salvata.height } : {}),
+    ...(area && !salvata ? { x: area.x + Math.floor((area.width - larghezza) / 2), y: area.y + Math.floor((area.height - altezza) / 2) } : {}),
     backgroundColor: valori["colore-fondo-cornice"],
     titleBarStyle: "hiddenInset",
     // semaforo del Mac dove il disegno mette «semaforo»: padding della barra e centro verticale
@@ -50,6 +64,8 @@ export function apriFinestra(sessione?: string, opzioni: { show?: boolean; query
   impostaPermessi(w.webContents, pagina);
   if (silenziosa) w.webContents.setAudioMuted(true);
   proteggiLinkEsterni(w, pagina);
+  menuContestuale(w);
+  if (principale) w.on("close", () => { try { fs.writeFileSync(fileFinestra(), JSON.stringify(w.getNormalBounds())); } catch { /* disco pieno: si riapre al centro */ } });
   if (mostra) w.once("ready-to-show", () => {
     if (!silenziosa) return w.show();
     w.showInactive();

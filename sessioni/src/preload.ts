@@ -21,8 +21,6 @@ const api: SessioniApi = {
   impostaPreferenze: (id, parte) => ipcRenderer.invoke("sessioni:imposta-preferenze", id, parte),
   onPreferenze: ascolta<Record<string, PreferenzeSessione>>("sessioni:preferenze"),
   azione: (id, azione) => ipcRenderer.invoke("sessioni:azione", id, azione),
-  menuBarra: (aperta) => ipcRenderer.send("sessioni:menu-barra", aperta),
-  onMenu: ascolta<string>("sessioni:menu"),
   impostazioni: () => ipcRenderer.invoke("sessioni:impostazioni"),
   impostaImpostazioni: (parte) => ipcRenderer.invoke("sessioni:imposta-impostazioni", parte),
   onImpostazioni: ascolta<Record<string, unknown>>("sessioni:impostazioni"),
@@ -86,3 +84,14 @@ const nuovaSessione: NuovaSessioneApi = {
   scegliCartella: () => ipcRenderer.invoke("nuova:scegli-cartella"),
 };
 contextBridge.exposeInMainWorld("nuovaSessione", nuovaSessione);
+
+// Menu dell'app (#885): i tasti di una voce arrivano come premuti a chi ha il fuoco, e passano per gli stessi gestori della tastiera
+const NOMI_TASTI: Record<string, string> = { "↵": "Enter", "⌫": "Backspace", "⌦": "Delete", "⇥": "Tab", Spazio: " ", "↑": "ArrowUp", "↓": "ArrowDown", "←": "ArrowLeft", "→": "ArrowRight" };
+ipcRenderer.on("menu:tasti", (_e, tasti: string) => {
+  const t = tasti.replace(/[⌃⌥⇧⌘]/g, "");
+  const code = /^[A-Z]$/.test(t) ? `Key${t}` : /^\d$/.test(t) ? `Digit${t}` : "";
+  (document.activeElement ?? document.body).dispatchEvent(new KeyboardEvent("keydown", {
+    key: NOMI_TASTI[t] ?? t.toLowerCase(), code, bubbles: true, cancelable: true,
+    metaKey: tasti.includes("⌘"), shiftKey: tasti.includes("⇧"), altKey: tasti.includes("⌥"), ctrlKey: tasti.includes("⌃"),
+  }));
+});

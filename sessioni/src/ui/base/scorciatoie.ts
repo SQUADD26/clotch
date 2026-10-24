@@ -6,7 +6,7 @@ import { FISSE } from "../impostazioni/riservati";
 import { azioneDi, tastiDi } from "../impostazioni/tasti";
 import { useApriSessione } from "../barra/apri";
 import { useAvvio } from "./Avvio";
-import { api, useElenco } from "./dati";
+import { useElenco } from "./dati";
 import { useNavigazione } from "./navigazione";
 import { prossimaInAttesa } from "./prossima";
 
@@ -38,17 +38,8 @@ export function useScorciatoie() {
       const fai = azioneDiNome((tasti && FISSE[tasti]?.[0]) || azioneDi(tasti, scorciatoie)); // i tasti fissi vincono: la pagina Scorciatoie non li concede (#686)
       if (fai) { e.preventDefault(); fai(); }
     };
+    // le voci del menu del Mac arrivano qui come tasti premuti (preload «menu:tasti», #885)
     addEventListener("keydown", premi);
-    // le voci del menu del Mac (#867) fanno la stessa azione del tasto
-    const togli = api().onMenu((a) => { if (!avvio) azioneDiNome(a)?.(); });
-    return () => { removeEventListener("keydown", premi); togli(); };
+    return () => removeEventListener("keydown", premi);
   }, [n, scorciatoie, sessioni, apriSessione, avvio]);
-  // la voce «Nascondi/Mostra barra laterale» del menu segue la barra della finestra davanti
-  const { barraAperta } = n;
-  useEffect(() => {
-    const manda = () => api().menuBarra(barraAperta);
-    manda();
-    addEventListener("focus", manda);
-    return () => removeEventListener("focus", manda);
-  }, [barraAperta]);
 }

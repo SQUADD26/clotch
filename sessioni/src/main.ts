@@ -2,7 +2,7 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import * as os from "node:os";
 import * as path from "node:path";
-import { aggiornaMenu, impostaIdentita, impostaNome } from "./branding";
+import { impostaIdentita, impostaNome } from "./branding";
 import { provaSilenziosa } from "./modalita-prova";
 import { verificaChiamante } from "./ipc-fiducia";
 
@@ -23,14 +23,14 @@ import { Sessioni } from "./api";
 import { collegaAllegati } from "./allegati-ipc";
 import { collegaAvvisi } from "./avvisi-mac";
 import { collegaBarraMenu } from "./barra-menu";
+import { collegaMenuApp } from "./menu-app";
 import { apriFinestra, parita } from "./finestra";
 import { infoSessione } from "./info-sessione";
 import { collegaClotchAi } from "./clotch-ai-ipc";
 import { collegaImpostazioni } from "./impostazioni";
 import { collegaNuovaSessione } from "./nuova-sessione";
 import { collegaIndice } from "./indice-ipc";
-import { leggiImpostazioni } from "./preferenze";
-import { PARTENZA } from "./partenza";
+import { impostaImpostazioni, leggiImpostazioni } from "./preferenze";
 import { collegaCasella } from "./casella-ipc";
 import { collegaPreferenze } from "./preferenze-ipc";
 import { CARTELLA_REGISTRO, scriviRegistro, testoErrore } from "./registro";
@@ -77,8 +77,9 @@ app.whenReady().then(() => {
     return;
   }
   impostaIdentita();
-  // anche nelle scene: la voce segue la barra (#867). Senza risposta (send): una pagina di prova senza questo canale non vede errori
-  ipcMain.on("sessioni:menu-barra", (e, aperta: unknown) => { try { verificaChiamante(e as unknown as Electron.IpcMainInvokeEvent); aggiornaMenu({ barra: aperta === true }); } catch (err) { registra(`sessioni:menu-barra: ${testoErrore(err)}`); } });
+  // in prova le impostazioni sono quelle della scena: il menu ha le scorciatoie di partenza e ⌘+ non scrive
+  const menuApp = collegaMenuApp(scenaProva ? () => ({}) : impostazioniApp, (parte) => scenaProva || invia("sessioni:impostazioni", impostaImpostazioni(filePreferenze, parte)));
+  menuApp();
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,
@@ -120,12 +121,10 @@ app.whenReady().then(() => {
   });
   collegaClotchAi(ipcMain, (c, d) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d)), os.homedir());
   const barraMenu = collegaBarraMenu(sessioni, () => impostazioniApp().barraDeiMenu !== false); // acceso se manca: come PARTENZA
-  const menuSalvato = () => aggiornaMenu({ tasti: { ...PARTENZA.scorciatoie, ...(impostazioniApp().scorciatoie as Record<string, string | null> | undefined) } });
   const invia = (c: string, d: unknown) => {
     BrowserWindow.getAllWindows().forEach((w) => w.webContents.send(c, d));
-    if (c === "sessioni:impostazioni") { barraMenu(); menuSalvato(); }
+    if (c === "sessioni:impostazioni") { barraMenu(); menuApp(); }
   };
-  menuSalvato();
   collegaPreferenze(ipcMain, invia, sessioni);
   collegaCasella(ipcMain, sessioni);
   collegaNuovaSessione(ipcMain, () => sessioni.elencoSessioni().sessioni);
