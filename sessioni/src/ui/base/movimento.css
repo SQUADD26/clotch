@@ -2,11 +2,21 @@
    Regole: entrata tempo-entrata con curva-entrata; uscita più breve, tempo-uscita con curva-uscita; si muovono solo transform e opacità;
    le infinite solo nei caricamenti. Menu, popup, tooltip e dialoghi: base/sovrapposto.css (issue 519), con gli stessi token. */
 
-/* hover e pressione: colore e fondo seguono il passaggio, i premibili piccoli si riducono a scala-premuto */
-button, [role="button"], .pillola, .pillola-filtro, .riga {
+/* hover, fuoco e pressione: colore, fondo, bordo e ombra seguono il passaggio in tempo-pressione; una regola sola per ogni
+   cosa che si tocca, anche quando non è un <button> (voci, risultati, link, interruttori, casella, campi) */
+:is(button, a, label, input, textarea, [role="button"], [role="switch"], [role="option"], [role^="menuitem"], .pillola, .pillola-filtro, .riga,
+  .voce, .risultato, .opzione, .segmento, .casella, .interruttore, .maniglia-barra .linea, .passa) {
   transition: background-color var(--tempo-pressione) var(--curva-entrata), color var(--tempo-pressione) var(--curva-entrata),
+    border-color var(--tempo-pressione) var(--curva-entrata), box-shadow var(--tempo-pressione) var(--curva-entrata),
     opacity var(--tempo-pressione) var(--curva-entrata), transform var(--tempo-pressione) var(--curva-entrata);
 }
+/* ciò che compare al passaggio con display (azioni della riga, cestino delle macchine, suggerimenti): un display non si anima,
+   così ogni volta che torna visibile parte una dissolvenza breve */
+:is(.pezzo-barra .riga-sessione :is(.azioni, .segno, .indicatore-pr), .pezzo-chat .menu-ssh :is(.togli, .tooltip), .suggerimento-maniglia) {
+  animation: dissolve var(--tempo-pressione) var(--curva-entrata);
+}
+/* interruttore: la manopola scorre (solo transform), il fondo cambia colore nello stesso tempo */
+.interruttore .manopola { transition: transform var(--tempo-entrata) var(--curva-spostamento); }
 :is(.bottone, .bottone-icona, .pillola, .pillola-filtro, .chip):active:not(:disabled) { transform: scale(var(--scala-premuto)); }
 /* bottoni pieni (primario, invio): al passaggio e premuti schiariscono con opacita-passaggio e opacita-premuto */
 :is(.bottone.primario, .bottone-invia):hover:not(:disabled) { opacity: var(--opacita-passaggio); }
@@ -50,6 +60,7 @@ button, [role="button"], .pillola, .pillola-filtro, .riga {
   :root { --scivola-barra: 0%; --scivola-pannello: 0%; --sposta-entrata: 0px; --scala-entrata: 1; --scala-premuto: 1; }
   ::view-transition-group(*) { animation: none; }
   .gira, .luccica-finestra, .luccica-copia, .pezzo-chat .cursore { animation: none !important; }
+  .interruttore .manopola { transition-duration: 0s; }
 }
 
 /* parità: il disegno è un fotogramma fermo */
