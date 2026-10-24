@@ -100,7 +100,7 @@ function ChatSessione() {
   if (!m.messaggi.length) {
     return (
       <>
-        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="La sessione è aperta ma non ha ancora messaggi." /></div>
+        <div className="filo vuoto"><MessaggioAlCentro titolo="Nessun messaggio" corpo="Scrivi per iniziare." /></div>
         {casella}
         <Trova iniziale={provaDi(sezione, "trova")} />
       </>

@@ -41,10 +41,10 @@ export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRispon
         </div>
       </div>
       <div className="azioni">
-        <BottoneIcona icona="pannello" etichetta="Pannello" title={!n.pannelloAperto ? "Mostra il pannello" : n.pannelloInfo ? "Chiudi il pannello" : "Mostra Info sessione"} aria-expanded={n.pannelloAperto} onClick={n.alternaPannello} />
+        <BottoneIcona icona="pannello" etichetta="Mostra pannello" title={!n.pannelloAperto ? "Mostra il pannello" : n.pannelloInfo ? "Chiudi il pannello" : "Mostra Info sessione"} aria-expanded={n.pannelloAperto} onClick={n.alternaPannello} />
         {/* «menu sessione» sotto il «…» (101:20859): le stesse voci della riga nella barra */}
         <div className="con-menu">
-          <BottoneIcona icona="altro" etichetta="Altro" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((x) => !x)} />
+          <BottoneIcona icona="altro" etichetta="Altre azioni" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((x) => !x)} />
           {menu && <Menu voci={vociMenuSessione(s, pref)} onChiudi={() => setMenu(false)} fine />}
         </div>
       </div>
