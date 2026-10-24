@@ -42,6 +42,10 @@ export function Intestazione() {
 
 export default function Chat() {
   const { elenco, s, sezione } = useSessione();
+  const { vista, sessione, apri } = useNavigazione();
+  const recente = elenco.dati?.sessioni[0]?.id; // l'elenco è già dalla più recente
+  // all'avvio nessuna sessione scelta: si apre la più recente, mai una colonna vuota
+  useEffect(() => { if (vista === "sessione" && !sessione && recente) apri("sessione", recente); }, [vista, sessione, recente, apri]);
   const m = useMessaggi(s?.id ?? null);
   const c = useChatClotchAi(s?.id ?? null);
   const adesso = useOra();
