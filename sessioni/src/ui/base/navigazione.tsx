@@ -57,8 +57,8 @@ export function ConNavigazione({ children }: { children: ReactNode }) {
     const passo = { vista, sessione: sessione === undefined ? passi[i].sessione : sessione, sezione: sezione ?? null,
       daClotchAi: vista === "sessione" && VISTE_CLOTCH_AI.includes(passi[i].vista) };
     if (passo.vista === passi[i].vista && passo.sessione === passi[i].sessione && passo.sezione === passi[i].sezione) return { passi, i };
-    // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine.
-    if (vista === "impostazioni" && passi[i].vista === "impostazioni")
+    // Cambiare sezione non aggiunge ostacoli al ritorno alla vista di origine; la pagina vuota dell'avvio non resta nella cronologia.
+    if ((vista === "impostazioni" && passi[i].vista === "impostazioni") || (passi[i].vista === "sessione" && !passi[i].sessione))
       return { passi: [...passi.slice(0, i), passo], i };
     return { passi: [...passi.slice(0, i + 1), passo], i: i + 1 };
   }), []);
