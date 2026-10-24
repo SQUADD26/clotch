@@ -90,9 +90,12 @@ test("scelte: permessi e modello dalla chat o dalla trascrizione, contesto in pe
   assert.equal(sforzoDi().id, "medium");
   assert.equal(sforzoDi({ sforzo: "max" }).etichetta, "Massimo");
   assert.equal(sforzoDi({ sforzo: "boh" }).id, "medium");
-  assert.equal(percentoContesto(124_000), 62);
-  assert.equal(percentoContesto(999_999), 100);
-  assert.equal(percentoContesto(null), null);
+  assert.equal(percentoContesto(124_000, 200_000), 62);
+  assert.equal(percentoContesto(100_000, 400_000), 25);
+  assert.equal(percentoContesto(999_999, 200_000), 100);
+  assert.equal(percentoContesto(null, 200_000), null);
+  assert.equal(percentoContesto(100_000, null), null); // senza contesto_max nessuna percentuale
+  assert.equal(percentoContesto(100_000, undefined), null);
 });
 
 test("motivoNonInviato: il perché dall'esito del comando", () => {
@@ -113,5 +116,5 @@ test("trascrizione Claude Code: permissionMode e token del contesto arrivano nel
   const s = leggiElenco({ home, env: {}, ora: Date.parse("2026-10-22T11:00:00Z") }).sessioni.find((x) => x.id === id)!;
   assert.equal(s.permessi, "acceptEdits");
   assert.equal(s.contesto, 124_002);
-  assert.equal(percentoContesto(s.contesto), 62);
+  assert.equal(percentoContesto(s.contesto, 200_000), 62);
 });

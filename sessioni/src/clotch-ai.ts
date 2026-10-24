@@ -37,6 +37,8 @@ export interface ChatClotchAi {
   limite: { account: string | null; ripartenza: number | null } | null;
   /** Permessi, domande e piani ancora aperti (chi risponde primo vince). */
   richieste: { rid: string; genere: string; strumento: string | null; ingresso: unknown; /** ms dell'evento `richiesta`: «da 2 min». */ t?: number | null; domande: { domanda: string; opzioni: string[] }[] }[];
+  /** Finestra di contesto in token, dall'ultimo `inizio` o `battito` che ha `contesto_max`; null = il motore non la dà (Cursor). */
+  contestoMax: number | null;
   /** Ultimo `battito` (non risponde si misura da qui). */
   battito: number | null;
   aiutanti: Map<string, { tipo: string | null; modello: string | null; testo: string | null; esito: string | null; finito: boolean }>;
@@ -93,7 +95,7 @@ export const cartellaRegistro = (home: string, env: NodeJS.ProcessEnv = {}) => e
 
 const nuova = (chat: string): ChatClotchAi => ({
   chat, titolo: null, madre: null, progetto: null, account: null, sorgente: null, daHandoff: null, stato: null, dettaglio: null, aspetto: null,
-  domanda: null, limite: null, richieste: [], battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
+  domanda: null, limite: null, richieste: [], contestoMax: null, battito: null, aiutanti: new Map(), compattazioni: 0, interrotta: null, coda: [],
   obiettivo: null, passi: [], visto: null, fine: null, fineT: null, chatNuova: null, fermata: false, quarantena: null, errore: null, rifiuto: null, persi: 0,
 });
 /** friday_hook.py scrive i passi in italiano; l'app li legge con i nomi di TodoWrite. */ // nome del protocollo del motore
@@ -136,6 +138,7 @@ export function leggiRegistro(home: string, env: NodeJS.ProcessEnv = {}): Regist
       }
       const t = aMillisecondi(o.t);
       if (t !== null) c.visto = Math.max(c.visto ?? 0, t);
+      if ((o.tipo === "inizio" || o.tipo === "battito") && Number.isInteger(d.contesto_max) && d.contesto_max > 0) c.contestoMax = d.contesto_max;
       switch (o.tipo) {
         case "inizio":
           Object.assign(c, { titolo: s(d.titolo), madre: s(d.madre), progetto: s(d.progetto), account: s(d.account), sorgente: s(d.sorgente), daHandoff: s(d.da_handoff), fine: null });

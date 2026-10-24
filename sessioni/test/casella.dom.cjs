@@ -15,6 +15,7 @@ app.whenReady().then(async () => {
   scene.file = ['sessioni/src/lettore.ts', 'sessioni/src/lettore.test.ts', 'sessioni/src/lettura/cartelle.ts'];
   scene.navigazione.sezione = undefined;
   scene.preferenze = { s1: { icona: 'stella', modello: 'claude-fable-5-1' } }; // la chat ha scelto un modello diverso da quello della sessione
+  scene.registro.chat.s1 = { chat: 's1', coda: [], richieste: [], contestoMax: 200000 }; // la finestra viene dal motore (#475)
   collegaScena(ipcMain, scene);
   const history = creaCronologiaScena((id) => scene.messaggi[id] ?? []);
   ipcMain.removeHandler('sessioni:messaggi');

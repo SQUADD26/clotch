@@ -32,10 +32,9 @@ export const SFORZI: Scelta[] = [
 ];
 export const SFORZO_BASE = "medium";
 
-/** Quanti token ha la finestra di contesto. shortcut: 200 000 per tutti i modelli, la trascrizione non dice se la sessione ha la finestra grande; da rivedere quando la dirà. */
-export const FINESTRA_CONTESTO = 200_000;
-export const percentoContesto = (token: number | null | undefined) =>
-  token == null ? null : Math.min(100, Math.round((token / FINESTRA_CONTESTO) * 100));
+/** Percentuale di contesto usata sulla finestra dichiarata dal motore (`contesto_max`); null se manca uno dei due: mai una finestra inventata. */
+export const percentoContesto = (token: number | null | undefined, max: number | null | undefined) =>
+  token == null || !max ? null : Math.min(100, Math.round((token / max) * 100));
 
 /** Id della modalità dei permessi in uso: la scelta fatta qui, poi quella della trascrizione, poi la prudente. */
 export const permessiDi = (s: Pick<Sessione, "permessi">, p?: PreferenzeSessione) =>

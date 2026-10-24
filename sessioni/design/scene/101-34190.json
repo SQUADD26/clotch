@@ -200,7 +200,16 @@
   }
  },
  "registro": {
-  "chat": {},
+  "chat": {
+   "s1": {
+    "chat": "s1",
+    "coda": [],
+    "richieste": [],
+    "aiutanti": {},
+    "passi": [],
+    "contestoMax": 1000000
+   }
+  },
   "fermoTutto": false,
   "avvisi": [],
   "clotch": null,

@@ -8,6 +8,7 @@ import { MessaggioAlCentro, Sagome, StatoErrore } from "../base/Stati";
 import { useClotchAcceso } from "../pannello/Pillole";
 import { Casella } from "./Casella";
 import { NotaSchermo } from "./CasellaVoce";
+import { ContestoMax } from "./Chip";
 import { Filo } from "./Filo";
 import { nonRisponde, useChatClotchAi, useOra } from "./clotch-ai";
 import { TestaSessione } from "./Intestazione";
@@ -73,9 +74,9 @@ export default function Chat() {
     ? <NonRisponde da={daQuanto(c.battito ?? 0, adesso)} terminale={() => void api().azione(s.id, "apri-terminale")} />
     : limite ? <Limite account={nomeAccount(c?.limite?.account ?? s.account)} ripartenza={ripartenza} /> : null;
   const casella = (
-    <Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} permessi={s.permessi} contesto={s.contesto} prova={sezione} account={s.account}
+    <ContestoMax.Provider value={c?.contestoMax ?? null}><Casella key={s.id} chat={s.id} lavora={vivo && !muta} coda={c?.coda ?? []} modello={s.modello} disabilitata={s.sorgente === "cursor"} permessi={s.permessi} contesto={s.contesto} prova={sezione} account={s.account}
       appenaMandato={dopoInterruzione(voci)}
-      segnaposto={muta ? "In attesa della sessione" : limite && ripartenza ? `Riparte alle ${ripartenza}` : undefined} />
+      segnaposto={muta ? "In attesa della sessione" : limite && ripartenza ? `Riparte alle ${ripartenza}` : undefined} /></ContestoMax.Provider>
   );
 
   if (!m.messaggi.length) {

@@ -1,6 +1,6 @@
 // figma: 101-26140 — «chip permessi» 101:24819, «contesto» 101:24825 con «tooltip» 101:26425, «menu permessi» 101:26398;
 // 101-26427 — «chip modello» 101:24829 e «menu modello» 101:26707: modello, sforzo a 5 tacche, modalità rapida, reimposta.
-import { useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import type { PreferenzeSessione, Sessione } from "../../tipi";
 import { api } from "../base/dati";
 import { Icona } from "../base/Icona";
@@ -68,9 +68,12 @@ export function ChipPermessi({ s, p, imposta, aperto, onAperto, disabled }: Dati
   );
 }
 
+/** Finestra di contesto della chat aperta (`contesto_max` del motore): la mette la chat, il chip la legge qui. */
+export const ContestoMax = createContext<number | null>(null);
+
 /** «62%» con il suggerimento «Contesto usato: 62%» al passaggio (`visibile` lo tiene aperto per la prova di parità). */
 export function ChipContesto({ s, visibile }: { s: Dati["s"]; visibile: boolean }) {
-  const percento = percentoContesto(s.contesto);
+  const percento = percentoContesto(s.contesto, useContext(ContestoMax));
   if (percento == null) return null;
   return (
     <span className={visibile ? "con-suggerimento sopra contesto visibile" : "con-suggerimento sopra contesto"}>
