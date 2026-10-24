@@ -38,7 +38,7 @@ app.whenReady().then(async () => {
     await win.loadFile(path.join(root, 'renderer/index.html'));
     await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden);
     await run(REGISTRA + ";0");
-    const tok = await run(() => Object.fromEntries(['tempo-entrata', 'tempo-uscita', 'tempo-pressione', 'curva-entrata', 'curva-uscita', 'scala-premuto']
+    const tok = await run(() => Object.fromEntries(['tempo-entrata', 'tempo-uscita', 'tempo-pressione', 'tempo-spostamento', 'curva-entrata', 'curva-uscita', 'curva-spostamento', 'scala-premuto']
       .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim()])));
     const ms = (x) => (x.endsWith('ms') ? parseFloat(x) : Math.round(parseFloat(x) * 1000)), curva = (x) => x.replace(/\s+/g, '').replace(/([(,])0\./g, '$1.');
     const misura = async (id, cosa, fai, attese, durata = 400) => {
@@ -56,10 +56,10 @@ app.whenReady().then(async () => {
       return r;
     };
     const clic = (sel) => `() => document.querySelector('${sel}').click()`;
-    const E = ['tempo-entrata', 'curva-entrata'], U = ['tempo-uscita', 'curva-uscita'];
+    const E = ['tempo-entrata', 'curva-entrata'], U = ['tempo-uscita', 'curva-uscita'], S = ['tempo-spostamento', 'curva-spostamento'];
 
     // barra laterale accanto alla colonna: chiudi (uscita) e apri (entrata), la superficie si allarga senza scatto
-    await misura('MOV-01', 'barra chiusa', clic('button[aria-label="Barra laterale"]'), [['::view-transition-old(barra)', ...U], ['::view-transition-group(superficie)', ...E]]);
+    await misura('MOV-01', 'barra chiusa', clic('button[aria-label="Barra laterale"]'), [['::view-transition-old(barra)', ...U], ['::view-transition-group(superficie)', ...S]]);
     await wait(() => !document.querySelector('.barra-laterale'));
     await misura('MOV-02', 'barra aperta', clic('button[aria-label="Barra laterale"]'), [['::view-transition-new(barra)', ...E]]);
     await wait(() => !!document.querySelector('.barra-laterale .riga'));
@@ -67,7 +67,7 @@ app.whenReady().then(async () => {
     const pannello = clic('button[aria-label="Pannello"]');
     const statoPannello = () => run(() => !!document.querySelector('.pannello'));
     while (!(await statoPannello())) await run(`(${pannello})()`), await new Promise((r) => setTimeout(r, 300));
-    await misura('MOV-03', 'pannello info', pannello, [['::view-transition-group(pannello)', ...E]]);
+    await misura('MOV-03', 'pannello info', pannello, [['::view-transition-group(pannello)', ...S]]);
     await misura('MOV-04', 'pannello chiuso', pannello, [['::view-transition-old(pannello)', ...U]]);
     await misura('MOV-05', 'pannello aperto', pannello, [['::view-transition-new(pannello)', ...E]]);
     // righe: la cartella si chiude (le sue righe escono) e si riapre (entrano)
