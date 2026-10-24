@@ -256,7 +256,21 @@ export type Token =
   | "tempo-breve"
   | "tempo-normale"
   | "tempo-lento"
-  | "opacita-spento";
+  | "tempo-entrata"
+  | "tempo-uscita"
+  | "tempo-pressione"
+  | "tempo-giro"
+  | "tempo-luccica"
+  | "tempo-cursore"
+  | "opacita-spento"
+  | "attesa-avviso"
+  | "curva-entrata"
+  | "curva-uscita"
+  | "curva-lineare"
+  | "curva-scatto"
+  | "scala-premuto"
+  | "scala-entrata"
+  | "spostamento-entrata";
 
 /** `var(--nome)` da usare negli stili in linea. */
 export const t = (n: Token) => `var(--${n})`;
@@ -519,7 +533,21 @@ export const valori: Record<Token, string> = {
   "tempo-breve": "150ms",
   "tempo-normale": "200ms",
   "tempo-lento": "400ms",
+  "tempo-entrata": "150ms",
+  "tempo-uscita": "100ms",
+  "tempo-pressione": "75ms",
+  "tempo-giro": "1200ms",
+  "tempo-luccica": "1800ms",
+  "tempo-cursore": "1000ms",
   "opacita-spento": "0.4",
+  "attesa-avviso": "4000ms",
+  "curva-entrata": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+  "curva-uscita": "cubic-bezier(0.55, 0.055, 0.675, 0.19)",
+  "curva-lineare": "linear",
+  "curva-scatto": "steps(1)",
+  "scala-premuto": "0.98",
+  "scala-entrata": "0.96",
+  "spostamento-entrata": "4px",
 };
 /** Numero di un token in px o ms. */
 export const numero = (n: Token) => parseFloat(valori[n]);
