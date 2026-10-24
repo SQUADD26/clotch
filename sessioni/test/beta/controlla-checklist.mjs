@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = fileURLToPath(new URL('./checklist/', import.meta.url));
-const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-testi': 'CTX', 'cerca-temi': 'CTE', 'cerca-modello-coda': 'CMC', 'cerca-markdown': 'CMD', 'cerca-casella': 'CCA', 'cerca-allegati': 'CAL', 'cerca-pannello': 'CPA', 'cerca-avvio-stati': 'CAS', 'cerca-filtri': 'CFI' };
+const FAMIGLIE = { barra: 'BAR', chat: 'CHAT', nuova: 'NUO', friday: 'FRI', impostazioni: 'IMP', cornice: 'COR', sovrapposti: 'SOV', movimento: 'MOV', campi: 'CAM', 'cerca-testi': 'CTX', 'cerca-temi': 'CTE', 'cerca-modello-coda': 'CMC', 'cerca-markdown': 'CMD', 'cerca-casella': 'CCA', 'cerca-allegati': 'CAL', 'cerca-pannello': 'CPA', 'cerca-avvio-stati': 'CAS', 'cerca-filtri': 'CFI', 'cerca-menu-sessione': 'CMS' };
 FAMIGLIE['cerca-intestazione'] = 'CIN';
 FAMIGLIE['cerca-dialoghi'] = 'CDI';
 FAMIGLIE['cerca-account'] = 'CAC';
