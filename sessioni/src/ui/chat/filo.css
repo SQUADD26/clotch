@@ -99,7 +99,7 @@
 .pezzo-chat .differenze .riga.aggiunta { background: var(--colore-fondo-aggiunta); color: var(--colore-testo-successo); }
 
 .pezzo-chat .file-toccati { border: var(--misura-tratto) solid var(--colore-bordo-normale); border-radius: var(--raggio-lg); overflow: hidden; }
-.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: calc(var(--raggio-lg) - var(--misura-tratto)); } /* il fuoco segue la forma dentro il bordo */
+.pezzo-chat .file-toccati .testata { padding: var(--spazio-2-5) var(--spazio-3); border-radius: var(--raggio-lg); } /* il fuoco segue la forma del riquadro, che taglia il resto */
 .pezzo-chat .file-toccati .titolo { flex: 1; min-width: 0; font-weight: 500; color: var(--colore-testo-primario); }
 .pezzo-chat .file-toccati .file {
   display: flex; align-items: center; gap: var(--spazio-2); padding: var(--spazio-1-5) var(--spazio-3);
