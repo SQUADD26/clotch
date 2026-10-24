@@ -88,6 +88,12 @@
       "area": "nuova",
       "dove": "Copia di lavoro",
       "issue": 1107
+    },
+    {
+      "voce": "COPERTO",
+      "area": "barra",
+      "dove": "avviso-comparsa",
+      "issue": 1131
     }
   ]
 }
