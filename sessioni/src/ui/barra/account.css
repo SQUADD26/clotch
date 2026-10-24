@@ -9,7 +9,7 @@
 .pezzo-barra .piede-account:hover { background: var(--colore-fondo-riga-passaggio); }
 .pezzo-barra .piede-account.aperto { background: var(--colore-fondo-riga-scelta); }
 .pezzo-barra .riga-account { display: flex; align-items: center; gap: var(--spazio-2); }
-.pezzo-barra .riga-account .apri { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); text-align: left; }
+.pezzo-barra .riga-account .apri { border-radius: var(--raggio-md); flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--spazio-2); text-align: left; }
 .pezzo-barra .account-barra .avatar {
   width: var(--misura-bottone); height: var(--misura-bottone); border-radius: var(--raggio-pieno); flex: none;
   display: flex; align-items: center; justify-content: center; color: var(--colore-testo-su-primario);

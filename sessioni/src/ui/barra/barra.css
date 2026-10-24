@@ -32,7 +32,7 @@
 /* madri, figlie e PR (101:34605): freccia dopo il titolo, indicatore PR a destra */
 .pezzo-barra .freccia-figlie { width: var(--misura-icona); height: var(--misura-icona); flex: none; }
 /* icona e freccia sono 16 px: l'area del clic cresce di 2 px per lato, 20×20 (minimo HIG macOS), l'aspetto non cambia (#962) */
-.pezzo-barra .riga-sessione > button:not(.bottone-icona) { position: relative; }
+.pezzo-barra .riga-sessione > button:not(.bottone-icona) { position: relative; border-radius: var(--raggio-sm); } /* l'anello del fuoco segue la forma (#894) */
 .pezzo-barra .riga-sessione > button:not(.bottone-icona)::before { content: ""; position: absolute; inset: calc(-1 * var(--spazio-0-5)); }
 .pezzo-barra .indicatore-pr { display: flex; align-items: center; gap: var(--spazio-1); flex: none; }
 /* il colore lo dà «colore/sessione/…» sul contenitore, non il colore di serie di Icona */
