@@ -53,7 +53,7 @@
   "raggio/lg": 12.5,
   "spazio/4": 16,
   "misura/intestazione": 56,
-  "colore/fondo/bolla": "#87401d",
+  "colore/fondo/bolla": "#7d3b1b",
   "raggio/2xl": 20,
   "spazio/2-5": 10,
   "colore/testo/bolla": "#fdf5f1",
@@ -65,7 +65,7 @@
   "raggio/xl": 15,
   "misura/pannello": 320,
   "colore/icona/successo": "#40c977",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "colore/fondo/elevato": "#2d2d2d",
   "misura/menu": 260,
   "colore/fondo/riga-passaggio": "#ffffff0d"

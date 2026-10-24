@@ -4,8 +4,7 @@
   "id": "101:12169",
   "nome": "scelta icona",
   "w": 304,
-  "h": 300,
-  "dentro": "101:12118"
+  "h": 300
  },
  "variabili": {
   "colore/fondo/elevato": "#2d2d2d",

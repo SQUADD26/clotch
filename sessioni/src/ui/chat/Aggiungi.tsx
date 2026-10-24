@@ -1,9 +1,10 @@
-// figma: 101-25845 — «menu aggiungi» della casella: Allega file… (⌘U), Imposta obiettivo, Modalità piano (⇧⇥), le skill dell'account.
+// figma: 101-25845 — «menu aggiungi» della casella: Allega file… (⌘U), Imposta obiettivo, Modalità piano (⇧⌘P), le skill dell'account.
 // Obiettivo, piano e skill sono comandi con la barra: il menu li scrive all'inizio del messaggio, come li scriverebbe Roberto.
 import { useEffect, useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { Menu, type VoceMenu } from "../base/Menu";
 import { numero } from "../base/token";
+import { NomeSopra } from "./Chip";
 import { casella } from "./percorsi";
 import type { SkillNome } from "../../tipi";
 
@@ -23,7 +24,7 @@ export function Aggiungi({ account, disabilitata, aperto, onApri, onChiudi, alle
   const voci: VoceMenu[] = [
     { icona: "graffetta", etichetta: "Allega file…", scorciatoia: "⌘U", fai: allega },
     { icona: "obiettivo", etichetta: "Imposta obiettivo", fai: () => comando("/goal ") },
-    { icona: "libro", etichetta: "Modalità piano", scorciatoia: "⇧⇥", fai: () => comando("/plan ") },
+    { icona: "libro", etichetta: "Modalità piano", scorciatoia: "⇧⌘P", fai: () => comando("/plan ") },
     ...(skill.length ? [
       "separatore" as const, { gruppo: "Skill" },
       ...(tutte ? skill : skill.slice(0, SKILL_VISTE)).map((s): VoceMenu => ({ icona: "scintille", etichetta: s.nome, fai: () => comando(`/${s.nome} `) })),
@@ -32,8 +33,10 @@ export function Aggiungi({ account, disabilitata, aperto, onApri, onChiudi, alle
   ];
   return (
     <span className="aggiungi">
-      <BottoneIcona icona="piu" etichetta="Aggiungi" disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
-        onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
+      <NomeSopra testo="Aggiungi">
+        <BottoneIcona icona="piu" etichetta="Aggiungi" title={undefined} disabled={disabilitata} aria-expanded={aperto} aria-haspopup="menu"
+          onMouseDown={(e) => e.stopPropagation()} onClick={() => (aperto ? onChiudi() : onApri())} />
+      </NomeSopra>
       {aperto && <Menu voci={voci} lato="sopra" scarto={numero("spazio-2")} classe="menu-aggiungi" onChiudi={onChiudi} />}
     </span>
   );
