@@ -3194,7 +3194,7 @@
    "box": {
     "x": 373,
     "y": 453,
-    "w": 176,
+    "w": 132,
     "h": 18
    },
    "variabili": {
@@ -3203,7 +3203,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Claude ha ragionato per 14 s",
+   "testo": "Ho ragionato per 14 s",
    "font": "SF Pro Regular"
   },
   {
@@ -3211,7 +3211,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 555,
+    "x": 511,
     "y": 454,
     "w": 16,
     "h": 16
@@ -3227,7 +3227,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 558.33203125,
+    "x": 514.33203125,
     "y": 459.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3331,7 +3331,7 @@
    "box": {
     "x": 373,
     "y": 529,
-    "w": 179,
+    "w": 135,
     "h": 18
    },
    "variabili": {
@@ -3340,7 +3340,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Claude ha usato 12 strumenti",
+   "testo": "Ho usato 12 strumenti",
    "font": "SF Pro Regular"
   },
   {
@@ -3348,7 +3348,7 @@
    "nome": "durata",
    "tipo": "TEXT",
    "box": {
-    "x": 558,
+    "x": 514,
     "y": 529,
     "w": 35,
     "h": 18
@@ -3367,7 +3367,7 @@
    "nome": "freccia",
    "tipo": "INSTANCE",
    "box": {
-    "x": 599,
+    "x": 555,
     "y": 530,
     "w": 16,
     "h": 16
@@ -3383,7 +3383,7 @@
    "nome": "forma",
    "tipo": "VECTOR",
    "box": {
-    "x": 602.33203125,
+    "x": 558.33203125,
     "y": 535.3330078125,
     "w": 9.333883285522461,
     "h": 5.333883762359619
@@ -3513,7 +3513,7 @@
    "box": {
     "x": 414,
     "y": 557,
-    "w": 36,
+    "w": 37,
     "h": 18
    },
    "variabili": {
@@ -3522,7 +3522,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Cerca",
+   "testo": "Cerco",
    "font": "SF Pro Regular"
   },
   {
@@ -3530,7 +3530,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 454,
+    "x": 455,
     "y": 557,
     "w": 128,
     "h": 18
@@ -3651,7 +3651,7 @@
    "box": {
     "x": 414,
     "y": 585,
-    "w": 38,
+    "w": 39,
     "h": 18
    },
    "variabili": {
@@ -3660,7 +3660,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Legge",
+   "testo": "Leggo",
    "font": "SF Pro Regular"
   },
   {
@@ -3668,7 +3668,7 @@
    "nome": "oggetto",
    "tipo": "TEXT",
    "box": {
-    "x": 456,
+    "x": 457,
     "y": 585,
     "w": 108,
     "h": 18
@@ -3798,7 +3798,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Esegue un comando",
+   "testo": "Eseguo un comando",
    "font": "SF Pro Regular"
   },
   {
@@ -4034,7 +4034,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Esegue un comando",
+   "testo": "Eseguo un comando",
    "font": "SF Pro Regular"
   },
   {
@@ -4172,7 +4172,7 @@
     "lineHeight": "testo/riga/sm"
    },
    "senza": [],
-   "testo": "Fotografa",
+   "testo": "Fotografo",
    "font": "SF Pro Regular"
   },
   {
