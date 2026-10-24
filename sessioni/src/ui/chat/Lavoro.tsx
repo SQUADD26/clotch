@@ -113,7 +113,7 @@ export function NonRisponde({ da, terminale }: { da: string; terminale?: () => v
 
 export function Limite({ account, ripartenza }: { account: string | null; ripartenza: string | null }) {
   const corpo = [
-    account && ripartenza ? `L'account ${account} riparte alle ${ripartenza}.` : null,
+    account && ripartenza ? `L’account ${account} riparte alle ${ripartenza}.` : null,
     "Puoi riprendere la sessione da un altro account.",
   ].filter(Boolean).join(" ");
   return <AvvisoFilo tipo="errore" titolo="Limite di uso raggiunto" corpo={corpo} />;

@@ -47,7 +47,7 @@ export function Ambiente({ s }: { s: Sessione }) {
         <div className="riga-info">
           <Icona nome="telefonino" /><span className="t-sm testo">Controllo remoto</span>
           {/* solo lettura: lo si cambia dall'app Claude, i suoi file non si scrivono da qui */}
-          <span role="switch" aria-checked={s.app.remoto} aria-readonly title="Si cambia dall'app Claude" className={`interruttore ${s.app.remoto ? "acceso" : ""}`}><span className="manopola" /></span>
+          <span role="switch" aria-checked={s.app.remoto} aria-readonly title="Si cambia dall’app Claude" className={`interruttore ${s.app.remoto ? "acceso" : ""}`}><span className="manopola" /></span>
         </div>
       )}
     </Scheda>
