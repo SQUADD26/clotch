@@ -131,3 +131,30 @@ private extension Dictionary where Key == String, Value == String {
     /// #299: the built-in English words sit in every list; these tests are about the files.
     var withoutBuiltIn: [String: String] { filter { VoiceTurn.builtInPronunciation[$0.key] == nil } }
 }
+
+/// clotch#1130: «usa questa voce» from Friday.
+final class VoiceSetTests: XCTestCase {
+    private let voices = [(name: "Giulia Rossi", id: "abc111"), (name: "Marco", id: "xyz222")]
+    private var files: VoiceFiles!
+
+    override func setUp() {
+        files = VoiceFiles(home: FileManager.default.temporaryDirectory.appendingPathComponent("voce-\(UUID().uuidString)"))
+    }
+
+    func testIdNameAndPrefixWriteTheId() async throws {
+        for (ask, want) in [("xyz222", "xyz222"), ("marco", "xyz222"), ("giu", "abc111")] {
+            let o = await VoiceSet.apply(ask, files: files) { self.voices }
+            XCTAssertEqual(o, .set(want))
+            XCTAssertEqual(try files.readConfig()["voice_id"] as? String, want)
+        }
+    }
+
+    func testUnknownNameAndBadAskWriteNothing() async throws {
+        try files.updateConfig(["voice_id": "vecchia"])
+        for ask in ["Sconosciuta", "", String(repeating: "a", count: 101)] {
+            let o = await VoiceSet.apply(ask, files: files) { self.voices }
+            guard case .rejected = o else { return XCTFail("\(ask)") }
+        }
+        XCTAssertEqual(try files.readConfig()["voice_id"] as? String, "vecchia")
+    }
+}
