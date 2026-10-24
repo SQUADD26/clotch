@@ -76,7 +76,18 @@ app.whenReady().then(() => {
   let apri!: () => void;
   const dopo = new Promise<void>((ok) => { apri = ok; });
   const pronte = dopo.then(() => caricaSessioni());
-  ipcMain.handle("sessioni:elenco", async () => { await pronte; return elenco(); });
+  // finché il worker legge, la finestra mostra l'elenco dell'avvio di prima (#474); a lettura finita lo rilegge (aggiornamento senza `elenco`)
+  const fileCache = path.join(app.getPath("userData"), "avvio-cache.json");
+  let pronto = false, inCache: ReturnType<typeof sessioni.elencoInCache> | undefined;
+  void pronte.then(() => {
+    pronto = true;
+    const ids = sessioni.elencoSessioni().sessioni.map((s) => s.id);
+    if (inCache) BrowserWindow.getAllWindows().forEach((w) => w.webContents.send("sessioni:aggiornamento", { sessioni: ids, nuoviMessaggi: [] }));
+  });
+  ipcMain.handle("sessioni:elenco", async () => {
+    if (!pronto && (inCache ??= sessioni.elencoInCache(fileCache))) return inCache;
+    await pronte; return elenco();
+  });
   ipcMain.handle("sessioni:info", async (_e, id: string) => { await pronte; return infoSessione(sessioni.elencoSessioni().sessioni.find((x) => x.id === String(id))); });
   const indice = collegaIndice(ipcMain, sessioni, pronte);
   ipcMain.handle("sessioni:messaggi", async (_e, id: string, pagina: number, opzioni?: OpzioniCronologia) => {
@@ -123,7 +134,7 @@ app.whenReady().then(() => {
       const sparite = [...ids].some((id) => !per.has(id)); // fuori dall'elenco = fuori dall'indice
       if (ids.size) indice.metti(sparite ? el : el.filter((s) => ids.has(s.id)), sparite);
       avvisa(a);
-    });
+    }, fileCache);
     // dopo l'osservatore: da qui l'elenco è il suo
     avvisa = collegaAvvisi(() => sessioni.elencoSessioni().sessioni, impostazioniApp);
     barraMenu();
