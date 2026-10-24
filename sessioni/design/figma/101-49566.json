@@ -4,8 +4,7 @@
   "id": "101:49566",
   "nome": "via dal mac",
   "w": 250,
-  "h": 70,
-  "dentro": "101:49194"
+  "h": 70
  },
  "variabili": {
   "colore/fondo/riga-passaggio": "#ffffff0d",

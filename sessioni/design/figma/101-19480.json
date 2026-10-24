@@ -41,12 +41,12 @@
   "colore/bordo/normale": "#ffffff15",
   "colore/icona/terziaria": "#ffffff82",
   "colore/testo/successo": "#40c977",
-  "colore/testo/errore": "#ff6764",
+  "colore/testo/errore": "#ff7673",
   "colore/fondo/errore": "#fa423e29",
   "colore/fondo/aggiunta": "#40c97729",
   "misura/riga": 32,
   "colore/fondo/riga-passaggio": "#ffffff0d",
-  "colore/fondo/accento": "#d25e28",
+  "colore/fondo/accento": "#c15625",
   "raggio/xs": 5,
   "colore/icona/su-accento": "#ffffff",
   "colore/bordo/forte": "#ffffff28",
@@ -67,7 +67,7 @@
   "colore/fondo/cornice": "#232323",
   "misura/pannello": 320,
   "colore/bordo/leggero": "#ffffff0b",
-  "colore/bordo/errore": "#ff6764"
+  "colore/bordo/errore": "#ff7673"
  },
  "nodi": [
   {
