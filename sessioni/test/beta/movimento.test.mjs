@@ -59,4 +59,6 @@ test('M10: un\'uscita che accelera dopo il gesto non è un salto', () => {
   const esce = anim({ dove: 'div.sovrapposto.tooltip.esce', serie: [[0, 1, 0, 0, 1], [33, 0.95, 0, 0, 1], [66, 0.8, 0, 0, 1], [100, 0.5, 0, 0, 1], [133, 0.15, 0, 0, 1], [166, 0, 0, 0, 1]] });
   assert.deepEqual(criteri(difettiInterruzione({ eventi: [80], animazioni: [esce] })), []);
 });
+test('interruzione: un salto sotto un decimo di opacità non si vede (#998)', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 1, 0, 0, 1], [16, 0.95, 0, 0, 1], [32, 0.89, 0, 0, 1], [48, 0.95, 0, 0, 1]] })] })), []));
+
 test('interruzione con salto', () => assert.deepEqual(criteri(difettiInterruzione({ animazioni: [anim({ serie: [[0, 0, 0, 0, 1], [16, 0.2, 0, 0, 1], [32, 1, 0, 0, 1]] })] })), ['M10']));
