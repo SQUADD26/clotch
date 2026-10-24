@@ -89,7 +89,11 @@ export async function avvia(fileScena, { video } = {}) {
     });
     const pagina = await app.firstWindow();
     // finestra caricata prima che Playwright si attacchi (visto in CI): la pagina resta senza contesto, un ricarico la sblocca
-    if (!(await pagina.waitForSelector('.cornice', { timeout: 10000 }).then(() => true, () => false))) await pagina.reload({ timeout: 20000 });
+    if (!(await pagina.waitForSelector('.cornice', { timeout: 10000 }).then(() => true, () => false))) {
+      const stato = await app.evaluate(async ({ BrowserWindow }) => Promise.all(BrowserWindow.getAllWindows().map(async (w) => ({ url: w.webContents.getURL(), carica: w.webContents.isLoading(), crash: w.webContents.isCrashed(), dom: await Promise.race([w.webContents.executeJavaScript('document.readyState + " " + !!document.querySelector(".cornice")'), new Promise((ok) => setTimeout(() => ok('js fermo'), 3000))]) }))));
+      console.log('avvio lento, stato delle finestre:', JSON.stringify(stato));
+      await pagina.reload({ timeout: 20000 });
+    }
     await pagina.waitForSelector('.cornice:not(.in-avvio)', { timeout: 20000 }).catch(() => {});
     return { app, pagina, chiudi: async () => { await app.close().catch(() => {}); rmSync(home, { recursive: true, force: true }); rilasciaLock(); } };
   } catch (e) { rmSync(home, { recursive: true, force: true }); rilasciaLock(); throw e; }

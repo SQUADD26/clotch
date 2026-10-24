@@ -65,7 +65,7 @@ jobs:
       - name: Clicca tutto (${{ matrix.area }}, matrice completa)
         env:
           DEBUG: pw:browser
-        run: node test/beta/clicca.mjs --area ${{ matrix.area }} --matrice --video --out beta-giro
+        run: node test/beta/clicca.mjs --area ${{ matrix.area }} --matrice ${{ matrix.area != 'cornice' && '--video' || '' }} --out beta-giro
       - name: Giudica
         env:
           GH_TOKEN: ${{ github.token }}
