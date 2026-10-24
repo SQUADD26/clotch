@@ -67,6 +67,7 @@ async function giro(app, area, cfg, console_) {
     if (!tipo) continue;
     // stati: riposo, mouse sopra, premuto (il rilascio è il clic); uguale al precedente = stato mancante
     const disab = await loc.evaluate((e) => e.disabled || e.getAttribute('aria-disabled') === 'true', null, { timeout: 2000 }).catch(() => false);
+    await loc.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {}); // prima di misurare: il riquadro vale dopo lo scorrimento
     const box = await loc.boundingBox(), clip = box && { x: Math.max(0, box.x - 4), y: Math.max(0, box.y - 4), width: box.width + 8, height: box.height + 8 };
     const pezzo = () => (clip ? pagina.screenshot({ clip, timeout: 3000 }).catch(() => null) : null);
     const uguali = (a, b) => a && b && a.equals(b);
@@ -97,13 +98,13 @@ async function giro(app, area, cfg, console_) {
     // tastiera: in un campo si scrive e si svuota; un sovrapposto aperto si percorre con le frecce, Esc lo chiude e il fuoco torna a chi l'ha aperto
     if (tipo === 'campo') { await loc.fill('Collaudo beta').catch(() => {}); el.foto.push(await foto(`el${i}-scritto`)); await loc.fill('').catch(() => {}); }
     else if (tipo === 'tab') { await pagina.keyboard.press('ArrowRight'); el.foto.push(await foto(`el${i}-freccia`)); }
-    const aperti = await pagina.evaluate(() => window.__bt.menuAperti());
+    const aperti = await pagina.evaluate(() => window.__bt.menuAperti()), nomiAperti = aperti ? await pagina.evaluate(() => window.__bt.nomiAperti()) : '';
     if (aperti && tipo !== 'campo') {
       await pagina.keyboard.press('ArrowDown'); el.foto.push(await foto(`el${i}-freccia`));
       await pagina.keyboard.press('Escape'); await pausa(450);
       const dopo = await pagina.evaluate(() => ({ aperti: window.__bt.menuAperti(), fuoco: document.activeElement?.getAttribute('data-bt') }));
       if (dopo.aperti) reg.difetti.push({ criterio: 'ESC', dove: el.dove, valore: 'Esc non chiude il sovrapposto', quando: el.dove, foto: el.foto.at(-1) });
-      else if (dopo.fuoco !== String(i)) reg.difetti.push({ criterio: 'FUOCO-RITORNO', dove: el.dove, valore: 'dopo Esc il fuoco non torna al pulsante che ha aperto', quando: el.dove, foto: el.foto.at(-1) });
+      else if (dopo.fuoco !== String(i)) reg.difetti.push({ criterio: 'FUOCO-RITORNO', dove: el.dove, valore: `dopo Esc il fuoco non torna al pulsante che ha aperto ${nomiAperti}`, quando: el.dove, foto: el.foto.at(-1) });
       if (VIDEO && !dopo.aperti) { // M10: si riapre e si interrompe a metà con Esc
         const c = pagina.evaluate(() => window.__bt.campiona(500)).catch(() => null);
         await loc.click({ timeout: 1000 }).catch(() => {}); await pausa(60); await pagina.keyboard.press('Escape');

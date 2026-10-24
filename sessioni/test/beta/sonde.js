@@ -146,6 +146,7 @@
     sopra,
     // menu, popover e dialoghi aperti da un gesto: tooltip e avvisi a comparsa non si chiudono con Esc né prendono il fuoco
     menuAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).length,
+    nomiAperti: () => sopra().filter((e) => !e.matches(SECONDARI)).map(sel).join(', '),
     firma: (radice) => [...document.querySelectorAll(`${radice} :is(${CLIC})`)].filter(vis).length + '|' + sopra().length + '|' + location.search,
   };
 })();
