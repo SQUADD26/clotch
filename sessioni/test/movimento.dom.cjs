@@ -1,6 +1,6 @@
 // Movimento (#520): ogni cosa animata, misurata fotogramma per fotogramma con document.getAnimations() e requestAnimationFrame.
 // Durata e curva devono essere quelle dei token (tempo/*, curva/*); con «riduci movimento» niente spostamenti né infinite.
-// Finestra visibile sotto xvfb (una finestra nascosta salta le View Transition), muta. Stampa una riga «MOV …» per misura.
+// Finestra visibile sotto xvfb con il fuoco (senza fuoco le View Transition non partono), muta. Stampa una riga «MOV …» per misura.
 const { app, BrowserWindow, ipcMain } = require('electron');
 process.env.CLOTCH_TEST_SILENT = '1';
 app.commandLine.appendSwitch('mute-audio');
@@ -30,13 +30,14 @@ const REGISTRA = `window.registra = (fai, ms) => new Promise((fine) => {
 
 app.whenReady().then(async () => {
   collegaScena(ipcMain, scene);
-  const win = new BrowserWindow({ show: true, focusable: false, width: 1440, height: 900,
+  const win = new BrowserWindow({ show: true, width: 1440, height: 900,
     webPreferences: { preload: path.join(root, 'dist/src/preload.js'), contextIsolation: true, backgroundThrottling: false } });
   const run = (fn) => win.webContents.executeJavaScript(typeof fn === 'string' ? fn : `(${fn})()`);
   const wait = async (test, ms = 8000) => { const fine = Date.now() + ms; while (!(await run(test))) { if (Date.now() > fine) throw new Error('Condizione UI non raggiunta: ' + test); await new Promise((r) => setTimeout(r, 20)); } };
   try {
     await win.loadFile(path.join(root, 'renderer/index.html'));
-    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden);
+    win.focus(); win.webContents.focus(); // le transizioni partono solo nella finestra che ha il fuoco
+    await wait(() => !!document.querySelector('.barra-laterale .riga') && !document.hidden && document.hasFocus());
     await run(REGISTRA + ";0");
     const tok = await run(() => Object.fromEntries(['tempo-entrata', 'tempo-uscita', 'tempo-pressione', 'tempo-spostamento', 'curva-entrata', 'curva-uscita', 'curva-spostamento', 'scala-premuto']
       .map((n) => [n, getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim()])));
