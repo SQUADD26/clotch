@@ -1,0 +1,10 @@
+/* figma: 101-30345. Copre il corpo con lo stesso fondo della finestra (niente lampo); la barra del titolo resta sopra. */
+.avvio { position: absolute; inset: 0; z-index: 0; display: grid; place-items: center; background: var(--colore-fondo-cornice); }
+.barra-titolo { position: relative; z-index: 1; }
+.logo {
+  width: var(--misura-logo); height: var(--misura-logo); border-radius: var(--raggio-lg);
+  display: grid; place-items: center; background: var(--colore-fondo-accento);
+}
+.logo .icona { width: var(--misura-logo-icona); height: var(--misura-logo-icona); }
+/* nell'avvio la barra mostra solo semaforo e navigazione, come il frame: attività e comandi globali tornano a lettura finita */
+.in-avvio .barra-titolo > :not(.semaforo, .navigazione) { visibility: hidden; }

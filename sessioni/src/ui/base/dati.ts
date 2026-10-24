@@ -43,9 +43,14 @@ export function useAggiornamenti(cb: (a: Aggiornamento) => void) {
   useEffect(() => api().onAggiornamento((a) => ultimo.current(a)), []);
 }
 
+let primaLettura: Promise<Elenco> | null = null;
+/** La prima lettura dell'elenco è una sola: la schermata di avvio (Cornice) e la barra la condividono, il disco si legge una volta. */
+export const primoElenco = () => (primaLettura ??= api().elencoSessioni());
+
 /** Elenco delle sessioni, ricaricato in silenzio quando una cambia. `dati.errori` = cartelle non lette. */
 export function useElenco() {
-  const c = useChiamata<Elenco>(() => api().elencoSessioni(), []);
+  const prima = useRef(true);
+  const c = useChiamata<Elenco>(() => (prima.current ? (prima.current = false, primoElenco()) : api().elencoSessioni()), []);
   useAggiornamenti((a) => { if (a.sessioni.length) c.ricarica(); });
   return c;
 }

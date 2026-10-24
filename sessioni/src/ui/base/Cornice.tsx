@@ -1,4 +1,4 @@
-// figma: 101-8036 — «Sessione aperta · 1440» (e 101-8610 a 1024): barra del titolo e tre colonne con i punti di montaggio.
+// figma: 101-8036, 101-30345 (avvio) — «Sessione aperta · 1440» (e 101-8610 a 1024): barra del titolo e tre colonne con i punti di montaggio.
 import { useEffect, useRef, useState } from "react";
 import Barra from "../barra";
 import Chat, { Intestazione as IntestazioneChat } from "../chat";
@@ -6,6 +6,7 @@ import Friday, { Intestazione as IntestazioneFriday } from "../friday";
 import Impostazioni from "../impostazioni";
 import Pannello from "../pannello";
 import { AreaAvvisi } from "./Avvisi";
+import { Avvio, useAvvio } from "./Avvio";
 import { useAspetto } from "./aspetto";
 import { BarraTitolo } from "./BarraTitolo";
 import { Pezzo } from "./Pezzo";
@@ -56,11 +57,13 @@ function Corpo() {
 
 export function Cornice() {
   useAspetto();
+  const avvio = useAvvio();
   return (
     <ConNavigazione>
-      <div className="cornice">
+      <div className={avvio ? "cornice in-avvio" : "cornice"}>
         <BarraTitolo />
         <Corpo />
+        {avvio && <Avvio />}
       </div>
     </ConNavigazione>
   );
