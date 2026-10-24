@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BottoneIcona } from "../base/Bottone";
 import { api } from "../base/dati";
 import { Menu } from "../base/Menu";
+import { comanda } from "./clotch-ai";
 import { Markdown, senzaMarkdown } from "./Markdown";
 import { useRiserva } from "./riserva";
 import "./filo.css";
@@ -16,6 +17,7 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
   const [copiato, setCopiato] = useState(prova);
   const [menu, setMenu] = useState(prova);
   const copia = (t: string) => navigator.clipboard.writeText(t).then(() => { setCopiato(true); setTimeout(() => setCopiato(false), 1500); });
+  const leggi = () => void comanda("voce_leggi", { testo: senzaMarkdown(testo) });
   return (
     <div className="risposta">
       <div className="testo-risposta"><Markdown testo={testo} />{inScrittura && <span className="cursore" />}</div>
@@ -25,14 +27,15 @@ export function Risposta({ testo: grezzo, inScrittura, sessione, prova = false }
             <BottoneIcona icona={copiato ? "spunta" : "copia"} etichetta="Copia" onClick={() => copia(senzaMarkdown(testo))} />
             {copiato && <span className="suggerimento">Copiato</span>}
           </span>
-          {/* shortcut: nessun comando di clotch AI legge un testo ad alta voce (COMANDI in src/clotch-ai.ts); il bottone torna attivo quando c'è */}
-          <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" disabled />
+          {/* shortcut: legge la voce dell'app (`say`), non quella di Clotch: il motore non ha un comando che legga un testo (proposta: `leggi {testo}`) */}
+          <BottoneIcona icona="microfono" etichetta="Leggi con clotch AI" className="al-passaggio" onClick={leggi} />
           <span className="con-menu al-passaggio">
             <BottoneIcona icona="altro" etichetta="Altro" className={menu ? "aperto" : ""} onClick={() => setMenu(!menu)} />
             {menu && (
               <Menu onChiudi={() => setMenu(false)} style={{ bottom: "100%", left: 0 }} voci={[
                 { icona: "copia", etichetta: "Copia testo", fai: () => copia(senzaMarkdown(testo)) },
                 { icona: "file", etichetta: "Copia come Markdown", fai: () => copia(testo) },
+                { icona: "microfono", etichetta: "Leggi con clotch AI", fai: leggi },
                 "separatore",
                 { icona: "finder", etichetta: "Mostra nel file della sessione", fai: () => { if (sessione) void api().azione(sessione, "mostra-nel-finder"); } },
               ]} />
