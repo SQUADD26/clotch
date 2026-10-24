@@ -77,7 +77,8 @@ app.whenReady().then(() => {
     return;
   }
   impostaIdentita();
-  ipcMain.handle("sessioni:menu-barra", (_e, aperta: unknown) => aggiornaMenu({ barra: aperta === true })); // anche nelle scene: la voce segue la barra (#867)
+  // anche nelle scene: la voce segue la barra (#867). Senza risposta (send): una pagina di prova senza questo canale non vede errori
+  ipcMain.on("sessioni:menu-barra", (e, aperta: unknown) => { try { verificaChiamante(e as unknown as Electron.IpcMainInvokeEvent); aggiornaMenu({ barra: aperta === true }); } catch (err) { registra(`sessioni:menu-barra: ${testoErrore(err)}`); } });
   if (scena) { collegaScena(ipcMain, scena); return parita(idParita!, scena.navigazione); }
   if (scenaProva) { collegaScena(ipcMain, scenaProva); apriFinestra(undefined, { query: scenaProva.navigazione }); return; }
   // Nessuna lettura di sessioni prima della prima finestra, e mai nel main (#463): i canali sono già registrati,

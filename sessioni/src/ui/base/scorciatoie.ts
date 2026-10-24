@@ -46,7 +46,7 @@ export function useScorciatoie() {
   // la voce «Nascondi/Mostra barra laterale» del menu segue la barra della finestra davanti
   const { barraAperta } = n;
   useEffect(() => {
-    const manda = () => void api().menuBarra(barraAperta).catch(() => {});
+    const manda = () => api().menuBarra(barraAperta);
     manda();
     addEventListener("focus", manda);
     return () => removeEventListener("focus", manda);

@@ -20,9 +20,9 @@ H.avvia('requisiti-a', async () => {
     nuova((s) => { const c = s.registro.chat.s1; c.stato = 'serve_roberto'; c.richieste = [{ rid: 'r1', genere: 'permesso', strumento: 'Bash', ingresso: { command: 'ls' }, domande: [] }];
       s.registro.chat.c2 = { ...c, chat: 'c2', titolo: 'Seconda', richieste: [] }; });
     await caricaChat(); await wait(() => document.querySelector('.bottone-attivita .contatore')?.textContent === '2');
-    await clicca('button', 'Mostra attività'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
+    await clicca('button', 'Mostra attività, 2 in attesa'); await wait(() => !!document.querySelector('[role=dialog][aria-label="Attività"]'));
     await tasto('body', { key: 'Escape' }); await wait(() => !document.querySelector('.popover-attivita'));
-    await clicca('button', 'Mostra attività'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
+    await clicca('button', 'Mostra attività, 2 in attesa'); await clicca('.popover-attivita button', 'Chiudi'); await wait(() => !document.querySelector('.popover-attivita'));
   });
 
   await req('A25', async () => {

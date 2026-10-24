@@ -158,7 +158,7 @@ export interface SessioniApi {
   impostaImpostazioni(parte: Record<string, unknown>): Promise<void>;
   onImpostazioni(cb: (i: Record<string, unknown>) => void): () => void;
   /** La barra laterale della finestra davanti è aperta: la voce del menu dice «Nascondi» o «Mostra» (#867). */
-  menuBarra(aperta: boolean): Promise<void>;
+  menuBarra(aperta: boolean): void;
   /** Voce del menu del Mac scelta (#867): il nome dell'azione, come nelle scorciatoie. */
   onMenu(cb: (azione: string) => void): () => void;
   /** Ricerca nell'indice del main (#368): titoli e testo di utente e assistente, al massimo 50 righe. */
