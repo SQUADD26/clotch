@@ -35,3 +35,10 @@
 .pezzo-chat .ricerca-avvio input::placeholder { color: var(--colore-testo-secondario); }
 .pezzo-chat .menu-avvio .valore { min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
 .pezzo-chat .menu-avvio .vuoto { padding: var(--spazio-3) var(--spazio-2); text-align: center; font-size: var(--testo-dimensione-sm); line-height: var(--testo-riga-sm); color: var(--colore-testo-secondario); }
+
+/* selettore aperto: passaggio e premuto si vedono anche con il fondo del «Aperto» (stessi token dei bottoni pieni) */
+.pezzo-chat .selettore.aperto:hover { opacity: var(--opacita-passaggio); }
+.pezzo-chat .selettore.aperto:active { opacity: var(--opacita-premuto); }
+/* un controllo spento non inghiotte il clic: passa al contenitore e chiude i menu aperti */
+.pezzo-chat .nuova-sessione .bottone-invia:disabled { pointer-events: none; }
+.pezzo-chat .nuova-sessione .bottone-icona[aria-disabled="true"] { opacity: var(--opacita-spento); cursor: default; }
