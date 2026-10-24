@@ -7,7 +7,7 @@ export const GRUPPI: Gruppo[] = [
   { titolo: "Navigazione", colonna: 0, righe: [
     { etichetta: "Cerca sessioni", azione: "cerca" }, { etichetta: "Prossima sessione in attesa", azione: "prossima" },
     { etichetta: "Sessione precedente", fisso: "⌃↑" }, { etichetta: "Sessione successiva", fisso: "⌃↓" },
-    { etichetta: "Mostra barra laterale", azione: "barra" }, { etichetta: "Trova nella sessione", azione: "trova" },
+    { etichetta: "Mostra o nascondi barra laterale", azione: "barra" }, { etichetta: "Cerca nella sessione", azione: "trova" },
   ] },
   { titolo: "Generale", colonna: 0, righe: [
     { etichetta: "Apri impostazioni", azione: "impostazioni" }, { etichetta: "Mostra scorciatoie", fisso: "⌘/" },
@@ -18,7 +18,7 @@ export const GRUPPI: Gruppo[] = [
     { etichetta: "Archivia", fisso: "⇧⌘A" }, { etichetta: "Copia ultimo blocco di codice", fisso: "⇧⌘;" },
   ] },
   { titolo: "Casella", colonna: 1, righe: [
-    { etichetta: "Invia (interrompe la sessione)", azione: "inviaInterrompi" }, { etichetta: "Metti in coda", azione: "coda" },
+    { etichetta: "Interrompi e invia", azione: "inviaInterrompi" }, { etichetta: "Metti in coda", azione: "coda" },
     { etichetta: "A capo", fisso: "⇧↵" }, { etichetta: "Allega file", fisso: "⌘U" }, { etichetta: "Comandi", fisso: "/" }, { etichetta: "File", fisso: "@" },
   ] },
 ];

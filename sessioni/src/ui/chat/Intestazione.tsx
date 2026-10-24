@@ -14,7 +14,7 @@ import { SORGENTE, nomeAccount, provaDi } from "./testi";
 import "./intestazione.css";
 
 const STATO: Record<StatoSegno, string> = {
-  lavora: "In corso", aspetta: "In attesa di te", ferma: "Ferma", finita: "Finita", errore: "Non risponde",
+  lavora: "In corso", aspetta: "In attesa di te", ferma: "In pausa", finita: "Finita", errore: "Non risponde",
 };
 
 export function TestaSessione({ s, nonRisponde, pref }: { s: Sessione; nonRisponde: boolean; pref?: PreferenzeSessione }) {

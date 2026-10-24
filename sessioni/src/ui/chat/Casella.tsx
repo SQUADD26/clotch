@@ -46,8 +46,8 @@ function Coda({ voci, modifica, onModifica, chat, suggerimento, attuale, prefere
           {i === 0 && <span className="etichetta">{quanti(voci.length, "messaggio in coda", "messaggi in coda")}</span>}
           <span className="testo">{v.testo}</span>
           <div className="azioni">
-            <Suggerimento testo="Interrompi e manda ora" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
-              <BottoneIcona icona="invia-ora" etichetta="Interrompi e manda ora" onClick={() => subito(v)} />
+            <Suggerimento testo="Interrompi e invia" scorciatoia="↵" classe="suggerimento" lato="sopra" allinea="fine" scarto={numero("spazio-1")} forzato={suggerimento && i === 0}>
+              <BottoneIcona icona="invia-ora" etichetta="Interrompi e invia" onClick={() => subito(v)} />
             </Suggerimento>
             <BottoneIcona icona="matita" etichetta="Modifica" onClick={() => onModifica(v)} />
             <BottoneIcona icona="chiudi" etichetta="Rimuovi" onClick={() => comanda("coda_togli", { chat, voce: v.voce })} />
